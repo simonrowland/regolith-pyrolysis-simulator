@@ -1,0 +1,4338 @@
+schema_version: literature_extract.v1
+source_id: gaillard-2003-hydrogen-iron-redox-rate
+figure_policy: Figures are deferred to a figure pass; figure records contain no numeric points.
+source:
+  citation: Gaillard, F., Schmidt, B., Mackwell, S. and McCammon, C. (2003). Rate of hydrogen-iron redox exchange
+    in silicate melts and glasses. Geochimica et Cosmochimica Acta 67(13), 2427-2441.
+  doi: 10.1016/S0016-7037(02)01407-2
+  year: 2003
+  corpus_asset: raw/gaillard-2003-hydrogen-iron-redox-rate/gaillard-2003-hydrogen-iron-redox-rate.pdf
+  sha256: 664cadf15198f52522432bfef60efe7039fe676e2bb5b1c06351e49125853c7b
+  doi_as_printed: 10.1016/S0016-7037(00)01407-2 (printed DOI contains a year-code typo; repository sidecar gives
+    02)
+extraction:
+  method: Born-digital paper; pdftotext-layout.txt used as the table-text source. The source folder has no MinerU
+    table content-list, and the table tool only drafts from MinerU inputs, so Tables 1-4 were hand-transcribed and
+    checked against 600 dpi renders of physical PDF pages 2, 3, 4 and 9. Figures 1-10 were inspected on 600 dpi
+    renders of pages 5-10, 12 and 13 and are deferred without numeric points. Table 1's whole-glass wt% composition
+    is retained in context because no existing quantity names starting-glass composition; the Fe3+/Fetot cell is
+    typed as a valence fraction. Tables 2-3 front distances and durations have no matching quantity token and are
+    retained row-by-row in context; fH2 and initial pH2/pAr are typed under existing fugacity/partial-pressure quantities.
+    Table 4's measured log K has no matching quantity token and its solubility/diffusivity/alpha columns are model-derived,
+    so the printed rows and equations are retained in context. Table 2's log fO2 is stored as a bare point_conditions.fO2_log;
+    the controller directed use of the existing bar convention and a locator note because the paper omits an atm/bar
+    reference. The 13 higher/lower fH2 brackets remain typed as Value intervals in the extract; the current migrator
+    does not select interval-valued fugacity, so those migrate unavailable rather than choosing an endpoint.
+  date: '2026-10-19'
+  worker: fam14b-1019
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[gaillard_2003_table1_fe3_over_fetot].values.value
+  value: '0.2'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2428
+    table: '1'
+    row: starting obsidian
+    column: Fe3+/Fetot
+- path: species.H2.observations[gaillard_t2_run03_h2_fugacity].values.value
+  value: '0.02'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 2429
+    table: '2'
+    row: '3'
+    column: fH2
+- path: species.H2.observations[gaillard_t3_run26_H2_initial_partial_pressure].values.pressure_bar
+  value: 10
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 2430
+    table: '3'
+    row: '26'
+    column: pH2
+species:
+  Fe:
+    observations:
+    - observation_id: gaillard_2003_table1_fe3_over_fetot
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2428
+        table: '1'
+        row: starting obsidian
+        column: Fe3+/Fetot
+      phase: glass
+      units: fraction
+      uncertainty:
+        value: '0.05'
+        units: fraction
+        as_printed: '0.05'
+        confidence_level: not_stated
+        notice: The table footnote identifies the second row as standard deviation or uncertainty but does not specify
+          which statistic applies to Fe3+/Fetot.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2428
+          table: '1'
+          row: second row
+          column: Fe3+/Fetot
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        method_as_printed: Mössbauer spectroscopy
+        value: '0.2'
+        value_as_published: '0.2'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 1 characterizes the starting obsidian and reports no measurement temperature.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Table 1 reports starting natural obsidian; no quench-preservation statement is given.
+    context:
+    - observation_id: gaillard_2003_table1_starting_glass_composition_context
+      type: measured_table_context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2428
+        table: '1'
+      units: wt% except Fe3+/Fetot fraction
+      values:
+        quantity_as_printed: composition of starting obsidian
+        quantity_token: unavailable for the whole-glass wt% composition
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - liquidus_composition
+        - condensate_composition
+        - residue_component_composition
+        schema_gap: The table reports a starting obsidian composition, not an equilibrated phase, liquidus, condensate
+          or residue composition. Fe3+/Fetot is typed separately under Fe.
+        composition_wt_pct_as_printed:
+          SiO2: '74.51'
+          TiO2: '0.10'
+          Al2O3: '13.25'
+          MgO: '0.08'
+          FeO: '1.60'
+          CaO: '0.75'
+          Na2O: '4.15'
+          K2O: '5.64'
+          OH: '0.125'
+        second_row_as_printed_standard_deviation_or_uncertainty_wt_pct:
+          SiO2: '0.55'
+          TiO2: '0.06'
+          Al2O3: '0.12'
+          MgO: '0.05'
+          FeO: '0.08'
+          CaO: '0.04'
+          Na2O: '0.06'
+          K2O: '0.10'
+          OH: '0.004'
+        note: The table footnote does not distinguish standard deviation from uncertainty column by column; no normalized
+          melt composition or Fe2O3 amount is reconstructed.
+    - observation_id: gaillard_2003_table2_front_distance_context
+      type: measured_table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+      units: front position μm; duration min; fO2 offset log units relative to IW
+      values:
+        quantity_as_printed: redox-front position versus exposure duration
+        quantity_token: unavailable
+        schema_gap: 'No store quantity represents measured front distance or elapsed duration. Candidate tokens
+          considered: mass_loss_rate, evaporation_rate, fe3_fe2_ratio, fugacity. None types front position or time;
+          no rate is derived from the table.'
+        evidence_class: measured_tabulated
+        rows:
+        - run: 1
+          duration_min: 4320
+          front_position_um: 0
+          fO2_delta_IW_as_printed: '-0.36'
+          related_observation_id: gaillard_t2_run01_h2_fugacity
+        - run: 2
+          duration_min: 10080
+          front_position_um: 0
+          fO2_delta_IW_as_printed: '-0.36'
+          related_observation_id: gaillard_t2_run02_h2_fugacity
+        - run: 3
+          duration_min: 1920
+          front_position_um: 85
+          fO2_delta_IW_as_printed: '-0.36'
+          related_observation_id: gaillard_t2_run03_h2_fugacity
+        - run: 4
+          duration_min: 3288
+          front_position_um: 110
+          fO2_delta_IW_as_printed: '-0.36'
+          related_observation_id: gaillard_t2_run04_h2_fugacity
+        - run: 5
+          duration_min: 2886
+          front_position_um: 240
+          fO2_delta_IW_as_printed: '+0.6'
+          related_observation_id: gaillard_t2_run05_h2_fugacity
+        - run: 6
+          duration_min: 6060
+          front_position_um: 320
+          fO2_delta_IW_as_printed: '+0.6'
+          related_observation_id: gaillard_t2_run06_h2_fugacity
+        - run: 7
+          duration_min: 180
+          front_position_um: 125
+          fO2_delta_IW_as_printed: '-0.36'
+          related_observation_id: gaillard_t2_run07_h2_fugacity
+        - run: 8
+          duration_min: 390
+          front_position_um: 205
+          fO2_delta_IW_as_printed: '-0.36'
+          related_observation_id: gaillard_t2_run08_h2_fugacity
+        - run: 9
+          duration_min: 2340
+          front_position_um: 450
+          fO2_delta_IW_as_printed: '-0.36'
+          related_observation_id: gaillard_t2_run09_h2_fugacity
+        - run: 10
+          duration_min: 4020
+          front_position_um: 605
+          fO2_delta_IW_as_printed: '-0.36'
+          related_observation_id: gaillard_t2_run10_h2_fugacity
+        - run: 11
+          duration_min: 7020
+          front_position_um: 800
+          fO2_delta_IW_as_printed: '-0.36'
+          related_observation_id: gaillard_t2_run11_h2_fugacity
+        - run: 12
+          duration_min: 180
+          front_position_um: 105
+          fO2_delta_IW_as_printed: '-0.70'
+          related_observation_id: gaillard_t2_run12_h2_fugacity
+        - run: 13
+          duration_min: 360
+          front_position_um: 170
+          fO2_delta_IW_as_printed: '-0.70'
+          related_observation_id: gaillard_t2_run13_h2_fugacity
+        - run: 14
+          duration_min: 1320
+          front_position_um: 310
+          fO2_delta_IW_as_printed: '-0.67'
+          related_observation_id: gaillard_t2_run14_h2_fugacity
+        - run: 15
+          duration_min: 4444
+          front_position_um: 560
+          fO2_delta_IW_as_printed: '-0.67'
+          related_observation_id: gaillard_t2_run15_h2_fugacity
+        - run: 16
+          duration_min: 7295
+          front_position_um: 730
+          fO2_delta_IW_as_printed: '-0.77'
+          related_observation_id: gaillard_t2_run16_h2_fugacity
+        - run: 17
+          duration_min: 360
+          front_position_um: 140
+          fO2_delta_IW_as_printed: '-0.25'
+          related_observation_id: gaillard_t2_run17_h2_fugacity
+        - run: 18
+          duration_min: 1350
+          front_position_um: 240
+          fO2_delta_IW_as_printed: '-0.25'
+          related_observation_id: gaillard_t2_run18_h2_fugacity
+        - run: 19
+          duration_min: 4020
+          front_position_um: 440
+          fO2_delta_IW_as_printed: '0'
+          related_observation_id: gaillard_t2_run19_h2_fugacity
+        - run: 20
+          duration_min: 5778
+          front_position_um: 530
+          fO2_delta_IW_as_printed: '0'
+          related_observation_id: gaillard_t2_run20_h2_fugacity
+        - run: 21
+          duration_min: 1200
+          front_position_um: 170
+          fO2_delta_IW_as_printed: '+0.1'
+          related_observation_id: gaillard_t2_run21_h2_fugacity
+        - run: 22
+          duration_min: 2610
+          front_position_um: 265
+          fO2_delta_IW_as_printed: '+0.1'
+          related_observation_id: gaillard_t2_run22_h2_fugacity
+        - run: 23
+          duration_min: 2400
+          front_position_um: 185
+          fO2_delta_IW_as_printed: '+0.14'
+          related_observation_id: gaillard_t2_run23_h2_fugacity
+        - run: 24
+          duration_min: 4800
+          front_position_um: 280
+          fO2_delta_IW_as_printed: '+0.14'
+          related_observation_id: gaillard_t2_run24_h2_fugacity
+        - run: 25
+          duration_min: 4320
+          front_position_um: 60
+          fO2_delta_IW_as_printed: null
+          related_observation_id: gaillard_t2_run25_h2_fugacity
+    - observation_id: gaillard_2003_table3_front_distance_context
+      type: measured_table_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+      units: front position μm; durations min; total pressure bar at dwell
+      values:
+        quantity_as_printed: redox-front position versus exposure duration
+        quantity_token: unavailable
+        schema_gap: 'No store quantity represents measured front distance or elapsed duration. Candidate tokens
+          considered: mass_loss_rate, evaporation_rate, fe3_fe2_ratio, partial_pressure. None types front position
+          or elapsed time; no rate is derived from the table.'
+        evidence_class: measured_tabulated
+        rows:
+        - run: 26
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '240'
+          total_duration_min: '90'
+          duration_at_T_min: '0'
+          front_position_um_as_printed: '0'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run26_H2_initial_partial_pressure
+          - gaillard_t3_run26_Ar_initial_partial_pressure
+        - run: 27
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '220'
+          total_duration_min: '98'
+          duration_at_T_min: '8'
+          front_position_um_as_printed: '70'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run27_H2_initial_partial_pressure
+          - gaillard_t3_run27_Ar_initial_partial_pressure
+        - run: 28
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '230'
+          total_duration_min: '105'
+          duration_at_T_min: '11'
+          front_position_um_as_printed: '125'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run28_H2_initial_partial_pressure
+          - gaillard_t3_run28_Ar_initial_partial_pressure
+        - run: 29
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '230'
+          total_duration_min: '97'
+          duration_at_T_min: '11'
+          front_position_um_as_printed: '211'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run29_H2_initial_partial_pressure
+          - gaillard_t3_run29_Ar_initial_partial_pressure
+        - run: 30
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '250'
+          total_duration_min: '107'
+          duration_at_T_min: '7'
+          front_position_um_as_printed: '250'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run30_H2_initial_partial_pressure
+          - gaillard_t3_run30_Ar_initial_partial_pressure
+        - run: 31
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '250'
+          total_duration_min: '107'
+          duration_at_T_min: '11'
+          front_position_um_as_printed: '310'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run31_H2_initial_partial_pressure
+          - gaillard_t3_run31_Ar_initial_partial_pressure
+        - run: 32
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '265'
+          total_duration_min: '96'
+          duration_at_T_min: '6'
+          front_position_um_as_printed: '310'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run32_H2_initial_partial_pressure
+          - gaillard_t3_run32_Ar_initial_partial_pressure
+        - run: 33
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '225'
+          total_duration_min: '97'
+          duration_at_T_min: '4'
+          front_position_um_as_printed: '255'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run33_H2_initial_partial_pressure
+          - gaillard_t3_run33_Ar_initial_partial_pressure
+        - run: 34
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '240'
+          total_duration_min: '93'
+          duration_at_T_min: '5.5'
+          front_position_um_as_printed: '440'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run34_H2_initial_partial_pressure
+          - gaillard_t3_run34_Ar_initial_partial_pressure
+        - run: 35
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '265'
+          total_duration_min: '96'
+          duration_at_T_min: '5'
+          front_position_um_as_printed: '560'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run35_H2_initial_partial_pressure
+          - gaillard_t3_run35_Ar_initial_partial_pressure
+        - run: 36
+          T_C_dwell: 800
+          Ptot_bar_at_dwell: '230'
+          total_duration_min: '150'
+          duration_at_T_min: '60'
+          front_position_um_as_printed: '>2000'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run36_H2_initial_partial_pressure
+          - gaillard_t3_run36_Ar_initial_partial_pressure
+        - run: 37
+          T_C_dwell: 700
+          Ptot_bar_at_dwell: '220'
+          total_duration_min: '98'
+          duration_at_T_min: '12'
+          front_position_um_as_printed: '108'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run37_H2_initial_partial_pressure
+          - gaillard_t3_run37_Ar_initial_partial_pressure
+        - run: 38
+          T_C_dwell: 1000
+          Ptot_bar_at_dwell: '250'
+          total_duration_min: '96'
+          duration_at_T_min: '7'
+          front_position_um_as_printed: '140'
+          linked_initial_pressure_observations:
+          - gaillard_t3_run38_H2_initial_partial_pressure
+          - gaillard_t3_run38_Ar_initial_partial_pressure
+    - observation_id: gaillard_2003_table4_measured_and_model_rate_context
+      type: measured_and_model_table_context
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 2435
+        table: '4'
+      units: as printed in the table headings
+      values:
+        quantity_as_printed: measured log K, H2 solubility, fitted alpha, calculated log K and H2 diffusivity
+        measured_quantity_token: unavailable for reaction constant log K
+        candidate_tokens_considered:
+        - mass_loss_rate
+        - evaporation_rate
+        - activity
+        - activity_coefficient
+        - evaporation_coefficient_alpha
+        schema_gap: K is the reaction-front constant ξ²/t in m²/s; none of the candidate quantities represents it.
+          Solubility, diffusivity and α are model outputs and are retained as model_derived context.
+        column_evidence:
+          fH2: tabulated experimental condition
+          SH2_gr_m3: model_derived
+          SH2_ppm_wt: model_derived
+          logK_measured: measured_tabulated except Eb row, quoted_attributed
+          logK_calculated_b: model_derived
+          alpha: model_derived
+          logK_calculated_c: model_derived
+        rows:
+        - run: 3–4
+          fH2_bar: '0.02'
+          SH2_g_m3: '0.002'
+          SH2_ppm_wt: '0.001'
+          logK_measured: '-13.21'
+          logK_calculated_b: '-13.56'
+          alpha: '0.0005'
+          logK_calculated_c: '-12.89'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: 5–6
+          fH2_bar: '0.25'
+          SH2_g_m3: '0.058'
+          SH2_ppm_wt: '0.025'
+          logK_measured: '-12.54'
+          logK_calculated_b: '-12.15'
+          alpha: '0.0026'
+          logK_calculated_c: '-11.80'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: 7–11
+          fH2_bar: '0.50'
+          SH2_g_m3: '0.14'
+          SH2_ppm_wt: '0.06'
+          logK_measured: '-11.83'
+          logK_calculated_b: '-11.76'
+          alpha: '0.0040'
+          logK_calculated_c: '-11.49'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: '27'
+          fH2_bar: '2'
+          SH2_g_m3: '0.8'
+          SH2_ppm_wt: '0.4'
+          logK_measured: '-11.01'
+          logK_calculated_b: '-10.98'
+          alpha: '0.0099'
+          logK_calculated_c: '-10.89'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: '28'
+          fH2_bar: '5'
+          SH2_g_m3: '2.6'
+          SH2_ppm_wt: '1.1'
+          logK_measured: '-10.63'
+          logK_calculated_b: '-10.47'
+          alpha: '0.0179'
+          logK_calculated_c: '-10.49'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: '29'
+          fH2_bar: '8'
+          SH2_g_m3: '4.8'
+          SH2_ppm_wt: '2.1'
+          logK_measured: '-10.18'
+          logK_calculated_b: '-10.21'
+          alpha: '0.0242'
+          logK_calculated_c: '-10.29'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: 30–31
+          fH2_bar: '15'
+          SH2_g_m3: '10.8'
+          SH2_ppm_wt: '4.7'
+          logK_measured: '-9.84'
+          logK_calculated_b: '-9.85'
+          alpha: '0.0364'
+          logK_calculated_c: '-10.02'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: '32'
+          fH2_bar: '25'
+          SH2_g_m3: '20.7'
+          SH2_ppm_wt: '9.9'
+          logK_measured: '-9.57'
+          logK_calculated_b: '-9.57'
+          alpha: '0.0505'
+          logK_calculated_c: '-9.80'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: '33'
+          fH2_bar: '30'
+          SH2_g_m3: '26.1'
+          SH2_ppm_wt: '11.3'
+          logK_measured: '-9.33'
+          logK_calculated_b: '-9.47'
+          alpha: '0.0568'
+          logK_calculated_c: '-9.72'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: '34'
+          fH2_bar: '40'
+          SH2_g_m3: '37.6'
+          SH2_ppm_wt: '16.3'
+          logK_measured: '-9.23'
+          logK_calculated_b: '-9.30'
+          alpha: '0.0684'
+          logK_calculated_c: '-9.59'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: '35'
+          fH2_bar: '70'
+          SH2_g_m3: '76.9'
+          SH2_ppm_wt: '33.4'
+          logK_measured: '-8.98'
+          logK_calculated_b: '-8.99'
+          alpha: '0.0980'
+          logK_calculated_c: '-9.35'
+          row_evidence: present study; measured and model-derived columns as listed above
+        - run: Eb
+          fH2_bar: '50'
+          SH2_g_m3: '50.0'
+          SH2_ppm_wt: '21.7'
+          logK_measured: '-10.52'
+          logK_calculated_b: '-10.53'
+          alpha: '0.0215'
+          logK_calculated_c: '-11.17'
+          row_evidence: quoted_attributed; Gaillard et al. (2003), Eburru sample
+        model_equations_as_printed:
+        - SH2 = 0.34 fH2^1.28 (g/m3)
+        - log DH2 = -7.8 m2 s-1 at 800°C
+        - DH2 = 1.40 × 10^-6 exp[-40000/(RT)] m2 s-1
+        - 'linear-solubility comparison: SH2 = 6.58 × 10^-4 fH2'
+    - observation_id: gaillard_2003_figure_1_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 2431
+        figure: '1'
+      panel: whole_figure
+      attribution: Gaillard et al. (2003), present study
+      units: axes and units as printed
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        schema_gap: No existing quantity token represents photographic redox-front appearance and sample texture
+          as plotted; figure is deferred without numeric points.
+        quantity_as_printed: photographic redox-front appearance and sample texture
+        species:
+        - Fe
+        phase: obsidian glass
+        temperature_as_printed: sample 34; Table 3 identifies run 34 at 800°C
+        axes_as_printed:
+          x: not applicable
+          y: not applicable
+        caption: Color changes due to reduction of ferric iron on the sample rims. The translucent external layer
+          of approximately 500 μm corresponds to the reduced zone. The inner brown zone is pristine. Diameter of
+          the sample is 4 mm. Sample 34. The black points are crystals entrapped in the glass matrix.
+        series:
+        - name: sample 34 photograph; crystal inclusions are texture, not plotted data markers
+          marker_count: 0
+          marker: none; photograph texture only
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: gaillard_2003_figure_3_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 2433
+        figure: '3'
+      panel: whole_figure
+      attribution: Gaillard et al. (2003), present study
+      units: axes and units as printed
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        schema_gap: No existing quantity token represents hydroxyl weight fraction profile across a low-H2-pressure
+          glass sample as plotted; figure is deferred without numeric points.
+        quantity_as_printed: hydroxyl weight fraction profile across a low-H2-pressure glass sample
+        species:
+        - OH
+        - Fe
+        phase: obsidian glass
+        temperature_as_printed: run 11 at 800°C, fH2 = 0.5 bar, 117 h
+        axes_as_printed:
+          x: Distance (μm)
+          y: OH wt%
+        caption: Typical low H2 pressure hydroxyl profiles obtained from infrared spectra of run product 11. Note
+          the decrease of OH on the sample rims and the position of the OH front in front of the redox front. See
+          text for discussion.
+        series:
+        - name: OH profile, filled diamonds
+          marker_count: 16
+          marker: filled diamond
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: gaillard_2003_figure_5_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 2434
+        figure: '5'
+      panel: whole_figure
+      attribution: Gaillard et al. (2003), present study
+      units: axes and units as printed
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        schema_gap: No existing quantity token represents squared redox-front advancement versus run duration as
+          plotted; figure is deferred without numeric points.
+        quantity_as_printed: squared redox-front advancement versus run duration
+        species:
+        - Fe
+        phase: obsidian glass
+        temperature_as_printed: 800, 700, 600, 550 and 500°C
+        axes_as_printed:
+          x: Duration (min)
+          y: Advancement squared (m2)
+        caption: 'Characterization of the rate laws governing the reduction rate of ferric iron from 800 to 500°C.
+          The square of the reduction advancement is linearly dependent on run durations: there is evidence for
+          a diffusion-limited process. The reaction advancement is calculated using Equation 3.'
+        series:
+        - name: 800°C, light diamonds
+          marker_count: 4
+          marker: light diamond
+        - name: 700°C, open circles
+          marker_count: 4
+          marker: open circle
+        - name: 600°C, gray circles
+          marker_count: 4
+          marker: gray circle
+        - name: 550°C, open diamonds
+          marker_count: 3
+          marker: open diamond
+        - name: 500°C, black diamonds
+          marker_count: 3
+          marker: filled diamond
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: gaillard_2003_figure_10_deferred
+      type: figure_record
+      locator:
+        page: 13
+        pdf_page_index: 12
+        published_page: 2439
+        figure: '10'
+      panel: whole_figure
+      attribution: Gaillard et al. (2003), modeled figure; H2O migration comparison after Zhang et al. (1991)
+      units: axes and units as printed
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        schema_gap: No existing quantity token represents modeled penetration distance of reduction-derived OH versus
+          duration as plotted; figure is deferred without numeric points.
+        quantity_as_printed: modeled penetration distance of reduction-derived OH versus duration
+        species:
+        - Fe
+        - H2O
+        phase: silicate glass
+        temperature_as_printed: 200°C under water-saturated conditions; initial glass 2.2 wt% Fe2O3
+        axes_as_printed:
+          x: Duration in years
+          y: Penetration of the OH front (mm)
+        caption: The full lines illustrate the penetration of a front of 0.25 wt% reduction-derived H2O in a glass
+          undergoing exposure to different fH2 conditions at 200°C under water-saturated conditions. The glass initially
+          contains 2.2 wt% Fe2O3. For comparison, a front of hydration rate controlled by H2O mobility is also shown.
+        series:
+        - name: fH2 = 10 bar, modeled reduction-derived H2O front
+          marker_count: 0
+          marker: solid curve
+        - name: fH2 = 1 bar, modeled reduction-derived H2O front
+          marker_count: 0
+          marker: solid curve
+        - name: H2O migration comparison
+          marker_count: 0
+          marker: dashed curve
+        numeric_points: none
+        digitisation: deferred to a figure pass
+  H2:
+    observations:
+    - observation_id: gaillard_t2_run01_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '1'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0'
+        value_as_published: '0'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/CO
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '1'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '1'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-19.15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '1'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run02_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '2'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0'
+        value_as_published: '0'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/CO
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '2'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '2'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-19.15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '2'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run03_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '3'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0.02'
+        value_as_published: '0.02'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: Ar/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '3'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '3'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-19.15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '3'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run04_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '4'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0.02'
+        value_as_published: '0.02'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: Ar/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '4'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '4'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-19.15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '4'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run05_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '5'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0.25'
+        value_as_published: '0.25'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '5'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '5'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-18.20'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '5'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run06_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '6'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0.25'
+        value_as_published: '0.25'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '6'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '6'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-18.20'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '6'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run07_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '7'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0.5'
+        value_as_published: '0.5'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '7'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '7'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-19.15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '7'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run08_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '8'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0.5'
+        value_as_published: '0.5'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '8'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '8'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-19.15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '8'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run09_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '9'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0.5'
+        value_as_published: '0.5'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '9'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '9'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-19.15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '9'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run10_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '10'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0.5'
+        value_as_published: '0.5'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '10'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '10'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-19.15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '10'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run11_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '11'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '800'
+        gas_species_as_printed: H2
+        value: '0.5'
+        value_as_published: '0.5'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '11'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '11'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-19.15'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '11'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run12_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '12'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '700'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.7'
+        value_as_published: 0.7/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '12'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '12'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-22.10'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '12'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run13_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '13'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '700'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.7'
+        value_as_published: 0.7/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '13'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '13'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-22.10'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '13'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run14_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '14'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '700'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.7'
+        value_as_published: 0.7/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '14'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '14'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-22.07'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '14'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run15_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '15'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '700'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.7'
+        value_as_published: 0.7/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '15'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '15'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-22.07'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '15'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run16_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '16'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '700'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.7'
+        value_as_published: 0.7/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '16'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '16'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-21.17'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '16'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex)
+    - observation_id: gaillard_t2_run17_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '17'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '600'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.67'
+        value_as_published: 0.67/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '17'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '17'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-24.85'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '17'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex); Table 2 footnote b says fO2 is probably uncertain below 700°C; no numeric uncertainty
+              is printed.
+    - observation_id: gaillard_t2_run18_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '18'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '600'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.67'
+        value_as_published: 0.67/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '18'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '18'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-24.85'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '18'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex); Table 2 footnote b says fO2 is probably uncertain below 700°C; no numeric uncertainty
+              is printed.
+    - observation_id: gaillard_t2_run19_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '19'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '600'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.67'
+        value_as_published: 0.67/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '19'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '19'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-24.60'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '19'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex); Table 2 footnote b says fO2 is probably uncertain below 700°C; no numeric uncertainty
+              is printed.
+    - observation_id: gaillard_t2_run20_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '20'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '600'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.67'
+        value_as_published: 0.67/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '20'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '20'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-24.60'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '20'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex); Table 2 footnote b says fO2 is probably uncertain below 700°C; no numeric uncertainty
+              is printed.
+    - observation_id: gaillard_t2_run21_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '21'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '550'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.67'
+        value_as_published: 0.67/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '21'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '21'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-26.4'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '21'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex); Table 2 footnote b says fO2 is probably uncertain below 700°C; no numeric uncertainty
+              is printed.
+    - observation_id: gaillard_t2_run22_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '22'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '550'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.67'
+        value_as_published: 0.67/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '22'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '22'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-26.4'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '22'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex); Table 2 footnote b says fO2 is probably uncertain below 700°C; no numeric uncertainty
+              is printed.
+    - observation_id: gaillard_t2_run23_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '23'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '500'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.65'
+        value_as_published: 0.65/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '23'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '23'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-28.5'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '23'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex); Table 2 footnote b says fO2 is probably uncertain below 700°C; no numeric uncertainty
+              is printed.
+    - observation_id: gaillard_t2_run24_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '24'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: author_estimate
+        T_C: '500'
+        gas_species_as_printed: H2
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '0.65'
+        value_as_published: 0.65/0.5
+        condition_note: 'Printed higher/lower pair: higher fH2 was introduced; lower fH2 is the value if H2-CO2
+          equilibrium is attained.'
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: CO2/H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '24'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '24'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: value
+            value: '-28.5'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '24'
+            column: log fO2
+            note: log fO2 printed without a stated reference; read with the bar convention (atm would differ by
+              0.0057 dex); Table 2 footnote b says fO2 is probably uncertain below 700°C; no numeric uncertainty
+              is printed.
+    - observation_id: gaillard_t2_run25_h2_fugacity
+      type: gas_speciation
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2429
+        table: '2'
+        row: '25'
+        column: fH2
+      phase: gas
+      units: bar
+      values:
+        quantity: fugacity
+        method_class: measured_tabulated
+        T_C: '300'
+        gas_species_as_printed: H2
+        value: '1'
+        value_as_published: '1'
+        condition_note: ''
+      point_conditions:
+        atmosphere:
+          state:
+            tag: value
+            value: H2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '25'
+            column: Gas mixtures
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '25'
+            note: Table 2 is explicitly headed 1 atm furnace; converted 1 atm to Pa.
+        composition:
+          state:
+            tag: unknown
+            reason: starting composition is reported in wt% and not normalized to mole fractions
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+            note: Starting obsidian composition is printed in wt%; no normalized mole composition is inferred.
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 2 prints ? for this row; no numeric log fO2 assigned
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2429
+            table: '2'
+            row: '25'
+            column: log fO2
+    - observation_id: gaillard_t3_run26_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '26'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 10
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '26'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '26'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '26'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run27_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '27'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 2
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '27'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '27'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '27'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run28_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '28'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 5
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '28'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '28'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '28'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run29_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '29'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 8
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '29'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '29'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '29'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run30_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '30'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 12
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '30'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '30'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '30'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run31_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '31'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 12
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '31'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '31'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '31'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run32_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '32'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 22
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '32'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '32'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '32'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run33_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '33'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 27
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '33'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '33'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '33'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run34_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '34'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 35
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '34'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '34'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '34'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run35_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '35'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 52
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '35'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '35'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '35'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run36_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '36'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 20
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '36'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '36'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '36'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run37_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '37'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 5
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '37'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '37'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '37'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run38_H2_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '38'
+        column: pH2
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: H2
+        pressure_stage: initially loaded before heating
+        pressure_bar: 5
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '38'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '38'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '38'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    context:
+    - observation_id: gaillard_2003_figure_2_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2432
+        figure: '2'
+      panel: whole_figure
+      attribution: Gaillard et al. (2003), present study
+      units: axes and units as printed
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        schema_gap: No existing quantity token represents infrared absorbance spectra for H2, OH and H2O bands as
+          plotted; figure is deferred without numeric points.
+        quantity_as_printed: infrared absorbance spectra for H2, OH and H2O bands
+        species:
+        - H2
+        - OH
+        - H2O
+        phase: obsidian glass
+        temperature_as_printed: sample 34 at 800°C; upper spectra from rim and lower spectra from interior
+        axes_as_printed:
+          x: wavenumbers (cm−1)
+          y: Absorbance units
+        caption: Infrared spectra of sample 34. Upper spectra correspond to the sample rims and lower spectra were
+          collected in the sample inner part. Note the absence of molecular H2O bands at 5200 cm−1 and the progressive
+          vanishing of the H2 bands going from rim to center.
+        series:
+        - name: infrared trace 1; five traces total, rim/interior locations as plotted
+          marker_count: 0
+          marker: continuous spectrum
+        - name: infrared trace 2; five traces total, rim/interior locations as plotted
+          marker_count: 0
+          marker: continuous spectrum
+        - name: infrared trace 3; five traces total, rim/interior locations as plotted
+          marker_count: 0
+          marker: continuous spectrum
+        - name: infrared trace 4; five traces total, rim/interior locations as plotted
+          marker_count: 0
+          marker: continuous spectrum
+        - name: infrared trace 5; five traces total, rim/interior locations as plotted
+          marker_count: 0
+          marker: continuous spectrum
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: gaillard_2003_figure_4_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 2433
+        figure: '4'
+      panel: whole_figure
+      attribution: Gaillard et al. (2003), present study
+      units: axes and units as printed
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        schema_gap: No existing quantity token represents OH concentration and molecular H2 absorbance profiles
+          as plotted; figure is deferred without numeric points.
+        quantity_as_printed: OH concentration and molecular H2 absorbance profiles
+        species:
+        - OH
+        - H2
+        phase: obsidian glass
+        temperature_as_printed: sample 33; Table 3 run 33 at 800°C
+        axes_as_printed:
+          x: Distance (μm)
+          left_y: OH wt%
+          right_y: H2 molecular absorbance units
+        caption: Typical high H2 pressure profiles of H2 and OH in the glass obtained from infrared spectra of sample
+          33. Note the difference between the positions of the H2, OH, and redox fronts. See text for discussion.
+        series:
+        - name: OH profile, diamonds
+          marker_count: 15
+          marker: filled diamond
+        - name: molecular H2 profile, circles
+          marker_count: 6
+          marker: filled circle
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: gaillard_2003_figure_6_deferred
+      type: figure_record
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 2435
+        figure: '6'
+      panel: whole_figure
+      attribution: Present study; Eburru data attributed to Gaillard et al. (2003)
+      units: axes and units as printed
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        schema_gap: No existing quantity token represents log reaction-front rate constant K versus hydrogen fugacity
+          as plotted; figure is deferred without numeric points.
+        quantity_as_printed: log reaction-front rate constant K versus hydrogen fugacity
+        species:
+        - Fe
+        - H2
+        phase: obsidian glass
+        temperature_as_printed: 800°C
+        axes_as_printed:
+          x: fH2 (bar)
+          y: log K (m2 s−1)
+        caption: Characterization of the fH2 dependence of the reduction rate of ferric iron at 800°C. Black diamonds
+          are points obtained in this study; open diamonds are data of Gaillard et al. (2003) on the Eburru sample.
+          The solid lines are calculated diffusion and fitted model relations.
+        series:
+        - name: present-study points, black diamonds
+          marker_count: 11
+          marker: filled diamond
+        - name: Eburru comparison, open diamond
+          marker_count: 1
+          marker: open diamond
+          evidence_class: quoted_attributed
+        - name: calculated diffusion/model curves
+          marker_count: 0
+          marker: continuous line
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: gaillard_2003_figure_7_deferred
+      type: figure_record
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: 2436
+        figure: '7'
+      panel: whole_figure
+      attribution: Gaillard et al. (2003), present study; comparison diffusion curves attributed in caption to Zhang
+        et al. (1991)
+      units: axes and units as printed
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        schema_gap: No existing quantity token represents log reduction rate versus reciprocal temperature as plotted;
+          figure is deferred without numeric points.
+        quantity_as_printed: log reduction rate versus reciprocal temperature
+        species:
+        - Fe
+        - H2
+        phase: silicate glass/melt
+        temperature_as_printed: 500–800°C
+        axes_as_printed:
+          x: 10000 / T°K
+          y: log rate (m2 s−1)
+        caption: Temperature dependence of the reduction rate determined at two different fH2. The two fits to the
+          data points are performed with the same activation energy (40 kJ/mol). Other lines correspond to the diffusion
+          rate of molecular H2O and molecular H2.
+        series:
+        - name: fH2 approximately 5 bar, circles
+          marker_count: 3
+          marker: filled circle
+        - name: fH2 approximately 0.5 bar, diamonds
+          marker_count: 5
+          marker: filled diamond
+        - name: two fitted relations and H2O/H2 diffusion curves
+          marker_count: 0
+          marker: continuous line
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: gaillard_2003_figure_8_deferred
+      type: figure_record
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: 2436
+        figure: '8'
+      panel: whole_figure
+      attribution: Present study; comparison relations attributed in caption to Persikov et al. (1990), Lou et al.
+        (2003), and Lee and Fry (1966)
+      units: axes and units as printed
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        schema_gap: No existing quantity token represents molecular H2 solubility versus hydrogen fugacity as plotted;
+          figure is deferred without numeric points.
+        quantity_as_printed: molecular H2 solubility versus hydrogen fugacity
+        species:
+        - H2
+        phase: silicate glasses and melts
+        temperature_as_printed: 800°C
+        axes_as_printed:
+          x: fH2 (bar)
+          y: H2 solubility (gr/cc)
+        caption: Solubility laws for H2 in silicate glasses and melts at 800°C. Different solubility relationships
+          corresponding to different studies and glass compositions are plotted. Solid lines are calibration domains;
+          dashed lines are extrapolations.
+        series:
+        - name: this study, silicate melts
+          marker_count: 0
+          marker: solid and extrapolated line
+        - name: Persikov et al. (1990), molten albite
+          marker_count: 0
+          marker: dashed/dotted line
+        - name: Lou et al. (2003) and Lee & Fry (1966), SiO2 glass
+          marker_count: 0
+          marker: dashed lines
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: gaillard_2003_figure_9_deferred
+      type: figure_record
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 2438
+        figure: '9'
+      panel: whole_figure
+      attribution: Gaillard et al. (2003), modeled figure; DM2+ comparator after Cooper et al. (1996)
+      units: axes and units as printed
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        schema_gap: No existing quantity token represents modeled iron-redox exchange rates over temperature and
+          fH2 as plotted; figure is deferred without numeric points.
+        quantity_as_printed: modeled iron-redox exchange rates over temperature and fH2
+        species:
+        - Fe
+        - H2
+        phase: silicate glass/melt
+        temperature_as_printed: temperature axis spans printed values; Fe2O3 approximately 3.5 wt%
+        axes_as_printed:
+          x: 10000 / T°K (top axis T°C)
+          y: log reaction rate (m2 s−1)
+        caption: Map of redox exchanges in glasses and melts as a function of temperature and fH2. Rates of reduction
+          or creation by oxidation of 3.5 wt% ferric iron due to redox exchanges with H2 are shown for hydrogen
+          fugacity ranging from 0.1 to 100 bar. The DM2+ line is a comparator; the square marks actual terrestrial
+          magma conditions.
+        series:
+        - name: modeled rates at fH2 = 0.1, 1, 10, 50 and 100 bar
+          marker_count: 0
+          marker: five continuous/dashed curves
+        - name: DM2+ divalent-cation comparator
+          marker_count: 0
+          marker: continuous curve
+        - name: actual terrestrial magma field
+          marker_count: 0
+          marker: outlined domain
+        numeric_points: none
+        digitisation: deferred to a figure pass
+  Ar:
+    observations:
+    - observation_id: gaillard_t3_run26_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '26'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 200
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '26'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '26'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '26'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run27_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '27'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 200
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '27'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '27'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '27'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run28_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '28'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 200
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '28'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '28'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '28'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run29_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '29'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 200
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '29'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '29'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '29'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run30_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '30'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 210
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '30'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '30'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '30'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run31_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '31'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 210
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '31'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '31'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '31'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run32_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '32'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 210
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '32'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '32'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '32'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run33_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '33'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 200
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '33'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '33'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '33'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run34_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '34'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 200
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '34'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '34'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '34'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run35_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '35'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 200
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '35'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '35'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '35'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run36_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '36'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 200
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '36'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '36'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '36'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run37_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '37'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 200
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '37'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '37'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '37'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    - observation_id: gaillard_t3_run38_Ar_initial_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2430
+        table: '3'
+        row: '38'
+        column: pAr
+      phase: gas
+      units: bar
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method_as_printed: Pressure of H2 and argon initially loaded in the vessel; the pressure-setting or measurement
+          instrument is not stated.
+        gas_species_as_printed: Ar
+        pressure_stage: initially loaded before heating
+        pressure_bar: 200
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 3 footnote a identifies these as initially loaded pressures; the listed T is the later
+              dwell temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '38'
+            column: T°C
+        fO2_log:
+          state:
+            tag: unknown
+            reason: Table 3 does not report fO2 or a buffer.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '38'
+            column: fO2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Ptot is measured at dwell temperature, not at the initial gas loading represented by these cells.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2430
+            table: '3'
+            row: '38'
+            column: Ptot
+        composition:
+          state:
+            tag: unknown
+            reason: No normalized mole composition is inferred from the starting-glass wt% table.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2428
+            table: '1'
+    context: []
