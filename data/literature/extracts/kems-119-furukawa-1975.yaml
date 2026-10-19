@@ -29,15 +29,17 @@ fidelity_samples:
   locator:
     table: '2'
     published_page: 3054
-    pdf_page_index: 5
+    pdf_page_index: 4
     note: Table 2 first row N_V=0.093, log(I_V+/I_Fe+) at 1600 C = -2.641
+    page: 5
 - path: species.V.observations[furukawa_1975_table2_fe_v_ion_current_ratios].values.rows[0].N_V
   value: 0.093
   locator:
     table: '2'
     published_page: 3054
-    pdf_page_index: 5
+    pdf_page_index: 4
     note: Table 2 first row N_V = 0.093
+    page: 5
 - path: species.Cr.observations[furukawa_1975_table3_fe_v_cr_ion_current_ratios].values.rows[0].log_ICr_over_IFe
   value: 0.238
   locator:
@@ -595,8 +597,9 @@ species:
       locator:
         table: '2'
         published_page: 3054
-        pdf_page_index: 5
+        pdf_page_index: 4
         note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+        page: 5
       T_range_K:
       - 1873.0
       - 1873.0

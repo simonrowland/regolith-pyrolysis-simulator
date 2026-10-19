@@ -204,7 +204,7 @@ def _assert_ohta_suito_1995_review_pins(extract: dict) -> None:
 
     table_iii_observation_id = "ohta_suito_1995_table3_interaction_parameters"
     expected_table_iii_locator = {
-        "page": 298, "published_page": 298, "pdf_page_index": 3, "table": "III"
+        "page": 4, "published_page": 298, "pdf_page_index": 3, "table": "III"
     }
     table_iii_locators = [
         row["locator"]
@@ -2861,7 +2861,7 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         assert values.get("formula") == formula
         assert values.get("condensed_phase") == condensed_phase
         assert row["T_range_K"] == [temperature, temperature]
-        assert row["locator"]["page"] == 826
+        assert row["locator"]["page"] == 6
         assert row["locator"]["published_page"] == 826
         assert row["locator"]["pdf_page_index"] == 5
         assert row["locator"]["figure"] == "7"
