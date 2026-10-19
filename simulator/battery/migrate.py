@@ -3784,6 +3784,13 @@ def _composition_located_from_values(
         locator,
         source_note=source_note,
     )
+    if set(wt) == {"K2O", "SiO2"} and wt["SiO2"] == Decimal("100") - wt["K2O"]:
+        # This lineage follows from the printed Decimal values only for the
+        # exact binary map; prose stays in derivation inputs as provenance.
+        derivation = replace(
+            derivation,
+            relation="SiO2_wt_pct=100-K2O_wt_pct;" + derivation.relation,
+        )
     composition = wt_pct_to_mole_fraction(wt)
     if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
         composition = replace(composition, proxy_flag=role)
@@ -3874,9 +3881,9 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
 
     The row is read before its parent values block. ``initial_charge_only``
     marks a printed starting charge that must carry the initial-charge proxy
-    flag. ``datum_state`` marks a row composition that describes the sample at
-    the state this datum was measured; it applies to the observation's point
-    conditions and never marks the experiment's starting charge. Each typed
+    flag. ``datum_state`` marks the sample composition at this datum's
+    measurement state, including a bulk two-phase sample; it applies to the
+    observation's point conditions and never marks the experiment's starting charge. Each typed
     declaration is a bare token or a mapping with its page locator and quote.
     A token outside the closed set is a refusal, never a guess.
     """
