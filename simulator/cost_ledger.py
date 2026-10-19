@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from functools import wraps
 from types import MappingProxyType
@@ -52,6 +52,30 @@ _AUXILIARY_ELECTRICAL_COMPONENT_ALIASES = MappingProxyType({
 _RETURN_NONE = object()
 _RETURN_EMPTY_TUPLE = object()
 _RETURN_SUMMARY = object()
+
+
+def _below_quantity_floor(quantity: float) -> bool:
+    return quantity <= VECTOR_TOLERANCE
+
+
+def _quantity_floor_skips(quantities: Iterable[float]) -> tuple[int, float]:
+    skipped_keys = 0
+    skipped_kg = 0.0
+    for quantity in quantities:
+        if _below_quantity_floor(quantity) and quantity > 0.0:
+            skipped_keys += 1
+            skipped_kg += float(quantity)
+    return skipped_keys, skipped_kg
+
+
+def _quantity_floor_warning(side: str, skipped_keys: int, total_kg: float) -> str:
+    # VECTOR_TOLERANCE (1e-12 kg) × the maximum shipped unit charge
+    # ($10,000/kg) is $1e-8, below the cost report's $0.01 resolution.
+    return (
+        f"cost_{side}_below_quantity_floor: "
+        f"skipped_keys={skipped_keys} total_kg={total_kg:.12g} "
+        f"floor_kg={VECTOR_TOLERANCE:.1e}"
+    )
 
 
 def _finite(value: Any, default: float = 0.0) -> float:
@@ -546,35 +570,34 @@ class CostLedger:
         )
         input_lots: list[CostLot] = []
         saw_cost_bearing_debit = False
-        skipped_floor_keys = 0
-        skipped_floor_kg = 0.0
+        skipped_floor_keys, skipped_floor_kg = _quantity_floor_skips(
+            kg
+            for lot in transition.debits
+            if _is_cost_bearing_account(lot.account)
+            for kg in lot.species_kg.values()
+        )
         for lot in transition.debits:
             if not _is_cost_bearing_account(lot.account):
                 continue
             for species, kg in lot.species_kg.items():
-                # VECTOR_TOLERANCE is the CostLot quantity floor (1e-12 kg).
-                # At the shipped maximum unit charge (LAUNCH_USD_PER_KG =
-                # $10,000/kg in cost_energy.py), one skipped key is at most
-                # $1e-8; the cost report displays USD to cents, so this per-key
-                # floor cannot move a reported cost.
-                if kg <= VECTOR_TOLERANCE:
-                    if kg > 0.0:
-                        skipped_floor_keys += 1
-                        skipped_floor_kg += float(kg)
+                if _below_quantity_floor(kg):
                     continue
                 saw_cost_bearing_debit = True
                 input_lots.extend(
                     self._debit_lots(lot.account, species, kg, strict=strict)
                 )
         if skipped_floor_keys:
-            self._warnings.append(
-                "cost_debit_below_quantity_floor: "
-                f"skipped_keys={skipped_floor_keys} "
-                f"total_kg={skipped_floor_kg:.12g} "
-                f"floor_kg={VECTOR_TOLERANCE:.1e}"
-            )
+            self._warnings.append(_quantity_floor_warning(
+                "debit", skipped_floor_keys, skipped_floor_kg
+            ))
 
-        outputs = _outputs_from_lots(transition.credits)
+        outputs, skipped_credit_keys, skipped_credit_kg = _outputs_from_lots(
+            transition.credits
+        )
+        if skipped_credit_keys:
+            self._warnings.append(_quantity_floor_warning(
+                "credit", skipped_credit_keys, skipped_credit_kg
+            ))
         if not outputs:
             if input_lots or not processing_cost.is_zero():
                 if strict:
@@ -1395,7 +1418,7 @@ def _clean_outputs(outputs_kg: Mapping[Any, float]) -> dict[Any, float]:
     result: dict[Any, float] = {}
     for key, value in dict(outputs_kg or {}).items():
         quantity = _finite(value)
-        if quantity > VECTOR_TOLERANCE:
+        if not _below_quantity_floor(quantity):
             result[key] = result.get(key, 0.0) + quantity
     return result
 
@@ -1425,13 +1448,16 @@ def _is_cost_bearing_account(account: str) -> bool:
     return account in COST_BEARING_ACCOUNTS or account.startswith("reservoir.reagent.")
 
 
-def _outputs_from_lots(lots: tuple[Any, ...]) -> dict[tuple[str, str], float]:
+def _outputs_from_lots(
+    lots: tuple[Any, ...],
+) -> tuple[dict[tuple[str, str], float], int, float]:
     outputs: dict[tuple[str, str], float] = {}
     for lot in lots:
         for species, kg in lot.species_kg.items():
             key = (lot.account, species)
             outputs[key] = outputs.get(key, 0.0) + max(0.0, _finite(kg))
-    return _clean_outputs(outputs)
+    skipped_keys, skipped_kg = _quantity_floor_skips(outputs.values())
+    return _clean_outputs(outputs), skipped_keys, skipped_kg
 
 
 def _split_beneficiary_outputs(lots: tuple[Any, ...]) -> tuple[dict[Any, float], dict[Any, float]]:

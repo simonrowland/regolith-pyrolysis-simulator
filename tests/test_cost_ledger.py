@@ -118,15 +118,21 @@ def test_sub_tolerance_reagent_debit_is_below_cost_input_floor():
 
     assert result is None
     warnings = ledger.summary()["warnings"]
-    assert len(warnings) == 1
-    assert "cost_debit_below_quantity_floor" in warnings[0]
-    assert "skipped_keys=1" in warnings[0]
-    assert f"total_kg={tiny_kg:.12g}" in warnings[0]
-    assert f"floor_kg={VECTOR_TOLERANCE:.1e}" in warnings[0]
+    assert len(warnings) == 2
+    debit_warning, credit_warning = warnings
+    assert "cost_debit_below_quantity_floor" in debit_warning
+    assert "skipped_keys=1" in debit_warning
+    assert f"total_kg={tiny_kg:.12g}" in debit_warning
+    assert f"floor_kg={VECTOR_TOLERANCE:.1e}" in debit_warning
+    assert "cost_credit_below_quantity_floor" in credit_warning
+    assert "skipped_keys=1" in credit_warning
+    assert f"total_kg={tiny_kg:.12g}" in credit_warning
+    assert f"floor_kg={VECTOR_TOLERANCE:.1e}" in credit_warning
 
 
-def test_sub_tolerance_beneficiary_credit_is_silent_before_fix():
+def test_sub_tolerance_beneficiary_credits_are_counted_and_warned():
     tiny_kg = 3.226e-13
+    other_tiny_kg = 2.0e-13
     ledger = CostLedger()
     ledger.seed_external_material(
         account="process.reagent_inventory",
@@ -139,6 +145,7 @@ def test_sub_tolerance_beneficiary_credit_is_silent_before_fix():
         debits=(MaterialLot("process.reagent_inventory", {"Mg": 1.0}),),
         credits=(
             MaterialLot("terminal.product", {"Al": 1.0, "Si": tiny_kg}),
+            MaterialLot("terminal.slag", {"CaO": other_tiny_kg}),
         ),
     )
 
@@ -150,9 +157,17 @@ def test_sub_tolerance_beneficiary_credit_is_silent_before_fix():
 
     assert result is not None
     summary = ledger.summary()
-    assert summary["warnings"] == []
+    warnings = summary["warnings"]
+    assert len(warnings) == 1
+    assert "cost_credit_below_quantity_floor" in warnings[0]
+    assert "skipped_keys=2" in warnings[0]
+    assert f"total_kg={tiny_kg + other_tiny_kg:.12g}" in warnings[0]
+    assert f"floor_kg={VECTOR_TOLERANCE:.1e}" in warnings[0]
     assert "terminal.product:Al" in summary["product_costs"]
     assert "terminal.product:Si" not in summary["product_costs"]
+    assert summary["product_costs"]["terminal.product:Al"]["accumulated_cost"] == (
+        CostVector(thermal_flux_h=2.0).to_json()
+    )
 
 
 def test_cost_ledger_mass_allocates_normal_coproducts_by_product_mass():

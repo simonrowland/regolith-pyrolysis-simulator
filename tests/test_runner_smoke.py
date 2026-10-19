@@ -86,6 +86,8 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # Golden pins for all evaporation flux maps emitted during each shipped runner
 # scenario and the ledger-facing product outputs. These are captured separately
 # from the runner JSON because its public envelope does not include raw flux maps.
+# The cost-rollup digest excludes warnings so counted credit-floor diagnostics
+# cannot hide a change to any cost or quantity value.
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
         # b-899 one-redox-state rebaseline:
@@ -1617,6 +1619,29 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config, monkeyp
 
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
+    expected_cost_warnings = expected["run_metadata"]["cost_rollup_diagnostic"][
+        "warnings"
+    ]
+    actual_cost_diagnostic = actual["run_metadata"]["cost_rollup_diagnostic"]
+    actual_cost_warnings = actual_cost_diagnostic["warnings"]
+    credit_floor_warnings = [
+        warning
+        for warning in actual_cost_warnings
+        if warning.startswith("cost_credit_below_quantity_floor: ")
+    ]
+    assert [
+        warning
+        for warning in actual_cost_warnings
+        if not warning.startswith("cost_credit_below_quantity_floor: ")
+    ] == expected_cost_warnings
+    for warning in credit_floor_warnings:
+        fields = warning.split()
+        assert len(fields) == 4
+        assert fields[0] == "cost_credit_below_quantity_floor:"
+        assert int(fields[1].removeprefix("skipped_keys=")) > 0
+        assert float(fields[2].removeprefix("total_kg=")) > 0.0
+        assert fields[3] == "floor_kg=1.0e-12"
+    actual_cost_diagnostic["warnings"] = expected_cost_warnings
     assert actual == expected, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
         "regenerate all canonical scenarios via "
