@@ -4185,7 +4185,19 @@ class CondensationModel:
         converged = False
         previous_delta: float | None = None
         relaxation = 1.0
-        for iteration in range(1024):
+        # Pure Cr, two supply-limited walls: inlet q, upstream capture x,
+        # stage candidate h, budget b (all kg over the routing interval).
+        # Raw wall candidates q and q-x are normalized to sum to q.
+        # Candidate normalization gives F(x)=b*q²/[(h+q)*(2q-x)]. Hence
+        # F'(x*)=x*/(2q-x*) is dimensionless and tends to 1 as h -> 0,
+        # b -> q. The physical root is x*=q-sqrt(q²-b*q²/(h+q)).
+        # At q=3.5, h=4.0694e-5, b=3.4999952, x*=3.4873817:
+        # rho=0.9928154, or 0.2+0.8*rho=0.9942524 with relaxation.
+        # From the 1024-step residual, ceil(ln(1e-7/1.3455e-7)/
+        # ln(0.9942524))=52 more steps reach the unchanged 1e-7 criterion.
+        # Keep a bounded budget with margin.
+        max_iterations = 2048
+        for iteration in range(max_iterations):
             species_rates_by_segment = segment_rates_from_capture(
                 stage_capture,
                 wall_capture,
@@ -4235,9 +4247,9 @@ class CondensationModel:
             )
             previous_delta = delta
         if not converged:
-            self.last_wall_capture_fixed_point_iterations = 1024
+            self.last_wall_capture_fixed_point_iterations = max_iterations
             raise RuntimeError(
-                'wall/stage capture fixed-point did not converge in 1024 '
+                f'wall/stage capture fixed-point did not converge in {max_iterations} '
                 f'iterations (relative delta={delta:.12g})'
             )
         if (
@@ -4725,6 +4737,7 @@ def _species_vapor_data(
     species: str,
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
+    temperature_K: float | None = None,
 ) -> Mapping[str, Any]:
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
@@ -4769,6 +4782,32 @@ def _species_vapor_data(
                             )
                             continue
                     merged[key] = value
+                # An explicit changed legacy fit owns its declared wall
+                # coverage ahead of an unchanged inherited pure sidecar.
+                # Outside that coverage, keep the default sidecar/JANAF
+                # selection. A changed pure sidecar retains its precedence.
+                custom_antoine = data.get('antoine')
+                if (
+                    temperature_K is not None
+                    and isinstance(custom_antoine, Mapping)
+                    and not _missing_required_antoine_keys(custom_antoine)
+                    and custom_antoine != global_data.get('antoine')
+                    and merged.get('pure_component_antoine')
+                    == global_data.get('pure_component_antoine')
+                ):
+                    from engines.builtin.vapor_pressure import (
+                        FIT_TARGET_STANDARD_REACTION,
+                        _fit_target,
+                        vapor_pressure_valid_range_K,
+                    )
+
+                    band = vapor_pressure_valid_range_K(merged, 'antoine', temperature_K)
+                    if (
+                        _fit_target(merged) != FIT_TARGET_STANDARD_REACTION
+                        and band is not None
+                        and float(band[0]) <= temperature_K <= float(band[1])
+                    ):
+                        merged.pop('pure_component_antoine', None)
                 return merged
         if catalog_authoritative:
             return {}
@@ -5897,6 +5936,7 @@ def _antoine_psat_pa(
     data = _species_vapor_data(
         species,
         vapor_pressure_data=vapor_pressure_data,
+        temperature_K=T_K,
     )
     has_legacy_antoine = any(
         isinstance(block, Mapping)

@@ -667,6 +667,11 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
         "oxide_vapors": {},
     }
     custom_vapor_pressures["metals"]["Ca"]["antoine"]["A"] += 8.0
+    # This route samples the 1053.15 K condensation reference and cold
+    # stage surfaces, below the built-in legacy fit's 1115 K lower edge.
+    # Declare the train's temperatures as custom coverage so the test exercises
+    # override precedence, rather than the default JANAF extrapolation.
+    custom_vapor_pressures["metals"]["Ca"]["antoine"]["valid_range_K"] = [400.0, 2000.0]
 
     default_route = route_calcium()
     custom_route = route_calcium(custom_vapor_pressures)
@@ -674,7 +679,8 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
     default_stage4 = default_route.condensed_by_stage_species[4]["Ca"]
     default_stage5 = default_route.condensed_by_stage_species[5]["Ca"]
     custom_stage4 = custom_route.condensed_by_stage_species[4]["Ca"]
-    custom_stage5 = custom_route.condensed_by_stage_species[5]["Ca"]
+    # A fully captured upstream supply leaves no Stage-5 entry.
+    custom_stage5 = custom_route.condensed_by_stage_species.get(5, {}).get("Ca", 0.0)
 
     assert custom_stage4 > default_stage4
     assert custom_stage5 < default_stage5 * 0.8
@@ -687,6 +693,50 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
         )
     assert fallback.value.reason == default.value.reason
     assert fallback.value.valid_range_K == default.value.valid_range_K
+
+
+@pytest.mark.parametrize("block_name,temperature_K", [
+    ("antoine", 1173.15),
+    ("pure_component_antoine", 900.0),
+])
+def test_custom_wall_fit_wins_inside_its_declared_coverage(block_name, temperature_K):
+    from engines.antoine import _antoine_log10_pressure
+
+    row = copy.deepcopy(condensation_module.VAPOR_PRESSURE_DATA["metals"]["Ca"])
+    block = row[block_name]
+    block["A"] += 1.0
+    if block_name == "pure_component_antoine":
+        block["valid_range_K"] = [900.0, 1712.0]
+    custom = {"metals": {"Ca": row}, "oxide_vapors": {}}
+
+    pressure = condensation_module._antoine_psat_pa(
+        "Ca", temperature_K, vapor_pressure_data=custom,
+    )
+
+    assert pressure == pytest.approx(10.0 ** _antoine_log10_pressure(
+        block["A"], block["B"], block["C"], temperature_K,
+    ))
+    assert pressure != condensation_module._antoine_psat_pa("Ca", temperature_K)
+
+
+def test_custom_legacy_wall_fit_keeps_default_below_its_coverage():
+    row = copy.deepcopy(condensation_module.VAPOR_PRESSURE_DATA["metals"]["Ca"])
+    row["antoine"]["A"] += 8.0
+    custom = {"metals": {"Ca": row}, "oxide_vapors": {}}
+
+    assert condensation_module._antoine_psat_pa(
+        "Ca", 670.0, vapor_pressure_data=custom,
+    ) == condensation_module._antoine_psat_pa("Ca", 670.0)
+
+
+def test_custom_melt_source_fit_does_not_displace_wall_saturation_sidecar():
+    row = copy.deepcopy(condensation_module.VAPOR_PRESSURE_DATA["metals"]["Na"])
+    row["antoine"]["A"] += 1.0
+    custom = {"metals": {"Na": row}, "oxide_vapors": {}}
+
+    assert condensation_module._antoine_psat_pa(
+        "Na", 1500.0, vapor_pressure_data=custom,
+    ) == condensation_module._antoine_psat_pa("Na", 1500.0)
 
 
 def test_partial_custom_antoine_block_falls_back_to_global_coefficients():
