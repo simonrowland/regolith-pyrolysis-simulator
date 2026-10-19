@@ -15,7 +15,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from simulator.battery.enums import Quantity, ValueKind
-from simulator.battery.migrate import Migrator, _log_fO2_to_pa
+from simulator.battery.migrate import Migrator, _BOUNDED_FO2_REASON, _log_fO2_to_pa
 from simulator.battery.records import Located, Value
 from tests.battery.test_migrate import _scalar_extract, _write_min_tree
 
@@ -296,6 +296,104 @@ def test_child_typed_pressure_beats_parent_log(tmp_path: Path) -> None:
     oxygen = matches[0].identity.fO2_Pa
     assert oxygen is not None and oxygen.is_value
     assert oxygen.value == Decimal("0.001")
+
+
+def _series_activity_rows(result):
+    return [
+        observation
+        for observation in result.observations.values()
+        if ":row=" in observation.observation_id
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+    ]
+
+
+def test_child_bound_pressure_beats_parent_log(tmp_path: Path) -> None:
+    # Parent log -9 bar is 1e-4 Pa. A typed bound on the child is present
+    # oxygen, not an absent axis, so the parent point is not assigned.
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        parent={"log_fO2": {"value": "-9", "units": "log10(bar)"}},
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "point_conditions": {
+                "fO2_Pa": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "kind": "bound",
+                            "bound_operator": "<",
+                            "bound_value": "0.001",
+                        },
+                    },
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    rows = _series_activity_rows(result)
+    assert len(rows) == 1
+    oxygen = rows[0].identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_unknown
+    assert oxygen.reason == _BOUNDED_FO2_REASON
+
+
+def test_child_typed_unknown_pressure_beats_parent_log(tmp_path: Path) -> None:
+    reason = "source prints only an upper bound"
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        parent={"log_fO2": {"value": "-9", "units": "log10(bar)"}},
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "point_conditions": {
+                "fO2_Pa": {
+                    "state": {"tag": "unknown", "reason": reason},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    rows = _series_activity_rows(result)
+    assert len(rows) == 1
+    located = rows[0].point_conditions["fO2_Pa"]
+    assert located.state.is_unknown
+    assert located.state.reason == reason
+    oxygen = rows[0].identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_unknown
+    assert oxygen.value != _log_fO2_to_pa(Decimal("-9"))
+
+
+def test_child_printed_pressure_bound_beats_parent_log(tmp_path: Path) -> None:
+    # <10^-10 atm is a printed upper bound (1.01325e-5 Pa), not a point.
+    # The parent log must not replace it with 1e-4 Pa.
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        parent={"log_fO2": {"value": "-9", "units": "log10(bar)"}},
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "oxygen_partial_pressure": {
+                "value": "<10^-10",
+                "units": "atm",
+                "semantics": "upper_bound_not_point",
+                "locator": {"published_page": 1},
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    rows = _series_activity_rows(result)
+    assert len(rows) == 1
+    oxygen = rows[0].identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_unknown
+    assert oxygen.reason == _BOUNDED_FO2_REASON
+    assert oxygen.value != _log_fO2_to_pa(Decimal("-9"))
 
 
 def test_plante_derived_ratio_reaches_p_partial_identity() -> None:

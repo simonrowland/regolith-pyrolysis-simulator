@@ -11467,6 +11467,37 @@ def _oxygen_pressure_point(located: object) -> Decimal | None:
     return None
 
 
+def _present_non_point_oxygen_reason(
+    raw_item: object,
+    point_conditions: Mapping[str, Any] | None,
+) -> str | None:
+    """Reason when this row printed oxygen that is not an absolute point.
+
+    Absent oxygen returns None, so a parent fallback may fill it. A typed
+    unknown, a bound or interval, or a printed pressure the collector
+    refuses (``<10^-10 atm``) is present. That refusal wins over the parent.
+    """
+
+    located = (point_conditions or {}).get("fO2_Pa")
+    if isinstance(located, Located):
+        state = located.state
+        if state.is_unknown:
+            return state.reason or _BOUNDED_FO2_REASON
+        if state.is_value:
+            raw = state.value
+            if isinstance(raw, Value) and raw.kind is not ValueKind.POINT:
+                return _BOUNDED_FO2_REASON
+            if not isinstance(raw, (Decimal, Value)):
+                return _BOUNDED_FO2_REASON
+    if isinstance(raw_item, Mapping):
+        node = raw_item.get("oxygen_partial_pressure")
+        if isinstance(node, Mapping) and _oxygen_node_rejected(node, node.get("value")):
+            return _BOUNDED_FO2_REASON
+        if isinstance(node, str) and _POINT_REJECT.match(node.strip()):
+            return _BOUNDED_FO2_REASON
+    return None
+
+
 def _printed_oxygen_buffer_text(
     raw_item: object,
     point_conditions: Mapping[str, Any] | None,
@@ -11532,17 +11563,25 @@ def printed_oxygen_decision(
     has_log = isinstance(log_point, Decimal) and log_point.is_finite()
     facts_pa = _oxygen_pressure_point(facts.oxygen_partial_pressure_Pa)
     point_pa = _oxygen_pressure_point((point_conditions or {}).get("fO2_Pa"))
-    if facts.rejected_log_fO2 or (
+    # A typed unknown or bound is present oxygen. None here means absent,
+    # which is the only result a parent fallback may replace.
+    non_point_reason = (
+        _present_non_point_oxygen_reason(raw_item, point_conditions)
+        if not has_log and facts_pa is None and point_pa is None
+        else None
+    )
+    if facts.rejected_log_fO2 or non_point_reason is not None or (
         buffer_text is not None
         and not has_log
         and facts_pa is None
         and point_pa is None
     ):
-        reason = (
-            _BUFFER_RELATIVE_FO2_REASON.format(buffer=buffer_text)
-            if buffer_text is not None
-            else _BOUNDED_FO2_REASON
-        )
+        if non_point_reason is not None:
+            reason = non_point_reason
+        elif buffer_text is not None:
+            reason = _BUFFER_RELATIVE_FO2_REASON.format(buffer=buffer_text)
+        else:
+            reason = _BOUNDED_FO2_REASON
         return PrintedOxygenDecision("refusal", State.unknown(reason))
     if has_log:
         return PrintedOxygenDecision(
@@ -11707,6 +11746,19 @@ def _printed_oxygen_state_for(
         return None
     current = identity.fO2_Pa
     if from_fallback and current is not None and not current.is_unknown:
+        return None
+    # A typed unknown blocks a parent point. It does not replace the
+    # profile's unknown sentence. A bound or buffer refusal does: that
+    # sentence is the row's oxygen result.
+    if (
+        decision.kind == "refusal"
+        and current is not None
+        and current.is_unknown
+        and decision.state.is_unknown
+        and current.reason != decision.state.reason
+        and decision.state.reason != _BOUNDED_FO2_REASON
+        and not (decision.state.reason or "").startswith("buffer-relative fO2 (")
+    ):
         return None
     if (
         current is not None
