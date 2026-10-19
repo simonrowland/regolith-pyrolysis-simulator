@@ -54,7 +54,6 @@ TOUCHED_EXTRACTS = (
     "data/literature/extracts/oneill-2002-feo-activity-coefficients-cmas.yaml",
     "data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml",
     "data/literature/extracts/robinot-2025-promes-review.yaml",
-    "data/literature/extracts/ivtan-cro2-g.yaml",
     "data/literature/extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml",
     "data/literature/extracts/seki-2011-ca-o-solubility-fe-cao-al2o3.yaml",
     "data/literature/extracts/shornikov-1994-mullite-kems.yaml",
@@ -232,9 +231,10 @@ def _numeric_values(value, parent_key="", published_only=False):
         if not published_only or re.search(r"as_(?:published|printed)$", parent_key):
             yield str(value)
     elif isinstance(value, str) and re.search(r"as_(?:published|printed)$", parent_key):
-        numeric_text = re.sub(r"[×xX*]\s*10\s*\^?\s*[−-]?\s*\d+", "", value)
-        if re.fullmatch(r"[\s\d.,±+−–—﹣－*/()^%eE-]+", numeric_text):
-            yield from re.findall(r"[−–—﹣－-]?\s*(?:\d+(?:\.\d*)?|\.\d+)", numeric_text)
+        measured_text = re.split(r"±|\+/-", value, maxsplit=1)[0]
+        match = re.match(r"\s*\(?\s*([−–—﹣－-]?\s*(?:\d+(?:\.\d*)?|\.\d+))", measured_text)
+        if match:
+            yield re.sub(r"\s+", "", match.group(1))
 
 
 def _digitized(value):
@@ -261,9 +261,11 @@ def _observation_values(document, locator_path):
             bound = bound[int(part)] if isinstance(bound, list) else bound[part]
         if isinstance(bound, dict) and "value" in bound:
             value_path = str(bound.get("path", bound.get("field", "")))
+            note = str(bound.get("note", ""))
             if (re.search(r"as_(?:published|printed)$|value_as_published$", value_path)
-                    or re.search(r"\bprinted\b", str(bound.get("note", "")), re.I)) and not re.search(r"digitiz", str(bound.get("note", "")), re.I):
-                yield from _numeric_values(bound["value"])
+                    or re.search(r"\bprinted\b", note, re.I)) and not re.search(r"digitiz", note, re.I):
+                field_context = value_path if re.search(r"as_(?:published|printed)$|value_as_published$", value_path) else "value_as_published"
+                yield from _numeric_values(bound["value"], parent_key=field_context)
         return
     for index, part in enumerate(locator_path[:-1]):
         if part not in {"observations", "context"} or index + 1 >= len(locator_path) - 1:
@@ -285,7 +287,19 @@ def _generic_observation_values(document, locator_path):
         bound = document
         for part in locator_path[:-1]:
             bound = bound[int(part)] if isinstance(bound, list) else bound[part]
-        return tuple(_numeric_values(bound.get("value"))) if isinstance(bound, dict) else ()
+        if not isinstance(bound, dict) or "value" not in bound:
+            return ()
+        value_path = str(bound.get("path", bound.get("field", "")))
+        note = str(bound.get("note", ""))
+        if re.search(r"digitiz", note, re.I):
+            return ()
+        if re.search(r"as_(?:published|printed)$|value_as_published$", value_path):
+            field_context = value_path
+        elif re.search(r"\bprinted\b", note, re.I):
+            field_context = "value_as_published"
+        else:
+            field_context = value_path.rsplit(".", 1)[-1]
+        return tuple(_numeric_values(bound["value"], parent_key=field_context))
     for index, part in enumerate(locator_path[:-1]):
         if part not in {"observations", "context"} or index + 1 >= len(locator_path) - 1:
             continue
@@ -342,7 +356,8 @@ def _number_pattern(value):
     if not number.is_finite():
         return None
     text = format(number, "f")
-    sign = r"(?:[−–—﹣－-]\s*)?" if original.strip().startswith("-") else ""
+    negative = original.strip().startswith("-")
+    sign = r"[−–—﹣－-]\s*" if negative else ""
     digits = text.lstrip("-")
     if "." in digits:
         integer, fraction = digits.split(".", 1)
@@ -358,7 +373,8 @@ def _number_pattern(value):
     body = r"\s*".join(re.escape(char) for char in digits)
     if digits.startswith("0."):
         body = "0?" + body[1:]
-    return re.compile(rf"(?<![\d.]){sign}{body}{trailing_zeros}(?![\d.])")
+    prefix = r"(?<![\d.])" if negative else r"(?<![\d.−–—﹣－-])"
+    return re.compile(rf"{prefix}{sign}{body}{trailing_zeros}(?![\d.])")
 
 
 def _assert_observation_value(page_text, observation_values):
@@ -550,14 +566,20 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
     recorded_fields = ("extract", "locator", "printed_string", "class", "verdict")
     for expected, recorded in zip(value_skips, recorded_skips):
         if recorded["class"] == "render-confirmed":
-            assert recorded["crop_path"], "render-confirmed value skip requires its 600-dpi crop path"
+            crop_path = Path(recorded["crop_path"])
+            assert not crop_path.is_absolute(), "render-confirmed crop path must be repository-relative"
+            assert (ROOT / crop_path).is_file(), "render-confirmed value skip crop does not resolve"
             expected["class"] = "render-confirmed"
             expected["verdict"] = "render-confirmed; no text layer"
             value_render_justified += 1
         assert {field: expected[field] for field in recorded_fields} == {
             field: recorded[field] for field in recorded_fields
         }, "typed locator value skip differs from committed CSV"
-    assert all(row["crop_path"] for row in recorded_skips if row["class"] == "render-confirmed")
+    assert all(
+        not Path(row["crop_path"]).is_absolute()
+        and (ROOT / row["crop_path"]).is_file()
+        for row in recorded_skips if row["class"] == "render-confirmed"
+    )
     print(f"render-justified values: {value_render_justified}")
     print(f"typed value skips: {sum(row['class'] == 'digitized' for row in value_skips)} digitized, "
           f"{sum(row['class'] == 'categorical' for row in value_skips)} categorical, "
@@ -572,6 +594,46 @@ def test_reiss_apparatus_values_are_not_measured_observation_values():
     locator_path = ("species", "NU-LHT-2M", "observations", "2", "locator")
     assert tuple(_observation_values(document, locator_path)) == ()
     assert _generic_observation_values(document, locator_path) == ()
+
+
+def test_printed_string_checks_central_measured_value_with_field_context():
+    import pytest
+
+    document = {
+        "fidelity_samples": [
+            {
+                "path": "species.Ca.observations[row].values.P_Ca_as_printed",
+                "value": "2.2 ± 0.2",
+                "locator": {"table": "Ia", "page": 2, "pdf_page_index": 1},
+            }
+        ]
+    }
+    locator_path = ("fidelity_samples", "0", "locator")
+    measured_value = tuple(_observation_values(document, locator_path))
+
+    assert measured_value == ("2.2",)
+    assert tuple(_numeric_values("NaCl(l) + K2O(slag)", parent_key="reaction_as_printed", published_only=True)) == ()
+    assert tuple(_numeric_values("P_KCl / P_K(no NaCl) ~ 10^4", parent_key="expression_as_printed", published_only=True)) == ()
+    _assert_observation_value("P_Ca 2.2 ± 0.2", measured_value)
+    with pytest.raises(AssertionError, match="no printed observation value"):
+        _assert_observation_value("P_Ca 0.2", measured_value)
+    with pytest.raises(AssertionError, match="no printed observation value"):
+        _assert_observation_value("P_Ca -2.2", measured_value)
+
+
+def test_tsuzuki_printed_coefficient_is_checked_as_its_measured_field():
+    document = _yaml((ROOT / "data/literature/extracts/ts1985.yaml").read_text())
+    observation = document["species"]["Na2O"]["observations"][0]
+    row = observation["values"]["rows"][0]
+    measured_value = tuple(
+        _numeric_values(row["A_as_printed"], parent_key="A_as_printed", published_only=True)
+    )
+    assert measured_value == ("-1.46",)
+    pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
+    assert pdf is not None
+    assert _label_pattern(observation["locator"]).search(
+        _normalize_label_text(_page_text(str(pdf), 7))
+    )
 
 
 def test_continued_table_checks_caption_page_and_data_page():
@@ -631,6 +693,38 @@ def test_zigo_table_1_prose_mention_does_not_satisfy_data_locator():
         assert str(exc) == "no printed observation value is present on cited page"
     else:
         raise AssertionError("Table 1 page-5 prose mention incorrectly satisfied the data locator")
+
+
+def test_zigo_equation_and_prose_locators_bind_to_their_physical_pages():
+    document = _yaml((ROOT / "data/literature/extracts/zigo-1987-gehlenite-fusion.yaml").read_text())
+    observations = {
+        row["observation_id"]: row
+        for row in document["species"]["gehlenite"]["observations"]
+    }
+    pins = (
+        ("zigo_1987_t4_melt_relative_enthalpy_fit", 8, 7, 178, "6"),
+        ("zigo_1987_fusion_enthalpy_at_1863K", 9, 8, 179, "7"),
+        ("zigo_1987_fusion_entropy_at_1863K", 9, 8, 179, "8"),
+        ("zigo_1987_fusion_temperature_sensitivity", 10, 9, 180, None),
+    )
+    for observation_id, page, index, folio, equation in pins:
+        locator = observations[observation_id]["locator"]
+        assert (locator["page"], locator["pdf_page_index"], locator["published_page"]) == (
+            page, index, folio
+        )
+        if equation is not None:
+            assert locator["equation"] == equation
+    pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
+    assert pdf is not None
+    page7 = _normalize_label_text(_page_text(str(pdf), 7))
+    page8 = _normalize_label_text(_page_text(str(pdf), 8))
+    page9 = _normalize_label_text(_page_text(str(pdf), 9))
+    page10 = _normalize_label_text(_page_text(str(pdf), 10))
+    assert re.search(r"\(\s*6\s*\)", page8) and "2.9" in page8
+    assert not re.search(r"\(\s*6\s*\)", page7)
+    assert re.search(r"\(\s*7\s*\)", page9) and "172.1" in page9
+    assert re.search(r"\(\s*[8S]\s*\)", page9) and re.search(r"9\s*2\s*4", page9)
+    assert "1857" in page10 and "1866" in page10
 
 
 def test_figure_caption_regex_handles_spacing_and_japanese_suffix():
