@@ -488,16 +488,19 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
     return tuple(results)
 
 
-def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
+def melt_activity_requests(
+    inputs: ConsumerInputs, *, experiment=None, bench=None, observation=None,
+) -> tuple[GeneratedInput, ...]:
     """Activity and activity-coefficient requests for engines that report activities.
 
     Required: a normalized composition, a point temperature, and a reference
-    state whose endmember formula is the activity that engine reports. Engines
-    that model redox require an oxygen point when the composition or measured
-    species holds a multivalent element; the internal-analytical built-in
-    activity function consumes the oxide composition directly. Pressure and
-    the gas boundary are not inputs. A missing required input is a typed gap,
-    and a missing oxygen point is never filled from the engine default.
+    state whose endmember formula is the activity that engine reports. When
+    the composition or measured species holds a multivalent element, every
+    engine receives the same fO2 from the row ladder, or the same oxygen gap
+    when no tier resolves. A printed fO2 is attached for every engine even
+    when oxygen is not otherwise an input. Pressure and the gas boundary are
+    not inputs. A missing required input is a typed gap, and a missing oxygen
+    point is never filled from the engine default.
     """
     provenance = _provenance(inputs)
     if inputs.pure_substance_reference:
@@ -542,19 +545,37 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
         redox = _redox_components(composition.selected.value, inputs.measured_species)
     elif inputs.measured_species and _is_multivalent(inputs.measured_species):
         redox = (inputs.measured_species,)
-    if redox:
+    temperature_K = None
+    thermal = inputs.waypoints["temperature_K"]
+    if thermal.selected is not None and _point_gap("temperature_K", thermal.selected) is None:
+        try:
+            temperature_K = float(_point(inputs, "temperature_K"))
+        except UnsupportedValue:
+            temperature_K = None
+    moles = None
+    if composition.selected is not None and isinstance(composition.selected.value, Mapping):
+        moles = composition.selected.value
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition_moles=moles,
+        temperature_K=temperature_K,
+        oxygen=inputs.waypoints["oxygen_condition"],
+    )
+    # Tier 1 is the printed fO2 and is shared even when oxygen is not
+    # otherwise an input. Tiers 2-4 fill only a multivalent row.
+    shared = resolved if resolved is not None and (resolved.tier == 1 or redox) else None
+    if redox and shared is None:
         oxygen = inputs.waypoints["oxygen_condition"]
-        if oxygen.selected is None:
-            absence = oxygen.absence
-            gaps.append(ReadinessGap(
-                "oxygen_condition",
-                GapReason.MISSING_EVIDENCE,
-                tuple(dict.fromkeys((*redox, *(absence.missing if absence else ())))),
-            ))
-        else:
-            point_gap = _point_gap("oxygen_condition", oxygen.selected)
-            if point_gap is not None:
-                gaps.append(point_gap)
+        absence = oxygen.absence
+        gaps.append(ReadinessGap(
+            "oxygen_condition",
+            GapReason.MISSING_EVIDENCE,
+            tuple(dict.fromkeys((*redox, *(absence.missing if absence else ())))),
+        ))
     gap_tuple = tuple(dict.fromkeys(gaps))
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
@@ -564,14 +585,7 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
         if engine == "internal-analytical" and inputs.activity_quantity != "activity":
             results.append(_not_applicable(provenance, engine))
             continue
-        engine_gaps = tuple(
-            gap
-            for gap in gap_tuple
-            if not (
-                engine == "internal-analytical"
-                and gap.waypoint == "oxygen_condition"
-            )
-        )
+        engine_gaps = gap_tuple
         engine_status = (
             ReadinessStatus.GAP if engine_gaps else ReadinessStatus.READY
         )
@@ -653,15 +667,20 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
                     "engine_reports": reported,
                 },
             }
-            if redox or engine in {"internal-analytical", "alphamelts"}:
-                oxygen_waypoint = inputs.waypoints["oxygen_condition"].selected
-                if oxygen_waypoint is not None:
-                    oxygen_log = _point(inputs, "oxygen_condition")
-                    payload["fO2_log"] = float(oxygen_log)
-                    routes["fO2_log"] = {
-                        "waypoint": "oxygen_condition",
-                        "because": list(redox),
-                    }
+            if shared is not None:
+                payload["fO2_log"] = shared.log10_fO2_bar
+                payload["fO2_tier"] = shared.tier
+                payload["fO2_route"] = shared.route
+                payload["fO2_borrowed"] = shared.borrowed
+                if shared.po2_bar is not None:
+                    payload["fO2_bar"] = shared.po2_bar
+                routes["fO2_log"] = {
+                    "waypoint": "fo2_ladder",
+                    "tier": shared.tier,
+                    "route": shared.route,
+                    "borrowed": shared.borrowed,
+                    "because": list(redox),
+                }
             results.append(GeneratedInput(readiness, payload, {**provenance, "output_routes": routes}))
         except UnsupportedValue as exc:
             results.append(_refused(readiness, provenance, str(exc)))
@@ -684,7 +703,12 @@ def activity_request_for_engine(experiment, observation, engine: str) -> Generat
         getattr(experiment, "work_id", None) or observation.source_id or "melt-activity",
         BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
     )
-    for item in melt_activity_requests(collect_consumer_inputs(experiment, bench, observation)):
+    for item in melt_activity_requests(
+        collect_consumer_inputs(experiment, bench, observation),
+        experiment=experiment,
+        bench=bench,
+        observation=observation,
+    ):
         if item.readiness.engine == engine:
             return item
     return None

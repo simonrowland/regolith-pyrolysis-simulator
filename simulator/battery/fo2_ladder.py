@@ -1,0 +1,488 @@
+"""One fO2 per row, shared by every engine (d-180).
+
+The ladder is the seeding order from d-160/d-163:
+
+1. printed fO2;
+2. printed Fe3+/ΣFe through the Kress91 inverse;
+3. the experiment's controlled atmosphere or buffer;
+4. the melt's intrinsic fO2, flagged borrowed.
+
+Tiers 1 and 3 reuse ``oxygen_condition`` routes. The Kress inverse lives in
+``simulator.fe_redox``. Tier 4 is ``intrinsic_melt_fO2``, the ledger diagnostic
+in this tree (the d-160 feedstock seeder is not on this commit). A row that
+resolves nothing returns None; callers refuse every engine the same way.
+"""
+
+from __future__ import annotations
+
+import math
+from collections.abc import Mapping
+from dataclasses import dataclass
+from decimal import Decimal
+
+from simulator.battery.enums import AmountBasis, NoticeKind, Quantity, ValueKind
+from simulator.battery.identity import Identity
+from simulator.battery.records import (
+    Composition,
+    Experiment,
+    Notice,
+    Observation,
+    Value,
+)
+from simulator.battery.waypoints import (
+    Waypoint,
+    WaypointAuthority,
+    WaypointResult,
+    oxygen_condition,
+)
+
+_TIER1_DIRECT_ROUTES = frozenset({
+    "oxygen_partial_pressure_to_log_fO2",
+    "oxygen_sweep_partial_pressure",
+    "oxygen_sweep_component_partial_pressure",
+})
+_TIER3_ROUTES = (
+    "observation_gas_composition",
+    "observation_gas_couple_equilibrium",
+    "graphite_c_co_buffer",
+    "buffer_relation",
+    "vacuum_total_pressure_upper_bound",
+)
+_FERRIC_FRACTION_FIELDS = ("Fe3_over_FeT", "Fe3_over_sum_Fe")
+_FE3_FE2_RATIO_FIELDS = ("fe3_fe2_ratio", "Fe3_over_Fe2")
+_TEMPERATURE_UNSET = object()
+
+
+@dataclass(frozen=True)
+class ResolvedFo2:
+    log10_fO2_bar: float
+    tier: int
+    route: str
+    borrowed: bool
+    # Set when the printed source is a pascal value. Callers command
+    # float(Pa)/1e5 rather than 10**log so that printed row stays bit-identical.
+    po2_bar: float | None = None
+
+
+def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
+    reason = f"fo2_tier={resolved.tier}; route={resolved.route}"
+    if resolved.borrowed:
+        reason += "; borrowed"
+    return Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin="fo2_ladder",
+    )
+
+
+def derived_fo2_condition(observation: Observation) -> bool:
+    point = (observation.point_conditions or {}).get("fO2_Pa")
+    if point is not None:
+        if point.inference is not None:
+            return True
+        note = point.locator.note if point.locator is not None else None
+        if note is not None and "derived condition" in note.casefold():
+            return True
+    return any(
+        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and isinstance(notice.reason, str)
+        and notice.reason.startswith("fO2_Pa is a DERIVED condition")
+        for notice in observation.notices
+    )
+
+
+def has_printed_fo2(observation: Observation, identity: Identity) -> bool:
+    if derived_fo2_condition(observation):
+        return False
+    fo2 = identity.fO2_Pa
+    if fo2 is not None and fo2.is_value and fo2.value is not None:
+        return True
+    point = (observation.point_conditions or {}).get("fO2_Pa")
+    return bool(
+        point is not None
+        and point.inference is None
+        and point.state.is_value
+    )
+
+
+def resolve_row_fo2(
+    experiment: Experiment | None,
+    bench: object | None,
+    observation: Observation | None,
+    *,
+    composition: Composition | None = None,
+    composition_moles: Mapping[str, object] | None = None,
+    composition_wt: Mapping[str, float] | None = None,
+    temperature_K: float | None | object = _TEMPERATURE_UNSET,
+    oxygen: WaypointResult | None = None,
+) -> ResolvedFo2 | None:
+    """Resolve one fO2 for this row. None when every tier fails.
+
+    An explicit ``temperature_K=None`` means the caller already knows the
+    row has no positive point temperature. The identity temperature is used
+    only when the caller does not pass one.
+    """
+
+    identity = _identity(observation)
+    if temperature_K is _TEMPERATURE_UNSET:
+        temperature = _temperature_K(identity, None)
+    elif isinstance(temperature_K, (int, float)):
+        temperature = _temperature_K(None, float(temperature_K))
+    else:
+        temperature = None
+    routes = _oxygen_routes(experiment, bench, observation, oxygen)
+    for route in routes:
+        if _is_tier1(route, observation):
+            log = _log_point(route.value)
+            if log is not None:
+                return ResolvedFo2(log, 1, route.route, False)
+    printed = _printed_identity_bar(observation, identity)
+    if printed is not None:
+        bar, log = printed
+        return ResolvedFo2(log, 1, "identity_fO2_Pa", False, po2_bar=bar)
+    weights = _weight_percent(composition, composition_moles, composition_wt, identity)
+    tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
+    if tier2 is not None:
+        return tier2
+    for route in routes:
+        if route.route in _TIER3_ROUTES:
+            log = _log_point(route.value)
+            if log is not None:
+                return ResolvedFo2(log, 3, route.route, False)
+    atmosphere = _gas_ratio_fo2(experiment, temperature)
+    if atmosphere is not None:
+        return atmosphere
+    return _tier4(weights, temperature)
+
+
+def _identity(observation: Observation | None) -> Identity | None:
+    if observation is None or not isinstance(observation.identity, Identity):
+        return None
+    return observation.identity
+
+
+def _temperature_K(identity: Identity | None, explicit: float | None) -> float | None:
+    if explicit is not None:
+        try:
+            number = float(explicit)
+        except (TypeError, ValueError):
+            return None
+        if math.isfinite(number) and number > 0.0:
+            return number
+        return None
+    if identity is None or identity.temperature_K is None:
+        return None
+    state = identity.temperature_K
+    if not state.is_value or state.value is None:
+        return None
+    try:
+        number = float(state.value)
+    except (TypeError, ValueError):
+        return None
+    if math.isfinite(number) and number > 0.0:
+        return number
+    return None
+
+
+def _oxygen_routes(
+    experiment: Experiment | None,
+    bench: object | None,
+    observation: Observation | None,
+    oxygen: WaypointResult | None,
+) -> tuple[Waypoint, ...]:
+    if oxygen is None and experiment is not None and bench is not None:
+        oxygen = oxygen_condition(experiment, bench, observation)
+    if oxygen is None:
+        return ()
+    return oxygen.routes
+
+
+def _is_tier1(route: Waypoint, observation: Observation | None) -> bool:
+    if route.route == "observation_fO2_log":
+        return route.authority is WaypointAuthority.PRINTED
+    if route.route == "observation_fO2_Pa_to_log_fO2":
+        if observation is None or derived_fo2_condition(observation):
+            return False
+        point = (observation.point_conditions or {}).get("fO2_Pa")
+        return point is not None and point.inference is None
+    return route.route in _TIER1_DIRECT_ROUTES
+
+
+def _log_point(value: object) -> float | None:
+    if not isinstance(value, Value) or value.kind is not ValueKind.POINT:
+        return None
+    if value.point is None:
+        return None
+    try:
+        number = float(value.point)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return number
+
+
+def _printed_identity_bar(
+    observation: Observation | None, identity: Identity | None
+) -> tuple[float, float] | None:
+    if observation is None or identity is None:
+        return None
+    if not has_printed_fo2(observation, identity):
+        return None
+    state = identity.fO2_Pa
+    if state is None or not state.is_value or state.value is None:
+        return None
+    try:
+        bar = float(state.value) / 1.0e5
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not math.isfinite(bar) or bar <= 0.0:
+        return None
+    return bar, math.log10(bar)
+
+
+def _weight_percent(
+    composition: Composition | None,
+    composition_moles: Mapping[str, object] | None,
+    composition_wt: Mapping[str, float] | None,
+    identity: Identity | None,
+) -> dict[str, float] | None:
+    if composition_wt:
+        return {
+            str(name): float(amount)
+            for name, amount in composition_wt.items()
+            if _positive_finite(amount)
+        } or None
+    comp = composition
+    if comp is None and composition_moles:
+        comp = Composition(
+            "oxides",
+            tuple(
+                (str(name), Decimal(str(amount)))
+                for name, amount in composition_moles.items()
+            ),
+            AmountBasis.MOLE_FRACTION,
+        )
+    if comp is None and identity is not None and identity.composition is not None:
+        state = identity.composition
+        if state.is_value and isinstance(state.value, Composition):
+            comp = state.value
+    if comp is None:
+        return None
+    from simulator.accounting.exceptions import UnknownSpeciesError
+    from simulator.battery.score import composition_wt_pct
+
+    try:
+        return composition_wt_pct(comp)
+    except (UnknownSpeciesError, ValueError, TypeError, ArithmeticError):
+        return None
+
+
+def _positive_finite(value: object) -> bool:
+    try:
+        number = float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(number) and number > 0.0
+
+
+def _printed_number(observation: Observation | None, key: str) -> float | None:
+    if observation is None:
+        return None
+    located = (observation.point_conditions or {}).get(key)
+    if located is None or located.inference is not None or not located.state.is_value:
+        return None
+    raw = located.state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None:
+            return None
+        raw = raw.point
+    try:
+        number = float(raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return number
+
+
+def _tier2(
+    observation: Observation | None,
+    weights: dict[str, float] | None,
+    temperature_K: float | None,
+    experiment: Experiment | None,
+    bench: object | None,
+    identity: Identity | None,
+) -> ResolvedFo2 | None:
+    if temperature_K is None:
+        return None
+    fraction, source = _printed_ferric_fraction(observation, weights)
+    if fraction is None:
+        return None
+    pressure_bar, pressure_route = _kress_pressure_bar(
+        experiment, bench, observation, identity
+    )
+    mol_fractions: Mapping[str, float] = {}
+    if weights:
+        from simulator.fe_redox import (
+            Kress91InvalidControls,
+            melt_mol_fractions_for_kress91,
+        )
+
+        try:
+            mol_fractions = melt_mol_fractions_for_kress91(weights)
+        except Kress91InvalidControls:
+            mol_fractions = {}
+    from simulator.fe_redox import (
+        Kress91InvalidControls,
+        kress91_log10_fO2_from_fe3_over_sigma_fe,
+    )
+
+    try:
+        log = kress91_log10_fO2_from_fe3_over_sigma_fe(
+            fe3_over_sigma_fe=fraction,
+            mol_fractions=mol_fractions,
+            T_K=temperature_K,
+            pressure_bar=pressure_bar,
+        )
+    except Kress91InvalidControls:
+        return None
+    if not math.isfinite(log):
+        return None
+    return ResolvedFo2(
+        log,
+        2,
+        f"kress_inverse:{source};pressure={pressure_route}",
+        False,
+    )
+
+
+def _printed_ferric_fraction(
+    observation: Observation | None,
+    weights: dict[str, float] | None,
+) -> tuple[float | None, str]:
+    for key in _FERRIC_FRACTION_FIELDS:
+        number = _printed_number(observation, key)
+        if number is not None and 0.0 < number < 1.0:
+            return number, key
+    for key in _FE3_FE2_RATIO_FIELDS:
+        ratio = _printed_number(observation, key)
+        if ratio is not None and ratio > 0.0:
+            fraction = ratio / (1.0 + ratio)
+            if 0.0 < fraction < 1.0:
+                return fraction, key
+    if not weights:
+        return None, ""
+    from simulator.feedstock_composition import iron_oxide_values
+
+    try:
+        feo, fe2o3 = iron_oxide_values(weights)
+    except ValueError:
+        return None, ""
+    if feo <= 0.0 or fe2o3 <= 0.0:
+        return None, ""
+    from simulator.battery.migrate import fe3_fe2_ratio_from_oxide_wt_pct
+
+    ratio = fe3_fe2_ratio_from_oxide_wt_pct(Decimal(str(fe2o3)), Decimal(str(feo)))
+    if ratio is None or ratio <= 0:
+        return None, ""
+    fraction = float(ratio / (Decimal(1) + ratio))
+    if not 0.0 < fraction < 1.0:
+        return None, ""
+    return fraction, "FeO+Fe2O3"
+
+
+def _kress_pressure_bar(
+    experiment: Experiment | None,
+    bench: object | None,
+    observation: Observation | None,
+    identity: Identity | None,
+) -> tuple[float, str]:
+    if identity is not None and identity.total_pressure_Pa is not None:
+        state = identity.total_pressure_Pa
+        if state.is_value and state.value is not None:
+            try:
+                pascal = float(state.value)
+            except (TypeError, ValueError):
+                pascal = -1.0
+            if math.isfinite(pascal) and pascal > 0.0:
+                return pascal / 1.0e5, "identity.total_pressure_Pa"
+    if experiment is not None and bench is not None:
+        from simulator.battery.waypoints import (
+            _prediction_pressure_waypoint,
+            pressure_boundary,
+        )
+
+        boundary = _prediction_pressure_waypoint(
+            pressure_boundary(experiment, bench, observation),
+            experiment.method,
+        )
+        if boundary is not None:
+            log_bar = _pascal_point_to_bar(boundary.value)
+            if log_bar is not None:
+                return log_bar, boundary.route
+    return 1.0, "kress_reference_1_bar"
+
+
+def _pascal_point_to_bar(value: object) -> float | None:
+    if not isinstance(value, Value) or value.kind is not ValueKind.POINT:
+        return None
+    if value.point is None or value.point <= 0:
+        return None
+    try:
+        bar = float(value.point) / 1.0e5
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not math.isfinite(bar) or bar <= 0.0:
+        return None
+    return bar
+
+
+def _gas_ratio_fo2(
+    experiment: Experiment | None, temperature_K: float | None
+) -> ResolvedFo2 | None:
+    if experiment is None or temperature_K is None or experiment.fO2_control is None:
+        return None
+    ratio = experiment.fO2_control.gas_ratio
+    if ratio is None or not ratio.value.state.is_value:
+        return None
+    raw = ratio.value.state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None:
+            return None
+        raw = raw.point
+    try:
+        number = float(raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not math.isfinite(number) or number <= 0.0:
+        return None
+    from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable, imposed_fo2
+
+    try:
+        computed = imposed_fo2(
+            {ratio.numerator_species: number, ratio.denominator_species: 1.0},
+            temperature_K,
+        )
+    except OffgasFO2Unavailable:
+        return None
+    if computed.log10_fO2 is None:
+        return None
+    log = float(computed.log10_fO2)
+    if not math.isfinite(log):
+        return None
+    return ResolvedFo2(log, 3, "experiment_gas_ratio", False)
+
+
+def _tier4(
+    weights: dict[str, float] | None, temperature_K: float | None
+) -> ResolvedFo2 | None:
+    if temperature_K is None or not weights:
+        return None
+    from simulator.fe_redox import intrinsic_melt_fO2
+
+    log = float(intrinsic_melt_fO2(weights, temperature_K))
+    if not math.isfinite(log):
+        return None
+    return ResolvedFo2(log, 4, "intrinsic_melt_fO2", True)

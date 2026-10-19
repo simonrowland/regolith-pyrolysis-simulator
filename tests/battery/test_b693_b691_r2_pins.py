@@ -615,7 +615,7 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
     )
     assert not any(n.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED for n in general.notices)
     expected = {
-        "p_partial_no_o2": ("identity_incomplete", "missing_fO2", None),
+        "p_partial_no_o2": ("unsupported", None, "commanded"),
         "p_partial_printed_o2": ("unsupported", None, "commanded"),
         "p_sat_pure_reservoir": ("unsupported", None, "not_an_input"),
     }[case]
@@ -624,6 +624,12 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
         reactive_outcome[1].get("reason"),
         reactive_outcome[2],
     ) == expected
+    if case == "p_partial_no_o2":
+        assert reactive_outcome[3] is not None
+        assert any(
+            notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+            for notice in on_reactive_knudsen.notices
+        )
 
 
 def test_r2_f4_guard_borrowed_envelope_never_attaches_to_residue_dex_rows() -> None:
