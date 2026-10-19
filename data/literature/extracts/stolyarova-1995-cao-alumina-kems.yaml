@@ -898,7 +898,12 @@ species:
     observations:
       - observation_id: stolyarova_1995_cao_activity_fig1_figure_only
         type: activity_coefficient
-        locator: {figure: '1', page: 687, published_page: 687, pdf_page_index: 1}
+        locator:
+          figure: '1'
+          page: 687
+          published_page: 687
+          pdf_page_index: 1
+          note: "Figure 1 is reproduced in Shornikov (1997); canonical digitized CaO markers are stored once in shornikov-1997-cao-alumina-vapor.yaml."
         T_range_K: [1933.0, 1933.0]
         phase: CaO–Al2O3 liquid oxide melt
         regime: kems_effusion

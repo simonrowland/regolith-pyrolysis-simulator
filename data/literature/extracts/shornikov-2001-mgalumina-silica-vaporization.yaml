@@ -10,7 +10,17 @@ extraction:
   date: '2026-10-05'
   worker: codex
   dispatch_id: x-2001-mas-vap
-  method: 'All 8 pages rendered with pdftoppm at 250 dpi and read from the page images. The paper has no numeric data tables. Figures 1–3 are retained as figure-only; no curves were digitized. OCR-produced graph grids were not treated as data.'
+  method: >-
+    All 8 pages rendered with pdftoppm at 600 dpi for Figure 2 and Figure 3
+    marker reads; the paper has no numeric data tables. Figure 2 MA-S activity
+    markers are the filled upward triangles at the printed x(SiO2) compositions:
+    six for MgO, five for Al2O3 and five for SiO2 (no up-triangle at x=0 on
+    those panels). Figure 3 curve 1 keeps five up-triangle ΔfG/RT readings;
+    the printed 52.21 mole% position is a square of curve 3, so it is not
+    stored. The readings are not converted, because the schema has
+    no quantity token for dimensionless ΔfG/RT. Other curves remain figure-only. Axis
+    calibration and raw pixel reads are in
+    crown4-1018-figure-read-audit.md.
 review_status: draft
 fidelity_samples:
 - species: MgO
@@ -334,25 +344,180 @@ species:
         published_page: 327
         pdf_page_index: 5
         figure: '2'
-        note: 'Curve 1; MA-S activity in this study.'
+        panel: 'a'
+        symbol: filled upward triangles
+        note: "Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings."
       T_range_K: [2050.0, 2050.0]
       phase: MgAl2O4-SiO2 melt
       experiment: shornikov-2001-mo-kems-1623-2523k
       standard_state: 'The paper defines a*(i) as the activity of component i in the MA compound crystallized from MA-S melt at x*(i); it does not name a separate pure solid or liquid oxide standard state.'
       regime: kems_effusion
-      units: logarithmic activity as plotted; curve not digitized
+      units: dimensionless activity; log10 activity as plotted
       values:
         quantity: activity
-        method_class: figure_only
         activity_component: MgO
         composition_component: SiO2
-        composition_basis: mole percent as plotted
-        composition_axis_range_mole_percent: [0, 100]
+        composition_basis: printed_mole_percent_as_plotted
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
         curve_as_printed: '1'
         system_as_printed: MA-S
         temperature_as_printed_K: 2050
         source_attribution_as_printed: present study
-        data_scope: Curve inspected and retained as figure-only; no data points digitized.
+        data_scope: marked points digitized from Figure 2
+        points:
+          - SiO2_mole_percent_as_printed: '0.00'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '1.00'
+              SiO2: '0'
+            activity: 0.36
+            read_uncertainty_dex: 0.0021
+            audit_read_id: shornikov_2001_f2_mgo_ma_s_2050k-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '1.00']
+                    - [SiO2, '0']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: a
+                  note: "Printed x(SiO2)=0.00 mole%; complementary MgAl2O4 fraction=1.00; log10(a(MgO))=-0.441; independent page-6 600-dpi pixel reads (3394.00,998.00) and (3394.25,1000.80); read uncertainty 0.0021 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-01."
+          - SiO2_mole_percent_as_printed: '18.18'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.8182'
+              SiO2: '0.1818'
+            activity: 0.34
+            read_uncertainty_dex: 0.0002
+            audit_read_id: shornikov_2001_f2_mgo_ma_s_2050k-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.8182']
+                    - [SiO2, '0.1818']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: a
+                  note: "Printed x(SiO2)=18.18 mole%; complementary MgAl2O4 fraction=0.8182; log10(a(MgO))=-0.463; independent page-6 600-dpi pixel reads (4217.00,1011.92) and (4217.34,1012.22); read uncertainty 0.0002 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-02."
+          - SiO2_mole_percent_as_printed: '52.21'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.4779'
+              SiO2: '0.5221'
+            activity: 0.18
+            read_uncertainty_dex: 0.0008
+            audit_read_id: shornikov_2001_f2_mgo_ma_s_2050k-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.4779']
+                    - [SiO2, '0.5221']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: a
+                  note: "Printed x(SiO2)=52.21 mole%; complementary MgAl2O4 fraction=0.4779; log10(a(MgO))=-0.736; independent page-6 600-dpi pixel reads (5747.25,1191.50) and (5749.09,1192.49); read uncertainty 0.0008 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-03."
+          - SiO2_mole_percent_as_printed: '55.56'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.4444'
+              SiO2: '0.5556'
+            activity: 0.16
+            read_uncertainty_dex: 0.0003
+            audit_read_id: shornikov_2001_f2_mgo_ma_s_2050k-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.4444']
+                    - [SiO2, '0.5556']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: a
+                  note: "Printed x(SiO2)=55.56 mole%; complementary MgAl2O4 fraction=0.4444; log10(a(MgO))=-0.790; independent page-6 600-dpi pixel reads (5897.17,1226.67) and (5898.29,1227.00); read uncertainty 0.0003 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-04."
+          - SiO2_mole_percent_as_printed: '64.89'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.3511'
+              SiO2: '0.6489'
+            activity: 0.11
+            read_uncertainty_dex: 0.0005
+            audit_read_id: shornikov_2001_f2_mgo_ma_s_2050k-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.3511']
+                    - [SiO2, '0.6489']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: a
+                  note: "Printed x(SiO2)=64.89 mole%; complementary MgAl2O4 fraction=0.3511; log10(a(MgO))=-0.954; independent page-6 600-dpi pixel reads (6320.50,1334.25) and (6320.40,1334.89); read uncertainty 0.0005 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-05."
+          - SiO2_mole_percent_as_printed: '74.69'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.2531'
+              SiO2: '0.7469'
+            activity: 0.068
+            read_uncertainty_dex: 0.0005
+            audit_read_id: shornikov_2001_f2_mgo_ma_s_2050k-06
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.2531']
+                    - [SiO2, '0.7469']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: a
+                  note: "Printed x(SiO2)=74.69 mole%; complementary MgAl2O4 fraction=0.2531; log10(a(MgO))=-1.167; independent page-6 600-dpi pixel reads (6760.67,1474.25) and (6759.14,1474.91); read uncertainty 0.0005 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-06."
+
     context:
     - observation_id: shornikov_2001_abstract_scope_and_comparison
       type: interpretation
@@ -642,25 +807,155 @@ species:
         published_page: 327
         pdf_page_index: 5
         figure: '2'
-        note: 'Curve 4; MA-S activity in this study.'
+        panel: 'b'
+        symbol: filled upward triangles
+        note: "Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings."
       T_range_K: [2050.0, 2050.0]
       phase: MgAl2O4-SiO2 melt
       experiment: shornikov-2001-mo-kems-1623-2523k
-      standard_state: 'Equation (14) anchors a(Al2O3) to a*(Al2O3), the activity of the Al2O3 component in crystallized MA at x*(SiO2)=34.08 ± 0.18 mole % SiO2 and 2050 K; the paper does not name a separate pure solid or liquid oxide standard state.'
+      standard_state: 'Equation (14) anchors a(Al2O3) to a*(Al2O3), the activity in crystallized MA at x*(SiO2)=34.08 ± 0.18 mole% and 2050 K; no separate pure solid or liquid oxide standard is named.'
       regime: kems_effusion
-      units: logarithmic activity as plotted; curve not digitized
+      units: dimensionless activity; log10 activity as plotted
       values:
         quantity: activity
-        method_class: figure_only
         activity_component: Al2O3
         composition_component: SiO2
-        composition_basis: mole percent as plotted
-        composition_axis_range_mole_percent: [0, 100]
+        composition_basis: printed_mole_percent_as_plotted
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
         curve_as_printed: '4'
         system_as_printed: MA-S
         temperature_as_printed_K: 2050
         source_attribution_as_printed: present study
-        data_scope: Curve inspected and retained as figure-only; no data points digitized.
+        data_scope: marked points digitized from Figure 2
+        points:
+          - SiO2_mole_percent_as_printed: '18.18'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.8182'
+              SiO2: '0.1818'
+            activity: 0.20
+            read_uncertainty_dex: 0.0006
+            audit_read_id: shornikov_2001_f2_al2o3_ma_s_2050k-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.8182']
+                    - [SiO2, '0.1818']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: b
+                  note: "Printed x(SiO2)=18.18 mole%; complementary MgAl2O4 fraction=0.8182; log10(a(Al2O3))=-0.706; independent page-6 600-dpi pixel reads (4204.17,5462.92) and (4204.58,5464.29); read uncertainty 0.0006 dex; audit shornikov_2001_f2_al2o3_ma_s_2050k-01."
+          - SiO2_mole_percent_as_printed: '52.21'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.4779'
+              SiO2: '0.5221'
+            activity: 0.078
+            read_uncertainty_dex: 0.0007
+            audit_read_id: shornikov_2001_f2_al2o3_ma_s_2050k-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.4779']
+                    - [SiO2, '0.5221']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: b
+                  note: "Printed x(SiO2)=52.21 mole%; complementary MgAl2O4 fraction=0.4779; log10(a(Al2O3))=-1.106; independent page-6 600-dpi pixel reads (5731.00,5887.25) and (5730.86,5888.66); read uncertainty 0.0007 dex; audit shornikov_2001_f2_al2o3_ma_s_2050k-02."
+          - SiO2_mole_percent_as_printed: '55.56'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.4444'
+              SiO2: '0.5556'
+            activity: 0.064
+            read_uncertainty_dex: 0.0001
+            audit_read_id: shornikov_2001_f2_al2o3_ma_s_2050k-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.4444']
+                    - [SiO2, '0.5556']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: b
+                  note: "Printed x(SiO2)=55.56 mole%; complementary MgAl2O4 fraction=0.4444; log10(a(Al2O3))=-1.194; independent page-6 600-dpi pixel reads (5883.00,5980.83) and (5882.71,5980.60); read uncertainty 0.0001 dex; audit shornikov_2001_f2_al2o3_ma_s_2050k-03."
+          - SiO2_mole_percent_as_printed: '64.89'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.3511'
+              SiO2: '0.6489'
+            activity: 0.033
+            read_uncertainty_dex: 0.0007
+            audit_read_id: shornikov_2001_f2_al2o3_ma_s_2050k-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.3511']
+                    - [SiO2, '0.6489']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: b
+                  note: "Printed x(SiO2)=64.89 mole%; complementary MgAl2O4 fraction=0.3511; log10(a(Al2O3))=-1.484; independent page-6 600-dpi pixel reads (6300.17,6289.08) and (6298.86,6287.61); read uncertainty 0.0007 dex; audit shornikov_2001_f2_al2o3_ma_s_2050k-04."
+          - SiO2_mole_percent_as_printed: '74.69'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.2531'
+              SiO2: '0.7469'
+            activity: 0.014
+            read_uncertainty_dex: 0.0006
+            audit_read_id: shornikov_2001_f2_al2o3_ma_s_2050k-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.2531']
+                    - [SiO2, '0.7469']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: b
+                  note: "Printed x(SiO2)=74.69 mole%; complementary MgAl2O4 fraction=0.2531; log10(a(Al2O3))=-1.853; independent page-6 600-dpi pixel reads (6736.42,6681.83) and (6737.77,6683.03); read uncertainty 0.0006 dex; audit shornikov_2001_f2_al2o3_ma_s_2050k-05."
+
     - observation_id: shornikov_2001_f2_al2o3_ca_s_1933k
       type: activity_coefficient
       locator:
@@ -769,25 +1064,155 @@ species:
         published_page: 327
         pdf_page_index: 5
         figure: '2'
-        note: 'Curve 7; MA-S activity in this study.'
+        panel: 'c'
+        symbol: filled upward triangles
+        note: "Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings."
       T_range_K: [2050.0, 2050.0]
       phase: MgAl2O4-SiO2 melt
       experiment: shornikov-2001-mo-kems-1623-2523k
-      standard_state: 'Equation (12) integrates SiO2 activity from x(SiO2)=1; the equation does not explicitly state a solid or liquid phase for that pure-composition endpoint.'
+      standard_state: 'Equation (12) integrates SiO2 activity from x(SiO2)=1; the pure-composition endpoint phase is not specified.'
       regime: kems_effusion
-      units: logarithmic activity as plotted; curve not digitized
+      units: dimensionless activity; log10 activity as plotted
       values:
         quantity: activity
-        method_class: figure_only
         activity_component: SiO2
         composition_component: SiO2
-        composition_basis: mole percent as plotted
-        composition_axis_range_mole_percent: [0, 100]
+        composition_basis: printed_mole_percent_as_plotted
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
         curve_as_printed: '7'
         system_as_printed: MA-S
         temperature_as_printed_K: 2050
         source_attribution_as_printed: present study
-        data_scope: Curve inspected and retained as figure-only; no data points digitized.
+        data_scope: marked points digitized from Figure 2
+        points:
+          - SiO2_mole_percent_as_printed: '18.18'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.8182'
+              SiO2: '0.1818'
+            activity: 0.12
+            read_uncertainty_dex: 0.0002
+            audit_read_id: shornikov_2001_f2_sio2_ma_s_2050k-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.8182']
+                    - [SiO2, '0.1818']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: c
+                  note: "Printed x(SiO2)=18.18 mole%; complementary MgAl2O4 fraction=0.8182; log10(a(SiO2))=-0.922; independent page-6 600-dpi pixel reads (4209.92,9613.42) and (4208.71,9612.98); read uncertainty 0.0002 dex; audit shornikov_2001_f2_sio2_ma_s_2050k-01."
+          - SiO2_mole_percent_as_printed: '52.21'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.4779'
+              SiO2: '0.5221'
+            activity: 0.32
+            read_uncertainty_dex: 0.0008
+            audit_read_id: shornikov_2001_f2_sio2_ma_s_2050k-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.4779']
+                    - [SiO2, '0.5221']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: c
+                  note: "Printed x(SiO2)=52.21 mole%; complementary MgAl2O4 fraction=0.4779; log10(a(SiO2))=-0.497; independent page-6 600-dpi pixel reads (5736.58,9235.00) and (5736.42,9236.43); read uncertainty 0.0008 dex; audit shornikov_2001_f2_sio2_ma_s_2050k-02."
+          - SiO2_mole_percent_as_printed: '55.56'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.4444'
+              SiO2: '0.5556'
+            activity: 0.36
+            read_uncertainty_dex: 0.0002
+            audit_read_id: shornikov_2001_f2_sio2_ma_s_2050k-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.4444']
+                    - [SiO2, '0.5556']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: c
+                  note: "Printed x(SiO2)=55.56 mole%; complementary MgAl2O4 fraction=0.4444; log10(a(SiO2))=-0.439; independent page-6 600-dpi pixel reads (5885.42,9182.83) and (5886.57,9182.43); read uncertainty 0.0002 dex; audit shornikov_2001_f2_sio2_ma_s_2050k-03."
+          - SiO2_mole_percent_as_printed: '64.89'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.3511'
+              SiO2: '0.6489'
+            activity: 0.51
+            read_uncertainty_dex: 0.0002
+            audit_read_id: shornikov_2001_f2_sio2_ma_s_2050k-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.3511']
+                    - [SiO2, '0.6489']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: c
+                  note: "Printed x(SiO2)=64.89 mole%; complementary MgAl2O4 fraction=0.3511; log10(a(SiO2))=-0.295; independent page-6 600-dpi pixel reads (6304.00,9054.58) and (6304.87,9054.98); read uncertainty 0.0002 dex; audit shornikov_2001_f2_sio2_ma_s_2050k-04."
+          - SiO2_mole_percent_as_printed: '74.69'
+            T_K: '2050'
+            T_K_as_printed: '2050'
+            composition_mol:
+              MgAl2O4: '0.2531'
+              SiO2: '0.7469'
+            activity: 0.66
+            read_uncertainty_dex: 0.0003
+            audit_read_id: shornikov_2001_f2_sio2_ma_s_2050k-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: printed_pseudobinary_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [MgAl2O4, '0.2531']
+                    - [SiO2, '0.7469']
+                locator:
+                  published_page: 327
+                  pdf_page_index: 5
+                  figure: '2'
+                  panel: c
+                  note: "Printed x(SiO2)=74.69 mole%; complementary MgAl2O4 fraction=0.2531; log10(a(SiO2))=-0.177; independent page-6 600-dpi pixel reads (6742.50,8949.92) and (6743.58,8949.37); read uncertainty 0.0003 dex; audit shornikov_2001_f2_sio2_ma_s_2050k-05."
+
     - observation_id: shornikov_2001_f2_sio2_ca_s_1933k
       type: activity_coefficient
       locator:
@@ -842,22 +1267,37 @@ species:
         published_page: 328
         pdf_page_index: 6
         figure: '3'
-        note: 'Curve 1; MA-S melt formation Gibbs energy from this study.'
+        panel: single panel
+        note: >-
+          Curve 1 is MA-S from this study at 2050 K. Up-triangle readings retained as (x(SiO2), ΔfG/RT, T).
+          The printed 52.21 mole% position is occupied by a square of curve 3, not an up-triangle, and is dropped.
+          x(SiO2)=0.00 mole%, ΔfG/RT=-1.3, T=2050 K; pixel reads (3238.08,1379.17) and (3239.29,1377.80)
+          x(SiO2)=18.18 mole%, ΔfG/RT=-1.5, T=2050 K; pixel reads (4077.08,1500.25) and (4076.04,1502.60)
+          x(SiO2)=55.56 mole%, ΔfG/RT=-1.5, T=2050 K; pixel reads (5808.58,1548.33) and (5808.52,1548.98)
+          x(SiO2)=64.89 mole%, ΔfG/RT=-1.4, T=2050 K; pixel reads (6240.58,1417.33) and (6240.21,1418.03)
+          x(SiO2)=74.69 mole%, ΔfG/RT=-1.2, T=2050 K; pixel reads (6695.83,1215.42) and (6696.54,1214.89)
+          The plotted ΔfG/RT values are not converted because the schema has no quantity token for dimensionless ΔfG/RT.
+          Independent pixel reads and axis calibrations are in crown4-1018-figure-read-audit.md.
       T_range_K: [2050.0, 2050.0]
       phase: MgAl2O4-SiO2 melt
       experiment: shornikov-2001-mo-kems-1623-2523k
-      units: ΔfG/RT as plotted; curve not digitized
+      units: dimensionless ΔfG/RT as plotted; not an energy per mole
       values:
-        quantity: Gibbs energy of melt formation
+        quantity: delta_fG
         method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        status: typed_refusal
+        reason: schema has no quantity token for ΔfG/RT
+        unavailable_reason: delta_fG_over_RT_schema_gap
+        delta_fG_kJ_mol: null
         composition_component: SiO2
-        composition_basis: mole percent as plotted
-        composition_axis_range_mole_percent: [0, 100]
+        composition_basis: printed_mole_percent_as_plotted
         curve_as_printed: '1'
         system_as_printed: MA-S
         temperature_as_printed_K: 2050
         source_attribution_as_printed: present study
-        data_scope: Curve inspected and retained as figure-only; no data points digitized.
+        data_scope: marked ΔfG/RT readings retained verbatim in the locator note; not converted
     - observation_id: shornikov_2001_f3_ma_s_ref11_1873k
       type: gibbs_table
       locator:
