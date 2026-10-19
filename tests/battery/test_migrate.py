@@ -7441,6 +7441,7 @@ def test_scalar_activity_printed_forms_round_trip(
     ("printed_form", "sigma", "expected_dex"),
     [
         ("neg_log10", "0.20", Decimal("0.20")),
+        ("log10", "0.20", Decimal("0.20")),
         (
             "ln",
             "0.4605170185988091368035982909",

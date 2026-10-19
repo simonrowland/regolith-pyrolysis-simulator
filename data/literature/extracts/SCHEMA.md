@@ -363,7 +363,9 @@ Rules:
   observation provenance retains the printed number as `printed_value` and the
   token as `printed_form`. A printed ± width on a base-10 log is retained in
   `log10_dex`; for `ln`, divide the printed width by `ln(10)` to express it in
-  dex. The uncertainty width stays in log space.
+  dex. The uncertainty width stays in log space. An unrecognized `printed_form`
+  is refused as a typed unavailable value and added to the migration queue; it
+  is never interpreted as one of the supported logarithms.
 
 ### Observation point conditions
 
