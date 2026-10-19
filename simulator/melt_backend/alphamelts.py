@@ -4353,12 +4353,20 @@ class _MELTSBackendSupport(MeltBackend):
             and redox_mode != REDOX_MODE_NOT_AN_INPUT
         ):
             result_diagnostics['intrinsic_fO2_log'] = executed_fO2_log
-        if executed_fO2_log is not None:
-            result_diagnostics['engine_reported_fO2_log'] = executed_fO2_log
-            result_diagnostics['printed_fO2_echo_log'] = executed_fO2_log
-        if requested_fO2_log is not None:
-            result_diagnostics['requested_fO2_log'] = requested_fO2_log
-        result_diagnostics['engine_reported_fO2_header'] = fO2_header
+        if redox_mode == REDOX_MODE_NOT_AN_INPUT:
+            result_diagnostics['fO2_output_status'] = 'not_reported'
+            result_diagnostics['fO2_output_status_reason'] = (
+                'not_an_input_default_column'
+                if executed_fO2_log is not None
+                else 'not_an_input_mode'
+            )
+        else:
+            if executed_fO2_log is not None:
+                result_diagnostics['engine_reported_fO2_log'] = executed_fO2_log
+                result_diagnostics['printed_fO2_echo_log'] = executed_fO2_log
+            if requested_fO2_log is not None:
+                result_diagnostics['requested_fO2_log'] = requested_fO2_log
+            result_diagnostics['engine_reported_fO2_header'] = fO2_header
         if (
             executed_fO2_log is not None
             and echo_comparison_fO2_log is not None
@@ -4479,13 +4487,18 @@ class _MELTSBackendSupport(MeltBackend):
         phase_species_mol, phase_species_kg = (
             self._phase_species_from_instances(phase_instances)
         )
+        reported_fO2_log = (
+            None
+            if redox_mode == REDOX_MODE_NOT_AN_INPUT
+            else executed_fO2_log
+        )
         eq = self._emit_equilibrium_result(
             temperature_C=executed_temperature_C,
             requested_temperature_C=requested_temperature_C,
             pressure_bar=pressure_bar,
-            fO2_log=executed_fO2_log,
+            fO2_log=reported_fO2_log,
             requested_fO2_log=requested_fO2_log,
-            printed_fO2_echo_log=executed_fO2_log,
+            printed_fO2_echo_log=reported_fO2_log,
             phases_present=phases_present,
             phase_masses_kg=phase_masses_kg,
             phase_species_mol=phase_species_mol,
