@@ -12,6 +12,7 @@ from scripts.battery_hero_plot import (
     element_tier,
     element_view_series,
     load_element_abundance,
+    main,
     read_scores,
     render_plots,
     species_tier,
@@ -360,6 +361,7 @@ def test_species_view_labels_major_curves_and_element_view_labels_elements(
 
 def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     residuals = tmp_path / "residuals.jsonl"
     rows: list[dict[str, object]] = [
@@ -451,6 +453,56 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
         "excluded under d-139: openimcc 1 uncalibrated KEMS p_partial, "
         "thermoengine 1 uncalibrated KEMS p_partial"
     ) in footer
+
+    redox_residuals = tmp_path / "redox-residuals.jsonl"
+    redox_rows = [
+        {"kind": "battery_store_stamp", "revision": "test-store"},
+        _record(
+            engine="openimcc",
+            experiment="redox-1",
+            formula="FeO",
+            temperature_K=1100,
+            residual=0.25,
+            rail="redox",
+        ),
+        uncalibrated,
+    ]
+    redox_residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in redox_rows), encoding="utf-8"
+    )
+    redox_data = read_scores(redox_residuals, rails=("redox",))
+    assert redox_data.summaries["openimcc"].excluded_d139_rows == 1
+
+    assert main(
+        [
+            "--input",
+            str(redox_residuals),
+            "--output-dir",
+            str(tmp_path / "redox-images"),
+            "--rail",
+            "redox",
+            "--group-by",
+            "species",
+            "--simulator-commit",
+            "sim-test",
+            "--openimcc-commit",
+            "openimcc-test",
+            "--render-date",
+            "2026-10-15",
+        ]
+    ) == 0
+    summary = json.loads(capsys.readouterr().out)
+    redox_svgs = [
+        Path(path)
+        for name, path in summary["files"].items()
+        if name.endswith(":tile_svg")
+    ]
+    assert redox_svgs
+    assert all(
+        "excluded under d-139: openimcc 1 uncalibrated KEMS p_partial"
+        in path.read_text(encoding="utf-8")
+        for path in redox_svgs
+    )
 
 
 def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
