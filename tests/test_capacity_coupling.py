@@ -1553,16 +1553,18 @@ def _retained_gas_shadow(
     )
 
 
-@pytest.mark.parametrize("initial_mol", [1.0, 15.161244955])
-@pytest.mark.parametrize("duration", [3600.0, 1e-8, 0.025, 0.05])
-def test_retained_stock_integrated_hk_source_matches_exact_transient(monkeypatch, initial_mol, duration):
-    # Independent piecewise solution of A dp/dt=H max(Pe-p,0)-Kp.
+@pytest.mark.parametrize(("initial_mol", "duration", "downstream"), [
+    *((n, dt, 0.0) for dt in (3600.0, 1e-8, 0.025, 0.05) for n in (1.0, 15.161244955)),
+    (1.0, 0.1, 2.0),
+])
+def test_retained_stock_integrated_hk_source_matches_exact_transient(monkeypatch, initial_mol, duration, downstream):
+    # Independent piecewise solution of A dp/dt=H max(Pe-p,0)-K(p-Pd).
     # Review r5-ror's fixed-conductance anchor, with the actual lunar V/T.
     A = 0.085383807627 / (GAS_CONSTANT * 1950.65)
     H, K, Pe = 0.001, 0.00235, 10.0
-    clear = A / K * math.log(initial_mol / (A * Pe))
+    clear = A / K * math.log((initial_mol / A - downstream) / (Pe - downstream))
     remaining = max(0.0, duration - clear)
-    tau, steady = A / (H + K), H * Pe / (H + K)
+    tau, steady = A / (H + K), (H * Pe + K * downstream) / (H + K)
     exact = H * (Pe - steady) * (remaining + tau * math.expm1(-remaining / tau))
     monkeypatch.setattr(capacity_coupling, "_molecular_pipe_conductance_mol_s_Pa", lambda **_: K)
     monkeypatch.setattr(capacity_coupling, "_knudsen_number_at_total_Pa", lambda *_, **__: math.inf)
@@ -1574,18 +1576,47 @@ def test_retained_stock_integrated_hk_source_matches_exact_transient(monkeypatch
         volume_m3=0.085383807627, temperature_K=1950.65,
         pipe_diameter_m=0.12, pipe_length_m=1.0,
         dt_hr=duration / 3600.0,
+        P_downstream_Pa=downstream,
     )
     assert isinstance(result, CapacityShadowResult)
     integrated = result.evaporation_flux_kg_hr.get("Fe", 0) / 0.055845 * duration / 3600.0
     error = integrated / exact - 1 if exact else integrated
     print(f"stock={initial_mol} duration={duration} integrated={integrated:.12g} exact={exact:.12g} error={error:.12g}")
-    assert integrated == pytest.approx(exact, rel=1e-6, abs=1e-13)
-    endpoint = (initial_mol / A * math.exp(-K * duration / A)
+    assert integrated == pytest.approx(exact, rel=1e-9 if downstream else 1e-6, abs=1e-13)
+    endpoint = (downstream + (initial_mol / A - downstream) * math.exp(-K * duration / A)
                 if duration <= clear else
                 steady + (Pe - steady) * math.exp(-remaining / tau))
-    assert result.partial_pressures_Pa["Fe"] == pytest.approx(endpoint, rel=1e-8, abs=1e-8)
+    assert result.partial_pressures_Pa["Fe"] == pytest.approx(
+        endpoint, rel=1e-9 if downstream else 1e-8, abs=1e-9 if downstream else 1e-8,
+    )
+    if downstream:
+        assert exact == pytest.approx(0.00042571032709709246, rel=1e-12)
+        assert endpoint == pytest.approx(4.388059701492537, rel=1e-12)
     assert A * result.partial_pressures_Pa["Fe"] + result.bled_species_mol["Fe"] == pytest.approx(initial_mol + integrated, rel=1e-9)
     assert result.convergence is SourceDuctConvergence.CONVERGED
+
+
+def test_retained_transient_rhs_budget_returns_typed_refusal(monkeypatch):
+    monkeypatch.setattr(capacity_coupling, "SOURCE_DUCT_TRANSIENT_MAX_RHS_EVALUATIONS", 1, raising=False)
+    result = _retained_gas_shadow("O2", 1.0)
+    assert isinstance(result, CapacityShadowRefusal)
+    assert result.reason == "source_duct_transient_rhs_budget_exhausted"
+    assert result.iterations == 1
+
+
+@pytest.mark.parametrize(("kn", "expected"), [
+    (.001, {"Fe": "0x1.f0e3bbaf5c268p-1", "Na": "0x1.1b1547c76ce86p+2"}),
+    (.1, {"Fe": "0x1.40b708a56dfa2p+0", "Na": "0x1.3e7cf162f8c02p+2"}),
+    (100., {"Fe": "0x1.18d5f85bb3950p+2", "Na": "0x1.6666666666666p+3"}),
+])
+def test_downstream_duct_consolidation_pin(kn, expected):
+    partials = mixture_surface_partials_Pa(
+        P_eq_Pa={"Fe": 10., "Na": 25.}, H_mol_s_Pa={"Fe": .001, "Na": .002},
+        G_mol_s_Pa2=.002, P_downstream_Pa=2.,
+        molecular_C_mol_s_Pa={"Fe": .00235, "Na": .003},
+        knudsen_at_total_Pa=lambda _: kn,
+    )
+    assert {s: p.hex() for s, p in partials.items()} == expected
 
 
 def test_coupled_viscous_retained_mixture_matches_exact_blowdown():
