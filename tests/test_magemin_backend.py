@@ -268,6 +268,73 @@ def _make_pooled_subprocess_backend(exception):
     return backend
 
 
+def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
+    class RunningFuture(Future):
+        cancel_attempted = False
+
+        def cancel(self):
+            self.cancel_attempted = True
+            return super().cancel()
+
+    pending = RunningFuture()
+    assert pending.set_running_or_notify_cancel()
+
+    class PendingPool:
+        def __init__(self):
+            self.abort_calls = 0
+
+        def submit(self, *_args, **_kwargs):
+            return pending
+
+        def abort_request(self, future):
+            assert future is pending
+            assert future.cancel_attempted
+            assert future.running()
+            self.abort_calls += 1
+
+    pool = PendingPool()
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 0.05,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    outcomes = []
+
+    def call():
+        try:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+            )
+        except BaseException as exc:  # returned to the asserting thread
+            outcomes.append(exc)
+
+    started_at = time.monotonic()
+    waiter = threading.Thread(target=call, daemon=True)
+    waiter.start()
+    waiter.join(timeout=0.5)
+    try:
+        assert not waiter.is_alive(), (
+            'MAGEMin waited forever on its pool future'
+        )
+        assert len(outcomes) == 1
+        assert isinstance(outcomes[0], EngineWorkerTimeout)
+        assert outcomes[0].phase == 'job'
+        assert outcomes[0].timeout_s == pytest.approx(0.1)
+        assert pending.cancel_attempted
+        assert pending.running()
+        assert pool.abort_calls == 1
+        assert time.monotonic() - started_at < 0.25
+    finally:
+        if waiter.is_alive():
+            pending.set_result({'phases': {'liq': {'mass_kg': 1.0}}})
+            waiter.join(timeout=1.0)
+
+
 def _assert_magemin_bulk_drop_projected(
     result,
     expected_components,
@@ -391,7 +458,8 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request
     submitted = {}
 
     class FakeFuture:
-        def result(self):
+        def result(self, timeout=None):
+            submitted['result_timeout_s'] = timeout
             return {'phases': {'liq': {'mass_kg': 1.0}}}
 
     class FakePool:
@@ -434,6 +502,9 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request
     assert submitted['timeout_s'] == pytest.approx(MAGEMIN_WARM_CALL_TIMEOUT_S)
     assert submitted['request']['call_timeout_s'] == pytest.approx(
         MAGEMIN_WARM_CALL_TIMEOUT_S + 0.5
+    )
+    assert submitted['result_timeout_s'] == pytest.approx(
+        MAGEMIN_WARM_CALL_TIMEOUT_S + 30.0
     )
 
 
