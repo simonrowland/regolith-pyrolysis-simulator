@@ -4962,6 +4962,7 @@ def test_battery_hero_deck_scores_polymerisation_and_delta_iw() -> None:
 
 def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
     from simulator.battery.score import compute_metric
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
 
     composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
@@ -4976,6 +4977,16 @@ def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
         candidate_value="2.0",
         fO2_pa="1000",
     )
+    sio_redox_row = _hero_deck_score_row(
+        rail=Rail.SIO_EVOLUTION.value,
+        formula="SiO",
+        quantity="p_partial",
+        composition=composition,
+        residual_dex=Decimal("-0.25"),
+        candidate_value="1.5",
+        fO2_pa="100000",
+    )
+    sio_redox_row["reference"] = "sio-redox-high-fo2"
     dex = compute_metric(
         MetricOperation.DEX, Decimal("2.5"), Decimal("1.25")
     )
@@ -4990,7 +5001,9 @@ def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
         fO2_pa="20892.96130854039",
     )
 
-    result = score_mod._battery_hero_deck_records([pO2_row, redox_row])
+    result = score_mod._battery_hero_deck_records(
+        [pO2_row, sio_redox_row, redox_row]
+    )
     sio = next(
         point for point in result["points"]
         if point["chart"] == "sio_evolution"
@@ -4999,10 +5012,18 @@ def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
         point for point in result["points"]
         if point["chart"] == "fo2_cross_comparison"
     )
+    sio_redox = next(
+        point for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+        and point["reference"] == "sio-redox-high-fo2"
+    )
 
     assert sio["group_label"] == "10^-2–10^-1 bar"
     assert float(cross["x_value"]) == pytest.approx(1.25, rel=1e-15)
     assert float(cross["y_value"]).hex() == "0x1.4000000000000p+1"
+    assert float(sio_redox["x_value"]).hex() == (
+        -feo_iw_log10_fO2_bar(1200.0)
+    ).hex()
 
 
 def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
