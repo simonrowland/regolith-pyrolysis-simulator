@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from types import SimpleNamespace
 
 from simulator.core import PyrolysisSimulator
@@ -9,6 +10,7 @@ from simulator.evaporation import _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
 from simulator.fe_redox import KRESS91_LIQUID_CALIBRATION_MIN_T_C
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.melt_backend.sulfsat import SulfSatGate
 from simulator.reduced_real_determinism import _curve_payload
 from simulator.runner import _attach_composition_projected_liquidus_notice
 
@@ -21,6 +23,54 @@ def _projected_notice() -> dict[str, object]:
         "certified_band": {"source": "test"},
         "dropped_components": [{"component": "FeS", "mass_fraction": 0.1}],
     }
+
+
+def _sr24_simulator(monkeypatch, *, fe3_ratio: float):
+    import pandas as pd
+    import simulator.melt_backend.sulfsat as sulfsat_module
+
+    monkeypatch.setattr(
+        sulfsat_module,
+        "kress91_split",
+        lambda **_kwargs: {"fe3": fe3_ratio},
+    )
+    gate = SulfSatGate()
+    gate._available = True
+    gate._module = SimpleNamespace(
+        calculate_S2017_SCSS=lambda **_kwargs: pd.DataFrame(
+            {"SCSS2_ppm_ideal_Smythe2017": [-10.0]}
+        ),
+        calculate_CD2019_SCAS=lambda **_kwargs: pd.DataFrame(
+            {"SCAS6_ppm": [250.0]}
+        ),
+        calculate_S6St_Jugo2010_eq10=lambda **_kwargs: 1.25,
+    )
+
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = SimpleNamespace(
+        hour=0,
+        temperature_C=926.85,
+        p_total_mbar=1000.0,
+    )
+    sim._stage0_sulfur_input_ppm = lambda: 500.0
+    sim._melt_oxide_wt_pct = lambda: {
+        "SiO2": 50.0,
+        "Al2O3": 15.0,
+        "FeO": 10.0,
+        "CaO": 10.0,
+        "MgO": 10.0,
+        "TiO2": 1.0,
+        "Na2O": 5.0,
+        "K2O": 1.0,
+        "MnO": 1.0,
+    }
+    sim._current_melt_redox_fO2_log = lambda: -10.0
+    sim._sync_oxygen_reservoir_mirror = lambda: None
+    sim._sulfsat_gate = gate
+    sim._sulfur_saturation_steps = []
+    result = SimpleNamespace(warnings=[])
+    sim._attach_post_equilibrium_sulfsat(result)
+    return sim, result
 
 
 def test_sr22_nonfinite_interpolation_fallback_emits_repair_notice() -> None:
@@ -253,3 +303,35 @@ def test_sr23_usable_projected_bound_has_no_repair_notice() -> None:
     run_notice = sim.composition_projected_liquidus_run_notice()
     assert run_notice is not None
     assert "repair_notice" not in run_notice["notices"][0]
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="SR24 finite fit/capacity/fraction repairs are not typed warnings yet",
+)
+def test_sr24_finite_fit_capacity_and_fraction_repairs_emit_notice(monkeypatch) -> None:
+    sim, _result = _sr24_simulator(monkeypatch, fe3_ratio=1.25)
+
+    notice = sim.sulfur_saturation_run_notice()
+
+    assert notice is not None
+    assert notice["notices"][0]["warnings"] == [
+        "SR24:sulfsat_output_repaired field=Fe3Fet_Liq raw=1.25 reason=fit_outside_[0,1] replacement=0.0",
+        "SR24:sulfsat_output_repaired field=SCSS_ppm raw=-10 reason=negative_capacity replacement=0.0 ppm",
+        "SR24:sulfsat_output_repaired field=S6_fraction raw=1.25 reason=outside_[0,1] replacement=1.0",
+    ]
+
+
+def test_sr24_finite_capacity_and_fraction_repairs_preserve_numeric_outputs(
+    monkeypatch,
+) -> None:
+    _sim, result = _sr24_simulator(monkeypatch, fe3_ratio=0.1)
+    sulfur = result.sulfur_saturation
+
+    assert (
+        sulfur.SCSS_ppm,
+        sulfur.SCAS_ppm,
+        sulfur.S6_fraction,
+        sulfur.S_in_sulfide_ppm,
+        sulfur.S_in_sulfate_ppm,
+    ) == (0.0, 250.0, 1.0, 0.0, 250.0)
