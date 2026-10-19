@@ -84,7 +84,6 @@ def test_account_units_match_ledger_ground_truth_and_are_basis_aware():
     assert metal_wt["species"] == {"Al": pytest.approx(100.0)}
 
 
-@pytest.mark.xfail(strict=True, reason="b-895: refractory oxides are omitted")
 def test_terminal_rump_classifies_minor_refractory_oxides():
     ledger = AtomLedger()
     refractory_species = ("Y2O3", "Sc2O3", "ZrO2", "HfO2", "ThO2", "UO2")

@@ -112,6 +112,12 @@ TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
     "Al2O3",
     "TiO2",
     "Cr2O3",
+    "Y2O3",
+    "Sc2O3",
+    "ZrO2",
+    "HfO2",
+    "ThO2",
+    "UO2",
     "REE_oxides",
 }) | REE_OXIDE_SPECIES
 TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({"SiO2"})
