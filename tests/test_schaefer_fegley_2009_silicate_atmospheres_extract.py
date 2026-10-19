@@ -108,6 +108,14 @@ def test_quoted_table_and_model_figures_remain_context_only(tmp_path: Path) -> N
             "pressure_after_90_percent_vaporized_bar",
         )
     ] == [[0.001, 0.0001], [0.000001, 0.0000001]]
+    assert [
+        edge["locator"]["pdf_page_index"]
+        for key in (
+            "pressure_after_sodium_loss_bar",
+            "pressure_after_90_percent_vaporized_bar",
+        )
+        for edge in bse[key]
+    ] == [7, 7, 7, 7]
 
     temperature_dependence = model_results[
         "bulk_silicate_earth_temperature_dependence"
