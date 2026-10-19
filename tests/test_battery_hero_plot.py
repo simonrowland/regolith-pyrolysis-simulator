@@ -366,6 +366,57 @@ def test_deck_scatter_uses_only_scorer_flag_for_hollow_markers() -> None:
         plt.close(figure)
 
 
+def test_solved_oxygen_marker_shape_preserves_flag_fill_semantics() -> None:
+    engine_color = "#0072b2"
+    points = [
+        {
+            "chart": "redox_sensitivity",
+            "engine": "openimcc",
+            "x_value": "0.1",
+            "y_value": "0.25",
+            "oxygen_mode": "solved",
+            "marker": "^",
+            "flagged": False,
+        },
+        {
+            "chart": "redox_sensitivity",
+            "engine": "openimcc",
+            "x_value": "0.2",
+            "y_value": "0.5",
+            "oxygen_mode": "solved",
+            "marker": "^",
+            "flagged": True,
+        },
+    ]
+    figure, axis = plt.subplots()
+    try:
+        hero_plot._draw_hero_deck_scatter(
+            axis, points, engine_colors={"openimcc": engine_color}
+        )
+        by_gid = {artist.get_gid(): artist for artist in axis.collections}
+        ordinary = by_gid["hero-deck-marker:openimcc:ordinary:^"]
+        flagged = by_gid["hero-deck-marker:openimcc:flagged:^"]
+        assert list(ordinary.get_facecolors()[0]) == pytest.approx(
+            list(to_rgba(engine_color))
+        )
+        assert list(flagged.get_facecolors()[0]) == pytest.approx(
+            list(to_rgba("#ffffff"))
+        )
+
+        handles = hero_plot._hero_deck_legend_handles(
+            points,
+            {"openimcc": engine_color},
+            source_labels=(("^", "solved cell oxygen balance"),),
+        )
+        source_handle = handles[-1]
+        assert source_handle.get_marker() == "^"
+        assert list(to_rgba(source_handle.get_markerfacecolor())) == pytest.approx(
+            list(to_rgba("#555555"))
+        )
+    finally:
+        plt.close(figure)
+
+
 def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     tmp_path: Path,
 ) -> None:
