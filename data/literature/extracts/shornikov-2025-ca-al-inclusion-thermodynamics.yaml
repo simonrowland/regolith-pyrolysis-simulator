@@ -397,7 +397,7 @@ species:
       values:
         quantity: oxide_and_CAIs_composition_as_printed
         note: Complete Table 1 transcription. Stoichiometric compound compositions and type A/B CAI compositions
-          are preserved here; the table is not treated as a measured oxide activity or melting quantity.
+          are preserved here; the table is not treated as a measured oxide activity or transition quantity.
         table_as_printed: "Table 1. Compositions of oxide compounds and type A and B CAIs from chondrites, mol %\n\
           \                         Compound            CaO                    MgO                             \
           \            Al2O3                 TiO2                     SiO2\nCA (CaAl2O4)                       \
@@ -422,8 +422,7 @@ species:
           \                 12.94                                       24.02                     2.10         \
           \        22.22\nCAIs, type B                                27.71                   18.73            \
           \                           17.46                     1.65                 34.45\n\n                GEOCHEMISTRY\
-          \ INTERNATIONAL                     Vol. 63     No. 9            2025\n\f814                         \
-          \                        SHORNIKOV"
+          \ INTERNATIONAL                     Vol. 63     No. 9            2025\n"
   CaAl4O7:
     observations:
     - observation_id: shornikov_2025_table3_shornikov_melting
@@ -569,7 +568,7 @@ species:
         digitisation: deferred to a figure pass
         attribution: Shornikov (2025); source references are retained in the printed caption.
     observations:
-    - observation_id: shornikov_2025_table4_shornikov_melting
+    - observation_id: shornikov_2025_table4_shornikov_decomposition
       type: transition_point
       locator:
         page: 7
@@ -590,7 +589,7 @@ species:
         delta_S_m_as_printed: 7.82 ± 0.90
         delta_S_m_J_per_mol_K: 7.82
         delta_S_m_uncertainty_J_per_mol_K: 0.9
-    - observation_id: shornikov_2025_table4_zherbetsov_melting
+    - observation_id: shornikov_2025_table4_zherbetsov_decomposition
       type: transition_point
       locator:
         page: 7
@@ -756,7 +755,7 @@ species:
         digitisation: deferred to a figure pass
         attribution: Shornikov (2025); source references are retained in the printed caption.
     observations:
-    - observation_id: shornikov_2025_table7_stebbins_melting
+    - observation_id: shornikov_2025_table7_stebbins_decomposition
       type: transition_point
       locator:
         page: 11
@@ -777,7 +776,7 @@ species:
         delta_S_m_as_printed: 21.03 ± 1.14
         delta_S_m_J_per_mol_K: 21.03
         delta_S_m_uncertainty_J_per_mol_K: 1.14
-    - observation_id: shornikov_2025_table7_richet_melting
+    - observation_id: shornikov_2025_table7_richet_decomposition
       type: transition_point
       locator:
         page: 11
@@ -798,7 +797,7 @@ species:
         delta_S_m_as_printed: 19.96 ± 1.64
         delta_S_m_J_per_mol_K: 19.96
         delta_S_m_uncertainty_J_per_mol_K: 1.64
-    - observation_id: shornikov_2025_table7_sugawara_melting
+    - observation_id: shornikov_2025_table7_sugawara_decomposition
       type: transition_point
       locator:
         page: 11
@@ -1013,8 +1012,7 @@ species:
         quantity: table_10_thermodynamic_data_as_printed
         method_class: quoted_attributed
         identity_as_printed: Ca2MgSi2O7
-        note: Complete table transcription is retained in context because these comparison or model-derived columns
-          do not map to a safe scored field in this extract.
+        note: Complete table transcription is retained in context; the two melting rows are scored as transition temperatures.
         table_as_printed: "Table 10. Enthalpy and entropy of akermanite formation and melting\n                \
           \             T, K       ΔHT, kJ/mol            ΔST, J/(mol K)                                       \
           \    Method                           Reference\n                             298              –     \
@@ -1380,6 +1378,49 @@ species:
         digitisation: deferred to a figure pass
         attribution: Shornikov (2025); source references are retained in the printed caption.
   MgAl2O4:
+    observations:
+    - observation_id: shornikov_2025_table6_richet_decomposition
+      type: transition_point
+      locator:
+        page: 10
+        published_page: 819
+        pdf_page_index: 9
+        table: '6'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Richet et al., 1993
+        T_m_as_printed: 2408 K
+        T_m_K: 2408
+        delta_H_m_as_printed: 53.50 ± 5.50
+        delta_H_m_kJ_per_mol: 53.50
+        delta_H_m_uncertainty_kJ_per_mol: 5.50
+        delta_S_m_as_printed: 22.22 ± 2.28
+        delta_S_m_J_per_mol_K: 22.22
+        delta_S_m_uncertainty_J_per_mol_K: 2.28
+    - observation_id: shornikov_2025_table6_shornikov_decomposition
+      type: transition_point
+      locator:
+        page: 10
+        published_page: 819
+        pdf_page_index: 9
+        table: '6'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Shornikov, 2017
+        T_m_as_printed: 2420 K
+        T_m_K: 2420
+        delta_H_m_as_printed: 55.81 ± 4.62
+        delta_H_m_kJ_per_mol: 55.81
+        delta_H_m_uncertainty_kJ_per_mol: 4.62
+        delta_S_m_as_printed: 23.06 ± 1.73
+        delta_S_m_J_per_mol_K: 23.06
+        delta_S_m_uncertainty_J_per_mol_K: 1.73
     context:
     - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_table6_printed_context
       type: printed_data_context
@@ -1481,7 +1522,6 @@ species:
           marker_count: not enumerated; figure values deferred
         digitisation: deferred to a figure pass
         attribution: Shornikov (2025); source references are retained in the printed caption.
-    observations: []
   CaMgSi2O6:
     context:
     - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_table9_printed_context
