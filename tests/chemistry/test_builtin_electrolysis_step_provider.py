@@ -481,6 +481,68 @@ def test_provider_rejects_wrong_intent(
     assert result.transition is None
 
 
+@pytest.mark.parametrize(
+    "control_name", ["dt_hr", "current_A", "voltage_V", "pO2_bar"]
+)
+@pytest.mark.parametrize("value", [1e-308, 1e30, 1e308])
+@pytest.mark.xfail(
+    strict=True,
+    reason="b-434: finite controls outside the electrolysis domain are admitted",
+)
+def test_provider_refuses_extreme_finite_electrolysis_controls(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    control_name,
+    value,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "SiO2": 10.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+            },
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    controls = {
+        "voltage_V": 5.0,
+        "current_A": 100.0,
+        "dt_hr": 1.0,
+        "pO2_bar": 1.0,
+        "allowed_oxides": ["SiO2"],
+    }
+    controls[control_name] = value
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1575.0,
+            pressure_bar=1.0,
+            control_inputs=controls,
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    diagnostic = dict(result.diagnostic or {})
+    assert (
+        diagnostic["reason_refused"]
+        == "electrolysis_control_out_of_domain"
+    )
+    invalid_controls = diagnostic["invalid_controls"]
+    assert control_name in invalid_controls
+    assert invalid_controls[control_name]
+    assert diagnostic.get("energy_kWh", 0.0) == 0.0
+
+
 def test_empty_melt_result_carries_redox_diagnostics(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
