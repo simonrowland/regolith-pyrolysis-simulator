@@ -62,15 +62,15 @@ species:
       type: gibbs_table
       locator:
         table: "877"
-        page: 4
-        pdf_page_index: 3
-        table_caption_page: 3
+        page: 3
+        pdf_page_index: 2
         source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
         record: CrO2(g)
         note: >
-          Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official
-          HTML print-CrO2.html. Calculated (model) thermodynamic functions,
-          not a measured Psat series. Data cell: 3300.000 64.806.
+          Whole-table locator; caption and rows through T=3200 K are on PDF
+          page 3; continuation rows T=3300-6000 K are on page 4. Official HTML
+          print-CrO2.html. Calculated (model) thermodynamic functions, not a
+          measured Psat series.
       T_range_K:
       - 100.0
       - 6000.0

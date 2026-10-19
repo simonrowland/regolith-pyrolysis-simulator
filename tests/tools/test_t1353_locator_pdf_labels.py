@@ -1,6 +1,7 @@
 """Check changed table/figure locators against their cited physical PDF pages."""
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 from functools import lru_cache
@@ -10,9 +11,15 @@ import yaml
 
 BASE = "28af098ed04b8ca99f569381a2f38330cb66d7cd"
 ROOT = Path(__file__).resolve().parents[2]
-CORPUS_ROOTS = (
-    Path("/Users/simonrowland/Repos/regolith-corpus/raw"),
-    Path("/Users/simonrowland/Repos/.regolith-main-review/corpus-main/raw"),
+CORPUS_ROOTS = tuple(
+    Path(corpus_root) / "raw"
+    for corpus_root in dict.fromkeys(
+        (
+            os.environ.get("REGOLITH_CORPUS_ROOT"),
+            str(Path.home() / "Repos/regolith-corpus"),
+        )
+    )
+    if corpus_root
 )
 TOUCHED_EXTRACTS = (
     "data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml",
@@ -109,6 +116,14 @@ def _label_pattern(locator):
                 rf"(?:\bfig(?:ure)?\.?\s*{number}\s*{panel}\b|"
                 rf"\bfig(?:ure)?\.?\s*{number}\b.{{0,240}}?\(\s*{panel}\s*\))",
                 re.I | re.S,
+            )
+        if label.isdigit() or label.startswith("(?:"):
+            figure_label = label if label.startswith("(?:") else re.escape(label)
+            return re.compile(
+                rf"(?:\bfig(?:ure)?\s*\.?\s*{figure_label}(?![0-9A-Za-z])|"
+                rf"\b図\s*{figure_label}(?![0-9A-Za-z])|"
+                rf"^\s*{re.escape(label)}\.)",
+                re.I | re.M,
             )
         figure_label = label if label.startswith("(?:") or r"\s" in label else re.escape(label)
         return re.compile(
@@ -284,3 +299,27 @@ def test_continued_table_checks_caption_page_and_data_page():
         "T (K)  F°(T)\n3300.000 64.806 346.974",
         "Class accuracy\nTable 877",
     )
+
+
+def test_figure_caption_regex_handles_spacing_and_japanese_suffix():
+    pattern = _label_pattern({"figure": "8"})
+    assert pattern.search("Fig .   8. Caption")
+    assert pattern.search("Results in Fig.8に shown below")
+
+
+def test_slag_figure_9_uses_caption_page_not_page_7_prose():
+    relative = "data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml"
+    document = _yaml((ROOT / relative).read_text())
+    matches = [
+        (path, locator)
+        for path, locator in _walk_locators(document)
+        if locator.get("figure") == "9" and locator.get("page") is not None
+    ]
+    assert len(matches) == 1
+    locator_path, locator = matches[0]
+    assert locator["page"] == 6
+    assert locator["pdf_page_index"] == 5
+    assert locator["published_page"] == 17
+    pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
+    assert pdf is not None
+    _assert_label_and_data(locator, locator_path, _normalize_label_text(_page_text(str(pdf), 6)))
