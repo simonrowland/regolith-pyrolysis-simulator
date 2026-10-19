@@ -470,6 +470,159 @@ def _migrate_real_extract(
     return migrate(root, write=write)
 
 
+def test_ueshima_quoted_fe_activity_migrates_with_attribution_and_coordinates(
+    tmp_path: Path,
+) -> None:
+    name = "kems-120-ueshima-1984.yaml"
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    source_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    quoted = next(
+        observation
+        for observation in source_doc["species"]["Fe"]["observations"]
+        if observation.get("observation_id") == "ueshima_1984_quoted_nesmeyanov_a_Fe"
+    )
+    source_doc["species"] = {"Fe": {"observations": [quoted]}}
+    source_doc["fidelity_samples"] = []
+    result = _migrate_real_extract(tmp_path, name, extract_doc=source_doc)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if "::ueshima_1984_quoted_nesmeyanov_a_Fe" in observation.observation_id
+    ]
+
+    assert len(rows) == 1
+    observation = rows[0]
+    assert observation.identity.quantity.value is Quantity.ACTIVITY
+    assert observation.identity.species.formula == "Fe"
+    assert observation.identity.temperature_K.value == Decimal("1500.0")
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.865")
+    assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert observation.evidence.attribution == (
+        "A. N. Nesmeyanov and G. Trapp, Russ. Journal of Phys. Chem., "
+        "39 (1965) 2, p. 183 (ref 1)"
+    )
+    conditions = observation.point_conditions
+    assert conditions is not None
+    assert conditions["temperature_K"].state.value == Decimal("1500.0")
+    assert conditions["temperature_K"].locator.page == 8
+    assert conditions["temperature_K"].locator.pdf_page_index == 7
+    assert conditions["W_at_percent"].state.value == Decimal("0.345")
+    assert conditions["W_at_percent"].locator.page == 8
+    assert conditions["W_at_percent"].locator.pdf_page_index == 7
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+
+def test_sossi_table4_gamma_points_migrate_for_printed_oxide_species(
+    tmp_path: Path,
+) -> None:
+    name = "kems-012-sossi-2019.yaml"
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    source_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    targets = {
+        "LiO0.5": "sossi_2019_li_table4_gamma_this_work_quoted_20260906",
+        "RbO0.5": "sossi_2019_rb_table4_gamma_this_work_quoted_20260906",
+        "CuO0.5": "sossi_2019_cu_table4_gamma_this_work_quoted_20260906",
+        "AgO0.5": "sossi_2019_ag_table4_gamma_this_work_quoted_20260906",
+        "ZnO": "sossi_2019_zn_table4_gamma_this_work_quoted_20260906",
+        "GeO2": "sossi_2019_ge_table4_gamma_this_work_quoted_20260906",
+        "CdO": "sossi_2019_cd_table4_gamma_this_work_quoted_20260906",
+        "PbO": "sossi_2019_pb_table4_gamma_this_work_quoted_20260906",
+    }
+    isolated_species = {}
+    for formula, observation_id in targets.items():
+        target = next(
+            observation
+            for entry in source_doc["species"].values()
+            for observation in entry.get("observations", [])
+            if observation.get("observation_id") == observation_id
+        ).copy()
+        target.pop("supersedes", None)
+        isolated_species[formula] = {"observations": [target]}
+    source_doc["species"] = isolated_species
+    source_doc["fidelity_samples"] = []
+    result = _migrate_real_extract(
+        tmp_path,
+        name,
+        extract_doc=source_doc,
+        use_repository_index_row=True,
+    )
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            f"::{observation_id}" in observation.observation_id
+            for observation_id in targets.values()
+        )
+    ]
+
+    expected = {
+        ("LiO0.5", "1673.15", "15.4", "LiO0.5 (-8)"),
+        ("RbO0.5", "1673.15", "0.00013", "RbO0.5"),
+        ("RbO0.5", "1773.15", "0.000074", "RbO0.5"),
+        ("RbO0.5", "1823.15", "0.00009", "RbO0.5"),
+        ("CuO0.5", "1573.15", "24.0", "CuO0.5"),
+        ("CuO0.5", "1673.15", "11.8", "CuO0.5"),
+        ("CuO0.5", "1773.15", "8.5", "CuO0.5"),
+        ("CuO0.5", "1823.15", "6.4", "CuO0.5"),
+        ("CuO0.5", "1923.15", "4.2", "CuO0.5"),
+        ("AgO0.5", "1673.15", "0.67", "AgO0.5"),
+        ("ZnO", "1573.15", "0.24", "ZnO"),
+        ("ZnO", "1673.15", "0.51", "ZnO"),
+        ("ZnO", "1773.15", "0.97", "ZnO"),
+        ("ZnO", "1823.15", "1.01", "ZnO"),
+        ("GeO2", "1573.15", "0.04", "GeO2"),
+        ("GeO2", "1673.15", "0.11", "GeO2"),
+        ("GeO2", "1773.15", "0.18", "GeO2"),
+        ("GeO2", "1823.15", "0.19", "GeO2"),
+        ("CdO", "1673.15", "0.15", "CdO"),
+        ("PbO", "1573.15", "0.06", "PbO^"),
+        ("PbO", "1673.15", "0.17", "PbO^"),
+        ("PbO", "1573.15", "0.21", "PbO#"),
+        ("PbO", "1673.15", "0.38", "PbO#"),
+    }
+    actual = set()
+    for observation in rows:
+        assert observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        conditions = observation.point_conditions
+        assert conditions is not None
+        assert (
+            conditions["temperature_K"].state.value
+            == observation.identity.temperature_K.value
+        )
+        assert conditions["temperature_K"].locator.page == 57
+        assert conditions["temperature_K"].locator.pdf_page_index == 56
+        assert observation.locator is not None
+        assert observation.locator.page == 57
+        assert observation.locator.pdf_page_index == 56
+        locator_note = observation.locator.note or ""
+        assert "printed cell:" in locator_note
+        channel = next(
+            (
+                label
+                for label in ("LiO0.5 (-8)", "PbO^", "PbO#")
+                if label in locator_note
+            ),
+            observation.identity.species.formula,
+        )
+        actual.add(
+            (
+                observation.identity.species.formula,
+                str(observation.identity.temperature_K.value),
+                str(observation.value.point),
+                channel,
+            )
+        )
+
+    assert len(rows) == 23
+    assert actual == expected
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+
 def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
     tmp_path: Path,
 ) -> None:
