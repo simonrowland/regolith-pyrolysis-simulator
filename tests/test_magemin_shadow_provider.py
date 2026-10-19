@@ -391,6 +391,33 @@ def test_liquidus_finder_forwards_normalized_redox_state():
     )
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason='b-769: provider must propagate its own liquidus programming errors',
+)
+def test_liquidus_finder_keyerror_propagates():
+    request = IntentRequest(
+        intent=ChemistryIntent.SILICATE_LIQUIDUS,
+        account_view=ProviderAccountView(accounts={}, species_formula_registry={}),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+    )
+
+    class BrokenBackend:
+        def find_liquidus_solidus(self, **_kwargs):
+            raise KeyError('synthetic MAGEMin finder programming error')
+
+    provider = MAGEMinShadowProvider(backend=BrokenBackend())
+    with pytest.raises(KeyError, match='synthetic MAGEMin finder programming error'):
+        provider._run_liquidus_finder(
+            provider._backend,
+            request,
+            composition_mol_by_account={
+                'process.cleaned_melt': {'SiO2': 1.0},
+            },
+        )
+
+
 def test_provider_parity_accepts_equal_optional_fo2_state_points() -> None:
     provider = MAGEMinShadowProvider()
     diagnostic = {"liquidus_T_C": 1350.0, "phase_modes_wt_pct": {"liq": 100.0}}
