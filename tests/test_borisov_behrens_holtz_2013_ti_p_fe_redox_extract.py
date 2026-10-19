@@ -37,10 +37,10 @@ RENDER_TABLE2 = """
 13|DAFS-9|1501|2|64.35|0|7.82|10.84|5.17|11.85|–|100.23|1.41
 14|DAF-10|1451|70|45.58|0.02|14.23|9.59|9.08|21.56|–|100.06|2.551
 15|DAFT10-10|1451|70|40.54|9.62|12.49|9.47|8.12|18.84|–|99.08|2.43
-16|DAFT20-10|1451|70|35.05|19.51|10.83|9.47|6.99|16.46|–|98.3|2.27
+16|DAFT20-10|1451||35.05|19.51|10.83|9.47|6.99|16.46|–|98.3|2.27
 17|DAFT30-10|1451|70|30.44|28.47|9.39|9.5|6.14|14.42|–|98.36|2.12
 18|DAFS-10a|1451|70|65.82|0.01|7.72|9.58|4.93|11.57|–|99.64|1.87
-19|DAFST15-10a|1451|70|54.94|14.55|6.38|9.41|4.12|9.61|–|99|1.73
+19|DAFST15-10a|1451||54.94|14.55|6.38|9.41|4.12|9.61|–|99|1.73
 20|DAFST25-10a|1451|70|46.33|25.56|5.64|9.88|3.58|8.67|–|99.89|1.62
 21|DAF-13|1400|72|45.64|0.02|14.14|9.56|9.13|21.45|–|99.94|3.17
 22|DAFT10-13|1400|72|40.9|9.18|12.56|9.34|8.06|18.89|–|98.92|2.99
@@ -116,7 +116,16 @@ def _assert_table2_grid(document: dict, expected: tuple[tuple[str, ...], ...]) -
         values = obs["values"]
         assert values["sample_as_published"] == sample
         assert values["T_C"] == temp
-        assert values["duration_h_as_printed"] == duration
+        if duration == "":
+            assert values["duration_h_as_printed"] == ""
+            t_condition = obs["point_conditions"]["T_C"]
+            assert t_condition["state"]["value"] == temp
+            assert "ditto inherited from row 14" in t_condition["locator"]["note"]
+            duration_condition = obs["point_conditions"]["duration_h"]
+            assert duration_condition["state"]["tag"] == "unknown"
+            assert "cell is blank" in duration_condition["state"]["reason"]
+        else:
+            assert values["duration_h_as_printed"] == duration
         assert values["Total_wt_pct_as_published"] == cells[-2]
         assert values["value"] == cells[-1]
         printed_composition = {
@@ -144,6 +153,18 @@ def test_table2_independent_render_grid_and_mutations() -> None:
     first_row["values"]["composition_wt_pct_as_published"]["SiO2"] = "45.48"
     with pytest.raises(AssertionError):
         _assert_table2_grid(extract_mutation, expected)
+
+    duration_mutation = deepcopy(document)
+    blank_duration = next(
+        item for item in duration_mutation["species"]["Fe"]["observations"]
+        if item["observation_id"].endswith("_row_16_daft20_10")
+    )
+    blank_duration["values"]["duration_h_as_printed"] = "70"
+    blank_duration["point_conditions"]["duration_h"]["state"] = {
+        "tag": "value", "value": "70"
+    }
+    with pytest.raises(AssertionError):
+        _assert_table2_grid(duration_mutation, expected)
 
     dap = next(
         item for item in document["species"]["P2O5"]["context"]
@@ -222,6 +243,10 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
         for key in ("T_C", "duration_h", "atmosphere", "fO2_log", "total_pressure_Pa", "composition"):
             assert key in conditions and conditions[key].locator is not None
         assert conditions["T_C"].state.value + Decimal("273.15") == record.identity.temperature_K.value
+        if record.observation_id.endswith(("_row_16_daft20_10", "_row_19_dafst15_10a")):
+            assert conditions["duration_h"].state.is_unknown
+        else:
+            assert conditions["duration_h"].state.is_value
         assert conditions["fO2_log"].state.is_unknown
         assert conditions["total_pressure_Pa"].state.value == Decimal("101325")
         assert conditions["composition"].state.is_unknown
