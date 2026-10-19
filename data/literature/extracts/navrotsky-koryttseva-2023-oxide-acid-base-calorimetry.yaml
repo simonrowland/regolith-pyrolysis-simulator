@@ -1,0 +1,597 @@
+schema_version: literature_extract.v1
+source_id: navrotsky-koryttseva-2023-oxide-acid-base-calorimetry
+source:
+  citation: Navrotsky A. and Koryttseva A. (2023). Acid–Base Properties of Oxides
+    Derived from Oxide Melt Solution Calorimetry. Molecules 28(12):4623.
+  doi: 10.3390/molecules28124623
+  year: 2023
+extraction:
+  method: Born-digital pdftotext-layout tables preserved in context; no MinerU table
+    JSON available. Figures retained without numeric points.
+  date: '2026-10-19'
+  worker: fam13-1019
+  provenance_path: text/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry/pdftotext-layout.txt
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: navrotsky_koryttseva_2023_table_1_context
+      type: table_context
+      units: kJ/mol or kJ/mol of oxygen atoms as labeled in table
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '1'
+      values:
+        caption: Heat contents and enthalpies of drop solution and solution for binary
+          oxides in lead borate and sodium molybdate at 700 and 800 °C.
+        printed_table_text: "Table 1. Heat contents (H0 (T)-H0 (25 ◦ C), kJ/mol),\
+          \ enthalpies of drop solution (∆ds H, kJ/mol) and\n                    \
+          \                  enthalpies of solution (∆s H, kJ/mole of oxygen atoms)\
+          \ of the binary oxides in lead borate and sodium\n                     \
+          \                 molybdate at 700 and 800 ◦ C.\n\n                    \
+          \                                                           Enthalpy of\
+          \ Drop Solution (kJ/mol) and Enthalpy of Solution\n                    \
+          \                              Heat Content                            \
+          \     (kJ/mol of Oxygen Atoms)\n                         Pauling       \
+          \      H0 (T)-H0 (25 ◦ C), kJ/mol                                      \
+          \          Sodium Molybdate\n      Oxide              Electro-         \
+          \                                     Lead Borate (2PbO·B2 O3 )\n      \
+          \                                                                      \
+          \                                            (3Na2 O·4MoO3 )\n         \
+          \              Negativity α\n                                          \
+          \                                     ∆ds H(700°C) β    ∆s H(700°C)γ   \
+          \    ∆ds H(700°C) β    ∆s H(700°C)γ\n                                  \
+          \           700 ◦ C           800 ◦ C         ∆ds H(800°C) β    ∆s H(800°C)γ\
+          \       ∆ds H(800°C) β    ∆s H(800°C)γ\n\n                             \
+          \                                              −193.68 ± 1.10 [11]   −260.38\
+          \        −318.0 ± 3.1 [11]     −384.7\n      K2 O (s)             0.82 \
+          \            66.70 [28]       78.17 [28]\n\n                           \
+          \                                                −91.5 ± 1.9 [11]      −127.05\
+          \        −184.61 ± 3.21 [11]   −220.16\n      BaO (s)              0.89\
+          \             35.55 [28]       41.20 [28]\n\n                          \
+          \                                                 −113.10 ± 0.83 [11]  \
+          \ −169.62        −217.56 ± 4.25 [11]   −274.08\n     Na2 O (s)         \
+          \    0.9              56.52 [28]       68.76 [28]\n\n                  \
+          \                                                         −58.5 ± 2.0 [11]\
+          \      −93.17         −137.2 ± 3.8 [11]     −171.87\n      SrO (s)     \
+          \         0.95             34.67 [28]       40.21 [28]\n\n             \
+          \                                                              −18.28 ±\
+          \ 2.17 [11]    −68.48         −90.3 ± 2.5 [11]      −140.5\n     Li2.5 O\
+          \ (s)           0.98             50.20 [28]       58.52 [28]\n         \
+          \                                                                  −5.85\
+          \ ± 0.65 [29]     −64.37\n                                             \
+          \                              −21.4 ± 1.9 [11]      −54.95         −90.3\
+          \ ± 1.8 [11]      −123.85\n     CaO (s)               1.00             33.55\
+          \ [28]       38.87 [28]\n\n      La2 O3                                \
+          \                               −42.3 ± 4.4 [11]      −42.01         −225.1\
+          \ ± 3.16 [11]    −102.94\n                           1.10             83.73\
+          \ [30]       97.43 [30]\n    (s, A-type)                               \
+          \                             −30.91 ± 0.61 [11]    −42.78         −221.81\
+          \ ± 2.25 [11]   −106.41\n                                              \
+          \                                                                  74.37\
+          \ ± 0.75 [11]     12.59\n   CeO2 (s, cub)           1.12             49.19\
+          \ [31]       57.33 [31]\n                                              \
+          \                             83.34 ± 1.86 [11]     13.00          97.40\
+          \ ± 0.98 [32]     20.04\n\n    Nd2 O3 (s,                              \
+          \                               3.04 ± 3.70 [11]      −28.35         −163.36\
+          \ ± 3.44 [11]   −83.82\n                           1.14             88.09\
+          \ [30]       102.78 [30]\n   A-type, hex)                              \
+          \                              11.82 ± 0.99 [11]     −30.32         −142.20\
+          \ ± 0.83 [11]   −81.66\n    Sm2 O3 (s,                                 \
+          \                            11.5 ± 4.1 [11]       −26.55         −153.62\
+          \ ± 2.86 [11]   −81.59\n                           1.17             91.15\
+          \ [30]       106.17 [30]\n   B-type, mon.)                             \
+          \                              27.3 ± 0.6 [11]       −26.29\n    Gd2 O3\
+          \ (s,                                                             8.4 ±\
+          \ 3.4 [11]        −24.73         −144.34 ± 1.35 [11]   −75.64\n        \
+          \                   1.20             82.58 [30]       95.86 [30]\n   C-type,\
+          \ cubic)                                                          25.7 ±\
+          \ 0.2 [11]       −23.39         −121.0 ± 3.2 [11]     −72.29\n    Dy2 O3\
+          \ (s,                                                             40.2 ±\
+          \ 1.2 [11]       −15.5          −114.88 ± 2.22 [11]   −67.19\n         \
+          \                  1.22             86.70 [30]       100.39 [30]\n   C-type,\
+          \ cub)                                                            46.9 ±\
+          \ 0.4 [11]       −17.83\n    Y2 O3 (s,                                 \
+          \                             19.6 ± 1.1 [11]       −20.53         −120.74\
+          \ ± 0.94 [11]   −67.31\n                           1.22             81.19\
+          \ [30]       94.11 [30]\n   C-type, cub)                               \
+          \                             32.8 ± 0.8 [11]       −20.44         −116.3\
+          \ ± 1.2 [11]     −70.14\n    Ho2 O3 (s,                                \
+          \                             35.1 ± 5.6 [11]       −16.34         −111.72\
+          \ ± 3.68 [11]   −65.28\n                           1.23             84.13\
+          \ [30]       97.35 [30]\n   C-type, cub)                               \
+          \                                                                  −109.51\
+          \ ± 1.84 [11]   −68.95\n    Er2 O3 (s,                                 \
+          \                            35.3 ± 1.7 [11]       −15.87         −105.26\
+          \ ± 2.48 [11]   −62.72\n                           1.24             82.91\
+          \ [30]       96.13 [30]\n   C-type, cub)                               \
+          \                             50.6 ± 0.4 [11]       −15.18         −107.2\
+          \ ± 1.8 [11]     −67.78\n                                              \
+          \                             38.6 ± 2.8 [11]       −15.70         −97.12\
+          \ ± 2.38 [11]    −60.94\n    Tm2 O3 (s)             1.25             85.71\
+          \ [30]       99.06 [30]\n                                              \
+          \                                                                  −97.97\
+          \ ± 1.10 [11]    −65.68\n    Lu2 O3 (s,                                \
+          \                             46.2 ± 1.2 [11]       −11.4          −96.90\
+          \ ± 1.90 [11]    −59.10\n                           1.27             80.40\
+          \ [30]       93.61 [30]\n   C-type, cub)\n\fMolecules 2023, 28, 4623   \
+          \                                                                      \
+          \                                                6 of 17\n\n\n\n\n     \
+          \                                 Table 1. Cont.\n\n                   \
+          \                                                                Enthalpy\
+          \ of Drop Solution (kJ/mol) and Enthalpy of Solution\n                 \
+          \                                 Heat Content                         \
+          \            (kJ/mol of Oxygen Atoms)\n                         Pauling\
+          \             H0 (T)-H0 (25 ◦ C), kJ/mol                               \
+          \                     Sodium Molybdate\n      Oxide              Electro-\
+          \                                                  Lead Borate (2PbO·B2\
+          \ O3 )\n                                                               \
+          \                                                             (3Na2 O·4MoO3\
+          \ )\n                       Negativity α\n                             \
+          \                                                      ∆ds H(700°C) β  \
+          \  ∆s H(700°C)γ       ∆ds H(700°C) β   ∆s H(700°C)γ\n                  \
+          \                           700 ◦ C           800 ◦ C             ∆ds H(800°C)\
+          \ β    ∆s H(800°C)γ       ∆ds H(800°C) β   ∆s H(800°C)γ\n\n            \
+          \                                                                      \
+          \                                  0.89 ± 0.48 [31]     −24.31\n     ThO2\
+          \ (s)              1.3              49.50 [33]     57.5 ± 1.7 [34]\n   \
+          \                                                                      \
+          \      98.1 ± 1.7 [34]       20.3 ± 2.4\n\n       HfO2                 \
+          \                                                                      \
+          \                  20.0 ± 2.2 [35]      −14.78\n                       \
+          \    1.3              49.56 [30]       57.78 [30]\n    (s, monocl)     \
+          \                                                           61.75 ± 1.38\
+          \ [11]     1.99\n                                                      \
+          \                         36.48 ± 0.50 [11]     4.88           −5.79 ± 0.15\
+          \ [11]    −37.39\n     MgO (s)               1.31             31.60 [28]\
+          \       36.71 [28]\n                                                   \
+          \                            42.09 ± 0.41 [11]     5.38\n              \
+          \                                                                 66.93\
+          \ ± 0.92 [11]     9.93           19.5 ± 0.9 [11]      −13.79\n     ZrO2\
+          \ (s)              1.33             47.07 [28]       54.68 [28]\n      \
+          \                                                                      \
+          \   82.9 ± 0.7 [11]       14.11\n                                      \
+          \                                                                      \
+          \        −57.72 ± 0.98 [11]   −45.32\n     Sc2 O3 (s)            1.36  \
+          \           78.25 [30]       91.21 [30]\n                              \
+          \                                                 77.83 ± 1.89 [11]    \
+          \ −4.46\n                                                              \
+          \                                                      34.22 ± 5.34 [33]\
+          \    −15.00\n    Np2 O5 (s)             1.36            109.26 [33]\n\n\
+          \                                                                      \
+          \                                              9.49 ± 1.53 [36]     −18.24\n\
+          \    γ-UO3 (s)              1.38             64.22 [33]\n              \
+          \                                                                 26.67\
+          \ ± 4.02 [36]\n                                                        \
+          \                                                            95.8 ± 3.6\
+          \ [37]      −2.98\n    Ta2 O5 (s)             1.5             110.71 [28]\
+          \       129.29 [28]\n                                                  \
+          \                                                                  111.41\
+          \ ± 1.61 [32]   −3.58\n                                                \
+          \                               55.4 ± 1.2 [38]       4.57           60.81\
+          \ ± 0.11 [11]    7.28\n  TiO2 (s, rutile)         1.54             46.26\
+          \ [28]       53.70 [28]\n                                              \
+          \                                                                      73.37\
+          \ ± 0.36 [32]    9.84\n                                                \
+          \                               146.60 ± 1.6 [11]     21.83          154.70\
+          \ ± 1.00 [11]   24.53\n  Mn2 O3 (s, cub)          1.55             81.10\
+          \ [31]       94.75 [31]\n                                              \
+          \                                                                      175.79\
+          \ ± 1.38 [32]   27.01\n                                                \
+          \                                                                    93.97\
+          \ ± 1.60 [11]    −2.81\n    Nb2 O5 (s)             1.6             108.00\
+          \ [28]       125.40 [28]\n                                             \
+          \                                                                      \
+          \ 127.05 ± 0.86 [32]   0.33\n\n     α-Al2 O3                           \
+          \                                       107.38 ± 0.15 [11]    11.04\n  \
+          \                         1.61             74.26 [28]       86.68 [28]\n\
+          \      (s, cor.)                                                       \
+          \         120.12 ± 0.17 [11]    11.15          110.08 ± 1.17 [32]   7.80\n\
+          \                                                                      \
+          \         −15.92 ± 0.45 [11]    −38.62         140.0 ± 2.1 [11]     −7.44\n\
+          \     V2 O5 (s)             1.63           177.19(l) [28]   196.25(l) [28]\n\
+          \                                                                      \
+          \                                              120.46 ± 0.57 [32]   −15.16\n\
+          \                                                                      \
+          \         51.03 ± 0.36 [11]     18.63          19.4 ± 0.7 [11]      −13.00\n\
+          \   ZnO (s, hex.)           1.65             32.40 [31]          37.66\n\
+          \n                                                                     \
+          \                                               −4.82 ± 0.28 [11]    −38.46\n\
+          \     CdO (s)               1.69             33.64 [39]       39.00 [39]\n\
+          \                                                                      \
+          \         47.98 ± 0.81 [11]     8.98\n                                 \
+          \                                                                      \
+          \             −1.12 ± 0.25 [11]    −27.41\n     In2 O3 (s)            1.78\
+          \             81.11 [39]       93.98 [39]\n                            \
+          \                                                                      \
+          \                  12.23 ± 1.03 [11]    −27.25\n                       \
+          \                                                        114.38 ± 1.17 [11]\
+          \    12.31          130.16 ± 1.66 [11]   17.57\n    Ga2 O3 (s)         \
+          \    1.81             77.45 [30]       90.11 [30]\n                    \
+          \                                                                      \
+          \                          132.46 ± 1.88 [11]   14.17\n                \
+          \                               96.43            110.94                \
+          \                              95.63 ± 0.50 [11]    −0.27\n     Fe2 O3 (s)\
+          \            1.83             (II-modif )    (III-modif ) [28]   182.29\
+          \ ± 1.34 [11]    23.78          115.92 ± 1.57 [32]   1.66\n            \
+          \                                    [28]\n                            \
+          \                                                   57.48 ± 0.93 [11]  \
+          \   21.23          15.66 ± 0.59 [11]    −20.59\n     CoO (s)           \
+          \    1.88             36.25 [28]       41.80 [28]\n                    \
+          \                                                                      \
+          \                          21.92 ± 0.36 [32]    −19.88\n               \
+          \                                                                67.9 ±\
+          \ 0.6 [11]       33.35          41.9 ± 0.6 [11]      7.35\n     CuO (s)\
+          \               1.90             34.55 [28]       40.07 [28]\n         \
+          \                                                                      \
+          \                                     63.05 ± 0.40 [32]    22.98\n\fMolecules\
+          \ 2023, 28, 4623                                                       \
+          \                                                                  7 of\
+          \ 17\n\n\n\n\n                                      Table 1. Cont.\n\n \
+          \                                                                      \
+          \           Enthalpy of Drop Solution (kJ/mol) and Enthalpy of Solution\n\
+          \                                                   Heat Content       \
+          \                            (kJ/mol of Oxygen Atoms)\n                \
+          \         Pauling              H0 (T)-H0 (25 ◦ C), kJ/mol              \
+          \                                    Sodium Molybdate\n      Oxide     \
+          \         Electro-                                                 Lead\
+          \ Borate (2PbO·B2 O3 )\n                                               \
+          \                                                                      \
+          \      (3Na2 O·4MoO3 )\n                       Negativity α\n          \
+          \                                                                      \
+          \  ∆ds H(700°C) β    ∆s H(700°C)γ       ∆ds H(700°C) β    ∆s H(700°C)γ\n\
+          \                                             700 ◦ C            800 ◦ C\
+          \           ∆ds H(800°C) β    ∆s H(800°C)γ       ∆ds H(800°C) β    ∆s H(800°C)γ\n\
+          \n       SiO2                                                          \
+          \         39.4 ± 0.4 [11]       −2.03\n    (s, quartz)            1.90 \
+          \            43.46 [28]        50.37 [28]\n                            \
+          \                                                  47.79 ± 0.32 [11]   \
+          \  −1.29\n\n                                               36.60       \
+          \      42.10        71.3 ± 0.8 [11]       34.7           35.73 ± 0.95 [11]\
+          \     −0.87\n     NiO (s)               1.91\n                         \
+          \                   (cubic) [31]      (cubic) [31]    72.08 ± 0.57 [11]\
+          \     29.98          42.77 ± 0.35 [32]     0.67\n                      \
+          \                         49.52             57.78                      \
+          \                       50.05 ± 0.21 [11]     0.27\n     SnO2 (s)      \
+          \        1.96             (tetragon)      (tetragon) [31]   73.07 ± 0.86\
+          \ [11]     7.65\n                                                [31]\n\
+          \      GeO2                                                            \
+          \        25.06 ± 0.29 [11]     −9.85\n    (s, quartz)            2.01  \
+          \           44.76 [30]        52.29 [30]\n                             \
+          \                                                 36.7 ± 0.3 [11]      \
+          \ −7.80          82.11 ± 0.86 [11]     14.91\n                         \
+          \                                                                      \
+          \                    5.21 ± 0.53 [11]      −26.34\n     Bi2 O3 (s)     \
+          \       2.02            84.23 (s) [31]    96.89 (s) [31]\n\n           \
+          \                                                                   46.75\
+          \ ± 1.52 [29]     −15.77\n      B2 O3                2.04            94.06\
+          \ (l) [28]   107.03(l) [28]\n\n\n      TeO2                 2.1        \
+          \     48.84 (s) [39]    88.37 (l) [39]\n                               \
+          \                                                                      \
+          \              90.89 ± 1.67 [40]     1.26\n                            \
+          \                                                                      \
+          \                 76.21± 1.47 [11]      5.08\n    MoO3 (s)             \
+          \  2.16            60.96 (s) [28]    71.56 (s) [28]\n\n                \
+          \                                                              −326.48 ±\
+          \ 1.21 [11]   −88.30         −164.60 ± 0.85 [11]   −55.92\n     P2 O5 (s)\
+          \             2.19             115.00 [28]\n\n       PbO               \
+          \                                                                      \
+          \                    −15.39 ± 1.14 [11]    −52.25\n  (red, tetragon)   \
+          \       2.33             36.86 [28]        42.88 [28]\n                \
+          \                                                              52.07 ± 0.43\
+          \ [11]     9.19\n                                               62.15  \
+          \           73.61                                             91.68 ± 1.34\
+          \ [11]     9.84\n     WO3 (s)               2.36            (orthorhomb)\
+          \     (tetragon) [28]                                        105.78 ± 0.87\
+          \ [32]    10.73\n                                                [28]\n\
+          \                                                                      \
+          \                                             −203.7 ± 4.091 [11]   −83.04\n\
+          \      SO3 (g)              2.58             45.43 [28]        53.11 [28]\n\
+          \                                                                      \
+          \        −211.95 ± 3.55 [11]   −88.35\n                                \
+          \      α —Pauling electronegativity of the element which form the binary\
+          \ oxide [1]. β —number of decimal places reduced\n\n                   \
+          \                   to one for consistency between different reports. γ\
+          \ —data per mole of oxygen atoms in the binary oxide.\n\n              \
+          \                             Before proceeding to that discussion, some\
+          \ comments on the acid–base chemistry of\n                             \
+          \         the solvent systems themselves are in order. High-temperature\
+          \ calorimetry has been used\n                                      to directly\
+          \ measure enthalpies of mixing in a number of oxide glasses and melts, giving\n\
+          \                                      insight into their acid–base equilibria.\
+          \ The systems studied include PbO–V2 O5 [41], PbO–\n                   \
+          \                   B2 O3 [42], PbO–SiO2 [43], PbO–GeO2 [44], Na2 O–MoO3\
+          \ [45], Li2 O–B2 O3 , Na2 O–B2 O3 and\n                                \
+          \      K2 O–B2 O3 [27]. In some cases, integral enthalpies of mixing were\
+          \ measured by combining\n                                      large amounts\
+          \ of components; in others, partial molar enthalpies of solution of one\
+          \ or both\n                                      of the components in binary\
+          \ systems were measured as a function of melt composition.\n           \
+          \                           The selected data are summarized in Figure 1.\n\
+          \                                           In the system Na2 O–MoO3 , Na2\
+          \ O is a strongly basic oxide, while MoO3 is a strong\n                \
+          \                      acid. We can write a number of successive stages\
+          \ of acid–base interaction that occur when\n                           \
+          \           MoO3 is added to a melt initially rich in Na2 O. The species\
+          \ in the melt, with increas-\n                                      ing\
+          \ MoO3 content, are MoO4 2− , Mo2 O7 2− and MoO3 . Their equilibria are\
+          \ described by\n                                      the following:\n \
+          \                                                             O2− (in melt)\
+          \ + MoO3 (s) = MoO4 2− (in melt)\n\n\n                                 \
+          \                              MoO4 2− (in melt) + MoO3 (s) = Mo2 O7 2−\
+          \ (in melt)\n\fMolecules 2023, 28, 4623                                \
+          \                                                                      \
+          \        8 of 17\n\n\n\n\n                                             \
+          \                        MoO3 (s) = MoO3 (in melt)\n                   \
+          \                     When the melt contains a mixture of several types\
+          \ of molybdate species, such as\n                                   those\
+          \ above or their polymers, it is a buffered acid–base system (Figure 1a).\
+          \ There are\n                                   several buffer regions in\
+          \ the Na2 O–MoO3 system [45]. For 0.52 < n (MoO3 ) < 0.63 and n\n      \
+          \                             (MoO3 ) > 0.7, where the enthalpy of solution\
+          \ of MoO3 changes very slowly with increasing\n                        \
+          \           mole fraction of MoO3 , these buffer regions contain mixtures\
+          \ of molybdate species. The\n  Molecules 2023, 28, x FOR PEER REVIEW\n \
+          \                                  composition chosen as a calorimetric\
+          \ solvent (3Na2 O 4MoO3 ) is a buffer containing 7 of 17\n             \
+          \                                                                      \
+          \                                    mainly\n                          \
+          \         MoO4 2− and Mo2 O7 2− species charge-balanced by Na+ ions.\n\n\
+          \n\n\n                                 Figure 1. Partial molar enthalpies\
+          \ of solution as a function of the mole fraction of (a) MoO3 in\n      \
+          \                         Figure 1. Partial molar enthalpies of solution\
+          \ as a function of the mole fraction of (a) MoO3 in\n                  \
+          \               Na2MoO4–MoO3 mixtures (melts) at 700 ◦°C [45]; (b) liquid\
+          \ B2O3 and solid PbO in lead borate melts\n                            \
+          \   Na2 MoO4 –MoO3 mixtures (melts) at 700 C [45]; (b) liquid B2 O3 and\
+          \ solid PbO in lead borate melts\n                                 at 800\
+          \ °C [42]; (c) liquid PbO and solid SiO2 (quartz) in lead–silicate melts\
+          \ at 900 °C [43]; (d) B2O3 in\n                               atLi,\n  \
+          \                                800 ◦                                 \
+          \                                  melts at 900 ◦ C [43]; (d) B2 O3 in\n\
+          \                                     Na,CK[42]; (c) melts\n           \
+          \                                borate   liquidat\n                   \
+          \                                        PbO\n                         \
+          \                                    667,and\n                         \
+          \                                         712solid SiO2°C,\n           \
+          \                                                           and 712   (quartz)\
+          \ in lead–silicate\n                                                   \
+          \                                respectively [27].\n                  \
+          \             Li, Na, K borate melts at 667, 712 and 712 ◦ C, respectively\
+          \ [27].\n                                     In the system Na2O–MoO3, Na2O\
+          \ is a strongly basic oxide, while MoO3 is a strong\n                  \
+          \              acid. We can write a number of successive stages of acid–base\
+          \ interaction that occur when\n                                MoO3 is added\
+          \ to a melt initially rich in Na2O. The species in the melt, with increasing\n\
+          \                                MoO3 content, are MoO42−, Mo2O72− and MoO3.\
+          \ Their equilibria are described by the fol-\n                         \
+          \       lowing:\n                                                      \
+          \         O2−(in melt) + MoO3 (s) = MoO42− (in melt)\n\fMolecules 2023,\
+          \ 28, 4623                                                             \
+          \                                                     9 of 17\n\n\n\n\n\
+          \                                         The data for the PbO–B2 O3 system\
+          \ (Figure 1b) can be interpreted similarly [42]. In this\n             \
+          \                       system, PbO is a moderately strong base (Pb2+ is\
+          \ a weak acid), while B2 O3 is a strong acid.\n                        \
+          \            The interaction between B2 O3 and PbO represents a strong acid–base\
+          \ reaction:\n\n                                                  (1 − n)\
+          \ PbO + n B2 O3 → (1 − n) Pb2+ + 2n {boron-based anion(s)}\n\n         \
+          \                                 In a PbO–B2 O3 melt, there is a buffer\
+          \ region in the composition range 0.25 < n (B2 O3 ) < 0.5,\n           \
+          \                         where partial molar enthalpies of solution change\
+          \ only to a moderate degree and the melt\n                             \
+          \       acidity changes little with the change in composition. Because the\
+          \ borate anions tend\n                                    to polymerize,\
+          \ their types and amounts depend on (B2 O3 ). Such speciation has been\n\
+          \                                    analyzed in detail [24]. The composition\
+          \ used as a calorimetric solvent, 2PbO·B2 O3 with\n                    \
+          \                n (B2 O3 ) = 0.33), lies within this buffer region. The\
+          \ dependence of the enthalpy of solution\n                             \
+          \       on the mole fraction of acidic oxide is similar in appearance to\
+          \ that of an aqueous acid–base\n                                    titration\
+          \ curve. Buffer regions are separated by rapidly changing regions of enthalpy,\
+          \ which\n                                    is very clearly seen in Figure\
+          \ 1c,d. The relative strength of acids and bases can be judged by\n    \
+          \                                the magnitude of the enthalpy “jump” on\
+          \ the curve (the distance between the two relatively\n                 \
+          \                   flat lines defining buffer regions). For example, Figure\
+          \ 1d shows that the enthalpy jump\n                                    increases\
+          \ in the order Li2 O–B2 O3 , Na2 O–B2 O3 , K2 O–B2 O3 , indicating an increase\
+          \ in basic\n                                    properties in this direction,\
+          \ and is consistent with the general trends in properties in the\n     \
+          \                               periodic table."
+        schema_gap: No enthalpy-of-solution quantity token exists; values remain context.
+    - observation_id: navrotsky_koryttseva_2023_table_2_context
+      type: table_context
+      units: kJ/mol or kJ/mol of oxygen atoms as labeled in table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '2'
+      values:
+        caption: Enthalpies of solution of oxides in lithium–sodium borate and CMAS
+          melts.
+        printed_table_text: "Table 2. Enthalpies of solution of oxides (per mole of\
+          \ oxygen atoms) in lithium–sodium borate at\n                          \
+          \          800 ◦ C and in calcia–magnesia–alumina–silica (CMAS) systems\
+          \ at 1450 ◦ C.\n\n                                                   Enthalpy\
+          \ of Solution\n                                                        \
+          \                          Enthalpy of Solution in          Enthalpy of\
+          \ Solution in\n                           Electro-Negativity       in Lithium–Sodium\n\
+          \       Oxide                                                          \
+          \             CMAS with 35 mol.%               CMAS with 42 mol.%\n    \
+          \                          (Pauling) [1]        Borate (LiBO2 –NaBO2\n \
+          \                                                                      \
+          \             Silica (1450 ◦ C) [46]           Silica (1450◦ C) [47]\n \
+          \                                                    Eutectic) (800 ◦ C)\n\
+          \        BaO                       0.89                    −87.94 [48]\n\
+          \        SrO                       0.95                    −59.15 [48]\n\
+          \        CaO                         1                     −23.39 [48] \
+          \                      −4.30                          −185.48\n       Gd2\
+          \ O3                      1.2                                          \
+          \                                           −20.12\n       Y2 O3       \
+          \               1.22                                                   \
+          \                                   −3.03\n       MgO                  \
+          \      1.31                     25.94 [49]                       56.70 \
+          \                          −2.07\n       ZrO2                       1.33\
+          \                     22.47 [48]                                       \
+          \                −6.07\n        TiO2                      1.54         \
+          \           19.595 [48]\n       Al2 O3                     1.61        \
+          \             17.53 [50]                       13.87\n        CdO      \
+          \                 1.69                     36.99 [48]\n        SiO2    \
+          \                  1.90                    −6.065 [49]                 \
+          \     −10.20\n                                    Heat content of corresponding\
+          \ oxides for calculations of enthalpies of solution from drop solution enthalpies\n\
+          \                                    taken from Table 1."
+        schema_gap: No enthalpy-of-solution quantity token exists; values remain context.
+    - observation_id: navrotsky_koryttseva_2023_figure_1_deferred
+      type: figure_context
+      units: as printed in caption
+      locator:
+        figure: '1'
+        page: 8
+        pdf_page_index: 7
+      values:
+        caption: Figure 1. Partial molar enthalpies of solution as a function of the
+          mole fraction of (a) MoO3 in Figure 1. Partial molar enthalpies of solution
+          as a function of the mole fraction of (a) MoO3 in Na2MoO4–MoO3 mixtures
+          (melts) at 700 ◦°C [45]; (b) liquid B2O3 and solid PbO in lead borate melts
+        quantity_as_printed: enthalpy of solution / heat content as caption states
+        species_as_printed: binary oxide or melt components named in caption
+        phase_as_printed: oxide melt; see caption
+        temperature_as_printed: see caption and axes
+        axes_as_printed: see caption; axes not independently transcribed
+        series: []
+        marker_count_per_series: not counted; deferred figure pass
+        digitisation: deferred to a figure pass
+    - observation_id: navrotsky_koryttseva_2023_figure_2_deferred
+      type: figure_context
+      units: as printed in caption
+      locator:
+        figure: '2'
+        page: 10
+        pdf_page_index: 9
+      values:
+        caption: Figure 2. values in of Enthalpies sodium molybdate solution of somewhat
+        quantity_as_printed: enthalpy of solution / heat content as caption states
+        species_as_printed: binary oxide or melt components named in caption
+        phase_as_printed: oxide melt; see caption
+        temperature_as_printed: see caption and axes
+        axes_as_printed: see caption; axes not independently transcribed
+        series: []
+        marker_count_per_series: not counted; deferred figure pass
+        digitisation: deferred to a figure pass
+    - observation_id: navrotsky_koryttseva_2023_figure_4_deferred
+      type: figure_context
+      units: as printed in caption
+      locator:
+        figure: '4'
+        page: 11
+        pdf_page_index: 10
+      values:
+        caption: Figure 4. Enthalpies of solution of the binary oxides vs. Mulliken
+          electronegativity for diﬀerent cal- Figure 4. Enthalpies of solution of
+          the binary oxides vs. Mulliken electronegativity for different orimetric
+          solvents.
+        quantity_as_printed: enthalpy of solution / heat content as caption states
+        species_as_printed: binary oxide or melt components named in caption
+        phase_as_printed: oxide melt; see caption
+        temperature_as_printed: see caption and axes
+        axes_as_printed: see caption; axes not independently transcribed
+        series: []
+        marker_count_per_series: not counted; deferred figure pass
+        digitisation: deferred to a figure pass
+    - observation_id: navrotsky_koryttseva_2023_figure_5_deferred
+      type: figure_context
+      units: as printed in caption
+      locator:
+        figure: '5'
+        page: 12
+        pdf_page_index: 11
+      values:
+        caption: Figure 5. Enthalpies Figure of solution of binary 5. Enthalpies oxidesofin
+        quantity_as_printed: enthalpy of solution / heat content as caption states
+        species_as_printed: binary oxide or melt components named in caption
+        phase_as_printed: oxide melt; see caption
+        temperature_as_printed: see caption and axes
+        axes_as_printed: see caption; axes not independently transcribed
+        series: []
+        marker_count_per_series: not counted; deferred figure pass
+        digitisation: deferred to a figure pass
+    - observation_id: navrotsky_koryttseva_2023_figure_6_deferred
+      type: figure_context
+      units: as printed in caption
+      locator:
+        figure: '6'
+        page: 13
+        pdf_page_index: 12
+      values:
+        caption: Figure 6. Enthalpies of solution of oxides, organized in groups according
+          to stoichiometry of highest Figure 6. Enthalpies of solution of oxides,
+          organized in groups according to stoichiometry of highest oxidation state
+          of oxide-forming elements in lead borate and sodium molybdate melts vs.
+          ionic radii
+        quantity_as_printed: enthalpy of solution / heat content as caption states
+        species_as_printed: binary oxide or melt components named in caption
+        phase_as_printed: oxide melt; see caption
+        temperature_as_printed: see caption and axes
+        axes_as_printed: see caption; axes not independently transcribed
+        series: []
+        marker_count_per_series: not counted; deferred figure pass
+        digitisation: deferred to a figure pass
+    - observation_id: navrotsky_koryttseva_2023_figure_3_deferred
+      type: figure_context
+      units: as printed in caption
+      locator:
+        figure: '3'
+        page: 10
+        pdf_page_index: 9
+      values:
+        caption: Figure3.3. Enthalpies Figure Enthalpies of of solution solutionofofthe
+          thebinary oxides binary vs.vs. oxi
+        quantity_as_printed: enthalpy of solution / heat content as caption states
+        species_as_printed: binary oxide or melt components named in caption
+        phase_as_printed: oxide melt; see caption
+        temperature_as_printed: see caption and axes
+        axes_as_printed: see caption; axes not independently transcribed
+        series: []
+        marker_count_per_series: not counted; deferred figure pass
+        digitisation: deferred to a figure pass
+    - observation_id: navrotsky_koryttseva_2023_figure_7_deferred
+      type: figure_context
+      units: as printed in caption
+      locator:
+        figure: '7'
+        page: 14
+        pdf_page_index: 13
+      values:
+        caption: Figure7.7.Enthalpies Figure Enthalpiesofofsolution solutionofofSiO
+          SiO2ininsilicate silicatemelts meltsvs.
+        quantity_as_printed: enthalpy of solution / heat content as caption states
+        species_as_printed: binary oxide or melt components named in caption
+        phase_as_printed: oxide melt; see caption
+        temperature_as_printed: see caption and axes
+        axes_as_printed: see caption; axes not independently transcribed
+        series: []
+        marker_count_per_series: not counted; deferred figure pass
+        digitisation: deferred to a figure pass
+    - observation_id: navrotsky_koryttseva_2023_figure_8_deferred
+      type: figure_context
+      units: as printed in caption
+      locator:
+        figure: '8'
+        page: 15
+        pdf_page_index: 14
+      values:
+        caption: Figure8.8.Enthalpies Figure Enthalpiesofofsolution solution(kJ/mole
+          (kJ/moleoxygen oxygenatoms) atoms)ofof the
+        quantity_as_printed: enthalpy of solution / heat content as caption states
+        species_as_printed: binary oxide or melt components named in caption
+        phase_as_printed: oxide melt; see caption
+        temperature_as_printed: see caption and axes
+        axes_as_printed: see caption; axes not independently transcribed
+        series: []
+        marker_count_per_series: not counted; deferred figure pass
+        digitisation: deferred to a figure pass
