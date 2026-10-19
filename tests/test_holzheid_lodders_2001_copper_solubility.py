@@ -144,15 +144,12 @@ def test_species_temperature_and_oxygen(tmp_path):
 
 def test_table3_and_fits_stay_in_context_and_match_the_text():
     document = _document()
-    text = _norm(TEXT.read_text(encoding="utf-8"))
     rows = _rows(document)
     cu = rows["hl01_t3_fe0_s0_CC1_Cu"][1]
     assert cu["type"] == "partition_coefficient_row"
     assert cu["values"]["Dmet_sil_Cu"] == "306"
-    assert "306" in text
     valence = rows["hl01_t4_01"][1]
     assert valence["values"]["formal_valence"] == "0.96 ± 0.13"
-    assert "0.96" in text
     asymmetric = rows["hl01_t4_06"][1]
     assert asymmetric["values"]["formal_valence"] == "0.64 + 0.28"
     caption = rows["hl01_t5_01"][1]
@@ -169,3 +166,8 @@ def test_table3_and_fits_stay_in_context_and_match_the_text():
     assert len(figures) == 6
     assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in figures)
     assert all(row["values"]["numeric_points"] == "none" for row in figures)
+    if not TEXT.is_file():
+        pytest.skip(f"corpus source text absent: {TEXT}")
+    text = _norm(TEXT.read_text(encoding="utf-8"))
+    assert "306" in text
+    assert "0.96" in text

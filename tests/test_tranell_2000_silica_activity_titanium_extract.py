@@ -151,11 +151,7 @@ def _extract_cells(document: dict) -> dict[tuple[str, str, str], str]:
                 if not row_label:
                     continue
                 item_locator = item.get("locator", locator)
-                column = item_locator.get("column")
-                if column == "aSi (in copper)":
-                    column = TABLES[table]["columns"][8 if table == "II" else 7]
-                elif column == "aSiO2 (in slag)":
-                    column = TABLES[table]["columns"][9 if table == "II" else 8]
+                column = _canonical_table_column(table, item_locator.get("column"))
                 printed = item.get("value_as_printed") or item.get("value_as_published")
                 if printed is None:
                     printed = values.get("activity_as_printed")
@@ -442,7 +438,8 @@ def test_rendered_tables_bind_every_cell_and_migrate_conditions() -> None:
             assert point["method_as_printed"] in {"GDMS", "ICP-AES", "X-ray fluorescence"}
             assert "water" in point["quench_statement"]["text"]
             assert "ex-situ" in point["quench_statement"]["text"]
-            assert point["quench_statement"]["locator"]["page"] == 2
+            assert point["quench_statement"]["locator"]["page"] == 3
+            assert point["quench_statement"]["locator"]["pdf_page_index"] == 2
 
     migrated_compositions = [
         row for row in rows
@@ -456,6 +453,18 @@ def test_rendered_tables_bind_every_cell_and_migrate_conditions() -> None:
     ]
     assert len(migrated_titanium_redox) == 45
     assert all(row.identity.species.phase.is_unknown for row in migrated_titanium_redox)
+    titanium_redox_points = [
+        point
+        for observation in document["species"]["Ti"]["observations"]
+        if observation["values"].get("quantity") == "valence_ratio"
+        for point in observation["values"]["points"]
+    ]
+    assert len(titanium_redox_points) == 45
+    assert all(
+        point["quench_statement"]["locator"]["page"] == 3
+        and point["quench_statement"]["locator"]["pdf_page_index"] == 2
+        for point in titanium_redox_points
+    )
     assert all(
         "phase_as_measured" not in point
         for observation in document["species"]["Ti"]["observations"]
