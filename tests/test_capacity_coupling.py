@@ -1553,6 +1553,49 @@ def _retained_gas_shadow(
     )
 
 
+@pytest.mark.parametrize("initial_mol", [1.0, 15.161244955])
+def test_retained_stock_integrated_hk_source_matches_exact_transient(monkeypatch, initial_mol):
+    # Independent piecewise solution of A dp/dt=H max(Pe-p,0)-Kp.
+    # Review r5-ror's fixed-conductance anchor, with the actual lunar V/T.
+    A = 0.085383807627 / (GAS_CONSTANT * 1950.65)
+    H, K, Pe, duration = 0.001, 0.00235, 10.0, 3600.0
+    clear = A / K * math.log(initial_mol / (A * Pe))
+    remaining = duration - clear
+    tau, steady = A / (H + K), H * Pe / (H + K)
+    exact = H * (Pe - steady) * (remaining + tau * math.expm1(-remaining / tau))
+    monkeypatch.setattr(capacity_coupling, "_molecular_pipe_conductance_mol_s_Pa", lambda **_: K)
+    monkeypatch.setattr(capacity_coupling, "_knudsen_number_at_total_Pa", lambda *_, **__: math.inf)
+    result = solve_source_duct_closure(
+        P_eq_Pa={"Fe": Pe}, H_mol_s_Pa={"Fe": H},
+        flux_kg_hr_at_partials=lambda p: {"Fe": H * max(Pe - p.get("Fe", 0), 0) * 0.055845 * 3600},
+        molar_mass_kg_mol={"Fe": 0.055845}, G_mol_s_Pa2=0,
+        capacity=NoColdTrain(), pre_holdup_mol={"Fe": initial_mol},
+        volume_m3=0.085383807627, temperature_K=1950.65,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+    )
+    assert isinstance(result, CapacityShadowResult)
+    integrated = result.evaporation_flux_kg_hr["Fe"] / 0.055845
+    print(f"stock={initial_mol} integrated={integrated:.12g} exact={exact:.12g} relative_error={integrated/exact-1:.12g}")
+    assert integrated == pytest.approx(exact, rel=1e-6)
+    assert result.convergence is SourceDuctConvergence.CONVERGED
+
+
+@pytest.mark.parametrize(("kn", "expected"), [
+    (0.001, {"Fe": "0x1.d9acac556c91cp-1", "Na": "0x1.0842210dce88fp+2"}),
+    (0.1, {"Fe": "0x1.15d76bcf1aebbp+0", "Na": "0x1.2b7180d5689aap+2"}),
+    (100, {"Fe": "0x1.8896018b7d2d8p+1", "Na": "0x1.3fef9e88e1a50p+3"}),
+])
+def test_mixture_duct_conductance_consolidation_pin(kn, expected):
+    # Behaviour-preserving pin at 3bf4893fb, before moving the duct blend.
+    partials = mixture_surface_partials_Pa(
+        P_eq_Pa={"Fe": 10., "Na": 25.}, H_mol_s_Pa={"Fe": .001, "Na": .002},
+        G_mol_s_Pa2=.002, molecular_C_mol_s_Pa={"Fe": .00235, "Na": .003},
+        knudsen_at_total_Pa=lambda _: kn,
+        stock_rate_mol_s={"Fe": 1/3600}, storage_mol_s_Pa=1e-6,
+    )
+    assert {s: p.hex() for s, p in partials.items()} == expected
+
+
 def test_no_cold_train_retained_zero_source_gas_closes_molar_budget():
     pre_mol = 15.161244955
     result = _retained_gas_shadow("O2", pre_mol)
