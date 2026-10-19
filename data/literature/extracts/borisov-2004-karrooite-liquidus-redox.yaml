@@ -9,9 +9,62 @@ extraction:
   date: '2026-10-18'
   worker: Codex
 review_status: draft
+fidelity_samples:
+- path: species.TiO2.observations[borisov_2004_table_2_tio2_activity_coefficients_scored].values.series[0].gamma
+  value: 6.63
+  locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32n}
+experiments:
+- experiment_id: borisov-2004-rutile-saturated-melts-in-air
+  method: loop_equilibration
+  method_as_printed: 'Loop technique in a one atm vertical tube furnace; Table 2 experiments were in air.'
+  locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+  conditions:
+    pressure_bar: {state: {tag: value, value: 1}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}}
+    oxygen_condition: {state: {tag: unknown, reason: source_reports_air_but_no_log_fO2}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}}
 species:
   TiO2:
-    observations: []
+    observations:
+    - observation_id: borisov_2004_table_2_rutile_saturation_activity
+      experiment: borisov-2004-rutile-saturated-melts-in-air
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      phase: condensed_liquid
+      standard_state: pure rutile at the temperature and pressure of interest
+      T_range_K: [1495, 1723]
+      units: dimensionless
+      values: {quantity: activity, method_class: measured_tabulated, activity: 1}
+    - observation_id: borisov_2004_table_2_tio2_activity_coefficients_scored
+      experiment: borisov-2004-rutile-saturated-melts-in-air
+      type: activity_coefficient
+      derived_from: [borisov_2004_table_2_rutile_saturation_activity]
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      phase: condensed_liquid
+      standard_state: pure rutile at the temperature and pressure of interest; rutile saturation fixes a(TiO2) = 1
+      regime: loop_equilibration
+      units: dimensionless
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        activity_standard_state: pure_rutile
+        activity_as_printed: 1
+        derivation:
+          relation: 'gamma(TiO2) = a(TiO2) / X(TiO2); rutile saturation fixes a(TiO2) = 1'
+          inputs: [borisov_2004_table_2_rutile_saturation_activity]
+          output_unit: dimensionless
+        composition_note: 'The Di:An eutectic proportions are not printed. The varying TiO2 wt% and mole fraction are preserved; the unprinted Di:An components remain unknown.'
+        series:
+        - {sample: DAT32n, T_C: 1222, T_K: 1495, TiO2_wt_pct: 19.09, XTiO2: 0.1508, gamma: 6.63, point_conditions: {composition: {state: {tag: unknown, reason: Di_An_eutectic_components_not_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32n}}, temperature_C: {state: {tag: value, value: 1222}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32n}}}}
+        - {sample: DAT32m, T_C: 1241, T_K: 1514, TiO2_wt_pct: 20.19, XTiO2: 0.1601, gamma: 6.24, point_conditions: {composition: {state: {tag: unknown, reason: Di_An_eutectic_components_not_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32m}}, temperature_C: {state: {tag: value, value: 1241}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32m}}}}
+        - {sample: DAT32c, T_C: 1249, T_K: 1522, TiO2_wt_pct: 21.28, XTiO2: 0.1685, gamma: 5.93, point_conditions: {composition: {state: {tag: unknown, reason: Di_An_eutectic_components_not_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32c}}, temperature_C: {state: {tag: value, value: 1249}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32c}}}}
+        - {sample: DAT32f, T_C: 1288, T_K: 1561, TiO2_wt_pct: 24.50, XTiO2: 0.1965, gamma: 5.09, point_conditions: {composition: {state: {tag: unknown, reason: Di_An_eutectic_components_not_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32f}}, temperature_C: {state: {tag: value, value: 1288}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32f}}}}
+        - {sample: DAT32a, T_C: 1294, T_K: 1567, TiO2_wt_pct: 25.38, XTiO2: 0.2044, gamma: 4.89, point_conditions: {composition: {state: {tag: unknown, reason: Di_An_eutectic_components_not_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32a}}, temperature_C: {state: {tag: value, value: 1294}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32a}}}}
+        - {sample: DAT32p, T_C: 1343, T_K: 1616, TiO2_wt_pct: 29.13, XTiO2: 0.2383, gamma: 4.20, point_conditions: {composition: {state: {tag: unknown, reason: Di_An_eutectic_components_not_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32p}}, temperature_C: {state: {tag: value, value: 1343}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32p}}}}
+        - {sample: DAT32r, T_C: 1355, T_K: 1628, TiO2_wt_pct: 30.12, XTiO2: 0.2483, gamma: 4.03, point_conditions: {composition: {state: {tag: unknown, reason: Di_An_eutectic_components_not_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32r}}, temperature_C: {state: {tag: value, value: 1355}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT32r}}}}
+        - {sample: 'DAT46 h', T_C: 1398, T_K: 1671, TiO2_wt_pct: 35.98, XTiO2: 0.2984, gamma: 3.35, point_conditions: {composition: {state: {tag: unknown, reason: Di_An_eutectic_components_not_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: 'DAT46 h'}}, temperature_C: {state: {tag: value, value: 1398}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: 'DAT46 h'}}}}
+        - {sample: DAT46i, T_C: 1421, T_K: 1694, TiO2_wt_pct: 39.39, XTiO2: 0.3281, gamma: 3.05, point_conditions: {composition: {state: {tag: unknown, reason: Di_An_eutectic_components_not_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT46i}}, temperature_C: {state: {tag: value, value: 1421}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT46i}}}}
+        - {sample: DAT46j, T_C: 1450, T_K: 1723, TiO2_wt_pct: 43.05, XTiO2: 0.3575, gamma: 2.80, point_conditions: {composition: {state: {tag: unknown, reason: Di_An_eutectic_components_not_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT46j}}, temperature_C: {state: {tag: value, value: 1450}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', row: DAT46j}}}}
     context:
     - observation_id: borisov_2004_table_1_redox_conditions_and_liquidus_phases
       type: experiment_series
@@ -99,12 +152,26 @@ species:
         - {sample: DAT32-5, minus_log_fO2: 11.12, TiO2_wt_pct: 26.99, excess_TiO2_wt_pct: 1.76, Ti4_over_Ti3: 15.91}
     - observation_id: borisov_2004_table_4_karrooite_composition
       type: experiment_series
-      locator: {page: 5, pdf_page_index: 4, published_page: 73, table: '4'}
+      locator: {page: 7, pdf_page_index: 6, published_page: 75, table: '4'}
       units: wt% and mole fractions as printed
       values:
         method_class: measured_direct
         caption: 'Microprobe analysis of Ti-rich karrooite and recalculations to pseudobrookite components.'
-        reason: 'Measured crystalline residue composition is in scope but not transcribed in this pass.'
+        prose_bounds: {Ti_Mg_atomic: '2.6–3.3', CaO_wt_pct: '0.03–0.68', Al2TiO5_mole_pct: '8.2 ± 0.4'}
+        columns: [sample, TiO2_wt_pct, Al2O3_wt_pct, MgO_wt_pct, total_wt_pct, X_Ti2O3, X_TiO2, X_Al2O3, X_MgO, X_MgTi2O5, X_Al2TiO5, X_Ti3plus2TiO5, Ti_Mg_atomic, D_Al_wt_ratio, D_Ti3plus_atomic_ratio]
+        rows:
+        - {sample: DAT32ik, TiO2_wt_pct: 81.81, Al2O3_wt_pct: 4.41, MgO_wt_pct: 14.89, total_wt_pct: 101.10, X_Ti2O3: 0.0595, X_TiO2: 0.6362, X_Al2O3: 0.0319, X_MgO: 0.2724, X_MgTi2O5: 0.749, X_Al2TiO5: 0.088, X_Ti3plus2TiO5: 0.163, Ti_Mg_atomic: 2.8, D_Al_wt_ratio: 0.39, D_Ti3plus_atomic_ratio: 8.2}
+        - {sample: DAT32jk, TiO2_wt_pct: 81.65, Al2O3_wt_pct: 4.21, MgO_wt_pct: 15.10, total_wt_pct: 100.96, X_Ti2O3: 0.0566, X_TiO2: 0.6377, X_Al2O3: 0.0303, X_MgO: 0.2754, X_MgTi2O5: 0.760, X_Al2TiO5: 0.084, X_Ti3plus2TiO5: 0.156, Ti_Mg_atomic: 2.7, D_Al_wt_ratio: 0.37, D_Ti3plus_atomic_ratio: 7.7}
+        - {sample: DAT32-5a, TiO2_wt_pct: 81.41, Al2O3_wt_pct: 4.25, MgO_wt_pct: 15.44, total_wt_pct: 101.10, X_Ti2O3: 0.0513, X_TiO2: 0.6395, X_Al2O3: 0.0303, X_MgO: 0.2789, X_MgTi2O5: 0.774, X_Al2TiO5: 0.084, X_Ti3plus2TiO5: 0.142, Ti_Mg_atomic: 2.7, D_Al_wt_ratio: 0.39, D_Ti3plus_atomic_ratio: 7.8}
+        - {sample: DAT32-12, TiO2_wt_pct: 82.60, Al2O3_wt_pct: 4.21, MgO_wt_pct: 14.67, total_wt_pct: 101.49, X_Ti2O3: 0.0653, X_TiO2: 0.6347, X_Al2O3: 0.0306, X_MgO: 0.2694, X_MgTi2O5: 0.738, X_Al2TiO5: 0.084, X_Ti3plus2TiO5: 0.179, Ti_Mg_atomic: 2.8, D_Al_wt_ratio: 0.39, D_Ti3plus_atomic_ratio: 7.7}
+        - {sample: DAT32-12a, TiO2_wt_pct: 82.79, Al2O3_wt_pct: 4.35, MgO_wt_pct: 14.77, total_wt_pct: 101.91, X_Ti2O3: 0.0640, X_TiO2: 0.6349, X_Al2O3: 0.0314, X_MgO: 0.2697, X_MgTi2O5: 0.739, X_Al2TiO5: 0.086, X_Ti3plus2TiO5: 0.175, Ti_Mg_atomic: 2.8, D_Al_wt_ratio: 0.40, D_Ti3plus_atomic_ratio: 7.6}
+        - {sample: DAT32-19, TiO2_wt_pct: 82.82, Al2O3_wt_pct: 4.02, MgO_wt_pct: 14.21, total_wt_pct: 101.06, X_Ti2O3: 0.0731, X_TiO2: 0.6324, X_Al2O3: 0.0296, X_MgO: 0.2648, X_MgTi2O5: 0.720, X_Al2TiO5: 0.081, X_Ti3plus2TiO5: 0.199, Ti_Mg_atomic: 2.9, D_Al_wt_ratio: 0.35, D_Ti3plus_atomic_ratio: 8.0}
+        - {sample: DAT32-15, TiO2_wt_pct: 84.67, Al2O3_wt_pct: 4.02, MgO_wt_pct: 13.25, total_wt_pct: 101.93, X_Ti2O3: 0.0925, X_TiO2: 0.6258, X_Al2O3: 0.0301, X_MgO: 0.2516, X_MgTi2O5: 0.672, X_Al2TiO5: 0.081, X_Ti3plus2TiO5: 0.247, Ti_Mg_atomic: 3.2, D_Al_wt_ratio: 0.35, D_Ti3plus_atomic_ratio: 8.5}
+        - {sample: DAT32-15a, TiO2_wt_pct: 84.15, Al2O3_wt_pct: 3.84, MgO_wt_pct: 13.48, total_wt_pct: 101.48, X_Ti2O3: 0.0882, X_TiO2: 0.6277, X_Al2O3: 0.0288, X_MgO: 0.2554, X_MgTi2O5: 0.686, X_Al2TiO5: 0.077, X_Ti3plus2TiO5: 0.237, Ti_Mg_atomic: 3.1, D_Al_wt_ratio: 0.34, D_Ti3plus_atomic_ratio: 8.2}
+        - {sample: DAT32-15b, TiO2_wt_pct: 84.59, Al2O3_wt_pct: 3.85, MgO_wt_pct: 13.19, total_wt_pct: 101.63, X_Ti2O3: 0.0938, X_TiO2: 0.6257, X_Al2O3: 0.0290, X_MgO: 0.2515, X_MgTi2O5: 0.672, X_Al2TiO5: 0.077, X_Ti3plus2TiO5: 0.251, Ti_Mg_atomic: 3.2, D_Al_wt_ratio: 0.35, D_Ti3plus_atomic_ratio: 8.5}
+        - {sample: DAT32il, TiO2_wt_pct: 80.46, Al2O3_wt_pct: 4.20, MgO_wt_pct: 15.58, total_wt_pct: 100.24, X_Ti2O3: 0.0469, X_TiO2: 0.6410, X_Al2O3: 0.0300, X_MgO: 0.2820, X_MgTi2O5: 0.786, X_Al2TiO5: 0.084, X_Ti3plus2TiO5: 0.131, Ti_Mg_atomic: 2.6, D_Al_wt_ratio: 0.36, D_Ti3plus_atomic_ratio: 9.9}
+        - {sample: DAT32jl, TiO2_wt_pct: 81.24, Al2O3_wt_pct: 4.07, MgO_wt_pct: 15.87, total_wt_pct: 101.18, X_Ti2O3: 0.0455, X_TiO2: 0.6419, X_Al2O3: 0.0287, X_MgO: 0.2839, X_MgTi2O5: 0.793, X_Al2TiO5: 0.080, X_Ti3plus2TiO5: 0.127, Ti_Mg_atomic: 2.6, D_Al_wt_ratio: 0.35, D_Ti3plus_atomic_ratio: 9.7}
+        - {sample: 'DAT32 g', TiO2_wt_pct: 81.47, Al2O3_wt_pct: 3.75, MgO_wt_pct: 15.20, total_wt_pct: 100.42, X_Ti2O3: 0.0562, X_TiO2: 0.6378, X_Al2O3: 0.0271, X_MgO: 0.2778, X_MgTi2O5: 0.769, X_Al2TiO5: 0.075, X_Ti3plus2TiO5: 0.156, Ti_Mg_atomic: 2.7, D_Al_wt_ratio: 0.32, D_Ti3plus_atomic_ratio: 23.3}
     - observation_id: borisov_2004_table_5_crystal_structure
       type: experiment_series
       locator: {page: 7, pdf_page_index: 6, published_page: 75, table: '5'}
@@ -112,3 +179,33 @@ species:
       values:
         caption: 'Comparison between calculated and measured d-values for karrooite from representative experimental charges.'
         reason: 'Crystal-structure comparison, outside the requested melt-activity and redox data.'
+    - observation_id: borisov_2004_figure_1_deferred
+      type: deferred_figure
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, figure: '1'}
+      units: wt% TiO2
+      values: {quantity: rutile_solubility_vs_temperature, method_class: figure_only, caption: 'Rutile solubility versus temperature in An–Di eutectic melts in air; no numeric points transcribed.', panels: none, axes_as_printed: {x: temperature_C, y: TiO2_wt_pct}, series: rutile_solubility, marker_counts: not counted, digitisation: deferred}
+    - observation_id: borisov_2004_figure_2_deferred
+      type: deferred_figure
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, figure: '2'}
+      units: kJ/mol
+      values: {quantity: excess_gibbs_energy, method_class: figure_only, caption: 'Excess Gibbs energy against temperature for TiO2 in An–Di eutectic melt; no numeric points transcribed.', panels: none, axes_as_printed: {x: temperature_K, y: excess_G_kJ_mol}, series: TiO2, marker_counts: not counted, digitisation: deferred}
+    - observation_id: borisov_2004_figure_3_deferred
+      type: deferred_figure
+      locator: {page: 5, pdf_page_index: 4, published_page: 73, figure: '3'}
+      units: wt% TiO2
+      values: {quantity: rutile_solubility_vs_fO2, method_class: figure_only, caption: 'Rutile solubility at reducing conditions at 1300 °C; no numeric points transcribed.', panels: none, axes_as_printed: {x: minus_log_fO2, y: TiO2_wt_pct}, series: melt_solubility, marker_counts: not counted, digitisation: deferred}
+    - observation_id: borisov_2004_figure_4_deferred
+      type: deferred_figure
+      locator: {page: 6, pdf_page_index: 5, published_page: 74, figure: '4'}
+      units: temperature and oxygen fugacity
+      values: {quantity: rutile_karrooite_liquidus_stability, method_class: figure_only, caption: 'Rutile and karrooite stability on the liquidus of Di–An eutectic composition; no numeric points transcribed.', panels: none, axes_as_printed: {x: minus_log_fO2, y: inverse_temperature}, series: liquidus_phases, marker_counts: not counted, digitisation: deferred}
+    - observation_id: borisov_2004_figure_5_deferred
+      type: deferred_figure
+      locator: {page: 8, pdf_page_index: 7, published_page: 76, figure: '5'}
+      units: d-spacing
+      values: {quantity: karrooite_electron_diffraction, method_class: figure_only, caption: 'Calculated and measured electron-diffraction d-spacings; no numeric points transcribed.', panels: [a, b, c, d], axes_as_printed: {x: none, y: d_spacing}, series: representative_charges, marker_counts: not counted, digitisation: deferred}
+    - observation_id: borisov_2004_figure_6_deferred
+      type: deferred_figure
+      locator: {page: 9, pdf_page_index: 8, published_page: 77, figure: '6'}
+      units: log fO2
+      values: {quantity: Ti3plus2TiO5_component_vs_fO2, method_class: figure_only, caption: 'Ti3+2TiO5 component in karrooite as a function of log fO2; no numeric points transcribed.', panels: none, axes_as_printed: {x: log_fO2, y: Ti3plus2TiO5_mole_fraction}, series: karrooite_samples, marker_counts: not counted, digitisation: deferred}
