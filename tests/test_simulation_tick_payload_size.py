@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import replace
 from pathlib import Path
+import subprocess
 from types import SimpleNamespace
 
 import pytest
@@ -31,6 +32,24 @@ _ROOT = Path(__file__).resolve().parents[1]
 
 def _nbytes(obj) -> int:
     return len(json.dumps(obj, default=str))
+
+
+def _client_tick_result(ticks: list[dict[str, object]]) -> dict:
+    harness = _ROOT / "tests/fixtures/web_render/render_simulator_socket_dom.mjs"
+    completed = subprocess.run(
+        ["node", str(harness)],
+        input=json.dumps({
+            "socket_script_path": str(_ROOT / "web/static/js/simulator-socket.js"),
+            "decisions_script_path": str(_ROOT / "web/static/js/simulator-decisions.js"),
+            "simulation_ticks": ticks,
+        }),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return json.loads(completed.stdout)
 
 
 def _force_internal_analytical(monkeypatch) -> list:
@@ -153,6 +172,13 @@ def test_advisory_js_fetches_on_demand_full_records() -> None:
     assert "appendOnDemandAdvisoryDetail(" in source
     assert "renderVapourRailInstrumentationPanel(" in source
     assert "renderCondensationRefusalsPanel(" in source
+    assert "renderWallRiskPanel(data.wall_risk_panel)" in source
+    assert "'wall_risk_panel'" in source
+    socket_source = (_ROOT / "web/static/js/simulator-socket.js").read_text(
+        encoding="utf-8"
+    )
+    assert "SIMULATION_TICK_PAYLOAD_VERSION = 2" in socket_source
+    assert "decodePerHourSummaryDelta" in socket_source
     html = (_ROOT / "web/templates/simulator.html").read_text(encoding="utf-8")
     assert 'id="vapour-rail-instrumentation-panel"' in html
     assert 'id="condensation-refusals-panel"' in html
@@ -170,6 +196,13 @@ def test_advisory_panel_detail_http_requires_browser_session() -> None:
         "/api/advisory-panel-detail?panel=condensation_refusals_panel"
     )
     assert no_run.status_code == 404
+    assert client.get("/api/simulation-history").status_code == 404
+
+
+def test_simulation_history_requires_browser_session() -> None:
+    app = app_module.create_app()
+    client = app.test_client()
+    assert client.get("/api/simulation-history").status_code == 400
 
 
 def test_condensation_refusals_tick_panel_keeps_counts_without_nested_blobs():
@@ -275,16 +308,14 @@ def test_vapour_rail_tick_panel_keeps_channel_index_without_full_answers():
     assert _nbytes(panel["channels_by_species"]) < 400
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="b-793: per-hour payload still grows with the species set",
-)
 def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
     captured_tasks = _force_internal_analytical(monkeypatch)
     original_drive_session = web_events.drive_session
     original_emit = app_module.socketio.emit
     tick_samples: list[tuple[int, int]] = []
+    tick_payloads: list[dict[str, object]] = []
     wire_samples: list[tuple[str, int | None, int, str]] = []
+    per_hour_deltas: list[dict[str, object]] = []
     mismatches: list[str] = []
 
     def drive_with_large_hourly_diagnostics(*args, **kwargs):
@@ -325,12 +356,21 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             wire_samples.append((event, hour, len(serialized), serialized))
         if event == "simulation_tick" and isinstance(payload, dict):
             emitted = dict(payload)
+            assert emitted.get("payload_version") == 2
+            assert emitted["wall_risk_panel"].get("tick_view") == "compact"
+            assert "zones" not in emitted["wall_risk_panel"]
             tick_samples.append((int(emitted["hour"]), _nbytes(emitted)))
+            tick_payloads.append(emitted)
             sid = kwargs.get("room")
             state = _simulations.get(sid)
             sim = state["session"].simulator if state else None
             if sim is not None:
                 _assert_tick_preserves_vr_totals(emitted, sim, mismatches)
+        if event == "per_hour_summary" and isinstance(payload, dict):
+            per_hour_deltas.append({
+                key: value for key, value in payload.items()
+                if key != "run_id"
+            })
         if event == "per_hour_summary" and isinstance(payload, dict):
             sid = kwargs.get("room")
             state = _simulations.get(sid)
@@ -381,13 +421,24 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             assert size < 120_000, (event, hour, size)
         stable_tail = [size for _hour, size in tick_samples[4:12]]
         assert max(stable_tail) - min(stable_tail) <= 1024, tick_samples
-        for event in ("simulation_tick", "per_hour_summary"):
-            hourly = [
-                (hour, size)
-                for name, hour, size, _serialized in wire_samples
-                if name == event and hour is not None
-            ][:12]
-            _assert_hourly_payload_slope_is_bounded(event, hourly[4:12])
+        tick_hourly = [
+            (hour, size)
+            for name, hour, size, _serialized in wire_samples
+            if name == "simulation_tick" and hour is not None
+        ][:12]
+        tick_tail = tick_hourly[4:12]
+        tick_hours = [hour for hour, _size in tick_tail]
+        tick_sizes = [size for _hour, size in tick_tail]
+        mean_hour = sum(tick_hours) / len(tick_hours)
+        mean_size = sum(tick_sizes) / len(tick_sizes)
+        slope = sum(
+            (hour - mean_hour) * (size - mean_size)
+            for hour, size in tick_tail
+        ) / sum((hour - mean_hour) ** 2 for hour in tick_hours)
+        assert abs(slope) < SAWTOOTH_SLOPE_BYTES_PER_HOUR, (
+            f"simulation_tick payload slope was {slope:.1f} bytes/hour; "
+            f"samples={tick_tail}"
+        )
         assert all(
             '"padding"' not in serialized
             for event, _hour, _size, serialized in wire_samples
@@ -398,6 +449,28 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         state = _simulations[active_sids.pop()]
         captured_summary = state["last_recipe_capture"]["per_hour_summary"]
         assert '"padding"' in json.dumps(captured_summary, default=str)
+        history_response = http.get("/api/simulation-history")
+        assert history_response.status_code == 200
+        history = history_response.get_json()
+        assert history["payload_version"] == 2
+        assert history["run_id"] == state["run_id"]
+        assert per_hour_deltas == history["per_hour_summary"]
+        client_result = _client_tick_result(tick_payloads)
+        assert client_result["simulationPerHourSummaryHistory"] == history[
+            "per_hour_summary"
+        ]
+        stale_tick = dict(tick_payloads[0])
+        stale_tick["payload_version"] = 1
+        stale_client_result = _client_tick_result([stale_tick])
+        assert stale_client_result["simulationPerHourSummaryHistory"] == []
+        assert "Unsupported simulation_tick payload version: 1" in (
+            stale_client_result["statusAfterSimulationTicks"]
+        )
+        wall_detail = http.get(
+            "/api/advisory-panel-detail?panel=wall_risk_panel"
+        )
+        assert wall_detail.status_code == 200
+        assert wall_detail.get_json()["zones"]
         assert mismatches == []
     finally:
         if client.is_connected():

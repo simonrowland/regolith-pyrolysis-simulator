@@ -15,6 +15,99 @@ const socket = io({
 });
 window.socket = socket;
 
+const SIMULATION_TICK_PAYLOAD_VERSION = 2;
+window.requireSimulationTickPayloadVersion = function (data) {
+    if (data && data.payload_version === SIMULATION_TICK_PAYLOAD_VERSION) {
+        return true;
+    }
+    const message = 'Unsupported simulation_tick payload version: '
+        + String(data && data.payload_version)
+        + ' (expected ' + SIMULATION_TICK_PAYLOAD_VERSION + ')';
+    console.error(message);
+    const status = document.getElementById('status-text');
+    if (status) status.textContent = message;
+    return false;
+};
+
+let simulationHistoryRunId = null;
+window.simulationPerHourSummaryHistory = [];
+window.latestPerHourSummary = null;
+
+function rejectSimulationTickShape(message) {
+    const detail = 'Invalid simulation_tick payload: ' + message;
+    console.error(detail);
+    const status = document.getElementById('status-text');
+    if (status) status.textContent = detail;
+}
+
+function decodePerHourSummaryDelta(delta) {
+    if (!delta || typeof delta !== 'object' || Array.isArray(delta)) {
+        rejectSimulationTickShape('per_hour_summary_delta is missing');
+        return null;
+    }
+    const entry = delta.entry;
+    const species = delta.carrier_species;
+    const fields = delta.carrier_fields;
+    const values = delta.carrier_values;
+    if (
+        !entry || typeof entry !== 'object' || Array.isArray(entry)
+        || !Array.isArray(species)
+        || !Array.isArray(fields)
+        || !values || typeof values !== 'object' || Array.isArray(values)
+    ) {
+        rejectSimulationTickShape('per_hour_summary_delta has an invalid shape');
+        return null;
+    }
+    const summary = { ...entry };
+    for (const field of fields) {
+        const fieldValues = values[field];
+        if (!Array.isArray(fieldValues) || fieldValues.length !== species.length) {
+            rejectSimulationTickShape('carrier values do not align for ' + field);
+            return null;
+        }
+        const carrierMap = {};
+        for (let index = 0; index < species.length; index += 1) {
+            const value = fieldValues[index];
+            if (value !== null && value !== undefined) {
+                carrierMap[species[index]] = value;
+            }
+        }
+        summary[field] = carrierMap;
+    }
+    const aliases = delta.carrier_aliases || {};
+    for (const [field, source] of Object.entries(aliases)) {
+        if (summary[source] && typeof summary[source] === 'object') {
+            summary[field] = { ...summary[source] };
+        }
+    }
+    return summary;
+}
+
+socket.on('simulation_status', (data) => {
+    if (data && data.status === 'started') {
+        simulationHistoryRunId = data.run_id || null;
+        window.simulationPerHourSummaryHistory = [];
+        window.latestPerHourSummary = null;
+    }
+});
+
+socket.on('simulation_tick', (data) => {
+    if (!window.requireSimulationTickPayloadVersion(data)) return;
+    const summary = decodePerHourSummaryDelta(data.per_hour_summary_delta);
+    if (!summary) return;
+    if (
+        simulationHistoryRunId
+        && data.run_id
+        && data.run_id !== simulationHistoryRunId
+    ) {
+        simulationHistoryRunId = data.run_id;
+        window.simulationPerHourSummaryHistory = [];
+    }
+    simulationHistoryRunId = data.run_id || simulationHistoryRunId;
+    window.simulationPerHourSummaryHistory.push(summary);
+    window.latestPerHourSummary = summary;
+});
+
 function resetDecisionModal() {
     const modal = document.getElementById('decision-modal');
     if (modal) modal.remove();

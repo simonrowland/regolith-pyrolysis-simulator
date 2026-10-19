@@ -4203,6 +4203,23 @@ def ledger_snapshot_api():
     return _ledger_get('snapshot')
 
 
+@bp.route('/api/simulation-history', methods=['GET'])
+def simulation_history_api():
+    """Fetch the active run's per-hour summary history on demand."""
+    client_id = str(session.get('ledger_client_id') or '')
+    if not client_id:
+        return _json_error(
+            'simulation history requires an initialized browser session', 400
+        )
+    try:
+        from web.events import read_simulation_history_for_client
+        return jsonify(read_simulation_history_for_client(client_id))
+    except LookupError as exc:
+        return _json_error(str(exc), 404)
+    except (TypeError, ValueError) as exc:
+        return _json_error(str(exc), 400)
+
+
 @bp.route('/api/ledger/views/<view_name>', methods=['GET'])
 def ledger_view_api(view_name: str):
     return _ledger_get('view', view=view_name)

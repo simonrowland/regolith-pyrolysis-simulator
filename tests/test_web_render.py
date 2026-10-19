@@ -606,6 +606,14 @@ def test_disconnect_reconnect_resets_controls_and_decision_modal():
 def _minimal_tick_payload(**overrides):
     """Bare tick with the numeric fields the tick DOM path always reads."""
     payload = {
+        "payload_version": 2,
+        "per_hour_summary_delta": {
+            "entry": {"hour": 70},
+            "carrier_species": [],
+            "carrier_fields": [],
+            "carrier_values": {},
+            "carrier_aliases": {},
+        },
         "run_id": "run-1",
         "hour": 70,
         "temperature_C": 1459.0,
@@ -1445,13 +1453,14 @@ def _render_advisory_sequence(*, html, events):
     return json.loads(completed.stdout)
 
 
-def _render_socket_lifecycle():
+def _render_socket_lifecycle(*, simulation_ticks=None):
     completed = subprocess.run(
         ["node", str(_SOCKET_HARNESS)],
         input=json.dumps(
             {
                 "socket_script_path": str(_SIMULATOR_SOCKET_JS),
                 "decisions_script_path": str(_SIMULATOR_DECISIONS_JS),
+                "simulation_ticks": simulation_ticks or [],
             }
         ),
         text=True,

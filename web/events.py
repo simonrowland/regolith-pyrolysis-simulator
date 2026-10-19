@@ -153,6 +153,7 @@ _BACKEND_WIRE_TOKEN_FIELDS = frozenset({
 _draft_validation_slots = threading.BoundedSemaphore(1)
 _registered_start_handler = None
 _registered_socketio = None
+SIMULATION_TICK_PAYLOAD_VERSION = 2
 _O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 _MAX_WEB_MASS_KG = 1_000_000_000.0
 _MAX_SIM_SPEED_SECONDS = 3600.0
@@ -342,6 +343,49 @@ def read_ledger_api_for_client(client_id: str, resource: str, **params):
     )
 
 
+def read_simulation_history(
+    sid: str,
+    *,
+    include_run_id: bool = False,
+) -> dict[str, object]:
+    """Return the current run's hourly entries on demand."""
+    state, lock = _current_simulation_state(sid)
+    if state is None:
+        raise LookupError("no active simulation")
+    run_id = state.get('run_id')
+
+    def response() -> dict[str, object]:
+        session = state.get('session')
+        summaries_builder = getattr(session, 'per_hour_summaries', None)
+        summaries = summaries_builder() if callable(summaries_builder) else []
+        payload: dict[str, object] = {
+            'payload_version': SIMULATION_TICK_PAYLOAD_VERSION,
+            'per_hour_summary': [
+                _browser_socket_payload('per_hour_summary', summary)
+                for summary in summaries
+                if isinstance(summary, Mapping)
+            ],
+        }
+        if include_run_id:
+            payload['run_id'] = run_id
+        return payload
+
+    if lock is None:
+        return response()
+    with lock:
+        current, _ = _current_simulation_state(sid, run_id)
+        if current is not state:
+            raise LookupError("simulation run changed")
+        return response()
+
+
+def read_simulation_history_for_client(client_id: str) -> dict[str, object]:
+    """Resolve the active run owned by one signed Flask browser session."""
+    return read_simulation_history(
+        _active_simulation_sid_for_client(client_id), include_run_id=True
+    )
+
+
 def read_advisory_panel_detail(
     sid: str,
     panel: str,
@@ -355,6 +399,13 @@ def read_advisory_panel_detail(
     run_id = state.get('run_id')
 
     def read():
+        if panel == 'wall_risk_panel':
+            capture = state.get('last_recipe_capture') or {}
+            tick = capture.get('tick') if isinstance(capture, Mapping) else None
+            detail = tick.get('wall_risk_panel') if isinstance(tick, Mapping) else None
+            if not isinstance(detail, Mapping):
+                raise LookupError('wall-risk detail is not available yet')
+            return copy.deepcopy(dict(detail))
         return sc50_vr_socket_panel_detail(state['session'].simulator, panel)
 
     def response():
@@ -645,16 +696,85 @@ def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bo
 
 
 def _browser_socket_payload(event: str, payload):
-    if event != 'per_hour_summary' or not isinstance(payload, Mapping):
+    if not isinstance(payload, Mapping):
         return payload
     emitted = dict(payload)
-    for key in (
-        'condensation_refusals_by_species',
-        'vapour_batch_summary',
-        'vapour_batch_flux_overlay',
-    ):
-        emitted.pop(key, None)
+    if event == 'per_hour_summary':
+        for key in (
+            'condensation_refusals_by_species',
+            'vapour_batch_summary',
+            'vapour_batch_flux_overlay',
+        ):
+            emitted.pop(key, None)
+    elif event == 'simulation_tick':
+        wall_risk = emitted.get('wall_risk_panel')
+        if isinstance(wall_risk, Mapping):
+            active_species = wall_risk.get('active_species')
+            emitted['wall_risk_panel'] = {
+                'status': wall_risk.get('status', 'n/a'),
+                'active_species_count': (
+                    len(active_species)
+                    if isinstance(active_species, (list, tuple))
+                    else 0
+                ),
+                'operating_point': copy.deepcopy(
+                    wall_risk.get('operating_point')
+                ),
+                'tick_view': 'compact',
+            }
     return emitted
+
+
+_PER_HOUR_CARRIER_MAP_FIELDS = (
+    'condensation_train_kg',
+    'vapor_species_kg_hr',
+    'metal_yields_kg',
+    'condensation_train_kg_cumulative',
+    'recycled_to_reagent_kg_cumulative',
+)
+
+
+def _per_hour_summary_delta(summary: Mapping[str, object]) -> dict[str, object]:
+    """Encode one hourly summary entry without repeating carrier names."""
+    sanitized = _browser_socket_payload('per_hour_summary', summary)
+    carrier_maps = {
+        field: sanitized[field]
+        for field in _PER_HOUR_CARRIER_MAP_FIELDS
+        if isinstance(sanitized.get(field), Mapping)
+    }
+    carrier_species = sorted({
+        str(species)
+        for values in carrier_maps.values()
+        for species in values
+    })
+    carrier_values = {
+        field: [values.get(species) for species in carrier_species]
+        for field, values in carrier_maps.items()
+    }
+    entry = {
+        key: copy.deepcopy(value)
+        for key, value in sanitized.items()
+        if key not in carrier_maps
+        and key != 'product_ledger_kg_at_hour'
+    }
+    aliases = {}
+    if (
+        isinstance(sanitized.get('product_ledger_kg_at_hour'), Mapping)
+        and sanitized.get('product_ledger_kg_at_hour')
+        == sanitized.get('metal_yields_kg')
+    ):
+        aliases['product_ledger_kg_at_hour'] = 'metal_yields_kg'
+    elif 'product_ledger_kg_at_hour' in sanitized:
+        entry['product_ledger_kg_at_hour'] = copy.deepcopy(
+            sanitized['product_ledger_kg_at_hour']
+        )
+    return {
+        'entry': entry,
+        'carrier_species': carrier_species,
+        'carrier_fields': list(carrier_maps),
+        'carrier_values': carrier_values,
+        'carrier_aliases': aliases,
+    }
 
 
 def recipe_save_context(sid: str) -> dict[str, object]:
@@ -2024,6 +2144,7 @@ def _tick_payload(
     flue_composition = _flue_composition_kg_hr(snapshot)
     active_wall_species = active_wall_species_from_flue(flue_composition)
     return {
+        'payload_version': SIMULATION_TICK_PAYLOAD_VERSION,
         'hour': snapshot.hour,
         'campaign': snapshot.campaign.name,
         'temperature_C': round(snapshot.temperature_C, 1),
@@ -3152,6 +3273,12 @@ def _start_background_loop(
                             backend_error=step_result.backend_error,
                             backend_status_reason=step_backend_status_reason,
                         )
+                        if isinstance(step_result.per_hour_summary, Mapping):
+                            tick_data['per_hour_summary_delta'] = (
+                                _per_hour_summary_delta(
+                                    step_result.per_hour_summary
+                                )
+                            )
                         _record_last_recipe_capture(
                             sid,
                             run_id,

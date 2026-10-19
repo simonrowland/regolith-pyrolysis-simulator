@@ -246,6 +246,8 @@ function handleRecipeDefiningControlEdit(e) {
 }
 
 socket.on('simulation_tick', (data) => {
+    if (typeof window.requireSimulationTickPayloadVersion === 'function'
+        && !window.requireSimulationTickPayloadVersion(data)) return;
     lastRecipeTick = data || null;
 });
 

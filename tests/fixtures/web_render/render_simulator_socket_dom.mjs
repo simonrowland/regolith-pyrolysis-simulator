@@ -95,6 +95,10 @@ function emitEvent(event, payload) {
 }
 
 emitEvent('connect');
+for (const tick of input.simulation_ticks || []) {
+  emitEvent('simulation_tick', tick);
+}
+const statusAfterSimulationTicks = findById(body, 'status-text').textContent;
 const start = findById(body, 'btn-start');
 const pause = findById(body, 'btn-pause');
 const resume = findById(body, 'btn-resume');
@@ -134,4 +138,11 @@ const afterReconnect = {
   decisionModalPresent: Boolean(findById(body, 'decision-modal')),
 };
 
-console.log(JSON.stringify({ afterDisconnect, afterReconnect, decisionModalStyles }));
+console.log(JSON.stringify({
+  afterDisconnect,
+  afterReconnect,
+  decisionModalStyles,
+  statusAfterSimulationTicks,
+  statusText: findById(body, 'status-text').textContent,
+  simulationPerHourSummaryHistory: context.window.simulationPerHourSummaryHistory || [],
+}));
