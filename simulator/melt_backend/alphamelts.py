@@ -1639,6 +1639,20 @@ class _MELTSBackendSupport(MeltBackend):
             status='unavailable',
         )
 
+    def _mark_vapor_unavailable_without_fO2(
+        self,
+        eq: EquilibriumResult,
+    ) -> EquilibriumResult:
+        eq.vapor_pressures_Pa = {}
+        eq.vapor_pressures_source = {}
+        eq.diagnostics = {
+            **eq.diagnostics,
+            'vapor_pressure_backend_status': 'not_attempted',
+            'vapor_pressure_backend_status_reason': 'fO2_not_an_input',
+            'authoritative_for_requested_vapor_pressure': False,
+        }
+        return self._fail_closed_on_clamped_operating_point(eq)
+
     def find_liquidus_solidus(self,
                               composition_kg: Optional[Dict[str, float]] = None,
                               fO2_log: float = -9.0,
@@ -2715,18 +2729,7 @@ class _MELTSBackendSupport(MeltBackend):
             # pre-equilibrium input); explicit Antoine fallback otherwise.
             vaporock_envelope_diagnostics: dict[str, Any] = {}
             if redox_mode == REDOX_MODE_NOT_AN_INPUT:
-                # The melt activity solve answered the requested fixed
-                # composition, but the oxygen-dependent vapor facet has no
-                # fO2 input and cannot be evaluated independently.
-                eq.vapor_pressures_Pa = {}
-                eq.vapor_pressures_source = {}
-                eq.diagnostics = {
-                    **eq.diagnostics,
-                    'vapor_pressure_backend_status': 'not_attempted',
-                    'vapor_pressure_backend_status_reason': 'fO2_not_an_input',
-                    'authoritative_for_requested_vapor_pressure': False,
-                }
-                return self._fail_closed_on_clamped_operating_point(eq)
+                return self._mark_vapor_unavailable_without_fO2(eq)
             if self._vaporock_available:
                 eq.vapor_pressures_Pa, source = (
                     self._vapor_pressures_via_vaporock_or_antoine(
@@ -3455,6 +3458,8 @@ class _MELTSBackendSupport(MeltBackend):
             )
             if eq.status != 'ok':
                 return eq
+            if redox_mode == REDOX_MODE_NOT_AN_INPUT:
+                return self._mark_vapor_unavailable_without_fO2(eq)
             (
                 eq.vapor_pressures_Pa,
                 eq.vapor_pressures_source,
