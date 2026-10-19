@@ -7,10 +7,10 @@ source:
   doi: 10.1007/s11663-024-02995-6
   year: 2024
 extraction:
-  method: deepening DEEP-kems-031-halwax-2024 from PDF on disk (pdftotext -layout + pdftoppm 150 dpi renders). Parent observation objects preserved bit-identical. Tables I-VII transcribed cell-for-cell into corpus tables/kems-031-halwax-2024/. Quotes on existing rows added by superseding rows (new observation_id), not by editing parents. No MinerU jobs. No unit conversion without a derivation comment.
+  method: deepening DEEP-kems-031-halwax-2024 from PDF on disk (pdftotext -layout + pdftoppm 150 dpi renders). Parent observation objects preserved bit-identical. Tables I-VII transcribed cell-for-cell into corpus tables/kems-031-halwax-2024/. Quotes on existing rows added by superseding rows (new observation_id), not by editing parents. No MinerU jobs. No unit conversion without a derivation comment.; validated in an internal review, 2026-09-06, deepening
   date: '2026-09-06'
   worker: DEEP-kems-031-halwax-2024
-  provenance_path: docs-private/research/2026-09-06-deepening/DEEP-kems-031-halwax-2024/kems-031-halwax-2024/
+  provenance_path: raw/kems-031-halwax-2024/kems-031-halwax-2024.pdf
 review_status: draft
 benches:
 - id: julich-ir-kems
@@ -166,7 +166,7 @@ species:
       experiment: mgo-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
         section: III. EXPERIMENTAL
         line_range: 220-230
         note: Pure MgO vaporization in Ir Knudsen cell; lid orifice 0.3 mm
@@ -201,7 +201,7 @@ species:
       experiment: mgo-series
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
         table: IV
         line_range: 595-607
         note: Third-law standard formation enthalpy for pure solid MgO
@@ -239,7 +239,7 @@ species:
       experiment: mgo-series
       type: psat_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
         paragraph: Ir Knudsen cell geometry; explicitly not HKL α
       T_range_K:
       - 1800.0
@@ -553,7 +553,7 @@ species:
       experiment: cao-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
         section: III. EXPERIMENTAL
         line_range: 220-230
       T_range_K:
@@ -579,7 +579,7 @@ species:
       experiment: cao-series
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
         table: IV
         line_range: 595-607
         note: Third-law standard formation enthalpy for pure solid CaO
@@ -1159,7 +1159,7 @@ fidelity_samples:
   field: sample_mass_approx_mg
   value: 50.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
     paragraph: approximately 50 mg of the pure CaO or MgO powder
     line_range: '228'
 - species: MgO
@@ -1168,20 +1168,20 @@ fidelity_samples:
   field: semantics
   value: not_hkl_alpha
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
     note: not alpha
 - path: species.MgO.observations[halwax_2024_mgo_third_law_formation_enthalpy].values.delta_f_H_kJ_mol
   value: -598.0
   note: 'Table IV: third-law MgO formation enthalpy -598 +/- 10 kJ/mol'
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
     table: IV
     line_range: '603'
 - path: species.CaO.observations[halwax_2024_cao_third_law_formation_enthalpy].values.delta_f_H_kJ_mol
   value: -624.5
   note: 'Table IV: third-law CaO formation enthalpy -624.5 +/- 3.5 kJ/mol'
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    source_path: text/kems-031-halwax-2024/mineru/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
     table: IV
     line_range: '603'
 - species: CaO
