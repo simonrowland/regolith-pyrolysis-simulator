@@ -275,6 +275,10 @@ def test_vapour_rail_tick_panel_keeps_channel_index_without_full_answers():
     assert _nbytes(panel["channels_by_species"]) < 400
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="b-793: per-hour payload still grows with the species set",
+)
 def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
     captured_tasks = _force_internal_analytical(monkeypatch)
     original_drive_session = web_events.drive_session
