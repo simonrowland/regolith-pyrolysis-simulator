@@ -115,7 +115,7 @@ def test_table_context_and_deferred_figures_preserve_printed_cells() -> None:
     expected_corrected_rows = {
         3: ("Niwa [5] (1957)", {"SiO2": "40", "CaO": "40", "Al2O3": "20"}, "1350", "3.3 × 10−7"),
         6: ("Niwa [5] (1957)", {"SiO2": "39", "CaO": "43", "Al2O3": "18"}, "1350", "5.2 × 10−7"),
-        11: ("Saitô and Maruya [6] (1958)", {"SiO2": "71", "CaO": "11", "Al2O3": "18"}, "1350", "3.9 × 10−7"),
+        11: ("Saitô and Maruya [6] (1958)", {"SiO2": "41", "CaO": "40", "Al2O3": "19"}, "1350", "3.9 × 10−7"),
         20: ("Saitô and Maruya [6] (1958)", {"SiO2": "34", "CaO": "46", "Al2O3": "20"}, "1440", "3.8 × 10−7"),
         21: ("Saitô and Maruya [6] (1958)", {"SiO2": "34", "CaO": "46", "Al2O3": "20"}, "1485", "7.1 × 10−7"),
         30: ("Liang et al. [8] (1996)", {"SiO2": "60", "CaO": "30", "Al2O3": "10"}, "1500", "7.41 × 10−7"),
