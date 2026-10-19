@@ -1554,13 +1554,14 @@ def _retained_gas_shadow(
 
 
 @pytest.mark.parametrize("initial_mol", [1.0, 15.161244955])
-def test_retained_stock_integrated_hk_source_matches_exact_transient(monkeypatch, initial_mol):
+@pytest.mark.parametrize("duration", [3600.0, 1e-8, 0.025, 0.05])
+def test_retained_stock_integrated_hk_source_matches_exact_transient(monkeypatch, initial_mol, duration):
     # Independent piecewise solution of A dp/dt=H max(Pe-p,0)-Kp.
     # Review r5-ror's fixed-conductance anchor, with the actual lunar V/T.
     A = 0.085383807627 / (GAS_CONSTANT * 1950.65)
-    H, K, Pe, duration = 0.001, 0.00235, 10.0, 3600.0
+    H, K, Pe = 0.001, 0.00235, 10.0
     clear = A / K * math.log(initial_mol / (A * Pe))
-    remaining = duration - clear
+    remaining = max(0.0, duration - clear)
     tau, steady = A / (H + K), H * Pe / (H + K)
     exact = H * (Pe - steady) * (remaining + tau * math.expm1(-remaining / tau))
     monkeypatch.setattr(capacity_coupling, "_molecular_pipe_conductance_mol_s_Pa", lambda **_: K)
@@ -1572,28 +1573,43 @@ def test_retained_stock_integrated_hk_source_matches_exact_transient(monkeypatch
         capacity=NoColdTrain(), pre_holdup_mol={"Fe": initial_mol},
         volume_m3=0.085383807627, temperature_K=1950.65,
         pipe_diameter_m=0.12, pipe_length_m=1.0,
+        dt_hr=duration / 3600.0,
     )
     assert isinstance(result, CapacityShadowResult)
-    integrated = result.evaporation_flux_kg_hr["Fe"] / 0.055845
-    print(f"stock={initial_mol} integrated={integrated:.12g} exact={exact:.12g} relative_error={integrated/exact-1:.12g}")
-    assert integrated == pytest.approx(exact, rel=1e-6)
+    integrated = result.evaporation_flux_kg_hr.get("Fe", 0) / 0.055845 * duration / 3600.0
+    error = integrated / exact - 1 if exact else integrated
+    print(f"stock={initial_mol} duration={duration} integrated={integrated:.12g} exact={exact:.12g} error={error:.12g}")
+    assert integrated == pytest.approx(exact, rel=1e-6, abs=1e-13)
+    endpoint = (initial_mol / A * math.exp(-K * duration / A)
+                if duration <= clear else
+                steady + (Pe - steady) * math.exp(-remaining / tau))
+    assert result.partial_pressures_Pa["Fe"] == pytest.approx(endpoint, rel=1e-8, abs=1e-8)
+    assert A * result.partial_pressures_Pa["Fe"] + result.bled_species_mol["Fe"] == pytest.approx(initial_mol + integrated, rel=1e-9)
     assert result.convergence is SourceDuctConvergence.CONVERGED
 
 
-@pytest.mark.parametrize(("kn", "expected"), [
-    (0.001, {"Fe": "0x1.d9acac556c91cp-1", "Na": "0x1.0842210dce88fp+2"}),
-    (0.1, {"Fe": "0x1.15d76bcf1aebbp+0", "Na": "0x1.2b7180d5689aap+2"}),
-    (100, {"Fe": "0x1.8896018b7d2d8p+1", "Na": "0x1.3fef9e88e1a50p+3"}),
-])
-def test_mixture_duct_conductance_consolidation_pin(kn, expected):
-    # Behaviour-preserving pin at 3bf4893fb, before moving the duct blend.
-    partials = mixture_surface_partials_Pa(
-        P_eq_Pa={"Fe": 10., "Na": 25.}, H_mol_s_Pa={"Fe": .001, "Na": .002},
-        G_mol_s_Pa2=.002, molecular_C_mol_s_Pa={"Fe": .00235, "Na": .003},
-        knudsen_at_total_Pa=lambda _: kn,
-        stock_rate_mol_s={"Fe": 1/3600}, storage_mol_s_Pa=1e-6,
+def test_coupled_viscous_retained_mixture_matches_exact_blowdown():
+    # With no sources and the common viscous drain, mole fractions stay
+    # constant. dP/dt=-(G/A)P(P+Pc) integrates independently to this logistic
+    # decay, including the effect of BOTH retained species on conductance.
+    A, G, carrier, duration = 0.085383807627 / (GAS_CONSTANT * 1950.65), 2.35e-6, 1000.0, 0.003
+    initial = {"Fe": 1.0, "O2": 2.0}
+    p0 = sum(initial.values()) / A
+    decay = math.exp(-G * carrier * duration / A)
+    end = carrier * p0 * decay / (carrier + p0 * (1 - decay))
+    result = solve_source_duct_closure(
+        P_eq_Pa={}, flux_kg_hr_at_partials=lambda _: {},
+        molar_mass_kg_mol={"Fe": .055845, "O2": M_O2},
+        G_mol_s_Pa2=G, capacity=NoColdTrain(),
+        pre_holdup_mol=initial, carrier_partials_Pa={"N2": carrier},
+        volume_m3=.085383807627, temperature_K=1950.65, dt_hr=duration / 3600,
     )
-    assert {s: p.hex() for s, p in partials.items()} == expected
+    assert isinstance(result, CapacityShadowResult)
+    for species, amount in initial.items():
+        remaining = A * end * amount / sum(initial.values())
+        assert result.partial_pressures_Pa[species] == pytest.approx(remaining / A, rel=1e-8)
+        assert result.bled_species_mol[species] == pytest.approx(amount - remaining, rel=1e-8)
+    assert result.source_duct_residual_rel < 1e-9
 
 
 def test_no_cold_train_retained_zero_source_gas_closes_molar_budget():
@@ -1606,11 +1622,14 @@ def test_no_cold_train_retained_zero_source_gas_closes_molar_budget():
     bled = result.bled_species_mol.get("O2", 0.0)
     assert 0.0 < bled <= pre_mol
     assert remaining + bled == pytest.approx(pre_mol, rel=1e-9)
-    # The same duct law must fund its outflow from finite stock, including
-    # species with no source; a tiny positive-source residual is insufficient.
-    total = sum(result.partial_pressures_Pa.values())
-    duct_mol = 2.35e-6 * total * result.partial_pressures_Pa["O2"] * 3600.0
-    assert duct_mol == pytest.approx(bled, rel=1e-8)
+    # Exact viscous blowdown with maintained carrier: dp/dt=-G*p*(Pc+p)/A.
+    # Its integrated throughput is n0-n_end, not dt*q(p_end).
+    A = 0.085383807627 / (GAS_CONSTANT * 1950.65)
+    p0, carrier = pre_mol / A, 1000.0
+    decay = math.exp(-2.35e-6 * carrier * 3600.0 / A)
+    end = carrier * p0 * decay / (carrier + p0 * (1.0 - decay))
+    assert remaining == pytest.approx(A * end, abs=1e-12)
+    assert bled == pytest.approx(pre_mol - A * end, rel=1e-8)
     assert result.source_duct_residual_rel < 1e-9
 
 
@@ -1634,7 +1653,8 @@ def test_retained_supersaturated_vapour_does_not_stay_fixed_after_bleed():
     second = _retained_gas_shadow(
         "Fe", remaining, flux=source, equilibrium={"Fe": 10.0},
     )
-    assert second.partial_pressures_Pa["Fe"] < first.partial_pressures_Pa["Fe"]
+    # Both ticks settle to the same source/duct state after the fast drain.
+    assert second.partial_pressures_Pa["Fe"] == pytest.approx(first.partial_pressures_Pa["Fe"], rel=1e-8)
 
 
 def test_retained_stock_is_held_when_duct_conductance_is_zero():
@@ -1652,6 +1672,24 @@ def test_coproduct_source_and_vanishing_volume_share_inventory_balance():
     )
     assert result.bled_species_mol["O2"] == pytest.approx(3.0, rel=1e-9)
     assert result.source_duct_residual_rel < 1e-9
+
+
+def test_retained_coproduct_without_carrier_uses_source_duct_root():
+    result = solve_source_duct_closure(
+        P_eq_Pa={}, flux_kg_hr_at_partials=lambda _: {},
+        overhead_source_mol_hr_at_partials=lambda _: {"O2": 2.0},
+        molar_mass_kg_mol={"O2": M_O2}, G_mol_s_Pa2=2.35e-6,
+        capacity=NoColdTrain(), pre_holdup_mol={"O2": 1.0},
+        volume_m3=.085383807627, temperature_K=1950.65,
+    )
+    assert isinstance(result, CapacityShadowResult)
+    assert result.source_duct_residual_rel < 1e-9
+    # Constant coproduct supply obeys G*p_ss^2=2 mol/hr; the stock pulse
+    # has long since cleared. Check source accumulation as well as p_ss.
+    steady = math.sqrt(2.0 / 3600.0 / 2.35e-6)
+    remaining = steady * .085383807627 / (GAS_CONSTANT * 1950.65)
+    assert result.partial_pressures_Pa["O2"] == pytest.approx(steady, rel=1e-8)
+    assert result.bled_species_mol["O2"] + remaining == pytest.approx(3.0, rel=1e-9)
 
 
 def test_source_duct_bleed_preserves_reserved_inventory_after_capture():

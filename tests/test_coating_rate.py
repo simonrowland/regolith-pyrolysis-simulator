@@ -829,7 +829,12 @@ def test_c4_to_c2a_retained_gas_balance_matches_committed_bleed(monkeypatch) -> 
     before, after, bleed_result = bleeds[-1]
     bled = dict(bleed_result.diagnostic["bled_species_mol"])
     assert args["volume_m3"] == pytest.approx(simulator._headspace_volume_m3())
-    source = args["overhead_source_mol_hr_at_partials"](result.partial_pressures_Pa)
+    # Commit the integrated source, whose average HK drive differs from
+    # the endpoint during the retained-stock drain. Use the stoichiometry
+    # owner to project the same average evaporation rates as the ledger.
+    source = simulator._project_evaporation_overhead_source_mol_hr(
+        result.evaporation_flux_kg_hr, {},
+    )
     for species in set(before) | set(after) | set(args["pre_holdup_mol"]) | set(source):
         supplied = args["pre_holdup_mol"].get(species, 0.0) + source.get(species, 0.0)
         condensed = sum(c.get(species, 0.0) for c in captures)

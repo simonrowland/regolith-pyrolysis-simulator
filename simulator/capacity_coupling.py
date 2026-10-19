@@ -427,8 +427,6 @@ def mixture_surface_partials_Pa(
     P_carrier_Pa: float = 0.0,
     molecular_C_mol_s_Pa: Mapping[str, float] | None = None,
     knudsen_at_total_Pa: Callable[[float], float] | None = None,
-    stock_rate_mol_s: Mapping[str, float] | None = None,
-    storage_mol_s_Pa: float = 0.0,
     coproduct_mol_s: Mapping[str, float] | None = None,
 ) -> dict[str, float]:
     # Premise: the well-mixed melt-to-train mixture is the actual boundary
@@ -466,13 +464,10 @@ def mixture_surface_partials_Pa(
         for species, conductance in dict(molecular_C_mol_s_Pa or {}).items()
         if float(conductance) > 0.0
     }
-    stock = dict(stock_rate_mol_s or {})
     coproduct = dict(coproduct_mol_s or {})
-    species_order = tuple(sorted(set(P_eq_Pa) | set(stock) | set(coproduct)))
+    species_order = tuple(sorted(set(P_eq_Pa) | set(coproduct)))
 
     def companion_pressure(species: str) -> float:
-        if storage_mol_s_Pa > 0.0:
-            return 0.0
         return P_down if float(P_eq_Pa.get(species, 0.0)) <= 0.0 else 0.0
 
     solved_species = tuple(
@@ -480,9 +475,8 @@ def mixture_surface_partials_Pa(
         for species in species_order
         if ((float(P_eq_Pa.get(species, 0.0)) > 0.0
              and float(H_mol_s_Pa.get(species, 0.0)) > 0.0)
-            or stock.get(species, 0.0) > 0.0
             or coproduct.get(species, 0.0) > 0.0)
-        and (species not in extra or storage_mol_s_Pa > 0.0)
+        and species not in extra
     )
     if not solved_species:
         return {
@@ -498,7 +492,7 @@ def mixture_surface_partials_Pa(
         and not extra
         and P_carrier <= 0.0
         and knudsen_at_total_Pa is None
-        and storage_mol_s_Pa <= 0.0
+        and not any(coproduct.values())
     ):
         species = solved_species[0]
         pressure = pipe1_surface_pressure_Pa(
@@ -514,11 +508,7 @@ def mixture_surface_partials_Pa(
     P_eq_sum = sum(max(0.0, float(P_eq_Pa.get(species, 0.0))) for species in solved_species)
     lo = 0.0
     hi = max(P_eq_sum, 0.0)
-    if storage_mol_s_Pa > 0.0:
-        # Closed-vessel stock plus source equilibrium bounds the endpoint.
-        hi += sum(max(0.0, stock.get(s, 0.0) + coproduct.get(s, 0.0))
-                  / storage_mol_s_Pa for s in solved_species)
-    elif any(coproduct.get(s, 0.0) > 0.0 for s in solved_species):
+    if any(coproduct.get(s, 0.0) > 0.0 for s in solved_species):
         # Bound a pressure-independent coproduct source by either pure
         # transport limit: sqrt(q/G) [Pa], q/C [Pa]. Their larger pressure
         # also bounds the convex blend of the two duct laws.
@@ -537,30 +527,25 @@ def mixture_surface_partials_Pa(
         )
         out = dict(extra)
         for species in species_order:
-            if species in extra and storage_mol_s_Pa <= 0.0:
+            if species in extra:
                 continue
             carrier_partial = extra.get(species, 0.0)
             P_eq = max(0.0, float(P_eq_Pa.get(species, 0.0)) - carrier_partial)
             conductance = max(0.0, float(H_mol_s_Pa.get(species, 0.0)))
             if ((P_eq <= 0.0 or conductance <= 0.0)
-                    and storage_mol_s_Pa <= 0.0 and coproduct.get(species, 0.0) <= 0.0):
+                    and coproduct.get(species, 0.0) <= 0.0):
                 out[species] = companion_pressure(str(species))
                 continue
             C = float(C_map.get(species, 0.0))
             drain = drains.get(species, viscous)
-            supply = max(0.0, stock.get(species, 0.0) + coproduct.get(species, 0.0))
-            downstream = 0.0 if storage_mol_s_Pa > 0.0 else P_down
-            denom = conductance + storage_mol_s_Pa + drain
+            supply = max(0.0, coproduct.get(species, 0.0))
+            denom = conductance + drain
             if denom <= 0.0:
                 out[species] = P_eq
             else:
                 out[species] = (
-                    conductance * P_eq + supply + w_m * C * downstream
+                    conductance * P_eq + supply + w_m * C * P_down
                 ) / denom
-                if storage_mol_s_Pa > 0.0 and out[species] > P_eq:
-                    # HK evaporation is zero above saturation, not a
-                    # negative source that can silently consume retained gas.
-                    out[species] = supply / (storage_mol_s_Pa + drain)
             out[species] += carrier_partial
         return out
 
@@ -618,8 +603,6 @@ def _source_duct_residual_rel(
     P_carrier_Pa: float = 0.0,
     molecular_C_mol_s_Pa: Mapping[str, float] | None = None,
     knudsen_at_total_Pa: Callable[[float], float] | None = None,
-    stock_rate_mol_s: Mapping[str, float] | None = None,
-    storage_mol_s_Pa: float = 0.0,
     source_mol_hr: Mapping[str, float] | None = None,
     carrier_partials_Pa: Mapping[str, float] | None = None,
 ) -> float:
@@ -634,8 +617,7 @@ def _source_duct_residual_rel(
     P_down = max(0.0, float(P_downstream_Pa))
     max_scale = 0.0
     max_delta = 0.0
-    stock = dict(stock_rate_mol_s or {})
-    species = set(partials_Pa) | set(flux_kg_hr) | set(stock) | set(source_mol_hr or {})
+    species = set(partials_Pa) | set(flux_kg_hr) | set(source_mol_hr or {})
     for name in species:
         mass = float(molar_mass_kg_mol.get(name, 0.0))
         if mass <= 0.0:
@@ -646,10 +628,9 @@ def _source_duct_residual_rel(
         p_i = max(0.0, float(partials_Pa.get(name, 0.0))
                   - float((carrier_partials_Pa or {}).get(name, 0.0)))
         C = max(0.0, float(C_map.get(name, 0.0)))
-        downstream = 0.0 if storage_mol_s_Pa > 0.0 else P_down
-        q_duct = p_i * drains.get(name, viscous) - w_m * C * downstream
-        supplied = max(0.0, stock.get(name, 0.0) + q_source)
-        disposed = q_duct + storage_mol_s_Pa * p_i
+        q_duct = p_i * drains.get(name, viscous) - w_m * C * P_down
+        supplied = max(0.0, q_source)
+        disposed = q_duct
         max_delta = max(max_delta, abs(supplied - disposed))
         max_scale = max(max_scale, abs(supplied), abs(disposed))
     if max_scale <= 0.0:
@@ -670,6 +651,114 @@ def source_duct_remaining_mol(
         * volume_m3 / (GAS_CONSTANT * temperature_K)
         for species, p in partials_Pa.items()
     }
+
+
+def _integrate_retained_source_duct(
+    *, initial_mol, steady_partials, steady_flux, flux_at_partials, molar_source,
+    molar_masses, carrier_partials, carrier_Pa, G, P_down, molecular_C,
+    knudsen_at_total, volume_m3, temperature_K, dt_hr, steady_converged,
+):
+    from scipy.integrate import solve_ivp
+    import numpy as np
+
+    # Premise: A=V/(RT) [mol/Pa], p_i=n_i/A is finite excess over
+    # maintained carrier c_i; dn_i/dt=s_i(c+p)-K_i(c+sum(p))*p_i.
+    # HK clips s_i=H_i max(Peq_i-c_i-p_i,0). In a linear, single-species
+    # drain, p=p0 exp(-Kt/A) above saturation, hence
+    # t_clear=(A/K) ln(p0/(Peq-c)) [s] for Peq>c (otherwise carrier
+    # alone keeps HK clipped). Below saturation, with c=0,
+    # p=pss+(Peq-pss) exp(-(H+K)t/A), pss=H*Peq/(H+K).
+    # Thus N_source=H*(Peq-pss)*(u + tau*expm1(-u/tau)),
+    # u=dt-t_clear, tau=A/(H+K). Ignoring this second relaxation can
+    # bias the source even after correctly computing the blackout.
+    # The production mixture's K_i(P) blends G*(P-Pd^2/P) and C_i
+    # with log(Kn(P)) weights, while other species/coproducts change P.
+    # It has no general separated closed form. Radau adaptively resolves
+    # the drain AND relaxation with rtol=1e-9, atol=1e-13 mol; it integrates
+    # source and outflow separately, including source from other species
+    # while one species is supersaturated. Phase 2 uses today's steady
+    # closure once each partial agrees within the combined root/ODE error:
+    # 2*rtol*max(1 Pa,pss)+atol/A. Requiring a tighter pressure match than
+    # atol/A [mol/(mol/Pa)=Pa] can make the steady event unreachable.
+    # All integrated states are mol: (mol/s)*s=mol. The returned kg/hr
+    # is a projection of integrated evaporation / dt_hr, not endpoint HK.
+    # tau<<dt recovers steady throughput after the finite drain; tau>>dt
+    # retains the stock and integrates only the physically available drive.
+    A = volume_m3 / (GAS_CONSTANT * temperature_K)
+    duration = dt_hr * 3600.0
+    steady_source = molar_source(steady_partials, steady_flux)
+    names = tuple(sorted(set(initial_mol) | set(steady_partials)
+                         | set(steady_flux) | set(steady_source)
+                         | set(flux_at_partials(carrier_partials))))
+    names = tuple(s for s in names if s not in carrier_partials
+                  or s in initial_mol or s in steady_source or s in steady_flux)
+    if not names:
+        return dict(steady_partials), {}, {}, 0.0, 0
+    count = len(names)
+    n0 = np.array([max(0.0, initial_mol.get(s, 0.0)) for s in names])
+    target = np.array([max(0.0, steady_partials.get(s, 0.0)
+                           - carrier_partials.get(s, 0.0)) for s in names])
+    rtol, atol_mol = DEFAULT_REL_TOL, 1e-13
+    match_tolerance = 2 * rtol * np.maximum(1.0, target) + atol_mol / A
+
+    def rhs(_time, state):
+        pressure = np.maximum(state[:count], 0.0) / A
+        partials = dict(carrier_partials)
+        partials.update({s: p + carrier_partials.get(s, 0.0)
+                         for s, p in zip(names, pressure)})
+        flux = flux_at_partials(partials)
+        source = molar_source(partials, flux)
+        drains, viscous, _ = _mixture_duct_coefficients(
+            sum(partials.values()) + carrier_Pa, G, P_down,
+            molecular_C, knudsen_at_total,
+        )
+        outflow = np.array([p * drains.get(s, viscous)
+                            for s, p in zip(names, pressure)])
+        supply = np.array([source.get(s, 0.0) / 3600.0 for s in names])
+        evaporation = np.array([flux.get(s, 0.0) / molar_masses[s] / 3600.0
+                                for s in names])
+        return np.concatenate((supply - outflow, evaporation, supply, outflow))
+
+    def settled(_time, state):
+        return float(np.max(np.abs(state[:count] / A - target)
+                            / match_tolerance)) - 1.0
+
+    settled.terminal = True
+    settled.direction = -1
+    trajectory = solve_ivp(
+        rhs, (0.0, duration), np.concatenate((n0, np.zeros(3 * count))),
+        method="Radau", rtol=rtol, atol=atol_mol,
+        events=settled if steady_converged else None,
+    )
+    if not trajectory.success:
+        raise CapacityCouplingRefusalError(CapacityShadowRefusal(
+            "source_duct_transient_non_convergence", trajectory.nfev,
+        ))
+    state = trajectory.y[:, -1]
+    rest = duration - trajectory.t[-1]
+    if rest > 0.0:
+        # The root's finite algebraic tolerance must not accumulate into
+        # an artificial stock drift over the remaining hour: dn/dt=0 in
+        # the steady phase, and its source is exactly its duct throughput.
+        steady_supply = np.array([steady_source.get(s, 0.0) / 3600.0 for s in names])
+        state[count:2 * count] += rest * np.array([
+            steady_flux.get(s, 0.0) / molar_masses[s] / 3600.0 for s in names
+        ])
+        state[2 * count:3 * count] += rest * steady_supply
+        state[3 * count:] += rest * steady_supply
+    remaining, evaporated, supplied, drained = np.split(state, 4)
+    partials = dict(carrier_partials)
+    partials.update({s: max(0.0, n) / A + carrier_partials.get(s, 0.0)
+                     for s, n in zip(names, remaining)})
+    residual = float(np.max(np.abs(n0 + supplied - remaining - drained)))
+    scale = float(np.max(n0 + supplied))
+    return (
+        partials,
+        {s: max(0.0, n) * molar_masses[s] / dt_hr for s, n in zip(names, evaporated)},
+        {s: n / dt_hr for s, n in zip(names, supplied)},
+        residual / scale if scale > 0.0 else 0.0,
+        trajectory.nfev,
+    )
 
 
 def solve_source_duct_closure(
@@ -712,26 +801,10 @@ def solve_source_duct_closure(
             extra[str(species)] = fill
     if incoming_partials_Pa and pre_holdup_mol is None:
         return CapacityShadowRefusal("retained_gas_requires_molar_inventory", 0)
-    storage = 0.0
-    stock_rate: dict[str, float] = {}
     if pre_holdup_mol is not None:
         if not all(math.isfinite(v) and v > 0.0
                    for v in (float(volume_m3 or 0.0), float(temperature_K or 0.0), dt_hr)):
             return CapacityShadowRefusal("finite_stock_requires_positive_volume_temperature_dt", 0)
-        # Premise: a well-mixed finite headspace obeys dn_i/dt = s_i -
-        # q_i(p), p_i=n_i RT/V. Backward Euler over dt seconds gives
-        # (V/(RT dt) + K_i(P))*p_end = n_start/dt + s_i(p_end), with
-        # q_i=K_i(P)*p_i from the SAME mixture duct law as the steady solve.
-        # Its bounded integral is dt*q_i(p_end); n_end + integral(q dt)
-        # = n_start + dt*s_i, so finite stock cannot fund unlimited outflow.
-        # HK s_i=H_i*max(P_eq_i-p_i,0); coproducts use the existing source
-        # projection. Units: storage and K are mol/(s Pa), n/dt is mol/s.
-        # V->0 removes storage (instant drain to the source/duct state);
-        # K->0 holds zero-source stock exactly. This is an implicit tick
-        # approximation, not a resolved sub-second blowdown trajectory.
-        storage = float(volume_m3) / (GAS_CONSTANT * float(temperature_K) * dt_hr * 3600.0)
-        stock_rate = {str(s): max(0.0, float(n)) / (dt_hr * 3600.0)
-                      for s, n in pre_holdup_mol.items()}
 
     def molar_source(partials, flux):
         if overhead_source_mol_hr_at_partials is not None:
@@ -794,8 +867,6 @@ def solve_source_duct_closure(
         P_carrier_Pa=unnamed_carrier_Pa,
         molecular_C_mol_s_Pa=molecular_C or None,
         knudsen_at_total_Pa=knudsen_at_total,
-        stock_rate_mol_s=stock_rate,
-        storage_mol_s_Pa=storage,
         coproduct_mol_s=coproduct_source(zero_partials, free_flux),
     )
     try:
@@ -850,8 +921,6 @@ def solve_source_duct_closure(
             P_carrier_Pa=unnamed_carrier_Pa,
             molecular_C_mol_s_Pa=molecular_C or None,
             knudsen_at_total_Pa=knudsen_at_total,
-            stock_rate_mol_s=stock_rate,
-            storage_mol_s_Pa=storage,
             source_mol_hr=molar_source(partials, flux),
             carrier_partials_Pa=extra,
         )
@@ -950,16 +1019,38 @@ def solve_source_duct_closure(
                     ),
                 }
             )
+    integrated_source = None
+    if pre_holdup_mol is not None:
+        try:
+            partials, flux, integrated_source, residual_rel, evaluations = _integrate_retained_source_duct(
+                initial_mol=pre_holdup_mol, steady_partials=partials,
+                steady_flux=flux, flux_at_partials=flux_kg_hr_at_partials,
+                molar_source=molar_source, molar_masses=molar_mass_kg_mol,
+                carrier_partials=extra, carrier_Pa=unnamed_carrier_Pa,
+                G=G, P_down=P_down, molecular_C=molecular_C,
+                knudsen_at_total=knudsen_at_total,
+                volume_m3=float(volume_m3), temperature_K=T_K, dt_hr=dt_hr,
+                steady_converged=residual_rel <= DEFAULT_REL_TOL and not notices,
+            )
+        except CapacityCouplingRefusalError as exc:
+            return exc.refusal
+        except EvaporationFluxRefusal:
+            raise
+        except Exception as exc:
+            return CapacityShadowRefusal(
+                f"evaporation_flux_refused:{type(exc).__name__}:{exc}", iterations,
+            )
+        iterations += evaluations
     bled = dict(head_bled_species_mol or {})
     inventory_error_kg = 0.0
     available_kg = 0.0
-    if storage > 0.0:
-        source = molar_source(partials, flux)
+    if pre_holdup_mol is not None:
+        source = integrated_source
         remaining_mol = source_duct_remaining_mol(
             partials, extra, volume_m3=float(volume_m3), temperature_K=T_K,
         )
-        for species in set(stock_rate) | set(source) | (set(partials) - set(extra)):
-            available = max(0.0, stock_rate.get(species, 0.0) * dt_hr * 3600.0
+        for species in set(pre_holdup_mol) | set(source) | (set(partials) - set(extra)):
+            available = max(0.0, max(0.0, pre_holdup_mol.get(species, 0.0))
                             + source.get(species, 0.0) * dt_hr)
             remaining = remaining_mol.get(species, 0.0)
             debit = min(available, max(0.0, available - remaining))
