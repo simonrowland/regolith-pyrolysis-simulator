@@ -17,7 +17,7 @@ fidelity_samples:
 - path: species.Ca.observations[stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation].values.points[0].P_Ca_times_10^7_atm_as_printed
   value: 2.2 ± 0.2
   locator:
-    page: 3711
+    page: 3
     published_page: 3711
     pdf_page_index: 2
     table: Ia
@@ -25,7 +25,7 @@ fidelity_samples:
 - path: species.CaO_gas.observations[stolyarova_1991_cao_partial_pressure_1993k_ion_comparison].values.points[0].P_CaO_times_10^8_atm_as_printed
   value: 6.0 ± 0.5
   locator:
-    page: 3711
+    page: 3
     published_page: 3711
     pdf_page_index: 2
     table: Ia
@@ -33,7 +33,7 @@ fidelity_samples:
 - path: species.SiO.observations[stolyarova_1991_sio_partial_pressure_1933k_ion_comparison].values.points[0].P_SiO_times_10^6_atm_as_printed
   value: 100 ± 10
   locator:
-    page: 3711
+    page: 3
     published_page: 3711
     pdf_page_index: 2
     table: Ib
@@ -41,7 +41,7 @@ fidelity_samples:
 - path: species.SiO2.observations[stolyarova_1991_sio2_activity_eq3_1933k].values.points[0].a_SiO2_as_printed
   value: 0.20 ± 0.01
   locator:
-    page: 3711
+    page: 3
     published_page: 3711
     pdf_page_index: 2
     table: IIb
@@ -49,7 +49,7 @@ fidelity_samples:
 - path: species.SiO2.observations[stolyarova_1991_gibbs_integral_energy_fig3].values.points[0].delta_G_kcal_per_mole_as_digitized
   value: -5.3
   locator:
-    page: 3713
+    page: 5
     published_page: 3713
     pdf_page_index: 4
     figure: '3'
@@ -57,7 +57,7 @@ fidelity_samples:
 - path: species.O2.observations[stolyarova_1991_o2_pressure_fig4].values.points[0].lg_P_O2_atm_as_digitized
   value: -7.747
   locator:
-    page: 3713
+    page: 5
     published_page: 3713
     pdf_page_index: 4
     figure: '4'
@@ -113,13 +113,13 @@ phase_field_records:
       of SiO2 was shown on the basis of analysis of the dependencies of the CaO, Ca, and SiO evaporation isotherms, Fig. 1.
       Owing to this observation, we concluded that the liquidus point on the phase diagram may be corrected compared with
       the earlier mentioned 0.41 mole fraction of SiO2 (30).
-    locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, note: 'Right column, last paragraph of Results; its Fig. 1 is captioned 1933 K. Ref. (30) is the earlier phase diagram. The sentence itself prints no temperature.'}
+    locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, note: 'Right column, last paragraph of Results; its Fig. 1 is captioned 1933 K. Ref. (30) is the earlier phase diagram. The sentence itself prints no temperature.'}
   plateaus:
   - id: stolyarova-1991-table-ia-1993k-lime-plateau
     temperature_K_as_captioned: 1993.0
     composition_field: SiO2_mole_fraction_as_printed
     compositions: ['0.33', '0.25']
-    locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: Ia}
+    locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: Ia}
     series:
     - observation_id: stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation
       field: P_Ca_times_10^7_atm_as_printed
@@ -137,7 +137,7 @@ phase_field_records:
     temperature_K_as_captioned: 1933.0
     composition_field: SiO2_mole_fraction_as_printed
     compositions: ['0.33', '0.25']
-    locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib, IIa, IIb'}
+    locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib, IIa, IIb'}
     series:
     - observation_id: stolyarova_1991_sio_partial_pressure_1933k_complete_evaporation
       field: P_SiO_times_10^6_atm_as_printed
@@ -163,22 +163,22 @@ phase_field_records:
       field: a_CaO_as_printed
       sigma_basis: relative
       relative_sigma: '0.15'
-      sigma_locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
+      sigma_locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
     - observation_id: stolyarova_1991_cao_activity_eq7_1933k
       field: a_CaO_as_printed
       sigma_basis: relative
       relative_sigma: '0.15'
-      sigma_locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
+      sigma_locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
     - observation_id: stolyarova_1991_sio2_activity_eq6_1933k
       field: a_SiO2_as_printed
       sigma_basis: relative
       relative_sigma: '0.15'
-      sigma_locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
+      sigma_locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
     - observation_id: stolyarova_1991_sio2_activity_eq8_1933k
       field: a_SiO2_as_printed
       sigma_basis: relative
       relative_sigma: '0.15'
-      sigma_locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
+      sigma_locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
     named_failure:
       observation_id: stolyarova_1991_sio2_activity_eq8_1933k
       reason: Eq. [8]* is a Belton-Fruehan integral of the measured ion-current ratio and has no printed ±; tested at
@@ -190,14 +190,14 @@ phase_field_records:
       not printed). The caption is left as printed (regolith-main t-1123 Q5).
       A misprint ruling needs internal evidence (text, another table, or the experimental section stating 1933 K for this
       series), not a temperature difference by itself.
-    locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: Ia, note: 'Caption: "... CaO-SiO2 system at 1993 K obtained by the complete evaporation method (1) and the ion comparison method (2)." Abstract, p. 3710: "... 0.1-0.5 mole fraction of SiO2 at 1933 K."'}
+    locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: Ia, note: 'Caption: "... CaO-SiO2 system at 1993 K obtained by the complete evaporation method (1) and the ion comparison method (2)." Abstract, p. 3710: "... 0.1-0.5 mole fraction of SiO2 at 1933 K."'}
 species:
   Ca:
     observations:
     - observation_id: stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation
       type: partial_pressure
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: Ia
@@ -230,7 +230,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.2e-07
           sigma: 2.0e-08
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -243,7 +243,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 3.5e-07
           sigma: 3.0e-08
         - SiO2_mole_fraction_as_printed: '0.47'
@@ -256,7 +256,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.53'], [SiO2, '0.47']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.47; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.47; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 5.1e-07
           sigma: 3.0e-08
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -269,7 +269,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 9.6e-07
           sigma: 4.0e-08
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -282,7 +282,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.76e-06
           sigma: 1.0e-07
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -295,7 +295,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.76e-06
           sigma: 1.0e-07
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -308,7 +308,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 3.6299999999999995e-06
           sigma: 2.0e-07
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -321,7 +321,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 3.71e-06
           sigma: 3.0e-07
         - SiO2_mole_fraction_as_printed: '0.36'
@@ -334,7 +334,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [SiO2, '0.36']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.36; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.36; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.96e-06
           sigma: 4.0e-07
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -349,13 +349,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-table-ia-1993k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_Ca_times_10^7_atm_as_printed: 50.1 ± 4.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 5.01e-06
           sigma: 4.0e-07
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -370,13 +370,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-table-ia-1993k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_Ca_times_10^7_atm_as_printed: 49.9 ± 4.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.99e-06
           sigma: 4.0e-07
         quantity_as_published: P_Ca
@@ -430,7 +430,7 @@ species:
     - observation_id: stolyarova_1991_ca_partial_pressure_1993k_ion_comparison
       type: partial_pressure
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: Ia
@@ -463,7 +463,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.5e-07
           sigma: 3.0e-08
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -476,7 +476,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 3.8999999999999997e-07
           sigma: 4.0e-08
         - SiO2_mole_fraction_as_printed: '0.47'
@@ -489,7 +489,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.53'], [SiO2, '0.47']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.47; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.47; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 5.1e-07
           sigma: 4.0e-08
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -502,7 +502,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.03e-06
           sigma: 5.0e-08
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -515,7 +515,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.2899999999999997e-06
           sigma: 1.5e-07
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -528,7 +528,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.94e-06
           sigma: 2.0e-07
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -541,7 +541,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 3.87e-06
           sigma: 3.0e-07
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -554,7 +554,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.16e-06
           sigma: 4.0e-07
         - SiO2_mole_fraction_as_printed: '0.36'
@@ -567,7 +567,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [SiO2, '0.36']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.36; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.36; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.87e-06
           sigma: 5.0e-07
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -582,13 +582,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-table-ia-1993k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_Ca_times_10^7_atm_as_printed: 49.2 ± 5.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.92e-06
           sigma: 5.0e-07
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -603,13 +603,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-table-ia-1993k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_Ca_times_10^7_atm_as_printed: 50.9 ± 5.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 5.0899999999999995e-06
           sigma: 5.0e-07
         quantity_as_published: P_Ca
@@ -665,7 +665,7 @@ species:
     - observation_id: stolyarova_1991_cao_partial_pressure_1993k_complete_evaporation
       type: partial_pressure
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: Ia
@@ -705,7 +705,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 5.9000000000000006e-08
           sigma: 4.0e-09
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -718,7 +718,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 8.800000000000001e-08
           sigma: 5.0e-09
         - SiO2_mole_fraction_as_printed: '0.47'
@@ -731,7 +731,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.53'], [SiO2, '0.47']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.47; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.47; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.1900000000000001e-07
           sigma: 5.0e-09
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -744,7 +744,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.08e-07
           sigma: 1.0e-08
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -757,7 +757,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.3e-07
           sigma: 2.0e-08
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -770,7 +770,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.1200000000000004e-07
           sigma: 3.0000000000000004e-08
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -783,7 +783,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.13e-07
           sigma: 3.0000000000000004e-08
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -796,7 +796,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.96e-07
           sigma: 4.0e-08
         - SiO2_mole_fraction_as_printed: '0.36'
@@ -809,7 +809,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [SiO2, '0.36']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.36; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.36; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 6.170000000000001e-07
           sigma: 4.0e-08
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -824,13 +824,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-table-ia-1993k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_CaO_times_10^8_atm_as_printed: 75.8 ± 5.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 7.58e-07
           sigma: 5.0e-08
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -845,13 +845,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-table-ia-1993k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_CaO_times_10^8_atm_as_printed: 78.8 ± 5.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 7.88e-07
           sigma: 5.0e-08
         quantity_as_published: P_CaO
@@ -900,7 +900,7 @@ species:
     - observation_id: stolyarova_1991_cao_partial_pressure_1993k_ion_comparison
       type: partial_pressure
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: Ia
@@ -940,7 +940,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 6.000000000000001e-08
           sigma: 5.0e-09
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -953,7 +953,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 8.9e-08
           sigma: 6.0e-09
         - SiO2_mole_fraction_as_printed: '0.47'
@@ -966,7 +966,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.53'], [SiO2, '0.47']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.47; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.47; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.1900000000000001e-07
           sigma: 8.0e-09
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -979,7 +979,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.82e-07
           sigma: 1.5000000000000002e-08
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -992,7 +992,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.69e-07
           sigma: 3.0000000000000004e-08
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -1005,7 +1005,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 3.56e-07
           sigma: 4.0e-08
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -1018,7 +1018,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 3.5700000000000003e-07
           sigma: 4.0e-08
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -1031,7 +1031,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.86e-07
           sigma: 5.0e-08
         - SiO2_mole_fraction_as_printed: '0.36'
@@ -1044,7 +1044,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [SiO2, '0.36']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.36; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.36; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 6.05e-07
           sigma: 5.0e-08
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -1059,13 +1059,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-table-ia-1993k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_CaO_times_10^8_atm_as_printed: 73.4 ± 6.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 7.340000000000001e-07
           sigma: 6.000000000000001e-08
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -1080,13 +1080,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-table-ia-1993k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_CaO_times_10^8_atm_as_printed: 79.5 ± 6.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ia', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 7.95e-07
           sigma: 6.000000000000001e-08
         quantity_as_published: P_CaO
@@ -1137,7 +1137,7 @@ species:
     - observation_id: stolyarova_1991_sio_partial_pressure_1933k_complete_evaporation
       type: partial_pressure
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: Ib
@@ -1171,7 +1171,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 9.14e-05
           sigma: 4.9999999999999996e-06
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -1184,7 +1184,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.22e-05
           sigma: 3.0e-06
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -1197,7 +1197,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.57e-05
           sigma: 3.0e-06
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -1210,7 +1210,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.38e-05
           sigma: 2.0e-06
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -1223,7 +1223,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.7199999999999998e-05
           sigma: 1.0e-06
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -1236,7 +1236,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.59e-05
           sigma: 1.0e-06
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -1249,7 +1249,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.3899999999999999e-05
           sigma: 1.0e-06
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -1264,13 +1264,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO_times_10^6_atm_as_printed: 1.9 ± 1.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.8999999999999998e-06
           sigma: 1.0e-06
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -1285,13 +1285,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO_times_10^6_atm_as_printed: 2.7 ± 1.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.7e-06
           sigma: 1.0e-06
         quantity_as_published: P_SiO
@@ -1344,7 +1344,7 @@ species:
     - observation_id: stolyarova_1991_sio_partial_pressure_1933k_ion_comparison
       type: partial_pressure
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: Ib
@@ -1378,7 +1378,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 9.999999999999999e-05
           sigma: 9.999999999999999e-06
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -1391,7 +1391,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.6e-05
           sigma: 4.9999999999999996e-06
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -1404,7 +1404,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.34e-05
           sigma: 4.0e-06
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -1417,7 +1417,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.6199999999999996e-05
           sigma: 3.0e-06
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -1430,7 +1430,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.89e-05
           sigma: 2.0e-06
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -1443,7 +1443,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.75e-05
           sigma: 2.0e-06
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -1456,7 +1456,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.53e-05
           sigma: 2.0e-06
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -1471,13 +1471,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO_times_10^6_atm_as_printed: 5.0 ± 2.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 4.9999999999999996e-06
           sigma: 2.0e-06
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -1492,13 +1492,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO_times_10^6_atm_as_printed: 0.8 ± 1.0
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 8.0e-07
           sigma: 1.0e-06
         quantity_as_published: P_SiO
@@ -1553,7 +1553,7 @@ species:
     - observation_id: stolyarova_1991_sio2_gas_partial_pressure_1933k_ion_comparison
       type: partial_pressure
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: Ib
@@ -1587,7 +1587,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.59e-08
         - SiO2_mole_fraction_as_printed: '0.44'
           T_C: '1659.85'
@@ -1599,7 +1599,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.01e-08
         - SiO2_mole_fraction_as_printed: '0.40'
           T_C: '1659.85'
@@ -1611,7 +1611,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 7.700000000000001e-09
         - SiO2_mole_fraction_as_printed: '0.33'
           T_C: '1659.85'
@@ -1625,13 +1625,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO2_times_10^9_atm_as_printed: (5.3)
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 5.3e-09
         - SiO2_mole_fraction_as_printed: '0.25'
           T_C: '1659.85'
@@ -1645,13 +1645,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO2_times_10^9_atm_as_printed: (2.0)
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 2.0e-09
         quantity_as_published: P_SiO2
         formula: SiO2
@@ -1701,7 +1701,7 @@ species:
     - observation_id: stolyarova_1991_printed_equilibrium_1
       type: thermodynamic_example
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: Ib
@@ -1716,7 +1716,7 @@ species:
     - observation_id: stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium
       type: partial_pressure
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: Ib
@@ -1751,7 +1751,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.0e-09
         - SiO2_mole_fraction_as_printed: '0.49'
           T_C: '1659.85'
@@ -1763,7 +1763,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.0e-09
         - SiO2_mole_fraction_as_printed: '0.44'
           T_C: '1659.85'
@@ -1775,7 +1775,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.0e-09
         - SiO2_mole_fraction_as_printed: '0.41'
           T_C: '1659.85'
@@ -1787,7 +1787,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.0e-09
         - SiO2_mole_fraction_as_printed: '0.40'
           T_C: '1659.85'
@@ -1799,7 +1799,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 6.8e-10
         - SiO2_mole_fraction_as_printed: '0.39'
           T_C: '1659.85'
@@ -1811,7 +1811,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 1.0e-09
         - SiO2_mole_fraction_as_printed: '0.38'
           T_C: '1659.85'
@@ -1823,7 +1823,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 7.4e-10
         - SiO2_mole_fraction_as_printed: '0.33'
           T_C: '1659.85'
@@ -1837,13 +1837,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_O_times_10^10_atm_as_printed: '6.7'
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 6.700000000000001e-10
         - SiO2_mole_fraction_as_printed: '0.25'
           T_C: '1659.85'
@@ -1857,13 +1857,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_O_times_10^10_atm_as_printed: '6.8'
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           pressure_atm: 6.8e-10
         quantity_as_published: P_O
         formula: O
@@ -1911,7 +1911,7 @@ species:
     - observation_id: stolyarova_1991_cao_activity_eq2_1933k
       type: activity_coefficient
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: IIa
@@ -1945,7 +1945,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.07
           activity_as_published: 0.07 ± 0.02
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -1958,7 +1958,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.11
           activity_as_published: 0.11 ± 0.03
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -1971,7 +1971,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.26
           activity_as_published: 0.26 ± 0.04
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -1984,7 +1984,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.29
           activity_as_published: 0.29 ± 0.04
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -1997,7 +1997,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.52
           activity_as_published: 0.52 ± 0.04
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -2010,7 +2010,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.52
           activity_as_published: 0.52 ± 0.04
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -2023,7 +2023,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.63
           activity_as_published: 0.63 ± 0.04
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -2038,13 +2038,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: 0.96 ± 0.03
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.96
           activity_as_published: 0.96 ± 0.03
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -2059,13 +2059,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: 1.00 ± 0.02
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 1.0
           activity_as_published: 1.00 ± 0.02
         quantity_as_published: a_CaO
@@ -2081,7 +2081,7 @@ species:
     - observation_id: stolyarova_1991_cao_activity_eq5_1933k
       type: activity_coefficient
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: IIa
@@ -2115,7 +2115,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.08
           activity_as_published: '0.08'
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -2128,7 +2128,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.1
           activity_as_published: '0.10'
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -2141,7 +2141,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.2
           activity_as_published: '0.20'
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -2154,7 +2154,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.33
           activity_as_published: '0.33'
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -2167,7 +2167,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.38
           activity_as_published: '0.38'
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -2180,7 +2180,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.49
           activity_as_published: '0.49'
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -2193,7 +2193,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.67
           activity_as_published: '0.67'
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -2208,13 +2208,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: '0.95'
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.95
           activity_as_published: '0.95'
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -2229,13 +2229,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: '1.00'
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 1.0
           activity_as_published: '1.00'
         quantity_as_published: a_CaO
@@ -2254,7 +2254,7 @@ species:
     - observation_id: stolyarova_1991_cao_activity_eq7_1933k
       type: activity_coefficient
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: IIa
@@ -2288,7 +2288,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.07
           activity_as_published: '0.07'
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -2301,7 +2301,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.12
           activity_as_published: '0.12'
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -2314,7 +2314,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.19
           activity_as_published: '0.19'
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -2327,7 +2327,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.33
           activity_as_published: '0.33'
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -2340,7 +2340,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.45
           activity_as_published: '0.45'
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -2353,7 +2353,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.52
           activity_as_published: '0.52'
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -2366,7 +2366,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.55
           activity_as_published: '0.55'
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -2381,13 +2381,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: '0.75'
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.75
           activity_as_published: '0.75'
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -2402,13 +2402,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: '1.00'
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIa', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 1.0
           activity_as_published: '1.00'
         quantity_as_published: a_CaO
@@ -2425,7 +2425,7 @@ species:
     - observation_id: stolyarova_1991_experimental_method_and_apparatus
       type: method
       locator:
-        page: 3710
+        page: 2
         published_page: 3710
         pdf_page_index: 1
         section: Experimental
@@ -2443,7 +2443,7 @@ species:
     - observation_id: stolyarova_1991_sio2_activity_eq3_1933k
       type: activity_coefficient
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: IIb
@@ -2477,7 +2477,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.2
           activity_as_published: 0.20 ± 0.01
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -2490,7 +2490,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.09
           activity_as_published: 0.09 ± 0.02
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -2503,7 +2503,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.1
           activity_as_published: 0.10 ± 0.02
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -2516,7 +2516,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.05
           activity_as_published: 0.05 ± 0.01
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -2529,7 +2529,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.03
           activity_as_published: 0.03 ± 0.01
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -2542,7 +2542,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.04
           activity_as_published: 0.04 ± 0.01
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -2555,7 +2555,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.023
           activity_as_published: 0.023 ± 0.005
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -2570,13 +2570,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: 0.003 ± 0.002
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.003
           activity_as_published: 0.003 ± 0.002
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -2591,13 +2591,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: 0.004 ± 0.001
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.004
           activity_as_published: 0.004 ± 0.001
         quantity_as_published: a_SiO2
@@ -2614,7 +2614,7 @@ species:
     - observation_id: stolyarova_1991_sio2_activity_eq6_1933k
       type: activity_coefficient
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: IIb
@@ -2649,7 +2649,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.2
           activity_as_published: '0.20'
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -2662,7 +2662,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.13
           activity_as_published: '0.13'
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -2675,7 +2675,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.05
           activity_as_published: '0.05'
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -2688,7 +2688,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.03
           activity_as_published: '0.03'
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -2701,7 +2701,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.03
           activity_as_published: '0.03'
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -2714,7 +2714,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.02
           activity_as_published: '0.02'
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -2727,7 +2727,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.02
           activity_as_published: '0.02'
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -2742,13 +2742,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: '0.006'
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.006
           activity_as_published: '0.006'
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -2763,13 +2763,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: '0.005'
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.005
           activity_as_published: '0.005'
         quantity_as_published: a_SiO2
@@ -2788,7 +2788,7 @@ species:
     - observation_id: stolyarova_1991_sio2_activity_eq8_1933k
       type: activity_coefficient
       locator:
-        page: 3711
+        page: 3
         published_page: 3711
         pdf_page_index: 2
         table: IIb
@@ -2823,7 +2823,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [SiO2, '0.5']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.2
           activity_as_published: '0.20'
         - SiO2_mole_fraction_as_printed: '0.49'
@@ -2836,7 +2836,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.51'], [SiO2, '0.49']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.11
           activity_as_published: '0.11'
         - SiO2_mole_fraction_as_printed: '0.44'
@@ -2849,7 +2849,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.56'], [SiO2, '0.44']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.07
           activity_as_published: '0.07'
         - SiO2_mole_fraction_as_printed: '0.41'
@@ -2862,7 +2862,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.59'], [SiO2, '0.41']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.03
           activity_as_published: '0.03'
         - SiO2_mole_fraction_as_printed: '0.40'
@@ -2875,7 +2875,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [SiO2, '0.4']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.02
           activity_as_published: '0.02'
         - SiO2_mole_fraction_as_printed: '0.39'
@@ -2888,7 +2888,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.61'], [SiO2, '0.39']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.016
           activity_as_published: '0.016'
         - SiO2_mole_fraction_as_printed: '0.38'
@@ -2901,7 +2901,7 @@ species:
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [SiO2, '0.38']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.015
           activity_as_published: '0.015'
         - SiO2_mole_fraction_as_printed: '0.33'
@@ -2916,13 +2916,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: '0.008'
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.67'], [SiO2, '0.33']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.008
           activity_as_published: '0.008'
         - SiO2_mole_fraction_as_printed: '0.25'
@@ -2937,13 +2937,13 @@ species:
               criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
               liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
               plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
               test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: '0.004'
           point_conditions:
             composition:
               state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.75'], [SiO2, '0.25']]}}
-              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
+              locator: {page: 3, published_page: 3711, pdf_page_index: 2, table: 'IIb', note: 'Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived as T_K−273.15 from the table caption; not printed.'}
           activity: 0.004
           activity_as_published: '0.004'
         quantity_as_published: a_SiO2
@@ -2958,7 +2958,7 @@ species:
     - observation_id: stolyarova_1991_gibbs_integral_energy_fig3
       type: gibbs_table
       locator:
-        page: 3713
+        page: 5
         published_page: 3713
         pdf_page_index: 4
         figure: '3'
@@ -3013,7 +3013,7 @@ species:
     - observation_id: stolyarova_1991_gas_speciation_table3
       type: gas_speciation
       locator:
-        page: 3713
+        page: 5
         published_page: 3713
         pdf_page_index: 4
         table: III
@@ -3041,7 +3041,7 @@ species:
     - observation_id: stolyarova_1991_o2_pressure_fig4
       type: partial_pressure
       locator:
-        page: 3713
+        page: 5
         published_page: 3713
         pdf_page_index: 4
         figure: '4'

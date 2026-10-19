@@ -75,7 +75,7 @@ benches:
     basis: described_in_this_work
   apparatus_family:
     state: {tag: value, value: Knudsen-cell mass spectrometer}
-    locator: &apparatus_locator {page: 13, published_page: 3051, pdf_page_index: 2, section: '3.1'}
+    locator: &apparatus_locator {page: 3, published_page: 3051, pdf_page_index: 2, section: '3.1'}
   method:
     state: {tag: value, value: Knudsen effusion mass spectrometry}
     locator: *apparatus_locator
@@ -84,7 +84,7 @@ benches:
         tag: value
         value: Al2O3
       locator:
-        page: 13
+        page: 3
         published_page: 3051
         pdf_page_index: 2
         section: '3.1'
@@ -92,7 +92,7 @@ benches:
         tag: value
         value: Ta
       locator:
-        page: 13
+        page: 3
         published_page: 3051
         pdf_page_index: 2
         section: '3.1'
@@ -116,11 +116,11 @@ benches:
   temperature_measurement:
     sensor:
       state: {tag: value, value: Two Pt-30%Rh/Pt-6%Rh thermocouple pairs at upper and lower susceptor}
-      locator: {page: 14, published_page: 3052, pdf_page_index: 3, section: '3.1'}
+      locator: {page: 4, published_page: 3052, pdf_page_index: 3, section: '3.1'}
   temperature_calibration:
     method:
       state: {tag: value, value: Pure-Fe solidification onset after supercooling detected by ion intensity; details in reference 16}
-      locator: {page: 15, published_page: 3053, pdf_page_index: 4, section: '3.2'}
+      locator: {page: 5, published_page: 3053, pdf_page_index: 4, section: '3.2'}
     uncertainty:
       state: {tag: unknown, reason: not_published}
       locator: {page: 14, published_page: 3052, section: '3.1', note: 'The printed +/-0.5 C is temperature stability, not calibration uncertainty'}
@@ -164,7 +164,7 @@ experiments:
   sample:
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.003'}}
-      locator: &loading_locator {page: 15, published_page: 3053, pdf_page_index: 4, section: '3.2', note: Printed loading range 1-3 g; individual charge masses not assigned}
+      locator: &loading_locator {page: 5, published_page: 3053, pdf_page_index: 4, section: '3.2', note: Printed loading range 1-3 g; individual charge masses not assigned}
     printed_composition:
       state: {tag: unknown, reason: not_published}
       locator: {published_page: 3054, table: '2', note: 'Multiple Fe-V compositions remain in observation rows; no single series composition. Table 1 is starting-metal assays, not charge compositions'}
