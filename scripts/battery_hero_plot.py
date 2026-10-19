@@ -2884,7 +2884,27 @@ def render_hero_deck_charts(
             tuple(sweet_spot_engines[index : index + 2])
             for index in range(0, len(sweet_spot_engines), 2)
         ]
-        row_heights = [1.65, 0.55, 1.55]
+        refusal_rails = (
+            (source_rail, Rail.SIO_EVOLUTION.value)
+            if chart == "redox_sensitivity"
+            else (source_rail,)
+        )
+        axis_refusal_entries = tuple(
+            (engine, reason, count)
+            for (axis_chart, engine, reason), count
+            in sorted(data.hero_deck_axis_refusals.items())
+            if axis_chart == chart and count
+        )
+        refusal_entries = tuple(
+            entry
+            for rail in refusal_rails
+            for entry in _hero_deck_refusal_entries(data, rail)
+        ) + axis_refusal_entries
+        refusal_reason_count = len(
+            {reason for _engine, reason, _count in refusal_entries}
+        )
+        refusal_strip_height = max(0.55, refusal_reason_count * 0.15)
+        row_heights = [1.65, refusal_strip_height, 1.55]
         row_heights.extend(2.4 for _ in sweet_spot_pairs)
         figure = plt.figure(figsize=(14.0, max(7.0, sum(row_heights) / 0.78)))
         grid = figure.add_gridspec(
@@ -3061,27 +3081,9 @@ def render_hero_deck_charts(
             axis.set_ylabel(y_label, fontsize=6)
 
         refusal_axis = figure.add_subplot(grid[1, :])
-        refusal_rails = (
-            (source_rail, Rail.SIO_EVOLUTION.value)
-            if chart == "redox_sensitivity"
-            else (source_rail,)
-        )
-        axis_refusal_entries = tuple(
-            (engine, reason, count)
-            for (axis_chart, engine, reason), count
-            in sorted(data.hero_deck_axis_refusals.items())
-            if axis_chart == chart and count
-        )
         _draw_hero_refusals(
             refusal_axis,
-            (
-                *(
-                    entry
-                    for rail in refusal_rails
-                    for entry in _hero_deck_refusal_entries(data, rail)
-                ),
-                *axis_refusal_entries,
-            ),
+            refusal_entries,
             engine_colors=engine_colors,
         )
         if refusal_axis.axison:
