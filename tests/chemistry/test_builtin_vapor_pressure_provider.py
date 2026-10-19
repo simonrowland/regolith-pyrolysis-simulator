@@ -1069,6 +1069,13 @@ def test_present_phosphate_is_priced_in_c2a(
     assert equilibrium.vapor_pressures_Pa[carrier] > 0.0
     flux = sim._calculate_evaporation(equilibrium)
     assert flux.species_kg_hr[carrier] > 0.0
+    sim._configure_condensation_operating_conditions(flux)
+    route = sim.condensation_model.route(flux, sim.melt)
+    assert route.remaining_by_species[carrier] == pytest.approx(flux.species_kg_hr[carrier])
+    assert route.retained_in_source_by_species.get(carrier, 0.0) == 0.0
+    authorization = route.condensation_authority_by_species[carrier]
+    assert authorization["authoritative_for_condensation"] is False
+    assert authorization["routing_authorization"]["active"] is True
     row = vapor_pressure_data["oxide_vapors"][carrier]
     # The production resolver validates both mass and atoms for P2O5 ->
     # carrier + O2. Keep the existing CEA reaction and melt activity basis.

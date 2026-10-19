@@ -117,9 +117,9 @@ def _route_species(sim, species: str, rate_kg_hr: float, *, status: str | None):
     )
 
 
-@pytest.mark.parametrize("campaign,stage", [("C0", "stage0_p_carriers"), ("C0B", "c0b_p_cleanup")])
-@pytest.mark.parametrize("evidence_kind", ["admitted", "missing", "inactive", "wrong_stage", "refused"])
-def test_cleanup_offgas_requires_positive_predicate(
+@pytest.mark.parametrize("campaign,stage", [("C0", "stage0_p_carriers"), ("C0B", "c0b_p_cleanup"), ("C2A", "evaporation")])
+@pytest.mark.parametrize("evidence_kind", ["admitted", "missing", "inactive", "wrong_parent", "refused"])
+def test_phosphate_offgas_requires_positive_source_predicate(
     vapor_pressure_data, feedstocks_data, setpoints_data, campaign, stage, evidence_kind,
 ):
     from simulator.state import CampaignPhase
@@ -131,9 +131,9 @@ def test_cleanup_offgas_requires_positive_predicate(
     carrier = _carrier_record("PO", status)
     if evidence_kind != "missing":
         carrier["PO"]["extra"] = {"applicability_evidence": {
-            "active": evidence_kind != "inactive", "predicate": "stage0_only",
-            "stage": "other" if evidence_kind == "wrong_stage" else stage,
-            "process_phase": "hot_train", "parent_species_ids": ["P2O5"],
+            "active": evidence_kind != "inactive", "predicate": "applicable",
+            "stage": stage, "process_phase": "hot_train",
+            "parent_species_ids": ["SiO2"] if evidence_kind == "wrong_parent" else ["P2O5"],
         }}
     before = sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"]
     sim._route_to_condensation(EvaporationFlux(

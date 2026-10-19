@@ -156,7 +156,9 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
     flux_overlay = session.simulator._last_vapour_batch_flux_overlay
     channel_states = flux_overlay["batch_channel_states"]
     assert carriers <= set(channel_states)
-    assert channel_states["P2O5_gas"] == "refusal"
+    # The retired exact key stays explicitly dormant by applicability at the
+    # longer C0B hold. It remains a typed refusal and can never enter flux.
+    assert channel_states["P2O5_gas"] == "dormant_by_epoch"
     assert "P2O5_gas" not in flux_overlay["batch_pa_by_species"]
     assert {species: channel_states[species] for species in carriers} == {
         species: "eligible" for species in carriers
@@ -165,6 +167,7 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
     channels = batch_report["channels_by_species"]
     retired_channel = channels["P2O5_gas"]
     assert retired_channel["is_refused"] is True
+    assert retired_channel["extra"]["applicability_evidence"]["flux_dormant"] is True
     assert retired_channel["is_union_flux_eligible"] is False
     assert retired_channel["flux"]["kind"] == "refusal"
     for species in carriers:
