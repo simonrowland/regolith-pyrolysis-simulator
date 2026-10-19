@@ -18351,85 +18351,6 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
-    - observation_id: sossi_2019_li_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
-        note: >-
-          Table 4 γ_i (this work) for LiO0.5; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1673.15
-      - 1673.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=LiO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        gamma_uncertainty: 3.1
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 15.4
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_li_logKstar_table3_Li_g
-        oxide_formula_as_published: LiO0.5
-        gas_species: Li(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_li_logKstar_table3_Li_g
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 LiO0.5 (−8) γ_i (this work)=15.4±3.1 at 1673.15 K. Air row is 1.8±0.2
-          (competing; this observation is the reducing row).
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
     - observation_id: sossi_2019_li_table5_experimental_Li_g
       type: gibbs_table
       locator:
@@ -18690,96 +18611,6 @@ species:
             N_points_at_T: 1
         note: >-
           Table 3 t0=14.4 min. 1573.15 and 1823.15 values have no published SD (N=1).
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
-    - observation_id: sossi_2019_rb_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        page: 57
-        note: >-
-          Table 4 γ_i (this work) for RbO0.5; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1673.15
-      - 1823.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=RbO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        gamma_uncertainty: 1.5e-05
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.00013
-        per_temperature:
-        - T_K: 1673.15
-          gamma: 0.00013
-          gamma_uncertainty: 1.5e-05
-        - T_K: 1773.15
-          gamma: 7.4e-05
-          gamma_uncertainty: 5.9e-06
-        - T_K: 1823.15
-          gamma: 9.0e-05
-          gamma_uncertainty: null
-          uncertainty_note: no uncertainty printed for this Table 4 cell
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_rb_logKstar_table3
-        oxide_formula_as_published: RbO0.5
-        gas_species: Rb(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_rb_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=1.3e-4±1.5e-5 at 1673.15 K; 7.4e-5±5.9e-6 at 1773.15 K; 9.0e-5
-          at 1823.15 K. Primary scalar is 1673.15 K.
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -19066,105 +18897,6 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
-    - observation_id: sossi_2019_cu_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        page: 57
-        note: >-
-          Table 4 γ_i (this work) for CuO0.5; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1573.15
-      - 1923.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CuO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        gamma_uncertainty: 1.7
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 11.8
-        per_temperature:
-        - T_K: 1573.15
-          gamma: 24.0
-          gamma_uncertainty: 6.3
-        - T_K: 1673.15
-          gamma: 11.8
-          gamma_uncertainty: 1.7
-        - T_K: 1773.15
-          gamma: 8.5
-          gamma_uncertainty: 0.1
-        - T_K: 1823.15
-          gamma: 6.4
-          gamma_uncertainty: null
-          uncertainty_note: no uncertainty printed for this Table 4 cell
-        - T_K: 1923.15
-          gamma: 4.2
-          gamma_uncertainty: null
-          source_marker: '*'
-          uncertainty_note: source footnote states this value was extrapolated to 1923.15 K
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_cu_logKstar_table3
-        oxide_formula_as_published: CuO0.5
-        gas_species: Cu(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_cu_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=11.8±1.7 at 1673.15 K (also 24.0±6.3 at 1573.15, 8.5±0.1 at
-          1773.15, 6.4 at 1823.15). Literature α_e=2.4±0.8 at 1300 °C is K*/(γ_lit K) — not
-          extracted as type:alpha.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
     - observation_id: sossi_2019_cu_table5_experimental
       type: gibbs_table
       locator:
@@ -19426,84 +19158,6 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
-    - observation_id: sossi_2019_ag_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
-        note: >-
-          Table 4 γ_i (this work) for AgO0.5; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1673.15
-      - 1673.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=AgO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.67
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_ag_logKstar_table3
-        oxide_formula_as_published: AgO0.5
-        gas_species: Ag(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_ag_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=0.67 in the 1673.15 K column; no SD. logK* itself is only at
-          1573.15 K — T assignment of gamma is as printed, not re-derived.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
     - observation_id: sossi_2019_ag_logKstar_table3_quoted_20260906
       standard_state:
         state:
@@ -19621,99 +19275,6 @@ species:
             N_points_at_T: 1
         note: >-
           Table 3 t0=9.0 min. n=2.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
-    - observation_id: sossi_2019_zn_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        page: 57
-        note: >-
-          Table 4 γ_i (this work) for ZnO; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1573.15
-      - 1823.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=ZnO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        gamma_uncertainty: 0.13
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.51
-        per_temperature:
-        - T_K: 1573.15
-          gamma: 0.24
-          gamma_uncertainty: 0.02
-        - T_K: 1673.15
-          gamma: 0.51
-          gamma_uncertainty: 0.13
-        - T_K: 1773.15
-          gamma: 0.97
-          gamma_uncertainty: 0.38
-        - T_K: 1823.15
-          gamma: 1.01
-          gamma_uncertainty: null
-          uncertainty_note: no uncertainty printed for this Table 4 cell
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_zn_logKstar_table3
-        oxide_formula_as_published: ZnO
-        gas_species: Zn(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_zn_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=0.51±0.13 at 1673.15 K. Literature α_e≈2 (Reyes & Gaskell) is
-          K*/(γ_lit K) — not extracted as type:alpha.
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -20009,98 +19570,6 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
-    - observation_id: sossi_2019_ge_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        page: 57
-        note: >-
-          Table 4 γ_i (this work) for GeO2; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1573.15
-      - 1823.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=GeO2; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        gamma_uncertainty: 0.01
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.11
-        per_temperature:
-        - T_K: 1573.15
-          gamma: 0.04
-          gamma_uncertainty: 0.01
-        - T_K: 1673.15
-          gamma: 0.11
-          gamma_uncertainty: 0.01
-        - T_K: 1773.15
-          gamma: 0.18
-          gamma_uncertainty: 0.07
-        - T_K: 1823.15
-          gamma: 0.19
-          gamma_uncertainty: null
-          uncertainty_note: no uncertainty printed for this Table 4 cell
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_ge_logKstar_table3
-        oxide_formula_as_published: GeO2
-        gas_species: Ge(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_ge_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=0.11±0.01 at 1673.15 K.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
     - observation_id: sossi_2019_ge_table5_experimental
       type: gibbs_table
       locator:
@@ -20335,83 +19804,6 @@ species:
             N_points_at_T: 1
         note: >-
           Table 3 Cd only at 1573.15 K (N=1). 1300 °C liquidus caveat as for Ag.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
-    - observation_id: sossi_2019_cd_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        line_range: '1112-1118'
-        note: >-
-          Table 4 γ_i (this work) for CdO; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1673.15
-      - 1673.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CdO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.15
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_cd_logKstar_table3
-        oxide_formula_as_published: CdO
-        gas_species: Cd(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_cd_logKstar_table3
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 γ_i (this work)=0.15 in the 1673.15 K column; no SD. logK* only at 1573.15 K.
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -21052,104 +20444,6 @@ species:
             N_points_at_T: 1
         note: >-
           Table 3 n=2 Pb(g) reaction.
-      equipment:
-        sample_surface_area:
-          value: 2.0e-05
-          units: m2
-          form: glass_bead_on_wire_loop
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-            line_range: '71'
-        cell_material:
-          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: loaded onto a metal wire loop; Re used where possible
-            line_range: '67'
-        chamber_pressure:
-          value: 1.0
-          units: bar
-          note: 1-atm vertical tube gas-mixing furnace (GERO)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-            paragraph: 1-atm vertical tube gas-mixing furnaces
-            line_range: '408'
-    - observation_id: sossi_2019_pb_table4_gamma_this_work
-      type: activity_coefficient
-      locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
-        table: '4'
-        section: '4.6 Evaporation coefficients / Table 4'
-        page: 57
-        note: >-
-          Table 4 γ_i (this work) for PbO; authors set α_e=1 and compute γ from K*/K
-      T_range_K:
-      - 1573.15
-      - 1673.15
-      phase: silicate_melt_ferrobasalt_FCMAS
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: >-
-          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
-          all runs quench to homogeneous glasses except some 1300 C low-fO2
-          charges with about 5% olivine+spinel microphenocrysts.
-        transition_context:
-          liquidus_K: 1573.0
-          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=PbO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
-      regime: open_furnace_apparent
-      units: dimensionless γ as published
-      uncertainty:
-        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
-      values:
-        gamma: 0.17
-        per_temperature_by_channel:
-          PbO_caret:
-          - T_K: 1573.15
-            gamma: 0.06
-            gamma_uncertainty: 0.02
-          - T_K: 1673.15
-            gamma: 0.17
-            gamma_uncertainty: null
-            uncertainty_note: no uncertainty printed for this Table 4 cell
-          PbO_hash:
-          - T_K: 1573.15
-            gamma: 0.21
-            gamma_uncertainty: 0.09
-          - T_K: 1673.15
-            gamma: 0.38
-            gamma_uncertainty: null
-            uncertainty_note: no uncertainty printed for this Table 4 cell
-        channel_note: PbO^ and PbO# retained as printed; channel footnote was not recovered from the repaired slice.
-        quantity: activity_coefficient_this_work
-        derived_from:
-        - tables:kems-012-sossi-2019
-        - sossi_2019_pb_logKstar_table3_Pb_g
-        oxide_formula_as_published: PbO
-        gas_species: Pb(g)
-        material: ferrobasalt_FCMAS_open_furnace
-        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
-        system_class: silicate_melt
-        derived: true
-        not_a_measured_alpha: true
-        derivation:
-          relation: >-
-            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
-          inputs:
-          - tables:kems-012-sossi-2019
-          - sossi_2019_pb_logKstar_table3_Pb_g
-          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
-          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
-          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
-          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
-        note: >-
-          Table 4 PbO^ (n=0, PbO(g) channel) γ_i (this work)=0.17 at 1673.15 K; 0.06±0.02 at
-          1573.15 K. Companion PbO# (n=2) γ=0.38 at 1673.15 / 0.21±0.09 at 1573.15. Primary scalar
-          is the n=0 1673.15 value as printed. Table 4 α_e rows (0.3–1.7) are K*/(γ_lit K) — not
-          extracted as type:alpha.
       equipment:
         sample_surface_area:
           value: 2.0e-05
@@ -22045,6 +21339,85 @@ species:
 
   LiO0.5:
     observations:
+    - observation_id: sossi_2019_li_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for LiO0.5; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=LiO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 3.1
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 15.4
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_li_logKstar_table3_Li_g
+        oxide_formula_as_published: LiO0.5
+        gas_species: Li(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_li_logKstar_table3_Li_g
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 LiO0.5 (−8) γ_i (this work)=15.4±3.1 at 1673.15 K. Air row is 1.8±0.2
+          (competing; this observation is the reducing row).
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
     - observation_id: sossi_2019_li_table4_gamma_this_work_quoted_20260906
       supersedes: sossi_2019_li_table4_gamma_this_work
       type: activity_coefficient
@@ -22082,6 +21455,7 @@ species:
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
               pdf_page_index: 56
       values:
+        admission_status: admitted
         quantity: activity_coefficient_this_work
         evidence_class: model
         method_class: model_derived
@@ -22115,6 +21489,101 @@ species:
           output_unit: dimensionless
   RbO0.5:
     observations:
+    - observation_id: sossi_2019_rb_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        page: 57
+        note: >-
+          Table 4 γ_i (this work) for RbO0.5; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1673.15}
+          locator: {page: 57, pdf_page_index: 56, table: '4'}
+      T_range_K:
+      - 1673.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=RbO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 1.5e-05
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.00013
+        per_temperature:
+        - T_K: 1673.15
+          gamma: 0.00013
+          gamma_uncertainty: 1.5e-05
+        - T_K: 1773.15
+          gamma: 7.4e-05
+          gamma_uncertainty: 5.9e-06
+        - T_K: 1823.15
+          gamma: 9.0e-05
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_rb_logKstar_table3
+        oxide_formula_as_published: RbO0.5
+        gas_species: Rb(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_rb_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=1.3e-4±1.5e-5 at 1673.15 K; 7.4e-5±5.9e-6 at 1773.15 K; 9.0e-5
+          at 1823.15 K. Primary scalar is 1673.15 K.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
     - observation_id: sossi_2019_rb_table4_gamma_this_work_quoted_20260906
       supersedes: sossi_2019_rb_table4_gamma_this_work
       type: activity_coefficient
@@ -22161,6 +21630,7 @@ species:
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
               pdf_page_index: 56
       values:
+        admission_status: admitted
         quantity: activity_coefficient_this_work
         evidence_class: model
         method_class: model_derived
@@ -22232,6 +21702,110 @@ species:
           output_unit: dimensionless
   CuO0.5:
     observations:
+    - observation_id: sossi_2019_cu_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        page: 57
+        note: >-
+          Table 4 γ_i (this work) for CuO0.5; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1673.15}
+          locator: {page: 57, pdf_page_index: 56, table: '4'}
+      T_range_K:
+      - 1573.15
+      - 1923.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CuO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 1.7
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 11.8
+        per_temperature:
+        - T_K: 1573.15
+          gamma: 24.0
+          gamma_uncertainty: 6.3
+        - T_K: 1673.15
+          gamma: 11.8
+          gamma_uncertainty: 1.7
+        - T_K: 1773.15
+          gamma: 8.5
+          gamma_uncertainty: 0.1
+        - T_K: 1823.15
+          gamma: 6.4
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
+        - T_K: 1923.15
+          gamma: 4.2
+          gamma_uncertainty: null
+          source_marker: '*'
+          uncertainty_note: source footnote states this value was extrapolated to 1923.15 K
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_cu_logKstar_table3
+        oxide_formula_as_published: CuO0.5
+        gas_species: Cu(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_cu_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=11.8±1.7 at 1673.15 K (also 24.0±6.3 at 1573.15, 8.5±0.1 at
+          1773.15, 6.4 at 1823.15). Literature α_e=2.4±0.8 at 1300 °C is K*/(γ_lit K) — not
+          extracted as type:alpha.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
     - observation_id: sossi_2019_cu_table4_gamma_this_work_quoted_20260906
       supersedes: sossi_2019_cu_table4_gamma_this_work
       type: activity_coefficient
@@ -22287,6 +21861,7 @@ species:
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
               pdf_page_index: 56
       values:
+        admission_status: admitted
         quantity: activity_coefficient_this_work
         evidence_class: model
         method_class: model_derived
@@ -22397,6 +21972,84 @@ species:
           output_unit: dimensionless
   AgO0.5:
     observations:
+    - observation_id: sossi_2019_ag_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for AgO0.5; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=AgO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.67
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_ag_logKstar_table3
+        oxide_formula_as_published: AgO0.5
+        gas_species: Ag(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_ag_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.67 in the 1673.15 K column; no SD. logK* itself is only at
+          1573.15 K — T assignment of gamma is as printed, not re-derived.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
     - observation_id: sossi_2019_ag_table4_gamma_this_work_quoted_20260906
       supersedes: sossi_2019_ag_table4_gamma_this_work
       type: activity_coefficient
@@ -22425,6 +22078,7 @@ species:
         by_channel:
           AgO0.5: []
       values:
+        admission_status: admitted
         quantity: activity_coefficient_this_work
         evidence_class: model
         method_class: model_derived
@@ -22460,6 +22114,104 @@ species:
           output_unit: dimensionless
   ZnO:
     observations:
+    - observation_id: sossi_2019_zn_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        page: 57
+        note: >-
+          Table 4 γ_i (this work) for ZnO; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1673.15}
+          locator: {page: 57, pdf_page_index: 56, table: '4'}
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=ZnO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 0.13
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.51
+        per_temperature:
+        - T_K: 1573.15
+          gamma: 0.24
+          gamma_uncertainty: 0.02
+        - T_K: 1673.15
+          gamma: 0.51
+          gamma_uncertainty: 0.13
+        - T_K: 1773.15
+          gamma: 0.97
+          gamma_uncertainty: 0.38
+        - T_K: 1823.15
+          gamma: 1.01
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_zn_logKstar_table3
+        oxide_formula_as_published: ZnO
+        gas_species: Zn(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_zn_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.51±0.13 at 1673.15 K. Literature α_e≈2 (Reyes & Gaskell) is
+          K*/(γ_lit K) — not extracted as type:alpha.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
     - observation_id: sossi_2019_zn_table4_gamma_this_work_quoted_20260906
       supersedes: sossi_2019_zn_table4_gamma_this_work
       type: activity_coefficient
@@ -22515,6 +22267,7 @@ species:
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
               pdf_page_index: 56
       values:
+        admission_status: admitted
         quantity: activity_coefficient_this_work
         evidence_class: model
         method_class: model_derived
@@ -22605,6 +22358,103 @@ species:
           output_unit: dimensionless
   GeO2:
     observations:
+    - observation_id: sossi_2019_ge_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        page: 57
+        note: >-
+          Table 4 γ_i (this work) for GeO2; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1673.15}
+          locator: {page: 57, pdf_page_index: 56, table: '4'}
+      T_range_K:
+      - 1573.15
+      - 1823.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=GeO2; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        gamma_uncertainty: 0.01
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.11
+        per_temperature:
+        - T_K: 1573.15
+          gamma: 0.04
+          gamma_uncertainty: 0.01
+        - T_K: 1673.15
+          gamma: 0.11
+          gamma_uncertainty: 0.01
+        - T_K: 1773.15
+          gamma: 0.18
+          gamma_uncertainty: 0.07
+        - T_K: 1823.15
+          gamma: 0.19
+          gamma_uncertainty: null
+          uncertainty_note: no uncertainty printed for this Table 4 cell
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_ge_logKstar_table3
+        oxide_formula_as_published: GeO2
+        gas_species: Ge(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_ge_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.11±0.01 at 1673.15 K.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
     - observation_id: sossi_2019_ge_table4_gamma_this_work_quoted_20260906
       supersedes: sossi_2019_ge_table4_gamma_this_work
       type: activity_coefficient
@@ -22660,6 +22510,7 @@ species:
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
               pdf_page_index: 56
       values:
+        admission_status: admitted
         quantity: activity_coefficient_this_work
         evidence_class: model
         method_class: model_derived
@@ -22750,6 +22601,83 @@ species:
           output_unit: dimensionless
   CdO:
     observations:
+    - observation_id: sossi_2019_cd_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        line_range: '1112-1118'
+        note: >-
+          Table 4 γ_i (this work) for CdO; authors set α_e=1 and compute γ from K*/K
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CdO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.15
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_cd_logKstar_table3
+        oxide_formula_as_published: CdO
+        gas_species: Cd(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_cd_logKstar_table3
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 γ_i (this work)=0.15 in the 1673.15 K column; no SD. logK* only at 1573.15 K.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
     - observation_id: sossi_2019_cd_table4_gamma_this_work_quoted_20260906
       supersedes: sossi_2019_cd_table4_gamma_this_work
       type: activity_coefficient
@@ -22778,6 +22706,7 @@ species:
         by_channel:
           CdO: []
       values:
+        admission_status: admitted
         quantity: activity_coefficient_this_work
         evidence_class: model
         method_class: model_derived
@@ -22813,6 +22742,109 @@ species:
           output_unit: dimensionless
   PbO:
     observations:
+    - observation_id: sossi_2019_pb_table4_gamma_this_work
+      type: activity_coefficient
+      locator:
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
+        table: '4'
+        section: '4.6 Evaporation coefficients / Table 4'
+        page: 57
+        note: >-
+          Table 4 γ_i (this work) for PbO; authors set α_e=1 and compute γ from K*/K
+      T_K: 1673.15
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1673.15}
+          locator: {page: 57, pdf_page_index: 56, table: '4'}
+      T_range_K:
+      - 1573.15
+      - 1673.15
+      phase: silicate_melt_ferrobasalt_FCMAS
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: >-
+          Sossi ferrobasalt; scored T above ~1573 K liquidus. OCR section 4.0
+          all runs quench to homogeneous glasses except some 1300 C low-fO2
+          charges with about 5% olivine+spinel microphenocrysts.
+        transition_context:
+          liquidus_K: 1573.0
+          source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=PbO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      uncertainty:
+        note: Table 4 precision on the fit only; does not include α_e uncertainty. Authors set α_e=1.
+      values:
+        gamma: 0.17
+        per_temperature_by_channel:
+          PbO_caret:
+          - T_K: 1573.15
+            gamma: 0.06
+            gamma_uncertainty: 0.02
+          - T_K: 1673.15
+            gamma: 0.17
+            gamma_uncertainty: null
+            uncertainty_note: no uncertainty printed for this Table 4 cell
+          PbO_hash:
+          - T_K: 1573.15
+            gamma: 0.21
+            gamma_uncertainty: 0.09
+          - T_K: 1673.15
+            gamma: 0.38
+            gamma_uncertainty: null
+            uncertainty_note: no uncertainty printed for this Table 4 cell
+        channel_note: PbO^ and PbO# retained as printed; channel footnote was not recovered from the repaired slice.
+        quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_pb_logKstar_table3_Pb_g
+        oxide_formula_as_published: PbO
+        gas_species: Pb(g)
+        material: ferrobasalt_FCMAS_open_furnace
+        method_class: model_derived_from_Kstar_with_alpha_e_adopted_unity
+        system_class: silicate_melt
+        derived: true
+        not_a_measured_alpha: true
+        derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_pb_logKstar_table3_Pb_g
+          premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
+          algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
+          unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
+          sanity_check: Na γ=1.0e-3 sits inside literature 8.4e-4–2.2e-3 (Table 4 footnote e)
+        note: >-
+          Table 4 PbO^ (n=0, PbO(g) channel) γ_i (this work)=0.17 at 1673.15 K; 0.06±0.02 at
+          1573.15 K. Companion PbO# (n=2) γ=0.38 at 1673.15 / 0.21±0.09 at 1573.15. Primary scalar
+          is the n=0 1673.15 value as printed. Table 4 α_e rows (0.3–1.7) are K*/(γ_lit K) — not
+          extracted as type:alpha.
+      equipment:
+        sample_surface_area:
+          value: 2.0e-05
+          units: m2
+          form: glass_bead_on_wire_loop
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+            line_range: '71'
+        cell_material:
+          value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: loaded onto a metal wire loop; Re used where possible
+            line_range: '67'
+        chamber_pressure:
+          value: 1.0
+          units: bar
+          note: 1-atm vertical tube gas-mixing furnace (GERO)
+          locator:
+            source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+            paragraph: 1-atm vertical tube gas-mixing furnaces
+            line_range: '408'
     - observation_id: sossi_2019_pb_table4_gamma_this_work_quoted_20260906
       supersedes: sossi_2019_pb_table4_gamma_this_work
       type: activity_coefficient
@@ -22861,6 +22893,7 @@ species:
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
               pdf_page_index: 56
       values:
+        admission_status: admitted
         quantity: activity_coefficient_this_work
         evidence_class: model
         method_class: model_derived

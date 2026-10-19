@@ -308,8 +308,8 @@ species:
       type: activity_coefficient
       locator:
         published_page: 555
-        pdf_page_index: 7
-        page: 8
+        pdf_page_index: 6
+        page: 7
         section: '4.3'
         note: Nesmeyanov Knudsen a_Fe=0.865 at 0.345 at% W and 1500 K in gamma-Fe-W
       T_range_K:
@@ -329,17 +329,17 @@ species:
         - activity: 0.865
           T_K: 1500.0
           locator:
-            page: 8
+            page: 7
             published_page: 555
-            pdf_page_index: 7
+            pdf_page_index: 6
             section: '4.3'
           point_conditions:
             temperature_K:
               state: {tag: value, value: 1500.0}
-              locator: {page: 8, published_page: 555, pdf_page_index: 7, section: '4.3'}
+              locator: {page: 7, published_page: 555, pdf_page_index: 6, section: '4.3'}
             W_at_percent:
               state: {tag: value, value: 0.345}
-              locator: {page: 8, published_page: 555, pdf_page_index: 7, section: '4.3'}
+              locator: {page: 7, published_page: 555, pdf_page_index: 6, section: '4.3'}
       uncertainty:
         note: quoted; no +/- printed here
   W:

@@ -505,56 +505,67 @@ def test_ueshima_quoted_fe_activity_migrates_with_attribution_and_coordinates(
     conditions = observation.point_conditions
     assert conditions is not None
     assert conditions["temperature_K"].state.value == Decimal("1500.0")
-    assert conditions["temperature_K"].locator.page == 8
-    assert conditions["temperature_K"].locator.pdf_page_index == 7
+    assert conditions["temperature_K"].locator.page == 7
+    assert conditions["temperature_K"].locator.pdf_page_index == 6
     assert conditions["W_at_percent"].state.value == Decimal("0.345")
-    assert conditions["W_at_percent"].locator.page == 8
-    assert conditions["W_at_percent"].locator.pdf_page_index == 7
+    assert conditions["W_at_percent"].locator.page == 7
+    assert conditions["W_at_percent"].locator.pdf_page_index == 6
+    assert observation.locator is not None
+    assert observation.locator.page == 7
+    assert observation.locator.pdf_page_index == 6
     assert result.validation is not None
     assert not result.validation.hard_issues
 
 
-def test_sossi_table4_gamma_points_migrate_for_printed_oxide_species(
+def test_sossi_table4_successors_supersede_predecessors_in_full_extract(
     tmp_path: Path,
 ) -> None:
     name = "kems-012-sossi-2019.yaml"
-    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
-    source_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
-    targets = {
-        "LiO0.5": "sossi_2019_li_table4_gamma_this_work_quoted_20260906",
-        "RbO0.5": "sossi_2019_rb_table4_gamma_this_work_quoted_20260906",
-        "CuO0.5": "sossi_2019_cu_table4_gamma_this_work_quoted_20260906",
-        "AgO0.5": "sossi_2019_ag_table4_gamma_this_work_quoted_20260906",
-        "ZnO": "sossi_2019_zn_table4_gamma_this_work_quoted_20260906",
-        "GeO2": "sossi_2019_ge_table4_gamma_this_work_quoted_20260906",
-        "CdO": "sossi_2019_cd_table4_gamma_this_work_quoted_20260906",
-        "PbO": "sossi_2019_pb_table4_gamma_this_work_quoted_20260906",
+    source_id = "kems-012-sossi-2019"
+    predecessors = {
+        "LiO0.5": "sossi_2019_li_table4_gamma_this_work",
+        "RbO0.5": "sossi_2019_rb_table4_gamma_this_work",
+        "CuO0.5": "sossi_2019_cu_table4_gamma_this_work",
+        "AgO0.5": "sossi_2019_ag_table4_gamma_this_work",
+        "ZnO": "sossi_2019_zn_table4_gamma_this_work",
+        "GeO2": "sossi_2019_ge_table4_gamma_this_work",
+        "CdO": "sossi_2019_cd_table4_gamma_this_work",
+        "PbO": "sossi_2019_pb_table4_gamma_this_work",
     }
-    isolated_species = {}
-    for formula, observation_id in targets.items():
-        target = next(
-            observation
-            for entry in source_doc["species"].values()
-            for observation in entry.get("observations", [])
-            if observation.get("observation_id") == observation_id
-        ).copy()
-        target.pop("supersedes", None)
-        isolated_species[formula] = {"observations": [target]}
-    source_doc["species"] = isolated_species
-    source_doc["fidelity_samples"] = []
     result = _migrate_real_extract(
         tmp_path,
         name,
-        extract_doc=source_doc,
         use_repository_index_row=True,
     )
-    rows = [
+    all_observations = list(result.observations.values())
+
+    def observations_for(local_id: str):
+        prefix = f"{source_id}::{local_id}"
+        return [
+            observation
+            for observation in all_observations
+            if observation.observation_id == prefix
+            or observation.observation_id.startswith(prefix + "::")
+        ]
+
+    for formula, predecessor_id in predecessors.items():
+        rows = observations_for(predecessor_id)
+        assert len(rows) == 1
+        assert rows[0].identity.species.formula == formula
+        assert rows[0].admission.status is AdmissionStatus.SUPERSEDED
+
+    successors = {
+        formula: f"{predecessor_id}_quoted_20260906"
+        for formula, predecessor_id in predecessors.items()
+    }
+    oxide_points = [
         observation
-        for observation in result.observations.values()
+        for observation in all_observations
         if any(
-            f"::{observation_id}" in observation.observation_id
-            for observation_id in targets.values()
+            observation.observation_id.startswith(f"{source_id}::{successor_id}::")
+            for successor_id in successors.values()
         )
+        and observation.value.kind is ValueKind.POINT
     ]
 
     expected = {
@@ -583,9 +594,10 @@ def test_sossi_table4_gamma_points_migrate_for_printed_oxide_species(
         ("PbO", "1673.15", "0.38", "PbO#"),
     }
     actual = set()
-    for observation in rows:
+    for observation in oxide_points:
         assert observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
         assert observation.value.kind is ValueKind.POINT
+        assert observation.admission.status is AdmissionStatus.ADMITTED
         assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
         conditions = observation.point_conditions
         assert conditions is not None
@@ -617,10 +629,36 @@ def test_sossi_table4_gamma_points_migrate_for_printed_oxide_species(
             )
         )
 
-    assert len(rows) == 23
+    assert len(oxide_points) == 23
     assert actual == expected
-    assert result.validation is not None
-    assert not result.validation.hard_issues
+
+    element_species = {"Li", "Rb", "Cu", "Ag", "Zn", "Ge", "Cd", "Pb"}
+    target_ids = set(predecessors.values()) | set(successors.values())
+    element_keyed_gamma = [
+        observation
+        for observation in all_observations
+        if observation.identity.species.formula in element_species
+        and observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        and any(
+            observation.observation_id.startswith(f"{source_id}::{target_id}")
+            for target_id in target_ids
+        )
+    ]
+    assert not any(
+        observation.admission.status is AdmissionStatus.ADMITTED
+        for observation in element_keyed_gamma
+    )
+
+    for formula, successor_id, value in (
+        ("Na", "sossi_2019_na_table4_gamma_this_work_quoted_20260906", "0.001"),
+        ("K", "sossi_2019_k_table4_gamma_this_work_quoted_20260906", "0.00022"),
+    ):
+        rows = observations_for(successor_id)
+        assert len(rows) == 1
+        assert rows[0].identity.species.formula == formula
+        assert rows[0].identity.temperature_K.value == Decimal("1673.15")
+        assert rows[0].value.point == Decimal(value)
+        assert rows[0].admission.status is AdmissionStatus.ADMITTED
 
 
 def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
