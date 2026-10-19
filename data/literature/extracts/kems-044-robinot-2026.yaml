@@ -8,7 +8,7 @@ source:
   url: https://doi.org/10.1016/j.asr.2026.02.003
   year: 2026
 extraction:
-  method: Official HAL / article-in-press PDF from corpus raw/kems-044-robinot-2026/kems-044-robinot-2026.pdf
+  method: Official HAL / article-in-press PDF from corpus raw/kems-044-robinot-2026/kems-044-robinot-2026.pdf; validated in an internal review, 2026-09-12, kems-extracts
     (15 pages; HAL cover is PDF page 1). pdftotext -layout and MinerU decode used only as a map. Printed
     numbers transcribed from a 400 dpi pdftoppm render; the render wins where the decode disagrees (Eq.
     6 coefficients; MinerU Fig. 1 numeric dump is all zeros and was rejected). Fig. 4c bar labels are
@@ -18,7 +18,7 @@ extraction:
     text. This paper is solar vacuum pyrolysis with an O2 trace analyser, not KEMS.
   date: '2026-09-12'
   worker: extract-kems-033
-  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+  provenance_path: raw/kems-044-robinot-2026/kems-044-robinot-2026.pdf
 review_status: draft
 corrections: []
 fidelity_samples:

@@ -8,7 +8,7 @@ source:
   url: https://doi.org/10.1073/pnas.1809060115
   year: 2018
 extraction:
-  method: Official Europe PMC OA PDF (corpus raw/kems-045-sossi-2018-pnas-cr/, sha256 6f4f7b74ab9a3e26f381b79fba929c7af24b02d0be5bf6c4e183c7e145b70ffb;
+  method: Official Europe PMC OA PDF (corpus raw/kems-045-sossi-2018-pnas-cr/, sha256 6f4f7b74ab9a3e26f381b79fba929c7af24b02d0be5bf6c4e183c7e145b70ffb;; validated in an internal review, 2026-09-12, kems-extracts
     6 pages; published 10920-10925). Born-digital. pdftotext -layout used only as a map; Table 1 and printed
     prose numbers transcribed from a 400 dpi pdftoppm render (PDF pages 1-6). Where the decode and the
     render disagree the render wins (PCC-1 d53Cr row is split across lines in pdftotext). This paper is
@@ -20,7 +20,7 @@ extraction:
     main text but the SI PDF is not in the corpus and was not fetched.
   date: '2026-09-12'
   worker: extract-kems-045-sossi
-  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+  provenance_path: raw/kems-045-sossi-2018-pnas-cr/kems-045-sossi-2018-pnas-cr.pdf
 review_status: draft
 corrections: []
 fidelity_samples:
