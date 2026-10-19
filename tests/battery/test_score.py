@@ -80,6 +80,7 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.battery.validity import run_validity_gates, underdetermined_apparatus
+import simulator.battery.score as score_mod
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
     SCORE_ENGINE_SET,
@@ -4879,6 +4880,129 @@ def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
             "execution": {"state": "not_probed"},
         }
     )
+
+
+def _hero_deck_score_row(
+    *,
+    rail: str,
+    formula: str,
+    quantity: str,
+    composition: dict[str, object],
+    residual_dex: Decimal,
+    candidate_value: str,
+    fO2_pa: str | None = None,
+    engine: str = "openimcc",
+) -> dict[str, object]:
+    identity = {
+        "composition": {"tag": "value", "value": composition},
+        "fO2_Pa": (
+            {"tag": "value", "value": fO2_pa}
+            if fO2_pa is not None
+            else {"tag": "unknown", "reason": "not reported"}
+        ),
+        "quantity": {"tag": "value", "value": quantity},
+        "species": {"formula": formula},
+        "temperature_K": {"tag": "value", "value": "1200"},
+    }
+    return {
+        "candidate_request": {"engine": engine, "experiment_id": "deck-test"},
+        "candidate_observation": {
+            "engine": {"name": engine},
+            "experiment_id": "deck-test",
+            "identity": identity,
+            "value": {"kind": "point", "point": candidate_value},
+        },
+        "execution": {"state": "produced"},
+        "notices": [],
+        "numeric": {
+            "operation": "dex",
+            "unit": "dimensionless",
+            "value": str(residual_dex),
+        },
+        "rail": rail,
+        "reference": "measured-row",
+        "status": "no_band",
+    }
+
+
+def test_battery_hero_deck_scores_polymerisation_and_delta_iw() -> None:
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["MgO", "0.5"], ["SiO2", "0.5"]],
+    }
+    row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity="p_partial",
+        composition=composition,
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+        fO2_pa="100000",
+    )
+
+    result = score_mod._battery_hero_deck_records([row])
+    polymerisation = next(
+        point for point in result["points"]
+        if point["chart"] == "polymerisation"
+    )
+    redox = next(
+        point for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+    )
+
+    # MgSiO3 has two non-bridging oxygens per tetrahedral Si in the standard
+    # oxide stoichiometry. The output is pinned by exact binary value.
+    assert float(polymerisation["x_value"]).hex() == "0x1.0000000000000p+1"
+    assert float(polymerisation["y_value"]).hex() == "0x1.999999999999ap-3"
+    expected_delta_iw = -feo_iw_log10_fO2_bar(1200.0)
+    assert float(redox["x_value"]).hex() == expected_delta_iw.hex()
+
+
+def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
+    from simulator.battery.score import compute_metric
+
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["CaO", "0.5"]],
+    }
+    pO2_row = _hero_deck_score_row(
+        rail=Rail.SIO_EVOLUTION.value,
+        formula="SiO",
+        quantity="p_partial",
+        composition=composition,
+        residual_dex=Decimal("0.125"),
+        candidate_value="2.0",
+        fO2_pa="1000",
+    )
+    dex = compute_metric(
+        MetricOperation.DEX, Decimal("2.5"), Decimal("1.25")
+    )
+    assert dex is not None
+    redox_row = _hero_deck_score_row(
+        rail=Rail.REDOX.value,
+        formula="Fe",
+        quantity="fe3_fe2_ratio",
+        composition=composition,
+        residual_dex=dex,
+        candidate_value="2.5",
+        fO2_pa="20892.96130854039",
+    )
+
+    result = score_mod._battery_hero_deck_records([pO2_row, redox_row])
+    sio = next(
+        point for point in result["points"]
+        if point["chart"] == "sio_evolution"
+    )
+    cross = next(
+        point for point in result["points"]
+        if point["chart"] == "fo2_cross_comparison"
+    )
+
+    assert sio["group_label"] == "10^-2–10^-1 bar"
+    assert float(cross["x_value"]) == pytest.approx(1.25, rel=1e-15)
+    assert float(cross["y_value"]).hex() == "0x1.4000000000000p+1"
 
 
 def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
