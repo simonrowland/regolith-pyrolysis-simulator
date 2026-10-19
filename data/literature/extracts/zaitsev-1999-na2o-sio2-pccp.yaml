@@ -118,9 +118,9 @@ species:
             - {row_as_printed: '0.55', x_Na2O_as_printed: '0.55', T_K: '1473', partial_molar_enthalpy_as_printed: {value: -141.7, units: kJ/mol, as_printed: '-141.7'}, sigma: '3.9', printed_minus_delta_H_kJ_per_mol: '141.7', uncertainty_notice: confidence level not stated, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '5', row: '0.55', note: 'Ref. 12; printed -Delta H(Na2O) = 141.7 kJ/mol; stored Delta H = -141.7 kJ/mol'}, composition_mol: {basis: printed_mole_fraction, Na2O: '0.55', SiO2: '0.45'}}
       - observation_id: zaitsev_1999_table6_ref17_standard_entropy_na2o_host
         type: gibbs_table
-        locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6'}
+        locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6', note: 'Table 6 prints entropy units as J/(mol K); equivalent J/mol K used for migration'}
         phase: cr
-        units: J/(mol K)
+        units: J/mol K
         formula_as_printed: NS and N2S
         composition_derivation: 'N denotes Na2O and S denotes SiO2 as defined on p.1901'
         values:
@@ -129,8 +129,8 @@ species:
           admission_status: admitted
           attribution: Ref. 17
           series:
-            - {formula_as_printed: NS, T_K: '298.15', S: '113.805', locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6', row: NS, note: 'absolute standard entropy at 298.15 K'}, composition_mol: {basis: printed_formula_stoichiometry, Na2O: '0.5', SiO2: '0.5'}}
-            - {formula_as_printed: N2S, T_K: '298.15', S: '195.811', locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6', row: N2S, note: 'absolute standard entropy at 298.15 K'}, composition_mol: {basis: printed_formula_stoichiometry, Na2O: '0.6666666667', SiO2: '0.3333333333'}}
+            - {formula_as_printed: NS, T_K: '298.15', entropy: '113.805', locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6', row: NS, note: 'absolute standard entropy at 298.15 K'}, composition_mol: {basis: printed_formula_stoichiometry, Na2O: '0.5', SiO2: '0.5'}}
+            - {formula_as_printed: N2S, T_K: '298.15', entropy: '195.811', locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6', row: N2S, note: 'absolute standard entropy at 298.15 K'}, composition_mol: {basis: printed_formula_stoichiometry, Na2O: '0.6666666667', SiO2: '0.3333333333'}}
       - observation_id: zaitsev_1999_table6_ref17_element_formation_enthalpy_na2o_host
         type: gibbs_table
         locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6'}
@@ -473,9 +473,9 @@ species:
             - {row_as_printed: '29', x_SiO2_as_printed: '0.349', T_K: '1373', activity: '3.77e-6', activity_as_printed: '3.77 × 10^-6', locator: {page: 3, published_page: 1901, pdf_page_index: 2, table: '1', row: '29'}, composition_mol: {basis: printed_mole_fraction, SiO2: '0.349', Na2O: '0.651'}}
       - observation_id: zaitsev_1999_table6_ref17_standard_entropy_sio2_host
         type: gibbs_table
-        locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6'}
+        locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6', note: 'Table 6 prints entropy units as J/(mol K); equivalent J/mol K used for migration'}
         phase: cr
-        units: J/(mol K)
+        units: J/mol K
         formula_as_printed: NS2
         composition_derivation: 'N denotes Na2O and S denotes SiO2 as defined on p.1901'
         values:
@@ -484,7 +484,7 @@ species:
           admission_status: admitted
           attribution: Ref. 17
           series:
-            - {formula_as_printed: NS2, T_K: '298.15', S: '164.055', locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6', row: NS2, note: 'absolute standard entropy at 298.15 K'}, composition_mol: {basis: printed_formula_stoichiometry, Na2O: '0.3333333333', SiO2: '0.6666666667'}}
+            - {formula_as_printed: NS2, T_K: '298.15', entropy: '164.055', locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6', row: NS2, note: 'absolute standard entropy at 298.15 K'}, composition_mol: {basis: printed_formula_stoichiometry, Na2O: '0.3333333333', SiO2: '0.6666666667'}}
       - observation_id: zaitsev_1999_table6_ref17_element_formation_enthalpy_sio2_host
         type: gibbs_table
         locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6'}

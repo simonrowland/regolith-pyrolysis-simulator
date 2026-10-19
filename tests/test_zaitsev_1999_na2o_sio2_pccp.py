@@ -108,3 +108,30 @@ def test_zaitsev_1999_partial_enthalpy_and_element_formation_signs():
         Decimal("-2100.8"),
         Decimal("-2467.3"),
     }
+
+    standard_entropies = [
+        observation
+        for observation in migrator.result.observations.values()
+        if "::zaitsev_1999_table6_ref17_standard_entropy_"
+        in observation.observation_id
+    ]
+    assert len(standard_entropies) == 3
+    assert {observation.value.point for observation in standard_entropies} == {
+        Decimal("113.805"),
+        Decimal("195.811"),
+        Decimal("164.055"),
+    }
+    source_entropies = [
+        observation
+        for species in document["species"].values()
+        for observation in species["observations"]
+        if observation["observation_id"].startswith(
+            "zaitsev_1999_table6_ref17_standard_entropy_"
+        )
+    ]
+    assert len(source_entropies) == 2
+    assert all(
+        observation["units"] == "J/mol K"
+        and "J/(mol K)" in observation["locator"]["note"]
+        for observation in source_entropies
+    )
