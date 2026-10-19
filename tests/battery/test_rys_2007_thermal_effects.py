@@ -54,7 +54,20 @@ def test_rys_tables_7_and_9_thermal_cells_migrate_with_composition_and_locators(
     assert len(table9) == 13
     assert len(table7) + len(table9) == 73
     assert all(quantity_token(row.identity) is Quantity.TRANSITION_TEMPERATURE for row in table7 + table9)
-    assert all(row.identity.species.formula == "SiO2" for row in table7 + table9)
+    expected_formula_by_parent = {
+        "rys_2007_table7_t1_structure_change": "Na2O",
+        "rys_2007_table7_t2_unidentified_thermal_effect": "SiO2",
+        "rys_2007_table7_t3_eutectic": "SiO2",
+        "rys_2007_table7_t4_eutectic": "SiO2",
+        "rys_2007_table7_t5_structure_change": "Na4SiO4",
+        "rys_2007_table9_eutectic": "SiO2",
+        "rys_2007_table9_structure_change": "Na4SiO4",
+    }
+    for parent, formula in expected_formula_by_parent.items():
+        assert all(
+            row.identity.species.formula == formula
+            for row in _rows(result, (parent,))
+        ), parent
     assert all(row.identity.total_pressure_Pa.is_unknown for row in table7 + table9)
     assert all(
         row.point_conditions["total_pressure_Pa"].locator.page == row.locator.page
