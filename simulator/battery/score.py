@@ -25,7 +25,7 @@ from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Literal, Mapping, Sequence
 
 import yaml
 
@@ -9236,22 +9236,32 @@ _BATTERY_HERO_DECK_CHART_IDS = (
 )
 
 
+@dataclass(frozen=True)
+class _BatteryHeroNboTRefusal:
+    reason: Literal["free_oxygen_beyond_orthosilicate"]
+    detail: Mapping[str, Decimal]
+
+
 def _battery_hero_state_value(value: object) -> object | None:
     if isinstance(value, Mapping):
         return value.get("value") if value.get("tag") == "value" else None
     return value
 
 
-def _battery_hero_nbo_t(composition_raw: object) -> Decimal | None:
+def _battery_hero_nbo_t(
+    composition_raw: object,
+) -> Decimal | _BatteryHeroNboTRefusal | None:
     """Calculate oxide-basis NBO/T from the composition used by the scorer.
 
     Network formers T are Si, Al, and P: each is represented by tetrahedral
     oxide units in the declared mole composition. Fe and other variable-valence
     or coordination cations are not counted as T because this composition does
-    not resolve their coordination state. With this convention, oxygen atoms
-    supply two bridging-bond ends and each T tetrahedron uses four; therefore
-    NBO/T = (2*O - 4*T)/T. Non-mole compositions and negative results are
-    unavailable rather than converted or clipped.
+    not resolve their coordination state. Let B be bridging oxygen and N be
+    non-bridging oxygen. Since O = B + N and each tetrahedron has four corners,
+    4T = 2B + N; subtracting gives N = 2O - 4T and NBO/T = (2*O - 4*T)/T.
+    This network derivation is valid only while 0 <= N <= 4T: there is no free
+    O2- beyond orthosilicate and no tricluster oxygen. Non-mole compositions
+    and negative results are unavailable rather than converted or clipped.
     """
 
     if not isinstance(composition_raw, Mapping):
@@ -9298,7 +9308,19 @@ def _battery_hero_nbo_t(composition_raw: object) -> Decimal | None:
     if not oxygen.is_finite() or tetrahedral_formers <= 0:
         return None
     nbo_t = (Decimal(2) * oxygen - Decimal(4) * tetrahedral_formers) / tetrahedral_formers
-    return nbo_t if nbo_t.is_finite() and nbo_t >= 0 else None
+    if not nbo_t.is_finite():
+        return None
+    tolerance = Decimal("1e-9")
+    if abs(nbo_t - Decimal(4)) <= tolerance:
+        return Decimal(4)
+    if nbo_t < 0:
+        return Decimal(0) if nbo_t >= -tolerance else None
+    if nbo_t > Decimal(4):
+        return _BatteryHeroNboTRefusal(
+            reason="free_oxygen_beyond_orthosilicate",
+            detail={"computed_value": nbo_t},
+        )
+    return nbo_t
 
 
 def _battery_hero_delta_iw(
@@ -9511,11 +9533,25 @@ def _battery_hero_deck_records(
     metric_values: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
     unavailable: dict[tuple[str, str], int] = defaultdict(int)
     axis_refusals: dict[tuple[str, str, str], int] = defaultdict(int)
+    axis_refusal_details: dict[
+        tuple[str, str, str], list[Mapping[str, str]]
+    ] = defaultdict(list)
     engines: set[str] = set()
 
-    def refuse_axis(chart: str, engine: str, reason: str) -> None:
+    def refuse_axis(
+        chart: str,
+        engine: str,
+        reason: str,
+        *,
+        detail: Mapping[str, object] | None = None,
+    ) -> None:
         unavailable[(chart, engine)] += 1
-        axis_refusals[(chart, engine, reason)] += 1
+        key = (chart, engine, reason)
+        axis_refusals[key] += 1
+        if detail is not None:
+            axis_refusal_details[key].append(
+                {str(name): str(value) for name, value in detail.items()}
+            )
 
     def add_point(
         chart: str,
@@ -9637,6 +9673,13 @@ def _battery_hero_deck_records(
             nbo_t = _battery_hero_nbo_t(composition)
             if nbo_t is None:
                 refuse_axis("polymerisation", engine, "no usable NBO/T")
+            elif isinstance(nbo_t, _BatteryHeroNboTRefusal):
+                refuse_axis(
+                    "polymerisation",
+                    engine,
+                    nbo_t.reason,
+                    detail=nbo_t.detail,
+                )
             else:
                 add_point(
                     "polymerisation",
@@ -9798,6 +9841,10 @@ def _battery_hero_deck_records(
         "benchmarks": benchmarks,
         "unavailable_axis_counts": dict(unavailable),
         "axis_refusals": dict(axis_refusals),
+        "axis_refusal_details": {
+            key: tuple(details)
+            for key, details in axis_refusal_details.items()
+        },
     }
 
 

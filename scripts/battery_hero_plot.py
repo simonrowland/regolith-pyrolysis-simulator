@@ -204,6 +204,9 @@ class ScorePlotData:
     hero_deck_axis_refusals: Mapping[tuple[str, str, str], int] = field(
         default_factory=dict
     )
+    hero_deck_axis_refusal_details: Mapping[
+        tuple[str, str, str], tuple[Mapping[str, str], ...]
+    ] = field(default_factory=dict)
 
 
 def _d139_exclusion_counts(
@@ -950,6 +953,7 @@ def read_scores(
             "unavailable_axis_counts"
         ],
         hero_deck_axis_refusals=deck_records["axis_refusals"],
+        hero_deck_axis_refusal_details=deck_records["axis_refusal_details"],
     )
 
 
