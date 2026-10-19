@@ -129,8 +129,11 @@ from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
     OXYGEN_BALANCE_NOTICE_PREFIX,
+    _cell_material_class,
+    _cell_oxygen_class,
     has_own_engine_solved_oxygen_balance,
 )
+from simulator.battery.composition import composition_wt_pct, parse_species_formula
 from simulator.battery.source_lineage import (
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
@@ -545,14 +548,6 @@ def engines_from_names(names: Sequence[str] | None) -> tuple[Engine, ...]:
             seen.add(engine)
             out.append(engine)
     return tuple(out)
-
-
-def parse_species_formula(formula: str) -> tuple[tuple[str, float], ...] | None:
-    """Closed element-symbol parse. None → unmatched, never string equality."""
-
-    if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
-        return None
-    return formula_composition(formula)
 
 
 def _is_raw_element_label(formula: str) -> bool:
@@ -2720,36 +2715,6 @@ def temperature_of(identity: Identity) -> Decimal | None:
     return None
 
 
-def composition_wt_pct(composition: Composition) -> dict[str, float] | None:
-    """Convert an engine-basis composition to oxide wt%.
-
-    Premise: Identity.composition is a complete ordered map on
-    mol_inventory or mole_fraction. Equilibrate cells take oxide wt%.
-    Algebra: m_i = n_i M_i; w_i = 100 m_i / Σ m_j.
-    Unit check: (mol)×(g/mol) = g; g/g × 100 = wt%.
-    Sanity: equal moles of SiO2 (60.084) and MgO (40.304) → ~59.9/40.1 wt%.
-    """
-
-    from simulator.diagnostic_helpers.binary_pot_scoring import oxide_molar_mass_g_mol
-
-    masses: dict[str, float] = {}
-    for oxide, amount in composition.components:
-        parsed = parse_species_formula(oxide)
-        if parsed is None:
-            return None
-        n = float(amount)
-        if not math.isfinite(n) or n < 0.0:
-            return None
-        mass = n * oxide_molar_mass_g_mol(oxide)
-        if not math.isfinite(mass) or mass < 0.0:
-            return None
-        masses[oxide] = mass
-    total = sum(masses.values())
-    if total <= 0.0:
-        return None
-    return {k: 100.0 * v / total for k, v in masses.items() if v > 0.0}
-
-
 def blocking_qualifications(
     quantity: Quantity | None,
     notices: Sequence[Notice],
@@ -4816,58 +4781,6 @@ def _evidence_class_notice(
     )
 
 
-def _cell_material_class(
-    materials: Sequence[Located[CellMaterial]] | None,
-) -> str:
-    if not materials:
-        return "unknown"
-    values: list[CellMaterial] = []
-    for material in materials:
-        if not material.state.is_value or not isinstance(material.state.value, CellMaterial):
-            return "unknown"
-        values.append(material.state.value)
-    if any(
-        material in {
-            CellMaterial.W,
-            CellMaterial.MO,
-            CellMaterial.TA,
-            CellMaterial.NB,
-            CellMaterial.C_GRAPHITE,
-            CellMaterial.RE,
-        }
-        for material in values
-    ):
-        return "reactive"
-    if all(material in {CellMaterial.PT, CellMaterial.IR} for material in values):
-        return "inert"
-    return "not_inert"
-
-
-_MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
-
-
-def _uniform_modelled_reactive_cell(
-    materials: Sequence[Located[CellMaterial]] | None,
-) -> str | None:
-    """W or Mo when every typed entry is that same modelled reservoir metal."""
-
-    if not materials:
-        return None
-    values: list[CellMaterial] = []
-    for material in materials:
-        if not material.state.is_value or not isinstance(material.state.value, CellMaterial):
-            return None
-        values.append(material.state.value)
-    if not values:
-        return None
-    metal = values[0]
-    if metal not in _MODELLED_REACTIVE_CELL:
-        return None
-    if any(item is not metal for item in values):
-        return None
-    return metal.value
-
-
 def _bench_for_score(
     experiment: Experiment,
     benches: Mapping[str, Bench],
@@ -5760,20 +5673,6 @@ def _knudsen_vapour_equilibrium(
         and experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
     )
-
-
-def _cell_oxygen_class(
-    materials: Sequence[Located[CellMaterial]] | None,
-) -> tuple[str, str | None]:
-    """(material class, modelled reactive reservoir metal or None)."""
-
-    material_class = _cell_material_class(materials)
-    modelled = (
-        _uniform_modelled_reactive_cell(materials)
-        if material_class == "reactive"
-        else None
-    )
-    return material_class, modelled
 
 
 def _payload_fo2_notice(quantity: Quantity, payload: Mapping) -> Notice | None:

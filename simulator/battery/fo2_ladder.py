@@ -33,7 +33,13 @@ from simulator.battery.enums import (
     Quantity,
     ValueKind,
 )
+from simulator.battery.composition import composition_wt_pct
 from simulator.battery.identity import Identity
+from simulator.battery.migrate import (
+    FE3_FE2_RATIO_PRINTED_FIELDS,
+    FERRIC_FRACTION_FIELDS,
+)
+from simulator.battery.oxygen_balance import _cell_oxygen_class
 from simulator.battery.records import (
     Composition,
     Experiment,
@@ -62,8 +68,6 @@ _TIER3_ATMOSPHERE_ROUTES = (
 _VACUUM_ROUTE = "vacuum_total_pressure_upper_bound"
 _EFFUSION_ROUTE = "effusion_oxygen_balance"
 _BLANK_CARRIER = frozenset({"", "none", "n/a", "na", "absent", "unknown", "null"})
-_FERRIC_FRACTION_FIELDS = ("Fe3_over_FeT", "Fe3_over_sum_Fe")
-_FE3_FE2_RATIO_FIELDS = ("fe3_fe2_ratio", "Fe3_over_Fe2")
 _TEMPERATURE_UNSET = object()
 
 
@@ -310,7 +314,6 @@ def _weight_percent(
     if comp is None:
         return None
     from simulator.accounting.exceptions import UnknownSpeciesError
-    from simulator.battery.score import composition_wt_pct
 
     try:
         return composition_wt_pct(comp)
@@ -401,11 +404,11 @@ def _printed_ferric_fraction(
     observation: Observation | None,
     weights: dict[str, float] | None,
 ) -> tuple[float | None, str]:
-    for key in _FERRIC_FRACTION_FIELDS:
+    for key in FERRIC_FRACTION_FIELDS:
         number = _printed_number(observation, key)
         if number is not None and 0.0 < number < 1.0:
             return number, key
-    for key in _FE3_FE2_RATIO_FIELDS:
+    for key in FE3_FE2_RATIO_PRINTED_FIELDS:
         ratio = _printed_number(observation, key)
         if ratio is not None and ratio > 0.0:
             fraction = ratio / (1.0 + ratio)
@@ -559,8 +562,6 @@ def _has_carrier_gas(experiment: Experiment | None) -> bool:
 
 def _closable_cell(bench: object | None) -> tuple[bool, str | None]:
     """(True, metal or None) when the cell is inert or a uniform W/Mo reservoir."""
-
-    from simulator.battery.score import _cell_oxygen_class
 
     materials = None if bench is None else getattr(bench, "cell_materials", None)
     material_class, modelled = _cell_oxygen_class(materials)
