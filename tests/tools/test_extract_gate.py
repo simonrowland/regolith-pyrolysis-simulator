@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+from contextlib import nullcontext
 from pathlib import Path
 
 import yaml
@@ -11,6 +12,10 @@ from simulator.battery.extract_gate import evaluate_extract
 from simulator.yaml_cache import load_cached_safe_yaml, yaml_mapping_source_issues
 from tools import validate_literature_extracts as validator
 from tools import extract_gate
+import simulator.yaml_cache as yaml_cache
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _document() -> dict:
@@ -179,7 +184,7 @@ def test_absent_corpus_pdf_only_warns_about_page_count(tmp_path: Path):
     )
 
 
-def test_composition_rejects_unsupported_basis_and_percent_scale(tmp_path: Path):
+def test_composition_rejects_percent_scale(tmp_path: Path):
     doc = _document()
     doc["species"]["Fe"]["observations"][0]["values"]["composition_mol"] = {
         "basis": "printed_mole_percent",
@@ -192,7 +197,6 @@ def test_composition_rejects_unsupported_basis_and_percent_scale(tmp_path: Path)
     detail = next(
         item.detail for item in report.findings if item.check == "composition"
     )
-    assert "unsupported composition basis" in detail
     assert "percent-as-fraction" in detail
 
     doc["species"]["Fe"]["observations"][0]["values"]["composition_mol"] = {
@@ -205,6 +209,23 @@ def test_composition_rejects_unsupported_basis_and_percent_scale(tmp_path: Path)
     assert "percent-as-fraction" in next(
         item.detail for item in report.findings if item.check == "composition"
     )
+
+
+def test_composition_basis_vocabulary_is_owned_by_migrator():
+    assert gate.migrate.SUPPORTED_COMPOSITION_MOL_BASES
+    assert "pure_oxide_system" in gate.migrate.SUPPORTED_COMPOSITION_MOL_BASES
+    assert "printed_mole_percent" not in gate.migrate.SUPPORTED_COMPOSITION_MOL_BASES
+
+
+def test_pure_oxide_system_basis_passes_gate(tmp_path: Path):
+    doc = _document()
+    doc["species"]["Fe"]["observations"][0]["values"]["composition_mol"] = {
+        "basis": "pure_oxide_system",
+        "Na2O": "1",
+    }
+    report = _run_gate(tmp_path, doc)
+    assert "composition" not in _checks(report)
+    assert "isolated-migration" not in _checks(report)
 
 
 def test_explicit_inventory_basis_allows_descriptive_composition_label():
@@ -473,26 +494,69 @@ def test_schema_fidelity_and_flow_guard_use_shared_validators(tmp_path: Path):
     assert next(item for item in report.findings if item.check == "yaml-source").severity == "HARD"
 
 
-def test_cli_audits_one_extract_by_source_id(tmp_path: Path, monkeypatch, capsys):
-    repo = tmp_path / "repo"
-    extracts = repo / "data/literature/extracts"
-    extracts.mkdir(parents=True)
-    path = extracts / "fixture-source.yaml"
-    path.write_text(yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8")
-    monkeypatch.setattr(extract_gate, "REPO_ROOT", repo)
+def test_cli_audits_extract_with_explicit_tree(tmp_path: Path, capsys):
+    path = tmp_path / "fixture-source.yaml"
+    doc = _document()
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation.update(
+        {
+            "type": "equilibrium_phase_composition",
+            "phase": "liquid",
+            "units": "wt%",
+            "point_conditions": {
+                "temperature_K": {
+                    "state": {"tag": "value", "value": 1773},
+                    "locator": {"pdf_page_index": 1, "table": "1"},
+                }
+            },
+            "values": {
+                "quantity": "equilibrium_phase_composition",
+                "method_class": "measured_direct",
+                "T_K": 1773,
+                "composition_mass_percent": {
+                    "CaO": 38.3,
+                    "Al2O3": 30.5,
+                    "SiO2": 18.4,
+                    "MgO": 12.7,
+                },
+                "rows": [
+                    {"analyte": "CaO", "value": 38.3},
+                    {"analyte": "Al2O3", "value": 30.5},
+                    {"analyte": "SiO2", "value": 18.4},
+                    {"analyte": "MgO", "value": 12.7},
+                ],
+            },
+        }
+    )
+    doc["fidelity_samples"][0].update(
+        {
+            "path": "species.Fe.observations[fe_alpha_1].values.quantity",
+            "value": "equilibrium_phase_composition",
+        }
+    )
+    path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
 
-    status = extract_gate.main(["--ids", "fixture-source", "--corpus", str(tmp_path)])
+    status = extract_gate.main(
+        [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+    )
 
     output = capsys.readouterr().out
-    assert status == 0
+    assert status == 0, output
+    assert f"TREE {REPO_ROOT} HEAD " in output
     assert "MIGRATION observations by ValueKind:" in output
+    assert "HARD schema/fidelity:" not in output
+    assert "HARD isolated-migration:" not in output
+    assert "unsupported quantity" not in output
 
     doc = _document()
     doc["extraction"]["date"] = "2026-10-18"
     doc["species"]["Fe"]["observations"][0]["locator"].pop("pdf_page_index")
     path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
-    status = extract_gate.main(["--ids", "fixture-source", "--corpus", str(tmp_path)])
+    status = extract_gate.main(
+        [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+    )
     assert status == 1
+    assert f"TREE {REPO_ROOT} HEAD " in capsys.readouterr().out
 
 
 def test_cli_requires_corpus_or_environment_and_explains_option(capsys):
@@ -512,18 +576,67 @@ def test_cli_audits_changed_extracts(tmp_path: Path, monkeypatch, capsys):
         yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8"
     )
     (extracts / "_policy.yaml").write_text("ignored: true\n", encoding="utf-8")
-    monkeypatch.setattr(extract_gate, "REPO_ROOT", repo)
+    monkeypatch.setattr(extract_gate, "REPO_ROOT", REPO_ROOT)
+    monkeypatch.setattr(extract_gate, "_tree_head", lambda _path: (repo, "test-head"))
+    monkeypatch.setattr(
+        extract_gate,
+        "_tree_modules",
+        lambda _tree: nullcontext(
+            (gate, validator, yaml_cache, yaml_cache.yaml_mapping_source_issues)
+        ),
+    )
 
     class Result:
         returncode = 0
         stderr = ""
         stdout = "data/literature/extracts/fixture-source.yaml\n"
 
+    original_run = extract_gate.subprocess.run
     monkeypatch.setattr(
-        extract_gate.subprocess, "run", lambda *args, **kwargs: Result()
+        extract_gate.subprocess,
+        "run",
+        lambda args, **kwargs: Result()
+        if args[:3] == ["git", "diff", "--name-only"]
+        else original_run(args, **kwargs),
     )
-    status = extract_gate.main(["--changed-since", "BASE", "--corpus", str(tmp_path)])
+    status = extract_gate.main(
+        ["--changed-since", "BASE", "--tree", str(repo), "--corpus", str(tmp_path)]
+    )
 
     output = capsys.readouterr().out
     assert status == 0
     assert "EXTRACT" in output and "fixture-source.yaml" in output
+
+
+def test_tree_import_refuses_missing_migrator_without_fallback(tmp_path: Path, capsys):
+    tree = tmp_path / "tree"
+    tree.mkdir()
+    subprocess.run(["git", "init", str(tree)], check=True, capture_output=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(tree),
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.com",
+            "commit",
+            "--allow-empty",
+            "-m",
+            "test",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    extract = tmp_path / "fixture.yaml"
+    extract.write_text(yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8")
+
+    status = extract_gate.main(
+        [str(extract), "--tree", str(tree), "--corpus", str(tmp_path)]
+    )
+
+    assert status == 1
+    output = capsys.readouterr().out
+    assert "HARD tree-import:" in output
+    assert "simulator/battery/migrate.py" in output
