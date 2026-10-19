@@ -654,6 +654,93 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     assert handle.available is True
 
 
+@pytest.mark.parametrize(
+    "oxide",
+    ("FeO", "Fe2O3", "TiO2", "Cr2O3", "MnO", "FeOT"),
+)
+def test_scorer_and_bench_share_the_pinned_multivalent_rule(oxide: str) -> None:
+    from simulator.battery.generators.bench import _redox_components
+    from simulator.battery.score import multivalent_components
+
+    composition = {oxide: 1.0, "SiO2": 0.0}
+    expected = (oxide,)
+
+    assert _redox_components(composition) == expected
+    assert multivalent_components(
+        SimpleNamespace(components=tuple(composition.items())), None
+    ) == expected
+
+
+@pytest.mark.parametrize(
+    "redox_oxide",
+    ("FeO", "Fe2O3", "TiO2", "Cr2O3", "MnO"),
+)
+def test_not_an_input_rejects_multivalent_composition_at_backend_and_cell(
+    monkeypatch,
+    redox_oxide: str,
+) -> None:
+    from engines.domain_reason import OutOfDomainReason
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.base import EquilibriumResult
+
+    composition_kg = {"SiO2": 0.5, "CaO": 0.4, redox_oxide: 0.1}
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    transport_calls: list[dict[str, object]] = []
+
+    def fake_transport(*args, **kwargs):
+        transport_calls.append(kwargs)
+        return EquilibriumResult(
+            status="ok",
+            liquid_fraction=1.0,
+            activity_coefficients={"SiO2": 0.5},
+        )
+
+    monkeypatch.setattr(backend, "_equilibrate_subprocess", fake_transport)
+    monkeypatch.setattr(backend, "_domain_gate", lambda *_args, **_kwargs: None)
+
+    direct = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg=composition_kg,
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode=PO2_NOT_AN_INPUT,
+        subprocess_run_mode="isothermal",
+    )
+
+    pot = BinaryPot(
+        pot_id=f"redox_{redox_oxide}",
+        kato_1993_table4_system="SiO2-CaO-redox oxide",
+        why="multivalent redox-mode refusal fixture",
+        composition_wt_pct={key: value * 100.0 for key, value in composition_kg.items()},
+    )
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1673.15,
+        po2=Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+        isolated=False,
+        timeout_s=2.0,
+    )
+
+    assert direct.status == "out_of_domain"
+    assert direct.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.FORBIDDEN_SPECIES.value
+    )
+    assert cell.status == "refusal"
+    assert cell.engine_status == "out_of_domain"
+    assert cell.engine_reason == OutOfDomainReason.FORBIDDEN_SPECIES.value
+    assert transport_calls == []
+
+
 def test_domain_exception_does_not_kill_engine_handle() -> None:
     pot = BinaryPot(
         pot_id="fixture_pot",
