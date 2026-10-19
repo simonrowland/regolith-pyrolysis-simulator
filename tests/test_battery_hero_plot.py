@@ -403,9 +403,10 @@ def test_solved_oxygen_marker_shape_preserves_flag_fill_semantics() -> None:
             list(to_rgba("#ffffff"))
         )
 
-        handles = hero_plot._hero_deck_legend_handles(
-            points,
+        handles = _hero_legend_handles(
+            {str(point["engine"]) for point in points},
             {"openimcc": engine_color},
+            flagged=any(bool(point["flagged"]) for point in points),
             source_labels=(("^", "solved cell oxygen balance"),),
         )
         source_handle = handles[-1]
@@ -927,7 +928,9 @@ def test_hero_hollow_encoding_uses_only_scorer_flags(tmp_path: Path) -> None:
     hero_flagged_label = next(
         handle.get_label()
         for handle in _hero_legend_handles(
-            data, "vapour", _hero_engine_colors(data.engines)
+            {"openimcc"},
+            _hero_engine_colors(data.engines),
+            flagged=True,
         )
         if handle.get_markerfacecolor() == "#ffffff"
     )
@@ -1274,7 +1277,8 @@ def test_hero_series_keep_composition_and_count_refusals_by_reason(
         *(facet for facet, _label in HERO_MINOR_FACETS),
     }
     legend_handles = _hero_legend_handles(
-        data, "vapour", _hero_engine_colors(data.engines)
+        data.engines,
+        _hero_engine_colors(data.engines),
     )
     assert len(legend_handles) <= len(data.engines) + 2
     assert [handle.get_label() for handle in legend_handles].count(

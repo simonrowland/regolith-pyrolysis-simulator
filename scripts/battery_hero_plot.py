@@ -43,7 +43,7 @@ from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, BinaryIO, Iterator, Mapping, Sequence
+from typing import Any, BinaryIO, Iterable, Iterator, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -1872,22 +1872,15 @@ def _hero_refusal_entries(
 
 
 def _hero_legend_handles(
-    data: ScorePlotData,
-    rail: str,
+    engine_names: Iterable[str],
     engine_colors: Mapping[str, Any],
+    *,
+    flagged: bool = False,
+    group_labels: Sequence[tuple[str, str]] = (),
+    source_labels: Sequence[tuple[str, str]] = (),
+    size_labels: Sequence[tuple[float, str]] = (),
 ) -> list[Line2D]:
-    engines = sorted(
-        {
-            engine
-            for series_rail, _facet, engine, _composition in data.hero_series
-            if series_rail == rail
-        }
-        | {
-            engine
-            for refusal_rail, _facet, _composition, engine, _reason in data.hero_refusals
-            if refusal_rail == rail
-        }
-    )
+    engines = sorted(set(engine_names))
     handles = [
         Line2D(
             [0],
@@ -1903,12 +1896,7 @@ def _hero_legend_handles(
         )
         for engine in engines
     ]
-    if any(
-        point.flagged
-        for (series_rail, _facet, _engine, _composition), points in data.hero_series.items()
-        if series_rail == rail
-        for point in points
-    ):
+    if flagged:
         handles.append(
             Line2D(
                 [0],
@@ -1922,6 +1910,48 @@ def _hero_legend_handles(
                 label=FLAGGED_MARKER_LABEL,
             )
         )
+    handles.extend(
+        Line2D(
+            [0],
+            [0],
+            color="#555555",
+            linestyle="None",
+            marker=marker,
+            markerfacecolor="#555555",
+            markeredgecolor="#555555",
+            markersize=4,
+            label=label,
+        )
+        for marker, label in source_labels
+    )
+    handles.extend(
+        Line2D(
+            [0],
+            [0],
+            color="#555555",
+            linestyle="None",
+            marker=marker,
+            markerfacecolor="#ffffff",
+            markeredgecolor="#555555",
+            markersize=4,
+            label=label,
+        )
+        for marker, label in group_labels
+    )
+    handles.extend(
+        Line2D(
+            [0],
+            [0],
+            color="#555555",
+            linestyle="None",
+            marker="o",
+            markerfacecolor="#ffffff",
+            markeredgecolor="#555555",
+            markersize=math.sqrt(size),
+            label=label,
+        )
+        for size, label in size_labels
+    )
     return handles
 
 
@@ -2179,12 +2209,13 @@ def _draw_hero_history(
     history: Sequence[Mapping[str, Any]],
     *,
     engine_colors: Mapping[str, Any],
-) -> None:
+) -> set[str]:
     metrics_by_engine: dict[str, dict[str, list[tuple[float, float]]]] = defaultdict(
         lambda: {"rms_dex": [], "median_abs_dex": []}
     )
     paired_primary_points: dict[str, list[tuple[float, float]]] = defaultdict(list)
     benchmark_points: dict[str, list[tuple[float, float]]] = defaultdict(list)
+    history_engines: set[str] = set()
     history_dates: list[float] = []
     history_rows = 0
     for entry in history:
@@ -2203,6 +2234,7 @@ def _draw_hero_history(
                     value = _finite_float(metric.get(field_name))
                     if value is not None:
                         metrics_by_engine[engine][field_name].append((date, value))
+                        history_engines.add(engine)
         benchmarks = entry.get("benchmarks")
         if isinstance(benchmarks, Sequence) and not isinstance(benchmarks, (str, bytes)):
             for benchmark in benchmarks:
@@ -2220,6 +2252,8 @@ def _draw_hero_history(
                     continue
                 paired_primary_points[primary].append((date, primary_value))
                 benchmark_points[primary].append((date, value))
+                history_engines.add(primary)
+                history_engines.add(str(benchmark.get("benchmark_engine")))
 
     if not metrics_by_engine and not paired_primary_points and not benchmark_points:
         axis.set_axis_off()
@@ -2233,7 +2267,7 @@ def _draw_hero_history(
             fontsize=7,
         )
         axis.set_title("History by green landing", loc="left", fontsize=8)
-        return
+        return history_engines
 
     engine_names = sorted(metrics_by_engine)
     for engine in engine_names:
@@ -2304,6 +2338,7 @@ def _draw_hero_history(
     axis.tick_params(axis="y", labelsize=6)
     axis.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
     axis.grid(True, color="#999999", alpha=0.18, linewidth=0.5)
+    return history_engines
 
 
 def _hero_summary_payload(
@@ -2505,6 +2540,7 @@ def render_hero_charts(
             wspace=0.2,
         )
         sweet_spot_axes: list[Axes] = []
+        history_engine_names: set[str] = set()
         row_index = 0
         for kind, payload, _height in row_specs:
             if kind == "current":
@@ -2576,7 +2612,7 @@ def render_hero_charts(
                         )
             elif kind == "history":
                 history_axis = figure.add_subplot(grid[row_index, :])
-                _draw_hero_history(
+                history_engine_names = _draw_hero_history(
                     history_axis,
                     rail,
                     history,
@@ -2669,7 +2705,34 @@ def render_hero_charts(
             fontsize=6.4,
             linespacing=1.15,
         )
-        legend_handles = _hero_legend_handles(data, rail, engine_colors)
+        legend_engine_names = {
+            engine
+            for series_rail, _facet, engine, _composition in data.hero_series
+            if series_rail == rail
+        } | {
+            engine
+            for refusal_rail, _facet, _composition, engine, _reason in data.hero_refusals
+            if refusal_rail == rail
+        }
+        legend_engine_names.update(history_engine_names)
+        legend_engine_names.update(
+            engine
+            for (sweet_spot_rail, engine), cells in data.hero_sweet_spot_cells.items()
+            if sweet_spot_rail == rail
+            and any(int(cell.get("n") or 0) for cell in cells)
+        )
+        flagged_points = any(
+            point.flagged
+            for (series_rail, _facet, _engine, _composition), points
+            in data.hero_series.items()
+            if series_rail == rail
+            for point in points
+        )
+        legend_handles = _hero_legend_handles(
+            legend_engine_names,
+            engine_colors,
+            flagged=flagged_points,
+        )
         if legend_handles:
             figure.legend(
                 handles=legend_handles,
@@ -2730,88 +2793,6 @@ def render_hero_charts(
         files[f"hero:{rail}:svg"] = path
         files[f"hero:{rail}:png"] = png_path
     return files
-
-
-def _hero_deck_legend_handles(
-    points: Sequence[Mapping[str, object]],
-    engine_colors: Mapping[str, Any],
-    *,
-    group_labels: Sequence[tuple[str, str]] = (),
-    source_labels: Sequence[tuple[str, str]] = (),
-    size_labels: Sequence[tuple[float, str]] = (),
-) -> list[Line2D]:
-    engines = sorted({str(point.get("engine") or "unknown") for point in points})
-    handles = [
-        Line2D(
-            [0],
-            [0],
-            color=engine_colors.get(engine, "#555555"),
-            linestyle="None",
-            marker="o",
-            markerfacecolor=engine_colors.get(engine, "#555555"),
-            markeredgecolor=engine_colors.get(engine, "#555555"),
-            markersize=4,
-            label=engine,
-        )
-        for engine in engines
-    ]
-    if any(bool(point.get("flagged")) for point in points):
-        handles.append(
-            Line2D(
-                [0],
-                [0],
-                color="#444444",
-                linestyle="None",
-                marker="o",
-                markerfacecolor="#ffffff",
-                markeredgecolor="#444444",
-                markersize=4,
-                label=FLAGGED_MARKER_LABEL,
-            )
-        )
-    handles.extend(
-        Line2D(
-            [0],
-            [0],
-            color="#555555",
-            linestyle="None",
-            marker=marker,
-            markerfacecolor="#555555",
-            markeredgecolor="#555555",
-            markersize=4,
-            label=label,
-        )
-        for marker, label in source_labels
-    )
-    handles.extend(
-        Line2D(
-            [0],
-            [0],
-            color="#555555",
-            linestyle="None",
-            marker=marker,
-            markerfacecolor="#ffffff",
-            markeredgecolor="#555555",
-            markersize=4,
-            label=label,
-        )
-        for marker, label in group_labels
-    )
-    handles.extend(
-        Line2D(
-            [0],
-            [0],
-            color="#555555",
-            linestyle="None",
-            marker="o",
-            markerfacecolor="#ffffff",
-            markeredgecolor="#555555",
-            markersize=math.sqrt(size),
-            label=label,
-        )
-        for size, label in size_labels
-    )
-    return handles
 
 
 def _hero_deck_benchmark_caption(
@@ -3186,7 +3167,7 @@ def render_hero_deck_charts(
                     message,
                 )
             elif points:
-                if chart == "sio_evolution":
+                if chart == "sio_evolution" and not mixed_sio_sources:
                     group_indices = sorted(
                         {
                             int(point["group_index"])
@@ -3198,54 +3179,11 @@ def render_hero_deck_charts(
                         group: _HERO_MARKERS[index % len(_HERO_MARKERS)]
                         for index, group in enumerate(group_indices)
                     }
-                    if mixed_sio_sources:
-                        group_labels = []
-                        size_labels = [
-                            (
-                                sio_bin_marker_sizes[group],
-                                next(
-                                    str(point["group_label"])
-                                    for point in points
-                                    if int(point["group_index"]) == group
-                                ),
-                            )
-                            for group in group_indices
-                        ]
-                    else:
-                        points = [
-                            {**point, "marker": markers[int(point["group_index"])]}
-                            for point in points
-                        ]
-                        group_labels = [
-                            (
-                                markers[group],
-                                next(
-                                    str(point["group_label"])
-                                    for point in points
-                                    if int(point["group_index"]) == group
-                                ),
-                            )
-                            for group in group_indices
-                        ]
-                        size_labels = []
-                else:
-                    group_labels = []
-                    size_labels = []
+                    points = [
+                        {**point, "marker": markers[int(point["group_index"])]}
+                        for point in points
+                    ]
                 _draw_hero_deck_scatter(axis, points, engine_colors=engine_colors)
-                if chart == "sio_evolution":
-                    axis.legend(
-                        handles=_hero_deck_legend_handles(
-                            points,
-                            engine_colors,
-                            group_labels=group_labels,
-                            source_labels=source_labels if mixed_sio_sources else (),
-                            size_labels=size_labels,
-                        ),
-                        loc="upper left",
-                        bbox_to_anchor=(1.005, 1.0),
-                        frameon=False,
-                        fontsize=5,
-                    )
             else:
                 missing = sum(
                     count
@@ -3282,7 +3220,7 @@ def render_hero_deck_charts(
             refusal_axis.set_title("Refused scorer rows (not-observable rows separate)", loc="left", fontsize=6)
 
         history_axis = figure.add_subplot(grid[current_row_count + 1, :])
-        _draw_hero_history(
+        history_engine_names = _draw_hero_history(
             history_axis,
             source_rail,
             history,
@@ -3312,36 +3250,45 @@ def render_hero_deck_charts(
                 blank = figure.add_subplot(grid[row_index, 3:6])
                 blank.set_axis_off()
 
-        if points:
-            group_labels: list[tuple[str, str]] = []
-            size_labels: list[tuple[float, str]] = []
-            if chart == "sio_evolution":
-                seen_groups: dict[int, str] = {}
-                for point in points:
-                    if point.get("group_index") is not None:
-                        seen_groups[int(point["group_index"])] = str(point["group_label"])
-                groups = sorted(seen_groups.items())
-                if mixed_sio_sources:
-                    size_labels = [
-                        (sio_bin_marker_sizes[group], label)
-                        for group, label in groups
-                    ]
-                else:
-                    group_labels = [
-                        (_HERO_MARKERS[index % len(_HERO_MARKERS)], label)
-                        for index, (_group, label) in enumerate(groups)
-                    ]
-            handles = _hero_deck_legend_handles(
-                points,
-                engine_colors,
-                group_labels=group_labels,
-                source_labels=(
-                    source_labels
-                    if chart == "redox_sensitivity" or mixed_sio_sources
-                    else ()
-                ),
-                size_labels=size_labels,
-            )
+        group_labels: list[tuple[str, str]] = []
+        size_labels: list[tuple[float, str]] = []
+        if chart == "sio_evolution" and points:
+            seen_groups: dict[int, str] = {}
+            for point in points:
+                if point.get("group_index") is not None:
+                    seen_groups[int(point["group_index"])] = str(point["group_label"])
+            groups = sorted(seen_groups.items())
+            if mixed_sio_sources:
+                size_labels = [
+                    (sio_bin_marker_sizes[group], label)
+                    for group, label in groups
+                ]
+            else:
+                group_labels = [
+                    (_HERO_MARKERS[index % len(_HERO_MARKERS)], label)
+                    for index, (_group, label) in enumerate(groups)
+                ]
+        legend_engine_names = {
+            str(point.get("engine") or "unknown") for point in points
+        }
+        legend_engine_names.update(
+            engine for engine, _reason, _count in refusal_entries
+        )
+        legend_engine_names.update(history_engine_names)
+        legend_engine_names.update(sweet_spot_engines)
+        handles = _hero_legend_handles(
+            legend_engine_names,
+            engine_colors,
+            flagged=any(bool(point.get("flagged")) for point in points),
+            group_labels=group_labels,
+            source_labels=(
+                source_labels
+                if chart == "redox_sensitivity" or mixed_sio_sources
+                else ()
+            ),
+            size_labels=size_labels,
+        )
+        if handles:
             figure.legend(
                 handles=handles,
                 loc="upper center",
