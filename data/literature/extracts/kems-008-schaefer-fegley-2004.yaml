@@ -6,10 +6,10 @@ source:
   year: 2004
   doi: 10.1016/j.icarus.2003.08.023
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 alpha-bounds review extract
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 alpha-bounds review extract; validated in an internal review, 2026-08-03, ocr-artifacts
   date: '2026-08-03'
   worker: ocr-phase2b-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/
+  provenance_path: raw/kems-008-schaefer-fegley-2004/kems-008-schaefer-fegley-2004.pdf
 review_status: draft
 species:
   SiO:
@@ -17,7 +17,7 @@ species:
     - observation_id: schaefer_fegley_2004_sio_alpha_s_survey
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+        source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
         table: '10'
         line_range: 649-661
       T_range_K:
@@ -193,7 +193,7 @@ species:
     - observation_id: schaefer_fegley_2004_mg_forsterite_alpha_s_survey
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+        source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
         table: '10'
         line_range: 649-661
       T_range_K:
@@ -332,7 +332,7 @@ species:
     - observation_id: schaefer_fegley_2004_al2o3_table10_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+        source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
         table: '10'
         paragraph: Vaporization coefficients for oxides and silicates
       T_range_K:
@@ -594,7 +594,7 @@ species:
     - observation_id: schaefer_fegley_2004_mgo_table10_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+        source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
         table: '10'
         paragraph: Vaporization coefficients for oxides and silicates
       T_range_K:
@@ -807,7 +807,7 @@ species:
     - observation_id: schaefer_fegley_2004_sio2_table10_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+        source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
         table: '10'
         paragraph: Vaporization coefficients for oxides and silicates
       T_range_K:
@@ -2070,7 +2070,7 @@ fidelity_samples:
   field: alpha
   value: 0.2
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
     table: '10'
     paragraph: ~0.2 for SiO vaporized from Mg2SiO4 liquid
     line_range: '661'
@@ -2082,7 +2082,7 @@ fidelity_samples:
   - 0.04
   - 0.2
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
     paragraph: ~0.04 liquid silica to ~0.2 forsterite liquid
     line_range: '661'
 - species: Mg
@@ -2094,7 +2094,7 @@ fidelity_samples:
   - 2323.0
   note: Table 10 Mg2SiO4(l) T 2163–2323 K (Hashimoto 1990) — corrected from erroneous 2000–2300
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
     table: '10'
     paragraph: Mg2SiO4 (l) 2163–2323 K α_s 0.20–0.21 Hashimoto 1990
     line_range: '654'
@@ -2104,7 +2104,7 @@ fidelity_samples:
   field: alpha
   value: 0.2
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
     table: '10'
     paragraph: Mg2SiO4 (l) α_s 0.20–0.21; Mg(g) and SiO(g) taken as equal
     line_range: 654-657
@@ -2116,7 +2116,7 @@ fidelity_samples:
   - 0.067
   - 1.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
     table: '10'
 - species: MgO
   observable: alpha
@@ -2126,7 +2126,7 @@ fidelity_samples:
   - 0.09
   - 0.4
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
     table: '10'
 - species: SiO2
   observable: alpha
@@ -2136,7 +2136,7 @@ fidelity_samples:
   - 0.015
   - 0.11
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+    source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
     table: '10'
 
 - species: K2O

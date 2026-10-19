@@ -7,11 +7,11 @@ source:
   url: https://www.jstage.jst.go.jp/article/jinstmet1952/30/6/30_6_515/_pdf
   year: 1966
 extraction:
-  method: OCR-artifact transcription (MinerU vlm of scanned J-STAGE PDF) + t-544 langmuir-ingest pilot
+  method: OCR-artifact transcription (MinerU vlm of scanned J-STAGE PDF) + t-544 langmuir-ingest pilot; validated in an internal review, 2026-08-07, ocr-artifacts
     table extract. PDF text layer is garbled OCR; values taken from MinerU markdown tables/abstract.
   date: '2026-08-07'
   worker: langmuir-ingest-gr-t544
-  provenance_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/
+  provenance_path: raw/kems-001-homma-1966/kems-001-homma-1966.pdf
 review_status: draft
 benches:
 - id: vif-ii-vacuum-induction
@@ -546,7 +546,7 @@ species:
     - observation_id: homma_1966_mn_specific_evaporation_constant
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         table: '4'
         paragraph: English abstract specific evaporation constants
         line_range: 5-7
@@ -598,7 +598,7 @@ species:
         cell_material:
           value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+            source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
             paragraph: 市販アルミナるつぼ (CP-2)
             line_range: '27'
         chamber_pressure:
@@ -607,7 +607,7 @@ species:
           as_printed: '$10^{-2} \sim 10^{-3}$ mmHg'
           locator:
             page: 516
-            source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+            source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
             paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
             line_range: '29'
         sample_surface_area:
@@ -617,13 +617,13 @@ species:
             inferred: true
             inference: area from stated crucible ID 38 mm (not free-surface measured)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+            source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
             paragraph: るつぼ (CP-2) の寸法は内径 38 mm
             line_range: '27'
     - observation_id: homma_1966_mn_olette_alpha_exp_table1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         table: '1'
         line_range: 162-164
       T_range_K:
@@ -695,7 +695,7 @@ species:
     - observation_id: homma_1966_crucible_area_numeric_b1
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         paragraph: alumina crucible CP-2 ID 38 mm
       T_range_K:
       - 1873.15
@@ -720,17 +720,17 @@ species:
           inferred: true
           inference: A = pi*(d/2)^2 with d=38 mm ID => 0.0011341149 m2
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+            source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
             paragraph: commercial alumina crucible CP-2 ID 38 mm
         cell_material:
           value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+            source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
             paragraph: crucible CP-2
     - observation_id: homma_1966_mn_olette_class_fence_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         paragraph: Olette relative evaporation coefficient
       T_range_K:
       - 1873.15
@@ -1155,7 +1155,7 @@ species:
     - observation_id: homma_1966_cu_specific_evaporation_constant
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         table: '5'
         line_range: 216-218
       T_range_K:
@@ -1188,8 +1188,8 @@ species:
     - observation_id: homma_1966_cu_olette_alpha_exp_table2
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        repaired_table_path: text/kems-001-homma-1966/ocr-repair/kems-001-homma-1966.md
         table: '2'
         page: PDF pp. 3-4 / printed pp. 517-518
         line_range: 166-168
@@ -1285,7 +1285,7 @@ species:
     - observation_id: homma_1966_cu_olette_class_fence_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         paragraph: Olette relative evaporation coefficient
       T_range_K:
       - 1873.15
@@ -1750,7 +1750,7 @@ species:
     - observation_id: homma_1966_sn_specific_evaporation_constant
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         table: '5'
         line_range: 216-218
       T_range_K:
@@ -1780,8 +1780,8 @@ species:
     - observation_id: homma_1966_sn_olette_alpha_exp_table3
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        repaired_table_path: text/kems-001-homma-1966/ocr-repair/kems-001-homma-1966.md
         table: '3'
         page: PDF p. 4 / printed p. 518
         line_range: 174-176
@@ -1826,7 +1826,7 @@ species:
     - observation_id: homma_1966_sn_olette_class_fence_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         paragraph: Olette relative evaporation coefficient
       T_range_K:
       - 1873.15
@@ -2222,7 +2222,7 @@ fidelity_samples:
   - 0.0092
   - 0.012
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     paragraph: K_Mn^S (Fe-Mn) = 9.2e-3 ~ 1.2e-2 cm·sec^{-1}
     line_range: '7'
 - species: Mn
@@ -2231,7 +2231,7 @@ fidelity_samples:
   field: olette_alpha_theo
   value: 1095
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     table: '1'
     paragraph: α_Mn (theo.) = 1095
     line_range: '164'
@@ -2241,7 +2241,7 @@ fidelity_samples:
   field: alpha
   value: 51.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     table: '2'
     paragraph: α_Cu (exp.) = 51 at t=5 min melt 6503-12
     line_range: '168'
@@ -2253,7 +2253,7 @@ fidelity_samples:
   - 0.0012
   - 0.0016
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     paragraph: K_Sn^S = 1.2e-3 ~ 1.6e-3 cm·sec^{-1}
     line_range: '7'
 - species: Mn
@@ -2262,7 +2262,7 @@ fidelity_samples:
   field: sample_surface_area_m2
   value: 0.0011341149
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     paragraph: ID 38 mm
 - species: Mn
   observable: alpha
@@ -2270,7 +2270,7 @@ fidelity_samples:
   field: alpha
   value: 115.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     note: Olette fence pin
 - species: Cu
   observable: alpha
@@ -2278,7 +2278,7 @@ fidelity_samples:
   field: alpha
   value: 51.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     note: Olette fence pin
 - species: Sn
   observable: alpha
@@ -2286,7 +2286,7 @@ fidelity_samples:
   field: alpha
   value: 19.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     note: Olette fence pin
 - species: Mn
   observation_id: homma_1966_mn_olette_experimental_quoted_deep
