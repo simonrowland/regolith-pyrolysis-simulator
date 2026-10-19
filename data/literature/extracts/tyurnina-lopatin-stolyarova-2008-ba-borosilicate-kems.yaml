@@ -6226,7 +6226,7 @@ species:
           negative_excess_chemical_potential_kJ_mol_as_printed:
           - '120.12'
           - '30.02'
-          - '37.04'
+          - −7.04
           delta_G_kJ_as_printed: '42.09'
           delta_G_excess_kJ_as_printed: '30.69'
         - composition_mole_fraction:
@@ -6256,7 +6256,7 @@ species:
           negative_excess_chemical_potential_kJ_mol_as_printed:
           - '82.92'
           - '57.45'
-          - '318.75'
+          - −18.75
           delta_G_kJ_as_printed: '59.39'
           delta_G_excess_kJ_as_printed: '49.71'
         - composition_mole_fraction:
@@ -6271,13 +6271,13 @@ species:
           negative_excess_chemical_potential_kJ_mol_as_printed:
           - '138.52'
           - '61.43'
-          - '314.44'
+          - −14.44
           delta_G_kJ_as_printed: '69.04'
           delta_G_excess_kJ_as_printed: '58.90'
         note: These are the authors’ equation-derived thermodynamic values, not formation enthalpies or formation
           Gibbs energies. The source column headers print negative chemical potentials. The born-digital text layer
-          turned four minus signs into the digit 3 and omitted one separator between the final cells; all five affected
-          values were corrected against the 600 dpi renders. Activity values are scored separately.
+          turned seven minus signs into the digit 3 and omitted one separator between the final cells; all nine affected
+          numeric entries were corrected against the 600 dpi renders. Activity values are scored separately.
     - observation_id: tyurnina_2008_appearance_energies
       type: measurement_context
       locator:
