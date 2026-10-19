@@ -25,6 +25,7 @@ from simulator.battery.migrate import (
     select_declared_source,
 )
 from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Apparatus,
     ApparatusGeometry,
     Located,
@@ -611,6 +612,54 @@ def test_mass_loss_source_values_select_points_and_preserve_printed_range() -> N
     assert wilkerson_range.value.kind is ValueKind.INTERVAL
     assert wilkerson_range.value.interval_low == Decimal("0.0045")
     assert wilkerson_range.value.interval_high == Decimal("0.005")
+
+
+def test_hashimoto_table5_starting_composition_is_typed_on_each_point() -> None:
+    source_id = "kems-015-hashimoto-1983"
+    source_path = LITERATURE / "extracts" / f"{source_id}.yaml"
+    document = load_yaml(source_path)
+    source_row = next(
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row["observation_id"]
+        == "hashimoto_1983_table5_initial_vaporization_rate_F"
+    )
+    expected = migrate_module.wt_pct_to_mole_fraction(
+        source_row["values"]["composition_wt_pct"]
+    )
+
+    migrator = Migrator()
+    migrator._migrate_extract(source_path)
+    point_prefix = (
+        f"{source_id}::hashimoto_1983_table5_initial_vaporization_rate_F::T="
+    )
+    observations = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.startswith(point_prefix)
+    ]
+
+    assert len(observations) == 4
+    assert {
+        observation.observation_id.split("::T=", 1)[1].split(":h=", 1)[0]
+        for observation in observations
+    } == {"1973.15", "2073.15", "2173.15", "2273.15"}
+    for observation in observations:
+        point_composition = (observation.point_conditions or {}).get("composition")
+        assert point_composition is not None and point_composition.state.is_value
+        point = point_composition.state.value
+        assert dict(point.components) == dict(expected.components)
+        assert point.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+
+        initial = migrator.result.experiments[
+            observation.experiment_id
+        ].sample.initial_composition
+        assert initial is not None and initial.state.is_value
+        assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        assert not migrate_module._initial_compositions_conflict(
+            initial, point_composition
+        )
 
 
 def test_printed_mass_loss_range_refuses_point_residual() -> None:
