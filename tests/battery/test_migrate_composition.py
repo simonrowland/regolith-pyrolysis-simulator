@@ -558,6 +558,36 @@ def test_round8_multiple_printed_columns_without_typed_initial_refuse() -> None:
     )
 
 
+def test_round9_values_composition_derivation_baseline_pin() -> None:
+    """Pin the current note-dependent admission before changing its owner."""
+    oxide_map = {"SiO2": "60", "MgO": "40"}
+    notes = (
+        None,
+        "No composition was derived",
+        "SiO2 and K2O are not complements to 100; this sample contains MgO",
+    )
+    results = []
+    for note in notes:
+        values = {"composition_wt_pct": oxide_map}
+        if note is not None:
+            values["composition_derivation"] = note
+        results.append(_composition_located_from_values(values, None))
+
+    assert results[0] is None
+    assert results[1] is not None and results[1].state.is_value
+    assert results[2] is not None and results[2].state.is_value
+    expected = wt_pct_to_mole_fraction(
+        {name: Decimal(value) for name, value in oxide_map.items()}
+    )
+    assert results[1].state.value == expected
+    assert results[1].inference is not None
+    assert results[1].inference.relation == "wt_pct_to_mole_fraction"
+    assert results[2].inference is not None
+    assert results[2].inference.relation == (
+        "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction"
+    )
+
+
 def test_plante_fig19_points_keep_pooled_sample_unknown_and_gas_phase() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
