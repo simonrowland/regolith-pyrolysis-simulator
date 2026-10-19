@@ -1864,7 +1864,9 @@ def _sample_from_plain(
             or composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
         )
     ):
-        owner_initial = _owner_initial_from_printed(printed_located)
+        owner_initial = _owner_initial_from_printed(
+            printed_located, proxy_flag=composition_role
+        )
     if owner_initial is not None:
         initial_located = owner_initial
     return Sample(
@@ -3908,6 +3910,8 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
 
 def _owner_initial_from_printed(
     printed: Located[Any] | None,
+    *,
+    proxy_flag: str | None = None,
 ) -> Located[Composition] | None:
     """Convert the printed map already selected by the typed-role owner."""
 
@@ -3952,6 +3956,17 @@ def _owner_initial_from_printed(
         )
     if wt:
         _printed, initial = _located_printed_and_initial(wt, locator)
+        if (
+            initial is not None
+            and initial.state.is_value
+            and proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        ):
+            initial = replace(
+                initial,
+                state=State.of(
+                    replace(initial.state.value, proxy_flag=proxy_flag)
+                ),
+            )
         return initial
     if refusal_reason:
         return Located(
@@ -10942,6 +10957,7 @@ def sample_from_equipment(
 
     vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
     roots = _lab_roots(equipment, values)
+    role, _role_refusal = _declared_composition_role(equipment, values)
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
     volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
@@ -10969,7 +10985,6 @@ def sample_from_equipment(
             declared_map=declared_map,
         )
         printed, _ = _located_printed_and_initial(oxide_map, locator)
-        role, _role_refusal = _declared_composition_role(equipment, values)
         if oxide_map is None and refusal_reason and role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
             initial = Located(
                 State.unknown(
@@ -10987,7 +11002,7 @@ def sample_from_equipment(
             values, composition_units
         ),
     ):
-        initial = _owner_initial_from_printed(printed)
+        initial = _owner_initial_from_printed(printed, proxy_flag=role)
     if (
         mass_located is None
         and volume_located is None

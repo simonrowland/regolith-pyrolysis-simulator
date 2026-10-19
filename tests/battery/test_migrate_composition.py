@@ -44,6 +44,7 @@ from simulator.battery.migrate import (
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Composition,
+    Located,
     Locator,
     as_decimal,
 )
@@ -235,6 +236,47 @@ def test_noncomposition_values_are_not_scanned_or_refused_as_oxides() -> None:
     assert sample.printed_composition is None
     assert sample.initial_composition is None
     assert not hasattr(migrate_module, "_is_formula_component_key")
+
+
+def test_flemetakis_starting_glass_becomes_initial_charge_proxy(tmp_path) -> None:
+    source = "ta-flemetakis-2024.yaml"
+    source_path = REPO_ROOT / "data/literature/extracts" / source
+    document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    source_row = next(
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row["observation_id"] == "flemetakis_2024_starting_glass_composition"
+    )
+    assert source_row["values"]["composition_role"] == {
+        "value": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        "locator": source_row["locator"],
+        "quote": source_row["quote"],
+    }
+
+    result = _migrate_real_extract(tmp_path, source)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(
+            "flemetakis_2024_starting_glass_composition"
+        )
+    )
+    point_composition = (observation.point_conditions or {}).get("composition")
+    assert isinstance(point_composition, Located)
+    assert point_composition.state.is_value
+    assert isinstance(point_composition.state.value, Composition)
+    assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+
+    initial = result.experiments[observation.experiment_id].sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.locator is not None
+    assert initial.locator.section == "2.1 Starting material"
+    assert isinstance(initial.state.value, Composition)
+    assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert not migrate_module._initial_compositions_conflict(
+        initial, point_composition
+    )
 
 
 def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
@@ -1514,7 +1556,11 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                 for observation in rows:
                     composition = observation.identity.composition
                     assert composition is not None and composition.is_value
-                    assert composition.value == expected, observation.observation_id
+                        # This sweep pins composition conversion; the typed
+                        # initial-charge proxy is asserted by its owner test.
+                    assert replace(composition.value, proxy_flag=None) == expected, (
+                        observation.observation_id
+                    )
                     if "FeOT" in raw_composition:
                         assert observation.identity.quantity.is_unknown
                         assert not any(

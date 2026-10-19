@@ -83,6 +83,10 @@ species:
         composition_wt_pct: {SiO2: 44.97, Al2O3: 13.74, MgO: 9.49, CaO: 20.62, B2O3: 10.55, total: 99.38}
         composition_uncertainty_sd_wt_pct: {SiO2: 0.17, Al2O3: 0.06, MgO: 0.04, CaO: 0.07, B2O3: 0.27, total: 0.35}
         composition_basis: EPMA median of 20 analyses; named glass PPG14
+        composition_role:
+          value: initial_charge_only
+          locator: *starting
+          quote: The initial B2O3 concentration was 10.55 +/- 0.27 wt % (SD); median composition is given in Table 1.
     - observation_id: flemetakis_2024_sample_and_furnace_apparatus
       type: rate_series
       class_tag: measured
