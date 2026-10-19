@@ -959,6 +959,49 @@ def test_sweet_spot_plot_uses_scorer_color_eligibility() -> None:
         plt.close(fig)
 
 
+def test_sweet_spot_count_text_contrasts_with_viridis_fill() -> None:
+    cells = [
+        {
+            "sio2_lower": "0.0",
+            "sio2_upper": "0.05",
+            "temperature_lower_K": "1000",
+            "temperature_upper_K": "1100",
+            "n": 3,
+            "color_eligible": True,
+            "median_abs_dex": "0.0",
+        },
+        {
+            "sio2_lower": "0.05",
+            "sio2_upper": "0.1",
+            "temperature_lower_K": "1000",
+            "temperature_upper_K": "1100",
+            "n": 4,
+            "color_eligible": True,
+            "median_abs_dex": "1.0",
+        },
+    ]
+    colormap = plt.get_cmap("viridis")
+    figure, axis = plt.subplots()
+    try:
+        assert _draw_hero_sweet_spot(
+            axis,
+            "openimcc",
+            cells,
+            colormap=colormap,
+            normalization=Normalize(vmin=0, vmax=1),
+            x_limits=(0, 0.1),
+            temperature_limits=(1000, 1100),
+        )
+        assert axis.patches[0].get_facecolor() == pytest.approx(colormap(0.0))
+        assert axis.patches[1].get_facecolor() == pytest.approx(colormap(1.0))
+        assert [text.get_color() for text in axis.texts] == [
+            "#f7f7f7",
+            "#222222",
+        ]
+    finally:
+        plt.close(figure)
+
+
 def test_refusal_strip_uses_integer_unique_ticks() -> None:
     fig, axis = plt.subplots()
     _draw_hero_refusals(
