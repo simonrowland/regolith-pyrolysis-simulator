@@ -731,8 +731,8 @@ def test_magemin_and_thermoengine_borrow_one_internal_closure(monkeypatch) -> No
             engine, observation, experiment=experiment, bench=bench, isolated=False,
         ))
     assert seen["thermoengine"] == 3.5e-9
-    assert seen["magemin"] == 3.5e-9
-    for prediction in predictions:
+    assert "magemin" not in seen
+    for prediction in predictions[:1]:
         borrowed_notice = next(
             notice for notice in prediction.notices
             if "effusion closure borrowed from internal-analytical" in notice.reason
@@ -745,6 +745,12 @@ def test_magemin_and_thermoengine_borrow_one_internal_closure(monkeypatch) -> No
         assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND in flagged_strata(
             (borrowed_notice,)
         )
+    magemin = predictions[1]
+    assert magemin.execution.state is ExecutionState.UNSUPPORTED
+    assert magemin.authority is Authority.REFUSED
+    assert magemin.refusal_reason is RefusalReason.UNSUPPORTED
+    assert magemin.refusal_detail["reason"] == "engine_missing_observable"
+    assert magemin.refusal_detail["observable"] == "vapour species"
 
 
 def test_carrier_gas_row_borrows_one_intrinsic_fo2(monkeypatch) -> None:
@@ -809,7 +815,7 @@ def test_carrier_gas_row_borrows_one_intrinsic_fo2(monkeypatch) -> None:
         ))
     assert set(seen) == {
         "alphamelts", "thermoengine", "openimcc", "vaporock",
-        "internal-analytical", "magemin",
+        "internal-analytical",
     }
     assert len(set(seen.values())) == 1
     log = float(intrinsic_melt_fO2(
@@ -822,5 +828,11 @@ def test_carrier_gas_row_borrows_one_intrinsic_fo2(monkeypatch) -> None:
             notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
             for notice in prediction.notices
         )
-        for prediction in predictions
+        for prediction in predictions[:-1]
     )
+    magemin = predictions[-1]
+    assert magemin.execution.state is ExecutionState.UNSUPPORTED
+    assert magemin.authority is Authority.REFUSED
+    assert magemin.refusal_reason is RefusalReason.UNSUPPORTED
+    assert magemin.refusal_detail["reason"] == "engine_missing_observable"
+    assert magemin.refusal_detail["observable"] == "vapour species"
