@@ -1914,7 +1914,6 @@ def _draw_hero_refusals(
     axis.set_yticks(positions)
     axis.set_yticklabels(reasons, fontsize=4.8)
     axis.invert_yaxis()
-    axis.set_xlabel("refusal rows", fontsize=5.5)
     axis.xaxis.set_major_locator(MaxNLocator(integer=True))
     axis.xaxis.set_major_formatter(
         FuncFormatter(lambda value, _position: _compact_count(round(value)))

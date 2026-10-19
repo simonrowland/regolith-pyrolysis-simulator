@@ -912,6 +912,7 @@ def test_refusal_strip_uses_integer_unique_ticks() -> None:
     assert all(float(tick).is_integer() for tick in axis.get_xticks())
     labels = [label.get_text() for label in axis.get_xticklabels()]
     assert len(labels) == len(set(labels))
+    assert axis.get_xlabel() == ""
     plt.close(fig)
 
 
