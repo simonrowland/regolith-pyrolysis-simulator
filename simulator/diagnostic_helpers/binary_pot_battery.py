@@ -43,6 +43,7 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
+from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
 from simulator.melt_regime import (
     legacy_raw_liquid_fraction_is_zero,
     liquid_fraction_invalidity,
@@ -106,7 +107,7 @@ PO2_COMMANDED = "commanded"
 PO2_OXYGEN_BALANCE_EFFUSION = "oxygen_balance_effusion"
 # Caller-stated oxygen omission, including condensed activity without a
 # multivalent element, is never rewritten as engine fO2 = -9.
-PO2_NOT_AN_INPUT = "not_an_input"
+PO2_NOT_AN_INPUT = REDOX_MODE_NOT_AN_INPUT
 
 REFUSAL_OUT_OF_BASIS = "out_of_basis"
 REFUSAL_COMPOSITION_PROJECTED = "composition_projected"
@@ -4048,6 +4049,8 @@ def equilibrate_cell(
         parameters = {}
     if "fO2_log" in parameters:
         kwargs["fO2_log"] = fo2_log
+    if "redox_mode" in parameters and po2.mode == PO2_NOT_AN_INPUT:
+        kwargs["redox_mode"] = REDOX_MODE_NOT_AN_INPUT
     if "po2_request" in parameters:
         kwargs["po2_request"] = po2
     if "call_timeout_s" in parameters:

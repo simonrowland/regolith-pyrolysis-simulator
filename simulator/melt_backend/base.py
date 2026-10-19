@@ -32,6 +32,8 @@ DEFAULT_BACKEND_CAPABILITIES = {
     for key in BACKEND_CAPABILITY_KEYS
 }
 
+REDOX_MODE_NOT_AN_INPUT = 'not_an_input'
+
 
 class RealBackendFamily(str, Enum):
     """Closed typed authority carried by explicit real-engine adapters."""
@@ -594,6 +596,7 @@ class MeltBackend(ABC):
                         Mapping[str, Mapping[str, float]]
                     ] = None,
                     species_formula_registry: Optional[Mapping[str, Any]] = None,
+                    redox_mode: Optional[str] = None,
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium at given conditions.
@@ -611,6 +614,9 @@ class MeltBackend(ABC):
                               finite default preserves legacy callers; an
                               intrinsic-capable implementation may default to
                               ``None`` explicitly.
+            redox_mode:     ``'not_an_input'`` distinguishes a scorer omission
+                              from an intrinsic closed-system fO2 request. The
+                              default preserves the legacy ``fO2_log`` meaning.
             pressure_bar:    Total pressure (bar)
 
         Returns:

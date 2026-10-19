@@ -3669,6 +3669,9 @@ def oxygen_is_scorer_input(
     if quantity in MELT_ACTIVITY_QUANTITIES:
         if redox:
             return True, "melt contains multivalent " + ", ".join(redox), redox
+        # fO2 changes melt activity through redox speciation. With no
+        # multivalent element in this fixed oxide composition, there is no
+        # redox pair for oxygen potential to shift, so fO2 is not an input.
         from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
 
         return (
