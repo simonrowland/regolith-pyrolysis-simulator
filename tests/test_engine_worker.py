@@ -294,14 +294,15 @@ def test_queue_pool_keeps_draining_while_one_slot_hangs(monkeypatch):
 
         connection.poll = poll
 
-    with EngineWorkerPool(lambda _index: _test_worker(timeout_s=0.08), size=2) as pool:
+    with EngineWorkerPool(lambda _index: _test_worker(timeout_s=5.0), size=2) as pool:
         clock = FakeClock()
         with monkeypatch.context() as patch:
             patch.setattr(engine_pool_module, 'time', clock)
             for worker in pool.workers:
                 consume_budget_on_first_poll(worker.connection, clock)
 
-            hung = pool.submit({**_points()[0], 'hang': True})
+            # Only the deliberately hung request gets the short call wall.
+            hung = pool.submit({**_points()[0], 'hang': True}, timeout_s=0.08)
             fast = [pool.submit(point) for point in _points()[1:7]]
             assert all(
                 future.result(timeout=_RENDEZVOUS_TIMEOUT_S) for future in fast
