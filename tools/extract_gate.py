@@ -265,32 +265,37 @@ def main(argv: list[str] | None = None) -> int:
     else:
         parser.error("provide an extract, --ids, or --changed-since")
 
+    module_context = _tree_modules(tree)
     try:
-        with _tree_modules(tree) as (gate, validator, yaml_cache, yaml_source_issues):
-            hard_failed = False
-            pre_policy_ids = validator.pre_policy_source_ids() if paths else set()
-            for path in paths:
-                if len(paths) > 1 or args.ids or args.changed_since:
-                    print(f"EXTRACT {path}")
-                if not path.is_file():
-                    print(f"HARD extract: file not found: {path}")
-                    hard_failed = True
-                    continue
-                hard_failed = _run_one(
-                    path,
-                    args.corpus,
-                    pre_policy_ids,
-                    gate=gate,
-                    validator=validator,
-                    yaml_cache=yaml_cache,
-                    yaml_source_issues=yaml_source_issues,
-                ) or hard_failed
-            if not paths:
-                print("PASS: no changed extract YAML files")
-            return int(hard_failed)
+        gate, validator, yaml_cache, yaml_source_issues = module_context.__enter__()
     except (ImportError, ModuleNotFoundError, AttributeError) as exc:
         print(f"HARD tree-import: {type(exc).__name__}: {exc}")
         return 1
+
+    try:
+        hard_failed = False
+        pre_policy_ids = validator.pre_policy_source_ids() if paths else set()
+        for path in paths:
+            if len(paths) > 1 or args.ids or args.changed_since:
+                print(f"EXTRACT {path}")
+            if not path.is_file():
+                print(f"HARD extract: file not found: {path}")
+                hard_failed = True
+                continue
+            hard_failed = _run_one(
+                path,
+                args.corpus,
+                pre_policy_ids,
+                gate=gate,
+                validator=validator,
+                yaml_cache=yaml_cache,
+                yaml_source_issues=yaml_source_issues,
+            ) or hard_failed
+        if not paths:
+            print("PASS: no changed extract YAML files")
+        return int(hard_failed)
+    finally:
+        module_context.__exit__(None, None, None)
 
 
 if __name__ == "__main__":

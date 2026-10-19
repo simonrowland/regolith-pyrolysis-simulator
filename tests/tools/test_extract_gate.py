@@ -3,9 +3,11 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import sys
 from contextlib import nullcontext
 from pathlib import Path
 
+import pytest
 import yaml
 
 import simulator.battery.extract_gate as gate
@@ -234,6 +236,66 @@ def test_migrator_supported_descriptive_basis_passes_gate(tmp_path: Path):
     report = _run_gate(tmp_path, doc)
     assert "composition" not in _checks(report)
     assert "isolated-migration" not in _checks(report)
+
+
+def test_context_compositions_are_preserved_and_not_flagged(tmp_path: Path):
+    path = (
+        REPO_ROOT
+        / "data/literature/extracts/tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems.yaml"
+    )
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    report = evaluate_extract(path, doc, corpus=tmp_path)
+    assert "composition" not in _checks(report)
+
+    source_id = str(doc["source_id"])
+    source = doc.get("source") or {}
+    migrator = gate.migrate.Migrator(
+        root=gate.migrate.REPO_ROOT,
+        index={
+            source_id: {
+                "source_id": source_id,
+                "citation": str(source.get("citation") or source_id),
+                "doi": source.get("doi"),
+            }
+        },
+        aliases={},
+    )
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+    source_context = {
+        row["observation_id"]: row["values"]
+        for block in doc["species"].values()
+        for row in block.get("context", [])
+        if isinstance(row, dict) and isinstance(row.get("values"), dict)
+    }
+    migrated_context = {
+        row["observation_id"]: row["values"]
+        for rows in result.context_by_work.values()
+        for row in rows
+        if row.get("observation_id") in source_context
+    }
+    assert migrated_context == source_context
+
+    activity_points = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value.value
+        in {"activity", "activity_coefficient", "activity_coefficient_temperature_fit"}
+    ]
+    assert activity_points
+    assert all(
+        observation.point_conditions is not None
+        and "composition" in observation.point_conditions
+        and observation.point_conditions["composition"].state.is_value
+        and "BaO"
+        in dict(observation.point_conditions["composition"].state.value.components)
+        for observation in activity_points
+    )
 
 
 def test_explicit_inventory_basis_allows_descriptive_composition_label():
@@ -666,12 +728,19 @@ def test_cli_uses_distinct_foreign_tree_and_restores_runner_modules(
     )
     (tree / "tools").mkdir(parents=True)
     (tree / "tools/__init__.py").write_text("", encoding="utf-8")
+    (tree / "tools/_foreign_tree_marker.py").write_text(
+        "MARKER = 'foreign tree'\n", encoding="utf-8"
+    )
     validator_source = (
         REPO_ROOT / "tools/validate_literature_extracts.py"
     ).read_text(encoding="utf-8")
     assert '        "alpha",\n' in validator_source
     (tree / "tools/validate_literature_extracts.py").write_text(
-        validator_source.replace('        "alpha",\n', "", 1),
+        validator_source.replace(
+            "from __future__ import annotations\n",
+            "from __future__ import annotations\nimport tools._foreign_tree_marker\n",
+            1,
+        ).replace('        "alpha",\n', "", 1),
         encoding="utf-8",
     )
     subprocess.run(["git", "init", str(tree)], check=True, capture_output=True)
@@ -712,6 +781,14 @@ def test_cli_uses_distinct_foreign_tree_and_restores_runner_modules(
     runner_validator = validator
     path = tmp_path / "fixture-source.yaml"
     path.write_text(yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8")
+    runner_modules = {
+        name: module
+        for name, module in sys.modules.items()
+        if name == "simulator"
+        or name.startswith("simulator.")
+        or name == "tools"
+        or name.startswith("tools.")
+    }
 
     status = extract_gate.main(
         [str(path), "--tree", str(tree), "--corpus", str(tmp_path)]
@@ -723,8 +800,34 @@ def test_cli_uses_distinct_foreign_tree_and_restores_runner_modules(
     assert "type must be one of" in output
     assert "MIGRATION observations by ValueKind:" in output
     assert f"TREE {tree} HEAD " in output
-    assert gate.migrate is runner_migrate
-    assert validator is runner_validator
+    assert all(sys.modules.get(name) is module for name, module in runner_modules.items())
+    assert "tools._foreign_tree_marker" not in sys.modules
+    assert sys.modules["simulator.battery.migrate"] is runner_migrate
+    assert sys.modules["tools.validate_literature_extracts"] is runner_validator
+
+
+def test_internal_gate_attribute_error_is_not_a_tree_import_error(
+    tmp_path: Path, monkeypatch, capsys
+):
+    path = tmp_path / "fixture-source.yaml"
+    path.write_text(yaml.safe_dump(_document(), sort_keys=False), encoding="utf-8")
+    monkeypatch.setattr(
+        extract_gate,
+        "_tree_modules",
+        lambda _tree: nullcontext(
+            (gate, validator, yaml_cache, yaml_cache.yaml_mapping_source_issues)
+        ),
+    )
+
+    def injected_gate_error(*_args, **_kwargs):
+        raise AttributeError("INJECTED_COMPOSITION_GATE_BUG")
+
+    monkeypatch.setattr(gate, "_composition_issues", injected_gate_error)
+    with pytest.raises(AttributeError, match="INJECTED_COMPOSITION_GATE_BUG"):
+        extract_gate.main(
+            [str(path), "--tree", str(REPO_ROOT), "--corpus", str(tmp_path)]
+        )
+    assert "HARD tree-import:" not in capsys.readouterr().out
 
 
 def test_tree_import_refuses_missing_migrator_without_fallback(tmp_path: Path, capsys):

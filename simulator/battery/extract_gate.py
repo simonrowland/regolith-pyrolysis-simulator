@@ -61,6 +61,7 @@ class GateReport:
     refusal_reasons: dict[str, int] = field(default_factory=dict)
     migration_hard_issues: int = 0
     migration_error: str | None = None
+    composition_drops: list[str] = field(default_factory=list)
     tables: list[TableCoverage] = field(default_factory=list)
 
     @property
@@ -270,30 +271,11 @@ def _formula_count(names: object) -> int:
     )
 
 
-def _composition_issues(doc: object) -> list[str]:
-    issues: list[str] = []
-    seen_dropped: set[str] = set()
+def _composition_issues(
+    doc: object, migration_drops: list[str] | None = None
+) -> list[str]:
+    issues = list(migration_drops or [])
     seen_percent: set[tuple[str, str]] = set()
-
-    def check_migrated_composition(
-        mapping: Mapping[str, object], path: str, composition_key: str
-    ) -> None:
-        try:
-            composition, omitted = migrate._mole_fraction_composition_from_values(
-                mapping
-            )
-        except (TypeError, ValueError) as exc:
-            composition, omitted = None, (str(exc),)
-        if composition is None or omitted:
-            key = f"{path}.{composition_key}"
-            if key not in seen_dropped:
-                seen_dropped.add(key)
-                detail = (
-                    ", ".join(omitted[:3])
-                    if omitted
-                    else "no composition was produced"
-                )
-                issues.append(f"{key} was dropped by migration: {detail}")
 
     def check_amounts(amounts: list[tuple[str, object]], path: str) -> None:
         numeric = [_as_decimal(value) for _, value in amounts]
@@ -316,15 +298,9 @@ def _composition_issues(doc: object) -> list[str]:
     for mapping, path in _mappings(doc):
         raw = mapping.get("composition_mol")
         if isinstance(raw, Mapping):
-            check_migrated_composition(mapping, path, "composition_mol")
             check_amounts(_component_pairs(raw), f"{path}.composition_mol")
         elif isinstance(mapping.get("composition_mole_fraction"), Mapping):
             values = mapping["composition_mole_fraction"]
-            check_migrated_composition(
-                {"composition_mole_fraction": values},
-                path,
-                "composition_mole_fraction",
-            )
             check_amounts(
                 _component_pairs(values),
                 f"{path}.composition_mole_fraction",
@@ -333,13 +309,6 @@ def _composition_issues(doc: object) -> list[str]:
         if "components" in mapping and "amount_basis" in mapping:
             amount_basis = str(mapping.get("amount_basis") or "")
             if amount_basis in {"", "mole_fraction"}:
-                try:
-                    migrate._composition_from_plain(mapping)
-                except (TypeError, ValueError, KeyError) as exc:
-                    key = f"{path or 'composition'}.components"
-                    if key not in seen_dropped:
-                        seen_dropped.add(key)
-                        issues.append(f"{key} was dropped by migration: {exc}")
                 check_amounts(
                     _component_pairs(mapping),
                     path or "composition",
@@ -940,6 +909,9 @@ def _migrate_one(path: Path, doc: object, report: GateReport) -> list[str]:
             refusals[str(reason)] += 1
     for entry in result.queue:
         refusals[str(entry.why)] += 1
+        if entry.why.startswith("unusable composition component(s):"):
+            location = entry.observation_id or entry.source or entry.work_id
+            report.composition_drops.append(f"{location}: {entry.why}")
     if result.validation is not None:
         for issue in result.validation.hard_issues:
             refusals[str(issue.reason.value)] += 1
@@ -997,7 +969,12 @@ def evaluate_extract(
     _add(report, "locator-page-offset", "SOFT", locator_page_soft)
     _add(report, "locator-pdf", "SOFT", locator_pdf_soft)
     _add(report, "locator-legacy", "SOFT", locator_legacy_soft)
-    _add(report, "composition", "HARD", _composition_issues(doc))
+    _add(
+        report,
+        "composition",
+        "HARD",
+        _composition_issues(doc, report.composition_drops),
+    )
     _add(report, "transition-composition", "HARD", _transition_composition_issues(doc))
     _add(report, "zero-uncertainty", "HARD", _uncertainty_issues(doc))
 
