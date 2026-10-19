@@ -115,6 +115,7 @@ Y_LIMITS = (-3.0, 3.0)
 TIER_MAJOR = "major"
 TIER_MINOR = "minor"
 TIER_TRACE = "trace"
+FLAGGED_MARKER_LABEL = "flagged / extrapolated"
 TIER_STYLES: dict[str, dict[str, Any]] = {
     TIER_MAJOR: {"color": "#111111", "linewidth": 2.0, "markersize": 3.5},
     TIER_MINOR: {"color": "#777777", "linewidth": 1.2, "markersize": 3.0},
@@ -1214,7 +1215,7 @@ def _legend_handles() -> list[Line2D]:
             linewidth=1.0,
             marker="o",
             markerfacecolor="none",
-            label="non-certified / out-of-band (hollow)",
+            label=FLAGGED_MARKER_LABEL,
         )
     )
     return handles
@@ -1870,7 +1871,7 @@ def _hero_legend_handles(
                 marker="o",
                 markerfacecolor="#ffffff",
                 markeredgecolor="#444444",
-                label="flagged / extrapolated",
+                label=FLAGGED_MARKER_LABEL,
             )
         )
     return handles
