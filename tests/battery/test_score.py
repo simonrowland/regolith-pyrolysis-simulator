@@ -5026,6 +5026,154 @@ def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
     ).hex()
 
 
+def test_battery_hero_deck_uses_store_oxygen_request_for_axis() -> None:
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+    }
+    oxygen_identity = Identity(
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Fe", Phase.G),
+        temperature_K=State.of(Decimal("1200")),
+        fO2_Pa=State.of(Decimal("10")),
+    )
+    stored = F.observation(
+        "store-oxygen-reference",
+        "deck-oxygen-experiment",
+        oxygen_identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity=Quantity.P_PARTIAL.value,
+        composition=composition,
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+        engine=Engine.OPENIMCC.value,
+    )
+    row["reference"] = stored.observation_id
+
+    result = score_mod._battery_hero_deck_records(
+        [row], observations={stored.observation_id: stored}
+    )
+    point = next(
+        point for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+    )
+
+    # The scorer's Po2Request converts 10 Pa to 1e-4 bar; do not trust the
+    # deliberately absent fO2 on the residual candidate payload.
+    expected = score_mod._battery_hero_delta_iw(Decimal("1200"), Decimal("10"))
+    assert expected is not None
+    assert float(point["x_value"]).hex() == float(expected).hex()
+    assert point["fO2_Pa"] == "10"
+
+
+def test_battery_hero_residue_requires_typed_mass_loss_at_same_time() -> None:
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+    }
+    temperature = State.of(Decimal("1200"))
+    residue_identity = Identity(
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        species=Species("Fe", Phase.L),
+        temperature_K=temperature,
+    )
+    mass_loss_identity = Identity(
+        quantity=Quantity.MASS_LOSS_FRACTION,
+        species=Species("Fe", Phase.G),
+        temperature_K=temperature,
+    )
+    residue = F.observation(
+        "residue-at-10-min",
+        "deck-residue-experiment",
+        residue_identity,
+        Decimal("2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    other_residue = F.observation(
+        "residue-at-20-min",
+        "deck-residue-experiment",
+        residue_identity,
+        Decimal("3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    mass_loss = F.observation(
+        "typed-mass-loss-at-10-min",
+        "deck-residue-experiment",
+        mass_loss_identity,
+        Decimal("0.25"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    residue = replace(
+        residue,
+        point_conditions={
+            **(residue.point_conditions or {}),
+            "time_min": Located(State.of(Decimal("10"))),
+        },
+    )
+    other_residue = replace(
+        other_residue,
+        point_conditions={
+            **(other_residue.point_conditions or {}),
+            "time_min": Located(State.of(Decimal("20"))),
+        },
+    )
+    mass_loss = replace(
+        mass_loss,
+        point_conditions={"time_min": Located(State.of(Decimal("10")))},
+    )
+    rows = [
+        _hero_deck_score_row(
+            rail=Rail.RESIDUE_COMPOSITION.value,
+            formula="Fe",
+            quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION.value,
+            composition=composition,
+            residual_dex=Decimal("0.125"),
+            candidate_value="2",
+            engine=Engine.INTERNAL_ANALYTICAL.value,
+        ),
+        _hero_deck_score_row(
+            rail=Rail.RESIDUE_COMPOSITION.value,
+            formula="Fe",
+            quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION.value,
+            composition=composition,
+            residual_dex=Decimal("-0.25"),
+            candidate_value="3",
+            engine=Engine.INTERNAL_ANALYTICAL.value,
+        ),
+    ]
+    rows[0]["reference"] = residue.observation_id
+    rows[1]["reference"] = other_residue.observation_id
+
+    result = score_mod._battery_hero_deck_records(
+        rows,
+        observations={
+            residue.observation_id: residue,
+            other_residue.observation_id: other_residue,
+            mass_loss.observation_id: mass_loss,
+        },
+    )
+    points = [
+        point for point in result["points"]
+        if point["chart"] == "residue_composition"
+    ]
+
+    assert len(points) == 1
+    assert float(points[0]["x_value"]).hex() == "0x1.0000000000000p-2"
+    assert float(points[0]["y_value"]).hex() == "0x1.0000000000000p-3"
+    assert result["axis_refusals"][
+        ("residue_composition", Engine.INTERNAL_ANALYTICAL.value, "no recorded mass loss")
+    ] == 1
+
+
 def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
     mole_composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
