@@ -108,13 +108,18 @@ def _citation_matches(locator: dict, text: str, cited_values=()) -> bool | None:
         r"\1e\2",
         normalized,
     )
+    normalized = re.sub(r"\\sim", "~", normalized)
+    normalized = re.sub(r"[${}]", "", normalized)
     normalized = re.sub(r"e([+-])0+(\d+)", r"e\1\2", normalized)
     has_direct_anchor = False
+    has_table_or_figure = False
     for kind in ("table", "figure", "equation"):
         label = locator.get(kind)
         if label is None:
             continue
         has_direct_anchor = True
+        if kind in {"table", "figure"}:
+            has_table_or_figure = True
         label = str(label).strip()
         label_kind = {
             "table": "table",
@@ -123,7 +128,7 @@ def _citation_matches(locator: dict, text: str, cited_values=()) -> bool | None:
         }[kind]
         if re.search(r"\b" + label_kind + r"\s*" + re.escape(label) + r"\b", normalized, re.I):
             return True
-        if kind == "equation" and re.search(r"\\tag\s*\{\s*" + re.escape(label) + r"\s*\}", normalized, re.I):
+        if kind == "equation" and re.search(r"\\tag\s*(?:\{\s*)?" + re.escape(label) + r"\b", normalized, re.I):
             return True
         if kind == "figure" and not label.isdigit():
             description_words = re.findall(r"[a-z]{4,}", label.casefold())
@@ -136,48 +141,31 @@ def _citation_matches(locator: dict, text: str, cited_values=()) -> bool | None:
             if roman and re.search(r"\b" + label_kind + r"\s*" + roman + r"\b", normalized, re.I):
                 return True
 
+    # Numeric data elsewhere in the cited range cannot stand in for a missing
+    # table or figure label (for example, a shared sample ID).
+    if has_table_or_figure:
+        return False
+
     for key in ("quote", "paragraph"):
         citation = locator.get(key)
         if isinstance(citation, str) and len(citation.strip()) >= 12:
             citation_normalized = " ".join(citation.split()).casefold()
-            if key == "quote":
-                has_direct_anchor = True
+            citation_normalized = re.sub(r"\\sim", "~", citation_normalized)
+            citation_normalized = re.sub(r"[${}]", "", citation_normalized)
+            has_direct_anchor = True
             if citation_normalized in normalized:
                 return True
-            # OCR markdown may add math delimiters or encode a tilde as ``\\sim``.
-            # A cited numeric value remains a direct source anchor across that formatting.
-            citation_numbers = re.findall(r"(?<![A-Za-z])\d+(?:\.\d+)?", citation_normalized)
-            has_direct_anchor |= any(len(number) >= 2 for number in citation_numbers)
-            if any(number in normalized for number in citation_numbers if len(number) >= 2):
-                return True
             if key == "paragraph":
-                words = [word for word in re.findall(r"[a-z]{4,}", citation_normalized) if word not in {"with", "from", "until", "into", "only", "where", "used", "range", "table", "figure"}]
-                if sum(word in normalized for word in set(words)) >= 2:
+                citation_numbers = re.findall(r"(?<![A-Za-z])\d+(?:\.\d+)?(?:e[-+]?\d+)?", citation_normalized)
+                citation_words = [
+                    word
+                    for word in re.findall(r"[a-z]{2,}", citation_normalized)
+                    if word not in {"with", "from", "until", "into", "only", "where", "used", "range", "was", "were", "the", "and", "for", "of", "in"}
+                ]
+                if sum(word in normalized for word in set(citation_words)) >= 2 and (
+                    not citation_numbers or any(number in normalized for number in citation_numbers)
+                ):
                     return True
-
-    section = locator.get("section")
-    if isinstance(section, str):
-        section_parts = [part.strip().casefold() for part in re.split(r"[/;]", section) if part.strip()]
-        if any(part in normalized for part in section_parts):
-            return True
-        section_words = re.findall(r"[a-z]{4,}", section.casefold())
-        if sum(word in normalized for word in set(section_words)) >= 2:
-            return True
-
-    note = locator.get("note")
-    if isinstance(note, str):
-        # Notes commonly quote the table's measured value while describing its row.
-        note_numbers = re.findall(r"(?<![A-Za-z])[-+]?\d+(?:\.\d+)?(?:e[-+]?\d+)?", note, re.I)
-        has_direct_anchor |= bool(note_numbers)
-        for number in note_numbers:
-            if number.casefold() in normalized:
-                return True
-        note_words = re.findall(r"[a-z]{4,}", note.casefold())
-        if sum(word in normalized for word in set(note_words)) >= 2:
-            return True
-        formulas = re.findall(r"\b[A-Z][a-z]?\d*(?:O\d*)?\b", note)
-        if any(formula.casefold() in normalized for formula in formulas):
-            return True
     for value in cited_values:
         for citation in _text_values(value):
             citation = " ".join(citation.split()).casefold()
@@ -232,7 +220,19 @@ def _record_demaria_table_8_pin() -> None:
         and str(locator.get("table", "")).strip() == "8"
     ]
     assert matches, "DeMaria Table 8 locator not found"
-    assert any((328, 330) in _line_ranges(locator["line_range"]) for locator in matches)
+    assert any(_line_ranges(locator["line_range"]) == [(328, 330)] for locator in matches)
+
+
+def test_locator_citation_requires_the_cited_anchor() -> None:
+    table_8 = {"table": "8", "paragraph": "Table 8 reports sample 12065 results."}
+    assert _citation_matches(table_8, "Table 7 sample 12065 results.") is False
+    assert _citation_matches(table_8, "Table 8 sample 12065 results.") is True
+
+    text_only = {"paragraph": "Sample 12065 was heated to 2360 K."}
+    assert _citation_matches(text_only, "Sample 12065 was held for a separate experiment.") is False
+    assert _citation_matches(text_only, "Sample 12065 was heated to 2360 K.") is True
+    assert _citation_matches(text_only, "Sample 12065 was heated to 2360 K.", [2360]) is True
+    assert _citation_matches({"quote": "heated to 2360 K"}, "Sample was heated to 2360 K.") is True
 
 
 def _record_lamoreaux_page_pins() -> None:
