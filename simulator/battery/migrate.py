@@ -994,6 +994,57 @@ def _raw_inputs_from_plain(payload: object) -> Located[RawInputStatus]:
     )
 
 
+def _method_from_plain(payload: object) -> Located[str]:
+    if isinstance(payload, Located):
+        if not isinstance(payload.state, State):
+            raise _InvalidDerivationAnnotation("Derivation.method state must be typed")
+        if payload.state.is_value and not isinstance(payload.state.value, str):
+            raise _InvalidDerivationAnnotation("Derivation.method value must be a string")
+        if payload.locator is not None and not isinstance(payload.locator, Locator):
+            raise _InvalidDerivationAnnotation(
+                "Derivation.method locator must be an object"
+            )
+        return payload
+    if isinstance(payload, str):
+        return Located(State.of(payload))
+    if not isinstance(payload, Mapping) or "state" not in payload:
+        raise _InvalidDerivationAnnotation(
+            "Derivation.method must be a string or a located string mapping with state"
+        )
+    state = payload["state"]
+    if isinstance(state, Mapping):
+        tag = state.get("tag") or "value"
+        if not isinstance(tag, str):
+            raise _InvalidDerivationAnnotation(
+                "Derivation.method state tag must be a string"
+            )
+        if tag == "value" and not isinstance(state.get("value"), str):
+            raise _InvalidDerivationAnnotation(
+                "Derivation.method value must be a string"
+            )
+    elif isinstance(state, State):
+        if state.is_value and not isinstance(state.value, str):
+            raise _InvalidDerivationAnnotation(
+                "Derivation.method value must be a string"
+            )
+    else:
+        raise _InvalidDerivationAnnotation("Derivation.method state must be an object")
+    locator = payload.get("locator")
+    if "locator" in payload and not isinstance(locator, (Mapping, Locator)):
+        raise _InvalidDerivationAnnotation(
+            "Derivation.method locator must be an object"
+        )
+
+    def _method_text(value: object) -> str:
+        if not isinstance(value, str):
+            raise _InvalidDerivationAnnotation(
+                "Derivation.method value must be a string"
+            )
+        return value
+
+    return _located_from_plain(payload, _method_text)
+
+
 def _locator_from_plain(payload: object) -> Locator | None:
     if payload is None:
         return None
@@ -1069,8 +1120,16 @@ def _derivation_from_plain(
     )
     raw_method = payload.get("method")
     parsed_method = (
-        _located_from_plain(raw_method, str) if raw_method is not None else None
+        _method_from_plain(raw_method) if raw_method is not None else None
     )
+    raw_references = payload.get("references", ())
+    if not isinstance(raw_references, (list, tuple)) or any(
+        not isinstance(reference, str) for reference in raw_references
+    ):
+        raise _InvalidDerivationAnnotation(
+            "Derivation.references must be a sequence of strings"
+        )
+    references = tuple(raw_references)
     relation = payload.get("relation", "identity")
     if relation is None or relation == "":
         if require_relation:
@@ -1091,6 +1150,7 @@ def _derivation_from_plain(
         pure_substance_reference=raw_marker,
         raw_inputs=parsed_raw_inputs,
         method=parsed_method,
+        references=references,
     )
     if require_inputs:
         requirement_error = _derivation_inputs_requirement_error(derivation)

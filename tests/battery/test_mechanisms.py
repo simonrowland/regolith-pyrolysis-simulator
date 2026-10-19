@@ -1270,6 +1270,7 @@ def _model_derived_without_raw_parent(
     *,
     declaration: Located,
     method: Located | None = None,
+    references: tuple[str, ...] = (),
     derived_from: tuple[str, ...] | None = None,
 ) -> Observation:
     experiment = F.tabulation_experiment()
@@ -1289,6 +1290,7 @@ def _model_derived_without_raw_parent(
             inputs=(),
             raw_inputs=declaration,
             method=method,
+            references=references,
         ),
     )
 
@@ -1327,14 +1329,53 @@ def test_model_derived_unprinted_inputs_with_located_method_passes() -> None:
             State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
         ),
         method=Located(
-            State.of("calculated with a printed equation and named references"),
+            State.of("calculated with the printed equilibrium equations"),
+            locator=F.loc(page=164, equation="7"),
+        ),
+        references=("Gurvich K°(T)", "Mann cross-sections"),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert issues == ()
+
+
+def test_model_derived_unprinted_inputs_rejects_page_only_placeholder_method() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(State.of("x"), locator=F.loc(page=164)),
+        references=("Gurvich K°(T)",),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.method")
+        and "equation and physical page locator" in issue.detail
+        for issue in issues
+    )
+
+
+def test_model_derived_unprinted_inputs_requires_named_references() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(
+            State.of("calculated with the printed equilibrium equation"),
             locator=F.loc(page=164, equation="7"),
         ),
     )
     issues = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
     ).hard_issues
-    assert issues == ()
+    assert any(
+        issue.path.endswith(".derivation.references")
+        and "requires named compiled references" in issue.detail
+        for issue in issues
+    )
 
 
 def test_model_derived_raw_inputs_not_printed_requires_method() -> None:

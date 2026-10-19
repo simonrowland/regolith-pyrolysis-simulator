@@ -786,6 +786,7 @@ def _raw_inputs_extract(
             },
             "locator": {"page": 2, "equation": "7"},
         }
+        derivation["references"] = ["Gurvich K°(T)", "Mann cross-sections"]
     observation["values"]["derivation"] = derivation
     return extract
 
@@ -1472,11 +1473,37 @@ def test_production_migration_accepts_model_derived_raw_input_method(
         "printed equation using Gurvich K°(T) and Mann cross-sections"
     )
     assert observation.derivation.method.locator is not None
+    assert observation.derivation.references == (
+        "Gurvich K°(T)",
+        "Mann cross-sections",
+    )
     assert result.validation.hard_issues == ()
     reloaded = observation_from_plain(
         yaml.safe_load(yaml.safe_dump(to_plain(observation)))
     )
     assert reloaded.derivation == observation.derivation
+
+
+@pytest.mark.parametrize(
+    "method", [0, {"nonsense": True}], ids=["numeric", "object"]
+)
+def test_model_derived_raw_input_method_rejects_non_string_values(
+    tmp_path: Path, method: object
+) -> None:
+    extract = _raw_inputs_extract("model_derived", include_method=True)
+    extract["species"]["Na"]["observations"][0]["values"]["derivation"][
+        "method"
+    ] = method
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(".values.derivation")
+        and "Derivation.method" in issue.detail
+        and "must be a string" in issue.detail
+        for issue in result.registry_issues
+    )
 
 
 def test_hastie_initial_charges_bind_to_figure_points_as_proxies(

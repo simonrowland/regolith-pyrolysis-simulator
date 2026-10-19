@@ -104,6 +104,8 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
         observation.derivation is not None
         and observation.derivation.has_located_unprinted_raw_inputs
         and observation.derivation.has_located_method
+        and observation.derivation.references
+        == ("Gurvich K°(T)", "Mann cross-sections")
         for observation in oxygen_rows
     )
     for observation in oxygen_rows:

@@ -1193,7 +1193,15 @@ def validate_observation(
                     _issue(
                         f"{path}.derivation.method",
                         RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs method requires a nonempty value",
+                        "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
+                    )
+                )
+            if derivation is not None and not derivation.has_named_references:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.references",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived raw_inputs method requires named compiled references",
                     )
                 )
         has_resolved_lineage = any(
@@ -1208,6 +1216,7 @@ def validate_observation(
                 or (
                     ev.value is EvidenceClass.MODEL_DERIVED
                     and derivation.has_located_method
+                    and derivation.has_named_references
                 )
             )
         )

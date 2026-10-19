@@ -248,19 +248,22 @@ derivation:
 When the source does not print raw inputs, omit `inputs` entirely. The paper
 is never an input, and no invented observation may stand in for the unprinted
 inputs. For `model_derived`, the derivation must also carry its method as a
-located `method` field. Its value names the printed calculation and the
-compiled references used; its locator identifies the printed equation and
-page. For example:
+located `method` field whose value describes the printed calculation. Its
+locator identifies the printed equation and physical page, and `references`
+is a typed list naming at least one compiled reference used. For example:
 
 ```yaml
 derivation:
   relation: "author calculation using the printed equilibrium equation"
   output_unit: Pa
   method:
-    state: {tag: value, value: "Eqs. (7)–(9) use Gurvich K°(T) and Mann cross-sections"}
+    state: {tag: value, value: "Eqs. (7)–(9) calculate K_ref from unprinted ion-current ratios"}
     locator:
       page: 19
       equation: "7–9"
+  references:
+    - "Gurvich K°(T)"
+    - "Mann cross-sections"
   raw_inputs:
     state: {tag: value, value: not_printed}
     locator:
@@ -271,7 +274,8 @@ derivation:
 
 `raw_inputs` is a typed `not_printed` value with its own source locator. It is
 valid for `measured_reduced`, and for `model_derived` only when a nonempty
-located method is supplied. It cannot appear with derivation `inputs` or
+method with an equation and physical-page locator and at least one named
+compiled reference is supplied. It cannot appear with derivation `inputs` or
 observation `derived_from`. A model-derived method locator does not replace
 the observation's required method locator.
 
