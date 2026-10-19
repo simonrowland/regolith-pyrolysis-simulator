@@ -1,6 +1,8 @@
 """Migration pins for Lu et al. (2024), Table 1."""
 
 from decimal import Decimal
+
+import yaml
 from pathlib import Path
 
 from simulator.battery.enums import Quantity
@@ -28,3 +30,15 @@ def test_table_1_m01_residue_values_and_conditions_migrate() -> None:
     assert all(o.point_conditions["duration_s"].state.value == Decimal("120") for o in m01)
     assert all(o.locator.published_page == 1195 and o.locator.table == "1" for o in m01)
     assert not migrator.result.validation.hard_issues
+
+
+def test_all_figure_captions_are_deferred_without_numeric_points() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    figures = [
+        row for row in extract["species"]["SiO2"]["context"]
+        if row.get("type") == "figure_only"
+    ]
+    assert len(figures) == 6
+    assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in figures)
+    assert all(row["values"]["identity"]["temperature_as_printed"] for row in figures)
+    assert all(row["values"]["series"] for row in figures)
