@@ -325,13 +325,15 @@ def _skip_class(document, locator_path, locator):
 
 
 def _number_pattern(value):
+    original = unicodedata.normalize("NFKC", str(value)).translate(
+        str.maketrans({"−": "-", "–": "-", "—": "-", "﹣": "-", "－": "-"})
+    )
     try:
-        number = Decimal(str(value))
+        number = Decimal(original)
     except InvalidOperation:
         return None
     if not number.is_finite():
         return None
-    original = str(value)
     text = format(number, "f")
     sign = r"(?:[−–—﹣－-]\s*)?" if original.strip().startswith("-") else ""
     digits = text.lstrip("-")
@@ -528,7 +530,20 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
     csv_path = Path(__file__).with_name("t1353_locator_pdf_value_skips.csv")
     with csv_path.open(newline="") as stream:
         recorded_skips = list(csv.DictReader(stream))
-    assert value_skips == recorded_skips, "typed locator value skips differ from committed CSV"
+    assert len(value_skips) == len(recorded_skips), "typed locator value skip count differs from committed CSV"
+    value_render_justified = 0
+    recorded_fields = ("extract", "locator", "printed_string", "class", "verdict")
+    for expected, recorded in zip(value_skips, recorded_skips):
+        if recorded["class"] == "render-confirmed":
+            assert recorded["crop_path"], "render-confirmed value skip requires its 600-dpi crop path"
+            expected["class"] = "render-confirmed"
+            expected["verdict"] = "render-confirmed; no text layer"
+            value_render_justified += 1
+        assert {field: expected[field] for field in recorded_fields} == {
+            field: recorded[field] for field in recorded_fields
+        }, "typed locator value skip differs from committed CSV"
+    assert all(row["crop_path"] for row in recorded_skips if row["class"] == "render-confirmed")
+    print(f"render-justified values: {value_render_justified}")
     print(f"typed value skips: {sum(row['class'] == 'digitized' for row in value_skips)} digitized, "
           f"{sum(row['class'] == 'categorical' for row in value_skips)} categorical, "
           f"{sum(row['class'] == 'derived' for row in value_skips)} derived")
@@ -580,6 +595,10 @@ def test_figure_caption_regex_handles_spacing_and_japanese_suffix():
     pattern = _label_pattern({"figure": "8"})
     assert pattern.search("Fig .   8. Caption")
     assert pattern.search("Results in Fig.8に shown below")
+
+
+def test_numeric_pattern_normalizes_unicode_minus():
+    assert _number_pattern("−5.703").search("value - 5.703")
 
 
 def test_slag_figure_9_uses_caption_page_not_page_7_prose():
