@@ -602,30 +602,31 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     if not engine_available:
         pytest.skip('shipped curve pins require the MAGEMin engine')
 
+    # b-899 one redox state, d-166 regen; bounds staged for owner sign-off.
     expected = {
         'lunar_mare_low_ti_C0_24h': [
             (
                 'C0',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                918.75,
-                1370.3125,
-                ((918.75, 0.0), (1370.3125, 1.0)),
+                1028.125,
+                1375.0,
+                ((1028.125, 0.0), (1375.0, 1.0)),
             ),
             (
                 'C0B',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                918.75,
-                1370.3125,
-                ((918.75, 0.0), (1370.3125, 1.0)),
+                1028.125,
+                1375.0,
+                ((1028.125, 0.0), (1375.0, 1.0)),
             ),
         ],
         'mars_basalt_C2A_12h': [
             (
                 'C2A',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1018.75,
-                1320.3125,
-                ((1018.75, 0.0), (1320.3125, 1.0)),
+                920.3125,
+                1318.75,
+                ((920.3125, 0.0), (1318.75, 1.0)),
             ),
         ],
         'ci_carbonaceous_chondrite_C2B_12h': [
