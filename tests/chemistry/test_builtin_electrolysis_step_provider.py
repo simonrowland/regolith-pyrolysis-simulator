@@ -803,7 +803,7 @@ def test_live_mre_converts_ferric_inventory_to_ferrous_behavior(
         feedstocks_data,
         setpoints_data,
     )
-    fe2o3_mol = 10.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
+    fe2o3_mol = 8.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
     view = ProviderAccountView(
         accounts={
             "process.cleaned_melt": {"Fe2O3": fe2o3_mol},
@@ -1126,8 +1126,8 @@ def test_allowed_sio2_target_still_converts_ferric_inventory_to_ferrous(
         feedstocks_data,
         setpoints_data,
     )
-    fe2o3_mol = 10.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
-    sio2_mol = 10.0 / (MOLAR_MASS["SiO2"] / 1000.0)
+    fe2o3_mol = 1.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
+    sio2_mol = 1.0 / (MOLAR_MASS["SiO2"] / 1000.0)
     view = ProviderAccountView(
         accounts={
             "process.cleaned_melt": {
@@ -1556,7 +1556,7 @@ def test_depletion_hour_energy_scales_by_capped_faradaic_charge(
     voltage_V = (
         ElectrolysisModel().nernst_voltage("FeO", temperature_C, 1.0) + 0.05
     )
-    current_A = 1.0e6
+    current_A = 3000.0
 
     legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
         sim=sim,
@@ -1868,7 +1868,7 @@ def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
         setpoints_data,
     )
     sim.atom_ledger = sim._new_atom_ledger()
-    nio_initial_mol = 10.0 / (MOLAR_MASS["NiO"] / 1000.0)
+    nio_initial_mol = 1.0 / (MOLAR_MASS["NiO"] / 1000.0)
     sim.atom_ledger.load_external_mol(
         "process.cleaned_melt", {"NiO": nio_initial_mol}, source="test seed",
         material_origin="feedstock",
@@ -1894,7 +1894,7 @@ def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
         pressure_bar=1e-6,
         control_inputs={
             "voltage_V": DECOMP_VOLTAGES["NiO"] + 0.10,
-            "current_A": 1.0e6,
+            "current_A": 3000.0,
             "dt_hr": 1.0,
             "allowed_oxides": ["NiO"],
         },
