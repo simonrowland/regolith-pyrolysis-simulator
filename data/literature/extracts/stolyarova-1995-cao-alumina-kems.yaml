@@ -29,35 +29,35 @@ fidelity_samples:
   - path: species.Ca.observations[stolyarova_1995_ca_partial_pressure_table2].equipment.cell_material_and_liner.value
     value: Mo
     note: 'Table 1, present-study column, Material of effusion cell: Mo.'
-    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '1'}
+    locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '1'}
   - path: species.Ca.observations[stolyarova_1995_ca_partial_pressure_table2].values.points[0].p_Ca_times_10^9_atm_as_printed
     value: 5.26
     note: 'Table 2, x_CaO=0.143, p_Ca column.'
-    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+    locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
   - path: species.Al.observations[stolyarova_1995_al_partial_pressure_table2].values.points[0].p_Al_times_10^9_atm_as_printed
     value: 45.7
     note: 'Table 2, x_CaO=0.000, p_Al column.'
-    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+    locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
   - path: species.AlO.observations[stolyarova_1995_alo_partial_pressure_table2].values.points[2].p_AlO_times_10^10_atm_as_printed
     value: 45.0
     note: 'Table 2, x_CaO=0.333, p_AlO column.'
-    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+    locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
   - path: species.O.observations[stolyarova_1995_o_partial_pressure_eqn1_table2].values.points[4].p_O_times_10^9_atm_as_printed
     value: 2.89
     note: 'Table 2, x_CaO=0.625, p_O calculated using Eqn 1.'
-    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+    locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
   - path: species.O.observations[stolyarova_1995_o_partial_pressure_eqn2_table2].values.points[7].p_O_times_10^9_atm_as_printed
     value: 3.30
     note: 'Table 2, x_CaO=0.860, p_O calculated using Eqn 2.'
-    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+    locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
   - path: species.O2.observations[stolyarova_1995_o2_partial_pressure_table2].values.points[3].p_O2_times_10^11_atm_as_printed
     value: 4.53
     note: 'Table 2, x_CaO=0.500, p_O2 column.'
-    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+    locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
   - path: species.Ca.observations[stolyarova_1995_ca_partial_pressure_table2].values.points[5].p_Ca_times_10^9_atm_as_printed
     value: 880
     note: 'Table 2, x_CaO=0.750, p_Ca column.'
-    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+    locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
 benches:
   - id: stolyarova-1995-molybdenum-cell
     identity: {basis: described_in_this_work}
@@ -143,7 +143,7 @@ species:
     observations:
       - observation_id: stolyarova_1995_ca_partial_pressure_table2
         type: partial_pressure
-        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
         T_range_K: [1933.0, 1933.0]
         phase: gas
         experiment: stolyarova-1995-mo-cell
@@ -173,7 +173,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.333'
               T_K: '1933'
               composition_mol:
@@ -185,7 +185,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.500'
               T_K: '1933'
               composition_mol:
@@ -197,7 +197,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.625'
               T_K: '1933'
               composition_mol:
@@ -209,7 +209,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.632'
               T_K: '1933'
               composition_mol:
@@ -221,7 +221,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.750'
               T_K: '1933'
               composition_mol:
@@ -233,7 +233,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.860'
               T_K: '1933'
               composition_mol:
@@ -245,7 +245,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '1.000'
               T_K: '1933'
               composition_mol:
@@ -257,16 +257,16 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '1.000'], [Al2O3, '0.000']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
         equipment:
           cell_material_and_liner:
             value: Mo
-            locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '1', note: 'Present-study column, row "Material of effusion cell".'}
+            locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '1', note: 'Present-study column, row "Material of effusion cell".'}
   Al:
     observations:
       - observation_id: stolyarova_1995_al_partial_pressure_table2
         type: partial_pressure
-        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
         T_range_K: [1933.0, 1933.0]
         phase: gas
         experiment: stolyarova-1995-mo-cell
@@ -296,7 +296,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.000'], [Al2O3, '1.000']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.143'
               T_K: '1933'
               composition_mol:
@@ -308,7 +308,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.333'
               T_K: '1933'
               composition_mol:
@@ -320,7 +320,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.500'
               T_K: '1933'
               composition_mol:
@@ -332,7 +332,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.625'
               T_K: '1933'
               composition_mol:
@@ -344,7 +344,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.632'
               T_K: '1933'
               composition_mol:
@@ -356,7 +356,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.750'
               T_K: '1933'
               composition_mol:
@@ -368,7 +368,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.860'
               T_K: '1933'
               composition_mol:
@@ -380,12 +380,12 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
   AlO:
     observations:
       - observation_id: stolyarova_1995_alo_partial_pressure_table2
         type: partial_pressure
-        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
         T_range_K: [1933.0, 1933.0]
         phase: gas
         experiment: stolyarova-1995-mo-cell
@@ -415,7 +415,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.000'], [Al2O3, '1.000']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.143'
               T_K: '1933'
               composition_mol:
@@ -427,7 +427,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.333'
               T_K: '1933'
               composition_mol:
@@ -439,7 +439,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.500'
               T_K: '1933'
               composition_mol:
@@ -451,7 +451,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.625'
               T_K: '1933'
               composition_mol:
@@ -463,7 +463,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.632'
               T_K: '1933'
               composition_mol:
@@ -475,7 +475,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.750'
               T_K: '1933'
               composition_mol:
@@ -487,7 +487,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.860'
               T_K: '1933'
               composition_mol:
@@ -499,12 +499,12 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
   O:
     observations:
       - observation_id: stolyarova_1995_o_partial_pressure_eqn1_table2
         type: partial_pressure
-        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
         T_range_K: [1933.0, 1933.0]
         phase: gas
         experiment: stolyarova-1995-mo-cell
@@ -539,7 +539,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.000'], [Al2O3, '1.000']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.143'
               T_K: '1933'
               composition_mol:
@@ -551,7 +551,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.333'
               T_K: '1933'
               composition_mol:
@@ -563,7 +563,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.500'
               T_K: '1933'
               composition_mol:
@@ -575,7 +575,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.625'
               T_K: '1933'
               composition_mol:
@@ -587,7 +587,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.632'
               T_K: '1933'
               composition_mol:
@@ -599,7 +599,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.750'
               T_K: '1933'
               composition_mol:
@@ -611,7 +611,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.860'
               T_K: '1933'
               composition_mol:
@@ -623,7 +623,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '1.000'
               T_K: '1933'
               composition_mol:
@@ -635,10 +635,10 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '1.000'], [Al2O3, '0.000']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
       - observation_id: stolyarova_1995_o_partial_pressure_eqn2_table2
         type: partial_pressure
-        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
         T_range_K: [1933.0, 1933.0]
         phase: gas
         experiment: stolyarova-1995-mo-cell
@@ -673,7 +673,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.000'], [Al2O3, '1.000']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.143'
               T_K: '1933'
               composition_mol:
@@ -685,7 +685,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.333'
               T_K: '1933'
               composition_mol:
@@ -697,7 +697,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.500'
               T_K: '1933'
               composition_mol:
@@ -709,7 +709,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.625'
               T_K: '1933'
               composition_mol:
@@ -721,7 +721,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.632'
               T_K: '1933'
               composition_mol:
@@ -733,7 +733,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.750'
               T_K: '1933'
               composition_mol:
@@ -745,7 +745,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.860'
               T_K: '1933'
               composition_mol:
@@ -757,12 +757,12 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
   O2:
     observations:
       - observation_id: stolyarova_1995_o2_partial_pressure_table2
         type: partial_pressure
-        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2'}
         T_range_K: [1933.0, 1933.0]
         phase: gas
         experiment: stolyarova-1995-mo-cell
@@ -797,7 +797,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.000'], [Al2O3, '1.000']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.143'
               T_K: '1933'
               composition_mol:
@@ -809,7 +809,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.333'
               T_K: '1933'
               composition_mol:
@@ -821,7 +821,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.500'
               T_K: '1933'
               composition_mol:
@@ -833,7 +833,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.625'
               T_K: '1933'
               composition_mol:
@@ -845,7 +845,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.632'
               T_K: '1933'
               composition_mol:
@@ -857,7 +857,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.750'
               T_K: '1933'
               composition_mol:
@@ -869,7 +869,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '0.860'
               T_K: '1933'
               composition_mol:
@@ -881,7 +881,7 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
             - CaO_mole_fraction_as_printed: '1.000'
               T_K: '1933'
               composition_mol:
@@ -893,14 +893,14 @@ species:
               point_conditions:
                 composition:
                   state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '1.000'], [Al2O3, '0.000']]}}
-                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
+                  locator: {page: 2, published_page: 687, pdf_page_index: 1, table: '2', note: "Printed binary mole fractions: x_CaO as printed; x_Al2O3 = 1 - x_CaO, the binary complement, not separately printed."}
   CaO:
     observations:
       - observation_id: stolyarova_1995_cao_activity_fig1_figure_only
         type: activity_coefficient
         locator:
           figure: '1'
-          page: 687
+          page: 2
           published_page: 687
           pdf_page_index: 1
           note: "Figure 1 is reproduced in Shornikov (1997); canonical digitized CaO markers are stored once in shornikov-1997-cao-alumina-vapor.yaml."
@@ -922,7 +922,7 @@ species:
           series: Figure 1(a), CaO activity
       - observation_id: stolyarova_1995_cao_chemical_potential_fig3_figure_only
         type: gibbs_table
-        locator: {figure: '3', page: 688, published_page: 688, pdf_page_index: 2}
+        locator: {figure: '3', page: 3, published_page: 688, pdf_page_index: 2}
         T_range_K: [1833.0, 2033.0]
         phase: CaO–Al2O3 liquid oxide melt
         regime: kems_effusion
@@ -937,7 +937,7 @@ species:
     observations:
       - observation_id: stolyarova_1995_alumina_activity_fig1_figure_only
         type: activity_coefficient
-        locator: {figure: '1', page: 687, published_page: 687, pdf_page_index: 1}
+        locator: {figure: '1', page: 2, published_page: 687, pdf_page_index: 1}
         T_range_K: [1933.0, 1933.0]
         phase: CaO–Al2O3 liquid oxide melt
         regime: kems_effusion
@@ -956,7 +956,7 @@ species:
           series: Figure 1(b), Al2O3 activity
       - observation_id: stolyarova_1995_alumina_chemical_potential_fig3_figure_only
         type: gibbs_table
-        locator: {figure: '3', page: 688, published_page: 688, pdf_page_index: 2}
+        locator: {figure: '3', page: 3, published_page: 688, pdf_page_index: 2}
         T_range_K: [1833.0, 2033.0]
         phase: CaO–Al2O3 liquid oxide melt
         regime: kems_effusion
@@ -971,7 +971,7 @@ species:
     observations:
       - observation_id: stolyarova_1995_gibbs_energy_fig2_figure_only
         type: gibbs_table
-        locator: {figure: '2', page: 687, published_page: 687, pdf_page_index: 1}
+        locator: {figure: '2', page: 2, published_page: 687, pdf_page_index: 1}
         T_range_K: [1933.0, 2060.0]
         phase: CaO–Al2O3 liquid oxide melt
         regime: kems_effusion
@@ -984,7 +984,7 @@ species:
           series: Figure 2, Gibbs energy for the system
       - observation_id: stolyarova_1995_enthalpy_entropy_fig4_figure_only
         type: gibbs_table
-        locator: {figure: '4', page: 688, published_page: 688, pdf_page_index: 2}
+        locator: {figure: '4', page: 3, published_page: 688, pdf_page_index: 2}
         T_range_K: [1833.0, 2033.0]
         phase: CaO–Al2O3 liquid oxide melt
         regime: kems_effusion

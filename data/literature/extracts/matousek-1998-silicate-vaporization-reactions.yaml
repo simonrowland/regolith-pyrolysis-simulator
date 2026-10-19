@@ -20,10 +20,10 @@ corrections: []
 fidelity_samples:
   - path: species.KOH.observations[matousek_1998_koh_quoted_vapor_pressure].values.points[0].P
     value: 101.325
-    locator: {page: 76, published_page: 76, pdf_page_index: 2}
+    locator: {page: 3, published_page: 76, pdf_page_index: 2}
   - path: species.NaOH.observations[matousek_1998_naoh_quoted_vapor_pressure].values.points[0].P
     value: 101.325
-    locator: {page: 76, published_page: 76, pdf_page_index: 2}
+    locator: {page: 3, published_page: 76, pdf_page_index: 2}
 species:
   SiO2:
     observations: []
@@ -32,7 +32,7 @@ species:
         type: relation
         locator:
           table: '1'
-          page: 74
+          page: 1
           published_page: 74
           pdf_page_index: 0
         units: K and gas species identities as printed
@@ -68,7 +68,7 @@ species:
         type: relation
         locator:
           table: '2'
-          page: 75
+          page: 2
           published_page: 75
           pdf_page_index: 1
         units: dimensionless equilibrium constant K at 1400 °C
@@ -90,7 +90,7 @@ species:
         type: relation
         locator:
           table: '3'
-          page: 75
+          page: 2
           published_page: 75
           pdf_page_index: 1
         units: K and gas species identities as printed
@@ -117,7 +117,7 @@ species:
       - observation_id: matousek_1998_other_equilibrium_constants
         type: relation
         locator:
-          page: 74
+          page: 1
           published_page: 74
           pdf_page_index: 0
           section: Vaporization of melts in vacuo and in inert atmosphere
@@ -130,21 +130,21 @@ species:
           schema_gap: no quantity enum for equilibrium constant K
           reactions:
             - equation: '1'
-              locator: {equation: '1', page: 74, published_page: 74, pdf_page_index: 0}
+              locator: {equation: '1', page: 1, published_page: 74, pdf_page_index: 0}
               reaction_as_printed: Na2O (l) → 2 Na (g) + 1/2 O2 (g)
               K_as_printed: 9.5 × 10^-5
             - equation: '3'
-              locator: {equation: '3', page: 75, published_page: 75, pdf_page_index: 1}
+              locator: {equation: '3', page: 2, published_page: 75, pdf_page_index: 1}
               reaction_as_printed: B2O3 (l) → B2O3 (g)
               K_as_printed: 5.6 × 10^-4
             - equation: '4'
-              locator: {equation: '4', page: 75, published_page: 75, pdf_page_index: 1}
+              locator: {equation: '4', page: 2, published_page: 75, pdf_page_index: 1}
               reaction_as_printed: NaBO2 (l) → NaBO2 (g)
               K_as_printed: 5.7 × 10^-2
       - observation_id: matousek_1998_water_vapor_equilibrium_constants
         type: relation
         locator:
-          page: 76
+          page: 3
           published_page: 76
           pdf_page_index: 2
           equations: '8-12'
@@ -168,13 +168,13 @@ species:
               reaction_as_printed: B2O3 (l) + 3 H2O (g) → 2 H3BO3 (g)
               K_as_printed: 1.2 × 10^-4
             - equation: '12'
-              locator: {equation: '12', page: 77, published_page: 77, pdf_page_index: 3}
+              locator: {equation: '12', page: 4, published_page: 77, pdf_page_index: 3}
               reaction_as_printed: PbO (l) + H2O (g) → Pb(OH)2 (g)
               K_as_printed: 4.7 × 10^-1
       - observation_id: matousek_1998_commercial_glass_compositions
         type: relation
         locator:
-          page: 75
+          page: 2
           published_page: 75
           pdf_page_index: 1
           section: Reactive vaporization of multicomponent melts
@@ -219,7 +219,7 @@ species:
       - observation_id: matousek_1998_quoted_sulfate_vaporization_threshold
         type: relation
         locator:
-          page: 78
+          page: 5
           published_page: 78
           pdf_page_index: 4
           section: Vaporization in an atmosphere containing SO2
@@ -235,7 +235,7 @@ species:
       - observation_id: matousek_1998_approximate_temperature_thresholds
         type: relation
         locator:
-          page: 74
+          page: 1
           published_page: 74
           pdf_page_index: 0
           section: Vaporization of melts in vacuo and in inert atmosphere
@@ -244,7 +244,7 @@ species:
           method_class: quoted_unattributed
           temperatures_as_printed:
             stable_oxide_volatilization:
-              locator: {page: 75, published_page: 75, pdf_page_index: 1}
+              locator: {page: 2, published_page: 75, pdf_page_index: 1}
               value:
                 kind: point
                 point: 1600
@@ -252,7 +252,7 @@ species:
               operator: higher_than
               as_printed: higher than about 1600 °C
             pure_hydroxide_monomer_dimer_mixture:
-              locator: {page: 76, published_page: 76, pdf_page_index: 2}
+              locator: {page: 3, published_page: 76, pdf_page_index: 2}
               value:
                 kind: point
                 point: 600
@@ -260,12 +260,12 @@ species:
               operator: above
               as_printed: above about 600 °C
             water_reaction_with_silica_glass:
-              locator: {page: 77, published_page: 77, pdf_page_index: 3}
+              locator: {page: 4, published_page: 77, pdf_page_index: 3}
               threshold: 1200
               operator: above
               as_printed: above 1200 °C
             preferential_Si_OH4_formation:
-              locator: {page: 77, published_page: 77, pdf_page_index: 3}
+              locator: {page: 4, published_page: 77, pdf_page_index: 3}
               threshold: 1300
               operator: above
               as_printed: above 1300 °C
@@ -273,7 +273,7 @@ species:
         type: figure_only
         locator:
           figure: '1'
-          page: 76
+          page: 3
           published_page: 76
           pdf_page_index: 2
         units: mg cm^-2; h^1/2
@@ -311,7 +311,7 @@ species:
         type: figure_only
         locator:
           figure: '2'
-          page: 76
+          page: 3
           published_page: 76
           pdf_page_index: 2
         units: mg cm^-2; h
@@ -344,7 +344,7 @@ species:
         type: figure_only
         locator:
           figure: '3'
-          page: 76
+          page: 3
           published_page: 76
           pdf_page_index: 2
         units: mg cm^-2; h
@@ -377,7 +377,7 @@ species:
         type: figure_only
         locator:
           figure: '4'
-          page: 77
+          page: 4
           published_page: 77
           pdf_page_index: 3
         units: mg cm^-2; h
@@ -416,7 +416,7 @@ species:
         type: figure_only
         locator:
           figure: '5'
-          page: 77
+          page: 4
           published_page: 77
           pdf_page_index: 3
         units: mg cm^-2; kPa
@@ -454,7 +454,7 @@ species:
         type: figure_only
         locator:
           figure: '6'
-          page: 79
+          page: 6
           published_page: 79
           pdf_page_index: 5
         units: mg cm^-2; wt.% SO3
@@ -487,7 +487,7 @@ species:
         type: figure_only
         locator:
           figure: '7'
-          page: 79
+          page: 6
           published_page: 79
           pdf_page_index: 5
         units: concentration profile schematic
@@ -514,7 +514,7 @@ species:
       - observation_id: matousek_1998_koh_quoted_vapor_pressure
         type: psat_series
         locator:
-          page: 76
+          page: 3
           published_page: 76
           pdf_page_index: 2
           section: Vaporization in an atmosphere containing water vapour
@@ -535,7 +535,7 @@ species:
                 temperature_C:
                   state: {tag: value, value: 1327}
                   locator:
-                    page: 76
+                    page: 3
                     published_page: 76
                     pdf_page_index: 2
                     citation: '[13]'
@@ -544,7 +544,7 @@ species:
       - observation_id: matousek_1998_naoh_quoted_vapor_pressure
         type: psat_series
         locator:
-          page: 76
+          page: 3
           published_page: 76
           pdf_page_index: 2
           section: Vaporization in an atmosphere containing water vapour
@@ -565,7 +565,7 @@ species:
                 temperature_C:
                   state: {tag: value, value: 1378}
                   locator:
-                    page: 76
+                    page: 3
                     published_page: 76
                     pdf_page_index: 2
                     citation: '[13]'

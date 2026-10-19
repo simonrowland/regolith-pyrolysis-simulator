@@ -25,7 +25,7 @@ species:
       - observation_id: toguri_1961_experimental_conditions
         type: laboratory_conditions
         locator:
-          page: 541
+          page: 2
           published_page: 541
           pdf_page_index: 1
           section: Experimental Procedures
@@ -44,11 +44,11 @@ species:
           mass_per_briquette_g: 10
           spring_balance_weight_change_as_printed: 0.020 ± 0.005 g
           degassing_temperature_C: 750
-          degassing_locator: {page: 542, published_page: 542, pdf_page_index: 2}
+          degassing_locator: {page: 3, published_page: 542, pdf_page_index: 2}
           degassing_duration_min: 10
-          degassing_duration_locator: {page: 542, published_page: 542, pdf_page_index: 2}
+          degassing_duration_locator: {page: 3, published_page: 542, pdf_page_index: 2}
           time_to_reach_operating_temperature_min: [2, 5]
-          heat_up_locator: {page: 542, published_page: 542, pdf_page_index: 2}
+          heat_up_locator: {page: 3, published_page: 542, pdf_page_index: 2}
           system_pressure_during_run:
             value:
               kind: point
@@ -56,12 +56,12 @@ species:
               approximate: true
             units: micron of Hg
             as_printed: approximately one micron
-            locator: {page: 542, published_page: 542, pdf_page_index: 2}
+            locator: {page: 3, published_page: 542, pdf_page_index: 2}
           blank_run_result: MgO-only briquettes had negligible weight loss over 1100–1440 °C.
       - observation_id: toguri_1961_measured_results_in_prose
         type: relation
         locator:
-          page: 543
+          page: 4
           published_page: 543
           pdf_page_index: 3
           section: Results and Discussion
@@ -89,7 +89,7 @@ species:
       - observation_id: toguri_1961_measured_residue_xrd_phases
         type: relation
         locator:
-          page: 545
+          page: 6
           published_page: 545
           pdf_page_index: 5
           section: Results and Discussion
@@ -108,7 +108,7 @@ species:
       - observation_id: toguri_1961_measured_mg2si_dissociation
         type: relation
         locator:
-          page: 546
+          page: 7
           published_page: 546
           pdf_page_index: 6
           section: Results and Discussion
@@ -132,7 +132,7 @@ species:
         type: relation
         locator:
           table: '1'
-          page: 545
+          page: 6
           published_page: 545
           pdf_page_index: 5
         units: kcal/mole of printed reaction component; equilibrium P_SiO in mm Hg
@@ -158,7 +158,7 @@ species:
       - observation_id: toguri_1961_calculated_sio_pressure_at_1300C
         type: relation
         locator:
-          page: 545
+          page: 6
           published_page: 545
           pdf_page_index: 5
           section: Results and Discussion
@@ -183,7 +183,7 @@ species:
       - observation_id: toguri_1961_quoted_silicon_vapor_pressure
         type: relation
         locator:
-          page: 543
+          page: 4
           published_page: 543
           pdf_page_index: 3
           section: Results and Discussion
@@ -203,7 +203,7 @@ species:
         type: figure_only
         locator:
           figure: '1'
-          page: 541
+          page: 2
           published_page: 541
           pdf_page_index: 1
         units: not applicable
@@ -225,7 +225,7 @@ species:
         type: figure_only
         locator:
           figure: '2'
-          page: 542
+          page: 3
           published_page: 542
           pdf_page_index: 2
         units: percent loss in weight; min
@@ -279,7 +279,7 @@ species:
         type: figure_only
         locator:
           figure: '3'
-          page: 543
+          page: 4
           published_page: 543
           pdf_page_index: 3
         units: percent loss in weight; °C
@@ -313,7 +313,7 @@ species:
         type: figure_only
         locator:
           figure: '4'
-          page: 544
+          page: 5
           published_page: 544
           pdf_page_index: 4
         units: X-ray diffraction trace; angle scale as printed

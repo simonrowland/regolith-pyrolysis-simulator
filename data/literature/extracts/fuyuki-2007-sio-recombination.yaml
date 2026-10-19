@@ -25,7 +25,7 @@ species:
         type: relation
         locator:
           section: Abstract; Concluding Remarks
-          page: 437
+          page: 1
           published_page: 437
           pdf_page_index: 0
         phase: laser-induced quartz vapor plume, gas
@@ -44,7 +44,7 @@ species:
         type: relation
         locator:
           section: 3.1, 3.2, 3.5
-          page: 443
+          page: 7
           published_page: 443
           pdf_page_index: 6
         phase: laser-induced quartz vapor plume, gas
@@ -59,11 +59,11 @@ species:
             unit: K
             approximate: true
             condition: early observation, 10–13 ns after laser irradiation
-            locator: {page: 440, published_page: 440, pdf_page_index: 3}
+            locator: {page: 4, published_page: 440, pdf_page_index: 3}
           observation_period_temperature_interval_as_printed: 4400 K to 3200 K
-          observation_period_temperature_locator: {page: 445, published_page: 445, pdf_page_index: 8}
+          observation_period_temperature_locator: {page: 9, published_page: 445, pdf_page_index: 8}
           observation_period_as_printed: 20–100 μs
-          observation_period_continuation_locator: {page: 446, published_page: 446, pdf_page_index: 9}
+          observation_period_continuation_locator: {page: 10, published_page: 446, pdf_page_index: 9}
           fitted_temperature_time_exponent:
             value: 0.22
             uncertainty: 0.02
@@ -75,13 +75,13 @@ species:
             approximate: true
             unit: dimensionless
             method_class: model_derived
-            locator: {page: 443, published_page: 443, pdf_page_index: 6}
+            locator: {page: 7, published_page: 443, pdf_page_index: 6}
           Si_and_SiO_central_temperature_difference:
             value: less than 200
             unit: K
             observation_period_as_printed: 40–80 μs
             locator:
-              page: 443
+              page: 7
               published_page: 443
               pdf_page_index: 6
           temperature_comparison_method: central temperatures of Si and SiO
@@ -90,7 +90,7 @@ species:
         type: relation
         locator:
           section: 2.2 Experimental results
-          page: 438
+          page: 2
           published_page: 438
           pdf_page_index: 1
         phase: quartz sample, solid
@@ -111,7 +111,7 @@ species:
         type: relation
         locator:
           section: 3.3, 3.5, 4.2
-          page: 442
+          page: 6
           published_page: 442
           pdf_page_index: 5
         phase: SiO gas in laser-induced quartz vapor plume
@@ -138,20 +138,20 @@ species:
             pressure: 120
             pressure_unit: bar
             attribution: Sugita et al. (2003) pressure–temperature relation, applied in this paper
-            locator: {page: 444, published_page: 444, pdf_page_index: 7}
+            locator: {page: 8, published_page: 444, pdf_page_index: 7}
           effective_activation_energy_as_printed:
             value: approximately 0
             unit: kJ mol^-1
             approximate: true
             attribution: Fuyuki et al. (2007) interpretation; qualitatively consistent with Andreazza et al. (1995)
-            locator: {page: 446, published_page: 446, pdf_page_index: 9}
+            locator: {page: 10, published_page: 446, pdf_page_index: 9}
           note: Column density, reaction activation energy, and the model-derived initial state have no matching quantity tokens in the extract schema.
       - observation_id: fuyuki_2007_table1_effective_collision_cross_sections
         type: relation
         locator:
           table: '1'
           section: Appendix B
-          page: 449
+          page: 13
           published_page: 449
           pdf_page_index: 12
         phase: vapor plume, gas
@@ -246,7 +246,7 @@ species:
         type: figure_only
         locator:
           figure: '1'
-          page: 438
+          page: 2
           published_page: 438
           pdf_page_index: 1
         units: schematic diagram
@@ -268,7 +268,7 @@ species:
         type: figure_only
         locator:
           figure: '2'
-          page: 439
+          page: 3
           published_page: 439
           pdf_page_index: 2
         units: nm; relative intensity (a.u.); μs
@@ -306,7 +306,7 @@ species:
         type: figure_only
         locator:
           figure: '3'
-          page: 440
+          page: 4
           published_page: 440
           pdf_page_index: 3
         units: nm; relative intensity (a.u.); K
@@ -344,7 +344,7 @@ species:
         type: figure_only
         locator:
           figure: '4'
-          page: 440
+          page: 4
           published_page: 440
           pdf_page_index: 3
         units: nm; E/k (K)
@@ -370,7 +370,7 @@ species:
         type: figure_only
         locator:
           figure: '5'
-          page: 440
+          page: 4
           published_page: 440
           pdf_page_index: 3
         units: μs; K
@@ -396,7 +396,7 @@ species:
         type: figure_only
         locator:
           figure: '6'
-          page: 441
+          page: 5
           published_page: 441
           pdf_page_index: 4
         units: nm; relative intensity (a.u.); residual (a.u.); K; mmol m^-2
@@ -430,7 +430,7 @@ species:
         type: figure_only
         locator:
           figure: '7'
-          page: 442
+          page: 6
           published_page: 442
           pdf_page_index: 5
         units: K; mmol m^-2; square-mean error (%)
@@ -469,7 +469,7 @@ species:
         type: figure_only
         locator:
           figure: '8'
-          page: 442
+          page: 6
           published_page: 442
           pdf_page_index: 5
         units: K; mol m^-2; μs
@@ -499,7 +499,7 @@ species:
         type: figure_only
         locator:
           figure: '9'
-          page: 443
+          page: 7
           published_page: 443
           pdf_page_index: 6
         units: K; mol m^-2; optical thickness
@@ -530,7 +530,7 @@ species:
         type: figure_only
         locator:
           figure: '10'
-          page: 443
+          page: 7
           published_page: 443
           pdf_page_index: 6
         units: μs; dimensionless intensity ratio
@@ -556,7 +556,7 @@ species:
         type: figure_only
         locator:
           figure: '11'
-          page: 444
+          page: 8
           published_page: 444
           pdf_page_index: 7
         units: K; W mol^-1 m^-2 sr^-1
@@ -586,7 +586,7 @@ species:
         type: figure_only
         locator:
           figure: '12'
-          page: 445
+          page: 9
           published_page: 445
           pdf_page_index: 8
         units: K; dimensionless number ratio; μs
@@ -616,7 +616,7 @@ species:
         type: figure_only
         locator:
           figure: '13'
-          page: 445
+          page: 9
           published_page: 445
           pdf_page_index: 8
         units: K; molar fraction; bar
@@ -662,7 +662,7 @@ species:
         type: figure_only
         locator:
           figure: '14'
-          page: 445
+          page: 9
           published_page: 445
           pdf_page_index: 8
         units: K; dimensionless number ratio; bar
