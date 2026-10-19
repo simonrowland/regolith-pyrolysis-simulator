@@ -2282,7 +2282,7 @@ def render_hero_charts(
             tuple(numeric_facets[index : index + 2])
             for index in range(0, len(numeric_facets), 2)
         ]
-        for pair in facet_pairs:
+        for pair_index, pair in enumerate(facet_pairs):
             row_specs.append(("current", pair, 1.08))
             refusal_rows = max(
                 (
@@ -2297,8 +2297,10 @@ def render_hero_charts(
                 default=0,
             )
             row_specs.append(("refusals", pair, max(0.24, min(0.52, 0.12 * refusal_rows))))
+            if pair_index + 1 < len(facet_pairs):
+                row_specs.append(("spacer", (), 0.45))
         if facet_pairs:
-            row_specs.append(("spacer", (), 0.16))
+            row_specs.append(("spacer", (), 0.45))
         if other_empty_facets:
             row_specs.append(
                 (
