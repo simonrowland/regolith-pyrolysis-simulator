@@ -82,7 +82,7 @@ species:
     context:
       - observation_id: folstad_2024_text_measured_interfacial_layer_cao
         type: table_record
-        locator: {page: 9, published_page: 9, pdf_page_index: 8, section: '3.2'}
+        locator: {page: 8, published_page: 8, pdf_page_index: 7, section: '3.2'}
         units: '% CaO'
         attribution: Folstad et al. report WDS analysis of the CaO-slag interphase.
         values:
@@ -95,7 +95,7 @@ species:
           phase: interfacial layer
           phase_composition_as_printed: CaO·Al2O3·2SiO2 for slag 1; 2CaO·Al2O3·SiO2 for slags 2 and 3
           value_as_printed: 35–42%
-          locator: {page: 9, published_page: 9, pdf_page_index: 8, section: '3.2'}
+          locator: {page: 8, published_page: 8, pdf_page_index: 7, section: '3.2'}
       - observation_id: folstad_2024_text_measured_cao_disintegration_temperature
         type: table_record
         locator: {page: 7, published_page: 7, pdf_page_index: 6, section: '3.1'}
@@ -112,6 +112,15 @@ species:
           temperature_as_printed: 1400–1500 °C
           temperature_kind: observed dissolution/disintegration interval, not a liquidus or solidus
           locator: {page: 7, published_page: 7, pdf_page_index: 6, section: '3.1'}
+      - observation_id: folstad_2024_text_measured_dissolution_onset
+        type: textual_fact
+        locator: {page: 13, published_page: 13, pdf_page_index: 12, section: '4. Conclusions'}
+        units: °C
+        attribution: Folstad et al. state that dissolution starts during heating at around 1300–1400 °C.
+        values:
+          quantity_as_printed: CaO dissolution onset during heating
+          value_as_printed: approximately 1300–1400 °C
+          value_semantics: dissolution starts during heating; distinct from the 1400–1500 °C particle-disintegration interval in section 3.1
       - observation_id: folstad_2024_text_measured_dissolution_slowdown
         type: table_record
         locator: {page: 7, published_page: 7, pdf_page_index: 6, section: '3.1'}
@@ -152,20 +161,20 @@ species:
               temperature_C_as_printed: '1430'
               D_as_printed: '1 × 10−6'
               comment_as_printed: 'Radioactive Tracer Technique, Ca45'
-            - authors_as_printed: Towers and Chipman [4] (1957)
-              composition_wt_percent: {SiO2: '40', CaO: '39', Al2O3: '21'}
+            - authors_as_printed: Niwa [5] (1957)
+              composition_wt_percent: {SiO2: '40', CaO: '40', Al2O3: '20'}
               temperature_C_as_printed: '1350'
               D_as_printed: '3.3 × 10−7'
-            - authors_as_printed: Towers and Chipman [4] (1957)
+            - authors_as_printed: Niwa [5] (1957)
               composition_wt_percent: {SiO2: '40', CaO: '40', Al2O3: '20'}
               temperature_C_as_printed: '1400'
               D_as_printed: '6.2 × 10−7'
-            - authors_as_printed: Towers and Chipman [4] (1957)
+            - authors_as_printed: Niwa [5] (1957)
               composition_wt_percent: {SiO2: '40', CaO: '40', Al2O3: '20'}
               temperature_C_as_printed: '1450'
               D_as_printed: '1.3 × 10−7'
-            - authors_as_printed: Towers and Chipman [4] (1957)
-              composition_wt_percent: {SiO2: '40', CaO: '40', Al2O3: '20'}
+            - authors_as_printed: Niwa [5] (1957)
+              composition_wt_percent: {SiO2: '39', CaO: '43', Al2O3: '18'}
               temperature_C_as_printed: '1350'
               D_as_printed: '5.2 × 10−7'
             - authors_as_printed: Niwa [5] (1957)
@@ -185,31 +194,31 @@ species:
               composition_wt_percent: {SiO2: '71', CaO: '11', Al2O3: '18'}
               temperature_C_as_printed: '1400'
               D_as_printed: '3.2 × 10−7'
-            - authors_as_printed: Niwa [5] (1957)
+            - authors_as_printed: Saitô and Maruya [6] (1958)
               composition_wt_percent: {SiO2: '71', CaO: '11', Al2O3: '18'}
               temperature_C_as_printed: '1350'
               D_as_printed: '3.9 × 10−7'
-            - authors_as_printed: Niwa [5] (1957)
+            - authors_as_printed: Saitô and Maruya [6] (1958)
               composition_wt_percent: {SiO2: '41', CaO: '40', Al2O3: '19'}
               temperature_C_as_printed: '1395'
               D_as_printed: '6.9· × 0−7'
-            - authors_as_printed: Niwa [5] (1957)
+            - authors_as_printed: Saitô and Maruya [6] (1958)
               composition_wt_percent: {SiO2: '41', CaO: '40', Al2O3: '19'}
               temperature_C_as_printed: '1440'
               D_as_printed: '10 × 10−7'
-            - authors_as_printed: Niwa [5] (1957)
+            - authors_as_printed: Saitô and Maruya [6] (1958)
               composition_wt_percent: {SiO2: '37', CaO: '43', Al2O3: '20'}
               temperature_C_as_printed: '1440'
               D_as_printed: '8 × 10−7'
-            - authors_as_printed: Niwa [5] (1957)
+            - authors_as_printed: Saitô and Maruya [6] (1958)
               composition_wt_percent: {SiO2: '37', CaO: '43', Al2O3: '20'}
               temperature_C_as_printed: '1510'
               D_as_printed: '10 × 10−7'
-            - authors_as_printed: Niwa [5] (1957)
+            - authors_as_printed: Saitô and Maruya [6] (1958)
               composition_wt_percent: {SiO2: '39', CaO: '49', Al2O3: '12'}
               temperature_C_as_printed: '1440'
               D_as_printed: '11.5 × 10−7'
-            - authors_as_printed: Niwa [5] (1957)
+            - authors_as_printed: Saitô and Maruya [6] (1958)
               composition_wt_percent: {SiO2: '39', CaO: '49', Al2O3: '12'}
               temperature_C_as_printed: '1510'
               D_as_printed: '17 × 10−7'
@@ -223,11 +232,11 @@ species:
               temperature_C_as_printed: '1530'
               D_as_printed: '9.9 × 10−7'
             - authors_as_printed: Saitô and Maruya [6] (1958)
-              composition_wt_percent: {SiO2: '36', CaO: '45', Al2O3: '19'}
+              composition_wt_percent: {SiO2: '34', CaO: '46', Al2O3: '20'}
               temperature_C_as_printed: '1440'
               D_as_printed: '3.8 × 10−7'
             - authors_as_printed: Saitô and Maruya [6] (1958)
-              composition_wt_percent: {SiO2: '36', CaO: '45', Al2O3: '19'}
+              composition_wt_percent: {SiO2: '34', CaO: '46', Al2O3: '20'}
               temperature_C_as_printed: '1485'
               D_as_printed: '7.1 × 10−7'
             - authors_as_printed: Saitô and Maruya [6] (1958)
@@ -263,21 +272,21 @@ species:
               composition_wt_percent: {SiO2: '40', CaO: '40', Al2O3: '20'}
               temperature_C_as_printed: '1500'
               D_as_printed: '2.6 × 10−6'
-            - authors_as_printed: Goto et al. [7] (1977)
+            - authors_as_printed: Liang et al. [8] (1996)
               composition_wt_percent: {SiO2: '60', CaO: '30', Al2O3: '10'}
-              temperature_C_as_printed: not_printed
+              temperature_C_as_printed: '1500'
               D_as_printed: '7.41 × 10−7'
-            - authors_as_printed: Goto et al. [7] (1977)
+            - authors_as_printed: Liang et al. [8] (1996)
               composition_wt_percent: {SiO2: '55', CaO: '25', Al2O3: '20'}
-              temperature_C_as_printed: not_printed
+              temperature_C_as_printed: '1500'
               D_as_printed: '5.18 × 10−7'
-            - authors_as_printed: Goto et al. [7] (1977)
+            - authors_as_printed: Liang et al. [8] (1996)
               composition_wt_percent: {SiO2: '65', CaO: '20', Al2O3: '15'}
-              temperature_C_as_printed: not_printed
+              temperature_C_as_printed: '1500'
               D_as_printed: '3.3 × 10−7'
-            - authors_as_printed: Goto et al. [7] (1977)
+            - authors_as_printed: Liang et al. [8] (1996)
               composition_wt_percent: {SiO2: '65', CaO: '25', Al2O3: '10'}
-              temperature_C_as_printed: not_printed
+              temperature_C_as_printed: '1500'
               D_as_printed: '4.78 × 10−7'
             - authors_as_printed: Liang et al. [8] (1996)
               composition_wt_percent: {SiO2: '55', CaO: '30', Al2O3: '15'}
