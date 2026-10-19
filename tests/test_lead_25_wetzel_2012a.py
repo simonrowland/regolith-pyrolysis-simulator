@@ -40,6 +40,13 @@ def _assert_table_and_figure_pins(document: dict) -> None:
         for row in figures
     )
     assert all("marker_count" in series for row in figures for series in row["values"]["series"])
+    fits = [row for row in species["context"] if row["type"] == "model_equation_context"]
+    assert [row["locator"]["equation"] for row in fits] == ["4", "5"]
+    assert [row["values"]["slope"] for row in fits] == [0.089, 0.070]
+    assert [row["values"]["slope_uncertainty"] for row in fits] == [0.003, 0.004]
+    assert [row["values"]["intercept_cm-1"] for row in fits] == [953, 1075]
+    assert [row["values"]["intercept_uncertainty_cm-1"] for row in fits] == [2, 2]
+    assert all(row["values"]["method_class"] == "model_derived" for row in fits)
     assert species["observations"] == []
 
 
@@ -60,4 +67,4 @@ def test_wetzel_table_one_and_deferred_figures_are_preserved_as_context() -> Non
     assert migrator.result.observations == {}
     assert len(migrator.result.queue) == 1
     assert migrator.result.queue[0].observation_id.endswith("::typed_absence")
-    assert sum(len(rows) for rows in migrator.result.context_by_work.values()) == 10
+    assert sum(len(rows) for rows in migrator.result.context_by_work.values()) == 12

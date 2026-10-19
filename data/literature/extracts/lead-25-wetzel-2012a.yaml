@@ -120,6 +120,34 @@ species:
             numeric_cells_checked: 61
             printed_data_rows: 15
             result: every displayed cell agrees with the rendered page
+      - observation_id: wetzel_2012_equation4_as1_position_fit
+        type: model_equation_context
+        locator: {page: 4, pdf_page_index: 3, published_page: 1064, equation: '4'}
+        phase: condensed_amorphous_SiO_film
+        units: cm^-1
+        values:
+          method_class: model_derived
+          quantity_as_printed: fitted AS1 mode position
+          equation_as_printed: 'x_AS1 [cm^-1] = (0.089 ± 0.003) T/K + (953 ± 2) [cm^-1]'
+          slope: 0.089
+          slope_uncertainty: 0.003
+          intercept_cm-1: 953
+          intercept_uncertainty_cm-1: 2
+          note: Fit coefficients are model-derived; no compatible wavenumber quantity token exists.
+      - observation_id: wetzel_2012_equation5_as2_position_fit
+        type: model_equation_context
+        locator: {page: 4, pdf_page_index: 3, published_page: 1064, equation: '5'}
+        phase: condensed_amorphous_SiO_film
+        units: cm^-1
+        values:
+          method_class: model_derived
+          quantity_as_printed: fitted AS2 mode position
+          equation_as_printed: 'x_AS2 [cm^-1] = (0.070 ± 0.004) T/K + (1075 ± 2) [cm^-1]'
+          slope: 0.070
+          slope_uncertainty: 0.004
+          intercept_cm-1: 1075
+          intercept_uncertainty_cm-1: 2
+          note: Fit coefficients are model-derived; no compatible wavenumber quantity token exists.
       - observation_id: wetzel_2012_text_reported_results
         type: measured_spectral_result_context
         locator:
