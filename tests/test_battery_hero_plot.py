@@ -318,6 +318,63 @@ def test_low_count_bins_are_markers_and_flagged_rows_are_hollow(tmp_path: Path) 
     finally:
         plt.close(figure)
 
+
+def test_deck_scatter_uses_only_scorer_flag_for_hollow_markers() -> None:
+    figure, axis = plt.subplots()
+    try:
+        hero_plot._draw_hero_deck_scatter(
+            axis,
+            [
+                {
+                    "chart": "polymerisation",
+                    "engine": "openimcc",
+                    "x_value": "1.0",
+                    "y_value": "0.25",
+                    "flagged": True,
+                }
+            ],
+            engine_colors={"openimcc": "#0072b2"},
+        )
+        figure.canvas.draw()
+
+        marker = axis.collections[0]
+        assert list(marker.get_facecolors()[0]) == pytest.approx(
+            list(to_rgba("#ffffff"))
+        )
+        assert list(marker.get_edgecolors()[0]) == pytest.approx(
+            list(to_rgba("#0072b2"))
+        )
+    finally:
+        plt.close(figure)
+
+
+def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+
+    files = hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+
+    for chart in (
+        "polymerisation",
+        "redox-sensitivity",
+        "sio-evolution",
+        "residue-composition",
+        "fo2-cross-comparison",
+    ):
+        assert Path(files[f"deck:{chart}:png"]).is_file()
+        assert Path(files[f"deck:{chart}:svg"]).is_file()
+    cross_svg = Path(files["deck:fo2-cross-comparison:svg"]).read_text(
+        encoding="utf-8"
+    )
+    residue_svg = Path(files["deck:residue-composition:svg"]).read_text(
+        encoding="utf-8"
+    )
+    assert "engine-computed fO2 not yet available" in cross_svg
+    assert "fraction evaporated is not recorded" in residue_svg
+
     element_figure, element_axis = plt.subplots()
     try:
         draw_panel(element_axis, data, "openimcc", abundance, view="element")
