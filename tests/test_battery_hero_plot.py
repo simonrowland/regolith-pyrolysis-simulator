@@ -3,6 +3,7 @@ from __future__ import annotations
 import gzip
 import io
 import json
+import re
 import tarfile
 from dataclasses import replace
 from pathlib import Path
@@ -16,7 +17,9 @@ from scripts.battery_hero_plot import (
     _draw_hero_current,
     _draw_hero_sweet_spot,
     _history_record,
+    _hero_engine_colors,
     _hero_facets,
+    _hero_legend_handles,
     _hero_refusal_entries,
     _refusal_coverage_from_summaries,
     _parser,
@@ -37,6 +40,8 @@ from scripts.battery_hero_plot import (
     TIER_TRACE,
 )
 from matplotlib.colors import Normalize
+from matplotlib.figure import Figure
+from matplotlib.text import Text
 import matplotlib.pyplot as plt
 
 
@@ -551,6 +556,12 @@ def test_hero_series_keep_composition_and_count_refusals_by_reason(
     }
     assert len(composition_keys) == 2
     assert all(key != "unknown" for key in composition_keys)
+    assert {
+        point.composition_sio2_mole_fraction
+        for (rail, facet, engine, _composition), points in data.hero_series.items()
+        if (rail, facet, engine) == ("vapour", "SiO", "internal-analytical")
+        for point in points
+    } == {0.0}
     element_points = element_view_series(data)[
         ("internal-analytical", "Si")
     ]
@@ -568,6 +579,21 @@ def test_hero_series_keep_composition_and_count_refusals_by_reason(
         "P2O5",
         *(facet for facet, _label in HERO_MINOR_FACETS),
     }
+    legend_handles = _hero_legend_handles(
+        data, "vapour", _hero_engine_colors(data.engines)
+    )
+    assert len(legend_handles) <= len(data.engines) + 2
+    assert [handle.get_label() for handle in legend_handles].count(
+        "internal-analytical"
+    ) == 1
+
+    files = render_hero_charts(data, tmp_path / "collapsed-facets")
+    svg = files["hero:vapour:svg"].read_text(encoding="utf-8")
+    assert svg.count("No numeric predictions yet:") == 1
+    assert svg.count("Minor species / foulants (no numeric predictions yet):") == 1
+    assert "P2O5 (refused 1: identity_incomplete 1" in svg
+    assert "P (refused 1: identity_incomplete 1" in svg
+    assert "minor:P" not in svg
 
 
 def test_non_observable_rows_are_separate_from_refusals_and_history(
@@ -712,7 +738,8 @@ def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
     files = render_hero_charts(data, tmp_path / "sweet-spot-render")
     svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
     assert "cell label=n" in svg
-    assert "sweet-spot fill is median" in svg
+    assert "sweet-spot fill=median" in svg
+    assert files["hero:vapour:png"].read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
     melt_svg = files["hero:melt_activity:svg"].read_text(encoding="utf-8").casefold()
     assert "140/147 rows" in melt_svg
     assert "main's fix is pending" in melt_svg
@@ -1051,7 +1078,7 @@ def test_read_scores_streams_residuals_from_archive_member(tmp_path: Path) -> No
     }
 
 
-def test_hero_svg_is_byte_identical_for_the_same_input(tmp_path: Path) -> None:
+def test_hero_svg_and_png_are_byte_identical_for_the_same_input(tmp_path: Path) -> None:
     residuals = tmp_path / "residuals.jsonl"
     row = _record(
         engine="internal-analytical",
@@ -1105,6 +1132,111 @@ def test_hero_svg_is_byte_identical_for_the_same_input(tmp_path: Path) -> None:
 
     for rail in HERO_RAILS:
         assert first[f"hero:{rail}:svg"].read_bytes() == second[f"hero:{rail}:svg"].read_bytes()
+        assert first[f"hero:{rail}:png"].read_bytes() == second[f"hero:{rail}:png"].read_bytes()
+
+
+def test_hero_legend_is_bounded_and_numeric_labels_use_three_significant_figures(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "formatted-residuals.jsonl"
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "formatted-store"}
+    ]
+    for engine, value in (
+        ("internal-analytical", 0.3333333333333333),
+        ("openimcc", 0.5555555555555555),
+        ("thermoengine", 0.2222222222222222),
+    ):
+        row = _record(
+            engine=engine,
+            experiment="shared",
+            formula="FeO",
+            temperature_K=1300,
+            residual=value,
+            rail="redox",
+        )
+        row["reference"] = "shared"
+        row["candidate_observation"]["identity"]["quantity"] = {
+            "tag": "value",
+            "value": "fe3_fe2_ratio",
+        }
+        row["candidate_observation"]["identity"]["composition"] = {
+            "tag": "value",
+            "value": {
+                "amount_basis": "mole_fraction",
+                "components": [["SiO2", "0.37"], ["FeO", "0.63"]],
+            },
+        }
+        rows.append(row)
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    data = read_scores(residuals, rails=HERO_RAILS)
+    history = tmp_path / "formatted-history.jsonl"
+    history.write_text(
+        json.dumps(
+            {
+                "kind": "battery_hero_history",
+                "store_revision": "formatted-store",
+                "commit_date": "2026-10-18T10:27:53-04:00",
+                "metrics": [
+                    {
+                        "rail": "redox",
+                        "engine": "internal-analytical",
+                        "n": 147,
+                        "numeric_count": 147,
+                        "rms_dex": "0.30636297707166455257",
+                        "median_abs_dex": "0.30636297707166455257",
+                    }
+                ],
+                "benchmarks": [],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    legend_labels: list[list[str]] = []
+    figures: list[Figure] = []
+    original_legend = Figure.legend
+    original_savefig = Figure.savefig
+
+    def record_legend(self: Figure, *args: object, **kwargs: object) -> object:
+        handles = kwargs.get("handles", args[0] if args else ())
+        legend_labels.append([handle.get_label() for handle in handles])
+        return original_legend(self, *args, **kwargs)
+
+    def record_figure(self: Figure, *args: object, **kwargs: object) -> object:
+        result = original_savefig(self, *args, **kwargs)
+        if args and Path(str(args[0])).suffix == ".svg":
+            figures.append(self)
+        return result
+
+    monkeypatch.setattr(Figure, "legend", record_legend)
+    monkeypatch.setattr(Figure, "savefig", record_figure)
+    render_hero_charts(data, tmp_path / "formatted-render", history_path=history)
+
+    assert legend_labels
+    assert all(len(labels) <= len(data.engines) + 2 for labels in legend_labels)
+    labels = [
+        artist.get_text()
+        for figure in figures
+        for artist in figure.findobj(match=Text)
+        if artist.get_text()
+    ]
+    assert any("0.31 dex" in label and "n=147" in label for label in labels)
+    assert all("0.30636297707166455257" not in label for label in labels)
+    for label in labels:
+        without_dates = re.sub(r"\b\d{4}-\d{2}(?:-\d{2})?\b", "", label)
+        for number in re.findall(r"(?<![A-Za-z])\d+(?:\.\d+)?(?:[kM])?", without_dates):
+            value = number[:-1] if number.endswith(("k", "M")) else number
+            digits = re.sub(r"\D", "", value)
+            significant = len(digits.lstrip("0")) if "." in value else len(
+                digits.lstrip("0").rstrip("0")
+            )
+            assert significant <= 3, f"too many significant figures in {label!r}"
 
 
 def test_stamp_contents_and_png_output(tmp_path: Path) -> None:
