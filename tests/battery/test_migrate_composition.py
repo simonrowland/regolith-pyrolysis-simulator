@@ -3,15 +3,18 @@
 from __future__ import annotations
 
 import re
+from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 import yaml
 
-from simulator.battery import migrate as migrate_module
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.battery import migrate as migrate_module
+from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -21,6 +24,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ValueKind,
 )
+from simulator.battery.generators.bench import engine_point_requests
 from simulator.battery.migrate import (
     Migrator,
     REPO_ROOT,
@@ -43,8 +47,14 @@ from simulator.battery.records import (
     Locator,
     as_decimal,
 )
-from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
 from tests.battery.factories import tabulation_experiment
+from tests.battery.test_migrate import (
+    FIXTURE_EXTRACT,
+    _migrate_real_extract,
+    _write_min_tree,
+)
+from tests.battery.test_schema_admission import _conditions, _located
+from tests.battery.test_waypoints import _bench
 
 
 _OBS_ROOTS = (
@@ -564,13 +574,12 @@ def test_round8_multiple_printed_columns_without_typed_initial_refuse() -> None:
     )
 
 
-def test_round9_values_composition_derivation_baseline_pin() -> None:
-    """Pin the current note-dependent admission before changing its owner."""
+def test_round9_composition_derivation_never_admits_an_untyped_map() -> None:
     oxide_map = {"SiO2": "60", "MgO": "40"}
     notes = (
         None,
         "No composition was derived",
-        "SiO2 and K2O are not complements to 100; this sample contains MgO",
+        "SiO2 and K2O are NOT complements to 100; this sample contains MgO",
     )
     results = []
     for note in notes:
@@ -579,9 +588,32 @@ def test_round9_values_composition_derivation_baseline_pin() -> None:
             values["composition_derivation"] = note
         results.append(_composition_located_from_values(values, None))
 
-    assert results[0] is None
-    assert results[1] is not None and results[1].state.is_value
-    assert results[2] is not None and results[2].state.is_value
+    assert results == [None, None, None]
+
+
+def test_round9_initial_charge_role_admits_map_and_keeps_note_as_provenance() -> None:
+    note = "No composition was derived"
+    result = _composition_located_from_values(
+        {
+            "composition_role": {
+                "value": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                "locator": {"table": "1"},
+                "quote": "Starting glass, wt%",
+            },
+            "composition_wt_pct": {"SiO2": "60", "MgO": "40"},
+            "composition_derivation": note,
+        },
+        None,
+    )
+
+    assert result is not None and result.state.is_value
+    assert result.state.value == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    )
+    assert result.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert result.inference is not None
+    assert result.inference.relation == "wt_pct_to_mole_fraction"
+    assert note in result.inference.inputs
     expected = wt_pct_to_mole_fraction(
         {name: Decimal(value) for name, value in oxide_map.items()}
     )
@@ -592,6 +624,92 @@ def test_round9_values_composition_derivation_baseline_pin() -> None:
     assert results[2].inference.relation == (
         "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction"
     )
+
+
+def test_round9_catalogue_composition_note_does_not_change_admission() -> None:
+    source = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
+    original_load = migrate_module.load_yaml
+    outcomes = []
+    for note in (
+        None,
+        "No composition was derived",
+        "SiO2 and K2O are NOT complements to 100; this sample contains MgO",
+    ):
+        document = deepcopy(FIXTURE_EXTRACT)
+        row = document["species"]["Na"]["observations"][0]
+        row["values"].update(
+            {
+                "composition_from_sample_catalog": True,
+                "sample_oxide_composition_wt_pct": {"SiO2": "60", "MgO": "40"},
+                "composition_source": "catalogue",
+            }
+        )
+        row["values"]["series"] = row["values"]["series"][:1]
+        conditions = _conditions()
+        conditions.pop("composition")
+        conditions.pop("printed_composition")
+        conditions["temperature_K"] = _located(
+            {"kind": "point", "point": "1200.0"}
+        )
+        row["values"]["series"][0]["point_conditions"] = conditions
+        if note is not None:
+            row["values"]["composition_derivation"] = note
+
+        migrator = Migrator(REPO_ROOT)
+
+        def load_fixture(candidate):
+            return document if candidate == source else original_load(candidate)
+
+        with patch.object(
+            migrate_module,
+            "load_yaml",
+            load_fixture,
+        ):
+            migrator._migrate_extract(source)
+            migrator.finalize()
+
+        observation = next(iter(migrator.result.observations.values()))
+        experiment = migrator.result.experiments[observation.experiment_id]
+        composition = (observation.point_conditions or {}).get("composition")
+        inputs = collect_consumer_inputs(experiment, _bench(), observation)
+        requests = engine_point_requests(inputs)
+        outcomes.append(
+            (
+                None
+                if composition is None or not composition.state.is_value
+                else tuple(sorted(composition.state.value.components)),
+                tuple(
+                    (request.readiness.status.value, request.payload is not None)
+                    for request in requests
+                ),
+                ()
+                if composition is None or composition.inference is None
+                else composition.inference.inputs,
+            )
+        )
+
+    expected_components = tuple(
+        sorted(
+            wt_pct_to_mole_fraction(
+                {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+            ).components
+        )
+    )
+    expected_outcome = (expected_components, (("ready", True),) * 7)
+    assert [(components, requests) for components, requests, _ in outcomes] == [
+        expected_outcome
+    ] * 3
+    for note, (_, _, derivation_inputs) in zip(
+        (
+            None,
+            "No composition was derived",
+            "SiO2 and K2O are not complements to 100; this sample contains MgO",
+        ),
+        outcomes,
+        strict=True,
+    ):
+        if note is not None:
+            assert note in derivation_inputs
 
 
 def test_plante_fig19_points_keep_pooled_sample_unknown_and_gas_phase() -> None:
