@@ -1646,10 +1646,56 @@ class _MELTSBackendSupport(MeltBackend):
         self,
         eq: EquilibriumResult,
     ) -> EquilibriumResult:
+        redox_fields = (
+            'fO2_log',
+            'requested_fO2_log',
+            'printed_fO2_echo_log',
+            'system_fO2_delta_QFM',
+        )
+        reported_fo2 = any(
+            getattr(eq, field) is not None for field in redox_fields
+        )
+
+        def without_redox_values(value: object) -> object:
+            if isinstance(value, Mapping):
+                clean: dict[object, object] = {}
+                for key, nested in value.items():
+                    key_name = str(key).casefold()
+                    if key_name in {
+                        'fo2_output_status',
+                        'fo2_output_status_reason',
+                    }:
+                        clean[key] = nested
+                    elif any(
+                        token in key_name
+                        for token in ('fo2', 'qfm', 'buffer')
+                    ):
+                        clean[key] = None
+                    else:
+                        clean[key] = without_redox_values(nested)
+                return clean
+            if isinstance(value, list):
+                return [without_redox_values(item) for item in value]
+            if isinstance(value, tuple):
+                return tuple(without_redox_values(item) for item in value)
+            return value
+
+        clean_diagnostics = without_redox_values(eq.diagnostics)
+        if not isinstance(clean_diagnostics, dict):
+            clean_diagnostics = {}
+        clean_diagnostics['fO2_output_status'] = 'not_reported'
+        clean_diagnostics.setdefault(
+            'fO2_output_status_reason',
+            'not_an_input_default_column' if reported_fo2 else 'not_an_input_mode',
+        )
+        eq.fO2_log = None
+        eq.requested_fO2_log = None
+        eq.printed_fO2_echo_log = None
+        eq.system_fO2_delta_QFM = None
         eq.vapor_pressures_Pa = {}
         eq.vapor_pressures_source = {}
         eq.diagnostics = {
-            **eq.diagnostics,
+            **clean_diagnostics,
             'vapor_pressure_backend_status': 'not_attempted',
             'vapor_pressure_backend_status_reason': 'fO2_not_an_input',
             'authoritative_for_requested_vapor_pressure': False,
@@ -2738,6 +2784,8 @@ class _MELTSBackendSupport(MeltBackend):
                     clamp_diagnostics,
                 ),
             )
+            if redox_mode == REDOX_MODE_NOT_AN_INPUT:
+                return self._mark_vapor_unavailable_without_fO2(eq)
             if eq.status != 'ok':
                 return eq
 
@@ -2745,8 +2793,6 @@ class _MELTSBackendSupport(MeltBackend):
             # fed the SOLVED equilibrium liquid composition (not the
             # pre-equilibrium input); explicit Antoine fallback otherwise.
             vaporock_envelope_diagnostics: dict[str, Any] = {}
-            if redox_mode == REDOX_MODE_NOT_AN_INPUT:
-                return self._mark_vapor_unavailable_without_fO2(eq)
             if self._vaporock_available:
                 eq.vapor_pressures_Pa, source = (
                     self._vapor_pressures_via_vaporock_or_antoine(
@@ -3476,10 +3522,10 @@ class _MELTSBackendSupport(MeltBackend):
                 redox_mode=redox_mode,
                 table_outputs=table_outputs,
             )
-            if eq.status != 'ok':
-                return eq
             if redox_mode == REDOX_MODE_NOT_AN_INPUT:
                 return self._mark_vapor_unavailable_without_fO2(eq)
+            if eq.status != 'ok':
+                return eq
             (
                 eq.vapor_pressures_Pa,
                 eq.vapor_pressures_source,
