@@ -233,6 +233,44 @@ species:
               marker_count: 15
           attribution: Xiao and Holappa (1993), measured by chemical analysis
           digitisation: deferred to a figure pass
+      - observation_id: xiao_holappa_1993_oxygen_pressure_equation_15
+        type: equation_context
+        locator: {page: 2, pdf_page_index: 1, published_page: 67, equation: '15'}
+        phase: chromium-containing slag system
+        units: log pressure as printed
+        values:
+          method_class: quoted_attributed
+          equation_as_printed: 'log(Po2/atm) = 8.63 − 3.87 × 10^4/(T/K)'
+          attribution: '[15]'
+      - observation_id: xiao_holappa_1993_electronic_pressure_equation_17
+        type: equation_context
+        locator: {page: 2, pdf_page_index: 1, published_page: 67, equation: '17'}
+        phase: chromium-containing slag system
+        units: log pressure as printed
+        values:
+          method_class: quoted_attributed
+          equation_as_printed: 'log(Pe/atm) = 20.40 − 6.45 × 10^4/(T/K)'
+          attribution: '[17]'
+      - observation_id: xiao_holappa_1993_cr_o_formation_gibbs_equation_18
+        type: equation_context
+        locator: {page: 2, pdf_page_index: 1, published_page: 67, equation: '18'}
+        phase: liquid CrO
+        units: cal as printed
+        values:
+          method_class: quoted_attributed
+          equation_as_printed: 'ΔG° = −79880 + 15.25 T (cal)'
+          attribution: '[18]'
+      - observation_id: xiao_holappa_1993_crucible_charge_and_gas_conditions
+        type: experimental_conditions_context
+        locator: {page: 2, pdf_page_index: 1, published_page: 67, section: 'Apparatus'}
+        phase: chromium slag-metal electrochemical cell
+        units: as printed
+        values:
+          method_class: method_only
+          chromium_crucible_dimensions_as_printed: 28 mm i.d.; 32 mm o.d.; 50 mm h
+          alloy_charge: 16 g CrAg alloy
+          slag_charge: 30 g slag
+          argon_flow_rate: 6 l/h
   CrO:
     observations: []
     context:
