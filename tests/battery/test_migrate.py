@@ -54,6 +54,7 @@ from simulator.battery.migrate import (
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
     _convert_compilation_amount,
+    fe3_fe2_ratio_from_ferric_fraction,
     MigrationResult,
     Migrator,
     UnknownRailSpellingError,
@@ -107,6 +108,7 @@ from simulator.battery.migrate import (
     write_outputs,
 
 )
+from simulator.battery.stable_ids import series_row_extra
 
 
 def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
@@ -6443,9 +6445,7 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         if ratio is None:
             return None
         if str(units or "").strip().lower() == "fraction (fe3+/sumfe)":
-            if ratio == 1:
-                return None
-            return ratio / (as_decimal("1") - ratio)
+            return fe3_fe2_ratio_from_ferric_fraction(ratio)
         return ratio
     if q_token == "valence_ratio":
         return _num(item.get("value"))
@@ -6604,11 +6604,6 @@ def _series_census(
                     expected = _census_expected_point(item, q_token, units)
                     stored_obs = by_id.get(oid)
                     if stored_obs is None:
-                        if expected is None:
-                            # A nonnumeric printed cell cannot identify one of
-                            # the store's locator-based stable IDs by value.
-                            n_unavailable += 1
-                            continue
                         stable_points = [
                             observation
                             for observation in stored_observations
@@ -6618,19 +6613,34 @@ def _series_census(
                             and str(observation.get("observation_id") or "")
                             not in used_stable_ids
                         ]
-                        stored_obs = next(
-                            (
-                                observation
-                                for observation in stable_points
-                                if (observation.get("value") or {}).get("kind")
-                                == "point"
-                                and Decimal(
-                                    str((observation.get("value") or {}).get("point"))
+                        if expected is None:
+                            row_extra = series_row_extra(item, include_locator=False)
+                            if row_extra is not None:
+                                row_suffix = f":{row_extra}"
+                                stored_obs = next(
+                                    (
+                                        observation
+                                        for observation in stable_points
+                                        if str(observation.get("observation_id") or "").endswith(
+                                            row_suffix
+                                        )
+                                    ),
+                                    None,
                                 )
-                                == expected
-                            ),
-                            None,
-                        )
+                        else:
+                            stored_obs = next(
+                                (
+                                    observation
+                                    for observation in stable_points
+                                    if (observation.get("value") or {}).get("kind")
+                                    == "point"
+                                    and Decimal(
+                                        str((observation.get("value") or {}).get("point"))
+                                    )
+                                    == expected
+                                ),
+                                None,
+                            )
                     if stored_obs is None:
                         mismatches.append(f"missing stored point {oid}")
                         continue
@@ -7048,6 +7058,57 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> N
         extracts, dest
     )
     assert mismatches, "census must go red when stored alpha points are corrupted"
+
+
+def test_j01_census_rejects_numeric_values_for_unavailable_rows(
+    tmp_path: Path,
+) -> None:
+    import shutil
+
+    source_id = "cottrell-2009-iron-xanes"
+    extracts = tmp_path / "extracts"
+    extracts_v2 = tmp_path / "extracts-v2"
+    extracts.mkdir()
+    extracts_v2.mkdir()
+    shutil.copy2(
+        REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml",
+        extracts / f"{source_id}.yaml",
+    )
+    store_path = REPO_ROOT / "data" / "literature" / "extracts-v2" / f"{source_id}.yaml"
+    mutated_path = extracts_v2 / f"{source_id}.yaml"
+    shutil.copy2(store_path, mutated_path)
+    store = yaml.safe_load(mutated_path.read_text(encoding="utf-8"))
+    mutated_ids = []
+    for observation in store.get("observations") or []:
+        oid = str(observation.get("observation_id") or "")
+        value = observation.get("value") or {}
+        if (
+            "::cottrell_2009_basalt_mossbauer::" in oid
+            and value.get("kind") == "unavailable"
+            and str(value.get("unavailable_reason") or "").startswith(
+                "printed Fe3+/sum Fe Fe3_over_FeT"
+            )
+        ):
+            observation["value"] = {
+                "kind": "point",
+                "point": "42",
+                "approximate": False,
+            }
+            mutated_ids.append(oid)
+    assert len(mutated_ids) == 3, mutated_ids
+    mutated_path.write_text(
+        yaml.safe_dump(store, sort_keys=False, allow_unicode=True), encoding="utf-8"
+    )
+
+    _census, mismatches, n_numeric, _n_unavailable, _per_source = _series_census(
+        extracts, extracts_v2
+    )
+    assert n_numeric == 38
+    assert sum(
+        "::cottrell_2009_basalt_mossbauer::" in mismatch
+        and "stored numeric 42" in mismatch
+        for mismatch in mismatches
+    ) == 3, mismatches
 
 
 def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = "psat_series") -> dict:
