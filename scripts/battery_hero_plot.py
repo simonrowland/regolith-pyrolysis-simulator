@@ -2772,7 +2772,7 @@ def _hero_deck_legend_handles(
             color="#555555",
             linestyle="None",
             marker=marker,
-            markerfacecolor="#ffffff",
+            markerfacecolor="#555555",
             markeredgecolor="#555555",
             markersize=4,
             label=label,
