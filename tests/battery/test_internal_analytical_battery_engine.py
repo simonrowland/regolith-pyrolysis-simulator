@@ -154,15 +154,81 @@ def test_internal_analytical_scores_multi_cation_parent_activity(monkeypatch) ->
     )
 
 
+def _nested_mappings(node):
+    if isinstance(node, dict):
+        yield node
+        for child in node.values():
+            yield from _nested_mappings(child)
+    elif isinstance(node, list):
+        for child in node:
+            yield from _nested_mappings(child)
+
+
+def _guo_table5_observation_id(context) -> str:
+    """Guo Table 5, printed row 4: a(MgO) = 0.6376 at 1873 K.
+
+    The store id is whatever the loader has for that printed point. A
+    provenance edit must not make this test name a retired digest.
+    """
+    import yaml
+
+    from simulator.battery.score import point_magnitude, quantity_token, temperature_of
+
+    source_id = "guo-2021-mgo-activity-cmas-slag"
+    activity = Decimal("0.6376")
+    row_as_printed = "4"
+    temperature_K = Decimal("1873")
+    root = Path(__file__).resolve().parents[2]
+    document = yaml.safe_load(
+        (root / "data/literature/extracts" / f"{source_id}.yaml").read_text()
+    )
+    printed = [
+        item
+        for item in _nested_mappings(document)
+        if str(item.get("row_as_printed")) == row_as_printed
+        and Decimal(str(item.get("activity"))) == activity
+        and Decimal(str(item.get("T_K"))) == temperature_K
+    ]
+    assert len(printed) == 1
+    printed_mol = {
+        oxide: Decimal(str(amount))
+        for oxide, amount in printed[0]["composition_mol"].items()
+    }
+    matches = []
+    for obs in context.observations.values():
+        composition = obs.identity.composition
+        if (
+            obs.source_id != source_id
+            or quantity_token(obs.identity) is not Quantity.ACTIVITY
+            or obs.identity.species.formula != "MgO"
+            or temperature_of(obs.identity) != temperature_K
+            or point_magnitude(obs.value) != activity
+            or composition is None
+            or not composition.is_value
+            or composition.value is None
+        ):
+            continue
+        moles = {
+            oxide: Decimal(str(amount))
+            for oxide, amount in composition.value.components
+        }
+        if moles == printed_mol:
+            matches.append(obs)
+    assert len(matches) == 1
+    return matches[0].observation_id
+
+
 def _assert_internal_activity_residual_matches_production(
     *,
     source_id: str,
     observation_id: str,
+    context=None,
 ) -> None:
     from simulator.battery.generators.bench import activity_request_for_engine
 
     root = Path(__file__).resolve().parents[2]
-    context = battery_score.load_score_context(root, sources=(source_id,))
+    if context is None:
+        context = battery_score.load_score_context(root, sources=(source_id,))
     observation = context.observations[observation_id]
     residual, _ = battery_score.compile_residual(
         observation,
@@ -209,12 +275,13 @@ def _assert_internal_activity_residual_matches_production(
 
 
 def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
+    source_id = "guo-2021-mgo-activity-cmas-slag"
+    root = Path(__file__).resolve().parents[2]
+    context = battery_score.load_score_context(root, sources=(source_id,))
     _assert_internal_activity_residual_matches_production(
-        source_id="guo-2021-mgo-activity-cmas-slag",
-        observation_id=(
-            "guo-2021-mgo-activity-cmas-slag::"
-            "guo_2021_table5_mgo_activities_1873k::T=1873:h=32bc4d012e2d"
-        ),
+        source_id=source_id,
+        observation_id=_guo_table5_observation_id(context),
+        context=context,
     )
 
 

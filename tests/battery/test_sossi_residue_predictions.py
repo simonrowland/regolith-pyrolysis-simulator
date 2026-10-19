@@ -349,6 +349,7 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
 def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from decimal import Decimal
     from types import SimpleNamespace
 
     from simulator.battery.enums import Engine, Quantity, Rail
@@ -357,6 +358,7 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
         point_magnitude,
         quantity_token,
         score_store,
+        temperature_of,
     )
     import simulator.battery.residue as residue
 
@@ -421,22 +423,32 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
         engines=(Engine.OPENIMCC,),
         rail=Rail.RESIDUE_COMPOSITION,
     )
-    pinned_score = next(
+    # Table 2 run 2M-18-07-16c, Mn 721.6 ppm at 1300 C. The admitted quoted
+    # row is the scored observation. Its digest is not part of the lookup.
+    pinned_rows = [
         row
-        for row in residuals
-        if row.reference
-        == "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=0eaa2bb3c525"
+        for row in context.observations.values()
+        if row.source_id == sossi_source
+        and row.identity.species.formula == "Mn"
+        and point_magnitude(row.value) == Decimal("721.6")
+        and temperature_of(row.identity) == Decimal("1573.15")
+        and row.experiment_id.endswith("sossi-2019-run-2m-18-07-16c")
+        and row.admission.status.value == "admitted"
+        and (
+            "sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::"
+            in row.observation_id
+        )
+    ]
+    assert len(pinned_rows) == 1
+    pinned = pinned_rows[0]
+    pinned_score = next(
+        row for row in residuals if row.reference == pinned.observation_id
     )
     assert pinned_score.key == (
-        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::"
-        "T=1573.15:h=0eaa2bb3c525:T=1573.15::residue_component_composition::"
+        f"{pinned.observation_id}:T=1573.15::residue_component_composition::"
         "residue_composition::openimcc"
     )
-    assert pinned_score.candidate == (
-        "engine:openimcc:kems-012-sossi-2019::"
-        "sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::"
-        "T=1573.15:h=0eaa2bb3c525"
-    )
+    assert pinned_score.candidate == f"engine:openimcc:{pinned.observation_id}"
     assert candidates[pinned_score.candidate].observation_id == pinned_score.candidate
     assert pinned_score.numeric is not None
     assert float(pinned_score.numeric.value).hex() == "0x1.88fea8359f38fp-4"
