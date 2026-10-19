@@ -127,6 +127,7 @@ from simulator.battery.records import (
 )
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
+    OXYGEN_BALANCE_EFFUSION_ENGINES,
     OXYGEN_BALANCE_NOTICE_PREFIX,
     has_own_engine_solved_oxygen_balance,
 )
@@ -5815,13 +5816,16 @@ def _oxygen_input_request(
     """The scorer's one oxygen-input decision.
 
     A printed identity fO2 is commanded as float(fO2_Pa)/1e5, the same
-    division this path already used. Anything else that needs oxygen goes
-    through the row ladder once; a row the ladder cannot resolve refuses
-    ``missing_fO2`` for every engine. ``force_ladder`` is the Knudsen branch
-    that used to solve a private effusion balance: those rows share the
-    ladder fO2 even when the quantity's profile does not require oxygen.
-    A quantity that does not take oxygen, and is not on that branch, records
-    the omission and runs with oxygen not an input.
+    division this path already used. Anything else goes through the row
+    ladder once. A tier-3 effusion closure is the oxygen-balance mode, not
+    a commanded number; engines that cannot solve it are rewritten by the
+    comparison path onto the internal-analytical closure. A row the ladder
+    cannot resolve refuses ``missing_fO2`` for every engine when oxygen is
+    required. ``force_ladder`` still asks the ladder for a quantity that
+    does not require oxygen; it does not override a closure, and it does
+    not fill a Knudsen cell that cannot close. Any other quantity that
+    does not take oxygen records the omission and runs with oxygen not an
+    input.
     """
 
     from simulator.battery.fo2_ladder import (
@@ -5832,6 +5836,7 @@ def _oxygen_input_request(
     from simulator.diagnostic_helpers.binary_pot_battery import (
         PO2_COMMANDED,
         PO2_NOT_AN_INPUT,
+        PO2_OXYGEN_BALANCE_EFFUSION,
         Po2Request,
     )
 
@@ -5856,16 +5861,25 @@ def _oxygen_input_request(
                     )
                 )
             return Po2Request(mode=PO2_COMMANDED, po2_bar=po2_bar)
-    if oxygen_required or force_ladder:
-        resolved = resolve_row_fo2(
-            experiment,
-            bench,
-            observation,
-            composition=composition_value,
-            composition_wt=composition_wt,
-            temperature_K=temperature_K,
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition=composition_value,
+        composition_wt=composition_wt,
+        temperature_K=temperature_K,
+        quantity=quantity,
+    )
+    if resolved is not None and resolved.closure:
+        if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
+            input_notices.append(fo2_tier_notice(quantity, resolved))
+        return Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+            cell_material=resolved.cell_material,
         )
-        if resolved is not None:
+    if oxygen_required or force_ladder:
+        if resolved is not None and not resolved.closure:
             input_notices.append(fo2_tier_notice(quantity, resolved))
             bar = (
                 resolved.po2_bar
@@ -5893,6 +5907,72 @@ def _oxygen_input_request(
     return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
 
 
+_BORROWED_EFFUSION_PHRASE = "effusion closure borrowed from internal-analytical"
+
+
+def _borrow_internal_analytical_effusion(
+    *,
+    engine: Engine,
+    channel: str,
+    sources: tuple[str, ...],
+    identity: Identity,
+    requested: State[Composition] | None,
+    quantity: Quantity,
+    observation: Observation,
+    experiment: Experiment | None,
+    bench: Bench | None,
+    handles: Mapping[str, object] | None,
+    isolated: bool | None,
+    notices: list[Notice],
+) -> "Po2Request | EnginePrediction":
+    """Command the internal-analytical closure for an engine that cannot solve it.
+
+    The solver stays in the internal-analytical adapter. This function reads
+    the solved bar off that engine's notice and does not copy the balance.
+    """
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        handles=handles,
+        isolated=isolated,
+        experiment=experiment,
+        bench=bench,
+    )
+    bar = _solved_effusion_po2_bar(prediction)
+    if bar is None or not math.isfinite(bar) or bar <= 0.0:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.UNSUPPORTED,
+            detail={
+                "reason": "internal_analytical_oxygen_balance_unavailable",
+                "engine": engine.value,
+            },
+            notices=tuple(notices),
+        )
+    notices.append(
+        Notice(
+            kind=NoticeKind.SOURCE_DISAGREEMENT,
+            affected_quantities=(quantity,),
+            reason=(
+                "fo2_tier=3; route=effusion_oxygen_balance; "
+                + _BORROWED_EFFUSION_PHRASE
+            ),
+            origin="fo2_ladder",
+        )
+    )
+    return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -5910,10 +5990,14 @@ def predict_with_engine(
         ARM_QUALIFICATION,
         MELTS_FAMILY_ENGINES,
         PO2_COMMANDED,
+        PO2_OXYGEN_BALANCE_EFFUSION,
         REFUSAL_ENGINE_CRASH,
         REFUSAL_TIMEOUT,
         REFUSAL_UNAVAILABLE,
         Po2Request,
+        _OxygenBalanceEngineTrialRefusal,
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
         assess_qualification_gate,
         equilibrate_cell,
         identity_battery_pot,
@@ -6559,9 +6643,9 @@ def predict_with_engine(
                 notices=tuple(input_notices),
             )
         else:
-            # One ladder fO2 for every engine. This is the branch that used
-            # to solve a private effusion balance.
-            decision = oxygen_decision(force_ladder=True)
+            # Inert or uniform W/Mo. The ladder returns the tier-3 effusion
+            # closure (the shared condition, not a borrowed intrinsic fO2).
+            decision = oxygen_decision()
             if isinstance(decision, EnginePrediction):
                 return decision
             po2 = decision
@@ -6732,17 +6816,136 @@ def predict_with_engine(
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY
         else None
     )
-    cell = equilibrate_cell(
-        handle,
-        pot,
-        temperature_K=float(T),
-        po2=po2,
-        qualification=qualification,
-        isolated=use_isolated,
-        arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
-        physical_pressure_bar=pressure_bar,
-        native_activity_formula=native_activity_formula,
-    )
+    if (
+        po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
+        and engine not in OXYGEN_BALANCE_EFFUSION_ENGINES
+    ):
+        borrowed = _borrow_internal_analytical_effusion(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            quantity=quantity,
+            observation=observation,
+            experiment=experiment,
+            bench=bench,
+            handles=handle_map,
+            isolated=use_isolated,
+            notices=extra_notices,
+        )
+        if isinstance(borrowed, EnginePrediction):
+            return borrowed
+        po2 = borrowed
+    if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION and engine in {
+        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
+    }:
+
+        def engine_call_at_po2(pO2_bar: float) -> object:
+            return equilibrate_cell(
+                handle,
+                pot,
+                temperature_K=float(T),
+                po2=Po2Request(
+                    mode=PO2_COMMANDED,
+                    po2_bar=pO2_bar,
+                ),
+                qualification=qualification,
+                isolated=use_isolated,
+                arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+                physical_pressure_bar=pressure_bar,
+                native_activity_formula=native_activity_formula,
+            )
+
+        try:
+            solved_pO2_bar, _pressures, balance, cell_fraction, cell_info = (
+                _solve_vapor_engine_cell_oxygen_balance(
+                    engine_call_at_po2,
+                    temperature_K=float(T),
+                    cell_material=po2.cell_material,
+                    fixed_point_activities=engine is Engine.ALPHAMELTS,
+                )
+            )
+        except _OxygenBalanceEngineTrialRefusal as exc:
+            cell = exc.cell
+        except _OxygenBalanceRefusal as exc:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.UNSUPPORTED,
+                    call_evidence=f"cell_oxygen_balance:{name}",
+                ),
+                authority=Authority.REFUSED,
+                notices=tuple(extra_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={"reason": exc.reason_code, "detail": str(exc)},
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        else:
+            solved_notice = {
+                "kind": "fo2_oxygen_balance_effusion_solved",
+                "pO2_bar": solved_pO2_bar,
+                "relative_residual": balance["residual"],
+                "bracket_log10_bar": balance["bracket"],
+                "dominant_O_carriers": balance["dominant_O_carriers"],
+                "dominant_metal_carriers": balance["dominant_metal_carriers"],
+                "cell_material": cell_info["cell_material"],
+                "cell_oxide_flux_fraction": cell_fraction,
+                "buffer_pinned": cell_info["buffer_pinned"],
+                "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
+                "cell_oxide_janaf_sources": cell_info[
+                    "cell_oxide_janaf_sources"
+                ],
+            }
+            extra_notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        OXYGEN_BALANCE_NOTICE_PREFIX
+                        + " "
+                        + json.dumps(
+                            solved_notice,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        )
+                    ),
+                    origin=f"engine:{engine.value}",
+                )
+            )
+            po2 = Po2Request(
+                mode=PO2_COMMANDED,
+                po2_bar=solved_pO2_bar,
+            )
+            cell = equilibrate_cell(
+                handle,
+                pot,
+                temperature_K=float(T),
+                po2=po2,
+                qualification=qualification,
+                isolated=use_isolated,
+                arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+                physical_pressure_bar=pressure_bar,
+                native_activity_formula=native_activity_formula,
+            )
+    else:
+        cell = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=float(T),
+            po2=po2,
+            qualification=qualification,
+            isolated=use_isolated,
+            arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+            physical_pressure_bar=pressure_bar,
+            native_activity_formula=native_activity_formula,
+        )
     notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)

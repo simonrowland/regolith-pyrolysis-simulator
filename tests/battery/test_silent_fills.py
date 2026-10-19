@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+import json
 import math
 import types
 from dataclasses import replace
@@ -39,6 +40,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     PO2_COMMANDED,
     PO2_ENGINE_DEFAULT,
     PO2_NOT_AN_INPUT,
+    PO2_OXYGEN_BALANCE_EFFUSION,
     BinaryPot,
     EngineHandle,
     Po2Request,
@@ -368,7 +370,7 @@ def test_cell_material_vocabulary_is_closed() -> None:
         (CellMaterial.PT, CellMaterial.IR),
     ),
 )
-def test_inert_knudsen_cell_commands_the_shared_ladder_fo2(
+def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
     materials: tuple[CellMaterial, ...],
     monkeypatch,
 ) -> None:
@@ -383,11 +385,11 @@ def test_inert_knudsen_cell_commands_the_shared_ladder_fo2(
         isolated=False,
     )
 
-    assert seen["mode"] == PO2_COMMANDED
-    assert seen["po2_bar"] is not None
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+    assert seen["po2_bar"] is None
     assert seen["cell_material"] is None
     assert any(
-        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
         for notice in prediction.notices
     )
 
@@ -400,12 +402,11 @@ def test_inert_knudsen_cell_commands_the_shared_ladder_fo2(
         ((CellMaterial.W, CellMaterial.W), "W"),
     ),
 )
-def test_uniform_modelled_reactive_cell_commands_the_shared_ladder_fo2(
+def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
     materials: tuple[CellMaterial, ...],
     cell_material: str,
     monkeypatch,
 ) -> None:
-    del cell_material
     seen = _capture_cell(monkeypatch)
     observation, experiment = _kems_partial(cell_material=None)
 
@@ -417,11 +418,11 @@ def test_uniform_modelled_reactive_cell_commands_the_shared_ladder_fo2(
         isolated=False,
     )
 
-    assert seen["mode"] == PO2_COMMANDED
-    assert seen["po2_bar"] is not None
-    assert seen["cell_material"] is None
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+    assert seen["po2_bar"] is None
+    assert seen["cell_material"] == cell_material
     assert any(
-        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
         for notice in prediction.notices
     )
 
@@ -555,11 +556,10 @@ def test_derived_point_condition_fo2_is_not_sent_as_a_command(monkeypatch) -> No
         isolated=False,
     )
 
-    assert seen["mode"] == PO2_COMMANDED
-    assert seen["po2_bar"] != float(Decimal("1e-3")) / 1.0e5
-    assert seen["po2_bar"] is not None
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+    assert seen["po2_bar"] is None
     assert any(
-        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
         for notice in prediction.notices
     )
 
@@ -680,7 +680,7 @@ def test_printed_total_pressure_is_passed_without_an_assumption(monkeypatch) -> 
 
 
 @pytest.mark.parametrize("engine", [Engine.VAPOROCK, Engine.ALPHAMELTS])
-def test_knudsen_vapour_rows_use_engine_pressures_at_the_ladder_po2(
+def test_oxygen_balance_vapour_rows_use_engine_pressures_at_commanded_po2(
     engine, monkeypatch
 ) -> None:
     observation, experiment = _kems_partial(cell_material=None)
@@ -740,16 +740,22 @@ def test_knudsen_vapour_rows_use_engine_pressures_at_the_ladder_po2(
 
     assert prediction.value is not None
     assert any(
-        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
         for notice in prediction.notices
     )
+    solved_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.reason.startswith("fo2_oxygen_balance_effusion_solved:")
+    )
+    solved = json.loads(solved_notice.reason.split(":", 1)[1])
     score_pO2_bar, score_pressures = calls[-1]
     direct_pressures = _cell(
         handle,
         None,
-        po2=Po2Request(PO2_COMMANDED, score_pO2_bar),
+        po2=Po2Request(PO2_COMMANDED, solved["pO2_bar"]),
     ).gas_partial_pressures_Pa
-    assert score_pO2_bar is not None and score_pO2_bar > 0.0
+    assert score_pO2_bar == pytest.approx(solved["pO2_bar"], rel=1e-12)
     assert math.isclose(
         float(prediction.value), direct_pressures["K"], rel_tol=1e-9
     )

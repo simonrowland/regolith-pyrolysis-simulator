@@ -609,13 +609,27 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
         OPENIMCC, observation, experiment=F.tabulation_experiment(), isolated=False
     )
     general_outcome = _oxygen_outcome(general, seen)
-    assert reactive_outcome == general_outcome
     assert any(
         n.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED for n in on_reactive_knudsen.notices
     )
     assert not any(n.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED for n in general.notices)
+    if case == "p_partial_no_o2":
+        # The Re cell cannot close, so it does not take the effusion closure
+        # and it does not borrow the melt's intrinsic fO2. The carrier-free
+        # tabulation of the same melt is the congruent closure.
+        assert (
+            reactive_outcome[0],
+            reactive_outcome[1].get("reason"),
+            reactive_outcome[2],
+        ) == ("identity_incomplete", "missing_fO2", None)
+        assert general_outcome[2] == "oxygen_balance_effusion"
+        assert any(
+            notice.reason == "fo2_tier=3; route=effusion_oxygen_balance"
+            for notice in general.notices
+        )
+        return
+    assert reactive_outcome == general_outcome
     expected = {
-        "p_partial_no_o2": ("unsupported", None, "commanded"),
         "p_partial_printed_o2": ("unsupported", None, "commanded"),
         "p_sat_pure_reservoir": ("unsupported", None, "not_an_input"),
     }[case]
@@ -624,12 +638,6 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
         reactive_outcome[1].get("reason"),
         reactive_outcome[2],
     ) == expected
-    if case == "p_partial_no_o2":
-        assert reactive_outcome[3] is not None
-        assert any(
-            notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
-            for notice in on_reactive_knudsen.notices
-        )
 
 
 def test_r2_f4_guard_borrowed_envelope_never_attaches_to_residue_dex_rows() -> None:

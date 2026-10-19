@@ -567,6 +567,9 @@ def melt_activity_requests(
     )
     # Tier 1 is the printed fO2 and is shared even when oxygen is not
     # otherwise an input. Tiers 2-4 fill only a multivalent row.
+    # A vapour effusion closure is not an activity fO2.
+    if resolved is not None and resolved.closure:
+        resolved = None
     shared = resolved if resolved is not None and (resolved.tier == 1 or redox) else None
     if redox and shared is None:
         oxygen = inputs.waypoints["oxygen_condition"]

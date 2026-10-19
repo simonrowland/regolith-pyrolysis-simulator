@@ -60,10 +60,12 @@ def _feo_case(**kwargs):
     )
 
 
-def test_comparison_path_does_not_solve_a_private_effusion_fo2() -> None:
+def test_comparison_path_shares_the_effusion_closure_condition() -> None:
+    """Tier-3 effusion shares the closure, not a private number per engine."""
+
     source = inspect.getsource(predict_with_engine)
-    assert "PO2_OXYGEN_BALANCE_EFFUSION" not in source
-    assert "oxygen_balance_effusion_unsupported_engine" not in source
+    assert "PO2_OXYGEN_BALANCE_EFFUSION" in source
+    assert "_borrow_internal_analytical_effusion" in source
 
 
 def test_tier1_printed_log_is_bit_identical_on_every_engine() -> None:
@@ -300,17 +302,50 @@ def test_tier_notice_reaches_the_residual() -> None:
     )
 
 
-@pytest.mark.parametrize(
-    "engine",
-    (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC, Engine.VAPOROCK),
-)
-def test_knudsen_row_without_printed_fo2_commands_one_borrowed_value(
-    engine, monkeypatch,
-) -> None:
+def test_closable_knudsen_row_is_one_effusion_closure() -> None:
+    from simulator.battery.enums import CellMaterial, Quantity
+    from tests.battery.test_silent_fills import _cell_material_bench, _kems_partial
+
+    observation, experiment = _kems_partial(cell_material=None)
+    bench = _cell_material_bench((CellMaterial.PT,))
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition=observation.identity.composition.value,
+        temperature_K=float(observation.identity.temperature_K.value),
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert resolved is not None
+    assert resolved.closure is True
+    assert resolved.tier == 3
+    assert resolved.route == "effusion_oxygen_balance"
+    assert resolved.borrowed is False
+    assert resolved.po2_bar is None
+    assert resolved.cell_material is None
+
+
+def test_unmodelled_knudsen_row_does_not_borrow_intrinsic_fo2() -> None:
+    from simulator.battery.enums import CellMaterial, Quantity
+    from tests.battery.test_silent_fills import _cell_material_bench, _kems_partial
+
+    observation, experiment = _kems_partial(cell_material=None)
+    resolved = resolve_row_fo2(
+        experiment,
+        _cell_material_bench((CellMaterial.RE,)),
+        observation,
+        composition=observation.identity.composition.value,
+        temperature_K=float(observation.identity.temperature_K.value),
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert resolved is None
+
+
+def test_supported_engines_receive_the_same_effusion_condition(monkeypatch) -> None:
     from simulator.battery.enums import CellMaterial
     from tests.battery.test_silent_fills import _cell_material_bench, _kems_partial
 
-    seen: dict[str, object] = {}
+    seen: dict[str, tuple[object, object]] = {}
 
     def _open(name):
         return type("Handle", (), {
@@ -319,9 +354,8 @@ def test_knudsen_row_without_printed_fo2_commands_one_borrowed_value(
             "unavailable_reason": None,
         })()
 
-    def _cell(_handle, _pot, *, po2, **_kwargs):
-        seen["po2_bar"] = po2.po2_bar
-        seen["mode"] = po2.mode
+    def _cell(handle, _pot, *, po2, **_kwargs):
+        seen[str(handle.name)] = (po2.mode, po2.cell_material)
         return type("Cell", (), {
             "status": "refusal",
             "refusal_reason": "census_stop",
@@ -343,16 +377,162 @@ def test_knudsen_row_without_printed_fo2_commands_one_borrowed_value(
         _cell,
     )
     observation, experiment = _kems_partial(cell_material=None)
-    predict_with_engine(
-        engine,
-        observation,
-        experiment=experiment,
-        bench=_cell_material_bench((CellMaterial.PT,)),
-        isolated=False,
+    bench = _cell_material_bench((CellMaterial.MO,))
+    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+        predict_with_engine(
+            engine, observation, experiment=experiment, bench=bench, isolated=False,
+        )
+    assert seen["openimcc"] == ("oxygen_balance_effusion", "Mo")
+    assert seen["internal-analytical"] == seen["openimcc"]
+
+
+def test_magemin_and_thermoengine_borrow_one_internal_closure(monkeypatch) -> None:
+    from simulator.battery.enums import CellMaterial
+    from tests.battery.test_silent_fills import _cell_material_bench, _kems_partial
+
+    seen: dict[str, object] = {}
+
+    def _open(name):
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+        })()
+
+    def _cell(handle, _pot, *, po2, **_kwargs):
+        name = str(handle.name)
+        if name == "internal-analytical" and po2.mode == "oxygen_balance_effusion":
+            return type("Cell", (), {
+                "status": "ok",
+                "refusal_reason": None,
+                "melt_activities": {},
+                "melt_activity_coefficients": {},
+                "gas_partial_pressures_Pa": {"K": 1.0},
+                "hostname": "test",
+                "exit_code": 0,
+                "exit_signal": None,
+                "notices": [{
+                    "kind": "fo2_oxygen_balance_effusion_solved",
+                    "pO2_bar": 3.5e-9,
+                    "relative_residual": 0.0,
+                    "bracket_log10_bar": [-12.0, -6.0],
+                    "dominant_O_carriers": ["O2"],
+                }],
+                "engine_reason": None,
+                "authority": None,
+            })()
+        seen[name] = po2.po2_bar
+        return type("Cell", (), {
+            "status": "refusal",
+            "refusal_reason": "census_stop",
+            "melt_activities": {},
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "engine_reason": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
     )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    observation, experiment = _kems_partial(cell_material=None)
+    bench = _cell_material_bench((CellMaterial.PT,))
+    predictions = []
+    for engine in (Engine.THERMOENGINE, Engine.MAGEMIN):
+        predictions.append(predict_with_engine(
+            engine, observation, experiment=experiment, bench=bench, isolated=False,
+        ))
+    assert seen["thermoengine"] == 3.5e-9
+    assert seen["magemin"] == 3.5e-9
+    for prediction in predictions:
+        assert any(
+            "effusion closure borrowed from internal-analytical" in notice.reason
+            and notice.reason.startswith("fo2_tier=3; route=effusion_oxygen_balance;")
+            for notice in prediction.notices
+        )
+
+
+def test_carrier_gas_row_borrows_one_intrinsic_fo2(monkeypatch) -> None:
+    from simulator.battery.records import SweepGas
+    from tests.battery.test_silent_fills import _kems_partial
+
+    seen: dict[str, float] = {}
+
+    def _open(name):
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+        })()
+
+    def _cell(handle, _pot, *, po2, **_kwargs):
+        seen[str(handle.name)] = po2.po2_bar
+        return type("Cell", (), {
+            "status": "refusal",
+            "refusal_reason": "census_stop",
+            "melt_activities": {},
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "engine_reason": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    observation, _knudsen = _kems_partial(cell_material=None)
+    carrier = F.tabulation_experiment(total_P=Decimal("100000"))
+    experiment = replace(
+        carrier,
+        pressure_environment=replace(
+            carrier.pressure_environment,
+            sweep_gas=F.located(SweepGas(
+                species="N2",
+                flow_sccm=State.of(Decimal("10")),
+                partial_pressure_Pa=State.not_applicable("carrier"),
+            )),
+        ),
+    )
+    predictions = []
+    for engine in (
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+        Engine.OPENIMCC,
+        Engine.VAPOROCK,
+        Engine.INTERNAL_ANALYTICAL,
+        Engine.MAGEMIN,
+    ):
+        predictions.append(predict_with_engine(
+            engine, observation, experiment=experiment, bench=None, isolated=False,
+        ))
+    assert set(seen) == {
+        "alphamelts", "thermoengine", "openimcc", "vaporock",
+        "internal-analytical", "magemin",
+    }
+    assert len(set(seen.values())) == 1
     log = float(intrinsic_melt_fO2(
         composition_wt_pct(observation.identity.composition.value),
         float(observation.identity.temperature_K.value),
     ))
-    assert seen["mode"] == "commanded"
-    assert seen["po2_bar"] == 10.0 ** log
+    assert next(iter(seen.values())) == 10.0 ** log
+    assert all(
+        any(
+            notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+            for notice in prediction.notices
+        )
+        for prediction in predictions
+    )
