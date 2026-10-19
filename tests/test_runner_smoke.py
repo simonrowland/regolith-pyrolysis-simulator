@@ -1616,14 +1616,15 @@ def test_lunar_mare_low_ti_full_run_ledger_pin(
         allow_nan=False,
     ).encode()
     digest = hashlib.sha256(ledger_bytes).hexdigest()
-    # Whole-stack golden: measured on green a822c275f (openimcc e1423d8,
-    # MAGEMin 1.9.6 ig) on the laptop and confirmed on studio-3. It moves
-    # with any engine or OpenIMCC pin; the pin offer's owner regenerates it.
+    # Whole-stack golden: measured on the b140 stack 3afcf84ae (b-899 melt
+    # redox, openimcc 66ec4a3, MAGEMin 1.9.6 ig) on the laptop, identical with
+    # and without this branch's fix. It moves with any engine, OpenIMCC or
+    # stack-wide physics change; that change's owner regenerates it.
     assert session.is_complete()
-    assert len(hourly_ledgers) == 195
-    assert len(ledger_bytes) == 706058
+    assert len(hourly_ledgers) == 287
+    assert len(ledger_bytes) == 1134622
     assert digest == (
-        "5ae80eb5c19c6550c0c0f0e96ae991d520bd3c2b105f6463e4fed28b037282ec"
+        "e4bc8ee789cf9bd6507627469e62d08a3aab05b9a9685a0673122b669068a709"
     )
 
 
