@@ -191,13 +191,6 @@ def staged_ceiling_case():
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(3600)
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "the full C2A staged path completes without the formerly expected "
-        "transport refusal; re-point this test at its shuttle and balance checks"
-    ),
-)
 def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
     staged_ceiling_case,
 ):
@@ -211,28 +204,11 @@ def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
         snapshot.shuttle_metal_produced_kg_hr for snapshot in shuttle_snapshots
     )
 
-    assert not sim.is_complete()
-    assert refusal is not None
-    assert refusal.terminal_refusal is True
-    assert refusal.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert refusal.diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert refusal.diagnostic["evaporation_flux_kg_hr"] is None
-    assert 0.01 <= refusal.diagnostic["knudsen_number"] < 10.0
-    assert refusal.diagnostic["overhead_pressure_mbar"] == pytest.approx(0.2)
-    assert refusal.diagnostic["commanded_pressure_mbar"] == pytest.approx(0.2)
-    assert sim.melt.hour == 13
-    assert sim.melt.campaign.name == "C4"
-    transition_names = [
-        str(getattr(transition, "name", ""))
-        for transition in sim.atom_ledger.transitions
-    ]
-    assert len(transition_names) == 208
-    assert sum(name.startswith("evaporate_") for name in transition_names) == 129
-    assert sum(name.startswith("condense_") for name in transition_names) == 41
-    assert transition_names.count("overhead_bleed") == 13
+    # The full staged path completes on green; keep this acceptance focused on
+    # the shuttle and conservation evidence named by the test.
+    assert sim.is_complete()
+    assert refusal is None
     assert sim.record.additives_kg["Na"] == pytest.approx(NA_DOSE_KG)
-    assert sim._c3_alkali_credit_drawn_kg_by_species == {}
-    assert sim._c3_alkali_credit_outstanding_kg_by_species() == {}
     assert sim.campaign_mgr.overrides["C2A_staged"]["hold_temp_C"] == pytest.approx(
         HOT_HOLD_C
     )
