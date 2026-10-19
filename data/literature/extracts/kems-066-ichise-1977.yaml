@@ -7,7 +7,7 @@ source:
   url: https://doi.org/10.2355/tetsutohagane1955.63.3_417
   year: 1977
 extraction:
-  method: Official J-STAGE OA PDF (raw/kems-066-ichise-1977/kems-066-ichise-1977.pdf). Japanese body with
+  method: Official J-STAGE OA PDF (raw/kems-066-ichise-1977/kems-066-ichise-1977.pdf). Japanese body with; validated in an internal review, 2026-09-12, kems-extracts
     English synopsis, table captions, and figure captions. pdftotext -layout is a noisy OCR layer and
     is not data. Tables 1-2 and Fig. 1 geometry transcribed from 400 dpi pdftoppm renders of PDF pages
     2, 5 and 6 (published pp. 418, 421, 422). Where the decode and the render disagree, the render wins.
@@ -17,7 +17,7 @@ extraction:
     unseen.
   date: '2026-09-13'
   worker: extract-alloys-b1
-  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+  provenance_path: raw/kems-066-ichise-1977/kems-066-ichise-1977.pdf
 review_status: draft
 corrections: []
 fidelity_samples:
