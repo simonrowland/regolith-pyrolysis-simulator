@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
 import os
 import re
 import subprocess
@@ -61,14 +62,16 @@ def _text_values(value):
             yield from _text_values(child)
 
 
-def _canonical_number(value: str) -> str:
-    value = re.sub(r"e([+-])0+(\d+)", r"e\1\2", value.casefold())
-    try:
-        number = float(value)
-    except ValueError:
-        return value
-    canonical = str(int(number)) if number.is_integer() else format(number, ".12g")
-    return re.sub(r"e([+-])0+(\d+)", r"e\1\2", canonical)
+def _numeric_tokens(value: str) -> set[tuple[int, Decimal]]:
+    value = re.sub(r"(?<=\d)(?=[pP])", " ", value.casefold())
+    tokens = re.findall(
+        r"(?<![A-Za-z0-9_.+-])[-+]?\d+(?:\.\d+)?(?:e[-+]?\d+)?(?![A-Za-z0-9_.])",
+        value,
+    )
+    return {
+        (-1 if token.startswith("-") else 1, Decimal(token.lstrip("+-")).normalize())
+        for token in tokens
+    }
 
 
 def _line_ranges(value: str) -> list[tuple[int, int]]:
@@ -156,19 +159,38 @@ def _citation_matches(locator: dict, text: str, cited_values=()) -> bool | None:
             if citation_normalized in normalized:
                 return True
             if key == "paragraph":
-                citation_numbers = re.findall(r"(?<![A-Za-z])\d+(?:\.\d+)?(?:e[-+]?\d+)?", citation_normalized)
+                citation_numbers = re.findall(
+                    r"(?<![A-Za-z])\d+(?:\.\d+)?(?:e[-+]?\d+)?", citation_normalized
+                )
+                source_numbers = _numeric_tokens(normalized)
                 citation_words = [
                     word
                     for word in re.findall(r"[a-z]{2,}", citation_normalized)
-                    if word not in {"with", "from", "until", "into", "only", "where", "used", "range", "was", "were", "the", "and", "for", "of", "in"}
+                    if word
+                    not in {
+                        "with", "from", "until", "into", "only", "where", "used", "range",
+                        "was", "were", "the", "and", "for", "of", "in",
+                    }
                 ]
                 if sum(word in normalized for word in set(citation_words)) >= 2 and (
-                    not citation_numbers or any(number in normalized for number in citation_numbers)
+                    not citation_numbers
+                    or any(number in source_numbers for number in _numeric_tokens(citation_normalized))
                 ):
                     return True
+    note = locator.get("note")
+    if isinstance(note, str):
+        if _numeric_tokens(note) & _numeric_tokens(normalized):
+            return True
+        note_words = re.findall(r"[a-z]{4,}", note.casefold())
+        if sum(word in normalized for word in set(note_words)) >= 2:
+            return True
     for value in cited_values:
         for citation in _text_values(value):
             citation = " ".join(citation.split()).casefold()
+            if re.fullmatch(r"[-+]?\d+(?:\.\d+)?(?:e[-+]?\d+)?", citation):
+                if citation in _numeric_tokens(normalized):
+                    return True
+                continue
             if citation and citation in normalized:
                 return True
             words = re.findall(r"[a-z]{4,}", citation)
@@ -180,8 +202,7 @@ def _citation_matches(locator: dict, text: str, cited_values=()) -> bool | None:
                 return True
         for number in _numeric_values(value):
             has_direct_anchor = True
-            number = _canonical_number(number)
-            if number in normalized:
+            if _numeric_tokens(number) & _numeric_tokens(normalized):
                 return True
     if not has_direct_anchor and re.search(r"\b(?:table|fig(?:ure)?\.?)\s*(?:\d+|[ivx]+)\b", normalized, re.I):
         return True
@@ -233,6 +254,9 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
     assert _citation_matches(text_only, "Sample 12065 was heated to 2360 K.") is True
     assert _citation_matches(text_only, "Sample 12065 was heated to 2360 K.", [2360]) is True
     assert _citation_matches({"quote": "heated to 2360 K"}, "Sample was heated to 2360 K.") is True
+    richter_locator = {"paragraph": "2.5 and 6 mm samples"}
+    unrelated_richter_range = "Temperature 4.6; evaporation fluxes -6.6 and -6.7."
+    assert _citation_matches(richter_locator, unrelated_richter_range, [[2.5, 6.0]]) is False
 
 
 def _record_lamoreaux_page_pins() -> None:
