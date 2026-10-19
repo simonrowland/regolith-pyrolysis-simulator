@@ -1621,14 +1621,18 @@ class _MELTSBackendSupport(MeltBackend):
                 redox_mode=redox_mode,
             )
         if self._mode == 'subprocess':
-            return self._equilibrate_subprocess(
-                temperature_C, comp_wt, fO2_log, pressure_bar, warnings,
-                total_input_kg=total_input_kg,
-                diagnostics=crash_diagnostics,
-                redox_mode=redox_mode,
-                run_mode=_normalize_subprocess_run_mode(
+            subprocess_kwargs = {
+                'total_input_kg': total_input_kg,
+                'diagnostics': crash_diagnostics,
+                'run_mode': _normalize_subprocess_run_mode(
                     subprocess_run_mode
                 ),
+            }
+            if redox_mode is not None:
+                subprocess_kwargs['redox_mode'] = redox_mode
+            return self._equilibrate_subprocess(
+                temperature_C, comp_wt, fO2_log, pressure_bar, warnings,
+                **subprocess_kwargs,
             )
         # No PetThermoTools or binary -- the engine is not present.
         return self._emit_equilibrium_result(
