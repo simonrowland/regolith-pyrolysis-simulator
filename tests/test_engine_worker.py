@@ -397,7 +397,7 @@ def test_abort_during_cold_restart_before_publication_prevents_request(
 
 
 @pytest.mark.timeout(20)
-def test_completed_request_abort_does_not_kill_next_assigned_request():
+def test_completed_request_abort_does_not_kill_next_assigned_request(monkeypatch):
     context = multiprocessing.get_context('spawn')
     results = context.Queue()
     handler_started = context.Event()
@@ -411,9 +411,19 @@ def test_completed_request_abort_does_not_kill_next_assigned_request():
         size=1,
     )
     worker = pool.workers[0]
+    connection = worker.connection
+    original_poll = connection.poll
+    parent_poll_entered = threading.Event()
     abort_entered = threading.Event()
     release_abort = threading.Event()
     original_abort = worker._abort_current_call
+
+    def poll_after_send(timeout=None):
+        # This poll is reached only after the post-send token check.
+        parent_poll_entered.set()
+        return original_poll(timeout)
+
+    monkeypatch.setattr(connection, 'poll', poll_after_send)
     try:
         first = pool.submit(
             {'request_id': 'first', 'block': True},
@@ -423,13 +433,12 @@ def test_completed_request_abort_does_not_kill_next_assigned_request():
         call_finished = pool._active_requests[first][1]
 
         def abort_after_gate(abort_event=None):
-            if abort_event is not None:
-                abort_event.set()
             abort_entered.set()
             assert release_abort.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
             return original_abort(abort_event)
 
         worker._abort_current_call = abort_after_gate
+        assert parent_poll_entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
         aborter = threading.Thread(
             target=lambda: pool._abort_request(first),
             daemon=True,
