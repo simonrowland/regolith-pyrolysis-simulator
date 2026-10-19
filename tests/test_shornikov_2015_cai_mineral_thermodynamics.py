@@ -15,6 +15,26 @@ EXTRACT = (
 )
 
 
+def _locators(value: object):
+    if isinstance(value, dict):
+        locator = value.get("locator")
+        if isinstance(locator, dict):
+            yield locator
+        for child in value.values():
+            yield from _locators(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from _locators(child)
+
+
+def test_all_locators_map_printed_pdf_page_to_zero_based_index() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    locators = [locator for locator in _locators(document) if "page" in locator]
+    assert len(locators) == 93
+    assert all(locator["page"] == 2 for locator in locators)
+    assert all(locator["pdf_page_index"] == 1 for locator in locators)
+
+
 def test_shornikov_2015_cai_table_and_deferred_figure_records() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     species = document["species"]
