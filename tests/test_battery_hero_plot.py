@@ -178,6 +178,41 @@ def test_binning_averages_same_experiment_duplicates_and_excludes_refusals(tmp_p
     assert element_points[12].flagged
 
 
+def test_hero_aggregation_float_hex_pin_from_r4_pre_move_tip(tmp_path: Path) -> None:
+    """Pin current aggregation outputs before moving them into score.py."""
+
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+
+    # Captured with the existing plotter at 94a303798889ad5ceab7a4160f67040a29f22f2b.
+    species_points = {
+        point.bin_index: point
+        for point in data.series[("openimcc", "SiO2", "vapour")]
+    }
+    hero_points = {
+        point.bin_index: point
+        for point in data.hero_series[("vapour", "SiO2", "openimcc", "unknown")]
+    }
+    activity_points = {
+        point.bin_index: point
+        for point in data.series[("openimcc", "SiO2", "melt_activity")]
+    }
+    element_points = {
+        point.bin_index: point
+        for point in element_view_series(data)[("openimcc", "Si")]
+    }
+
+    assert data.summaries["openimcc"].rms_dex.hex() == "0x1.77a0584f68ef6p-1"
+    assert species_points[10].residual_dex.hex() == "0x1.3333333333334p-2"
+    assert species_points[10].temperature_K.hex() == "0x1.fe40000000000p+9"
+    assert hero_points[10].residual_dex.hex() == "0x1.3333333333334p-2"
+    assert activity_points[12].residual_dex.hex() == "0x1.b333333333334p-1"
+    assert element_points[12].residual_dex.hex() == "0x1.d41d41d41d41ep-1"
+    assert element_points[12].temperature_K.hex() == "0x1.326db6db6db6ep+10"
+    assert element_points[12].n == 7
+
+
 def test_refusal_status_legacy_spellings_are_counted(tmp_path: Path) -> None:
     residuals = tmp_path / "residuals.jsonl"
     rows: list[dict[str, object]] = [
