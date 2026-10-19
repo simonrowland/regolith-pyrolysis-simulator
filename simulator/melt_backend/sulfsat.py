@@ -579,7 +579,8 @@ class SulfSatGate:
             numerical_warnings.append(note)
         if numerical_warnings:
             redox_warnings = list(redox_warnings) + numerical_warnings
-            redox_in_range = False
+            if any(not note.startswith('SR24:') for note in numerical_warnings):
+                redox_in_range = False
 
         return scss_ppm, scas_ppm, s6_fraction, redox_warnings, redox_in_range
 
@@ -635,20 +636,13 @@ class SulfSatGate:
         if not (ratio == ratio) or ratio < 0.0 or ratio > 1.0:
             # NaN / out-of-range -> the fit produced no usable answer.
             # Tag and warn instead of fabricating a default.
-            reason = (
-                'fit_nonfinite'
-                if not math.isfinite(ratio)
-                else 'fit_outside_[0,1]'
-            )
             return (
                 0.0,
                 [
-                    self._finite_output_repair_notice(
-                        field='Fe3Fet_Liq',
-                        raw=ratio,
-                        replacement=0.0,
-                        reason=reason,
-                    )
+                    'Kress-Carmichael 1991 Fe3+/SumFe fit produced non-finite or '
+                    f'out-of-range ratio {ratio!r} '
+                    f'(T_K={T_K}, fO2_log={fO2_log}); '
+                    'no operator Fe3Fet_Liq supplied -> calibration tagged out_of_range'
                 ],
                 False,
             )

@@ -306,7 +306,6 @@ def test_sr23_usable_projected_bound_has_no_repair_notice() -> None:
     assert "repair_notice" not in run_notice["notices"][0]
 
 
-@pytest.mark.xfail(strict=True, reason="SR24 review fix restores the pre-existing Fe-fit warning")
 def test_sr24_finite_fit_capacity_and_fraction_repairs_emit_notice(monkeypatch) -> None:
     sim, _result = _sr24_simulator(monkeypatch, fe3_ratio=1.25)
 
@@ -335,7 +334,6 @@ def test_sr24_finite_capacity_and_fraction_repairs_preserve_numeric_outputs(
     ) == (0.0, 250.0, 1.0, 0.0, 250.0)
 
 
-@pytest.mark.xfail(strict=True, reason="SR24 notices must not change calibration status")
 def test_sr24_finite_capacity_and_fraction_repairs_preserve_calibration_status(
     monkeypatch,
 ) -> None:

@@ -436,7 +436,6 @@ def test_fallback_proposal_commits_against_its_bound_provider_profile():
     ],
     ids=("no-primary", "unavailable-status", "unavailable-error"),
 )
-@pytest.mark.xfail(strict=True, reason="SR20 currently records only the selected fallback")
 def test_fallback_diagnostic_names_requested_provider_and_reason(
     request_kind, requested_provider, reason
 ):
@@ -484,7 +483,7 @@ def test_fallback_diagnostic_names_requested_provider_and_reason(
     )
     assert result.diagnostic == {
         "kernel_fallback_used": "fallback_commit_provider",
-        "kernel_fallback_requested": requested_provider,
+        "kernel_fallback_requested_provider": requested_provider,
         "kernel_fallback_reason": reason,
     }
 
