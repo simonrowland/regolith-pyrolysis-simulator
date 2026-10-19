@@ -29,6 +29,7 @@ DEFAULT_ABS_TOL_PA = 1.0e-6
 DEFAULT_MAX_ITERATIONS = 50
 SOURCE_DUCT_MAX_ITERATIONS = 80
 SOURCE_DUCT_H_REFINE_ITERATIONS = 80
+SOURCE_DUCT_TRANSIENT_MAX_RHS_EVALUATIONS = 20_000
 SOURCE_DUCT_ABS_TOL_PA = 1.0e-12
 SOURCE_DUCT_LIMIT_REASONS = frozenset(
     {
@@ -677,12 +678,12 @@ def _integrate_retained_source_duct(
     import numpy as np
 
     # Premise: A=V/(RT) [mol/Pa], p_i=n_i/A is finite excess over
-    # maintained carrier c_i; dn_i/dt=s_i(c+p)-K_i(c+sum(p))*p_i.
+    # maintained carrier c_i; dn_i/dt=s_i(c+p)-q_i, q_i=K_i(P)*p_i-b_i.
     # HK clips s_i=H_i max(Peq_i-c_i-p_i,0). In a linear, single-species
-    # drain, p=p0 exp(-Kt/A) above saturation, hence
-    # t_clear=(A/K) ln(p0/(Peq-c)) [s] for Peq>c (otherwise carrier
-    # alone keeps HK clipped). Below saturation, with c=0,
-    # p=pss+(Peq-pss) exp(-(H+K)t/A), pss=H*Peq/(H+K).
+    # molecular drain, b=K*Pd and p=Pd+(p0-Pd)exp(-Kt/A) above
+    # saturation. Thus t_clear=(A/K)ln((p0-Pd)/(Peq-c-Pd)) [s]
+    # for Peq>c+Pd (otherwise no crossing). Below saturation, with c=0,
+    # p=pss+(Peq-pss)exp(-(H+K)t/A), pss=(H*Peq+K*Pd)/(H+K).
     # Thus N_source=H*(Peq-pss)*(u + tau*expm1(-u/tau)),
     # u=dt-t_clear, tau=A/(H+K). Ignoring this second relaxation can
     # bias the source even after correctly computing the blackout.
@@ -715,20 +716,31 @@ def _integrate_retained_source_duct(
                            - carrier_partials.get(s, 0.0)) for s in names])
     rtol, atol_mol = DEFAULT_REL_TOL, 1e-13
     match_tolerance = 2 * rtol * np.maximum(1.0, target) + atol_mol / A
+    evaluations = 0
 
     def rhs(_time, state):
+        nonlocal evaluations
+        # Count every actual RHS call, including numerical Jacobians and
+        # rejected stages (solve_ivp.nfev excludes Jacobian probes). The
+        # 20,000-call ceiling bounds pressure-cache growth and adaptive work;
+        # exhaustion cannot certify a full-tick source, so refuse before commit.
+        if evaluations >= SOURCE_DUCT_TRANSIENT_MAX_RHS_EVALUATIONS:
+            raise CapacityCouplingRefusalError(CapacityShadowRefusal(
+                "source_duct_transient_rhs_budget_exhausted", evaluations,
+            ))
+        evaluations += 1
         pressure = np.maximum(state[:count], 0.0) / A
         partials = dict(carrier_partials)
         partials.update({s: p + carrier_partials.get(s, 0.0)
                          for s, p in zip(names, pressure)})
         flux = flux_at_partials(partials)
         source = molar_source(partials, flux)
-        drains, viscous, _ = _mixture_duct_coefficients(
-            sum(partials.values()) + carrier_Pa, G, P_down,
-            molecular_C, knudsen_at_total,
+        duct_flow = _mixture_duct_outflow_mol_s(
+            partials, carrier_partials_Pa=carrier_partials, P_carrier_Pa=carrier_Pa,
+            G_mol_s_Pa2=G, P_downstream_Pa=P_down,
+            molecular_C_mol_s_Pa=molecular_C, knudsen_at_total_Pa=knudsen_at_total,
         )
-        outflow = np.array([p * drains.get(s, viscous)
-                            for s, p in zip(names, pressure)])
+        outflow = np.array([duct_flow[s] for s in names])
         supply = np.array([source.get(s, 0.0) / 3600.0 for s in names])
         evaporation = np.array([flux.get(s, 0.0) / molar_masses[s] / 3600.0
                                 for s in names])
@@ -747,11 +759,19 @@ def _integrate_retained_source_duct(
     )
     if not trajectory.success:
         raise CapacityCouplingRefusalError(CapacityShadowRefusal(
-            "source_duct_transient_non_convergence", trajectory.nfev,
+            "source_duct_transient_non_convergence", evaluations,
         ))
     state = trajectory.y[:, -1]
     rest = duration - trajectory.t[-1]
     if rest > 0.0:
+        # Phase 2's endpoint is its steady root. Account for the small
+        # handoff stock difference as throughput: delta_Nout=n_match-A*p_ss
+        # [mol], preserving n_end+Nout=n_start+Nsource when projecting within
+        # the match tolerance. Keeping n_match would freeze a transient offset
+        # for the whole steady phase even after many relaxation times.
+        steady_inventory = A * target
+        state[3 * count:] += state[:count] - steady_inventory
+        state[:count] = steady_inventory
         # The root's finite algebraic tolerance must not accumulate into
         # an artificial stock drift over the remaining hour: dn/dt=0 in
         # the steady phase, and its source is exactly its duct throughput.
@@ -762,6 +782,19 @@ def _integrate_retained_source_duct(
         state[2 * count:3 * count] += rest * steady_supply
         state[3 * count:] += rest * steady_supply
     remaining, evaporated, supplied, drained = np.split(state, 4)
+    # A signed molecular flow can import gas from downstream. Pressure
+    # alone supplies no ledger moles: reject an unfunded net import rather
+    # than installing stock the caller cannot commit. Allow only the ODE's
+    # mol error plus the phase-switch projection error A*delta_p [mol].
+    funded = n0 + supplied
+    stock_error_bound = (
+        atol_mol + rtol * np.maximum(np.abs(funded), np.abs(remaining))
+        + A * match_tolerance
+    )
+    if np.any(remaining - funded > stock_error_bound):
+        raise CapacityCouplingRefusalError(CapacityShadowRefusal(
+            "downstream_gas_requires_molar_inventory", evaluations,
+        ))
     partials = dict(carrier_partials)
     partials.update({s: max(0.0, n) / A + carrier_partials.get(s, 0.0)
                      for s, n in zip(names, remaining)})
@@ -772,7 +805,7 @@ def _integrate_retained_source_duct(
         {s: max(0.0, n) * molar_masses[s] / dt_hr for s, n in zip(names, evaporated)},
         {s: n / dt_hr for s, n in zip(names, supplied)},
         residual / scale if scale > 0.0 else 0.0,
-        trajectory.nfev,
+        evaluations,
     )
 
 

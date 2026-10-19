@@ -1604,6 +1604,25 @@ def test_retained_transient_rhs_budget_returns_typed_refusal(monkeypatch):
     assert result.iterations == 1
 
 
+def test_retained_downstream_inflow_requires_funded_inventory(monkeypatch):
+    # With no source and p0=1 Pa below Pd=2 Pa, dp/dt=K*(Pd-p)/A
+    # grows stock toward 2*A mol. The finite ledger supplies only A mol:
+    # a downstream pressure alone cannot fund the additional material.
+    A = .085383807627 / (GAS_CONSTANT * 1950.65)
+    monkeypatch.setattr(capacity_coupling, "_molecular_pipe_conductance_mol_s_Pa", lambda **_: .00235)
+    monkeypatch.setattr(capacity_coupling, "_knudsen_number_at_total_Pa", lambda *_, **__: math.inf)
+    result = solve_source_duct_closure(
+        P_eq_Pa={"Fe": 0.0}, flux_kg_hr_at_partials=lambda _: {},
+        molar_mass_kg_mol={"Fe": .055845}, G_mol_s_Pa2=0,
+        capacity=NoColdTrain(), pre_holdup_mol={"Fe": A},
+        volume_m3=.085383807627, temperature_K=1950.65,
+        pipe_diameter_m=.12, pipe_length_m=1., P_downstream_Pa=2.,
+        dt_hr=.1 / 3600,
+    )
+    assert isinstance(result, CapacityShadowRefusal)
+    assert result.reason == "downstream_gas_requires_molar_inventory"
+
+
 @pytest.mark.parametrize(("kn", "expected"), [
     (.001, {"Fe": "0x1.f0e3bbaf5c268p-1", "Na": "0x1.1b1547c76ce86p+2"}),
     (.1, {"Fe": "0x1.40b708a56dfa2p+0", "Na": "0x1.3e7cf162f8c02p+2"}),
