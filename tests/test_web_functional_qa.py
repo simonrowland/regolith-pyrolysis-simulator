@@ -63,7 +63,11 @@ def _deterministic_web_run(monkeypatch):
     monkeypatch.setattr(
         PyrolysisSimulator,
         "_freeze_gate_curve_record",
-        lambda self: write_gate_curve_memo_record(self, curve),
+        lambda self: write_gate_curve_memo_record(
+            self,
+            curve,
+            provider_outcome="produced",
+        ),
     )
     original_load_yaml = web_events._load_yaml
 

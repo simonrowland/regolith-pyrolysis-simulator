@@ -779,6 +779,7 @@ def write_gate_curve_memo_record(
     *,
     evidence: GateCurveEvidence | None = None,
     redox_state: Any | None = None,
+    provider_outcome: str | None = None,
 ) -> dict[str, Any]:
     """Write one origin-bearing runtime record for production or a fixture."""
 
@@ -821,6 +822,7 @@ def write_gate_curve_memo_record(
         origin,
         repair_notices,
         "live",
+        provider_outcome=provider_outcome,
     )
 
 

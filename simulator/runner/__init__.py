@@ -3614,9 +3614,48 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         campaign_text = f"campaigns `{', '.join(map(str, campaigns))}`"
     else:
         campaign_text = "campaign `unspecified`"
+    items = [
+        item for item in notice.get("notices", ())
+        if isinstance(item, Mapping)
+    ]
+    first_order = any(
+        item.get("method") == "extrapolated_first_order_ln_gamma"
+        for item in items
+    )
+    bridged = any(
+        item.get("method") == "same_composition_T_bridge" for item in items
+    )
+    projected = any(
+        item.get("method") == "projected_composition_solve" for item in items
+    )
+    frozen = any(
+        item.get("flag") == "extrapolation_capped_frozen" for item in items
+    )
+    continued = any(
+        item.get("code") == "hold_last_certified_effective_gamma"
+        for item in items
+    )
+    if projected:
+        prediction = "projected-composition extrapolated predictions"
+        if bridged:
+            prediction += ", with a temperature bridge on the projected composition"
+    elif bridged:
+        prediction = "same-composition temperature-bridge predictions"
+        if first_order or frozen:
+            prediction += (
+                ", with a capped ln-gamma continuation where the bridge had no points"
+            )
+    elif first_order or frozen:
+        prediction = "first-order ln-gamma extrapolated predictions"
+        if frozen:
+            prediction += ", frozen past a species cap"
+    elif continued:
+        prediction = "held effective-gamma/table extrapolated predictions"
+    else:
+        prediction = "a constant-gamma extrapolated prediction"
     return (
         f"**High-temperature melt activity**: OpenIMCC refusal `{reason}` "
-        "used a constant-gamma extrapolated prediction for "
+        f"used {prediction} for "
         f"{notice.get('affected_tick_count', 0)} tick(s) and "
         f"{notice.get('affected_parent_count', 0)} parent oxide(s), "
         f"{campaign_text}, hours {notice.get('first_hour')}-"

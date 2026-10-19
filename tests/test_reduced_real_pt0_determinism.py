@@ -585,7 +585,9 @@ def _run_capped_c2a_with_equilibrium_counter(
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: dict(freeze_curve)
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
+            _classified_gate_curve_for_test(sim, freeze_curve)
+        )
     )
     original_equilibrate = sim.backend.equilibrate
     calls = 0
@@ -611,6 +613,12 @@ def _run_capped_c2a_with_equilibrium_counter(
     for _ in range(max_hours):
         snapshots.append(sim.step())
     return _capped_trace(sim, store, snapshots), calls
+
+
+def _classified_gate_curve_for_test(sim: Any, curve: dict[str, Any]) -> dict[str, Any]:
+    outcome = rrd.gate_curve_provider_outcome_for_status("ok")
+    rrd.record_gate_curve_provider_outcome(sim, outcome)
+    return dict(curve)
 
 
 def _capped_trace(sim, store: PT0DeterminismStore, snapshots: list) -> dict:
@@ -1670,6 +1678,7 @@ def test_pt0_gate_replay_separates_buffers_at_same_scalar_fO2(
         capture_sim,
         curve,
         redox_state=state_a,
+        provider_outcome=rrd.gate_curve_provider_outcome_for_status("ok"),
     )
     local_key = capture_sim._freeze_gate_cache_key(
         pressure_bar=float(capture_sim.melt.p_total_mbar) / 1000.0,
@@ -2886,7 +2895,9 @@ def test_pt1_persistent_store_round_trips_exact_payload(
         "origin",
         "repair_notices",
         "disposition",
+        "provider_outcome",
     }
+    assert runtime_record["provider_outcome"] is rrd.GateCurveProviderOutcome.PRODUCED
     assert set(runtime_record["origin"]) == {
         "producer_pid",
         "producer_configuration",
@@ -3667,11 +3678,17 @@ def test_gate_capture_rechecks_receipt_after_memo_hit(
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
     provider_calls = []
-    sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
-            provider_calls.append(fO2_log) or dict(curve)
-        )
-    )
+    def successful_gate_curve_dispatch(
+        reasons,
+        *,
+        fO2_log,
+        repair_notices=None,
+        redox_state=None,
+    ):
+        provider_calls.append(fO2_log)
+        return _classified_gate_curve_for_test(sim, curve)
+
+    sim._freeze_gate_curve_from_gate_dispatch = successful_gate_curve_dispatch
     store_calls = []
     persistent_put_calls = []
     original_store = capture._store
@@ -3716,11 +3733,17 @@ def test_pt0_gate_capture_with_receipt_covers_fresh_curve_and_memo_hit(
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
     provider_calls = []
-    sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
-            provider_calls.append(fO2_log) or dict(curve)
-        )
-    )
+    def successful_gate_curve_dispatch(
+        reasons,
+        *,
+        fO2_log,
+        repair_notices=None,
+        redox_state=None,
+    ):
+        provider_calls.append(fO2_log)
+        return _classified_gate_curve_for_test(sim, curve)
+
+    sim._freeze_gate_curve_from_gate_dispatch = successful_gate_curve_dispatch
     capture_calls = []
     original_capture = capture.capture_gate_curve
 

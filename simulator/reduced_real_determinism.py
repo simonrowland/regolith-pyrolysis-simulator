@@ -21,6 +21,7 @@ from datetime import datetime
 from datetime import timezone
 from decimal import Decimal
 from decimal import InvalidOperation
+from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, ClassVar
@@ -663,10 +664,27 @@ class PT0DeterminismStore:
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
         redox_state: RedoxState | None = None,
     ) -> None:
-        if uncacheable_replay_disposition(sim):
-            self._mark_uncacheable_capture(sim)
-            return
-        if not _is_cacheable_gate_curve(curve):
+        active_record = getattr(
+            sim,
+            "_freeze_gate_liquid_fraction_cache",
+            None,
+        )
+        provider_outcome = (
+            active_record.get("provider_outcome")
+            if isinstance(active_record, Mapping)
+            else None
+        )
+        disposition = (
+            active_record.get("disposition", "live")
+            if isinstance(active_record, Mapping)
+            else "live"
+        )
+        if not gate_curve_memo_is_cacheable(
+            sim,
+            curve,
+            provider_outcome,
+            disposition=disposition,
+        ):
             self._mark_uncacheable_capture(sim)
             return
         redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
@@ -675,11 +693,6 @@ class PT0DeterminismStore:
             gate_curve_memo_origin_matches,
         )
 
-        active_record = getattr(
-            sim,
-            "_freeze_gate_liquid_fraction_cache",
-            None,
-        )
         if not (
             isinstance(active_record, Mapping)
             and active_record.get("disposition") in {"live", "memo-hit"}
@@ -2630,20 +2643,168 @@ def gate_curve_memo_producer_configuration(
     }
 
 
+class GateCurveProviderOutcome(str, Enum):
+    NO_PROVIDER = "no_provider"
+    PRODUCED = "produced"
+    STABLE_REFUSAL = "stable_refusal"
+    FAILED = "failed"
+
+
+_GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
+    "engine_crash",
+    "engine_worker_timeout",
+    "engine_worker_unavailable",
+    "missing_binary",
+    "negative_convergence_evidence",
+    "no_convergence",
+    "nonzero_exit",
+    "parse_empty_output",
+    "phase_mass_incomplete",
+    "smoke_equilibrium_timeout",
+    "subprocess_died",
+    "subprocess_fe_free_absolute_fo2_crash",
+    "system_output_missing",
+    "thermoengine_adapter_unavailable",
+    "timeout",
+    "warm_call_equilibrium_timeout",
+    "worker_pool_error",
+})
+
+
+def gate_curve_provider_outcome_for_status(
+    status: str,
+    diagnostic: Mapping[str, Any] | None = None,
+) -> GateCurveProviderOutcome:
+    """Classify provider diagnostics before deciding whether to reuse a curve.
+
+    No-reason domain refusals remain stable for backends that omit diagnostics;
+    an unrecognized reason on a refusal is conservatively treated as failed.
+    """
+
+    from engines.domain_reason import (
+        STABLE_OUT_OF_DOMAIN_REASONS,
+        TRANSIENT_OUT_OF_DOMAIN_REASONS,
+        reason_value,
+    )
+
+    normalized_status = str(status).strip().lower()
+    reasons: list[str] = []
+    if isinstance(diagnostic, Mapping):
+        for field in (
+            "backend_status_reason",
+            "backend_failure_reason_code",
+            "reason",
+            "reason_refused",
+        ):
+            value = reason_value(diagnostic.get(field))
+            if value is not None and value.strip():
+                reasons.append(value.strip().lower())
+    transient_reasons = {
+        reason_value(reason).lower()
+        for reason in TRANSIENT_OUT_OF_DOMAIN_REASONS
+    } | _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS
+    stable_reasons = {
+        reason_value(reason).lower()
+        for reason in STABLE_OUT_OF_DOMAIN_REASONS
+    }
+    if any(
+        reason in transient_reasons
+        for reason in reasons
+    ):
+        return GateCurveProviderOutcome.FAILED
+    if normalized_status == "ok":
+        return GateCurveProviderOutcome.PRODUCED
+    if normalized_status in {"out_of_domain", "unsupported", "refused"}:
+        if not reasons or all(
+            reason in stable_reasons
+            for reason in reasons
+        ):
+            return GateCurveProviderOutcome.STABLE_REFUSAL
+    return GateCurveProviderOutcome.FAILED
+
+
+def record_gate_curve_provider_outcome(
+    sim: Any,
+    outcome: GateCurveProviderOutcome | str,
+) -> GateCurveProviderOutcome:
+    """Keep one failed provider from being masked by a later fallback."""
+
+    next_outcome = GateCurveProviderOutcome(outcome)
+    raw_current = getattr(sim, "_freeze_gate_provider_outcome", None)
+    try:
+        current = GateCurveProviderOutcome(raw_current)
+    except (TypeError, ValueError):
+        current = None
+    if (
+        current is not GateCurveProviderOutcome.FAILED
+        or next_outcome is GateCurveProviderOutcome.FAILED
+    ):
+        sim._freeze_gate_provider_outcome = next_outcome
+    return GateCurveProviderOutcome(sim._freeze_gate_provider_outcome)
+
+
+def gate_curve_provider_outcome_is_reusable(
+    outcome: GateCurveProviderOutcome | str | None,
+) -> bool:
+    if outcome is None:
+        return False
+    try:
+        typed_outcome = GateCurveProviderOutcome(outcome)
+    except (TypeError, ValueError):
+        return False
+    return typed_outcome in {
+        GateCurveProviderOutcome.NO_PROVIDER,
+        GateCurveProviderOutcome.PRODUCED,
+        GateCurveProviderOutcome.STABLE_REFUSAL,
+    }
+
+
 def gate_curve_memo_record(
     curve: Mapping[str, Any],
     origin: Mapping[str, Any] | None,
     repair_notices: Sequence[Mapping[str, Any]] | None,
     disposition: str,
+    *,
+    provider_outcome: GateCurveProviderOutcome | str | None = None,
 ) -> dict[str, Any]:
     """Build the runtime record shared by the producer and core reader."""
 
-    return {
+    record = {
         "curve": dict(curve),
         "origin": dict(origin) if isinstance(origin, Mapping) else None,
         "repair_notices": [dict(notice) for notice in repair_notices or ()],
         "disposition": disposition,
     }
+    if provider_outcome is not None:
+        record["provider_outcome"] = GateCurveProviderOutcome(provider_outcome)
+    return record
+
+
+def gate_curve_memo_record_is_reusable(record: Mapping[str, Any]) -> bool:
+    """Transient provider failures must not become reusable fallback curves."""
+
+    return gate_curve_provider_outcome_is_reusable(
+        record.get("provider_outcome")
+    )
+
+
+def gate_curve_memo_is_cacheable(
+    sim: Any,
+    curve: Mapping[str, Any],
+    provider_outcome: GateCurveProviderOutcome | str | None,
+    *,
+    disposition: str = "live",
+) -> bool:
+    """Apply the shared admission rule before writing any gate-curve memo."""
+
+    if (
+        disposition == "replay"
+        or uncacheable_replay_disposition(sim)
+        or not gate_curve_provider_outcome_is_reusable(provider_outcome)
+        or not isinstance(curve, Mapping)
+    ):
+        return False
+    return _is_cacheable_gate_curve(curve)
 
 
 def uncacheable_replay_disposition(sim: Any) -> bool:
