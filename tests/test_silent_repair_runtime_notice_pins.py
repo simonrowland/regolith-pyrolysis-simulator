@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import pytest
+
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
 from simulator.fe_redox import KRESS91_LIQUID_CALIBRATION_MIN_T_C
@@ -304,6 +306,7 @@ def test_sr23_usable_projected_bound_has_no_repair_notice() -> None:
     assert "repair_notice" not in run_notice["notices"][0]
 
 
+@pytest.mark.xfail(strict=True, reason="SR24 review fix restores the pre-existing Fe-fit warning")
 def test_sr24_finite_fit_capacity_and_fraction_repairs_emit_notice(monkeypatch) -> None:
     sim, _result = _sr24_simulator(monkeypatch, fe3_ratio=1.25)
 
@@ -311,7 +314,7 @@ def test_sr24_finite_fit_capacity_and_fraction_repairs_emit_notice(monkeypatch) 
 
     assert notice is not None
     assert notice["notices"][0]["warnings"] == [
-        "SR24:sulfsat_output_repaired field=Fe3Fet_Liq raw=1.25 reason=fit_outside_[0,1] replacement=0.0",
+        "Kress-Carmichael 1991 Fe3+/SumFe fit produced non-finite or out-of-range ratio 1.25 (T_K=1200.0, fO2_log=-10.0); no operator Fe3Fet_Liq supplied -> calibration tagged out_of_range",
         "SR24:sulfsat_output_repaired field=SCSS_ppm raw=-10 reason=negative_capacity replacement=0.0 ppm",
         "SR24:sulfsat_output_repaired field=S6_fraction raw=1.25 reason=fraction_outside_[0,1] replacement=1.0",
     ]
@@ -330,3 +333,17 @@ def test_sr24_finite_capacity_and_fraction_repairs_preserve_numeric_outputs(
         sulfur.S_in_sulfide_ppm,
         sulfur.S_in_sulfate_ppm,
     ) == (0.0, 250.0, 1.0, 0.0, 250.0)
+
+
+@pytest.mark.xfail(strict=True, reason="SR24 notices must not change calibration status")
+def test_sr24_finite_capacity_and_fraction_repairs_preserve_calibration_status(
+    monkeypatch,
+) -> None:
+    _sim, result = _sr24_simulator(monkeypatch, fe3_ratio=0.1)
+
+    assert (
+        result.sulfur_saturation.SCSS_ppm,
+        result.sulfur_saturation.SCAS_ppm,
+        result.sulfur_saturation.S6_fraction,
+        result.sulfur_saturation.calibration_status,
+    ) == (0.0, 250.0, 1.0, "in_range")
