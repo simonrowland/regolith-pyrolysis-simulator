@@ -88,6 +88,7 @@ from simulator.battery.score import (
     ScoreContext,
     SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
+    _battery_hero_minor_foulant_facets,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_sweet_spot_records,
     _paired_engine_rail_benchmarks,
@@ -5007,6 +5008,18 @@ def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
         if row["engine"] == "vaporock"
     }
     assert openimcc_temperature_bins == vaporock_temperature_bins
+
+
+@pytest.mark.parametrize(
+    ("formula", "is_alkali_salt"),
+    [("Na", False), ("Na2O", False), ("NaCl", True), ("K2SO4", True)],
+)
+def test_battery_hero_alkali_salt_facets_require_a_salt_anion(
+    formula: str, is_alkali_salt: bool
+) -> None:
+    assert (
+        "minor:alkali_salts" in _battery_hero_minor_foulant_facets(formula)
+    ) is is_alkali_salt
 
 
 def test_measured_headline_mode_serializes_typed_residuals_end_to_end(

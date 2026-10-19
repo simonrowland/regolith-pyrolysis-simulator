@@ -9221,13 +9221,24 @@ def _battery_hero_facet(rail: str, formula: str, observable: str) -> str:
 
 
 def _battery_hero_minor_foulant_facets(formula: str) -> tuple[str, ...]:
-    elements = {element for element, _count in formula_composition(formula) or ()}
+    composition = dict(formula_composition(formula) or ())
+    elements = set(composition)
     facets = [
         f"minor:{element}"
         for element in ("P", "S", "Cl", "C")
         if element in elements
     ]
-    if elements.intersection({"Na", "K"}):
+    alkali = elements.intersection({"Na", "K"})
+    halide = bool(elements.intersection({"Cl", "F"})) and not elements.intersection(
+        {"O", "S", "C"}
+    )
+    sulfate = composition.get("S", 0.0) > 0 and composition.get("O", 0.0) == (
+        4 * composition["S"]
+    )
+    carbonate = composition.get("C", 0.0) > 0 and composition.get("O", 0.0) == (
+        3 * composition["C"]
+    )
+    if alkali and (halide or sulfate or carbonate):
         facets.append("minor:alkali_salts")
     return tuple(facets)
 
