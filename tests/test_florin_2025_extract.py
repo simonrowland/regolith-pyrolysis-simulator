@@ -32,14 +32,27 @@ def test_florin_2025_isotope_series_and_isolated_migration() -> None:
         for source, result in zip(direct_points, reduced_points, strict=True)
     )
     assert all(point["two_sigma_permil"] > 0 for point in direct_points + reduced_points)
+    assert direct_points[0]["log_fO2"] == -0.68
+    elemental = by_id["florin_2025_table_3_elemental_residue_rows"]["values"]["series"]
+    assert len(elemental) == 50
+    assert elemental[0]["residue_ppm"] == "20653"
+    assert elemental[0]["f_Cu_as_printed"] == ".95"
+    assert elemental[0]["S_ug_g_as_printed"] == "—"
+    assert elemental[37]["S_ug_g_as_printed"] == "b.d.l."
 
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     assert not migrator.result.validation.hard_issues
     migrated = list(migrator.result.observations.values())
-    assert len(migrated) == 49
-    sample_observations = [row for row in migrated if row.identity.temperature_K.value is not None]
+    assert len(migrated) == 99
+    sample_observations = [
+        row for row in migrated
+        if row.observation_id.split("::")[1] in {
+            "florin_2025_table_3_cu_isotope_delta_erm633",
+            "florin_2025_table_3_cu_isotope_delta_sc",
+        }
+    ]
     assert len(sample_observations) == 48
     assert all(
         str(row.identity.temperature_K.value)
@@ -48,3 +61,8 @@ def test_florin_2025_isotope_series_and_isolated_migration() -> None:
     )
     assert all("delta_fmq" in row.point_conditions for row in sample_observations)
     assert all(row.point_conditions["delta_fmq"].locator.page == 6 for row in sample_observations)
+    assert all("log_fO2" in row.point_conditions for row in sample_observations)
+    assert all(row.point_conditions["log_fO2"].locator.page == 6 for row in sample_observations)
+    residue_points = [row for row in migrated if row.observation_id.split("::")[1] == "florin_2025_table_3_elemental_residue_rows"]
+    assert len(residue_points) == 50
+    assert residue_points[0].value.point == 20653
