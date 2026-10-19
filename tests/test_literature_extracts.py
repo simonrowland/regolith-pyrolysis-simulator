@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import importlib.util
 import math
 import sys
 from collections import Counter
@@ -1397,6 +1398,91 @@ def test_gas_ratio_validation_rejects_invalid_basis_or_species(
     errors = vle.validate_extract_document(doc, expected_source_id="fixture-source")
 
     assert any("invalid gas ratio" in error for error in errors), errors
+
+
+def test_docs_private_reference_in_nested_prose_is_refused_but_path_is_allowed():
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["locator"]["note"] = (
+        "See docs-private/research/hidden.md"
+    )
+    doc["extraction"]["provenance_path"] = "docs-private/research/source.md"
+
+    errors = vle.validate_extract_document(
+        doc, path=Path("fixture-source.yaml"), expected_source_id="fixture-source"
+    )
+
+    assert any(
+        "fixture-source.yaml:species.Fe.observations[0].locator.note" in error
+        and "[docs-private-prose]" in error
+        for error in errors
+    )
+    assert not any("extraction.provenance_path" in error for error in errors)
+
+    clean = _minimal_extract()
+    clean["extraction"]["provenance_path"] = "docs-private/research/source.md"
+    assert vle.validate_extract_document(
+        clean, expected_source_id="fixture-source"
+    ) == []
+
+
+def test_clean_extract_citation_renders_without_private_path_in_index():
+    spec = importlib.util.spec_from_file_location(
+        "literature_build_index", REPO_ROOT / "data/literature/build_index.py"
+    )
+    assert spec is not None and spec.loader is not None
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+
+    citation = _minimal_extract()["source"]["citation"]
+    counts = dict.fromkeys(
+        (
+            "sources",
+            "extracts",
+            "pdfs_present_in_worktree",
+            "pdfs_tracked_99_kems_langmuir",
+            "pdfs_without_extract",
+            "extracts_without_pdf",
+            "alias_groups_needing_resolution",
+            "extracts_with_private_locators",
+        ),
+        0,
+    )
+    counts.update(sources=1, extracts=1, extracts_without_pdf=1)
+    gap_names = (
+        "pdfs_without_extract",
+        "extracts_without_pdf",
+        "extracts_with_private_locators",
+        "untracked_files",
+        "sidecars_missing_fields",
+        "source_id_collisions",
+    )
+    index = {
+        "counts": counts,
+        "scan": {
+            "root": ".",
+            "corpus_root": ".",
+            "private_roots_scanned": [],
+            "private_roots_not_scanned": [],
+            "hunt_json": None,
+        },
+        "sources": [
+            {
+                "source_id": "fixture-source",
+                "citation": citation,
+                "pdf_status": "ABSENT",
+                "pdf_last_seen": [],
+                "extracts": [],
+                "corpus_status": "unavailable",
+                "corpus": {},
+            }
+        ],
+        "gaps": {name: [] for name in gap_names},
+    }
+
+    rendered = builder.render_md(index)
+
+    assert "docs-private" not in rendered
+    assert citation in rendered
 
 
 def test_refuses_context_container_outside_species_block():

@@ -12,8 +12,7 @@ source:
 extraction:
   method: Corpus PDF is the Russian Astronomicheskii Vestnik original (raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf).
     Born-digital. pdftotext -layout and MinerU were used only to locate tables; they are not data. Tables
-    1, 2 and 4 transcribed from a 400 dpi pdftoppm PNG render (docs-private/research/ocr-artifacts/murchison-degassing-2023-springer/p-06.png
-    and p-10.png). Printed units retained (mkg/g, deg C, bar) before converting T to K as T_K = t_C +
+    1, 2 and 4 transcribed from 400 dpi pdftoppm PNG renders of pages 6 and 10. Printed units retained (mkg/g, deg C, bar) before converting T to K as T_K = t_C +
     273.15. Authors' GC yields kept distinct from Chelyabinsk values they quote from Galimov/Voropaev
     2013 and Stennikov 2019, and from the Boudouard Kp fit (model_derived). Fig. 3 IR spectra listed figure-only
     and not digitised. Printed zeros in Table 2 recorded as printed cells, not invented. Sample mass is
