@@ -26,7 +26,7 @@ def _projected_notice() -> dict[str, object]:
     }
 
 
-def _sr24_simulator(monkeypatch, *, fe3_ratio: float):
+def _sr24_simulator(monkeypatch, *, fe3_ratio: float, scas_ppm: float = 250.0):
     import pandas as pd
     import simulator.melt_backend.sulfsat as sulfsat_module
 
@@ -42,7 +42,7 @@ def _sr24_simulator(monkeypatch, *, fe3_ratio: float):
             {"SCSS2_ppm_ideal_Smythe2017": [-10.0]}
         ),
         calculate_CD2019_SCAS=lambda **_kwargs: pd.DataFrame(
-            {"SCAS6_ppm": [250.0]}
+            {"SCAS6_ppm": [scas_ppm]}
         ),
         calculate_S6St_Jugo2010_eq10=lambda **_kwargs: 1.25,
     )
@@ -345,3 +345,46 @@ def test_sr24_finite_capacity_and_fraction_repairs_preserve_calibration_status(
         result.sulfur_saturation.S6_fraction,
         result.sulfur_saturation.calibration_status,
     ) == (0.0, 250.0, 1.0, "in_range")
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="SR24 status classification must not depend on the notice text",
+)
+def test_sr24_repair_notice_text_does_not_flip_calibration_status(monkeypatch) -> None:
+    monkeypatch.setattr(
+        SulfSatGate,
+        "_finite_output_repair_notice",
+        staticmethod(lambda **_kwargs: "operator repair note"),
+    )
+    _sim, result = _sr24_simulator(monkeypatch, fe3_ratio=0.1)
+
+    assert result.sulfur_saturation.calibration_status == "in_range"
+    assert result.sulfur_saturation.warnings == [
+        "operator repair note",
+        "operator repair note",
+    ]
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="SR24 numerical warnings must precede separately collected repair notes",
+)
+def test_sr24_repair_and_numerical_warning_keep_out_of_range_status(monkeypatch) -> None:
+    monkeypatch.setattr(
+        SulfSatGate,
+        "_finite_output_repair_notice",
+        staticmethod(lambda **_kwargs: "operator repair note"),
+    )
+    _sim, result = _sr24_simulator(
+        monkeypatch, fe3_ratio=0.1, scas_ppm=float("nan")
+    )
+    sulfur = result.sulfur_saturation
+
+    assert sulfur.calibration_status == "out_of_range"
+    assert sulfur.warnings == [
+        "Chowdhury-Dasgupta 2019 SCAS returned non-finite SCAS_ppm=nan; "
+        "treating capacity as 0.0 ppm for degenerate no modeled sulfide/sulfate saturation",
+        "operator repair note",
+        "operator repair note",
+    ]
