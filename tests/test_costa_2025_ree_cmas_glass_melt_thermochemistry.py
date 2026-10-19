@@ -5,11 +5,22 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.identity import quantity_token
 from tests.battery.test_migrate import _migrate_real_extract
 
 
 EXTRACT_NAME = "costa-2025-ree-cmas-glass-melt-thermochemistry.yaml"
 SOURCE_ID = "costa-2025-ree-cmas-glass-melt-thermochemistry"
+EXPECTED_HEAT_OF_FUSION = {
+    "costa_2025_cmas_heat_of_fusion_table3": (Decimal("31.01"), Decimal("1493")),
+    "costa_2025_y_l_heat_of_fusion_table3": (Decimal("18.54"), Decimal("1462")),
+    "costa_2025_yb_l_heat_of_fusion_table3": (Decimal("23.44"), Decimal("1477")),
+    "costa_2025_gd_l_heat_of_fusion_table3": (Decimal("23.31"), Decimal("1457")),
+    "costa_2025_y_h_heat_of_fusion_table3": (Decimal("14.27"), Decimal("1462")),
+    "costa_2025_yb_h_heat_of_fusion_table3": (Decimal("19.13"), Decimal("1454")),
+    "costa_2025_gd_h_heat_of_fusion_table3": (Decimal("16.36"), Decimal("1475")),
+}
 
 
 def test_costa_2025_table3_values_compositions_and_migration(tmp_path: Path) -> None:
@@ -17,14 +28,17 @@ def test_costa_2025_table3_values_compositions_and_migration(tmp_path: Path) -> 
     extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
     container = extract["species"]["CaO"]
     context = {row["observation_id"]: row for row in container["context"]}
+    observations = {
+        row["observation_id"]: row for row in container["observations"]
+    }
     source_rows = {
         observation_id: row
-        for observation_id, row in context.items()
+        for observation_id, row in (context | observations).items()
         if row["locator"].get("table") == "3"
         and row["values"].get("quantity")
         in {"transition_temperature", "heat_of_fusion"}
     }
-    assert not container.get("observations")
+    assert set(observations) == set(EXPECTED_HEAT_OF_FUSION)
 
     # Table 3, PDF page 11: these literals were confirmed against its 600-dpi render.
     rendered_values = {
@@ -48,10 +62,17 @@ def test_costa_2025_table3_values_compositions_and_migration(tmp_path: Path) -> 
     }
     assert len(composition_rows) == 7
     for row in source_rows.values():
-        assert row["type"] == "literature_context"
+        if row["values"]["quantity"] == "heat_of_fusion":
+            assert row["type"] == "heat_capacity_and_heat_content_series"
+            assert row["values"]["method_class"] == "measured_direct"
+        else:
+            assert row["type"] == "literature_context"
         composition = row["values"]["composition_mol"]
         assert composition["basis"] == "printed_mole_fraction"
-        assert row["values"]["composition_as_published"]
+        if row["values"]["quantity"] == "heat_of_fusion":
+            assert row["values"]["sample_as_printed"] == row["locator"]["row"]
+        else:
+            assert row["values"]["composition_as_published"]
         assert composition == composition_rows[row["locator"]["row"]]["composition_mol"]
         assert "temperature_K" in row["point_conditions"]
         if row["locator"]["column"] in {"Tm (K)", "ΔHfusion (kJ·mol−1)"}:
@@ -140,7 +161,36 @@ def test_costa_2025_table3_values_compositions_and_migration(tmp_path: Path) -> 
     migrated_costa_rows = [
         row for row in result.observations.values() if row.source_id == SOURCE_ID
     ]
-    assert not migrated_costa_rows
+    migrated_by_id = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrated_costa_rows
+    }
+    assert set(migrated_by_id) == set(EXPECTED_HEAT_OF_FUSION)
+    for observation_id, (expected_enthalpy, expected_temperature) in (
+        EXPECTED_HEAT_OF_FUSION.items()
+    ):
+        observation = migrated_by_id[observation_id]
+        assert quantity_token(observation.identity) is Quantity.ENTHALPY_OF_FUSION
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == expected_enthalpy
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.value == expected_temperature
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_not_applicable
+        assert (
+            observation.identity.composition.reason
+            == "profile heat_of_fusion does not use composition"
+        )
+        temperature = observation.point_conditions["temperature_K"]
+        assert temperature.state.value == expected_temperature
+        assert temperature.locator is not None
+        assert temperature.locator.page == 11
+        assert temperature.locator.pdf_page_index == 10
+        oxygen = observation.point_conditions["fO2_Pa"]
+        assert oxygen.state.is_unknown
+        assert oxygen.locator is not None
+        assert oxygen.locator.page == 4
+        assert oxygen.locator.pdf_page_index == 3
     assert not any(
         row.identity.species.formula == "CaO" and row.identity.composition.is_unknown
         for row in result.observations.values()

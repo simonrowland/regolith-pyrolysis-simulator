@@ -78,7 +78,328 @@ fidelity_samples:
     column: ΔHfusion (kJ·mol−1)
 species:
   CaO:
-    observations: []
+    observations:
+    - observation_id: costa_2025_cmas_heat_of_fusion_table3
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        row: CMAS
+        column: 'ΔHfusion (kJ·mol−1)'
+      phase: cr
+      regime: DSC melting endotherm
+      units: kJ mol−1
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_direct
+        delta_H_fus_kJ_mol-1: 31.01
+        T_fus_K:
+          value: 1493
+          units: K
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: CMAS, column: 'Tm (K)'}
+        sample_as_printed: CMAS
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: 0.3234
+          MgO: 0.1071
+          Al2O3: 0.0762
+          SiO2: 0.4933
+        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+      uncertainty:
+        reported_status: printed
+        value: 1.55
+        units: kJ/mol
+        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1493}
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: CMAS, column: 'Tm (K)'}
+        gas_environment:
+          state: {tag: value, value: 'air flow, 20 mL/min'}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        fO2_Pa:
+          state: {tag: unknown, reason: The source reports air flow but no oxygen partial pressure or fO2.}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not reported}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+    - observation_id: costa_2025_y_l_heat_of_fusion_table3
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        row: Y-L
+        column: 'ΔHfusion (kJ·mol−1)'
+      phase: cr
+      regime: DSC melting endotherm
+      units: kJ mol−1
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_direct
+        delta_H_fus_kJ_mol-1: 18.54
+        T_fus_K:
+          value: 1462
+          units: K
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Y-L, column: 'Tm (K)'}
+        sample_as_printed: Y-L
+        composition_mol:
+          basis: printed_mole_fraction
+          Y2O3: 0.01485
+          CaO: 0.3182
+          MgO: 0.1054
+          Al2O3: 0.0751
+          SiO2: 0.486
+        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+      uncertainty:
+        reported_status: printed
+        value: 0.93
+        units: kJ/mol
+        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1462}
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Y-L, column: 'Tm (K)'}
+        gas_environment:
+          state: {tag: value, value: 'air flow, 20 mL/min'}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        fO2_Pa:
+          state: {tag: unknown, reason: The source reports air flow but no oxygen partial pressure or fO2.}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not reported}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+    - observation_id: costa_2025_yb_l_heat_of_fusion_table3
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        row: Yb-L
+        column: 'ΔHfusion (kJ·mol−1)'
+      phase: cr
+      regime: DSC melting endotherm
+      units: kJ mol−1
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_direct
+        delta_H_fus_kJ_mol-1: 23.44
+        T_fus_K:
+          value: 1477
+          units: K
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Yb-L, column: 'Tm (K)'}
+        sample_as_printed: Yb-L
+        composition_mol:
+          basis: printed_mole_fraction
+          Yb2O3: 0.008
+          CaO: 0.322
+          MgO: 0.1057
+          Al2O3: 0.0742
+          SiO2: 0.49
+        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+      uncertainty:
+        reported_status: printed
+        value: 1.17
+        units: kJ/mol
+        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1477}
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Yb-L, column: 'Tm (K)'}
+        gas_environment:
+          state: {tag: value, value: 'air flow, 20 mL/min'}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        fO2_Pa:
+          state: {tag: unknown, reason: The source reports air flow but no oxygen partial pressure or fO2.}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not reported}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+    - observation_id: costa_2025_gd_l_heat_of_fusion_table3
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        row: Gd-L
+        column: 'ΔHfusion (kJ·mol−1)'
+      phase: cr
+      regime: DSC melting endotherm
+      units: kJ mol−1
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_direct
+        delta_H_fus_kJ_mol-1: 23.31
+        T_fus_K:
+          value: 1457
+          units: K
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Gd-L, column: 'Tm (K)'}
+        sample_as_printed: Gd-L
+        composition_mol:
+          basis: printed_mole_fraction
+          Gd2O3: 0.00869
+          CaO: 0.3224
+          MgO: 0.1048
+          Al2O3: 0.0758
+          SiO2: 0.488
+        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+      uncertainty:
+        reported_status: printed
+        value: 1.17
+        units: kJ/mol
+        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1457}
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Gd-L, column: 'Tm (K)'}
+        gas_environment:
+          state: {tag: value, value: 'air flow, 20 mL/min'}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        fO2_Pa:
+          state: {tag: unknown, reason: The source reports air flow but no oxygen partial pressure or fO2.}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not reported}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+    - observation_id: costa_2025_y_h_heat_of_fusion_table3
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        row: Y-H
+        column: 'ΔHfusion (kJ·mol−1)'
+      phase: cr
+      regime: DSC melting endotherm
+      units: kJ mol−1
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_direct
+        delta_H_fus_kJ_mol-1: 14.27
+        T_fus_K:
+          value: 1462
+          units: K
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Y-H, column: 'Tm (K)'}
+        sample_as_printed: Y-H
+        composition_mol:
+          basis: printed_mole_fraction
+          Y2O3: 0.0493
+          CaO: 0.3091
+          MgO: 0.1008
+          Al2O3: 0.0725
+          SiO2: 0.468
+        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+      uncertainty:
+        reported_status: printed
+        value: 0.71
+        units: kJ/mol
+        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1462}
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Y-H, column: 'Tm (K)'}
+        gas_environment:
+          state: {tag: value, value: 'air flow, 20 mL/min'}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        fO2_Pa:
+          state: {tag: unknown, reason: The source reports air flow but no oxygen partial pressure or fO2.}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not reported}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+    - observation_id: costa_2025_yb_h_heat_of_fusion_table3
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        row: Yb-H
+        column: 'ΔHfusion (kJ·mol−1)'
+      phase: cr
+      regime: DSC melting endotherm
+      units: kJ mol−1
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_direct
+        delta_H_fus_kJ_mol-1: 19.13
+        T_fus_K:
+          value: 1454
+          units: K
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Yb-H, column: 'Tm (K)'}
+        sample_as_printed: Yb-H
+        composition_mol:
+          basis: printed_mole_fraction
+          Yb2O3: 0.0495
+          CaO: 0.312
+          MgO: 0.1006
+          Al2O3: 0.0633
+          SiO2: 0.475
+        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+      uncertainty:
+        reported_status: printed
+        value: 0.96
+        units: kJ/mol
+        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1454}
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Yb-H, column: 'Tm (K)'}
+        gas_environment:
+          state: {tag: value, value: 'air flow, 20 mL/min'}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        fO2_Pa:
+          state: {tag: unknown, reason: The source reports air flow but no oxygen partial pressure or fO2.}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not reported}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+    - observation_id: costa_2025_gd_h_heat_of_fusion_table3
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        row: Gd-H
+        column: 'ΔHfusion (kJ·mol−1)'
+      phase: cr
+      regime: DSC melting endotherm
+      units: kJ mol−1
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_direct
+        delta_H_fus_kJ_mol-1: 16.36
+        T_fus_K:
+          value: 1475
+          units: K
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Gd-H, column: 'Tm (K)'}
+        sample_as_printed: Gd-H
+        composition_mol:
+          basis: printed_mole_fraction
+          Gd2O3: 0.0502
+          CaO: 0.312
+          MgO: 0.0932
+          Al2O3: 0.0722
+          SiO2: 0.472
+        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
+      uncertainty:
+        reported_status: printed
+        value: 0.82
+        units: kJ/mol
+        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1475}
+          locator: {page: 11, pdf_page_index: 10, table: '3', row: Gd-H, column: 'Tm (K)'}
+        gas_environment:
+          state: {tag: value, value: 'air flow, 20 mL/min'}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        fO2_Pa:
+          state: {tag: unknown, reason: The source reports air flow but no oxygen partial pressure or fO2.}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not reported}
+          locator: {page: 4, pdf_page_index: 3, section: 2.2 Sample characterization}
     context:
     - observation_id: costa_2025_table1_epma_glass_compositions
       type: characterization
@@ -1068,59 +1389,6 @@ species:
             tag: unknown
             reason: not reported
           locator: *id014
-    - observation_id: costa_2025_cmas_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: CMAS
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 31.01
-        T_fus_K:
-          value: 1493
-          units: K
-          locator: &id017
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: CMAS
-            column: Tm (K)
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 —; CaO 32.34(6); MgO 10.71(5); Al2O3 7.62(1); SiO2 49.33(8)
-        composition_mol: *id001
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 1.55
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1493
-          locator: *id017
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
     - observation_id: costa_2025_y_l_tg_table3
       type: literature_context
       locator: &id018
@@ -1250,59 +1518,6 @@ species:
             tag: value
             value: 1462
           locator: *id020
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_y_l_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Y-L
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 18.54
-        T_fus_K:
-          value: 1462
-          units: K
-          locator: &id021
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Y-L
-            column: Tm (K)
-        composition_as_published: Y2O3 1.485(7); Yb2O3 —; Gd2O3 —; CaO 31.82(9); MgO 10.54(7); Al2O3 7.51(1); SiO2 48.6(1)
-        composition_mol: *id002
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 0.93
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1462
-          locator: *id021
         gas_environment:
           state:
             tag: value
@@ -1462,59 +1677,6 @@ species:
             tag: unknown
             reason: not reported
           locator: *id014
-    - observation_id: costa_2025_yb_l_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Yb-L
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 23.44
-        T_fus_K:
-          value: 1477
-          units: K
-          locator: &id025
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Yb-L
-            column: Tm (K)
-        composition_as_published: Y2O3 —; Yb2O3 0.80(1); Gd2O3 —; CaO 32.2(1); MgO 10.57(5); Al2O3 7.42(2); SiO2 49.0(2)
-        composition_mol: *id003
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 1.17
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1477
-          locator: *id025
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
     - observation_id: costa_2025_gd_l_tg_table3
       type: literature_context
       locator: &id026
@@ -1644,59 +1806,6 @@ species:
             tag: value
             value: 1457
           locator: *id028
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_gd_l_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Gd-L
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 23.31
-        T_fus_K:
-          value: 1457
-          units: K
-          locator: &id029
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Gd-L
-            column: Tm (K)
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 0.869(7); CaO 32.24(9); MgO 10.48(7); Al2O3 7.58(1); SiO2 48.8(2)
-        composition_mol: *id004
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 1.17
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1457
-          locator: *id029
         gas_environment:
           state:
             tag: value
@@ -1856,59 +1965,6 @@ species:
             tag: unknown
             reason: not reported
           locator: *id014
-    - observation_id: costa_2025_y_h_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Y-H
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 14.27
-        T_fus_K:
-          value: 1462
-          units: K
-          locator: &id033
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Y-H
-            column: Tm (K)
-        composition_as_published: Y2O3 4.93(1); Yb2O3 —; Gd2O3 —; CaO 30.91(8); MgO 10.08(5); Al2O3 7.25(1); SiO2 46.8(1)
-        composition_mol: *id005
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 0.71
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1462
-          locator: *id033
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
     - observation_id: costa_2025_yb_h_tg_table3
       type: literature_context
       locator: &id034
@@ -2053,59 +2109,6 @@ species:
             tag: unknown
             reason: not reported
           locator: *id014
-    - observation_id: costa_2025_yb_h_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Yb-H
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 19.13
-        T_fus_K:
-          value: 1454
-          units: K
-          locator: &id037
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Yb-H
-            column: Tm (K)
-        composition_as_published: Y2O3 —; Yb2O3 4.95(8); Gd2O3 —; CaO 31.2(1); MgO 10.06(7); Al2O3 6.33(4); SiO2 47.5(3)
-        composition_mol: *id006
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 0.96
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1454
-          locator: *id037
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
     - observation_id: costa_2025_gd_h_tg_table3
       type: literature_context
       locator: &id038
@@ -2235,59 +2238,6 @@ species:
             tag: value
             value: 1475
           locator: *id040
-        gas_environment:
-          state:
-            tag: value
-            value: air flow, 20 mL/min
-          locator: *id014
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source reports air flow but no oxygen partial pressure or fO2.
-          locator: *id014
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: not reported
-          locator: *id014
-    - observation_id: costa_2025_gd_h_heat_of_fusion_table3
-      type: literature_context
-      locator:
-        page: 11
-        pdf_page_index: 10
-        table: '3'
-        row: Gd-H
-        column: ΔHfusion (kJ·mol−1)
-      phase: cr
-      regime: DSC melting endotherm
-      units: kJ mol−1
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_direct
-        delta_H_fus_kJ_mol-1: 16.36
-        T_fus_K:
-          value: 1475
-          units: K
-          locator: &id041
-            page: 11
-            pdf_page_index: 10
-            table: '3'
-            row: Gd-H
-            column: Tm (K)
-        composition_as_published: Y2O3 —; Yb2O3 —; Gd2O3 5.02(2); CaO 31.2(1); MgO 9.32(5); Al2O3 7.22(2); SiO2 47.2(1)
-        composition_mol: *id007
-        method: DSC melting endotherm; Table 3 reports onset Tm and fusion enthalpy.
-      uncertainty:
-        reported_status: printed
-        value: 0.82
-        units: kJ/mol
-        note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value: 1475
-          locator: *id041
         gas_environment:
           state:
             tag: value
