@@ -240,7 +240,7 @@ species:
         units: log pressure as printed
         values:
           method_class: quoted_attributed
-          equation_as_printed: 'log(Po2/atm) = 8.63 − 3.87 × 10^4/(T/K)'
+          equation_as_printed: 'log(Po2/atm) = 8.613 − 3.87 × 10^4/(T/K)'
           attribution: '[15]'
       - observation_id: xiao_holappa_1993_electronic_pressure_equation_17
         type: equation_context
@@ -260,6 +260,15 @@ species:
           method_class: quoted_attributed
           equation_as_printed: 'ΔG° = −79880 + 15.25 T (cal)'
           attribution: '[18]'
+      - observation_id: xiao_holappa_1993_cr_oxide_formation_gibbs_equation
+        type: equation_context
+        locator: {page: 2, pdf_page_index: 1, published_page: 67, equation: 'ΔG°3'}
+        phase: solid CrO1.5
+        units: cal as printed
+        values:
+          method_class: quoted_attributed
+          equation_as_printed: 'ΔG°3 = −132665 + 29.555 T (cal)'
+          attribution: '[15]'
       - observation_id: xiao_holappa_1993_crucible_charge_and_gas_conditions
         type: experimental_conditions_context
         locator: {page: 2, pdf_page_index: 1, published_page: 67, section: 'Apparatus'}
