@@ -5018,6 +5018,9 @@ def _comparison_identity(
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
+    shared_oxygen_condition = any(
+        notice.origin == "fo2_ladder" for notice in prediction.notices
+    )
     melt_identity = _melt_identity_for_valence(identity)
     redox = quantity_token(identity) in {
         Quantity.FE3_FE2_RATIO,
@@ -5036,6 +5039,7 @@ def _comparison_identity(
     )
     if (
         not solved_oxygen_balance
+        and not shared_oxygen_condition
         and not comparison_activity
         and not redox
         and melt_identity is identity
@@ -5053,6 +5057,18 @@ def _comparison_identity(
             used = getattr(prediction.identity, field_name)
             if (actual is None or not actual.is_value) and used is not None and used.is_value:
                 updates[field_name] = used
+    if (
+        shared_oxygen_condition
+        and "fO2_Pa" in profile_for(identity).required
+        and (identity.fO2_Pa is None or not identity.fO2_Pa.is_value)
+        and isinstance(prediction.identity, Identity)
+    ):
+        # The prediction identity carries the exact commanded bar value. Use
+        # it as the comparison condition on both sides, while leaving the
+        # stored reference identity untouched.
+        used_oxygen = prediction.identity.fO2_Pa
+        if used_oxygen is not None and used_oxygen.is_value:
+            updates["fO2_Pa"] = used_oxygen
     if fusion_polymorph_flag:
         call_evidence = prediction.execution.call_evidence or ""
         fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
@@ -5695,6 +5711,31 @@ def _payload_fo2_notice(quantity: Quantity, payload: Mapping) -> Notice | None:
     )
 
 
+def _payload_fo2_bar(payload: Mapping) -> float | None:
+    bar = payload.get("fO2_bar")
+    if bar is not None:
+        return float(bar)
+    log = payload.get("fO2_log")
+    return None if log is None else 10.0 ** float(log)
+
+
+def _prediction_identity_with_fo2(
+    identity: Identity, po2_bar: float | None
+) -> Identity:
+    if (
+        po2_bar is None
+        or not math.isfinite(po2_bar)
+        or po2_bar <= 0.0
+        or "fO2_Pa" not in profile_for(identity).required
+        or (identity.fO2_Pa is not None and identity.fO2_Pa.is_value)
+    ):
+        return identity
+    return replace(
+        identity,
+        fO2_Pa=State.of(Decimal(str(po2_bar)) * PA_PER_BAR_DEC),
+    )
+
+
 def _oxygen_input_request(
     *,
     engine: Engine,
@@ -6173,6 +6214,7 @@ def predict_with_engine(
     input_notices: list[Notice] = []
     composition_value: Composition | None = None
     activity_payload: Mapping | None = None
+    activity_fo2_bar: float | None = None
     if quantity in MELT_ACTIVITY_QUANTITIES and experiment is not None:
         # Activity rows use the melt-activity contract. A gap is a typed
         # refusal. No engine fO2 default is an input on this path.
@@ -6229,6 +6271,7 @@ def predict_with_engine(
                 generated=generated,
             )
         activity_payload = generated.payload
+        activity_fo2_bar = _payload_fo2_bar(activity_payload)
         moles = dict(activity_payload.get("composition_mol") or {})
         built = OxideComposition(
             "oxides",
@@ -6362,7 +6405,7 @@ def predict_with_engine(
                 coefficient_sources=activity_sources,
                 lineage_complete=activity_lineage_complete,
                 certified_band=certified_band,
-                identity=identity,
+                identity=_prediction_identity_with_fo2(identity, activity_fo2_bar),
                 requested_composition=requested,
                 version=activity.activity_model,
             )
@@ -6488,10 +6531,7 @@ def predict_with_engine(
             tier_notice = _payload_fo2_notice(quantity, activity_payload)
             if tier_notice is not None:
                 input_notices.append(tier_notice)
-            if activity_payload.get("fO2_bar") is not None:
-                bar = float(activity_payload["fO2_bar"])
-            else:
-                bar = 10.0 ** float(activity_payload["fO2_log"])
+            bar = activity_fo2_bar
             po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
         else:
             decision = oxygen_decision()
@@ -7289,7 +7329,10 @@ def predict_with_engine(
         lineage_complete=lineage_complete_for(sources),
         certified_band=certified_band,
         coefficient_basis=coefficient_basis,
-        identity=identity,
+        identity=_prediction_identity_with_fo2(
+            identity,
+            po2.po2_bar if po2.mode == PO2_COMMANDED else None,
+        ),
         requested_composition=requested,
         version=engine_version,
     )

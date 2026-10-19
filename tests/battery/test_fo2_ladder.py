@@ -40,6 +40,7 @@ from simulator.battery.score import (
     composition_wt_pct,
     compile_residual,
     flagged_strata,
+    load_score_context,
     predict_with_engine,
 )
 from simulator.battery.waypoints import ReadinessStatus, oxygen_condition
@@ -283,6 +284,10 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
         context=context,
         prediction=prediction,
     )
+    assert residual.numeric is not None, residual.refusal
+    assert float(residual.numeric.value) == pytest.approx(
+        -0.3047447378614776, abs=1e-12
+    )
     assert any(
         "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
         for notice in residual.notices
@@ -308,6 +313,29 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
     )
     assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND in flagged_strata(
         borrowed_residual.notices
+    )
+
+
+def test_steurer_effusion_row_has_a_numeric_internal_residual() -> None:
+    context = load_score_context(
+        sources=("steurer-1985-vapor-phase-pyrolysis",)
+    )
+    observation = context.observations[
+        "steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_sio_psat::T=3000.0:row=sio(g):h=377f06ee0c71"
+    ]
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+    )
+    assert residual.numeric is not None, residual.refusal
+    assert float(residual.numeric.value) == pytest.approx(
+        0.10508901884588326, abs=1e-12
+    )
+    assert any(
+        notice.origin == "fo2_ladder"
+        and "route=effusion_oxygen_balance" in notice.reason
+        for notice in residual.notices
     )
 
 
