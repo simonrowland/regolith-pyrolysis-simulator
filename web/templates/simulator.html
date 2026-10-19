@@ -738,10 +738,10 @@ Start a simulation to populate process inventory JSON.
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('web.static', filename='js/simulator-socket.js') }}"></script>
-<script src="{{ url_for('web.static', filename='js/simulator-charts.js') }}"></script>
-<script src="{{ url_for('web.static', filename='js/simulator-ticks.js') }}"></script>
-<script src="{{ url_for('web.static', filename='js/simulator-advisory.js') }}"></script>
-<script src="{{ url_for('web.static', filename='js/simulator-decisions.js') }}"></script>
-<script src="{{ url_for('web.static', filename='js/simulator-controls.js') }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-socket.js', v=simulation_tick_payload_version) }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-charts.js', v=simulation_tick_payload_version) }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-ticks.js', v=simulation_tick_payload_version) }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-advisory.js', v=simulation_tick_payload_version) }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-decisions.js', v=simulation_tick_payload_version) }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-controls.js', v=simulation_tick_payload_version) }}"></script>
 {% endblock %}

@@ -1,14 +1,16 @@
 """SocketIO event handlers for the simulator interface."""
 
+import base64
 import copy
-from collections.abc import Mapping
-from dataclasses import replace
-from datetime import datetime, timezone
+import gzip
 import json
 import math
 import threading
 import time
 import uuid
+from collections.abc import Mapping
+from dataclasses import replace
+from datetime import datetime, timezone
 from pathlib import Path
 
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -361,7 +363,7 @@ def read_simulation_history(
         payload: dict[str, object] = {
             'payload_version': SIMULATION_TICK_PAYLOAD_VERSION,
             'per_hour_summary': [
-                _browser_socket_payload('per_hour_summary', summary)
+                _per_hour_summary_entry(summary)
                 for summary in summaries
                 if isinstance(summary, Mapping)
             ],
@@ -695,18 +697,150 @@ def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bo
         return True
 
 
+_PER_HOUR_DETAIL_FIELDS = (
+    'condensation_refusals_by_species',
+    'vapour_batch_summary',
+    'vapour_batch_flux_overlay',
+)
+_PER_HOUR_CARRIER_MAP_FIELDS = (
+    'condensation_train_kg',
+    'vapor_species_kg_hr',
+    'metal_yields_kg',
+    'product_ledger_kg_at_hour',
+    'condensation_train_kg_cumulative',
+    'recycled_to_reagent_kg_cumulative',
+)
+
+
+def _per_hour_summary_entry(
+    summary: Mapping[str, object],
+    *,
+    for_live_event: bool = False,
+) -> dict[str, object]:
+    """Build a history row or the smaller per-hour display event."""
+    entry = copy.deepcopy(dict(summary))
+    for key in _PER_HOUR_DETAIL_FIELDS:
+        entry.pop(key, None)
+    if for_live_event:
+        for key in _PER_HOUR_CARRIER_MAP_FIELDS:
+            entry.pop(key, None)
+        redox_breakdown = entry.get('redox_source_breakdown')
+        if isinstance(redox_breakdown, Mapping):
+            # The live redox panel reads this projection; history retains the
+            # full breakdown for its on-demand fetch.
+            entry['redox_source_breakdown'] = {
+                key: redox_breakdown[key]
+                for key in (
+                    'applied_terms_mol_o2_equiv_by_label',
+                    'skipped_terms_mol_o2_equiv_by_label',
+                    'net_mol_o2_equiv',
+                    'delta_log10_fO2',
+                    'ferric_divergence',
+                    'source_campaign',
+                    'source_hour',
+                    'source_campaign_hour',
+                )
+                if key in redox_breakdown
+            }
+    return entry
+
+
+def _per_hour_summary_delta(summary: Mapping[str, object]) -> dict[str, object]:
+    """Gzip one sanitized hourly entry to keep its wire size content-flat."""
+    entry = _per_hour_summary_entry(summary)
+    encoded = json.dumps(
+        entry,
+        sort_keys=True,
+        separators=(',', ':'),
+        allow_nan=False,
+    ).encode('utf-8')
+    return {
+        'encoding': 'gzip+base64-json',
+        'entry_gzip_base64': base64.b64encode(
+            gzip.compress(encoded, mtime=0)
+        ).decode('ascii'),
+    }
+
+
 def _browser_socket_payload(event: str, payload):
     if not isinstance(payload, Mapping):
         return payload
     emitted = dict(payload)
     if event == 'per_hour_summary':
-        for key in (
-            'condensation_refusals_by_species',
-            'vapour_batch_summary',
-            'vapour_batch_flux_overlay',
-        ):
-            emitted.pop(key, None)
-    elif event == 'simulation_tick':
+        return _per_hour_summary_entry(payload, for_live_event=True)
+    if event == 'simulation_tick':
+        # This whole-train report is also included in simulation_complete. It
+        # is not consumed from hourly ticks and grows as product is captured.
+        emitted.pop('stage_purity_report', None)
+        vapour_rail = emitted.get('vapour_rail_instrumentation_panel')
+        if isinstance(vapour_rail, Mapping):
+            channels = vapour_rail.get('channels_by_species')
+            refusals = vapour_rail.get('refusals_by_species')
+            condensation = vapour_rail.get('condensation_refusals')
+            authority = vapour_rail.get('condensation_authority')
+            flux_overlay = vapour_rail.get('flux_overlay')
+            emitted['vapour_rail_instrumentation_panel'] = {
+                key: vapour_rail[key]
+                for key in (
+                    'status',
+                    'diagnostic_only',
+                    'shadow_equal',
+                    'shadow_outcome',
+                    'n_requested',
+                    'n_flux_active',
+                    'n_refused',
+                    'message',
+                )
+                if key in vapour_rail
+            }
+            emitted['vapour_rail_instrumentation_panel'].update({
+                'tick_view': 'compact',
+                'n_channel_species': (
+                    len(channels) if isinstance(channels, Mapping) else 0
+                ),
+                'n_refused_species': (
+                    len(refusals) if isinstance(refusals, Mapping) else 0
+                ),
+                'flux_overlay': {
+                    key: flux_overlay[key]
+                    for key in (
+                        'catalog_pa_shadow_equal',
+                        'catalog_pa_shadow_outcome',
+                    )
+                    if isinstance(flux_overlay, Mapping)
+                    and key in flux_overlay
+                },
+                'condensation_refusals': {
+                    key: condensation[key]
+                    for key in ('schema', 'n_species', 'has_refusals')
+                    if isinstance(condensation, Mapping)
+                    and key in condensation
+                },
+                'condensation_authority': {
+                    key: authority[key]
+                    for key in (
+                        'schema',
+                        'n_species',
+                        'status_counts',
+                        'max_mass_closure_error_kg_hr',
+                    )
+                    if isinstance(authority, Mapping) and key in authority
+                },
+            })
+        refusals = emitted.get('condensation_refusals_panel')
+        if isinstance(refusals, Mapping):
+            emitted['condensation_refusals_panel'] = {
+                key: refusals[key]
+                for key in (
+                    'status',
+                    'diagnostic_only',
+                    'n_species',
+                    'has_refusals',
+                    'message',
+                )
+                if key in refusals
+            }
+            emitted['condensation_refusals_panel']['tick_view'] = 'compact'
         wall_risk = emitted.get('wall_risk_panel')
         if isinstance(wall_risk, Mapping):
             active_species = wall_risk.get('active_species')
@@ -723,58 +857,6 @@ def _browser_socket_payload(event: str, payload):
                 'tick_view': 'compact',
             }
     return emitted
-
-
-_PER_HOUR_CARRIER_MAP_FIELDS = (
-    'condensation_train_kg',
-    'vapor_species_kg_hr',
-    'metal_yields_kg',
-    'condensation_train_kg_cumulative',
-    'recycled_to_reagent_kg_cumulative',
-)
-
-
-def _per_hour_summary_delta(summary: Mapping[str, object]) -> dict[str, object]:
-    """Encode one hourly summary entry without repeating carrier names."""
-    sanitized = _browser_socket_payload('per_hour_summary', summary)
-    carrier_maps = {
-        field: sanitized[field]
-        for field in _PER_HOUR_CARRIER_MAP_FIELDS
-        if isinstance(sanitized.get(field), Mapping)
-    }
-    carrier_species = sorted({
-        str(species)
-        for values in carrier_maps.values()
-        for species in values
-    })
-    carrier_values = {
-        field: [values.get(species) for species in carrier_species]
-        for field, values in carrier_maps.items()
-    }
-    entry = {
-        key: copy.deepcopy(value)
-        for key, value in sanitized.items()
-        if key not in carrier_maps
-        and key != 'product_ledger_kg_at_hour'
-    }
-    aliases = {}
-    if (
-        isinstance(sanitized.get('product_ledger_kg_at_hour'), Mapping)
-        and sanitized.get('product_ledger_kg_at_hour')
-        == sanitized.get('metal_yields_kg')
-    ):
-        aliases['product_ledger_kg_at_hour'] = 'metal_yields_kg'
-    elif 'product_ledger_kg_at_hour' in sanitized:
-        entry['product_ledger_kg_at_hour'] = copy.deepcopy(
-            sanitized['product_ledger_kg_at_hour']
-        )
-    return {
-        'entry': entry,
-        'carrier_species': carrier_species,
-        'carrier_fields': list(carrier_maps),
-        'carrier_values': carrier_values,
-        'carrier_aliases': aliases,
-    }
 
 
 def recipe_save_context(sid: str) -> dict[str, object]:

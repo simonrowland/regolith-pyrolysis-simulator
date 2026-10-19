@@ -40,48 +40,37 @@ function rejectSimulationTickShape(message) {
     if (status) status.textContent = detail;
 }
 
-function decodePerHourSummaryDelta(delta) {
-    if (!delta || typeof delta !== 'object' || Array.isArray(delta)) {
-        rejectSimulationTickShape('per_hour_summary_delta is missing');
-        return null;
+window.fetchSimulationHistory = async function () {
+    const response = await fetch('/api/simulation-history', {
+        credentials: 'same-origin',
+    });
+    if (!response.ok) {
+        throw new Error('Simulation history request failed (' + response.status + ')');
     }
-    const entry = delta.entry;
-    const species = delta.carrier_species;
-    const fields = delta.carrier_fields;
-    const values = delta.carrier_values;
+    const payload = await response.json();
     if (
-        !entry || typeof entry !== 'object' || Array.isArray(entry)
-        || !Array.isArray(species)
-        || !Array.isArray(fields)
-        || !values || typeof values !== 'object' || Array.isArray(values)
+        !payload
+        || payload.payload_version !== SIMULATION_TICK_PAYLOAD_VERSION
+        || !Array.isArray(payload.per_hour_summary)
     ) {
-        rejectSimulationTickShape('per_hour_summary_delta has an invalid shape');
+        const message = 'Unsupported simulation history payload version: '
+            + String(payload && payload.payload_version)
+            + ' (expected ' + SIMULATION_TICK_PAYLOAD_VERSION + ')';
+        console.error(message);
+        const status = document.getElementById('status-text');
+        if (status) status.textContent = message;
         return null;
     }
-    const summary = { ...entry };
-    for (const field of fields) {
-        const fieldValues = values[field];
-        if (!Array.isArray(fieldValues) || fieldValues.length !== species.length) {
-            rejectSimulationTickShape('carrier values do not align for ' + field);
-            return null;
-        }
-        const carrierMap = {};
-        for (let index = 0; index < species.length; index += 1) {
-            const value = fieldValues[index];
-            if (value !== null && value !== undefined) {
-                carrierMap[species[index]] = value;
-            }
-        }
-        summary[field] = carrierMap;
-    }
-    const aliases = delta.carrier_aliases || {};
-    for (const [field, source] of Object.entries(aliases)) {
-        if (summary[source] && typeof summary[source] === 'object') {
-            summary[field] = { ...summary[source] };
-        }
-    }
-    return summary;
-}
+    if (
+        simulationHistoryRunId
+        && payload.run_id
+        && payload.run_id !== simulationHistoryRunId
+    ) return null;
+    simulationHistoryRunId = payload.run_id || simulationHistoryRunId;
+    window.simulationPerHourSummaryHistory = payload.per_hour_summary;
+    window.latestPerHourSummary = payload.per_hour_summary.at(-1) || null;
+    return payload;
+};
 
 socket.on('simulation_status', (data) => {
     if (data && data.status === 'started') {
@@ -93,8 +82,15 @@ socket.on('simulation_status', (data) => {
 
 socket.on('simulation_tick', (data) => {
     if (!window.requireSimulationTickPayloadVersion(data)) return;
-    const summary = decodePerHourSummaryDelta(data.per_hour_summary_delta);
-    if (!summary) return;
+    const delta = data && data.per_hour_summary_delta;
+    if (
+        !delta || typeof delta !== 'object' || Array.isArray(delta)
+        || delta.encoding !== 'gzip+base64-json'
+        || typeof delta.entry_gzip_base64 !== 'string'
+    ) {
+        rejectSimulationTickShape('per_hour_summary_delta has an invalid shape');
+        return;
+    }
     if (
         simulationHistoryRunId
         && data.run_id
@@ -104,8 +100,16 @@ socket.on('simulation_tick', (data) => {
         window.simulationPerHourSummaryHistory = [];
     }
     simulationHistoryRunId = data.run_id || simulationHistoryRunId;
-    window.simulationPerHourSummaryHistory.push(summary);
-    window.latestPerHourSummary = summary;
+});
+
+socket.on('simulation_complete', () => {
+    window.fetchSimulationHistory().catch((error) => {
+        const message = 'Simulation history request failed: '
+            + String(error && error.message || error);
+        console.error(message);
+        const status = document.getElementById('status-text');
+        if (status) status.textContent = message;
+    });
 });
 
 function resetDecisionModal() {

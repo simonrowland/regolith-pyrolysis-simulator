@@ -817,6 +817,15 @@ function renderVapourRailInstrumentationPanel(payload) {
             'Refused species',
             refusedNames.length ? refusedNames.join(', ') : 'none'
         );
+    } else if (payload.tick_view === 'compact') {
+        const count = Number(payload.n_refused_species);
+        appendCeramicLine(
+            content,
+            'Refused species',
+            Number.isFinite(count)
+                ? (count ? `${count} species; open full records for names` : 'none')
+                : 'available in full records'
+        );
     } else {
         appendCeramicLine(content, 'Refused species', 'absent');
     }
@@ -905,6 +914,14 @@ function renderCondensationRefusalsPanel(payload) {
         } else {
             appendCeramicLine(content, 'By species', 'none');
         }
+    } else if (payload.tick_view === 'compact') {
+        appendCeramicLine(
+            content,
+            'By species',
+            payload.has_refusals
+                ? 'available in full records'
+                : 'none'
+        );
     } else {
         appendCeramicLine(content, 'By species', 'absent');
     }

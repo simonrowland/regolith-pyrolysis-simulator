@@ -80,7 +80,19 @@ const context = {
   io() {
     return socket;
   },
+  fetch: async (url, options) => {
+    if (url !== '/api/simulation-history' || !input.simulation_history_response) {
+      return { ok: false, status: 404 };
+    }
+    context.fetchCalls.push({ url, options });
+    return {
+      ok: true,
+      status: 200,
+      json: async () => input.simulation_history_response,
+    };
+  },
   window: {},
+  fetchCalls: [],
 };
 
 vm.createContext(context);
@@ -99,6 +111,10 @@ for (const tick of input.simulation_ticks || []) {
   emitEvent('simulation_tick', tick);
 }
 const statusAfterSimulationTicks = findById(body, 'status-text').textContent;
+if (input.simulation_history_response) {
+  emitEvent('simulation_complete', {});
+  await new Promise(resolve => setTimeout(resolve, 0));
+}
 const start = findById(body, 'btn-start');
 const pause = findById(body, 'btn-pause');
 const resume = findById(body, 'btn-resume');
@@ -145,4 +161,5 @@ console.log(JSON.stringify({
   statusAfterSimulationTicks,
   statusText: findById(body, 'status-text').textContent,
   simulationPerHourSummaryHistory: context.window.simulationPerHourSummaryHistory || [],
+  simulationHistoryFetches: context.fetchCalls,
 }));

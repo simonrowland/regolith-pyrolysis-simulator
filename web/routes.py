@@ -4126,9 +4126,12 @@ def load_recipe():
 def simulator():
     """Main simulator interface."""
     session.setdefault('ledger_client_id', os.urandom(16).hex())
+    from web.events import SIMULATION_TICK_PAYLOAD_VERSION
+
     feedstocks, debug_feedstocks = load_feedstock_groups()
     return render_template(
         'simulator.html',
+        simulation_tick_payload_version=SIMULATION_TICK_PAYLOAD_VERSION,
         feedstocks=feedstocks,
         mre_presets=_mre_preset_catalog_payload(),
         c4_operator_presets=_c4_operator_preset_payload(),

@@ -608,11 +608,8 @@ def _minimal_tick_payload(**overrides):
     payload = {
         "payload_version": 2,
         "per_hour_summary_delta": {
-            "entry": {"hour": 70},
-            "carrier_species": [],
-            "carrier_fields": [],
-            "carrier_values": {},
-            "carrier_aliases": {},
+            "encoding": "gzip+base64-json",
+            "entry_gzip_base64": "test",
         },
         "run_id": "run-1",
         "hour": 70,
