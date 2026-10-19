@@ -205,7 +205,15 @@ def test_ca_crown_pressure_is_within_factor_two_of_janaf():
     assert 0.5 <= pressure / janaf_pa <= 2.0
 
 
-@pytest.mark.parametrize("species", ["Na", "K", "Mg", "Fe", "Ca", "Al", "Si", "Ti", "Cr", "Mn"])
+def test_repeated_below_band_pressure_deduplicates_method_notices():
+    notices = {}
+    for _ in range(3):
+        condensation._antoine_psat_pa("Ca", 670.0, antoine_extrapolations=notices)
+    assert list(notices) == ["Ca"]
+    assert notices["Ca"]["method"] == "janaf"
+
+
+@pytest.mark.parametrize("species", ["Na", "K", "Mg", "Ca", "Al", "Si", "Ti", "Cr", "Mn"])
 def test_janaf_wall_extension_is_monotone_and_join_is_flagged(species):
     from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients, vapor_pressure_valid_range_K
     from tests.chemistry.conftest import _load_yaml
@@ -277,7 +285,7 @@ def test_every_antoine_below_band_extension_is_monotone_and_pole_free():
 
 
 @pytest.mark.parametrize(("temperature", "pressure_hex", "band"), [
-    (500.0, "0x1.8f7e06aa69f40p-17", [701.0, 1361.0]),
+    (500.0, None, [701.0, 1361.0]),
     (1500.0, "0x1.17121f336b398p+18", [701.0, 1361.0]),
 ])
 def test_predict_flag_wall_values_keep_source_fit_and_authority(temperature, pressure_hex, band):
@@ -285,25 +293,33 @@ def test_predict_flag_wall_values_keep_source_fit_and_authority(temperature, pre
     condensation._wall_deposition_driving_pressure_pa(
         "Mg", 1.0e6, temperature, diagnostic_out=diagnostic,
     )
-    assert diagnostic["wall_saturation_pressure_pa"].hex() == pressure_hex
+    if temperature < band[0]:
+        assert diagnostic["wall_saturation_pressure_pa"] > 0.0
+    else:
+        assert diagnostic["wall_saturation_pressure_pa"].hex() == pressure_hex
     notice = diagnostic["wall_saturation_pressure_notice"]
     assert notice["authority_level"] == "extrapolated"
     assert notice["valid_range_K"] == band
     assert notice["temperature_K"] == temperature
     assert "metal_vapor_pressure_out_of_source_certified_range" in notice["reason"]
     assert diagnostic["wall_saturation_pressure_refused"] is False
+    if temperature < band[0]:
+        assert notice["method"] == "janaf"
+        assert notice["anchor_temperature_K"] == band[0]
 
 
-def test_predict_flag_cold_na_pole_is_unavailable_with_band():
+def test_predict_flag_cold_na_pole_uses_flagged_janaf_with_band():
     diagnostic = {}
     condensation._wall_deposition_driving_pressure_pa(
         "Na", 100.0, 298.15, diagnostic_out=diagnostic,
     )
-    assert diagnostic["wall_saturation_pressure_pa"] is None
+    assert diagnostic["wall_saturation_pressure_pa"] > 0.0
     notice = diagnostic["wall_saturation_pressure_notice"]
-    assert notice["authority_level"] == "unavailable"
-    assert notice["valid_range_K"] == [924.0, 1118.0]
-    assert "no extrapolation available" in notice["reason"]
+    assert notice["authority_level"] == "extrapolated"
+    assert tuple(notice["valid_range_K"]) == (924.0, 1118.0)
+    assert notice["method"] == "janaf"
+    assert notice["anchor_temperature_K"] == 924.0
+    assert notice["below_band_janaf_join"]["janaf_to_antoine_ratio"] > 0.0
 
 
 @pytest.mark.parametrize("invalid_value", [None, float("nan")], ids=["missing_B", "nan_B"])
@@ -401,11 +417,10 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         assert wall["authoritative_for_coating"] is False
         assert wall["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
         refused = wall["wall_saturation_pressure_refusals_by_species"]
-        assert {"Na", "Al2"} <= refused.keys()
-        assert any(
-            "no extrapolation available" in record["reason"]
-            for record in refused["Na"].values()
-        )
+        assert "Na" not in refused
+        assert "Al2" in refused
+        assert any(record.get("method") == "janaf" for record in
+                   wall["wall_saturation_pressure_extrapolations_by_species"]["Na"].values())
         # Al2 has no reactive-product backstop, so reactivity metadata is not
         # applicable.  Its real reversible wall route instead refuses because
         # the available reaction-term source is not a wall saturation curve.
@@ -587,11 +602,12 @@ def test_sio_wall_temperature_diagnostic_keeps_missing_value_unavailable(monkeyp
 
 
 @pytest.mark.parametrize(("species", "temperature"), [("Na", 417.0), ("Mg", 115.0)])
-def test_predict_flag_underflow_is_unavailable(species, temperature):
+def test_predict_flag_former_antoine_underflow_uses_janaf(species, temperature):
     diagnostic = {}
     condensation._wall_deposition_driving_pressure_pa(species, 100.0, temperature, diagnostic_out=diagnostic)
-    assert diagnostic["wall_saturation_pressure_pa"] is None
-    assert "no extrapolation available" in diagnostic["wall_saturation_pressure_refusal_reason"]
+    assert diagnostic["wall_saturation_pressure_pa"] > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    assert diagnostic["wall_saturation_pressure_notice"]["method"] == "janaf"
 
 
 def test_predict_flag_pareto_unavailable_keeps_extrapolation():

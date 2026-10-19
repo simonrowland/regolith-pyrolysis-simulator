@@ -1431,18 +1431,25 @@ def wall_condensation_antoine_coefficients(
     behavior byte-for-byte.
     """
 
-    if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
-        return vapor_pressure_antoine_coefficients(row, temperature_K)
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
-            if _pure_segment_usable(selected, temperature_K):
+            band = _range_tuple(selected.get("valid_range_K") or (row or {}).get("valid_range_K"))
+            # A below-band wall extension uses this row at its certified
+            # anchor, not the raw shifted-temperature branch at the wall.
+            selection_temperature = temperature_K
+            if band is not None and temperature_K is not None and temperature_K < band[0]:
+                selection_temperature = band[0]
+            if _pure_segment_usable(selected, selection_temperature):
                 return selected, COEFF_BLOCK_PURE_COMPONENT
             # A grounded pure-species wall answer exists but not at this
             # temperature: fail closed so the caller types a refusal rather
             # than extrapolate through a pole or substitute the melt term.
-            return {}, COEFF_BLOCK_PURE_COMPONENT
+            if _fit_target(row) == FIT_TARGET_STANDARD_REACTION:
+                return {}, COEFF_BLOCK_PURE_COMPONENT
+    if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
+        return vapor_pressure_antoine_coefficients(row, temperature_K)
     return {}, COEFF_BLOCK_PURE_COMPONENT
 
 

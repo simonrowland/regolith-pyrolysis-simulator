@@ -16,6 +16,7 @@ from typing import Any
 import yaml
 
 from engines.antoine import _antoine_log10_pressure
+from engines.saturation_pressure import _below_band_saturation_log10
 from engines.yaml_loader import YAML12SafeLoader
 
 GAS_CONSTANT_J_PER_MOL_K = 8.314462618
@@ -91,16 +92,22 @@ def _resolve_carrier_key(carrier: str, registry: FoulantRegistry | None) -> str:
     return alias_map.get(carrier, alias_map.get(carrier.lower(), carrier))
 
 
-def _pure_component_antoine_pa(entry: Mapping[str, Any], temperature_K: float) -> float:
+def _pure_component_antoine_pa(
+    entry: Mapping[str, Any], temperature_K: float, *, diagnostic_out: dict | None = None,
+) -> float:
     coeff = entry.get("pure_component_antoine") or entry.get("antoine")
     if not coeff:
         raise KeyError("pure_component_antoine")
-    log_p = _antoine_log10_pressure(
-        float(coeff["A"]),
-        float(coeff["B"]),
-        float(coeff.get("C", 0.0)),
-        temperature_K,
-    )
+    A, B, C = float(coeff["A"]), float(coeff["B"]), float(coeff.get("C", 0.0))
+    band = _valid_range_K(entry)
+    if band is not None and 0.0 < temperature_K < band[0]:
+        log_p, notice = _below_band_saturation_log10(
+            entry.get("formula", ""), A, B, C, temperature_K, band[0],
+        )
+        if diagnostic_out is not None:
+            diagnostic_out.update(notice)
+    else:
+        log_p = _antoine_log10_pressure(A, B, C, temperature_K)
     return 10.0**log_p
 
 
@@ -232,12 +239,19 @@ def chi_escape_salt(
     try:
         if entry is None:
             raise KeyError("foulant_vapor")
-        p_sat_pa = _pure_component_antoine_pa(entry, temperature_K)
+        extension_notice = {}
+        p_sat_pa = _pure_component_antoine_pa(entry, temperature_K, diagnostic_out=extension_notice)
         warning = _temperature_range_warning(
             carrier_key,
             temperature_K,
             _valid_range_K(entry),
         )
+        if extension_notice:
+            warning = (
+                f"{warning}; method={extension_notice['method']} "
+                f"anchor_temperature_K={extension_notice['anchor_temperature_K']} "
+                f"below_band_janaf_join={extension_notice.get('below_band_janaf_join')}"
+            )
     except KeyError:
         p_sat_pa, valid_range, compiled_status = _compiled_carrier_pressure(
             carrier_key,

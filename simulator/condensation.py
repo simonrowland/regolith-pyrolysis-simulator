@@ -91,6 +91,7 @@ from typing import Any, Dict
 import yaml
 
 from engines.antoine import _antoine_log10_pressure
+from engines.saturation_pressure import _below_band_saturation_log10
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
@@ -5859,7 +5860,8 @@ def _record_antoine_extrapolation(
             for key, existing in antoine_extrapolations.items()
             if str(key).split("#", 1)[0] == species
         ]
-        if not any(dict(existing) == record for existing in existing_records):
+        if not any(all(existing.get(key) == value for key, value in record.items())
+                   for existing in existing_records):
             key = species
             if key in antoine_extrapolations:
                 suffix = 2
@@ -5983,7 +5985,9 @@ def _antoine_psat_pa(
     T_K = _deposition_finite_scalar("T_wall_K", T_K)
     if T_K <= 0.0 or A <= 0.0:
         raise DepositionInputRefusal(coefficient_block, (A, T_K), "requires A > 0 and T > 0")
-    if T_K + C <= 0.0:
+    valid_band = vapor_pressure_valid_range_K(data, coefficient_block, T_K)
+    below_band = valid_band is not None and T_K < float(valid_band[0])
+    if not below_band and T_K + C <= 0.0:
         refusal = WallSaturationPressureRefusal(species, T_K,
             f"no extrapolation available: Antoine denominator T+C <= 0; valid_range_K={source_band}")
         refusal.valid_range_K = source_band
@@ -6014,12 +6018,22 @@ def _antoine_psat_pa(
                 "reason": domain_reason,
                 "status": "extrapolated",
             }
-    # Same Antoine form used by equilibrium.py and builtin vapor pressure.
+    extension_notice = {}
+    if below_band:
+        log_pressure, extension_notice = _below_band_saturation_log10(
+            species, A, B, C, T_K, float(valid_band[0]),
+        )
+        if antoine_extrapolations is not None:
+            for key, record in antoine_extrapolations.items():
+                if str(key).split("#", 1)[0] == species and record.get("temperature_K") == T_K:
+                    record.update(extension_notice)
+    else:
+        log_pressure = _antoine_log10_pressure(A, B, C, T_K)
     try:
-        pressure_pa = 10.0 ** _antoine_log10_pressure(A, B, C, T_K)
+        pressure_pa = 10.0 ** log_pressure
     except OverflowError:
         pressure_pa = math.inf
-    if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+    if not math.isfinite(pressure_pa) or (pressure_pa <= 0.0 and not below_band):
         refusal = WallSaturationPressureRefusal(species, T_K,
             f"no extrapolation available: Antoine pressure is not representable as finite positive; valid_range_K={source_band}")
         refusal.valid_range_K = source_band
