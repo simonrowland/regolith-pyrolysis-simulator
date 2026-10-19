@@ -1053,6 +1053,53 @@ def test_refusal_ticks_do_not_overlap_the_next_facet_title(
             close(figure)
 
 
+def test_temperature_tick_labels_are_unique_at_three_significant_figures(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "temperature-ticks.jsonl"
+    rows = [
+        {"kind": "battery_store_stamp", "revision": "temperature-ticks-test"},
+        _record(
+            engine="openimcc",
+            experiment="t1935",
+            formula="SiO2",
+            temperature_K=1935,
+            residual=0.25,
+        ),
+        _record(
+            engine="openimcc",
+            experiment="t1940",
+            formula="SiO2",
+            temperature_K=1940,
+            residual=0.5,
+        ),
+    ]
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    data = read_scores(residuals, rails=HERO_RAILS)
+    figure, axis = plt.subplots()
+    try:
+        _draw_hero_current(
+            axis,
+            data,
+            "vapour",
+            "SiO2",
+            engine_colors={"openimcc": "#0072b2"},
+        )
+        axis.set_xlim(1935, 1940)
+        figure.canvas.draw()
+        labels = [
+            label.get_text()
+            for label in axis.get_xticklabels()
+            if label.get_visible() and label.get_text()
+        ]
+        assert labels
+        assert len(labels) == len(set(labels))
+    finally:
+        plt.close(figure)
+
+
 def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
     tmp_path: Path,
 ) -> None:
