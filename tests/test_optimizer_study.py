@@ -4835,10 +4835,17 @@ def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_pa
 
 
 def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
+    profile = {
+        **PROFILE,
+        "constraints": {
+            "gates": ["delivered_stream_purity", "furnace_temperature"]
+        },
+    }
     schema = RecipeSchema()
     patch = RecipePatch({})
-    loose = PhysicsConstraintSet()
-    tight = PhysicsConstraintSet(
+    loose = physics_constraints_from_profile(profile)
+    tight = replace(
+        loose,
         furnace_T_max_C=ThresholdSpec(
             id="furnace_T_max_C",
             value=1300.0,
@@ -4851,7 +4858,7 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
         patch.validated(schema),
         FEEDSTOCK,
         "internal-analytical",
-        PROFILE,
+        profile,
         schema,
         constraints=loose,
     )
@@ -4859,7 +4866,7 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
         patch.validated(schema),
         FEEDSTOCK,
         "internal-analytical",
-        PROFILE,
+        profile,
         schema,
         constraints=tight,
     )
@@ -4897,8 +4904,24 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
     candidate = study.Candidate(id="random-7-000000", patch=patch)
 
     assert cache_key(spec_tight) != cache_key(spec_loose)
-    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "internal-analytical", schema, store, loose)
-    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "internal-analytical", schema, store, tight) is None
+    assert study._lookup_cached(
+        candidate,
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        loose,
+    )
+    assert study._lookup_cached(
+        candidate,
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        tight,
+    ) is None
 
 
 def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
@@ -5007,6 +5030,62 @@ def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
     )
 
     assert cached is None
+
+    product_ledger = {
+        "SiO": 0.001,
+        "Fe": 0.001,
+        "Ca": 0.001,
+        "Al": 0.001,
+        "Mg": 0.001,
+        "Na": 0.001,
+    }
+    terminal_rump = {
+        "SiO2": 1.0,
+        "FeO": 1.0,
+        "Ca": 1.0,
+        "Al": 1.0,
+        "MgO": 1.0,
+        "Na2O": 1.0,
+    }
+    valid_scored = replace(
+        scored,
+        run_reference=replace(
+            scored.run_reference,
+            trace={**trace, "terminal_rump_by_species_kg": terminal_rump},
+            product_summary={
+                **scored.run_reference.product_summary,
+                "product_ledger_kg": product_ledger,
+            },
+        ),
+    )
+    store.store(spec, study._strip_heavy_result(valid_scored), created_at="bound")
+    bound = constraints.extraction_completeness(
+        SimpleNamespace(
+            **{
+                **trace,
+                "product_ledger_kg": product_ledger,
+                "terminal_rump_by_species_kg": terminal_rump,
+            }
+        )
+    )
+    assert math.isfinite(bound.observed)
+    assert not bound.feasible
+
+    replayed = study._lookup_cached(
+        Candidate("legacy-completeness-probe", patch),
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        constraints,
+    )
+    assert replayed is not None
+    assert replayed.feasible is True
+    assert (
+        replayed.feasibility_margins["extraction_completeness"].observed
+        == 0.03668332604274586
+    )
 
 
 def test_feasible_analytical_cache_hit_skips_evaluation_and_splits_keys(
