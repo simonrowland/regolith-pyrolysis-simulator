@@ -187,6 +187,72 @@ def test_predict_flag_wall_certified_value_retains_bits():
     assert notices == {}
 
 
+def test_ca_crown_pressure_is_within_one_decade_of_janaf():
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+    from simulator.state import GAS_CONSTANT
+
+    # sid nist-janaf-4th, Ca-006, gas formation relative to stable Ca(s).
+    # JANAF p°=0.1 MPa: equilibrium gives P=p° exp(-delta_fG/(R T)).
+    # kJ/mol * 1000 J/kJ / (J/mol/K * K) is dimensionless.
+    document = load_table_document(TABLES_DIR / "Ca-006.yaml")
+    assert document["source_id"] == "nist-janaf-4th"
+    rows = {row["temperature"]["value"]: row for row in document["table"]["values"]}
+    gibbs_600 = rows[600.0]["formation_gibbs_energy"]["value"]
+    gibbs_700 = rows[700.0]["formation_gibbs_energy"]["value"]
+    gibbs_670 = gibbs_600 + (gibbs_700 - gibbs_600) * (670.0 - 600.0) / (700.0 - 600.0)
+    janaf_pa = 1.0e5 * math.exp(-1000.0 * gibbs_670 / (GAS_CONSTANT * 670.0))
+    pressure = condensation._antoine_psat_pa("Ca", 670.0)
+    assert 0.1 <= pressure / janaf_pa <= 10.0
+
+
+def test_every_antoine_below_band_extension_is_monotone_and_pole_free():
+    from engines.antoine import _antoine_log10_pressure
+    from tests.chemistry.conftest import _load_yaml
+
+    data = _load_yaml("vapor_pressures.yaml")
+    checked = 0
+    for group in data.values():
+        if not isinstance(group, dict):
+            continue
+        for species, entry in group.items():
+            if not isinstance(entry, dict):
+                continue
+            for name in ("antoine", "pure_component_antoine"):
+                block = entry.get(name)
+                if not isinstance(block, dict):
+                    continue
+                for row in block.get("segments") or [block]:
+                    band = row.get("valid_range_K", entry.get("valid_range_K"))
+                    low, high = map(float, band)
+                    # Isolate each actual row from source-reaction applicability and
+                    # other phase segments: this property concerns its continuation.
+                    probe = {"metals": {"b931_probe": {
+                        "pure_component_antoine": {**row, "valid_range_K": [low, high]},
+                        "valid_range_K": [low, high],
+                    }}}
+                    temperatures = {low * fraction for fraction in (1e-6, .01, .1, .25, .5, .75, .99, 1.0)}
+                    pole = -float(row["C"])
+                    if 0.0 < pole < low:
+                        temperatures.update((pole * .99, pole, pole * 1.01))
+                    pressures = [condensation._antoine_psat_pa(
+                        "b931_probe", temperature, vapor_pressure_data=probe,
+                        enforce_hot_train_applicability=False,
+                    ) for temperature in sorted(temperatures)]
+                    assert all(math.isfinite(p) and p >= 0.0 for p in pressures), (species, name)
+                    assert pressures == sorted(pressures), (species, name)
+                    # Every certified point keeps the original arithmetic, including
+                    # both boundaries; no copied fit formula in the expectations.
+                    for temperature in (low, (low + high) / 2.0, high):
+                        actual = condensation._antoine_psat_pa(
+                            "b931_probe", temperature, vapor_pressure_data=probe,
+                            enforce_hot_train_applicability=False,
+                        )
+                        expected = 10.0 ** _antoine_log10_pressure(row["A"], row["B"], row["C"], temperature)
+                        assert actual.hex() == expected.hex(), (species, name, temperature)
+                    checked += 1
+    assert checked > 50
+
+
 @pytest.mark.parametrize(("temperature", "pressure_hex", "band"), [
     (500.0, "0x1.8f7e06aa69f40p-17", [701.0, 1361.0]),
     (1500.0, "0x1.17121f336b398p+18", [701.0, 1361.0]),

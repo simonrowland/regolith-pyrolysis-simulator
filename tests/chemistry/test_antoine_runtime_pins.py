@@ -219,6 +219,10 @@ def test_vapour_catalog_antoine_log_and_boundary_pins(vapor_pressure_data):
     assert evaluator.evaluate(1200.0).pressure_pa.hex() == (
         "0x1.d6b9eb0b55a4cp+16"
     )
+    # Pre-move pin of the existing below-band reciprocal-T continuation.
+    assert evaluator._reciprocal_T_tangent_log10(670.0).hex() == (
+        "0x1.38f75b00be5aep+0"
+    )
     pressure_rows = (
         ("K", 900.0, (679.4, 1033.0), "0x1.777ea4a15c5ebp+14"),
         ("Mg", 1200.0, (701.0, 1361.0), "0x1.585d52b026f95p+14"),
