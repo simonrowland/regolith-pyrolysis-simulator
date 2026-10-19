@@ -292,14 +292,16 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
     class PendingPool:
         def __init__(self):
             self.abort_calls = 0
+            self.diagnostic_detail = None
 
         def submit(self, *_args, **_kwargs):
             return pending
 
-        def _abort_request(self, future):
+        def _abort_request(self, future, *, diagnostic_detail=None):
             assert future is pending
             assert future.cancel_attempted
             assert future.running()
+            self.diagnostic_detail = diagnostic_detail
             self.abort_calls += 1
 
     pool = PendingPool()
@@ -319,6 +321,7 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
                 temperature_C=1200.0,
                 pressure_bar=1.0,
                 fO2_log=-8.0,
+                composition_mol={'SiO2': 0.5, 'MgO': 0.25},
             )
         except BaseException as exc:  # returned to the asserting thread
             outcomes.append(exc)
@@ -338,6 +341,21 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
         assert pending.cancel_attempted
         assert pending.running()
         assert pool.abort_calls == 1
+        assert pool.diagnostic_detail is not None
+        assert len(pool.diagnostic_detail) <= 8192
+        assert 'composition_mol' in pool.diagnostic_detail
+        assert 'projected_bulk' in pool.diagnostic_detail
+        assert 'oxide_names' in pool.diagnostic_detail
+        assert 'temperature_C' in pool.diagnostic_detail
+        assert 'pressure_bar' in pool.diagnostic_detail
+        assert 'fO2_log' in pool.diagnostic_detail
+        assert 'buffer' in pool.diagnostic_detail
+        assert 'buffer_n' in pool.diagnostic_detail
+        assert 'database' in pool.diagnostic_detail
+        assert 'argv' in pool.diagnostic_detail
+        assert '--Temp=1200.000000' in pool.diagnostic_detail
+        assert '--Pres=0.000100' in pool.diagnostic_detail
+        assert '--db=ig' in pool.diagnostic_detail
         assert time.monotonic() - started_at < 0.25
     finally:
         if waiter.is_alive():
@@ -345,7 +363,8 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
             waiter.join(timeout=1.0)
 
 
-def test_magemin_timeout_kills_and_reaps_a_hung_worker():
+def test_magemin_timeout_kills_and_reaps_a_hung_worker(tmp_path):
+    diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
     pool = engine_pool.EngineWorkerPool(
         lambda index: engine_pool.WarmEngineWorker(
             name=f'fake MAGEMin slot {index}',
@@ -353,6 +372,7 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker():
             handler=_handle_sleeping_magemin_request,
             startup_timeout_s=2.0,
             call_timeout_s=30.0,
+            diagnostic_log_path=diagnostic_log_path,
         ),
         size=1,
     )
@@ -380,6 +400,7 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker():
                 temperature_C=1200.0,
                 pressure_bar=1.0,
                 fO2_log=-8.0,
+                composition_mol={'SiO2': 0.5, 'MgO': 0.25},
             )
         except BaseException as exc:  # returned to the asserting thread
             outcomes.append(exc)
@@ -394,6 +415,29 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker():
         assert isinstance(outcomes[0], EngineWorkerTimeout)
         assert outcomes[0].phase == 'job'
         assert outcomes[0].timeout_s == pytest.approx(2.05)
+        timeout_text = str(outcomes[0])
+        for field in (
+            'composition_mol',
+            'SiO2',
+            'MgO',
+            'projected_bulk',
+            'oxide_names',
+            'temperature_C',
+            'pressure_bar',
+            'fO2_log',
+            'buffer',
+            'buffer_n',
+            'database',
+            'argv',
+            '--Temp=1200.000000',
+            '--Pres=0.000100',
+            '--db=ig',
+        ):
+            assert field in timeout_text
+        diagnostic_log = diagnostic_log_path.read_text(encoding='utf-8')
+        assert 'MAGEMin timed-out request:' in diagnostic_log
+        assert '--Temp=1200.000000' in diagnostic_log
+        assert 'projected_bulk' in diagnostic_log
         assert time.monotonic() - started_at < 2.5
         assert worker.process is None
         with pytest.raises(ProcessLookupError):
