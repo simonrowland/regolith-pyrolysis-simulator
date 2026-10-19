@@ -1530,6 +1530,66 @@ def test_source_duct_closure_matches_linear_hk_and_pipe1_quadratic():
     assert q_source == pytest.approx(q_duct, rel=1.0e-8)
 
 
+def _retained_gas_shadow(species, pre_mol, *, flux=None, equilibrium=None, G=2.35e-6):
+    return solve_capacity_shadow(
+        pre_holdup_mol={species: pre_mol},
+        molar_mass_kg_mol={"Fe": 0.055845, "O2": M_O2},
+        flux_kg_hr_at_partials=flux or (lambda _parts: {}),
+        capacity=NoColdTrain(),
+        head_bled_species_mol={}, external_o2_holdup_mol=0.0,
+        temperature_K=1950.65, volume_m3=0.085383807627, dt_hr=1.0,
+        bleed_conductance_kg_s=1.0, downstream_pressure_Pa=0.0,
+        k_relief_kg_hr_Pa=0.0, p_open_Pa=1.0,
+        equilibrium_pressures_Pa=equilibrium or {},
+        pipe_molar_G_mol_s_Pa2=G,
+        carrier_partials_Pa={"N2": 1000.0},
+        incoming_partials_Pa={
+            species: pre_mol * GAS_CONSTANT * 1950.65 / 0.085383807627,
+        },
+    )
+
+
+def test_no_cold_train_retained_zero_source_gas_closes_molar_budget():
+    pre_mol = 15.161244955
+    result = _retained_gas_shadow("O2", pre_mol)
+    assert isinstance(result, CapacityShadowResult)
+    remaining = result.partial_pressures_Pa.get("O2", 0.0) * (
+        0.085383807627 / (GAS_CONSTANT * 1950.65)
+    )
+    bled = result.bled_species_mol.get("O2", 0.0)
+    assert 0.0 < bled <= pre_mol
+    assert remaining + bled == pytest.approx(pre_mol, rel=1e-9)
+    # The same duct law must fund its outflow from finite stock, including
+    # species with no source; a tiny positive-source residual is insufficient.
+    total = sum(result.partial_pressures_Pa.values())
+    duct_mol = 2.35e-6 * total * result.partial_pressures_Pa["O2"] * 3600.0
+    assert duct_mol == pytest.approx(bled, rel=1e-8)
+    assert result.source_duct_residual_rel < 1e-9
+
+
+def test_retained_supersaturated_vapour_does_not_stay_fixed_after_bleed():
+    def source(parts):
+        return {"Fe": 0.001 * max(0.0, 10.0 - parts.get("Fe", 0.0))
+                * 0.055845 * 3600.0}
+
+    first = _retained_gas_shadow(
+        "Fe", 1.0, flux=source, equilibrium={"Fe": 10.0},
+    )
+    remaining = first.partial_pressures_Pa["Fe"] * (
+        0.085383807627 / (GAS_CONSTANT * 1950.65)
+    )
+    supplied = first.evaporation_flux_kg_hr.get("Fe", 0.0) / 0.055845
+    assert remaining + first.bled_species_mol.get("Fe", 0.0) == pytest.approx(
+        1.0 + supplied, rel=1e-9,
+    )
+    assert 0.0 < first.partial_pressures_Pa["Fe"] < 10.0
+    assert supplied > 0.0
+    second = _retained_gas_shadow(
+        "Fe", remaining, flux=source, equilibrium={"Fe": 10.0},
+    )
+    assert second.partial_pressures_Pa["Fe"] < first.partial_pressures_Pa["Fe"]
+
+
 def test_evaporation_flux_refuses_missing_overhead_pressure_without_command_fallback():
     from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
     from simulator.chemistry.kernel.capabilities import ChemistryIntent

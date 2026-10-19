@@ -771,6 +771,69 @@ def _capture_live_evaporation_controls(simulator):
     return captured
 
 
+def test_c4_to_c2a_retained_gas_balance_matches_committed_bleed(monkeypatch) -> None:
+    import simulator.capacity_coupling as coupling
+    from simulator.physical_constants import GAS_CONSTANT
+    from simulator.state import CampaignPhase
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C4", hours=1,
+        allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+        force_builtin_vapor_pressure=True,
+    )
+    simulator = run._start_session().simulator
+    simulator.melt.temperature_C = 1670.0
+    solves, bleeds = [], []
+    original_solve = coupling.solve_capacity_shadow
+    original_bleed = simulator._dispatch_overhead_bleed
+
+    def solve(**kwargs):
+        result = original_solve(**kwargs)
+        solves.append((kwargs, result))
+        return result
+
+    def bleed(**kwargs):
+        before = simulator._overhead_holdup_mol()
+        result = original_bleed(**kwargs)
+        bleeds.append((before, simulator._overhead_holdup_mol(), result))
+        return result
+
+    monkeypatch.setattr(coupling, "solve_capacity_shadow", solve)
+    monkeypatch.setattr(simulator, "_dispatch_overhead_bleed", bleed)
+    for campaign in (CampaignPhase.C4, CampaignPhase.C2A):
+        if simulator.melt.campaign != campaign:
+            simulator.start_campaign(campaign)
+        simulator.step()
+        args, result = solves[-1]
+        parts = dict(result.partial_pressures_Pa)
+        print(json.dumps({"campaign": campaign.name, "total_Pa": sum(parts.values()),
+                          "partials_Pa": parts, "volume_m3": args["volume_m3"]}))
+
+    args, result = solves[-1]
+    before, after, bleed_result = bleeds[-1]
+    bled = dict(bleed_result.diagnostic["bled_species_mol"])
+    assert bled == pytest.approx(dict(result.bled_species_mol), rel=1e-8, abs=1e-12)
+    assert args["volume_m3"] == pytest.approx(simulator._headspace_volume_m3())
+    source = args["overhead_source_mol_hr_at_partials"](result.partial_pressures_Pa)
+    for species in set(before) | set(after) | set(args["pre_holdup_mol"]) | set(source):
+        supplied = args["pre_holdup_mol"].get(species, 0.0) + source.get(species, 0.0)
+        assert after.get(species, 0.0) + bled.get(species, 0.0) == pytest.approx(
+            supplied, rel=1e-8, abs=1e-10,
+        ), species
+        assert before.get(species, 0.0) - bled.get(species, 0.0) == pytest.approx(
+            after.get(species, 0.0), rel=1e-8, abs=1e-10,
+        ), species
+        expected_pa = after.get(species, 0.0) * GAS_CONSTANT * args["temperature_K"] / args["volume_m3"]
+        assert result.partial_pressures_Pa.get(species, 0.0) == pytest.approx(
+            expected_pa, rel=1e-8, abs=1e-8,
+        ), species
+    assert simulator._melt_headspace_total_pressure_bar() * 1e5 == pytest.approx(
+        sum(result.partial_pressures_Pa.values()), rel=1e-9,
+    )
+    assert result.source_duct_residual_rel < 1e-9
+    assert abs(simulator.mass_balance().closure_error_pct) < 1e-8
+
+
 def test_c2a_1600c_six_hour_source_duct_closure_is_same_tick() -> None:
     """Live lunar C2A 1600 °C probe used as the SC-341 / b-922 regression.
 
