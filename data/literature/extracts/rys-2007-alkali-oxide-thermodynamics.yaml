@@ -4,9 +4,9 @@ source:
   citation: "Ryś, M. (2007). Investigation of Thermodynamic Properties of Alkali Metals in Oxide Systems Relevant to Coal Slags. PhD thesis, RWTH Aachen University."
   year: 2007
 extraction:
-  method: "Born-digital pdftotext-layout transcription; Tables 7 and 9 checked against 600 dpi page renders."
-  date: '2026-10-18'
-  worker: fam1-1018
+  method: "Born-digital pdftotext-layout transcription; Tables 7 and 9 typed and checked cell-by-cell against 600 dpi page renders."
+  date: '2026-10-19'
+  worker: codex-resume-84155-1792424986
 review_status: draft
 fidelity_samples:
   - path: species.SiO2.observations[rys_2007_table7_liquidus].values.points[0].T_C
@@ -18,6 +18,15 @@ fidelity_samples:
   - path: species.Na2O.observations[rys_2007_tables16_17_19_na2o_activity_1750k].values.points[2].activity
     value: '9.740E-12'
     locator: {page: 118, published_page: 106, pdf_page_index: 117, table: '16'}
+  - path: species.SiO2.observations[rys_2007_table7_t1_structure_change].values.points[0].T_C
+    value: 750
+    locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '96Na2O-4SiO2', column: 'T1 up'}
+  - path: species.SiO2.observations[rys_2007_table7_t3_eutectic].values.points[0].T_C
+    value: 842
+    locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '92Na2O-8SiO2', column: 'T3 up'}
+  - path: species.SiO2.observations[rys_2007_table9_eutectic].values.points[0].T_C
+    value: 1029
+    locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '63Na2O-37SiO2', column: 'eutectic up'}
 species:
   SiO2:
     observations:
@@ -341,54 +350,693 @@ species:
               point_conditions:
                 total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9'}}
               locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9'}
-    context:
-      - observation_id: rys_2007_table7_nonliquidus_thermal_effects
-        type: transition_event_results
+      - observation_id: rys_2007_table7_t1_structure_change
+        type: transition_point
         locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7'}
-        units: °C as printed
+        units: "°C; composition as mole fraction (source printed mol%)"
         values:
           quantity: transition_temperature
+          property_kind: solid_solid_transition
           method_class: measured_tabulated
-          admission_status: typed_unavailable
-          reason: 't-1326: the transition schema cannot yet retain composition for non-liquidus transitions.'
+          evidence_class: measured_tabulated
+          points:
+          - sample_as_printed: '96Na2O-4SiO2'
+            thermal_path: up
+            T_C: 750
+            composition_mol: {Na2O: '0.9598', SiO2: '0.0401'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '96Na2O-4SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '96Na2O-4SiO2', column: 'T1 up'}
+          - sample_as_printed: '96Na2O-4SiO2'
+            thermal_path: down
+            T_C: 747
+            composition_mol: {Na2O: '0.9598', SiO2: '0.0401'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '96Na2O-4SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '96Na2O-4SiO2', column: 'T1 down'}
+          - sample_as_printed: '92Na2O-8SiO2'
+            thermal_path: up
+            T_C: 751
+            composition_mol: {Na2O: '0.9196', SiO2: '0.0804'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '92Na2O-8SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '92Na2O-8SiO2', column: 'T1 up'}
+          - sample_as_printed: '92Na2O-8SiO2'
+            thermal_path: down
+            T_C: 745
+            composition_mol: {Na2O: '0.9196', SiO2: '0.0804'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '92Na2O-8SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '92Na2O-8SiO2', column: 'T1 down'}
+          - sample_as_printed: '90Na2O-10SiO2'
+            thermal_path: up
+            T_C: 752
+            composition_mol: {Na2O: '0.8998', SiO2: '0.1002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '90Na2O-10SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '90Na2O-10SiO2', column: 'T1 up'}
+          - sample_as_printed: '90Na2O-10SiO2'
+            thermal_path: down
+            T_C: 746
+            composition_mol: {Na2O: '0.8998', SiO2: '0.1002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '90Na2O-10SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '90Na2O-10SiO2', column: 'T1 down'}
+          - sample_as_printed: '87Na2O-13SiO2'
+            thermal_path: up
+            T_C: 750
+            composition_mol: {Na2O: '0.8716', SiO2: '0.1284'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '87Na2O-13SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '87Na2O-13SiO2', column: 'T1 up'}
+          - sample_as_printed: '87Na2O-13SiO2'
+            thermal_path: down
+            T_C: 745
+            composition_mol: {Na2O: '0.8716', SiO2: '0.1284'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '87Na2O-13SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '87Na2O-13SiO2', column: 'T1 down'}
+          - sample_as_printed: '85Na2O-15SiO2'
+            thermal_path: up
+            T_C: 747
+            composition_mol: {Na2O: '0.849', SiO2: '0.151'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '85Na2O-15SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '85Na2O-15SiO2', column: 'T1 up'}
+          - sample_as_printed: '85Na2O-15SiO2'
+            thermal_path: down
+            T_C: 747
+            composition_mol: {Na2O: '0.849', SiO2: '0.151'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '85Na2O-15SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '85Na2O-15SiO2', column: 'T1 down'}
+          - sample_as_printed: '83Na2O-17SiO2'
+            thermal_path: up
+            T_C: 746
+            composition_mol: {Na2O: '0.8353', SiO2: '0.1647'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T1 up'}
+          - sample_as_printed: '83Na2O-17SiO2'
+            thermal_path: down
+            T_C: 753
+            composition_mol: {Na2O: '0.8353', SiO2: '0.1647'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T1 down'}
+          - sample_as_printed: '82Na2O-18SiO2'
+            thermal_path: up
+            T_C: 748
+            composition_mol: {Na2O: '0.8197', SiO2: '0.1803'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '82Na2O-18SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '82Na2O-18SiO2', column: 'T1 up'}
+          - sample_as_printed: '82Na2O-18SiO2'
+            thermal_path: down
+            T_C: 742
+            composition_mol: {Na2O: '0.8197', SiO2: '0.1803'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '82Na2O-18SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '82Na2O-18SiO2', column: 'T1 down'}
+          - sample_as_printed: '80Na2O-20SiO2'
+            thermal_path: up
+            T_C: 751
+            composition_mol: {Na2O: '0.7998', SiO2: '0.2002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '80Na2O-20SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '80Na2O-20SiO2', column: 'T1 up'}
+          - sample_as_printed: '80Na2O-20SiO2'
+            thermal_path: down
+            T_C: 747
+            composition_mol: {Na2O: '0.7998', SiO2: '0.2002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '80Na2O-20SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '80Na2O-20SiO2', column: 'T1 down'}
+          - sample_as_printed: '78Na2O-22SiO2'
+            thermal_path: up
+            T_C: 747
+            composition_mol: {Na2O: '0.7789', SiO2: '0.2211'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '78Na2O-22SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '78Na2O-22SiO2', column: 'T1 up'}
+          - sample_as_printed: '78Na2O-22SiO2'
+            thermal_path: down
+            T_C: 743
+            composition_mol: {Na2O: '0.7789', SiO2: '0.2211'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '78Na2O-22SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '78Na2O-22SiO2', column: 'T1 down'}
+          - sample_as_printed: '76Na2O-24SiO2'
+            thermal_path: up
+            T_C: 751
+            composition_mol: {Na2O: '0.7598', SiO2: '0.2402'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '76Na2O-24SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '76Na2O-24SiO2', column: 'T1 up'}
+          - sample_as_printed: '76Na2O-24SiO2'
+            thermal_path: down
+            T_C: 745
+            composition_mol: {Na2O: '0.7598', SiO2: '0.2402'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '76Na2O-24SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '76Na2O-24SiO2', column: 'T1 down'}
+          - sample_as_printed: '72Na2O-28SiO2'
+            thermal_path: down
+            T_C: 742
+            composition_mol: {Na2O: '0.7198', SiO2: '0.2802'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '72Na2O-28SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '72Na2O-28SiO2', column: 'T1 down'}
+          - sample_as_printed: '70Na2O-30SiO2'
+            thermal_path: up
+            T_C: 750
+            composition_mol: {Na2O: '0.6998', SiO2: '0.3002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T1 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T1 up'}
+          - sample_as_printed: '70Na2O-30SiO2'
+            thermal_path: down
+            T_C: 748
+            composition_mol: {Na2O: '0.6998', SiO2: '0.3002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T1 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T1 down'}
+      - observation_id: rys_2007_table7_t2_unidentified_thermal_effect
+        type: transition_point
+        locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7'}
+        units: "°C; composition as mole fraction (source printed mol%)"
+        values:
+          quantity: transition_temperature
+          property_kind: thermal_effect
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          points:
+          - sample_as_printed: '96Na2O-4SiO2'
+            thermal_path: up
+            T_C: 795
+            composition_mol: {Na2O: '0.9598', SiO2: '0.0401'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '96Na2O-4SiO2', column: 'T2 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '96Na2O-4SiO2', column: 'T2 up'}
+          - sample_as_printed: '96Na2O-4SiO2'
+            thermal_path: down
+            T_C: 780
+            composition_mol: {Na2O: '0.9598', SiO2: '0.0401'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '96Na2O-4SiO2', column: 'T2 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '96Na2O-4SiO2', column: 'T2 down'}
+          - sample_as_printed: '85Na2O-15SiO2'
+            thermal_path: down
+            T_C: 812
+            composition_mol: {Na2O: '0.849', SiO2: '0.151'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '85Na2O-15SiO2', column: 'T2 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '85Na2O-15SiO2', column: 'T2 down'}
+          - sample_as_printed: '83Na2O-17SiO2'
+            thermal_path: up
+            T_C: 780
+            composition_mol: {Na2O: '0.8353', SiO2: '0.1647'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T2 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T2 up'}
+          - sample_as_printed: '83Na2O-17SiO2'
+            thermal_path: down
+            T_C: 800
+            composition_mol: {Na2O: '0.8353', SiO2: '0.1647'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T2 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T2 down'}
+          - sample_as_printed: '80Na2O-20SiO2'
+            thermal_path: down
+            T_C: 816
+            composition_mol: {Na2O: '0.7998', SiO2: '0.2002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '80Na2O-20SiO2', column: 'T2 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '80Na2O-20SiO2', column: 'T2 down'}
+          - sample_as_printed: '78Na2O-22SiO2'
+            thermal_path: down
+            T_C: 803
+            composition_mol: {Na2O: '0.7789', SiO2: '0.2211'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '78Na2O-22SiO2', column: 'T2 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '78Na2O-22SiO2', column: 'T2 down'}
+      - observation_id: rys_2007_table7_t3_eutectic
+        type: transition_point
+        locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7'}
+        units: "°C; composition as mole fraction (source printed mol%)"
+        values:
+          quantity: transition_temperature
+          property_kind: eutectic
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          points:
+          - sample_as_printed: '92Na2O-8SiO2'
+            thermal_path: up
+            T_C: 842
+            composition_mol: {Na2O: '0.9196', SiO2: '0.0804'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '92Na2O-8SiO2', column: 'T3 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '92Na2O-8SiO2', column: 'T3 up'}
+          - sample_as_printed: '92Na2O-8SiO2'
+            thermal_path: down
+            T_C: 840
+            composition_mol: {Na2O: '0.9196', SiO2: '0.0804'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '92Na2O-8SiO2', column: 'T3 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '92Na2O-8SiO2', column: 'T3 down'}
+          - sample_as_printed: '90Na2O-10SiO2'
+            thermal_path: up
+            T_C: 853
+            composition_mol: {Na2O: '0.8998', SiO2: '0.1002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '90Na2O-10SiO2', column: 'T3 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '90Na2O-10SiO2', column: 'T3 up'}
+          - sample_as_printed: '90Na2O-10SiO2'
+            thermal_path: down
+            T_C: 852
+            composition_mol: {Na2O: '0.8998', SiO2: '0.1002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '90Na2O-10SiO2', column: 'T3 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '90Na2O-10SiO2', column: 'T3 down'}
+          - sample_as_printed: '87Na2O-13SiO2'
+            thermal_path: up
+            T_C: 826
+            composition_mol: {Na2O: '0.8716', SiO2: '0.1284'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '87Na2O-13SiO2', column: 'T3 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '87Na2O-13SiO2', column: 'T3 up'}
+          - sample_as_printed: '87Na2O-13SiO2'
+            thermal_path: down
+            T_C: 837
+            composition_mol: {Na2O: '0.8716', SiO2: '0.1284'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '87Na2O-13SiO2', column: 'T3 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '87Na2O-13SiO2', column: 'T3 down'}
+          - sample_as_printed: '85Na2O-15SiO2'
+            thermal_path: up
+            T_C: 859
+            composition_mol: {Na2O: '0.849', SiO2: '0.151'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '85Na2O-15SiO2', column: 'T3 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '85Na2O-15SiO2', column: 'T3 up'}
+          - sample_as_printed: '85Na2O-15SiO2'
+            thermal_path: down
+            T_C: 867
+            composition_mol: {Na2O: '0.849', SiO2: '0.151'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '85Na2O-15SiO2', column: 'T3 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '85Na2O-15SiO2', column: 'T3 down'}
+      - observation_id: rys_2007_table7_t4_eutectic
+        type: transition_point
+        locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7'}
+        units: "°C; composition as mole fraction (source printed mol%)"
+        values:
+          quantity: transition_temperature
+          property_kind: eutectic
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          points:
+          - sample_as_printed: '83Na2O-17SiO2'
+            thermal_path: up
+            T_C: 849
+            composition_mol: {Na2O: '0.8353', SiO2: '0.1647'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T4 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T4 up'}
+          - sample_as_printed: '83Na2O-17SiO2'
+            thermal_path: down
+            T_C: 854
+            composition_mol: {Na2O: '0.8353', SiO2: '0.1647'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T4 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '83Na2O-17SiO2', column: 'T4 down'}
+          - sample_as_printed: '82Na2O-18SiO2'
+            thermal_path: up
+            T_C: 853
+            composition_mol: {Na2O: '0.8197', SiO2: '0.1803'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '82Na2O-18SiO2', column: 'T4 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '82Na2O-18SiO2', column: 'T4 up'}
+          - sample_as_printed: '82Na2O-18SiO2'
+            thermal_path: down
+            T_C: 858
+            composition_mol: {Na2O: '0.8197', SiO2: '0.1803'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '82Na2O-18SiO2', column: 'T4 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '82Na2O-18SiO2', column: 'T4 down'}
+          - sample_as_printed: '80Na2O-20SiO2'
+            thermal_path: up
+            T_C: 865
+            composition_mol: {Na2O: '0.7998', SiO2: '0.2002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '80Na2O-20SiO2', column: 'T4 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '80Na2O-20SiO2', column: 'T4 up'}
+          - sample_as_printed: '80Na2O-20SiO2'
+            thermal_path: down
+            T_C: 866
+            composition_mol: {Na2O: '0.7998', SiO2: '0.2002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '80Na2O-20SiO2', column: 'T4 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '80Na2O-20SiO2', column: 'T4 down'}
+          - sample_as_printed: '78Na2O-22SiO2'
+            thermal_path: up
+            T_C: 866
+            composition_mol: {Na2O: '0.7789', SiO2: '0.2211'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '78Na2O-22SiO2', column: 'T4 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '78Na2O-22SiO2', column: 'T4 up'}
+          - sample_as_printed: '78Na2O-22SiO2'
+            thermal_path: down
+            T_C: 863
+            composition_mol: {Na2O: '0.7789', SiO2: '0.2211'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '78Na2O-22SiO2', column: 'T4 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '78Na2O-22SiO2', column: 'T4 down'}
+          - sample_as_printed: '76Na2O-24SiO2'
+            thermal_path: up
+            T_C: 825
+            composition_mol: {Na2O: '0.7598', SiO2: '0.2402'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '76Na2O-24SiO2', column: 'T4 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '76Na2O-24SiO2', column: 'T4 up'}
+          - sample_as_printed: '76Na2O-24SiO2'
+            thermal_path: down
+            T_C: 841
+            composition_mol: {Na2O: '0.7598', SiO2: '0.2402'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '76Na2O-24SiO2', column: 'T4 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '76Na2O-24SiO2', column: 'T4 down'}
+          - sample_as_printed: '73.5Na2O-26.5SiO2'
+            thermal_path: up
+            T_C: 878
+            composition_mol: {Na2O: '0.735', SiO2: '0.265'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '73.5Na2O-26.5SiO2', column: 'T4 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '73.5Na2O-26.5SiO2', column: 'T4 up'}
+          - sample_as_printed: '73.5Na2O-26.5SiO2'
+            thermal_path: down
+            T_C: 879
+            composition_mol: {Na2O: '0.735', SiO2: '0.265'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '73.5Na2O-26.5SiO2', column: 'T4 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '73.5Na2O-26.5SiO2', column: 'T4 down'}
+          - sample_as_printed: '72Na2O-28SiO2'
+            thermal_path: up
+            T_C: 860
+            composition_mol: {Na2O: '0.7198', SiO2: '0.2802'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '72Na2O-28SiO2', column: 'T4 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '72Na2O-28SiO2', column: 'T4 up'}
+          - sample_as_printed: '72Na2O-28SiO2'
+            thermal_path: down
+            T_C: 853
+            composition_mol: {Na2O: '0.7198', SiO2: '0.2802'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '72Na2O-28SiO2', column: 'T4 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '72Na2O-28SiO2', column: 'T4 down'}
+          - sample_as_printed: '70Na2O-30SiO2'
+            thermal_path: up
+            T_C: 857
+            composition_mol: {Na2O: '0.6998', SiO2: '0.3002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T4 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T4 up'}
+          - sample_as_printed: '70Na2O-30SiO2'
+            thermal_path: down
+            T_C: 837
+            composition_mol: {Na2O: '0.6998', SiO2: '0.3002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T4 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T4 down'}
+      - observation_id: rys_2007_table7_t5_structure_change
+        type: transition_point
+        locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7'}
+        units: "°C; composition as mole fraction (source printed mol%)"
+        values:
+          quantity: transition_temperature
+          property_kind: solid_solid_transition
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          points:
+          - sample_as_printed: '73.5Na2O-26.5SiO2'
+            thermal_path: up
+            T_C: 962
+            composition_mol: {Na2O: '0.735', SiO2: '0.265'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '73.5Na2O-26.5SiO2', column: 'T5 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '73.5Na2O-26.5SiO2', column: 'T5 up'}
+          - sample_as_printed: '73.5Na2O-26.5SiO2'
+            thermal_path: down
+            T_C: 954
+            composition_mol: {Na2O: '0.735', SiO2: '0.265'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '73.5Na2O-26.5SiO2', column: 'T5 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '73.5Na2O-26.5SiO2', column: 'T5 down'}
+          - sample_as_printed: '72Na2O-28SiO2'
+            thermal_path: up
+            T_C: 958
+            composition_mol: {Na2O: '0.7198', SiO2: '0.2802'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '72Na2O-28SiO2', column: 'T5 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '72Na2O-28SiO2', column: 'T5 up'}
+          - sample_as_printed: '72Na2O-28SiO2'
+            thermal_path: down
+            T_C: 950
+            composition_mol: {Na2O: '0.7198', SiO2: '0.2802'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '72Na2O-28SiO2', column: 'T5 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '72Na2O-28SiO2', column: 'T5 down'}
+          - sample_as_printed: '70Na2O-30SiO2'
+            thermal_path: up
+            T_C: 957
+            composition_mol: {Na2O: '0.6998', SiO2: '0.3002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T5 up'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T5 up'}
+          - sample_as_printed: '70Na2O-30SiO2'
+            thermal_path: down
+            T_C: 953
+            composition_mol: {Na2O: '0.6998', SiO2: '0.3002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T5 down'}}
+            locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7', row: '70Na2O-30SiO2', column: 'T5 down'}
+      - observation_id: rys_2007_table9_eutectic
+        type: transition_point
+        locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9'}
+        units: "°C; composition as mole fraction (source printed mol%)"
+        values:
+          quantity: transition_temperature
+          property_kind: eutectic
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          points:
+          - sample_as_printed: '63Na2O-37SiO2'
+            thermal_path: up
+            T_C: 1029
+            composition_mol: {Na2O: '0.6298', SiO2: '0.3702'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '63Na2O-37SiO2', column: 'eutectic up'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '63Na2O-37SiO2', column: 'eutectic up'}
+          - sample_as_printed: '56Na2O-44SiO2'
+            thermal_path: up
+            T_C: 1009
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '56Na2O-44SiO2', column: 'eutectic up'}}
+              composition: {state: {tag: unknown, reason: printed_components_total_96_percent_no_reconstruction}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '56Na2O-44SiO2', column: 'eutectic up'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '56Na2O-44SiO2', column: 'eutectic up'}
+          - sample_as_printed: '56Na2O-44SiO2'
+            thermal_path: down
+            T_C: 1004
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '56Na2O-44SiO2', column: 'eutectic down'}}
+              composition: {state: {tag: unknown, reason: printed_components_total_96_percent_no_reconstruction}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '56Na2O-44SiO2', column: 'eutectic down'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '56Na2O-44SiO2', column: 'eutectic down'}
+          - sample_as_printed: '45Na2O-55SiO2'
+            thermal_path: up
+            T_C: 814
+            composition_mol: {Na2O: '0.4496', SiO2: '0.5504'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '45Na2O-55SiO2', column: 'eutectic up'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '45Na2O-55SiO2', column: 'eutectic up'}
+          - sample_as_printed: '45Na2O-55SiO2'
+            thermal_path: down
+            T_C: 786
+            composition_mol: {Na2O: '0.4496', SiO2: '0.5504'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '45Na2O-55SiO2', column: 'eutectic down'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '45Na2O-55SiO2', column: 'eutectic down'}
+          - sample_as_printed: '40Na2O-60SiO2'
+            thermal_path: up
+            T_C: 811
+            composition_mol: {Na2O: '0.3998', SiO2: '0.6002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '40Na2O-60SiO2', column: 'eutectic up'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '40Na2O-60SiO2', column: 'eutectic up'}
+          - sample_as_printed: '40Na2O-60SiO2'
+            thermal_path: down
+            T_C: 758
+            composition_mol: {Na2O: '0.3998', SiO2: '0.6002'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '40Na2O-60SiO2', column: 'eutectic down'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '40Na2O-60SiO2', column: 'eutectic down'}
+      - observation_id: rys_2007_table9_structure_change
+        type: transition_point
+        locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9'}
+        units: "°C; composition as mole fraction (source printed mol%)"
+        values:
+          quantity: transition_temperature
+          property_kind: solid_solid_transition
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          points:
+          - sample_as_printed: '68Na2O-32SiO2'
+            thermal_path: up
+            T_C: 956
+            composition_mol: {Na2O: '0.6799', SiO2: '0.3201'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '68Na2O-32SiO2', column: 'structure_change up'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '68Na2O-32SiO2', column: 'structure_change up'}
+          - sample_as_printed: '68Na2O-32SiO2'
+            thermal_path: down
+            T_C: 950
+            composition_mol: {Na2O: '0.6799', SiO2: '0.3201'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '68Na2O-32SiO2', column: 'structure_change down'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '68Na2O-32SiO2', column: 'structure_change down'}
+          - sample_as_printed: '67Na2O-33SiO2'
+            thermal_path: up
+            T_C: 960
+            composition_mol: {Na2O: '0.6656', SiO2: '0.3344'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '67Na2O-33SiO2', column: 'structure_change up'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '67Na2O-33SiO2', column: 'structure_change up'}
+          - sample_as_printed: '67Na2O-33SiO2'
+            thermal_path: down
+            T_C: 952
+            composition_mol: {Na2O: '0.6656', SiO2: '0.3344'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '67Na2O-33SiO2', column: 'structure_change down'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '67Na2O-33SiO2', column: 'structure_change down'}
+          - sample_as_printed: '63Na2O-37SiO2'
+            thermal_path: up
+            T_C: 958
+            composition_mol: {Na2O: '0.6298', SiO2: '0.3702'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '63Na2O-37SiO2', column: 'structure_change up'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '63Na2O-37SiO2', column: 'structure_change up'}
+          - sample_as_printed: '63Na2O-37SiO2'
+            thermal_path: down
+            T_C: 949
+            composition_mol: {Na2O: '0.6298', SiO2: '0.3702'}
+            composition_mol_basis: printed_mole_fraction
+            point_conditions:
+              total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '63Na2O-37SiO2', column: 'structure_change down'}}
+            locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '63Na2O-37SiO2', column: 'structure_change down'}
+    context:
+      - observation_id: rys_2007_table7_thermal_event_legend
+        type: literature_context
+        locator: {page: 82, published_page: 70, pdf_page_index: 81, table: '7'}
+        units: event labels as printed
+        values:
+          printed_quantity: DTA thermal effect labels
           events:
             T1: structure change of Na2O
             T2: thermal effect (event not further identified in the table)
             T3: eutectic
             T4: eutectic
             T5: structure change of Na4SiO4
-          rows:
-            - {sample: '96Na2O-4SiO2', composition_mole_percent: {Na2O: '95.98', SiO2: '4.01'}, T1_C: [750, 747], T2_C: [795, 780]}
-            - {sample: '92Na2O-8SiO2', composition_mole_percent: {Na2O: '91.96', SiO2: '8.04'}, T1_C: [751, 745], T3_C: [842, 840]}
-            - {sample: '90Na2O-10SiO2', composition_mole_percent: {Na2O: '89.98', SiO2: '10.02'}, T1_C: [752, 746], T3_C: [853, 852]}
-            - {sample: '87Na2O-13SiO2', composition_mole_percent: {Na2O: '87.16', SiO2: '12.84'}, T1_C: [750, 745], T3_C: [826, 837]}
-            - {sample: '85Na2O-15SiO2', composition_mole_percent: {Na2O: '84.90', SiO2: '15.10'}, T1_C: [747, 747], T2_C: [null, 812], T3_C: [859, 867]}
-            - {sample: '83Na2O-17SiO2', composition_mole_percent: {Na2O: '83.53', SiO2: '16.47'}, T1_C: [746, 753], T2_C: [780, 800], T4_C: [849, 854]}
-            - {sample: '82Na2O-18SiO2', composition_mole_percent: {Na2O: '81.97', SiO2: '18.03'}, T1_C: [748, 742], T4_C: [853, 858]}
-            - {sample: '80Na2O-20SiO2', composition_mole_percent: {Na2O: '79.98', SiO2: '20.02'}, T1_C: [751, 747], T2_C: [null, 816], T4_C: [865, 866]}
-            - {sample: '78Na2O-22SiO2', composition_mole_percent: {Na2O: '77.89', SiO2: '22.11'}, T1_C: [747, 743], T2_C: [null, 803], T4_C: [866, 863]}
-            - {sample: '76Na2O-24SiO2', composition_mole_percent: {Na2O: '75.98', SiO2: '24.02'}, T1_C: [751, 745], T4_C: [825, 841]}
-            - {sample: '73.5Na2O-26.5SiO2', composition_mole_percent: {Na2O: '73.50', SiO2: '26.50'}, T4_C: [878, 879], T5_C: [962, 954]}
-            - {sample: '72Na2O-28SiO2', composition_mole_percent: {Na2O: '71.98', SiO2: '28.02'}, T1_C: [null, 742], T4_C: [860, 853], T5_C: [958, 950]}
-            - {sample: '70Na2O-30SiO2', composition_mole_percent: {Na2O: '69.98', SiO2: '30.02'}, T1_C: [750, 748], T4_C: [857, 837], T5_C: [957, 953]}
           column_order: [up, down]
-      - observation_id: rys_2007_table9_nonliquidus_thermal_effects
-        type: transition_event_results
+      - observation_id: rys_2007_table9_phase_assemblages
+        type: literature_context
         locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9'}
-        units: °C as printed
+        units: phase names as printed
         values:
-          quantity: transition_temperature
-          method_class: measured_tabulated
-          admission_status: typed_unavailable
-          reason: 't-1326: the transition schema cannot yet retain composition for non-liquidus transitions.'
+          printed_quantity: phase assemblage labels by sample
           rows:
-            - {sample: '68Na2O-32SiO2', composition_mole_percent: {Na2O: '67.99', SiO2: '32.01'}, phases: Na4SiO4, structure_change_C: [956, 950]}
-            - {sample: '67Na2O-33SiO2', composition_mole_percent: {Na2O: '66.56', SiO2: '33.44'}, phases: Na4SiO4, structure_change_C: [960, 952]}
-            - {sample: '63Na2O-37SiO2', composition_mole_percent: {Na2O: '62.98', SiO2: '37.02'}, phases: 'Na4SiO4 + Na6Si2O7', eutectic_C: [1029, null], structure_change_C: [958, 949]}
-            - {sample: '56Na2O-44SiO2', phases: 'Na6Si2O7 + Na2SiO3', composition: {state: {tag: unknown, reason: printed_components_total_96_percent_no_reconstruction}}, eutectic_C: [1009, 1004]}
-            - {sample: '50Na2O-50SiO2', composition_mole_percent: {Na2O: '50.23', SiO2: '49.77'}, phases: Na2SiO3}
-            - {sample: '45Na2O-55SiO2', composition_mole_percent: {Na2O: '44.96', SiO2: '55.04'}, phases: 'Na2SiO3 + Na2Si2O5', eutectic_C: [814, 786]}
-            - {sample: '40Na2O-60SiO2', composition_mole_percent: {Na2O: '39.98', SiO2: '60.02'}, phases: 'Na2SiO3 + Na2Si2O5', eutectic_C: [811, 758]}
+            - sample: '68Na2O-32SiO2'
+              phases: 'Na4SiO4'
+            - sample: '67Na2O-33SiO2'
+              phases: 'Na4SiO4'
+            - sample: '63Na2O-37SiO2'
+              phases: 'Na4SiO4 + Na6Si2O7'
+            - sample: '56Na2O-44SiO2'
+              phases: 'Na6Si2O7 + Na2SiO3'
+            - sample: '50Na2O-50SiO2'
+              phases: 'Na2SiO3'
+            - sample: '45Na2O-55SiO2'
+              phases: 'Na2SiO3 + Na2Si2O5'
+            - sample: '40Na2O-60SiO2'
+              phases: 'Na2SiO3 + Na2Si2O5'
           column_order: [up, down]
     # Figures 1–68 are unscored records; plotted lines are deferred and carry no numeric points.
       - observation_id: rys_2007_figure1_figure_record
