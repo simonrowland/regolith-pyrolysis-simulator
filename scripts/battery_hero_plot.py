@@ -1992,7 +1992,7 @@ def _draw_hero_sweet_spot(
             continue
         value = _finite_float(cell.get("median_abs_dex"))
         color_eligible = bool(cell.get("color_eligible")) and value is not None
-        sparse = count < 3
+        sparse = not color_eligible
         fill = (
             colormap(normalization(value))
             if color_eligible
