@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 import yaml
 
+from simulator.battery.migrate import _mole_fraction_composition_from_values
 from tests.battery.test_migrate import _migrate_real_extract
 
 
@@ -129,6 +131,7 @@ def test_cheng_all_locators_use_printed_pages_and_zero_based_pdf_indices() -> No
 
 
 def test_cheng_isolated_migration_carries_temperature_and_conditions(tmp_path: Path) -> None:
+    """Printed-total histogram: 99.7: 3, 99.9: 102, 100.0: 765, 100.1: 54."""
     result = _migrate_real_extract(
         tmp_path, "cheng-2021-fe-ca-si-o-phase-equilibria.yaml"
     )
@@ -139,6 +142,47 @@ def test_cheng_isolated_migration_carries_temperature_and_conditions(tmp_path: P
         observation.value.kind.value == "unavailable"
         for observation in result.observations.values()
     ) == 3
+
+    document = _document()
+    composition_rows = {
+        row["observation_id"]: row
+        for block in document["species"].values()
+        for row in block["observations"]
+        if row.get("type") == "equilibrium_phase_composition"
+        and isinstance(row.get("values", {}).get("composition_mol"), dict)
+    }
+    rows_by_phase = {}
+    for row in composition_rows.values():
+        phase_key = row["values"].get("phase_row_id") or row["experiment"]
+        rows_by_phase.setdefault(phase_key, []).append(row)
+    migrated_by_id = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in result.observations.values()
+    }
+    assert len(composition_rows) == 924
+    for observation_id, source_row in composition_rows.items():
+        printed = source_row["values"]["composition_mol"]
+        phase_key = source_row["values"].get("phase_row_id") or source_row["experiment"]
+        total_pct = sum(
+            Decimal(str(row["values"]["value"]))
+            for row in rows_by_phase[phase_key]
+        )
+        assert Decimal("99.7") <= total_pct <= Decimal("100.3")
+        assert printed["basis"] == "printed_mole_fraction"
+        observation = migrated_by_id[observation_id]
+        assert observation.identity.composition.is_not_applicable
+        composition, omitted = _mole_fraction_composition_from_values(source_row["values"])
+        assert composition is not None
+        assert not omitted
+        migrated = composition.as_map()
+        assert abs(sum(migrated.values()) - total_pct / Decimal("100")) <= Decimal("1e-9")
+
+    feo_pin, omitted = _mole_fraction_composition_from_values(
+        composition_rows["cheng21_t5_e001_liq_feo1p5"]["values"]
+    )
+    assert not omitted
+    assert feo_pin is not None
+    assert feo_pin.as_map()["FeO1.5"] == Decimal("0.875")
 
     for observation in result.observations.values():
         conditions = observation.point_conditions

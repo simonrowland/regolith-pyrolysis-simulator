@@ -15,6 +15,7 @@ extraction:
     content-list JSON
   date: '2026-10-18'
   worker: w8-1018
+  composition_conversion: Table 3 and Table 5 phase mol% values were divided by 100 to store mole fractions; printed values remain in values.value and rounded row totals are preserved.
   provenance_path: data/literature/extracts/cheng-2021-fe-ca-si-o-phase-equilibria.yaml
 review_status: draft
 fidelity_samples:
@@ -1165,10 +1166,10 @@ species:
         T_C: 1500
         value: 0.0
         composition_mol: &id004
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 87.5
-          SiO2: 12.5
+          FeO1.5: 0.875
+          SiO2: 0.125
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 103.7
         phase_row_id: cheng21_t5_e001_liq
@@ -1418,10 +1419,10 @@ species:
         T_C: 1500
         value: 0.0
         composition_mol: &id006
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 99.9
-          SiO2: 0.1
+          FeO1.5: 0.999
+          SiO2: 0.001
         printed_phase_label: Spinel
         table5_old_total_wt_pct_as_printed: 104.3
         phase_row_id: cheng21_t5_e001_spinel
@@ -1762,10 +1763,10 @@ species:
         T_C: 1500
         value: 10.4
         composition_mol: &id009
-          basis: printed_mole_percent
-          CaO: 10.4
-          FeO1.5: 87.1
-          SiO2: 2.4
+          basis: printed_mole_fraction
+          CaO: 0.104
+          FeO1.5: 0.871
+          SiO2: 0.024
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 102.0
         phase_row_id: cheng21_t5_e024_liq
@@ -2020,9 +2021,9 @@ species:
         T_C: 1500
         value: 0.7
         composition_mol: &id011
-          basis: printed_mole_percent
-          CaO: 0.7
-          FeO1.5: 99.3
+          basis: printed_mole_fraction
+          CaO: 0.007
+          FeO1.5: 0.993
           SiO2: 0.0
         printed_phase_label: Spinel
         table5_old_total_wt_pct_as_printed: 103.5
@@ -2364,10 +2365,10 @@ species:
         T_C: 1500
         value: 7.5
         composition_mol: &id014
-          basis: printed_mole_percent
-          CaO: 7.5
-          FeO1.5: 81.0
-          SiO2: 11.6
+          basis: printed_mole_fraction
+          CaO: 0.075
+          FeO1.5: 0.81
+          SiO2: 0.116
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 102.6
         phase_row_id: cheng21_t5_e025_liq
@@ -2622,9 +2623,9 @@ species:
         T_C: 1500
         value: 0.1
         composition_mol: &id016
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 99.9
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.999
           SiO2: 0.0
         printed_phase_label: Spinel
         table5_old_total_wt_pct_as_printed: 103.3
@@ -2966,10 +2967,10 @@ species:
         T_C: 1400
         value: 20.3
         composition_mol: &id019
-          basis: printed_mole_percent
-          CaO: 20.3
-          FeO1.5: 53.1
-          SiO2: 26.6
+          basis: printed_mole_fraction
+          CaO: 0.203
+          FeO1.5: 0.531
+          SiO2: 0.266
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.9
         phase_row_id: cheng21_t5_e026_liq
@@ -3224,9 +3225,9 @@ species:
         T_C: 1400
         value: 0.3
         composition_mol: &id021
-          basis: printed_mole_percent
-          CaO: 0.3
-          FeO1.5: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.003
+          FeO1.5: 0.997
           SiO2: 0.0
         printed_phase_label: Spinel
         table5_old_total_wt_pct_as_printed: 104.1
@@ -3573,9 +3574,9 @@ species:
         T_C: 1390
         value: 0.0
         composition_mol: &id024
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 100.0
+          FeO1.5: 1.0
           SiO2: 0.0
         printed_phase_label: Spinel
         table5_old_total_wt_pct_as_printed: 103.1
@@ -3824,10 +3825,10 @@ species:
         T_C: 1670
         value: 0.0
         composition_mol: &id026
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 61.9
-          SiO2: 38.0
+          FeO1.5: 0.619
+          SiO2: 0.38
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 104.0
         phase_row_id: cheng21_t5_e002_liq
@@ -4082,10 +4083,10 @@ species:
         T_C: 1670
         value: 0.0
         composition_mol: &id028
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 0.7
-          SiO2: 99.3
+          FeO1.5: 0.007
+          SiO2: 0.993
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 101.7
         phase_row_id: cheng21_t5_e002_cristobalite
@@ -4426,10 +4427,10 @@ species:
         T_C: 1650
         value: 0.0
         composition_mol: &id031
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 63.7
-          SiO2: 36.3
+          FeO1.5: 0.637
+          SiO2: 0.363
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 103.4
         phase_row_id: cheng21_t5_e003_liq
@@ -4679,10 +4680,10 @@ species:
         T_C: 1650
         value: 0.0
         composition_mol: &id033
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 0.6
-          SiO2: 99.4
+          FeO1.5: 0.006
+          SiO2: 0.994
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 101.4
         phase_row_id: cheng21_t5_e003_cristobalite
@@ -5023,10 +5024,10 @@ species:
         T_C: 1600
         value: 0.0
         composition_mol: &id036
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 69.9
-          SiO2: 30.1
+          FeO1.5: 0.699
+          SiO2: 0.301
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 103.7
         phase_row_id: cheng21_t5_e004_liq
@@ -5276,10 +5277,10 @@ species:
         T_C: 1600
         value: 0.0
         composition_mol: &id038
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 0.4
-          SiO2: 99.6
+          FeO1.5: 0.004
+          SiO2: 0.996
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 101.8
         phase_row_id: cheng21_t5_e004_cristobalite
@@ -5620,10 +5621,10 @@ species:
         T_C: 1550
         value: 0.0
         composition_mol: &id041
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 73.9
-          SiO2: 26.0
+          FeO1.5: 0.739
+          SiO2: 0.26
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 104.2
         phase_row_id: cheng21_t5_e005_liq
@@ -5873,10 +5874,10 @@ species:
         T_C: 1550
         value: 0.0
         composition_mol: &id043
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 0.4
-          SiO2: 99.6
+          FeO1.5: 0.004
+          SiO2: 0.996
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 101.5
         phase_row_id: cheng21_t5_e005_cristobalite
@@ -6217,10 +6218,10 @@ species:
         T_C: 1500
         value: 0.0
         composition_mol: &id046
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 78.6
-          SiO2: 21.4
+          FeO1.5: 0.786
+          SiO2: 0.214
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 103.5
         phase_row_id: cheng21_t5_e006_liq
@@ -6470,10 +6471,10 @@ species:
         T_C: 1500
         value: 0.0
         composition_mol: &id048
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 0.3
-          SiO2: 99.7
+          FeO1.5: 0.003
+          SiO2: 0.997
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 101.1
         phase_row_id: cheng21_t5_e006_cristobalite
@@ -6819,10 +6820,10 @@ species:
         T_C: 1730
         value: 0.0
         composition_mol: &id051
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 55.7
-          SiO2: 44.3
+          FeO1.5: 0.557
+          SiO2: 0.443
         printed_phase_label: Liq1
         table5_old_total_wt_pct_as_printed: 104.6
         phase_row_id: cheng21_t5_e007_liq1
@@ -7087,10 +7088,10 @@ species:
         T_C: 1730
         value: 0.0
         composition_mol: &id053
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 3.9
-          SiO2: 96.1
+          FeO1.5: 0.039
+          SiO2: 0.961
         printed_phase_label: Liq2
         table5_old_total_wt_pct_as_printed: 101.0
         phase_row_id: cheng21_t5_e007_liq2
@@ -7355,10 +7356,10 @@ species:
         T_C: 1680
         value: 0.0
         composition_mol: &id055
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 60.9
-          SiO2: 39.1
+          FeO1.5: 0.609
+          SiO2: 0.391
         printed_phase_label: Liq1
         table5_old_total_wt_pct_as_printed: 105.3
         phase_row_id: cheng21_t5_e008_liq1
@@ -7623,10 +7624,10 @@ species:
         T_C: 1680
         value: 0.0
         composition_mol: &id057
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 2.4
-          SiO2: 97.5
+          FeO1.5: 0.024
+          SiO2: 0.975
         printed_phase_label: Liq2
         table5_old_total_wt_pct_as_printed: 101.2
         phase_row_id: cheng21_t5_e008_liq2
@@ -7886,10 +7887,10 @@ species:
         T_C: 1650
         value: 30.9
         composition_mol: &id059
-          basis: printed_mole_percent
-          CaO: 30.9
+          basis: printed_mole_fraction
+          CaO: 0.309
           FeO1.5: 0.0
-          SiO2: 69.0
+          SiO2: 0.69
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.5
         phase_row_id: cheng21_t5_e014_liq
@@ -8144,10 +8145,10 @@ species:
         T_C: 1650
         value: 0.6
         composition_mol: &id061
-          basis: printed_mole_percent
-          CaO: 0.6
+          basis: printed_mole_fraction
+          CaO: 0.006
           FeO1.5: 0.0
-          SiO2: 99.4
+          SiO2: 0.994
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 99.3
         phase_row_id: cheng21_t5_e014_cristobalite
@@ -8488,10 +8489,10 @@ species:
         T_C: 1450
         value: 36.9
         composition_mol: &id064
-          basis: printed_mole_percent
-          CaO: 36.9
+          basis: printed_mole_fraction
+          CaO: 0.369
           FeO1.5: 0.0
-          SiO2: 63.1
+          SiO2: 0.631
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.0
         phase_row_id: cheng21_t5_e015_liq
@@ -8741,10 +8742,10 @@ species:
         T_C: 1450
         value: 0.1
         composition_mol: &id066
-          basis: printed_mole_percent
-          CaO: 0.1
+          basis: printed_mole_fraction
+          CaO: 0.001
           FeO1.5: 0.0
-          SiO2: 99.9
+          SiO2: 0.999
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e015_tridymite
@@ -9090,10 +9091,10 @@ species:
         T_C: 1730
         value: 25.5
         composition_mol: &id069
-          basis: printed_mole_percent
-          CaO: 25.5
+          basis: printed_mole_fraction
+          CaO: 0.255
           FeO1.5: 0.0
-          SiO2: 74.5
+          SiO2: 0.745
         printed_phase_label: Liq1
         table5_old_total_wt_pct_as_printed: 99.4
         phase_row_id: cheng21_t5_e016_liq1
@@ -9358,10 +9359,10 @@ species:
         T_C: 1730
         value: 1.4
         composition_mol: &id071
-          basis: printed_mole_percent
-          CaO: 1.4
+          basis: printed_mole_fraction
+          CaO: 0.014
           FeO1.5: 0.0
-          SiO2: 98.6
+          SiO2: 0.986
         printed_phase_label: Liq2
         table5_old_total_wt_pct_as_printed: 99.5
         phase_row_id: cheng21_t5_e016_liq2
@@ -9626,10 +9627,10 @@ species:
         T_C: 1700
         value: 26.4
         composition_mol: &id073
-          basis: printed_mole_percent
-          CaO: 26.4
+          basis: printed_mole_fraction
+          CaO: 0.264
           FeO1.5: 0.0
-          SiO2: 73.6
+          SiO2: 0.736
         printed_phase_label: Liq1
         table5_old_total_wt_pct_as_printed: 99.5
         phase_row_id: cheng21_t5_e017_liq1
@@ -9894,10 +9895,10 @@ species:
         T_C: 1700
         value: 1.1
         composition_mol: &id075
-          basis: printed_mole_percent
-          CaO: 1.1
+          basis: printed_mole_fraction
+          CaO: 0.011
           FeO1.5: 0.0
-          SiO2: 98.9
+          SiO2: 0.989
         printed_phase_label: Liq2
         table5_old_total_wt_pct_as_printed: 99.5
         phase_row_id: cheng21_t5_e017_liq2
@@ -10157,10 +10158,10 @@ species:
         T_C: 1400
         value: 27.2
         composition_mol: &id077
-          basis: printed_mole_percent
-          CaO: 27.2
-          FeO1.5: 15.5
-          SiO2: 57.3
+          basis: printed_mole_fraction
+          CaO: 0.272
+          FeO1.5: 0.155
+          SiO2: 0.573
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e035_liq
@@ -10415,10 +10416,10 @@ species:
         T_C: 1400
         value: 0.1
         composition_mol: &id079
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.1
-          SiO2: 99.8
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.001
+          SiO2: 0.998
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 101.4
         phase_row_id: cheng21_t5_e035_tridymite
@@ -10764,10 +10765,10 @@ species:
         T_C: 1400
         value: 34.4
         composition_mol: &id082
-          basis: printed_mole_percent
-          CaO: 34.4
-          FeO1.5: 4.9
-          SiO2: 60.7
+          basis: printed_mole_fraction
+          CaO: 0.344
+          FeO1.5: 0.049
+          SiO2: 0.607
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e036_liq
@@ -11022,10 +11023,10 @@ species:
         T_C: 1400
         value: 0.0
         composition_mol: &id084
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 0.1
-          SiO2: 99.9
+          FeO1.5: 0.001
+          SiO2: 0.999
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e036_tridymite
@@ -11366,10 +11367,10 @@ species:
         T_C: 1400
         value: 22.9
         composition_mol: &id087
-          basis: printed_mole_percent
-          CaO: 22.9
-          FeO1.5: 23.1
-          SiO2: 54.1
+          basis: printed_mole_fraction
+          CaO: 0.229
+          FeO1.5: 0.231
+          SiO2: 0.541
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.2
         phase_row_id: cheng21_t5_e037_liq
@@ -11624,10 +11625,10 @@ species:
         T_C: 1400
         value: 0.1
         composition_mol: &id089
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.2
-          SiO2: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.002
+          SiO2: 0.997
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 101.6
         phase_row_id: cheng21_t5_e037_tridymite
@@ -11973,10 +11974,10 @@ species:
         T_C: 1400
         value: 18.5
         composition_mol: &id092
-          basis: printed_mole_percent
-          CaO: 18.5
-          FeO1.5: 32.3
-          SiO2: 49.1
+          basis: printed_mole_fraction
+          CaO: 0.185
+          FeO1.5: 0.323
+          SiO2: 0.491
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.8
         phase_row_id: cheng21_t5_e038_liq
@@ -12231,10 +12232,10 @@ species:
         T_C: 1400
         value: 0.1
         composition_mol: &id094
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.2
-          SiO2: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.002
+          SiO2: 0.997
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 101.9
         phase_row_id: cheng21_t5_e038_tridymite
@@ -12580,10 +12581,10 @@ species:
         T_C: 1300
         value: 24.7
         composition_mol: &id097
-          basis: printed_mole_percent
-          CaO: 24.7
-          FeO1.5: 24.4
-          SiO2: 50.9
+          basis: printed_mole_fraction
+          CaO: 0.247
+          FeO1.5: 0.244
+          SiO2: 0.509
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e039_liq
@@ -12838,10 +12839,10 @@ species:
         T_C: 1300
         value: 0.1
         composition_mol: &id099
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.1
-          SiO2: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.001
+          SiO2: 0.997
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 99.4
         phase_row_id: cheng21_t5_e039_tridymite
@@ -13187,10 +13188,10 @@ species:
         T_C: 1695
         value: 22.4
         composition_mol: &id102
-          basis: printed_mole_percent
-          CaO: 22.4
-          FeO1.5: 5.6
-          SiO2: 72.1
+          basis: printed_mole_fraction
+          CaO: 0.224
+          FeO1.5: 0.056
+          SiO2: 0.721
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.0
         phase_row_id: cheng21_t5_e040_liq
@@ -13623,10 +13624,10 @@ species:
         T_C: 1690
         value: 22.8
         composition_mol: &id106
-          basis: printed_mole_percent
-          CaO: 22.8
-          FeO1.5: 5.4
-          SiO2: 71.7
+          basis: printed_mole_fraction
+          CaO: 0.228
+          FeO1.5: 0.054
+          SiO2: 0.717
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e041_liq
@@ -13881,10 +13882,10 @@ species:
         T_C: 1690
         value: 0.2
         composition_mol: &id108
-          basis: printed_mole_percent
-          CaO: 0.2
-          FeO1.5: 0.1
-          SiO2: 99.8
+          basis: printed_mole_fraction
+          CaO: 0.002
+          FeO1.5: 0.001
+          SiO2: 0.998
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e041_cristobalite
@@ -14230,10 +14231,10 @@ species:
         T_C: 1687
         value: 23.3
         composition_mol: &id111
-          basis: printed_mole_percent
-          CaO: 23.3
-          FeO1.5: 5.7
-          SiO2: 71.0
+          basis: printed_mole_fraction
+          CaO: 0.233
+          FeO1.5: 0.057
+          SiO2: 0.71
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e042_liq
@@ -14666,10 +14667,10 @@ species:
         T_C: 1685
         value: 10.9
         composition_mol: &id115
-          basis: printed_mole_percent
-          CaO: 10.9
-          FeO1.5: 19.3
-          SiO2: 69.8
+          basis: printed_mole_fraction
+          CaO: 0.109
+          FeO1.5: 0.193
+          SiO2: 0.698
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 102.0
         phase_row_id: cheng21_t5_e043_liq
@@ -14924,10 +14925,10 @@ species:
         T_C: 1685
         value: 0.1
         composition_mol: &id117
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.3
-          SiO2: 99.6
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.003
+          SiO2: 0.996
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e043_cristobalite
@@ -15273,10 +15274,10 @@ species:
         T_C: 1680
         value: 23.6
         composition_mol: &id120
-          basis: printed_mole_percent
-          CaO: 23.6
-          FeO1.5: 5.9
-          SiO2: 70.5
+          basis: printed_mole_fraction
+          CaO: 0.236
+          FeO1.5: 0.059
+          SiO2: 0.705
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e044_liq
@@ -15531,10 +15532,10 @@ species:
         T_C: 1680
         value: 0.2
         composition_mol: &id122
-          basis: printed_mole_percent
-          CaO: 0.2
-          FeO1.5: 0.1
-          SiO2: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.002
+          FeO1.5: 0.001
+          SiO2: 0.997
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 101.6
         phase_row_id: cheng21_t5_e044_cristobalite
@@ -15880,10 +15881,10 @@ species:
         T_C: 1650
         value: 19.6
         composition_mol: &id125
-          basis: printed_mole_percent
-          CaO: 19.6
-          FeO1.5: 11.8
-          SiO2: 68.6
+          basis: printed_mole_fraction
+          CaO: 0.196
+          FeO1.5: 0.118
+          SiO2: 0.686
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e045_liq
@@ -16138,10 +16139,10 @@ species:
         T_C: 1650
         value: 0.3
         composition_mol: &id127
-          basis: printed_mole_percent
-          CaO: 0.3
-          FeO1.5: 0.2
-          SiO2: 99.5
+          basis: printed_mole_fraction
+          CaO: 0.003
+          FeO1.5: 0.002
+          SiO2: 0.995
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 99.5
         phase_row_id: cheng21_t5_e045_cristobalite
@@ -16487,10 +16488,10 @@ species:
         T_C: 1650
         value: 10.3
         composition_mol: &id130
-          basis: printed_mole_percent
-          CaO: 10.3
-          FeO1.5: 27.4
-          SiO2: 62.3
+          basis: printed_mole_fraction
+          CaO: 0.103
+          FeO1.5: 0.274
+          SiO2: 0.623
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 102.2
         phase_row_id: cheng21_t5_e046_liq
@@ -16745,10 +16746,10 @@ species:
         T_C: 1650
         value: 0.1
         composition_mol: &id132
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.4
-          SiO2: 99.5
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.004
+          SiO2: 0.995
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 100.7
         phase_row_id: cheng21_t5_e046_cristobalite
@@ -17094,10 +17095,10 @@ species:
         T_C: 1600
         value: 28.8
         composition_mol: &id135
-          basis: printed_mole_percent
-          CaO: 28.8
-          FeO1.5: 5.1
-          SiO2: 66.1
+          basis: printed_mole_fraction
+          CaO: 0.288
+          FeO1.5: 0.051
+          SiO2: 0.661
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.0
         phase_row_id: cheng21_t5_e047_liq
@@ -17352,10 +17353,10 @@ species:
         T_C: 1600
         value: 0.2
         composition_mol: &id137
-          basis: printed_mole_percent
-          CaO: 0.2
-          FeO1.5: 0.1
-          SiO2: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.002
+          FeO1.5: 0.001
+          SiO2: 0.997
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 101.5
         phase_row_id: cheng21_t5_e047_cristobalite
@@ -17701,10 +17702,10 @@ species:
         T_C: 1600
         value: 12.0
         composition_mol: &id140
-          basis: printed_mole_percent
-          CaO: 12.0
-          FeO1.5: 32.4
-          SiO2: 55.7
+          basis: printed_mole_fraction
+          CaO: 0.12
+          FeO1.5: 0.324
+          SiO2: 0.557
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 102.3
         phase_row_id: cheng21_t5_e048_liq
@@ -17959,10 +17960,10 @@ species:
         T_C: 1600
         value: 0.2
         composition_mol: &id142
-          basis: printed_mole_percent
-          CaO: 0.2
-          FeO1.5: 0.4
-          SiO2: 99.4
+          basis: printed_mole_fraction
+          CaO: 0.002
+          FeO1.5: 0.004
+          SiO2: 0.994
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e048_cristobalite
@@ -18308,10 +18309,10 @@ species:
         T_C: 1600
         value: 4.5
         composition_mol: &id145
-          basis: printed_mole_percent
-          CaO: 4.5
-          FeO1.5: 55.1
-          SiO2: 40.4
+          basis: printed_mole_fraction
+          CaO: 0.045
+          FeO1.5: 0.551
+          SiO2: 0.404
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 104.5
         phase_row_id: cheng21_t5_e049_liq
@@ -18566,10 +18567,10 @@ species:
         T_C: 1600
         value: 0.0
         composition_mol: &id147
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 0.3
-          SiO2: 99.6
+          FeO1.5: 0.003
+          SiO2: 0.996
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e049_cristobalite
@@ -18910,10 +18911,10 @@ species:
         T_C: 1500
         value: 31.7
         composition_mol: &id150
-          basis: printed_mole_percent
-          CaO: 31.7
-          FeO1.5: 5.6
-          SiO2: 62.7
+          basis: printed_mole_fraction
+          CaO: 0.317
+          FeO1.5: 0.056
+          SiO2: 0.627
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e050_liq
@@ -19168,10 +19169,10 @@ species:
         T_C: 1500
         value: 0.2
         composition_mol: &id152
-          basis: printed_mole_percent
-          CaO: 0.2
-          FeO1.5: 0.1
-          SiO2: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.002
+          FeO1.5: 0.001
+          SiO2: 0.997
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 101.4
         phase_row_id: cheng21_t5_e050_cristobalite
@@ -19517,10 +19518,10 @@ species:
         T_C: 1500
         value: 13.7
         composition_mol: &id155
-          basis: printed_mole_percent
-          CaO: 13.7
-          FeO1.5: 37.5
-          SiO2: 48.8
+          basis: printed_mole_fraction
+          CaO: 0.137
+          FeO1.5: 0.375
+          SiO2: 0.488
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 102.1
         phase_row_id: cheng21_t5_e051_liq
@@ -19775,10 +19776,10 @@ species:
         T_C: 1500
         value: 0.1
         composition_mol: &id157
-          basis: printed_mole_percent
-          CaO: 0.1
+          basis: printed_mole_fraction
+          CaO: 0.001
           FeO1.5: 0.0
-          SiO2: 99.9
+          SiO2: 0.999
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e051_cristobalite
@@ -20119,10 +20120,10 @@ species:
         T_C: 1500
         value: 5.2
         composition_mol: &id160
-          basis: printed_mole_percent
-          CaO: 5.2
-          FeO1.5: 62.8
-          SiO2: 32.0
+          basis: printed_mole_fraction
+          CaO: 0.052
+          FeO1.5: 0.628
+          SiO2: 0.32
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 103.2
         phase_row_id: cheng21_t5_e052_liq
@@ -20377,10 +20378,10 @@ species:
         T_C: 1500
         value: 0.2
         composition_mol: &id162
-          basis: printed_mole_percent
-          CaO: 0.2
-          FeO1.5: 0.3
-          SiO2: 99.5
+          basis: printed_mole_fraction
+          CaO: 0.002
+          FeO1.5: 0.003
+          SiO2: 0.995
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 100.8
         phase_row_id: cheng21_t5_e052_cristobalite
@@ -20726,10 +20727,10 @@ species:
         T_C: 1500
         value: 21.2
         composition_mol: &id165
-          basis: printed_mole_percent
-          CaO: 21.2
-          FeO1.5: 21.2
-          SiO2: 57.6
+          basis: printed_mole_fraction
+          CaO: 0.212
+          FeO1.5: 0.212
+          SiO2: 0.576
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e053_liq
@@ -20984,10 +20985,10 @@ species:
         T_C: 1500
         value: 0.1
         composition_mol: &id167
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.2
-          SiO2: 99.6
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.002
+          SiO2: 0.996
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 101.1
         phase_row_id: cheng21_t5_e053_cristobalite
@@ -21333,10 +21334,10 @@ species:
         T_C: 1500
         value: 16.9
         composition_mol: &id170
-          basis: printed_mole_percent
-          CaO: 16.9
-          FeO1.5: 29.9
-          SiO2: 53.3
+          basis: printed_mole_fraction
+          CaO: 0.169
+          FeO1.5: 0.299
+          SiO2: 0.533
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 102.3
         phase_row_id: cheng21_t5_e054_liq
@@ -21591,10 +21592,10 @@ species:
         T_C: 1500
         value: 0.2
         composition_mol: &id172
-          basis: printed_mole_percent
-          CaO: 0.2
-          FeO1.5: 0.3
-          SiO2: 99.5
+          basis: printed_mole_fraction
+          CaO: 0.002
+          FeO1.5: 0.003
+          SiO2: 0.995
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e054_cristobalite
@@ -21940,10 +21941,10 @@ species:
         T_C: 1500
         value: 25.0
         composition_mol: &id175
-          basis: printed_mole_percent
-          CaO: 25.0
-          FeO1.5: 14.3
-          SiO2: 60.7
+          basis: printed_mole_fraction
+          CaO: 0.25
+          FeO1.5: 0.143
+          SiO2: 0.607
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e055_liq
@@ -22198,10 +22199,10 @@ species:
         T_C: 1500
         value: 0.3
         composition_mol: &id177
-          basis: printed_mole_percent
-          CaO: 0.3
-          FeO1.5: 0.2
-          SiO2: 99.5
+          basis: printed_mole_fraction
+          CaO: 0.003
+          FeO1.5: 0.002
+          SiO2: 0.995
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 100.8
         phase_row_id: cheng21_t5_e055_cristobalite
@@ -22547,10 +22548,10 @@ species:
         T_C: 1240
         value: 39.8
         composition_mol: &id180
-          basis: printed_mole_percent
-          CaO: 39.8
-          FeO1.5: 36.3
-          SiO2: 23.9
+          basis: printed_mole_fraction
+          CaO: 0.398
+          FeO1.5: 0.363
+          SiO2: 0.239
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e074_liq
@@ -22805,10 +22806,10 @@ species:
         T_C: 1235
         value: 41.2
         composition_mol: &id182
-          basis: printed_mole_percent
-          CaO: 41.2
-          FeO1.5: 32.7
-          SiO2: 26.1
+          basis: printed_mole_fraction
+          CaO: 0.412
+          FeO1.5: 0.327
+          SiO2: 0.261
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e075_liq
@@ -23063,10 +23064,10 @@ species:
         T_C: 1385
         value: 12.7
         composition_mol: &id184
-          basis: printed_mole_percent
-          CaO: 12.7
-          FeO1.5: 48.1
-          SiO2: 39.2
+          basis: printed_mole_fraction
+          CaO: 0.127
+          FeO1.5: 0.481
+          SiO2: 0.392
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e076_liq
@@ -23321,10 +23322,10 @@ species:
         T_C: 1385
         value: 0.1
         composition_mol: &id186
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.2
-          SiO2: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.002
+          SiO2: 0.997
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 100.8
         phase_row_id: cheng21_t5_e076_tridymite
@@ -23579,10 +23580,10 @@ species:
         T_C: 1350
         value: 16.9
         composition_mol: &id188
-          basis: printed_mole_percent
-          CaO: 16.9
-          FeO1.5: 38.6
-          SiO2: 44.6
+          basis: printed_mole_fraction
+          CaO: 0.169
+          FeO1.5: 0.386
+          SiO2: 0.446
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.2
         phase_row_id: cheng21_t5_e077_liq
@@ -23837,10 +23838,10 @@ species:
         T_C: 1350
         value: 0.0
         composition_mol: &id190
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 0.3
-          SiO2: 99.7
+          FeO1.5: 0.003
+          SiO2: 0.997
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 102.4
         phase_row_id: cheng21_t5_e077_tridymite
@@ -24095,10 +24096,10 @@ species:
         T_C: 1300
         value: 21.8
         composition_mol: &id192
-          basis: printed_mole_percent
-          CaO: 21.8
-          FeO1.5: 29.9
-          SiO2: 48.3
+          basis: printed_mole_fraction
+          CaO: 0.218
+          FeO1.5: 0.299
+          SiO2: 0.483
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.2
         phase_row_id: cheng21_t5_e078_liq
@@ -24353,10 +24354,10 @@ species:
         T_C: 1300
         value: 0.0
         composition_mol: &id194
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 0.2
-          SiO2: 99.8
+          FeO1.5: 0.002
+          SiO2: 0.998
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 101.1
         phase_row_id: cheng21_t5_e078_tridymite
@@ -24606,10 +24607,10 @@ species:
         T_C: 1390
         value: 11.9
         composition_mol: &id196
-          basis: printed_mole_percent
-          CaO: 11.9
-          FeO1.5: 50.5
-          SiO2: 37.6
+          basis: printed_mole_fraction
+          CaO: 0.119
+          FeO1.5: 0.505
+          SiO2: 0.376
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 102.2
         phase_row_id: cheng21_t5_e079_liq
@@ -24864,10 +24865,10 @@ species:
         T_C: 1390
         value: 0.1
         composition_mol: &id198
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.2
-          SiO2: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.002
+          SiO2: 0.997
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 102.6
         phase_row_id: cheng21_t5_e079_tridymite
@@ -25122,10 +25123,10 @@ species:
         T_C: 1280
         value: 33.0
         composition_mol: &id200
-          basis: printed_mole_percent
-          CaO: 33.0
-          FeO1.5: 29.5
-          SiO2: 37.5
+          basis: printed_mole_fraction
+          CaO: 0.33
+          FeO1.5: 0.295
+          SiO2: 0.375
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.6
         phase_row_id: cheng21_t5_e080_liq
@@ -25380,10 +25381,10 @@ species:
         T_C: 1260
         value: 38.6
         composition_mol: &id202
-          basis: printed_mole_percent
-          CaO: 38.6
-          FeO1.5: 30.8
-          SiO2: 30.6
+          basis: printed_mole_fraction
+          CaO: 0.386
+          FeO1.5: 0.308
+          SiO2: 0.306
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e081_liq
@@ -25638,10 +25639,10 @@ species:
         T_C: 1250
         value: 31.0
         composition_mol: &id204
-          basis: printed_mole_percent
-          CaO: 31.0
-          FeO1.5: 26.7
-          SiO2: 42.2
+          basis: printed_mole_fraction
+          CaO: 0.31
+          FeO1.5: 0.267
+          SiO2: 0.422
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e082_liq
@@ -25896,10 +25897,10 @@ species:
         T_C: 1240
         value: 30.4
         composition_mol: &id206
-          basis: printed_mole_percent
-          CaO: 30.4
-          FeO1.5: 26.0
-          SiO2: 43.6
+          basis: printed_mole_fraction
+          CaO: 0.304
+          FeO1.5: 0.26
+          SiO2: 0.436
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.4
         phase_row_id: cheng21_t5_e083_liq
@@ -26154,10 +26155,10 @@ species:
         T_C: 1205
         value: 27.8
         composition_mol: &id208
-          basis: printed_mole_percent
-          CaO: 27.8
-          FeO1.5: 22.9
-          SiO2: 49.2
+          basis: printed_mole_fraction
+          CaO: 0.278
+          FeO1.5: 0.229
+          SiO2: 0.492
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e084_liq
@@ -26412,10 +26413,10 @@ species:
         T_C: 1300
         value: 30.5
         composition_mol: &id210
-          basis: printed_mole_percent
-          CaO: 30.5
-          FeO1.5: 13.5
-          SiO2: 56.1
+          basis: printed_mole_fraction
+          CaO: 0.305
+          FeO1.5: 0.135
+          SiO2: 0.561
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.7
         phase_row_id: cheng21_t5_e085_liq
@@ -26670,10 +26671,10 @@ species:
         T_C: 1300
         value: 0.2
         composition_mol: &id212
-          basis: printed_mole_percent
-          CaO: 0.2
+          basis: printed_mole_fraction
+          CaO: 0.002
           FeO1.5: 0.0
-          SiO2: 99.8
+          SiO2: 0.998
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e085_tridymite
@@ -26923,10 +26924,10 @@ species:
         T_C: 1400
         value: 52.0
         composition_mol: &id214
-          basis: printed_mole_percent
-          CaO: 52.0
-          FeO1.5: 7.5
-          SiO2: 40.5
+          basis: printed_mole_fraction
+          CaO: 0.52
+          FeO1.5: 0.075
+          SiO2: 0.405
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.8
         phase_row_id: cheng21_t5_e086_liq
@@ -27181,10 +27182,10 @@ species:
         T_C: 1300
         value: 46.3
         composition_mol: &id216
-          basis: printed_mole_percent
-          CaO: 46.3
-          FeO1.5: 19.1
-          SiO2: 34.6
+          basis: printed_mole_fraction
+          CaO: 0.463
+          FeO1.5: 0.191
+          SiO2: 0.346
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e087_liq
@@ -27439,10 +27440,10 @@ species:
         T_C: 1250
         value: 42.7
         composition_mol: &id218
-          basis: printed_mole_percent
-          CaO: 42.7
-          FeO1.5: 26.4
-          SiO2: 30.9
+          basis: printed_mole_fraction
+          CaO: 0.427
+          FeO1.5: 0.264
+          SiO2: 0.309
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e088_liq
@@ -27697,10 +27698,10 @@ species:
         T_C: 1235
         value: 41.3
         composition_mol: &id220
-          basis: printed_mole_percent
-          CaO: 41.3
-          FeO1.5: 29.1
-          SiO2: 29.5
+          basis: printed_mole_fraction
+          CaO: 0.413
+          FeO1.5: 0.291
+          SiO2: 0.295
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e089_liq
@@ -27955,10 +27956,10 @@ species:
         T_C: 1230
         value: 41.3
         composition_mol: &id222
-          basis: printed_mole_percent
-          CaO: 41.3
-          FeO1.5: 29.4
-          SiO2: 29.3
+          basis: printed_mole_fraction
+          CaO: 0.413
+          FeO1.5: 0.294
+          SiO2: 0.293
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e090_liq
@@ -28213,10 +28214,10 @@ species:
         T_C: 1225
         value: 41.0
         composition_mol: &id224
-          basis: printed_mole_percent
-          CaO: 41.0
-          FeO1.5: 29.7
-          SiO2: 29.3
+          basis: printed_mole_fraction
+          CaO: 0.41
+          FeO1.5: 0.297
+          SiO2: 0.293
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.4
         phase_row_id: cheng21_t5_e091_liq
@@ -28471,10 +28472,10 @@ species:
         T_C: 1410
         value: 53.5
         composition_mol: &id226
-          basis: printed_mole_percent
-          CaO: 53.5
-          FeO1.5: 6.1
-          SiO2: 40.4
+          basis: printed_mole_fraction
+          CaO: 0.535
+          FeO1.5: 0.061
+          SiO2: 0.404
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.8
         phase_row_id: cheng21_t5_e092_liq
@@ -28729,10 +28730,10 @@ species:
         T_C: 1350
         value: 49.8
         composition_mol: &id228
-          basis: printed_mole_percent
-          CaO: 49.8
-          FeO1.5: 13.7
-          SiO2: 36.5
+          basis: printed_mole_fraction
+          CaO: 0.498
+          FeO1.5: 0.137
+          SiO2: 0.365
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e093_liq
@@ -28987,10 +28988,10 @@ species:
         T_C: 1300
         value: 46.1
         composition_mol: &id230
-          basis: printed_mole_percent
-          CaO: 46.1
-          FeO1.5: 21.6
-          SiO2: 32.3
+          basis: printed_mole_fraction
+          CaO: 0.461
+          FeO1.5: 0.216
+          SiO2: 0.323
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e094_liq
@@ -29245,10 +29246,10 @@ species:
         T_C: 1275
         value: 44.0
         composition_mol: &id232
-          basis: printed_mole_percent
-          CaO: 44.0
-          FeO1.5: 26.4
-          SiO2: 29.6
+          basis: printed_mole_fraction
+          CaO: 0.44
+          FeO1.5: 0.264
+          SiO2: 0.296
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.4
         phase_row_id: cheng21_t5_e095_liq
@@ -29503,10 +29504,10 @@ species:
         T_C: 1260
         value: 42.9
         composition_mol: &id234
-          basis: printed_mole_percent
-          CaO: 42.9
-          FeO1.5: 28.6
-          SiO2: 28.5
+          basis: printed_mole_fraction
+          CaO: 0.429
+          FeO1.5: 0.286
+          SiO2: 0.285
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.0
         phase_row_id: cheng21_t5_e096_liq
@@ -29761,10 +29762,10 @@ species:
         T_C: 1235
         value: 41.0
         composition_mol: &id236
-          basis: printed_mole_percent
-          CaO: 41.0
-          FeO1.5: 33.1
-          SiO2: 25.9
+          basis: printed_mole_fraction
+          CaO: 0.41
+          FeO1.5: 0.331
+          SiO2: 0.259
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.6
         phase_row_id: cheng21_t5_e097_liq
@@ -30019,10 +30020,10 @@ species:
         T_C: 1410
         value: 55.5
         composition_mol: &id238
-          basis: printed_mole_percent
-          CaO: 55.5
-          FeO1.5: 38.9
-          SiO2: 5.6
+          basis: printed_mole_fraction
+          CaO: 0.555
+          FeO1.5: 0.389
+          SiO2: 0.056
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e098_liq
@@ -30277,10 +30278,10 @@ species:
         T_C: 1410
         value: 50.6
         composition_mol: &id240
-          basis: printed_mole_percent
-          CaO: 50.6
-          FeO1.5: 43.8
-          SiO2: 5.6
+          basis: printed_mole_fraction
+          CaO: 0.506
+          FeO1.5: 0.438
+          SiO2: 0.056
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e099_liq
@@ -30535,10 +30536,10 @@ species:
         T_C: 1390
         value: 47.2
         composition_mol: &id242
-          basis: printed_mole_percent
-          CaO: 47.2
-          FeO1.5: 47.6
-          SiO2: 5.2
+          basis: printed_mole_fraction
+          CaO: 0.472
+          FeO1.5: 0.476
+          SiO2: 0.052
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.4
         phase_row_id: cheng21_t5_e100_liq
@@ -30793,10 +30794,10 @@ species:
         T_C: 1340
         value: 42.7
         composition_mol: &id244
-          basis: printed_mole_percent
-          CaO: 42.7
-          FeO1.5: 52.3
-          SiO2: 4.9
+          basis: printed_mole_fraction
+          CaO: 0.427
+          FeO1.5: 0.523
+          SiO2: 0.049
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.7
         phase_row_id: cheng21_t5_e101_liq
@@ -31051,10 +31052,10 @@ species:
         T_C: 1410
         value: 56.2
         composition_mol: &id246
-          basis: printed_mole_percent
-          CaO: 56.2
-          FeO1.5: 39.1
-          SiO2: 4.7
+          basis: printed_mole_fraction
+          CaO: 0.562
+          FeO1.5: 0.391
+          SiO2: 0.047
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e102_liq
@@ -31309,10 +31310,10 @@ species:
         T_C: 1685
         value: 62.9
         composition_mol: &id248
-          basis: printed_mole_percent
-          CaO: 62.9
-          FeO1.5: 24.9
-          SiO2: 12.2
+          basis: printed_mole_fraction
+          CaO: 0.629
+          FeO1.5: 0.249
+          SiO2: 0.122
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.8
         phase_row_id: cheng21_t5_e103_liq
@@ -31567,10 +31568,10 @@ species:
         T_C: 1650
         value: 62.3
         composition_mol: &id250
-          basis: printed_mole_percent
-          CaO: 62.3
-          FeO1.5: 26.9
-          SiO2: 10.8
+          basis: printed_mole_fraction
+          CaO: 0.623
+          FeO1.5: 0.269
+          SiO2: 0.108
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.1
         phase_row_id: cheng21_t5_e104_liq
@@ -31825,10 +31826,10 @@ species:
         T_C: 1600
         value: 61.1
         composition_mol: &id252
-          basis: printed_mole_percent
-          CaO: 61.1
-          FeO1.5: 29.3
-          SiO2: 9.6
+          basis: printed_mole_fraction
+          CaO: 0.611
+          FeO1.5: 0.293
+          SiO2: 0.096
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.5
         phase_row_id: cheng21_t5_e105_liq
@@ -32083,10 +32084,10 @@ species:
         T_C: 1550
         value: 59.9
         composition_mol: &id254
-          basis: printed_mole_percent
-          CaO: 59.9
-          FeO1.5: 32.0
-          SiO2: 8.1
+          basis: printed_mole_fraction
+          CaO: 0.599
+          FeO1.5: 0.32
+          SiO2: 0.081
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e106_liq
@@ -32341,10 +32342,10 @@ species:
         T_C: 1500
         value: 58.1
         composition_mol: &id256
-          basis: printed_mole_percent
-          CaO: 58.1
-          FeO1.5: 34.9
-          SiO2: 7.0
+          basis: printed_mole_fraction
+          CaO: 0.581
+          FeO1.5: 0.349
+          SiO2: 0.07
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e107_liq
@@ -32599,10 +32600,10 @@ species:
         T_C: 1440
         value: 56.9
         composition_mol: &id258
-          basis: printed_mole_percent
-          CaO: 56.9
-          FeO1.5: 37.6
-          SiO2: 5.5
+          basis: printed_mole_fraction
+          CaO: 0.569
+          FeO1.5: 0.376
+          SiO2: 0.055
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e108_liq
@@ -32857,10 +32858,10 @@ species:
         T_C: 1685
         value: 62.6
         composition_mol: &id260
-          basis: printed_mole_percent
-          CaO: 62.6
-          FeO1.5: 23.8
-          SiO2: 13.6
+          basis: printed_mole_fraction
+          CaO: 0.626
+          FeO1.5: 0.238
+          SiO2: 0.136
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e109_liq
@@ -33115,10 +33116,10 @@ species:
         T_C: 1650
         value: 62.1
         composition_mol: &id262
-          basis: printed_mole_percent
-          CaO: 62.1
-          FeO1.5: 25.4
-          SiO2: 12.5
+          basis: printed_mole_fraction
+          CaO: 0.621
+          FeO1.5: 0.254
+          SiO2: 0.125
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.8
         phase_row_id: cheng21_t5_e110_liq
@@ -33373,10 +33374,10 @@ species:
         T_C: 1600
         value: 60.5
         composition_mol: &id264
-          basis: printed_mole_percent
-          CaO: 60.5
-          FeO1.5: 28.7
-          SiO2: 10.8
+          basis: printed_mole_fraction
+          CaO: 0.605
+          FeO1.5: 0.287
+          SiO2: 0.108
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e111_liq
@@ -33631,10 +33632,10 @@ species:
         T_C: 1550
         value: 59.6
         composition_mol: &id266
-          basis: printed_mole_percent
-          CaO: 59.6
-          FeO1.5: 31.3
-          SiO2: 9.1
+          basis: printed_mole_fraction
+          CaO: 0.596
+          FeO1.5: 0.313
+          SiO2: 0.091
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e112_liq
@@ -33889,10 +33890,10 @@ species:
         T_C: 1500
         value: 57.8
         composition_mol: &id268
-          basis: printed_mole_percent
-          CaO: 57.8
-          FeO1.5: 34.5
-          SiO2: 7.7
+          basis: printed_mole_fraction
+          CaO: 0.578
+          FeO1.5: 0.345
+          SiO2: 0.077
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.6
         phase_row_id: cheng21_t5_e113_liq
@@ -34147,10 +34148,10 @@ species:
         T_C: 1450
         value: 56.7
         composition_mol: &id270
-          basis: printed_mole_percent
-          CaO: 56.7
-          FeO1.5: 37.0
-          SiO2: 6.3
+          basis: printed_mole_fraction
+          CaO: 0.567
+          FeO1.5: 0.37
+          SiO2: 0.063
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e114_liq
@@ -34405,10 +34406,10 @@ species:
         T_C: 1440
         value: 56.4
         composition_mol: &id272
-          basis: printed_mole_percent
-          CaO: 56.4
-          FeO1.5: 37.4
-          SiO2: 6.2
+          basis: printed_mole_fraction
+          CaO: 0.564
+          FeO1.5: 0.374
+          SiO2: 0.062
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e115_liq
@@ -34663,10 +34664,10 @@ species:
         T_C: 1430
         value: 56.3
         composition_mol: &id274
-          basis: printed_mole_percent
-          CaO: 56.3
-          FeO1.5: 37.7
-          SiO2: 6.0
+          basis: printed_mole_fraction
+          CaO: 0.563
+          FeO1.5: 0.377
+          SiO2: 0.06
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 98.5
         phase_row_id: cheng21_t5_e116_liq
@@ -34926,10 +34927,10 @@ species:
         T_C: 1686
         value: 16.5
         composition_mol: &id276
-          basis: printed_mole_percent
-          CaO: 16.5
-          FeO1.5: 11.8
-          SiO2: 71.7
+          basis: printed_mole_fraction
+          CaO: 0.165
+          FeO1.5: 0.118
+          SiO2: 0.717
         printed_phase_label: Liq 1
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e117_liq_1
@@ -35199,10 +35200,10 @@ species:
         T_C: 1686
         value: 2.8
         composition_mol: &id278
-          basis: printed_mole_percent
-          CaO: 2.8
-          FeO1.5: 2.7
-          SiO2: 94.5
+          basis: printed_mole_fraction
+          CaO: 0.028
+          FeO1.5: 0.027
+          SiO2: 0.945
         printed_phase_label: Liq 2
         table5_old_total_wt_pct_as_printed: 100.9
         phase_row_id: cheng21_t5_e117_liq_2
@@ -35472,10 +35473,10 @@ species:
         T_C: 1686
         value: 0.1
         composition_mol: &id280
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.3
-          SiO2: 99.6
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.003
+          SiO2: 0.996
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 100.8
         phase_row_id: cheng21_t5_e117_cristobalite
@@ -35745,10 +35746,10 @@ species:
         T_C: 1685
         value: 10.2
         composition_mol: &id282
-          basis: printed_mole_percent
-          CaO: 10.2
-          FeO1.5: 17.8
-          SiO2: 72.0
+          basis: printed_mole_fraction
+          CaO: 0.102
+          FeO1.5: 0.178
+          SiO2: 0.72
         printed_phase_label: Liq 1
         table5_old_total_wt_pct_as_printed: 98.5
         phase_row_id: cheng21_t5_e118_liq_1
@@ -36018,10 +36019,10 @@ species:
         T_C: 1685
         value: 2.4
         composition_mol: &id284
-          basis: printed_mole_percent
-          CaO: 2.4
-          FeO1.5: 4.6
-          SiO2: 93.0
+          basis: printed_mole_fraction
+          CaO: 0.024
+          FeO1.5: 0.046
+          SiO2: 0.93
         printed_phase_label: Liq 2
         table5_old_total_wt_pct_as_printed: 97.2
         phase_row_id: cheng21_t5_e118_liq_2
@@ -36291,10 +36292,10 @@ species:
         T_C: 1683
         value: 8.3
         composition_mol: &id286
-          basis: printed_mole_percent
-          CaO: 8.3
-          FeO1.5: 26.2
-          SiO2: 65.5
+          basis: printed_mole_fraction
+          CaO: 0.083
+          FeO1.5: 0.262
+          SiO2: 0.655
         printed_phase_label: Liq 1
         table5_old_total_wt_pct_as_printed: 102.9
         phase_row_id: cheng21_t5_e119_liq_1
@@ -36564,10 +36565,10 @@ species:
         T_C: 1683
         value: 1.2
         composition_mol: &id288
-          basis: printed_mole_percent
-          CaO: 1.2
-          FeO1.5: 4.0
-          SiO2: 94.8
+          basis: printed_mole_fraction
+          CaO: 0.012
+          FeO1.5: 0.04
+          SiO2: 0.948
         printed_phase_label: Liq 2
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e119_liq_2
@@ -36837,10 +36838,10 @@ species:
         T_C: 1683
         value: 8.5
         composition_mol: &id290
-          basis: printed_mole_percent
-          CaO: 8.5
-          FeO1.5: 26.0
-          SiO2: 65.5
+          basis: printed_mole_fraction
+          CaO: 0.085
+          FeO1.5: 0.26
+          SiO2: 0.655
         printed_phase_label: Liq 1
         table5_old_total_wt_pct_as_printed: 102.6
         phase_row_id: cheng21_t5_e120_liq_1
@@ -37110,10 +37111,10 @@ species:
         T_C: 1683
         value: 1.3
         composition_mol: &id292
-          basis: printed_mole_percent
-          CaO: 1.3
-          FeO1.5: 4.1
-          SiO2: 94.6
+          basis: printed_mole_fraction
+          CaO: 0.013
+          FeO1.5: 0.041
+          SiO2: 0.946
         printed_phase_label: Liq 2
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e120_liq_2
@@ -37383,10 +37384,10 @@ species:
         T_C: 1682
         value: 6.5
         composition_mol: &id294
-          basis: printed_mole_percent
-          CaO: 6.5
-          FeO1.5: 36.1
-          SiO2: 57.4
+          basis: printed_mole_fraction
+          CaO: 0.065
+          FeO1.5: 0.361
+          SiO2: 0.574
         printed_phase_label: Liq 1
         table5_old_total_wt_pct_as_printed: 103.6
         phase_row_id: cheng21_t5_e121_liq_1
@@ -37656,10 +37657,10 @@ species:
         T_C: 1682
         value: 0.8
         composition_mol: &id296
-          basis: printed_mole_percent
-          CaO: 0.8
-          FeO1.5: 4.1
-          SiO2: 95.1
+          basis: printed_mole_fraction
+          CaO: 0.008
+          FeO1.5: 0.041
+          SiO2: 0.951
         printed_phase_label: Liq 2
         table5_old_total_wt_pct_as_printed: 100.7
         phase_row_id: cheng21_t5_e121_liq_2
@@ -37929,10 +37930,10 @@ species:
         T_C: 1681
         value: 4.0
         composition_mol: &id298
-          basis: printed_mole_percent
-          CaO: 4.0
-          FeO1.5: 46.1
-          SiO2: 49.9
+          basis: printed_mole_fraction
+          CaO: 0.04
+          FeO1.5: 0.461
+          SiO2: 0.499
         printed_phase_label: Liq 1
         table5_old_total_wt_pct_as_printed: 103.4
         phase_row_id: cheng21_t5_e122_liq_1
@@ -38202,10 +38203,10 @@ species:
         T_C: 1681
         value: 0.3
         composition_mol: &id300
-          basis: printed_mole_percent
-          CaO: 0.3
-          FeO1.5: 3.2
-          SiO2: 96.4
+          basis: printed_mole_fraction
+          CaO: 0.003
+          FeO1.5: 0.032
+          SiO2: 0.964
         printed_phase_label: Liq 2
         table5_old_total_wt_pct_as_printed: 99.4
         phase_row_id: cheng21_t5_e122_liq_2
@@ -38475,10 +38476,10 @@ species:
         T_C: 1681
         value: 0.1
         composition_mol: &id302
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.4
-          SiO2: 99.5
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.004
+          SiO2: 0.995
         printed_phase_label: Cristobalite
         table5_old_total_wt_pct_as_printed: 99.1
         phase_row_id: cheng21_t5_e122_cristobalite
@@ -38743,10 +38744,10 @@ species:
         T_C: 1199
         value: 27.4
         composition_mol: &id304
-          basis: printed_mole_percent
-          CaO: 27.4
-          FeO1.5: 22.1
-          SiO2: 50.5
+          basis: printed_mole_fraction
+          CaO: 0.274
+          FeO1.5: 0.221
+          SiO2: 0.505
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e123_liq
@@ -39001,10 +39002,10 @@ species:
         T_C: 1199
         value: 0.1
         composition_mol: &id306
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.2
-          SiO2: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.002
+          SiO2: 0.997
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 101.1
         phase_row_id: cheng21_t5_e123_tridymite
@@ -39259,10 +39260,10 @@ species:
         T_C: 1199
         value: 27.4
         composition_mol: &id308
-          basis: printed_mole_percent
-          CaO: 27.4
-          FeO1.5: 22.1
-          SiO2: 50.5
+          basis: printed_mole_fraction
+          CaO: 0.274
+          FeO1.5: 0.221
+          SiO2: 0.505
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e124_liq
@@ -39517,10 +39518,10 @@ species:
         T_C: 1199
         value: 0.1
         composition_mol: &id310
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 0.2
-          SiO2: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.002
+          SiO2: 0.997
         printed_phase_label: Tridymite
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e124_tridymite
@@ -39774,10 +39775,10 @@ species:
         T_C: 1205
         value: 27.6
         composition_mol:
-          basis: printed_mole_percent
-          CaO: 27.6
-          FeO1.5: 22.5
-          SiO2: 49.9
+          basis: printed_mole_fraction
+          CaO: 0.276
+          FeO1.5: 0.225
+          SiO2: 0.499
     - observation_id: cheng21_table3_a_liq_feo1p5
       experiment: cheng21_table3_a
       type: equilibrium_phase_composition
@@ -39852,10 +39853,10 @@ species:
         T_C: 1205
         value: 22.5
         composition_mol:
-          basis: printed_mole_percent
-          CaO: 27.6
-          FeO1.5: 22.5
-          SiO2: 49.9
+          basis: printed_mole_fraction
+          CaO: 0.276
+          FeO1.5: 0.225
+          SiO2: 0.499
     - observation_id: cheng21_table3_a_liq_sio2
       experiment: cheng21_table3_a
       type: equilibrium_phase_composition
@@ -39930,10 +39931,10 @@ species:
         T_C: 1205
         value: 49.9
         composition_mol:
-          basis: printed_mole_percent
-          CaO: 27.6
-          FeO1.5: 22.5
-          SiO2: 49.9
+          basis: printed_mole_fraction
+          CaO: 0.276
+          FeO1.5: 0.225
+          SiO2: 0.499
     - observation_id: cheng21_table3_b_liq_cao
       experiment: cheng21_table3_b
       type: equilibrium_phase_composition
@@ -40013,10 +40014,10 @@ species:
         T_C: 1205
         value: 27.3
         composition_mol:
-          basis: printed_mole_percent
-          CaO: 27.3
-          FeO1.5: 22.7
-          SiO2: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.273
+          FeO1.5: 0.227
+          SiO2: 0.5
     - observation_id: cheng21_table3_b_liq_feo1p5
       experiment: cheng21_table3_b
       type: equilibrium_phase_composition
@@ -40091,10 +40092,10 @@ species:
         T_C: 1205
         value: 22.7
         composition_mol:
-          basis: printed_mole_percent
-          CaO: 27.3
-          FeO1.5: 22.7
-          SiO2: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.273
+          FeO1.5: 0.227
+          SiO2: 0.5
     - observation_id: cheng21_table3_b_liq_sio2
       experiment: cheng21_table3_b
       type: equilibrium_phase_composition
@@ -40169,10 +40170,10 @@ species:
         T_C: 1205
         value: 50.0
         composition_mol:
-          basis: printed_mole_percent
-          CaO: 27.3
-          FeO1.5: 22.7
-          SiO2: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.273
+          FeO1.5: 0.227
+          SiO2: 0.5
     context:
     - observation_id: cheng21_table3_c_summary
       type: experiment_series
@@ -41216,10 +41217,10 @@ species:
         T_C: 1470
         value: 56.0
         composition_mol: &id314
-          basis: printed_mole_percent
-          CaO: 56.0
+          basis: printed_mole_fraction
+          CaO: 0.56
           FeO1.5: 0.0
-          SiO2: 44.0
+          SiO2: 0.44
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e009_liq
@@ -41469,10 +41470,10 @@ species:
         T_C: 1470
         value: 50.0
         composition_mol: &id316
-          basis: printed_mole_percent
-          CaO: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.5
           FeO1.5: 0.0
-          SiO2: 50.0
+          SiO2: 0.5
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e009_cs
@@ -41813,10 +41814,10 @@ species:
         T_C: 1450
         value: 38.8
         composition_mol: &id319
-          basis: printed_mole_percent
-          CaO: 38.8
+          basis: printed_mole_fraction
+          CaO: 0.388
           FeO1.5: 0.0
-          SiO2: 61.2
+          SiO2: 0.612
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.0
         phase_row_id: cheng21_t5_e010_liq
@@ -42066,10 +42067,10 @@ species:
         T_C: 1450
         value: 50.1
         composition_mol: &id321
-          basis: printed_mole_percent
-          CaO: 50.1
+          basis: printed_mole_fraction
+          CaO: 0.501
           FeO1.5: 0.0
-          SiO2: 49.9
+          SiO2: 0.499
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 99.6
         phase_row_id: cheng21_t5_e010_cs
@@ -42410,10 +42411,10 @@ species:
         T_C: 1730
         value: 59.1
         composition_mol: &id324
-          basis: printed_mole_percent
-          CaO: 59.1
+          basis: printed_mole_fraction
+          CaO: 0.591
           FeO1.5: 0.0
-          SiO2: 40.9
+          SiO2: 0.409
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e011_liq
@@ -42663,10 +42664,10 @@ species:
         T_C: 1730
         value: 66.8
         composition_mol: &id326
-          basis: printed_mole_percent
-          CaO: 66.8
+          basis: printed_mole_fraction
+          CaO: 0.668
           FeO1.5: 0.0
-          SiO2: 33.2
+          SiO2: 0.332
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 98.9
         phase_row_id: cheng21_t5_e011_c2s
@@ -43007,10 +43008,10 @@ species:
         T_C: 1600
         value: 57.7
         composition_mol: &id329
-          basis: printed_mole_percent
-          CaO: 57.7
+          basis: printed_mole_fraction
+          CaO: 0.577
           FeO1.5: 0.0
-          SiO2: 42.2
+          SiO2: 0.422
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e012_liq
@@ -43260,10 +43261,10 @@ species:
         T_C: 1600
         value: 66.6
         composition_mol: &id331
-          basis: printed_mole_percent
-          CaO: 66.6
+          basis: printed_mole_fraction
+          CaO: 0.666
           FeO1.5: 0.0
-          SiO2: 33.4
+          SiO2: 0.334
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e012_c2s
@@ -43604,10 +43605,10 @@ species:
         T_C: 1500
         value: 56.8
         composition_mol: &id334
-          basis: printed_mole_percent
-          CaO: 56.8
+          basis: printed_mole_fraction
+          CaO: 0.568
           FeO1.5: 0.0
-          SiO2: 43.1
+          SiO2: 0.431
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.8
         phase_row_id: cheng21_t5_e013_liq
@@ -43857,10 +43858,10 @@ species:
         T_C: 1500
         value: 66.7
         composition_mol: &id336
-          basis: printed_mole_percent
-          CaO: 66.7
+          basis: printed_mole_fraction
+          CaO: 0.667
           FeO1.5: 0.0
-          SiO2: 33.3
+          SiO2: 0.333
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e013_c2s
@@ -44206,10 +44207,10 @@ species:
         T_C: 1650
         value: 66.8
         composition_mol: &id339
-          basis: printed_mole_percent
-          CaO: 66.8
+          basis: printed_mole_fraction
+          CaO: 0.668
           FeO1.5: 0.0
-          SiO2: 33.2
+          SiO2: 0.332
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 97.9
         phase_row_id: cheng21_t5_e018_c2s
@@ -44459,10 +44460,10 @@ species:
         T_C: 1650
         value: 75.0
         composition_mol: &id341
-          basis: printed_mole_percent
-          CaO: 75.0
+          basis: printed_mole_fraction
+          CaO: 0.75
           FeO1.5: 0.0
-          SiO2: 25.0
+          SiO2: 0.25
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e018_c3s
@@ -44712,10 +44713,10 @@ species:
         T_C: 1400
         value: 60.0
         composition_mol: &id343
-          basis: printed_mole_percent
-          CaO: 60.0
+          basis: printed_mole_fraction
+          CaO: 0.6
           FeO1.5: 0.0
-          SiO2: 40.0
+          SiO2: 0.4
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e019_c3s2
@@ -44965,10 +44966,10 @@ species:
         T_C: 1400
         value: 50.0
         composition_mol: &id345
-          basis: printed_mole_percent
-          CaO: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.5
           FeO1.5: 0.0
-          SiO2: 50.0
+          SiO2: 0.5
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e019_cs
@@ -45218,10 +45219,10 @@ species:
         T_C: 1400
         value: 66.7
         composition_mol: &id347
-          basis: printed_mole_percent
-          CaO: 66.7
+          basis: printed_mole_fraction
+          CaO: 0.667
           FeO1.5: 0.0
-          SiO2: 33.2
+          SiO2: 0.332
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e020_c2s
@@ -45471,10 +45472,10 @@ species:
         T_C: 1400
         value: 60.1
         composition_mol: &id349
-          basis: printed_mole_percent
-          CaO: 60.1
+          basis: printed_mole_fraction
+          CaO: 0.601
           FeO1.5: 0.0
-          SiO2: 39.9
+          SiO2: 0.399
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e020_c3s2
@@ -45724,10 +45725,10 @@ species:
         T_C: 1400
         value: 66.7
         composition_mol: &id351
-          basis: printed_mole_percent
-          CaO: 66.7
+          basis: printed_mole_fraction
+          CaO: 0.667
           FeO1.5: 0.0
-          SiO2: 33.3
+          SiO2: 0.333
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e021_c2s
@@ -45977,10 +45978,10 @@ species:
         T_C: 1400
         value: 75.0
         composition_mol: &id353
-          basis: printed_mole_percent
-          CaO: 75.0
+          basis: printed_mole_fraction
+          CaO: 0.75
           FeO1.5: 0.0
-          SiO2: 25.0
+          SiO2: 0.25
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.7
         phase_row_id: cheng21_t5_e021_c3s
@@ -46230,10 +46231,10 @@ species:
         T_C: 1400
         value: 75.1
         composition_mol: &id355
-          basis: printed_mole_percent
-          CaO: 75.1
+          basis: printed_mole_fraction
+          CaO: 0.751
           FeO1.5: 0.0
-          SiO2: 24.9
+          SiO2: 0.249
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e022_c3s
@@ -46483,8 +46484,8 @@ species:
         T_C: 1400
         value: 100.0
         composition_mol: &id357
-          basis: printed_mole_percent
-          CaO: 100.0
+          basis: printed_mole_fraction
+          CaO: 1.0
           FeO1.5: 0.0
           SiO2: 0.0
         printed_phase_label: Lime
@@ -46731,10 +46732,10 @@ species:
         T_C: 1300
         value: 67.1
         composition_mol: &id359
-          basis: printed_mole_percent
-          CaO: 67.1
+          basis: printed_mole_fraction
+          CaO: 0.671
           FeO1.5: 0.0
-          SiO2: 32.9
+          SiO2: 0.329
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 100.9
         phase_row_id: cheng21_t5_e023_c2s
@@ -46984,10 +46985,10 @@ species:
         T_C: 1300
         value: 75.1
         composition_mol: &id361
-          basis: printed_mole_percent
-          CaO: 75.1
+          basis: printed_mole_fraction
+          CaO: 0.751
           FeO1.5: 0.0
-          SiO2: 24.9
+          SiO2: 0.249
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.9
         phase_row_id: cheng21_t5_e023_c3s
@@ -47237,10 +47238,10 @@ species:
         T_C: 1600
         value: 58.6
         composition_mol: &id363
-          basis: printed_mole_percent
-          CaO: 58.6
-          FeO1.5: 38.5
-          SiO2: 2.9
+          basis: printed_mole_fraction
+          CaO: 0.586
+          FeO1.5: 0.385
+          SiO2: 0.029
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.2
         phase_row_id: cheng21_t5_e030_liq
@@ -47495,8 +47496,8 @@ species:
         T_C: 1600
         value: 100.0
         composition_mol: &id365
-          basis: printed_mole_percent
-          CaO: 100.0
+          basis: printed_mole_fraction
+          CaO: 1.0
           FeO1.5: 0.0
           SiO2: 0.0
         printed_phase_label: Lime
@@ -47834,10 +47835,10 @@ species:
         T_C: 1435
         value: 56.4
         composition_mol: &id368
-          basis: printed_mole_percent
-          CaO: 56.4
-          FeO1.5: 39.2
-          SiO2: 4.3
+          basis: printed_mole_fraction
+          CaO: 0.564
+          FeO1.5: 0.392
+          SiO2: 0.043
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.8
         phase_row_id: cheng21_t5_e031_liq
@@ -48092,8 +48093,8 @@ species:
         T_C: 1435
         value: 100.0
         composition_mol: &id370
-          basis: printed_mole_percent
-          CaO: 100.0
+          basis: printed_mole_fraction
+          CaO: 1.0
           FeO1.5: 0.0
           SiO2: 0.0
         printed_phase_label: Lime
@@ -48431,10 +48432,10 @@ species:
         T_C: 1433
         value: 54.6
         composition_mol: &id373
-          basis: printed_mole_percent
-          CaO: 54.6
-          FeO1.5: 44.8
-          SiO2: 0.5
+          basis: printed_mole_fraction
+          CaO: 0.546
+          FeO1.5: 0.448
+          SiO2: 0.005
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.1
         phase_row_id: cheng21_t5_e032_liq
@@ -48689,8 +48690,8 @@ species:
         T_C: 1433
         value: 100.0
         composition_mol: &id375
-          basis: printed_mole_percent
-          CaO: 100.0
+          basis: printed_mole_fraction
+          CaO: 1.0
           FeO1.5: 0.0
           SiO2: 0.0
         printed_phase_label: Lime
@@ -49028,10 +49029,10 @@ species:
         T_C: 1425
         value: 56.3
         composition_mol: &id378
-          basis: printed_mole_percent
-          CaO: 56.3
-          FeO1.5: 39.4
-          SiO2: 4.3
+          basis: printed_mole_fraction
+          CaO: 0.563
+          FeO1.5: 0.394
+          SiO2: 0.043
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e033_liq
@@ -49286,8 +49287,8 @@ species:
         T_C: 1425
         value: 100.0
         composition_mol: &id380
-          basis: printed_mole_percent
-          CaO: 100.0
+          basis: printed_mole_fraction
+          CaO: 1.0
           FeO1.5: 0.0
           SiO2: 0.0
         printed_phase_label: Lime
@@ -49625,10 +49626,10 @@ species:
         T_C: 1415
         value: 56.1
         composition_mol: &id383
-          basis: printed_mole_percent
-          CaO: 56.1
-          FeO1.5: 39.6
-          SiO2: 4.2
+          basis: printed_mole_fraction
+          CaO: 0.561
+          FeO1.5: 0.396
+          SiO2: 0.042
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e034_liq
@@ -49883,8 +49884,8 @@ species:
         T_C: 1415
         value: 100.0
         composition_mol: &id385
-          basis: printed_mole_percent
-          CaO: 100.0
+          basis: printed_mole_fraction
+          CaO: 1.0
           FeO1.5: 0.0
           SiO2: 0.0
         printed_phase_label: Lime
@@ -50222,10 +50223,10 @@ species:
         T_C: 1400
         value: 38.3
         composition_mol: &id388
-          basis: printed_mole_percent
-          CaO: 38.3
-          FeO1.5: 14.1
-          SiO2: 47.6
+          basis: printed_mole_fraction
+          CaO: 0.383
+          FeO1.5: 0.141
+          SiO2: 0.476
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e056_liq
@@ -50480,10 +50481,10 @@ species:
         T_C: 1400
         value: 49.7
         composition_mol: &id390
-          basis: printed_mole_percent
-          CaO: 49.7
+          basis: printed_mole_fraction
+          CaO: 0.497
           FeO1.5: 0.0
-          SiO2: 50.3
+          SiO2: 0.503
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e056_cs
@@ -50824,10 +50825,10 @@ species:
         T_C: 1300
         value: 32.5
         composition_mol: &id393
-          basis: printed_mole_percent
-          CaO: 32.5
-          FeO1.5: 21.2
-          SiO2: 46.3
+          basis: printed_mole_fraction
+          CaO: 0.325
+          FeO1.5: 0.212
+          SiO2: 0.463
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e057_liq
@@ -51082,10 +51083,10 @@ species:
         T_C: 1300
         value: 49.9
         composition_mol: &id395
-          basis: printed_mole_percent
-          CaO: 49.9
+          basis: printed_mole_fraction
+          CaO: 0.499
           FeO1.5: 0.0
-          SiO2: 50.1
+          SiO2: 0.501
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e057_cs
@@ -51426,10 +51427,10 @@ species:
         T_C: 1280
         value: 37.9
         composition_mol: &id398
-          basis: printed_mole_percent
-          CaO: 37.9
-          FeO1.5: 30.0
-          SiO2: 32.1
+          basis: printed_mole_fraction
+          CaO: 0.379
+          FeO1.5: 0.3
+          SiO2: 0.321
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.4
         phase_row_id: cheng21_t5_e058_liq
@@ -51684,10 +51685,10 @@ species:
         T_C: 1280
         value: 50.1
         composition_mol: &id400
-          basis: printed_mole_percent
-          CaO: 50.1
+          basis: printed_mole_fraction
+          CaO: 0.501
           FeO1.5: 0.0
-          SiO2: 49.9
+          SiO2: 0.499
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 99.6
         phase_row_id: cheng21_t5_e058_cs
@@ -52033,10 +52034,10 @@ species:
         T_C: 1600
         value: 49.3
         composition_mol: &id403
-          basis: printed_mole_percent
-          CaO: 49.3
-          FeO1.5: 36.0
-          SiO2: 14.7
+          basis: printed_mole_fraction
+          CaO: 0.493
+          FeO1.5: 0.36
+          SiO2: 0.147
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e059_liq
@@ -52291,10 +52292,10 @@ species:
         T_C: 1600
         value: 66.7
         composition_mol: &id405
-          basis: printed_mole_percent
-          CaO: 66.7
-          FeO1.5: 0.5
-          SiO2: 32.8
+          basis: printed_mole_fraction
+          CaO: 0.667
+          FeO1.5: 0.005
+          SiO2: 0.328
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 100.7
         phase_row_id: cheng21_t5_e059_c2s
@@ -52640,10 +52641,10 @@ species:
         T_C: 1600
         value: 50.3
         composition_mol: &id408
-          basis: printed_mole_percent
-          CaO: 50.3
-          FeO1.5: 22.6
-          SiO2: 27.0
+          basis: printed_mole_fraction
+          CaO: 0.503
+          FeO1.5: 0.226
+          SiO2: 0.27
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.8
         phase_row_id: cheng21_t5_e060_liq
@@ -52898,10 +52899,10 @@ species:
         T_C: 1600
         value: 66.2
         composition_mol: &id410
-          basis: printed_mole_percent
-          CaO: 66.2
-          FeO1.5: 0.7
-          SiO2: 33.1
+          basis: printed_mole_fraction
+          CaO: 0.662
+          FeO1.5: 0.007
+          SiO2: 0.331
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 100.7
         phase_row_id: cheng21_t5_e060_c2s
@@ -53247,10 +53248,10 @@ species:
         T_C: 1600
         value: 57.7
         composition_mol: &id413
-          basis: printed_mole_percent
-          CaO: 57.7
-          FeO1.5: 32.3
-          SiO2: 10.0
+          basis: printed_mole_fraction
+          CaO: 0.577
+          FeO1.5: 0.323
+          SiO2: 0.1
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.5
         phase_row_id: cheng21_t5_e061_liq
@@ -53505,10 +53506,10 @@ species:
         T_C: 1600
         value: 66.9
         composition_mol: &id415
-          basis: printed_mole_percent
-          CaO: 66.9
-          FeO1.5: 1.6
-          SiO2: 31.5
+          basis: printed_mole_fraction
+          CaO: 0.669
+          FeO1.5: 0.016
+          SiO2: 0.315
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e061_c2s
@@ -53854,10 +53855,10 @@ species:
         T_C: 1500
         value: 45.1
         composition_mol: &id418
-          basis: printed_mole_percent
-          CaO: 45.1
-          FeO1.5: 43.8
-          SiO2: 11.2
+          basis: printed_mole_fraction
+          CaO: 0.451
+          FeO1.5: 0.438
+          SiO2: 0.112
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.1
         phase_row_id: cheng21_t5_e062_liq
@@ -54112,10 +54113,10 @@ species:
         T_C: 1500
         value: 66.4
         composition_mol: &id420
-          basis: printed_mole_percent
-          CaO: 66.4
-          FeO1.5: 0.5
-          SiO2: 33.1
+          basis: printed_mole_fraction
+          CaO: 0.664
+          FeO1.5: 0.005
+          SiO2: 0.331
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e062_c2s
@@ -54461,10 +54462,10 @@ species:
         T_C: 1500
         value: 46.8
         composition_mol: &id423
-          basis: printed_mole_percent
-          CaO: 46.8
-          FeO1.5: 29.0
-          SiO2: 24.3
+          basis: printed_mole_fraction
+          CaO: 0.468
+          FeO1.5: 0.29
+          SiO2: 0.243
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e063_liq
@@ -54719,10 +54720,10 @@ species:
         T_C: 1500
         value: 66.0
         composition_mol: &id425
-          basis: printed_mole_percent
-          CaO: 66.0
-          FeO1.5: 0.8
-          SiO2: 33.2
+          basis: printed_mole_fraction
+          CaO: 0.66
+          FeO1.5: 0.008
+          SiO2: 0.332
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e063_c2s
@@ -55068,10 +55069,10 @@ species:
         T_C: 1500
         value: 52.1
         composition_mol: &id428
-          basis: printed_mole_percent
-          CaO: 52.1
-          FeO1.5: 40.3
-          SiO2: 7.6
+          basis: printed_mole_fraction
+          CaO: 0.521
+          FeO1.5: 0.403
+          SiO2: 0.076
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.4
         phase_row_id: cheng21_t5_e064_liq
@@ -55326,10 +55327,10 @@ species:
         T_C: 1500
         value: 66.8
         composition_mol: &id430
-          basis: printed_mole_percent
-          CaO: 66.8
-          FeO1.5: 1.1
-          SiO2: 32.1
+          basis: printed_mole_fraction
+          CaO: 0.668
+          FeO1.5: 0.011
+          SiO2: 0.321
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e064_c2s
@@ -55675,10 +55676,10 @@ species:
         T_C: 1440
         value: 43.7
         composition_mol: &id433
-          basis: printed_mole_percent
-          CaO: 43.7
-          FeO1.5: 47.6
-          SiO2: 8.6
+          basis: printed_mole_fraction
+          CaO: 0.437
+          FeO1.5: 0.476
+          SiO2: 0.086
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 98.9
         phase_row_id: cheng21_t5_e065_liq
@@ -55933,10 +55934,10 @@ species:
         T_C: 1440
         value: 66.5
         composition_mol: &id435
-          basis: printed_mole_percent
-          CaO: 66.5
-          FeO1.5: 0.5
-          SiO2: 33.1
+          basis: printed_mole_fraction
+          CaO: 0.665
+          FeO1.5: 0.005
+          SiO2: 0.331
         printed_phase_label: α-C2S(**)
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e065_c2s
@@ -56282,10 +56283,10 @@ species:
         T_C: 1430
         value: 43.4
         composition_mol: &id438
-          basis: printed_mole_percent
-          CaO: 43.4
-          FeO1.5: 48.2
-          SiO2: 8.5
+          basis: printed_mole_fraction
+          CaO: 0.434
+          FeO1.5: 0.482
+          SiO2: 0.085
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.3
         phase_row_id: cheng21_t5_e066_liq
@@ -56718,10 +56719,10 @@ species:
         T_C: 1400
         value: 51.4
         composition_mol: &id442
-          basis: printed_mole_percent
-          CaO: 51.4
-          FeO1.5: 10.7
-          SiO2: 37.9
+          basis: printed_mole_fraction
+          CaO: 0.514
+          FeO1.5: 0.107
+          SiO2: 0.379
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e067_liq
@@ -56976,10 +56977,10 @@ species:
         T_C: 1400
         value: 65.5
         composition_mol: &id444
-          basis: printed_mole_percent
-          CaO: 65.5
-          FeO1.5: 1.1
-          SiO2: 33.3
+          basis: printed_mole_fraction
+          CaO: 0.655
+          FeO1.5: 0.011
+          SiO2: 0.333
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 100.9
         phase_row_id: cheng21_t5_e067_c2s
@@ -57325,10 +57326,10 @@ species:
         T_C: 1400
         value: 45.0
         composition_mol: &id447
-          basis: printed_mole_percent
-          CaO: 45.0
-          FeO1.5: 29.6
-          SiO2: 25.4
+          basis: printed_mole_fraction
+          CaO: 0.45
+          FeO1.5: 0.296
+          SiO2: 0.254
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 99.8
         phase_row_id: cheng21_t5_e068_liq
@@ -57583,10 +57584,10 @@ species:
         T_C: 1400
         value: 66.4
         composition_mol: &id449
-          basis: printed_mole_percent
-          CaO: 66.4
-          FeO1.5: 0.5
-          SiO2: 33.1
+          basis: printed_mole_fraction
+          CaO: 0.664
+          FeO1.5: 0.005
+          SiO2: 0.331
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 99.8
         phase_row_id: cheng21_t5_e068_c2s
@@ -57927,10 +57928,10 @@ species:
         T_C: 1400
         value: 52.3
         composition_mol: &id452
-          basis: printed_mole_percent
-          CaO: 52.3
-          FeO1.5: 9.1
-          SiO2: 38.7
+          basis: printed_mole_fraction
+          CaO: 0.523
+          FeO1.5: 0.091
+          SiO2: 0.387
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e069_liq
@@ -58185,10 +58186,10 @@ species:
         T_C: 1400
         value: 65.8
         composition_mol: &id454
-          basis: printed_mole_percent
-          CaO: 65.8
-          FeO1.5: 0.9
-          SiO2: 33.3
+          basis: printed_mole_fraction
+          CaO: 0.658
+          FeO1.5: 0.009
+          SiO2: 0.333
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e069_c2s
@@ -58534,10 +58535,10 @@ species:
         T_C: 1400
         value: 48.3
         composition_mol: &id457
-          basis: printed_mole_percent
-          CaO: 48.3
-          FeO1.5: 46.0
-          SiO2: 5.7
+          basis: printed_mole_fraction
+          CaO: 0.483
+          FeO1.5: 0.46
+          SiO2: 0.057
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e070_liq
@@ -58792,10 +58793,10 @@ species:
         T_C: 1400
         value: 66.6
         composition_mol: &id459
-          basis: printed_mole_percent
-          CaO: 66.6
-          FeO1.5: 0.4
-          SiO2: 33.0
+          basis: printed_mole_fraction
+          CaO: 0.666
+          FeO1.5: 0.004
+          SiO2: 0.33
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 98.9
         phase_row_id: cheng21_t5_e070_c2s
@@ -59141,10 +59142,10 @@ species:
         T_C: 1300
         value: 40.2
         composition_mol: &id462
-          basis: printed_mole_percent
-          CaO: 40.2
-          FeO1.5: 37.9
-          SiO2: 21.9
+          basis: printed_mole_fraction
+          CaO: 0.402
+          FeO1.5: 0.379
+          SiO2: 0.219
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e071_liq
@@ -59399,10 +59400,10 @@ species:
         T_C: 1300
         value: 66.7
         composition_mol: &id464
-          basis: printed_mole_percent
-          CaO: 66.7
+          basis: printed_mole_fraction
+          CaO: 0.667
           FeO1.5: 0.0
-          SiO2: 33.3
+          SiO2: 0.333
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 101.0
         phase_row_id: cheng21_t5_e071_c2s
@@ -59743,10 +59744,10 @@ species:
         T_C: 1300
         value: 43.8
         composition_mol: &id467
-          basis: printed_mole_percent
-          CaO: 43.8
-          FeO1.5: 27.2
-          SiO2: 28.9
+          basis: printed_mole_fraction
+          CaO: 0.438
+          FeO1.5: 0.272
+          SiO2: 0.289
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.9
         phase_row_id: cheng21_t5_e072_liq
@@ -60001,10 +60002,10 @@ species:
         T_C: 1300
         value: 66.6
         composition_mol: &id469
-          basis: printed_mole_percent
-          CaO: 66.6
+          basis: printed_mole_fraction
+          CaO: 0.666
           FeO1.5: 0.0
-          SiO2: 33.4
+          SiO2: 0.334
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 101.4
         phase_row_id: cheng21_t5_e072_c2s
@@ -60345,10 +60346,10 @@ species:
         T_C: 1300
         value: 41.0
         composition_mol: &id472
-          basis: printed_mole_percent
-          CaO: 41.0
-          FeO1.5: 35.7
-          SiO2: 23.3
+          basis: printed_mole_fraction
+          CaO: 0.41
+          FeO1.5: 0.357
+          SiO2: 0.233
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e073_liq
@@ -60603,10 +60604,10 @@ species:
         T_C: 1300
         value: 66.7
         composition_mol: &id474
-          basis: printed_mole_percent
-          CaO: 66.7
+          basis: printed_mole_fraction
+          CaO: 0.667
           FeO1.5: 0.0
-          SiO2: 33.3
+          SiO2: 0.333
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e073_c2s
@@ -60947,10 +60948,10 @@ species:
         T_C: 1240
         value: 66.7
         composition_mol: &id477
-          basis: printed_mole_percent
-          CaO: 66.7
-          FeO1.5: 0.6
-          SiO2: 32.7
+          basis: printed_mole_fraction
+          CaO: 0.667
+          FeO1.5: 0.006
+          SiO2: 0.327
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e074_c2s
@@ -61205,10 +61206,10 @@ species:
         T_C: 1235
         value: 67.1
         composition_mol: &id479
-          basis: printed_mole_percent
-          CaO: 67.1
-          FeO1.5: 0.2
-          SiO2: 32.7
+          basis: printed_mole_fraction
+          CaO: 0.671
+          FeO1.5: 0.002
+          SiO2: 0.327
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 101.2
         phase_row_id: cheng21_t5_e075_c2s
@@ -61463,10 +61464,10 @@ species:
         T_C: 1280
         value: 50.0
         composition_mol: &id481
-          basis: printed_mole_percent
-          CaO: 50.0
-          FeO1.5: 0.1
-          SiO2: 49.9
+          basis: printed_mole_fraction
+          CaO: 0.5
+          FeO1.5: 0.001
+          SiO2: 0.499
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 99.6
         phase_row_id: cheng21_t5_e080_cs
@@ -61721,10 +61722,10 @@ species:
         T_C: 1260
         value: 50.3
         composition_mol: &id483
-          basis: printed_mole_percent
-          CaO: 50.3
+          basis: printed_mole_fraction
+          CaO: 0.503
           FeO1.5: 0.0
-          SiO2: 49.7
+          SiO2: 0.497
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.7
         phase_row_id: cheng21_t5_e081_cs
@@ -61974,10 +61975,10 @@ species:
         T_C: 1250
         value: 50.0
         composition_mol: &id485
-          basis: printed_mole_percent
-          CaO: 50.0
-          FeO1.5: 0.1
-          SiO2: 49.9
+          basis: printed_mole_fraction
+          CaO: 0.5
+          FeO1.5: 0.001
+          SiO2: 0.499
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 101.3
         phase_row_id: cheng21_t5_e082_cs
@@ -62232,10 +62233,10 @@ species:
         T_C: 1240
         value: 49.9
         composition_mol: &id487
-          basis: printed_mole_percent
-          CaO: 49.9
-          FeO1.5: 0.1
-          SiO2: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.499
+          FeO1.5: 0.001
+          SiO2: 0.5
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e083_cs
@@ -62490,10 +62491,10 @@ species:
         T_C: 1205
         value: 49.8
         composition_mol: &id489
-          basis: printed_mole_percent
-          CaO: 49.8
-          FeO1.5: 0.2
-          SiO2: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.498
+          FeO1.5: 0.002
+          SiO2: 0.5
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.9
         phase_row_id: cheng21_t5_e084_cs
@@ -62748,10 +62749,10 @@ species:
         T_C: 1300
         value: 50.0
         composition_mol: &id491
-          basis: printed_mole_percent
-          CaO: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.5
           FeO1.5: 0.0
-          SiO2: 50.0
+          SiO2: 0.5
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e085_cs
@@ -63001,10 +63002,10 @@ species:
         T_C: 1400
         value: 59.9
         composition_mol: &id493
-          basis: printed_mole_percent
-          CaO: 59.9
+          basis: printed_mole_fraction
+          CaO: 0.599
           FeO1.5: 0.0
-          SiO2: 40.1
+          SiO2: 0.401
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e086_c3s2
@@ -63259,10 +63260,10 @@ species:
         T_C: 1400
         value: 49.8
         composition_mol: &id495
-          basis: printed_mole_percent
-          CaO: 49.8
-          FeO1.5: 0.1
-          SiO2: 50.1
+          basis: printed_mole_fraction
+          CaO: 0.498
+          FeO1.5: 0.001
+          SiO2: 0.501
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e086_cs
@@ -63517,10 +63518,10 @@ species:
         T_C: 1300
         value: 60.0
         composition_mol: &id497
-          basis: printed_mole_percent
-          CaO: 60.0
+          basis: printed_mole_fraction
+          CaO: 0.6
           FeO1.5: 0.0
-          SiO2: 39.9
+          SiO2: 0.399
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e087_c3s2
@@ -63770,10 +63771,10 @@ species:
         T_C: 1300
         value: 50.1
         composition_mol: &id499
-          basis: printed_mole_percent
-          CaO: 50.1
+          basis: printed_mole_fraction
+          CaO: 0.501
           FeO1.5: 0.0
-          SiO2: 49.9
+          SiO2: 0.499
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e087_cs
@@ -64023,10 +64024,10 @@ species:
         T_C: 1250
         value: 60.0
         composition_mol: &id501
-          basis: printed_mole_percent
-          CaO: 60.0
+          basis: printed_mole_fraction
+          CaO: 0.6
           FeO1.5: 0.0
-          SiO2: 40.0
+          SiO2: 0.4
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 101.3
         phase_row_id: cheng21_t5_e088_c3s2
@@ -64281,10 +64282,10 @@ species:
         T_C: 1250
         value: 49.9
         composition_mol: &id503
-          basis: printed_mole_percent
-          CaO: 49.9
-          FeO1.5: 0.1
-          SiO2: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.499
+          FeO1.5: 0.001
+          SiO2: 0.5
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 101.0
         phase_row_id: cheng21_t5_e088_cs
@@ -64539,10 +64540,10 @@ species:
         T_C: 1235
         value: 59.9
         composition_mol: &id505
-          basis: printed_mole_percent
-          CaO: 59.9
+          basis: printed_mole_fraction
+          CaO: 0.599
           FeO1.5: 0.0
-          SiO2: 40.1
+          SiO2: 0.401
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e089_c3s2
@@ -64797,10 +64798,10 @@ species:
         T_C: 1235
         value: 49.9
         composition_mol: &id507
-          basis: printed_mole_percent
-          CaO: 49.9
-          FeO1.5: 0.1
-          SiO2: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.499
+          FeO1.5: 0.001
+          SiO2: 0.5
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e089_cs
@@ -65055,10 +65056,10 @@ species:
         T_C: 1230
         value: 60.1
         composition_mol: &id509
-          basis: printed_mole_percent
-          CaO: 60.1
+          basis: printed_mole_fraction
+          CaO: 0.601
           FeO1.5: 0.0
-          SiO2: 39.9
+          SiO2: 0.399
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 101.0
         phase_row_id: cheng21_t5_e090_c3s2
@@ -65313,10 +65314,10 @@ species:
         T_C: 1230
         value: 49.9
         composition_mol: &id511
-          basis: printed_mole_percent
-          CaO: 49.9
+          basis: printed_mole_fraction
+          CaO: 0.499
           FeO1.5: 0.0
-          SiO2: 50.1
+          SiO2: 0.501
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 101.0
         phase_row_id: cheng21_t5_e090_cs
@@ -65571,10 +65572,10 @@ species:
         T_C: 1225
         value: 59.8
         composition_mol: &id513
-          basis: printed_mole_percent
-          CaO: 59.8
+          basis: printed_mole_fraction
+          CaO: 0.598
           FeO1.5: 0.0
-          SiO2: 40.2
+          SiO2: 0.402
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 101.2
         phase_row_id: cheng21_t5_e091_c3s2
@@ -65824,10 +65825,10 @@ species:
         T_C: 1225
         value: 49.7
         composition_mol: &id515
-          basis: printed_mole_percent
-          CaO: 49.7
+          basis: printed_mole_fraction
+          CaO: 0.497
           FeO1.5: 0.0
-          SiO2: 50.3
+          SiO2: 0.503
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 101.3
         phase_row_id: cheng21_t5_e091_cs
@@ -66077,10 +66078,10 @@ species:
         T_C: 1410
         value: 60.0
         composition_mol: &id517
-          basis: printed_mole_percent
-          CaO: 60.0
+          basis: printed_mole_fraction
+          CaO: 0.6
           FeO1.5: 0.0
-          SiO2: 40.0
+          SiO2: 0.4
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e092_c3s2
@@ -66330,10 +66331,10 @@ species:
         T_C: 1410
         value: 65.8
         composition_mol: &id519
-          basis: printed_mole_percent
-          CaO: 65.8
-          FeO1.5: 0.8
-          SiO2: 33.3
+          basis: printed_mole_fraction
+          CaO: 0.658
+          FeO1.5: 0.008
+          SiO2: 0.333
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e092_c2s
@@ -66588,10 +66589,10 @@ species:
         T_C: 1350
         value: 60.1
         composition_mol: &id521
-          basis: printed_mole_percent
-          CaO: 60.1
+          basis: printed_mole_fraction
+          CaO: 0.601
           FeO1.5: 0.0
-          SiO2: 39.9
+          SiO2: 0.399
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 100.7
         phase_row_id: cheng21_t5_e093_c3s2
@@ -66846,10 +66847,10 @@ species:
         T_C: 1350
         value: 66.7
         composition_mol: &id523
-          basis: printed_mole_percent
-          CaO: 66.7
-          FeO1.5: 0.1
-          SiO2: 33.2
+          basis: printed_mole_fraction
+          CaO: 0.667
+          FeO1.5: 0.001
+          SiO2: 0.332
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e093_c2s
@@ -67104,10 +67105,10 @@ species:
         T_C: 1300
         value: 60.1
         composition_mol: &id525
-          basis: printed_mole_percent
-          CaO: 60.1
+          basis: printed_mole_fraction
+          CaO: 0.601
           FeO1.5: 0.0
-          SiO2: 39.9
+          SiO2: 0.399
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 101.0
         phase_row_id: cheng21_t5_e094_c3s2
@@ -67362,10 +67363,10 @@ species:
         T_C: 1300
         value: 66.8
         composition_mol: &id527
-          basis: printed_mole_percent
-          CaO: 66.8
-          FeO1.5: 0.1
-          SiO2: 33.2
+          basis: printed_mole_fraction
+          CaO: 0.668
+          FeO1.5: 0.001
+          SiO2: 0.332
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 100.7
         phase_row_id: cheng21_t5_e094_c2s
@@ -67620,10 +67621,10 @@ species:
         T_C: 1275
         value: 60.1
         composition_mol: &id529
-          basis: printed_mole_percent
-          CaO: 60.1
+          basis: printed_mole_fraction
+          CaO: 0.601
           FeO1.5: 0.0
-          SiO2: 39.9
+          SiO2: 0.399
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e095_c3s2
@@ -67873,10 +67874,10 @@ species:
         T_C: 1275
         value: 66.8
         composition_mol: &id531
-          basis: printed_mole_percent
-          CaO: 66.8
-          FeO1.5: 0.1
-          SiO2: 33.1
+          basis: printed_mole_fraction
+          CaO: 0.668
+          FeO1.5: 0.001
+          SiO2: 0.331
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 98.8
         phase_row_id: cheng21_t5_e095_c2s
@@ -68131,10 +68132,10 @@ species:
         T_C: 1260
         value: 60.1
         composition_mol: &id533
-          basis: printed_mole_percent
-          CaO: 60.1
+          basis: printed_mole_fraction
+          CaO: 0.601
           FeO1.5: 0.0
-          SiO2: 39.9
+          SiO2: 0.399
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 99.7
         phase_row_id: cheng21_t5_e096_c3s2
@@ -68389,10 +68390,10 @@ species:
         T_C: 1260
         value: 66.8
         composition_mol: &id535
-          basis: printed_mole_percent
-          CaO: 66.8
-          FeO1.5: 0.1
-          SiO2: 33.1
+          basis: printed_mole_fraction
+          CaO: 0.668
+          FeO1.5: 0.001
+          SiO2: 0.331
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 99.3
         phase_row_id: cheng21_t5_e096_c2s
@@ -68647,10 +68648,10 @@ species:
         T_C: 1235
         value: 60.1
         composition_mol: &id537
-          basis: printed_mole_percent
-          CaO: 60.1
+          basis: printed_mole_fraction
+          CaO: 0.601
           FeO1.5: 0.0
-          SiO2: 39.9
+          SiO2: 0.399
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e097_c3s2
@@ -68905,10 +68906,10 @@ species:
         T_C: 1235
         value: 66.8
         composition_mol: &id539
-          basis: printed_mole_percent
-          CaO: 66.8
-          FeO1.5: 0.1
-          SiO2: 33.1
+          basis: printed_mole_fraction
+          CaO: 0.668
+          FeO1.5: 0.001
+          SiO2: 0.331
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 99.5
         phase_row_id: cheng21_t5_e097_c2s
@@ -69163,10 +69164,10 @@ species:
         T_C: 1410
         value: 50.3
         composition_mol: &id541
-          basis: printed_mole_percent
-          CaO: 50.3
-          FeO1.5: 49.5
-          SiO2: 0.1
+          basis: printed_mole_fraction
+          CaO: 0.503
+          FeO1.5: 0.495
+          SiO2: 0.001
         printed_phase_label: C2F
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e098_c2f
@@ -69421,10 +69422,10 @@ species:
         T_C: 1410
         value: 66.6
         composition_mol: &id543
-          basis: printed_mole_percent
-          CaO: 66.6
-          FeO1.5: 2.4
-          SiO2: 31.0
+          basis: printed_mole_fraction
+          CaO: 0.666
+          FeO1.5: 0.024
+          SiO2: 0.31
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 99.8
         phase_row_id: cheng21_t5_e098_c2s
@@ -69679,10 +69680,10 @@ species:
         T_C: 1410
         value: 50.6
         composition_mol: &id545
-          basis: printed_mole_percent
-          CaO: 50.6
-          FeO1.5: 48.7
-          SiO2: 0.7
+          basis: printed_mole_fraction
+          CaO: 0.506
+          FeO1.5: 0.487
+          SiO2: 0.007
         printed_phase_label: C2F
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e099_c2f
@@ -69937,10 +69938,10 @@ species:
         T_C: 1410
         value: 66.3
         composition_mol: &id547
-          basis: printed_mole_percent
-          CaO: 66.3
-          FeO1.5: 0.6
-          SiO2: 33.1
+          basis: printed_mole_fraction
+          CaO: 0.663
+          FeO1.5: 0.006
+          SiO2: 0.331
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 99.1
         phase_row_id: cheng21_t5_e099_c2s
@@ -70195,10 +70196,10 @@ species:
         T_C: 1390
         value: 50.6
         composition_mol: &id549
-          basis: printed_mole_percent
-          CaO: 50.6
-          FeO1.5: 48.8
-          SiO2: 0.6
+          basis: printed_mole_fraction
+          CaO: 0.506
+          FeO1.5: 0.488
+          SiO2: 0.006
         printed_phase_label: C2F
         table5_old_total_wt_pct_as_printed: 99.5
         phase_row_id: cheng21_t5_e100_c2f
@@ -70453,10 +70454,10 @@ species:
         T_C: 1390
         value: 66.6
         composition_mol: &id551
-          basis: printed_mole_percent
-          CaO: 66.6
-          FeO1.5: 0.3
-          SiO2: 33.1
+          basis: printed_mole_fraction
+          CaO: 0.666
+          FeO1.5: 0.003
+          SiO2: 0.331
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 99.4
         phase_row_id: cheng21_t5_e100_c2s
@@ -70711,10 +70712,10 @@ species:
         T_C: 1340
         value: 50.4
         composition_mol: &id553
-          basis: printed_mole_percent
-          CaO: 50.4
-          FeO1.5: 48.8
-          SiO2: 0.8
+          basis: printed_mole_fraction
+          CaO: 0.504
+          FeO1.5: 0.488
+          SiO2: 0.008
         printed_phase_label: C2F
         table5_old_total_wt_pct_as_printed: 99.0
         phase_row_id: cheng21_t5_e101_c2f
@@ -70969,10 +70970,10 @@ species:
         T_C: 1340
         value: 66.5
         composition_mol: &id555
-          basis: printed_mole_percent
-          CaO: 66.5
-          FeO1.5: 0.4
-          SiO2: 33.1
+          basis: printed_mole_fraction
+          CaO: 0.665
+          FeO1.5: 0.004
+          SiO2: 0.331
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 99.2
         phase_row_id: cheng21_t5_e101_c2s
@@ -71227,9 +71228,9 @@ species:
         T_C: 1410
         value: 99.9
         composition_mol: &id557
-          basis: printed_mole_percent
-          CaO: 99.9
-          FeO1.5: 0.1
+          basis: printed_mole_fraction
+          CaO: 0.999
+          FeO1.5: 0.001
           SiO2: 0.0
         printed_phase_label: Lime
         table5_old_total_wt_pct_as_printed: 101.1
@@ -71480,10 +71481,10 @@ species:
         T_C: 1410
         value: 50.5
         composition_mol: &id559
-          basis: printed_mole_percent
-          CaO: 50.5
-          FeO1.5: 49.1
-          SiO2: 0.5
+          basis: printed_mole_fraction
+          CaO: 0.505
+          FeO1.5: 0.491
+          SiO2: 0.005
         printed_phase_label: C2F
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e102_c2f
@@ -71738,9 +71739,9 @@ species:
         T_C: 1685
         value: 99.8
         composition_mol: &id561
-          basis: printed_mole_percent
-          CaO: 99.8
-          FeO1.5: 0.2
+          basis: printed_mole_fraction
+          CaO: 0.998
+          FeO1.5: 0.002
           SiO2: 0.0
         printed_phase_label: Lime
         table5_old_total_wt_pct_as_printed: 98.7
@@ -71991,10 +71992,10 @@ species:
         T_C: 1685
         value: 74.5
         composition_mol: &id563
-          basis: printed_mole_percent
-          CaO: 74.5
-          FeO1.5: 1.1
-          SiO2: 24.4
+          basis: printed_mole_fraction
+          CaO: 0.745
+          FeO1.5: 0.011
+          SiO2: 0.244
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e103_c3s
@@ -72249,9 +72250,9 @@ species:
         T_C: 1650
         value: 99.8
         composition_mol: &id565
-          basis: printed_mole_percent
-          CaO: 99.8
-          FeO1.5: 0.2
+          basis: printed_mole_fraction
+          CaO: 0.998
+          FeO1.5: 0.002
           SiO2: 0.0
         printed_phase_label: Lime
         table5_old_total_wt_pct_as_printed: 102.2
@@ -72502,10 +72503,10 @@ species:
         T_C: 1650
         value: 74.8
         composition_mol: &id567
-          basis: printed_mole_percent
-          CaO: 74.8
-          FeO1.5: 1.0
-          SiO2: 24.2
+          basis: printed_mole_fraction
+          CaO: 0.748
+          FeO1.5: 0.01
+          SiO2: 0.242
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 102.1
         phase_row_id: cheng21_t5_e104_c3s
@@ -72760,9 +72761,9 @@ species:
         T_C: 1600
         value: 99.9
         composition_mol: &id569
-          basis: printed_mole_percent
-          CaO: 99.9
-          FeO1.5: 0.1
+          basis: printed_mole_fraction
+          CaO: 0.999
+          FeO1.5: 0.001
           SiO2: 0.0
         printed_phase_label: Lime
         table5_old_total_wt_pct_as_printed: 100.3
@@ -73013,10 +73014,10 @@ species:
         T_C: 1600
         value: 74.8
         composition_mol: &id571
-          basis: printed_mole_percent
-          CaO: 74.8
-          FeO1.5: 1.1
-          SiO2: 24.1
+          basis: printed_mole_fraction
+          CaO: 0.748
+          FeO1.5: 0.011
+          SiO2: 0.241
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 101.0
         phase_row_id: cheng21_t5_e105_c3s
@@ -73271,9 +73272,9 @@ species:
         T_C: 1550
         value: 99.8
         composition_mol: &id573
-          basis: printed_mole_percent
-          CaO: 99.8
-          FeO1.5: 0.2
+          basis: printed_mole_fraction
+          CaO: 0.998
+          FeO1.5: 0.002
           SiO2: 0.0
         printed_phase_label: Lime
         table5_old_total_wt_pct_as_printed: 94.5
@@ -73524,10 +73525,10 @@ species:
         T_C: 1550
         value: 74.7
         composition_mol: &id575
-          basis: printed_mole_percent
-          CaO: 74.7
-          FeO1.5: 1.1
-          SiO2: 24.2
+          basis: printed_mole_fraction
+          CaO: 0.747
+          FeO1.5: 0.011
+          SiO2: 0.242
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 101.0
         phase_row_id: cheng21_t5_e106_c3s
@@ -73782,8 +73783,8 @@ species:
         T_C: 1500
         value: 100.0
         composition_mol: &id577
-          basis: printed_mole_percent
-          CaO: 100.0
+          basis: printed_mole_fraction
+          CaO: 1.0
           FeO1.5: 0.0
           SiO2: 0.0
         printed_phase_label: Lime
@@ -74030,10 +74031,10 @@ species:
         T_C: 1500
         value: 74.4
         composition_mol: &id579
-          basis: printed_mole_percent
-          CaO: 74.4
-          FeO1.5: 1.1
-          SiO2: 24.4
+          basis: printed_mole_fraction
+          CaO: 0.744
+          FeO1.5: 0.011
+          SiO2: 0.244
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.7
         phase_row_id: cheng21_t5_e107_c3s
@@ -74288,8 +74289,8 @@ species:
         T_C: 1440
         value: 100.0
         composition_mol: &id581
-          basis: printed_mole_percent
-          CaO: 100.0
+          basis: printed_mole_fraction
+          CaO: 1.0
           FeO1.5: 0.0
           SiO2: 0.0
         printed_phase_label: Lime
@@ -74536,10 +74537,10 @@ species:
         T_C: 1440
         value: 74.2
         composition_mol: &id583
-          basis: printed_mole_percent
-          CaO: 74.2
-          FeO1.5: 1.1
-          SiO2: 24.7
+          basis: printed_mole_fraction
+          CaO: 0.742
+          FeO1.5: 0.011
+          SiO2: 0.247
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.0
         phase_row_id: cheng21_t5_e108_c3s
@@ -74794,10 +74795,10 @@ species:
         T_C: 1685
         value: 66.8
         composition_mol: &id585
-          basis: printed_mole_percent
-          CaO: 66.8
-          FeO1.5: 2.1
-          SiO2: 31.1
+          basis: printed_mole_fraction
+          CaO: 0.668
+          FeO1.5: 0.021
+          SiO2: 0.311
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 99.1
         phase_row_id: cheng21_t5_e109_c2s
@@ -75052,10 +75053,10 @@ species:
         T_C: 1685
         value: 74.7
         composition_mol: &id587
-          basis: printed_mole_percent
-          CaO: 74.7
-          FeO1.5: 0.9
-          SiO2: 24.4
+          basis: printed_mole_fraction
+          CaO: 0.747
+          FeO1.5: 0.009
+          SiO2: 0.244
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e109_c3s
@@ -75310,10 +75311,10 @@ species:
         T_C: 1650
         value: 66.6
         composition_mol: &id589
-          basis: printed_mole_percent
-          CaO: 66.6
-          FeO1.5: 2.1
-          SiO2: 31.0
+          basis: printed_mole_fraction
+          CaO: 0.666
+          FeO1.5: 0.021
+          SiO2: 0.31
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 101.5
         phase_row_id: cheng21_t5_e110_c2s
@@ -75568,10 +75569,10 @@ species:
         T_C: 1650
         value: 74.6
         composition_mol: &id591
-          basis: printed_mole_percent
-          CaO: 74.6
-          FeO1.5: 1.1
-          SiO2: 24.3
+          basis: printed_mole_fraction
+          CaO: 0.746
+          FeO1.5: 0.011
+          SiO2: 0.243
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 101.8
         phase_row_id: cheng21_t5_e110_c3s
@@ -75826,10 +75827,10 @@ species:
         T_C: 1600
         value: 66.9
         composition_mol: &id593
-          basis: printed_mole_percent
-          CaO: 66.9
-          FeO1.5: 2.3
-          SiO2: 30.8
+          basis: printed_mole_fraction
+          CaO: 0.669
+          FeO1.5: 0.023
+          SiO2: 0.308
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 101.3
         phase_row_id: cheng21_t5_e111_c2s
@@ -76084,10 +76085,10 @@ species:
         T_C: 1600
         value: 74.6
         composition_mol: &id595
-          basis: printed_mole_percent
-          CaO: 74.6
-          FeO1.5: 1.0
-          SiO2: 24.4
+          basis: printed_mole_fraction
+          CaO: 0.746
+          FeO1.5: 0.01
+          SiO2: 0.244
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 101.5
         phase_row_id: cheng21_t5_e111_c3s
@@ -76342,10 +76343,10 @@ species:
         T_C: 1550
         value: 66.8
         composition_mol: &id597
-          basis: printed_mole_percent
-          CaO: 66.8
-          FeO1.5: 2.3
-          SiO2: 30.9
+          basis: printed_mole_fraction
+          CaO: 0.668
+          FeO1.5: 0.023
+          SiO2: 0.309
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 102.0
         phase_row_id: cheng21_t5_e112_c2s
@@ -76600,10 +76601,10 @@ species:
         T_C: 1550
         value: 74.7
         composition_mol: &id599
-          basis: printed_mole_percent
-          CaO: 74.7
-          FeO1.5: 1.0
-          SiO2: 24.3
+          basis: printed_mole_fraction
+          CaO: 0.747
+          FeO1.5: 0.01
+          SiO2: 0.243
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 102.0
         phase_row_id: cheng21_t5_e112_c3s
@@ -76858,10 +76859,10 @@ species:
         T_C: 1500
         value: 66.8
         composition_mol: &id601
-          basis: printed_mole_percent
-          CaO: 66.8
-          FeO1.5: 2.6
-          SiO2: 30.6
+          basis: printed_mole_fraction
+          CaO: 0.668
+          FeO1.5: 0.026
+          SiO2: 0.306
         printed_phase_label: α-C2S
         table5_old_total_wt_pct_as_printed: 99.3
         phase_row_id: cheng21_t5_e113_c2s
@@ -77116,10 +77117,10 @@ species:
         T_C: 1500
         value: 74.4
         composition_mol: &id603
-          basis: printed_mole_percent
-          CaO: 74.4
-          FeO1.5: 1.1
-          SiO2: 24.4
+          basis: printed_mole_fraction
+          CaO: 0.744
+          FeO1.5: 0.011
+          SiO2: 0.244
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e113_c3s
@@ -77374,10 +77375,10 @@ species:
         T_C: 1450
         value: 66.6
         composition_mol: &id605
-          basis: printed_mole_percent
-          CaO: 66.6
-          FeO1.5: 2.8
-          SiO2: 30.6
+          basis: printed_mole_fraction
+          CaO: 0.666
+          FeO1.5: 0.028
+          SiO2: 0.306
         printed_phase_label: α'-C2S(**)
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e114_c2s
@@ -77632,10 +77633,10 @@ species:
         T_C: 1450
         value: 74.1
         composition_mol: &id607
-          basis: printed_mole_percent
-          CaO: 74.1
-          FeO1.5: 1.3
-          SiO2: 24.7
+          basis: printed_mole_fraction
+          CaO: 0.741
+          FeO1.5: 0.013
+          SiO2: 0.247
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e114_c3s
@@ -77890,10 +77891,10 @@ species:
         T_C: 1440
         value: 66.5
         composition_mol: &id609
-          basis: printed_mole_percent
-          CaO: 66.5
-          FeO1.5: 2.5
-          SiO2: 31.0
+          basis: printed_mole_fraction
+          CaO: 0.665
+          FeO1.5: 0.025
+          SiO2: 0.31
         printed_phase_label: α'-C2S(**)
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e115_c2s
@@ -78148,10 +78149,10 @@ species:
         T_C: 1440
         value: 73.9
         composition_mol: &id611
-          basis: printed_mole_percent
-          CaO: 73.9
-          FeO1.5: 1.5
-          SiO2: 24.7
+          basis: printed_mole_fraction
+          CaO: 0.739
+          FeO1.5: 0.015
+          SiO2: 0.247
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e115_c3s
@@ -78406,10 +78407,10 @@ species:
         T_C: 1430
         value: 66.9
         composition_mol: &id613
-          basis: printed_mole_percent
-          CaO: 66.9
-          FeO1.5: 2.5
-          SiO2: 30.6
+          basis: printed_mole_fraction
+          CaO: 0.669
+          FeO1.5: 0.025
+          SiO2: 0.306
         printed_phase_label: α'-C2S(**)
         table5_old_total_wt_pct_as_printed: 99.9
         phase_row_id: cheng21_t5_e116_c2s
@@ -78664,10 +78665,10 @@ species:
         T_C: 1430
         value: 74.3
         composition_mol: &id615
-          basis: printed_mole_percent
-          CaO: 74.3
-          FeO1.5: 1.1
-          SiO2: 24.7
+          basis: printed_mole_fraction
+          CaO: 0.743
+          FeO1.5: 0.011
+          SiO2: 0.247
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 99.8
         phase_row_id: cheng21_t5_e116_c3s
@@ -78922,10 +78923,10 @@ species:
         T_C: 1199
         value: 49.8
         composition_mol: &id617
-          basis: printed_mole_percent
-          CaO: 49.8
-          FeO1.5: 0.1
-          SiO2: 50.0
+          basis: printed_mole_fraction
+          CaO: 0.498
+          FeO1.5: 0.001
+          SiO2: 0.5
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 101.2
         phase_row_id: cheng21_t5_e123_cs
@@ -79180,10 +79181,10 @@ species:
         T_C: 1199
         value: 49.7
         composition_mol: &id619
-          basis: printed_mole_percent
-          CaO: 49.7
-          FeO1.5: 0.1
-          SiO2: 50.2
+          basis: printed_mole_fraction
+          CaO: 0.497
+          FeO1.5: 0.001
+          SiO2: 0.502
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e124_cs
@@ -79438,8 +79439,8 @@ species:
         T_C: 1400
         value: 100.0
         composition_mol: &id621
-          basis: printed_mole_percent
-          CaO: 100.0
+          basis: printed_mole_fraction
+          CaO: 1.0
           FeO1.5: 0.0
           SiO2: 0.0
         printed_phase_label: Lime
@@ -79686,10 +79687,10 @@ species:
         T_C: 1400
         value: 74.3
         composition_mol: &id623
-          basis: printed_mole_percent
-          CaO: 74.3
-          FeO1.5: 1.2
-          SiO2: 24.4
+          basis: printed_mole_fraction
+          CaO: 0.743
+          FeO1.5: 0.012
+          SiO2: 0.244
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.9
         phase_row_id: cheng21_t5_e125_c3s
@@ -79944,10 +79945,10 @@ species:
         T_C: 1400
         value: 50.4
         composition_mol: &id625
-          basis: printed_mole_percent
-          CaO: 50.4
-          FeO1.5: 49.1
-          SiO2: 0.5
+          basis: printed_mole_fraction
+          CaO: 0.504
+          FeO1.5: 0.491
+          SiO2: 0.005
         printed_phase_label: C2F
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e125_c2f
@@ -80202,10 +80203,10 @@ species:
         T_C: 1400
         value: 66.9
         composition_mol: &id627
-          basis: printed_mole_percent
-          CaO: 66.9
-          FeO1.5: 2.2
-          SiO2: 30.9
+          basis: printed_mole_fraction
+          CaO: 0.669
+          FeO1.5: 0.022
+          SiO2: 0.309
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 100.2
         phase_row_id: cheng21_t5_e126_c2s
@@ -80460,10 +80461,10 @@ species:
         T_C: 1400
         value: 74.7
         composition_mol: &id629
-          basis: printed_mole_percent
-          CaO: 74.7
-          FeO1.5: 1.1
-          SiO2: 24.2
+          basis: printed_mole_fraction
+          CaO: 0.747
+          FeO1.5: 0.011
+          SiO2: 0.242
         printed_phase_label: C3S
         table5_old_total_wt_pct_as_printed: 100.4
         phase_row_id: cheng21_t5_e126_c3s
@@ -80718,9 +80719,9 @@ species:
         T_C: 1400
         value: 50.4
         composition_mol: &id631
-          basis: printed_mole_percent
-          CaO: 50.4
-          FeO1.5: 49.6
+          basis: printed_mole_fraction
+          CaO: 0.504
+          FeO1.5: 0.496
           SiO2: 0.0
         printed_phase_label: C2F
         table5_old_total_wt_pct_as_printed: 99.8
@@ -80971,10 +80972,10 @@ species:
         T_C: 1230
         value: 59.9
         composition_mol: &id633
-          basis: printed_mole_percent
-          CaO: 59.9
+          basis: printed_mole_fraction
+          CaO: 0.599
           FeO1.5: 0.0
-          SiO2: 40.1
+          SiO2: 0.401
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 101.2
         phase_row_id: cheng21_t5_e127_c3s2
@@ -81229,10 +81230,10 @@ species:
         T_C: 1230
         value: 66.6
         composition_mol: &id635
-          basis: printed_mole_percent
-          CaO: 66.6
+          basis: printed_mole_fraction
+          CaO: 0.666
           FeO1.5: 0.0
-          SiO2: 33.4
+          SiO2: 0.334
         printed_phase_label: α'-C2S
         table5_old_total_wt_pct_as_printed: 101.2
         phase_row_id: cheng21_t5_e127_c2s
@@ -81482,10 +81483,10 @@ species:
         T_C: 1220
         value: 60.0
         composition_mol: &id637
-          basis: printed_mole_percent
-          CaO: 60.0
-          FeO1.5: 0.1
-          SiO2: 39.8
+          basis: printed_mole_fraction
+          CaO: 0.6
+          FeO1.5: 0.001
+          SiO2: 0.398
         printed_phase_label: C3S2
         table5_old_total_wt_pct_as_printed: 100.7
         phase_row_id: cheng21_t5_e128_c3s2
@@ -81740,10 +81741,10 @@ species:
         T_C: 1220
         value: 50.2
         composition_mol: &id639
-          basis: printed_mole_percent
-          CaO: 50.2
+          basis: printed_mole_fraction
+          CaO: 0.502
           FeO1.5: 0.0
-          SiO2: 49.8
+          SiO2: 0.498
         printed_phase_label: CS
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e128_cs
@@ -82255,10 +82256,10 @@ species:
         T_C: 1300
         value: 26.9
         composition_mol: &id641
-          basis: printed_mole_percent
-          CaO: 26.9
-          FeO1.5: 31.1
-          SiO2: 42.0
+          basis: printed_mole_fraction
+          CaO: 0.269
+          FeO1.5: 0.311
+          SiO2: 0.42
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.8
         phase_row_id: cheng21_t5_e027_liq
@@ -82513,9 +82514,9 @@ species:
         T_C: 1300
         value: 0.0
         composition_mol: &id643
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 100.0
+          FeO1.5: 1.0
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 100.1
@@ -82852,10 +82853,10 @@ species:
         T_C: 1263
         value: 36.7
         composition_mol: &id646
-          basis: printed_mole_percent
-          CaO: 36.7
-          FeO1.5: 43.4
-          SiO2: 19.9
+          basis: printed_mole_fraction
+          CaO: 0.367
+          FeO1.5: 0.434
+          SiO2: 0.199
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e028_liq
@@ -83110,9 +83111,9 @@ species:
         T_C: 1263
         value: 0.0
         composition_mol: &id648
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 100.0
+          FeO1.5: 1.0
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 99.6
@@ -83459,10 +83460,10 @@ species:
         T_C: 1250
         value: 37.6
         composition_mol: &id651
-          basis: printed_mole_percent
-          CaO: 37.6
-          FeO1.5: 42.3
-          SiO2: 20.1
+          basis: printed_mole_fraction
+          CaO: 0.376
+          FeO1.5: 0.423
+          SiO2: 0.201
         printed_phase_label: Liq
         table5_old_total_wt_pct_as_printed: 101.1
         phase_row_id: cheng21_t5_e029_liq
@@ -83717,9 +83718,9 @@ species:
         T_C: 1250
         value: 0.0
         composition_mol: &id653
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 100.0
+          FeO1.5: 1.0
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 101.4
@@ -84056,10 +84057,10 @@ species:
         T_C: 1240
         value: 0.1
         composition_mol: &id656
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 99.8
-          SiO2: 0.1
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.998
+          SiO2: 0.001
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 100.5
         phase_row_id: cheng21_t5_e074_hematite
@@ -84314,9 +84315,9 @@ species:
         T_C: 1235
         value: 0.1
         composition_mol: &id658
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 99.9
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.999
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 100.1
@@ -84567,9 +84568,9 @@ species:
         T_C: 1385
         value: 0.0
         composition_mol: &id660
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 100.0
+          FeO1.5: 1.0
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 99.4
@@ -84815,9 +84816,9 @@ species:
         T_C: 1350
         value: 0.0
         composition_mol: &id662
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 100.0
+          FeO1.5: 1.0
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 100.1
@@ -85063,10 +85064,10 @@ species:
         T_C: 1300
         value: 0.0
         composition_mol: &id664
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 99.8
-          SiO2: 0.2
+          FeO1.5: 0.998
+          SiO2: 0.002
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e078_hematite
@@ -85316,9 +85317,9 @@ species:
         T_C: 1280
         value: 0.3
         composition_mol: &id666
-          basis: printed_mole_percent
-          CaO: 0.3
-          FeO1.5: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.003
+          FeO1.5: 0.997
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 100.2
@@ -85569,9 +85570,9 @@ species:
         T_C: 1260
         value: 0.1
         composition_mol: &id668
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 99.9
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.999
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 100.2
@@ -85822,9 +85823,9 @@ species:
         T_C: 1250
         value: 0.2
         composition_mol: &id670
-          basis: printed_mole_percent
-          CaO: 0.2
-          FeO1.5: 99.8
+          basis: printed_mole_fraction
+          CaO: 0.002
+          FeO1.5: 0.998
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 100.1
@@ -86075,9 +86076,9 @@ species:
         T_C: 1240
         value: 0.3
         composition_mol: &id672
-          basis: printed_mole_percent
-          CaO: 0.3
-          FeO1.5: 99.7
+          basis: printed_mole_fraction
+          CaO: 0.003
+          FeO1.5: 0.997
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 99.5
@@ -86328,10 +86329,10 @@ species:
         T_C: 1205
         value: 0.1
         composition_mol: &id674
-          basis: printed_mole_percent
-          CaO: 0.1
-          FeO1.5: 99.8
-          SiO2: 0.1
+          basis: printed_mole_fraction
+          CaO: 0.001
+          FeO1.5: 0.998
+          SiO2: 0.001
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 100.3
         phase_row_id: cheng21_t5_e084_hematite
@@ -86586,10 +86587,10 @@ species:
         T_C: 1199
         value: 0.0
         composition_mol: &id676
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 99.8
-          SiO2: 0.1
+          FeO1.5: 0.998
+          SiO2: 0.001
         printed_phase_label: (***) Hematite
         table5_old_total_wt_pct_as_printed: 100.6
         phase_row_id: cheng21_t5_e123_hematite
@@ -86839,10 +86840,10 @@ species:
         T_C: 1199
         value: 0.0
         composition_mol: &id678
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 99.9
-          SiO2: 0.1
+          FeO1.5: 0.999
+          SiO2: 0.001
         printed_phase_label: (***) Hematite
         table5_old_total_wt_pct_as_printed: 100.1
         phase_row_id: cheng21_t5_e124_hematite
@@ -87092,9 +87093,9 @@ species:
         T_C: 1230
         value: 0.0
         composition_mol: &id680
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 100.0
+          FeO1.5: 1.0
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 99.8
@@ -87340,9 +87341,9 @@ species:
         T_C: 1220
         value: 0.0
         composition_mol: &id682
-          basis: printed_mole_percent
+          basis: printed_mole_fraction
           CaO: 0.0
-          FeO1.5: 100.0
+          FeO1.5: 1.0
           SiO2: 0.0
         printed_phase_label: Hematite
         table5_old_total_wt_pct_as_printed: 100.0
