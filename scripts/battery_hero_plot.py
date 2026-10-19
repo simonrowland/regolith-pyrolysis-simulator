@@ -59,7 +59,12 @@ from matplotlib.axes import Axes
 from matplotlib.colors import Normalize
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
-from matplotlib.ticker import FuncFormatter, FormatStrFormatter, MaxNLocator
+from matplotlib.ticker import (
+    FuncFormatter,
+    FormatStrFormatter,
+    MaxNLocator,
+    MultipleLocator,
+)
 
 from simulator.battery.enums import (  # noqa: E402
     NoticeKind,
@@ -1691,7 +1696,30 @@ def _format_dex(value: object) -> str:
 
 
 def _temperature_tick(value: float, _position: int | None = None) -> str:
-    return f"{value / 1_000:.2f}k" if abs(value) >= 1_000 else f"{value:.0f}"
+    return f"{value / 1_000:.3g}k" if abs(value) >= 1_000 else f"{value:.0f}"
+
+
+def _temperature_tick_step(limits: tuple[float, float]) -> float:
+    """Pick ticks coarse enough to stay distinct at three significant figures."""
+
+    low, high = limits
+    maximum = max(abs(low), abs(high))
+    display_step = (
+        10.0 ** (math.floor(math.log10(maximum)) - 2)
+        if maximum >= 1_000
+        else 1.0
+    )
+    desired_step = max(display_step, abs(high - low) / 6)
+    scale = 10.0 ** math.floor(math.log10(desired_step))
+    return next(
+        factor * scale
+        for factor in (1, 2, 5, 10)
+        if factor * scale >= desired_step
+    )
+
+
+def _set_temperature_tick_locator(axis: Any, limits: tuple[float, float]) -> None:
+    axis.set_major_locator(MultipleLocator(_temperature_tick_step(limits)))
 
 
 def _hero_facet_counts(data: ScorePlotData, rail: str) -> Counter[str]:
@@ -1876,6 +1904,7 @@ def _draw_hero_current(
     axis.set_xlabel("Temperature (K)", fontsize=7)
     axis.tick_params(labelsize=6)
     axis.grid(True, color="#999999", alpha=0.18, linewidth=0.5)
+    _set_temperature_tick_locator(axis.xaxis, axis.get_xlim())
     axis.xaxis.set_major_formatter(FuncFormatter(_temperature_tick))
     axis.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
 
@@ -2003,15 +2032,7 @@ def _draw_hero_sweet_spot(
     axis.set_ylim(*temperature_limits)
     axis.set_xticks([index / 10 for index in range(11)])
     axis.set_xticklabels([f"{index / 10:.1f}" for index in range(11)], fontsize=5)
-    cell_lowers = sorted(
-        {
-            _finite_float(cell.get("temperature_lower_K"))
-            for cell in cells
-            if _finite_float(cell.get("temperature_lower_K")) is not None
-        }
-    )
-    tick_stride = max(1, math.ceil(len(cell_lowers) / 8))
-    axis.set_yticks(cell_lowers[::tick_stride])
+    _set_temperature_tick_locator(axis.yaxis, temperature_limits)
     axis.tick_params(axis="y", labelsize=5)
     axis.yaxis.set_major_formatter(FuncFormatter(_temperature_tick))
     axis.set_xlabel("SiO₂ mole fraction", fontsize=6)
