@@ -1,0 +1,539 @@
+schema_version: literature_extract.v1
+source_id: cohen-2006-iron-silicate-reduction-isotopes
+source:
+  citation: Cohen B.A., Levasseur S., Zanda B., Hewins R.H., and Halliday A.N. (2006).
+    Kinetic isotope effect during reduction of iron from a silicate melt. Geochimica
+    et Cosmochimica Acta 70:3139–3148.
+  doi: 10.1016/j.gca.2006.03.022
+  year: 2006
+extraction:
+  method: Printed table text transcribed from pdftotext-layout into context; figures
+    retained without numeric points.
+  date: '2026-10-19'
+  worker: fam13-1019
+  provenance_path: text/cohen-2006-iron-silicate-reduction-isotopes/pdftotext-layout.txt
+review_status: draft
+species:
+  Fe:
+    observations: []
+    context:
+    - observation_id: cohen_2006_table_1_context
+      type: table_context
+      units: as printed in source table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 3141
+        table: '1'
+      values:
+        caption: Chemical compositions and standard deviations of powdered starting
+          material and starting Fe isotope composition.
+        printed_table_text: "Table 1. Under\nd57 Fe ¼ ½ð57 Fe=54 FeÞsample =ð57 Fe=54\
+          \ FeÞIRMM-14 \x02 1\x04 \x05 1000ð‰Þ:   ð1Þ\n                          \
+          \                                                  the formation conditions,\
+          \ there was no evaporative loss of\n                                   \
+          \                                         Na, or Fe in 60 min (Table 1),\
+          \ and there was no reduction.\nThe standard used for calculating d57/54Fe\
+          \ was IRMM-014                        Experiments were conducted in a 1-atm\
+          \ vertical Deltech\n(Standard from the Institute for Reference Materials\
+          \ and                    furnace. Isothermal experiments were conducted\
+          \ at 1450,\nMeasurements, European Commission). Kehm et al.            \
+          \                 1500, and 1540 \x03C. For each temperature run, between\
+          \ 80\n\f                                                     Fe-isotope\
+          \ fractionation by silicate melt reduction                             \
+          \                  3141\n\nTable 1                                     \
+          \                                           to or IW\x020.5. Heating times\
+          \ varied between 2 min and 6 h\nChemical compositions and their corresponding\
+          \ standard deviations of                   ("
+        reason: Starting-material/run compositions are preserved as printed context;
+          no row-level composition observations transcribed.
+    - observation_id: cohen_2006_table_2_context
+      type: table_context
+      units: as printed in source table
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3142
+        table: '2'
+      values:
+        caption: Chemical analyses of experimental charges and Fe isotope compositions
+          of silicate and metal phases.
+        printed_table_text: "Table 2). The charges were quenched by placing the bot-\n\
+          powdered starting material melted at 1480 \x03C and IW+0.5 for 10 (chosen\n\
+          to best represent the starting material), 30, and 60 min. Its isotopic\n\
+          \                                                                      \
+          \                 tom of the crucible in water. Some of the metal occurred\n\
+          composition was measured on unheated powdered starting material        \
+          \                as very ﬁne beads attached to the walls of the crucible\n\
+          Oxide wt%     10 min      SD             30 min      SD       60 min   \
+          \     SD\n                                                             \
+          \                          and, based on the pattern of weights recovered\
+          \ versus\n                                                             \
+          \                          run time, up to half the metal produced was lost.\
+          \ Based\nSiO2          33.59       0.76           33.78       0.84     33.44\
+          \         0.68\nAl2O3          6.83       0.19            6.88       0.20\
+          \      6.79         0.17\n                                             \
+          \                                          on the mass of FeO, SiO, and\
+          \ MnO remaining in the sili-\nTiO2           0.26       0.02           \
+          \ 0.24       0.03      0.25         0.02       cate bead, up to 12.5 mg\
+          \ of oxygen was lost in each run.\nFeO           47.25       0.58      \
+          \     47.76       0.55     47.20         0.45          Duplicate runs were\
+          \ made. One of the silicate beads from\nMnO            5.47       0.12 \
+          \           5.54       0.13      5.52         0.12       each pair of experiments\
+          \ was analyzed on a JEOL 8600\nMgO            1.60       0.12          \
+          \  1.75       0.13      1.83         0.13       electron probe for chemical\
+          \ composition, using an accelerat-\nCaO            2.59       0.09     \
+          \       2.55       0.08      2.52         0.08\nK2O            0.43    \
+          \   0.05            0.38       0.04      0.36         0.04\n           \
+          \                                                                      \
+          \      ing potential of 20 kV and a current of 15–20 nA. Counting\nNa2O\
+          \           0.28       0.06            0.30       0.07      0.32       \
+          \  0.05       times varied between 20 and 40 s. Glass analyses were\n  \
+          \                                                                      \
+          \               performed using a 5 lm rastered beam. Some analyses were\n\
+          Total         98.30       0.77           99.18       0.99     98.22    \
+          \     0.89\n                                                           \
+          \                            performed on a Cameca SX100 microprobe at Université\n\
+          \ 57\nd Fe          \x020.32&      2s = 0.03&                          \
+          \                         Paris VI. Silicate beads were analyzed using a\
+          \ 5 lm\n                                                               \
+          \                        defocused beam, a current of 10 nA and an acceleration\
+          \ of\n                                                                 \
+          \                      15 kV. Metal beads were analyzed using a focused\
+          \ beam, a\nand 81 mg of starting material set in a graphite crucible was\
+          \                          40 nA current and an acceleration of 15 kV.\n\
+          placed in the hot spot of a furnace containing either pure             \
+          \                   Iron isotope compositions were determined on material\n\
+          CO, or a CO/CO2 mix with an oxygen fugacity equivalent                 \
+          \                from the duplicate charges using a Nu Plasma MC-ICPMS\n\
+          \n\n\nTable 2\nChemical analyses of the experimental charges. Concentrations\
+          \ displayed in weight percent. Also shown is Fe isotopic compositions of\
+          \ the silicate and\nmetal phase in each charge. Isotopic composition and\
+          \ 2s are shown in &\nTime (min)    wt%                                 \
+          \                                              Total    d57Fe metal (&)\
+          \   2s     d57Fe silicate (&)   2s\n              SiO2     Al2O3     TiO2\
+          \   FeO       MnO       MgO       CaO        K2O     Na2O\n1450 \x03C\n\
+          \  2                                                                   \
+          \                                   \x020.31             0.25\n  5     \
+          \      45.7      9.3      0.33   31.3       7.3      2.3       3.4     \
+          \   1.0     0.31   101.04                             0.13             \
+          \   0.07\n 10           53.7     11.9      0.45   13.7      10.4      3.1\
+          \       4.3        1.8     0.49    99.84   \x020.34             0.25\n 20\
+          \           58.0     13.1      0.48    6.9      11.1      3.8       4.8\
+          \        2.0     0.51   100.85   \x020.29             0.08   \x020.12  \
+          \              0.04\n 30           59.8     13.5      0.49    4.2      11.2\
+          \      3.2       4.9        2.1     0.43    99.75   \x020.42           \
+          \  0.10    0.63                0.09\n 40           63.0     12.7      0.47\
+          \    4.6       9.4      2.9       4.7        2.0     0.44   100.14   \x02\
+          0.33             0.03    1.03                0.11\n 60           59.7  \
+          \   13.6      0.52    2.0      11.4      3.7       5.2        2.2     0.46\
+          \    98.69   \x020.23             0.10    2.25                0.07\n 90\
+          \           62.2     14.3      0.54    0.66     10.9      3.9       5.3\
+          \        2.2     0.45   100.51   \x020.26             0.09    2.62     \
+          \           0.06\n120           64.4     13.7      0.52    0.51      9.4\
+          \      3.6       5.2        2.1     0.46    99.88\n240           64.8  \
+          \   14.4      0.51    0.29      7.6      3.6       5.5        2.2     0.38\
+          \    99.26   \x020.20             0.03    2.02\n360           65.4     15.2\
+          \      0.51    0.17      6.5      3.7       5.8        2.0     0.21    99.42\
+          \   \x020.01             0.16    1.71\n1500 \x03C\n  5           53.9  \
+          \   10.9      0.40   18.2       8.5      2.7       4.0        1.5     0.42\
+          \   100.55   \x020.38             0.12\n 10           56.1     12.8    \
+          \  0.52    5.2      11.4      3.6       5.1        2.1     0.49    97.18\
+          \   \x020.38             0.14   \x020.24                0.20\n 20      \
+          \     57.9     13.2      0.53    3.6      11.4      3.6       5.2      \
+          \  2.1     0.46    98.11   \x020.36             0.13    0.77\n 30      \
+          \     60.3     13.4      0.54    1.5      11.6      3.7       5.3      \
+          \  2.1     0.46    98.90   \x020.26             0.10    2.03           \
+          \     0.18\n 60           59.9     14.2      0.56    0.30     10.0     \
+          \ 4.0       5.7        2.1     0.42    97.27   \x020.30             0.05\
+          \    2.32                0.32\n 90                                     \
+          \                                                                 \x020.12\
+          \             0.08    2.33                0.11\n120           60.6     15.4\
+          \      0.55    0.18      8.8      4.3       6.1        2.0     0.32    98.23\
+          \   \x020.22             0.08\n240           63.7     16.3      0.53   \
+          \ 0.21      6.1      3.9       6.3        1.9     0.19    99.00   \x020.28\
+          \             0.05    1.90\n360           53.9     10.9      0.40   18.2\
+          \       8.5      2.7       4.0        1.5     0.42   100.55   \x020.22 \
+          \            0.06    0.05\n1540 \x03C\n  5           57.3     11.6     \
+          \ 0.43   11.8       9.2      3.0       4.4        1.7     0.43    99.78\
+          \   \x020.46             0.17   \x020.17                0.08\n 10      \
+          \     57.9     13.2      0.54    3.5      11.3      3.6       5.2      \
+          \  2.1     0.50    97.96   \x020.16             0.17    0.32           \
+          \     0.07\n 20           59.1     13.8      0.54    0.78     11.4     \
+          \ 3.9       5.6        2.1     0.47    97.68   \x020.21             0.15\
+          \    2.60                0.08\n 30           59.3     14.2      0.58   \
+          \ 0.53     10.8      4.0       5.7        2.2     0.48    97.79   \x020.30\
+          \             0.13    2.77                0.10\n 60           59.7     15.7\
+          \      0.57    0.16      9.1      4.3       6.3        2.1     0.35    98.17\
+          \   \x020.47             0.03    2.93                0.03\n 90         \
+          \                                                                      \
+          \                       \x020.31             0.06    2.76              \
+          \  0.30\n120           63.3     16.2      0.51    0.21      6.6      4.1\
+          \       6.2        2.1     0.38    99.68\n240                          \
+          \                                                                      \
+          \      \x020.13             0.18    1.05\n360           60.9     20.0  \
+          \    0.50    0.17      3.5      4.7       7.8        1.5     0.05    99.21\
+          \   \x020.25             0.02    0.42\n\f3142                          \
+          \                           B.A. Cohen et al. 70 (2006) 3139–3148\n\n(multiple\
+          \ collector inductively coupled plasma mass spec-                     104\
+          \ rpm. The powder was then rinsed twice with MilliQ-El-\ntrometer) at ETH-Zürich\
+          \ using a standard bracketing tech-                    ement water, this\
+          \ water being eliminated also by\nnique (Levasseur et al., 2004). The iron\
+          \ isotopic                             centrifugation.\ncompositions, shown\
+          \ in Table 2, are expressed in d57Fe, rel-                     The metal\
+          \ beads were dissolved in a mixture of 0.5 ml\native to the IRMM-014 standard.\
+          \ All the Fe isotopic data                      distilled 6 N HCl and 0.5\
+          \ ml of 16 N HNO3 and the\nlie on a mass-dependent fractionation line with\
+          \ a slope of                    powders of silicate glass were dissolved\
+          \ in a mixture of\none-third when plotted as d57/54Fe against d57/56Fe \
+          \                          0.5 ml distilled HNO3 and 0.5 ml of distilled\
+          \ 27 N HF.\n(Fig. 1), indicating that hydrides and other putative inter-\
+          \                  Once dissolved, samples (and leachates) were evaporated\n\
+          ferences are insigniﬁcant. It should be noted that the nor-            \
+          \       and re-dissolved in 6 N HCl and evaporated again. Be-\nmalization\
+          \ to IRMM-14 used here is shifted from the one                       fore\
+          \ its passage on an anion exchange column, the sam-\nbased on the igneous\
+          \ Fe base line (also called Earth–Moon                     ple was ﬁnally\
+          \ re-dissolved in 1 ml of 6 N HCl. More\nigneous average) adopted by some\
+          \ authors (Beard and                           information on this procedure\
+          \ can be found in Levasseur\nJohnson, 1999). The d57Fe value of IRMM-14\
+          \ relative to                        et al. (2004).\nthe igneous Fe base\
+          \ line = \x020.11& ± 0.14& (2r) (Johnson                          The results\
+          \ show that metal and silicate are uniform and\net al., 2003). This means\
+          \ that                                                that the leaching\
+          \ step has no signiﬁcant eﬀect, i.e. the pow-\n                        \
+          \                                                      dered glass, the\
+          \ leached glass, and the leachate all had the\nd57 FeIRMM-14 ¼ d57 FeIGNEOUS\
+          \ þ 0:11:                                  ð2Þ\n                       \
+          \                                                       same isotopic composition.\
+          \ The long-term reproducibility\nThe normalization to Kil1919, as practiced\
+          \ by Kehm et al.                     of the standard (internal laboratory\
+          \ standard made of dis-\n(2003) should correspond very closely to the Earth–Moon\
+          \                       solved hematite) is d57Fe = 0.87& ± 0.12& (2r) over\
+          \ the\nigneous average. All the iron isotope data discussed below      \
+          \              duration of the study.\nwill be expressed in d57/54FeIRMM-14\
+          \ using the notation\nd57Fe.                                           \
+          \                             3. Results\n   The isotopic composition of\
+          \ the starting material was\ndetermined on the original powdered slag. Analyses\
+          \ of                            Experimental charges were studied by electron\
+          \ micro-\nrun products were made on ﬁve separate fractions: metal      \
+          \                 probe and BSE imaging, and all consist of only two major\n\
+          beads detached from the silicate, ﬁne metal beads separated            \
+          \       phases, a silicate glass and metal beads (containing sulﬁde\nfrom\
+          \ the silicate using 3 N HCl overnight, silicate glass                 \
+          \    blebs). The charges for the shortest heating times (2–5 min)\nwithout\
+          \ obvious ﬁne metal, reduced to powder, powder                         \
+          \ consist of glass and tiny metal beads embedded in the glass\nwhich is\
+          \ leached with 3 N HCl, and the leachate which is                      (Cohen\
+          \ et al., 2005). Due to relatively short heating dura-\nthe complement of\
+          \ the latter. This was to check that metal                    tions these\
+          \ charges contain many vesicles. In the charges\nwas uniform in composition,\
+          \ and that no remaining iron                        heated for longer durations\
+          \ (greater than 10 min) the metal\nmetal aﬀects the composition of the silicate.\
+          \ About 10 mg                     beads become larger and are conﬁned to\
+          \ the circumference\nof powdered glass were used for the analyses. The amount\
+          \                      of the silicate bead (Fig. 2). In these experiments\
+          \ a large\nof metal was a function of the size of the beads available  \
+          \                  separate metal bead was produced as well. At even longer\n\
+          but was at least a few mg. The leachates were separated                \
+          \       heating times the metal and silicate separate completely.\nfrom\
+          \ the glass powder by centrifugation for 15 min at                     \
+          \    In these experiments the glass bead is entirely free of any\n     \
+          \                                                                      \
+          \   metal (Fig. 2).\n                                                  \
+          \                               The chemical analyses of the glass beads\
+          \ are shown in\n                                                       \
+          \                       Table 2. They are homogeneous, with standard deviations\n\
+          \            15                                                        \
+          \        1–3% of the amount present for major elements. Cr and Ni\n    \
+          \                                                                      \
+          \    are below the detection limits of the electron probe. The\n       \
+          \                                                                      \
+          \ most noticeable and obvious change in the glass\n            10      \
+          \                                                          compositions\
+          \ is the decrease in the concentration of FeO,\n                       \
+          \                                                       which decreases\
+          \ steeply in the ﬁrst hour of heating, from\n\nδ 57/56Fe\n             \
+          \                                                                 47 to\
+          \ 13.6 wt% at 1450 \x03C and 3.5 wt% at 1550 \x03C after\n            5\n\
+          \                                                                      \
+          \        10 min, and then tapers oﬀ (Table 2, FeO normalized to\n      \
+          \                                                                      \
+          \  Al2O3 shown in Fig. 3). The rate of decrease increases with\n       \
+          \     0                                                                \
+          \ run temperature. In runs we made under similar\n                     \
+          \                                                         conditions, except\
+          \ for an fO2 above the iron-wustite buﬀer,\n                           \
+          \                                                   there is no Fe loss\
+          \ (Fig. 3). Experiments on a less FeO-rich\n            -5             \
+          \                                                   composition (Yu et al.,\
+          \ 2003) show a barely signiﬁcant\n              -10    0           10  \
+          \         20          30           40     evaporative loss of Fe at 1.0\
+          \ · 10\x025 bar at 1450 \x03C for the\n                                \
+          \      δ 57/54 Fe                              same heating time.\n    \
+          \                                                                      \
+          \       In Fig. 4 we examine the behavior of Na as a function of\nFig. 1.\
+          \ Iron isotopic data plotted on a d57/54Fe against d57/56Fe diagram.\nData\
+          \ points lie on a mass-dependent fractionation line with a slope of one-\
+          \   heating time. In the time it takes for more than 90% of the\nthird indicating\
+          \ that hydrides and other putative interferences are           FeO to be\
+          \ lost, there are very modest evaporative losses of\ninsigniﬁcant.     \
+          \                                                            Na, whereas\
+          \ in vacuum about 95% of the Na would be lost\n\f                      \
+          \                                Fe-isotope fractionation by silicate melt\
+          \ reduction                                                 3143\n\n\n\n\
+          \nFig. 2. BSE images of experimental charges heated at 1500 and 1540 \x03\
+          C for 10, 30, and 60 min. Metal formed during short runs (10–30 min) is\
+          \ found both\nas small beads around the rim of the charge and in a separated\
+          \ bead (not shown). During longer experiments (60 min and longer) all the\
+          \ metal that formed\ncoalesced into one separate bead (not shown) leaving\
+          \ the glass clear of metal.\n\n\n\n               8                    \
+          \                                                                 5\n  \
+          \                                                                      \
+          \                                                     1450ºC reduction\n\
+          \                                                                      \
+          \                                                       1500ºC reduction\n\
+          \                                                                      \
+          \                               4                       1540ºC reduction\n\
+          \               6\n\n\n\n                                              \
+          \                                     100×Na 2O/Al2O3\n                \
+          \                                                                      \
+          \                                       10-5 bar (Yu et al., 2003)\n\n \
+          \  FeO/Al2O3\n                                              1450ºC     \
+          \                                            3\n               4       \
+          \                       1500ºC\n                                       \
+          \       1540ºC                                                 2\n     \
+          \                                         10-5 bar (Yu et al., 2003)\n \
+          \              2                              \"non reduction\" runs\n \
+          \                                             required evaporative loss\
+          \                              1\n\n\n               0                 \
+          \                                                                    0\n\
+          \                   0   20         40          60           80         \
+          \ 100                               0   100       200             300  \
+          \              400\n                                   time (min.)     \
+          \                                                                time (min.)\n\
+          Fig. 3. FeO/Al2O3 ratios vs. time (min) in the charges produced in the \
+          \           Fig. 4. 100 · Na2O/Al2O3 vs. time (min) in the charges produced\
+          \ at the\n1450, 1500, and 1540 \x03C reduction runs (solid symbols), together\
+          \ with data        1450, 1500, and 1540 \x03C experimental runs (solid symbols),\
+          \ together with\nfrom our ‘‘non-reduction’’ runs (open squares) conducted\
+          \ at 1480 \x03C,              data from experiments by Yu et al. (2003)\
+          \ conducted at 1450 \x03C and\n1 atm and IW+0.5. Open triangles represent\
+          \ calculated values of the               1.0 · 10\x025 bar (open circles).\n\
+          minimum amount of iron loss expected from Rayleigh evaporation, based\n\
+          on the d57Fe values of the 20 and 60 min runs at 1540 \x03C (solid line\n\
+          through these points was hand drawn). Also shown are data from         \
+          \           stant in the diﬀerent experimental runs, those of S and\nexperiments\
+          \ by Yu et al. (2003) conducted at 1450 \x03C and 1.0 · 10\x025 bar\n  \
+          \                                                                      \
+          \          Cu gradually decreased with longer heating time. Manga-\n(open\
+          \ circles). Dashed lines represent upper and lower limits for the results\n\
+          of the reduction experiments.                                          \
+          \           nese is incorporated into the metallic component and is\n  \
+          \                                                                      \
+          \          observed as the sulﬁde alabandite (Fig. 5), containing\n    \
+          \                                                                      \
+          \        43 wt% Mn, 20 wt% Fe, and 2 wt% Cu ("
+        reason: Fe isotope delta is a supported token; this table requires row-level
+          phase-specific values and uncertainty verification, so it is retained verbatim
+          pending extraction.
+    - observation_id: cohen_2006_table_3_context
+      type: table_context
+      units: as printed in source table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 3144
+        table: '3'
+      values:
+        caption: Chemical composition of metal grains in experimental charges.
+        printed_table_text: "Table 3). Some\n(Yu et al., 2003). There are similar\
+          \ small evaporative losses                     troilite is also present.\n\
+          of K in our experiments (Table 2). Manganese, a less                   \
+          \              The results of the iron isotope analyses of the metal\nvolatile\
+          \ element, decreases with time too (Table 2), but is                   \
+          \    and silicate glass beads are shown in Table 2 and in\nincorporated\
+          \ into the metal–sulﬁde liquid.                                        Fig.\
+          \ 6. The initial iron isotope composition of the start-\n   The metal beads\
+          \ (Table 3) are comprised overwhelm-                             ing material\
+          \ was measured as \x020.32& using unheated\ningly of iron (over 91 wt%)\
+          \ together with other elements                          powdered starting\
+          \ material. In runs for all three temper-\nsuch as Si (up to 0.8 wt%), S\
+          \ (up to 4.0 wt%), Cu                                 atures, the iron isotope\
+          \ composition of the glass increas-\n(1.0 wt%), Mn (0.71 wt%), and P (0.22\
+          \ wt%). While the                             es rapidly within the ﬁrst\
+          \ 60–80 min to +2.5–3&. As\nconcentrations of Mn and P in the metal remained\
+          \ con-                             experimental run times become longer\
+          \ the isotopic\n\f3144                                                 \
+          \   B.A. Cohen et al. 70 (2006) 3139–3148\n\nTable 3\nChemical composition\
+          \ of metal grains in a number of experimental charges\n                \
+          \     No. of points          Si            P             S             \
+          \                  Mn       Fe           Co         Cu             Total\n\
+          1500 \x03C\n10 min               5                      0.02          0.14\
+          \              2.58                         0.12    94.78        0.09  \
+          \     0.74           98.50\n                     SD                    \
+          \ 0.02          0.04              1.44                         0.07    \
+          \ 1.09        0.03       0.12            0.33\n20 min               4  \
+          \                    0.40          0.11              1.80              \
+          \           1.05    93.91        0.10       0.68           98.10\n     \
+          \                SD                     0.07          0.05             \
+          \ 1.19                         1.94     3.25        0.02       0.14    \
+          \        0.04\n30 min               4                      0.69        \
+          \  0.11              0.39                         0.14    95.53        0.07\
+          \       0.46           97.42\n                     SD                  \
+          \   0.10          0.02              0.16                         0.10  \
+          \   0.14        0.03       0.04            0.17\n1540 \x03C\n10 min    \
+          \           5                      0.11          0.12              1.26\
+          \                         0.13    95.85        0.08       0.62         \
+          \  98.20\n                     SD                     0.03          0.04\
+          \              0.92                         0.10     1.03        0.02  \
+          \     0.09            0.13\n30 min               1                     \
+          \ 2.11          0.08              0.57                         1.57    91.94\
+          \        0.03       0.32           96.62\nAlabandite                   \
+          \               0.02          0.02          34.33                      \
+          \     42.58    20.52        0.02       2.14           99.63\n\n\n\n\n  \
+          \                                                                      \
+          \                                                                  1450ºC\
+          \ metal\n                                                              \
+          \                                                                      \
+          \      1500ºC metal\n                                                  \
+          \                                             3\n                      \
+          \                                                                      \
+          \                                              1540ºC metal\n          \
+          \                                                                      \
+          \                                                          1450ºC silicate\n\
+          \                                                                      \
+          \                                                                    1500ºC\
+          \ silicate\n                                                           \
+          \                                                                      \
+          \         1540ºC silicate\n                                            \
+          \                                                   2\n\n\n\n\n        \
+          \                                                                      \
+          \     δ57Fe (‰)   1\n\n\n\n                                            \
+          \                                                   0\n\n\n            \
+          \ 100µm\n\n                                                            \
+          \                                   -1"
+        reason: Metal grain analyses are preserved as printed context; no row-level
+          composition observations transcribed.
+    - observation_id: cohen_2006_table_4_context
+      type: table_context
+      units: as printed in source table
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 3145
+        table: '4'
+      values:
+        caption: Final silicate and metal weights, total Fe, and bulk Fe isotope composition.
+        printed_table_text: Table 4 and in
+        reason: Bulk isotope mass-balance values are preserved as context pending
+          row-level extraction.
+    - observation_id: cohen_2006_figure_1_deferred
+      type: figure_context
+      units: as printed in figure caption
+      locator:
+        figure: '1'
+        page: 4
+        pdf_page_index: 3
+      values:
+        caption: Fig. 1. Iron isotopic data plotted on a d57/54Fe against d57/56Fe
+          diagram. Data points lie on a mass-dependent fractionation line with a slope
+          of one- heating time. In the time it takes for more than 90% of the third
+          indicating that hydrides and other putative interferences are FeO to be
+          lost, there are very modest evaporative losses of
+        quantity_as_printed: Fe isotope composition / experimental chemistry as caption
+          states
+        series: []
+        marker_count_per_series: not counted; numeric figure digitisation deferred
+        digitisation: deferred to a figure pass
+    - observation_id: cohen_2006_figure_2_deferred
+      type: figure_context
+      units: as printed in figure caption
+      locator:
+        figure: '2'
+        page: 5
+        pdf_page_index: 4
+      values:
+        caption: "Fig. 2. BSE images of experimental charges heated at 1500 and 1540\
+          \ \x03C for 10, 30, and 60 min. Metal formed during short runs (10–30 min)\
+          \ is found both as small beads around the rim of the charge and in a separated\
+          \ bead (not shown). During longer experiments (60 min and longer) all the\
+          \ metal that formed coalesced into one separate bead (not shown) leaving\
+          \ the glass clear of metal."
+        quantity_as_printed: Fe isotope composition / experimental chemistry as caption
+          states
+        series: []
+        marker_count_per_series: not counted; numeric figure digitisation deferred
+        digitisation: deferred to a figure pass
+    - observation_id: cohen_2006_figure_3_deferred
+      type: figure_context
+      units: as printed in figure caption
+      locator:
+        figure: '3'
+        page: 5
+        pdf_page_index: 4
+      values:
+        caption: "Fig. 3. FeO/Al2O3 ratios vs. time (min) in the charges produced\
+          \ in the Fig. 4. 100 · Na2O/Al2O3 vs. time (min) in the charges produced\
+          \ at the 1450, 1500, and 1540 \x03C reduction runs (solid symbols), together\
+          \ with data 1450, 1500, and 1540 \x03C experimental runs (solid symbols),\
+          \ together with from our ‘‘non-reduction’’ runs (open squares) conducted\
+          \ at 1480 \x03C, data from experiments by Yu et al. (2003) conducted at\
+          \ 1450 \x03C and"
+        quantity_as_printed: Fe isotope composition / experimental chemistry as caption
+          states
+        series: []
+        marker_count_per_series: not counted; numeric figure digitisation deferred
+        digitisation: deferred to a figure pass
+    - observation_id: cohen_2006_figure_5_deferred
+      type: figure_context
+      units: as printed in figure caption
+      locator:
+        figure: '5'
+        page: 6
+        pdf_page_index: 5
+      values:
+        caption: "Fig. 5. BSE image of a metal grain on the rim of a silicate bead\
+          \ produced 0 100 200 300 400 at a 10 min run at 1540 \x03C. The arrows point\
+          \ to two alabandite grains time (min.) containing 43 wt% Mn, 20 wt% Fe,\
+          \ and 2 wt% Cu."
+        quantity_as_printed: Fe isotope composition / experimental chemistry as caption
+          states
+        series: []
+        marker_count_per_series: not counted; numeric figure digitisation deferred
+        digitisation: deferred to a figure pass
+    - observation_id: cohen_2006_figure_6_deferred
+      type: figure_context
+      units: as printed in figure caption
+      locator:
+        figure: '6'
+        page: 6
+        pdf_page_index: 5
+      values:
+        caption: "Fig. 6. d57Fe (&) for the silicate phase (solid symbols) and for\
+          \ the metal phase (open symbols) formed in the experimental runs of 1450,\
+          \ 1500, and composition of the silicate gradually decreases, 1540 \x03C.\
+          \ Error bars are based on the long-term reproducibility of the"
+        quantity_as_printed: Fe isotope composition / experimental chemistry as caption
+          states
+        series: []
+        marker_count_per_series: not counted; numeric figure digitisation deferred
+        digitisation: deferred to a figure pass
+    - observation_id: cohen_2006_figure_7_deferred
+      type: figure_context
+      units: as printed in figure caption
+      locator:
+        figure: '7'
+        page: 7
+        pdf_page_index: 6
+      values:
+        caption: "Fig. 7. Calculated bulk-d57Fe composition of the charges produced\
+          \ during the 1450, 1500, and 1540 \x03C runs, based on the d57Fe values\
+          \ and weights of Complementary experiments to ours have been per- the silicate\
+          \ and metal phases (Table 4). The heavy dashed line represents formed by\
+          \ Roskosz et al. (2005). They heated a haplobasal-"
+        quantity_as_printed: Fe isotope composition / experimental chemistry as caption
+          states
+        series: []
+        marker_count_per_series: not counted; numeric figure digitisation deferred
+        digitisation: deferred to a figure pass
