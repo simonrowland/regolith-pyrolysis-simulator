@@ -39,7 +39,7 @@ from scripts.battery_hero_plot import (
     TIER_MINOR,
     TIER_TRACE,
 )
-from matplotlib.colors import Normalize
+from matplotlib.colors import Normalize, to_rgba
 from matplotlib.figure import Figure
 from matplotlib.text import Text
 import matplotlib.pyplot as plt
@@ -732,13 +732,20 @@ def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
     )
     assert any(patch.get_hatch() == "///" for patch in axis.patches)
     assert "1" in {text.get_text() for text in axis.texts}
-    assert "0" in {text.get_text() for text in axis.texts}
+    assert "0" not in {text.get_text() for text in axis.texts}
+    assert len(axis.patches) == sum(int(cell["n"]) > 0 for cell in openimcc_cells)
     plt.close(fig)
 
     files = render_hero_charts(data, tmp_path / "sweet-spot-render")
     svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
     assert "cell label=n" in svg
     assert "sweet-spot fill=median" in svg
+    assert (
+        "scatter marker face=engine colour; flagged/extrapolated=white face with "
+        "engine-coloured edge"
+    ) in svg
+    assert "marker edge=sio₂ mole fraction" not in svg
+    assert "1≤n&lt;3 is grey and hatched; n=0 is blank" in svg
     assert files["hero:vapour:png"].read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
     melt_svg = files["hero:melt_activity:svg"].read_text(encoding="utf-8").casefold()
     assert "140/147 rows" in melt_svg
@@ -763,7 +770,7 @@ def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
             engine=engine,
             experiment=experiment,
             formula="FeO",
-            temperature_K=1300,
+            temperature_K=1550 if experiment == "internal-only" else 1300,
             residual=value,
             rail="redox",
             authority=authority,
@@ -812,7 +819,18 @@ def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
             if (artist.get_gid() or "").endswith(":flagged")
         ]
         assert len(flagged) == 1
-        assert len(flagged[0].get_facecolors()) == 0
+        assert flagged[0].get_facecolors()[0] == pytest.approx(to_rgba("#ffffff"))
+        assert flagged[0].get_edgecolors()[0] == pytest.approx(to_rgba("#111111"))
+        ordinary = next(
+            artist
+            for artist in axis.collections
+            if (artist.get_gid() or "").startswith(
+                "hero-marker:redox:Fe3+/Fe2+ ratio:internal-analytical:"
+            )
+            and (artist.get_gid() or "").endswith(":ordinary")
+        )
+        assert ordinary.get_facecolors()[0] == pytest.approx(to_rgba("#111111"))
+        assert not axis.lines
     finally:
         plt.close(figure)
 

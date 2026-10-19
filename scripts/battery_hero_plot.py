@@ -1944,8 +1944,11 @@ def _hero_legend_handles(
             [0],
             [0],
             color=engine_colors.get(engine, "#555555"),
-            linewidth=1.3,
+            linewidth=0.0,
+            linestyle="None",
             marker="o",
+            markerfacecolor=engine_colors.get(engine, "#555555"),
+            markeredgecolor=engine_colors.get(engine, "#555555"),
             markersize=4,
             label=engine,
         )
@@ -1963,8 +1966,10 @@ def _hero_legend_handles(
                 [0],
                 color="#444444",
                 linewidth=0.0,
+                linestyle="None",
                 marker="o",
-                markerfacecolor="none",
+                markerfacecolor="#ffffff",
+                markeredgecolor="#444444",
                 label="flagged / extrapolated",
             )
         )
@@ -1978,8 +1983,6 @@ def _draw_hero_current(
     facet: str,
     *,
     engine_colors: Mapping[str, Any],
-    composition_colormap: Any = None,
-    composition_normalization: Normalize | None = None,
 ) -> None:
     series = [
         (engine, composition, points)
@@ -1993,40 +1996,21 @@ def _draw_hero_current(
             item[1],
         )
     )
-    composition_colormap = composition_colormap or plt.get_cmap("viridis")
-    composition_normalization = composition_normalization or Normalize(vmin=0, vmax=1)
     for engine, composition, points in series:
         if not points:
             continue
         color = engine_colors.get(engine, "#555555")
-        line, = axis.plot(
-            [item.temperature_K for item in points],
-            [item.residual_dex for item in points],
-            color=color,
-            linewidth=1.0,
-            alpha=0.85,
-            zorder=2,
-        )
-        line.set_gid(f"hero-series:{rail}:{facet}:{engine}:{_composition_slug(composition)}")
         for flagged in (False, True):
             flagged_points = [item for item in points if item.flagged is flagged]
             if not flagged_points:
                 continue
-            edge_colors = [
-                color
-                if item.composition_sio2_mole_fraction is None
-                else composition_colormap(
-                    composition_normalization(item.composition_sio2_mole_fraction)
-                )
-                for item in flagged_points
-            ]
             artist = axis.scatter(
                 [item.temperature_K for item in flagged_points],
                 [item.residual_dex for item in flagged_points],
                 marker="o",
                 s=25,
-                facecolors="none" if flagged else color,
-                edgecolors=edge_colors,
+                facecolors="#ffffff" if flagged else color,
+                edgecolors=color,
                 linewidths=1.2,
                 zorder=3,
             )
@@ -2034,7 +2018,6 @@ def _draw_hero_current(
                 f"hero-marker:{rail}:{facet}:{engine}:{_composition_slug(composition)}:"
                 f"{'flagged' if flagged else 'ordinary'}"
             )
-    axis.axhline(0.0, color="#666666", linewidth=0.7, zorder=1)
     axis.set_ylabel("signed dex", fontsize=7)
     axis.set_xlabel("Temperature (K)", fontsize=7)
     axis.tick_params(labelsize=6)
@@ -2120,12 +2103,19 @@ def _draw_hero_sweet_spot(
             continue
         assert x_low is not None and x_high is not None
         assert y_low is not None and y_high is not None
-        temperatures.extend((y_low, y_high))
         count = int(cell.get("n") or 0)
+        if count == 0:
+            continue
+        temperatures.extend((y_low, y_high))
         value = _finite_float(cell.get("median_abs_dex"))
         color_eligible = bool(cell.get("color_eligible")) and value is not None
-        fill = colormap(normalization(value)) if color_eligible else "#eeeeee"
-        hatch = None if color_eligible else "///"
+        sparse = count < 3
+        fill = (
+            colormap(normalization(value))
+            if color_eligible
+            else "#eeeeee" if sparse else "#ffffff"
+        )
+        hatch = "///" if sparse else None
         axis.add_patch(
             Rectangle(
                 (x_low, y_low),
@@ -2152,7 +2142,7 @@ def _draw_hero_sweet_spot(
             fontsize=5.0,
         )
 
-    if not temperatures or not any(int(cell.get("n") or 0) for cell in cells):
+    if not temperatures:
         axis.set_axis_off()
         return False
     axis.set_xlim(0.0, 1.0)
@@ -2389,8 +2379,6 @@ def render_hero_charts(
     output_dir.mkdir(parents=True, exist_ok=True)
     files: dict[str, Path] = {}
     engine_colors = _hero_engine_colors(data.engines)
-    composition_colormap = plt.get_cmap("viridis")
-    composition_normalization = Normalize(vmin=0.0, vmax=1.0)
     for rail in HERO_RAILS:
         facets = _hero_facets(data, rail)
         facet_counts = _hero_facet_counts(data, rail)
@@ -2496,7 +2484,6 @@ def render_hero_charts(
             hspace=0.3,
             wspace=0.2,
         )
-        current_axes: list[Axes] = []
         sweet_spot_axes: list[Axes] = []
         row_index = 0
         for kind, payload, _height in row_specs:
@@ -2516,11 +2503,8 @@ def render_hero_charts(
                         rail,
                         facet,
                         engine_colors=engine_colors,
-                        composition_colormap=composition_colormap,
-                        composition_normalization=composition_normalization,
                     )
                     axis.set_title(facet, loc="left", fontsize=7.5)
-                    current_axes.append(axis)
             elif kind == "refusals":
                 pair = payload
                 assert isinstance(pair, tuple)
@@ -2600,29 +2584,6 @@ def render_hero_charts(
                         sweet_spot_axes.append(axis)
             row_index += 1
 
-        composition_values = [
-            point.composition_sio2_mole_fraction
-            for (series_rail, _facet, _engine, _composition), points in data.hero_series.items()
-            if series_rail == rail
-            for point in points
-            if point.composition_sio2_mole_fraction is not None
-        ]
-        if current_axes and composition_values:
-            composition_scalar = matplotlib.cm.ScalarMappable(
-                norm=composition_normalization,
-                cmap=composition_colormap,
-            )
-            composition_scalar.set_array([])
-            colorbar = figure.colorbar(
-                composition_scalar,
-                ax=current_axes,
-                fraction=0.018,
-                pad=0.012,
-            )
-            colorbar.set_label("SiO₂ mole fraction", fontsize=5.5)
-            colorbar.set_ticks([0.0, 0.5, 1.0])
-            colorbar.ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
-            colorbar.ax.tick_params(labelsize=5)
         if sweet_spot_axes and sweet_spot_values:
             scalar = matplotlib.cm.ScalarMappable(
                 norm=normalization,
@@ -2696,9 +2657,9 @@ def render_hero_charts(
                 columnspacing=1.0,
             )
         caption = (
-            "Line color=engine; marker edge=SiO₂ mole fraction (key at right); hollow=flagged/extrapolated. "
+            "Scatter marker face=engine colour; flagged/extrapolated=white face with engine-coloured edge. "
             "History: solid=RMS, dashed=median |dex|, dash-dot=paired RMS, dotted=best same-row benchmark. "
-            "Sweet-spot fill=median |dex|; cell label=n; n<3 is grey and hatched."
+            "Sweet-spot fill=median |dex|; cell label=n; 1≤n<3 is grey and hatched; n=0 is blank."
         )
         if rail == Rail.MELT_ACTIVITY.value:
             caption += (
