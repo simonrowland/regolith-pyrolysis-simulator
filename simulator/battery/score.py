@@ -3610,10 +3610,9 @@ def oxygen_is_scorer_input(
 ) -> tuple[bool, str, tuple[str, ...]]:
     """Whether a missing fO2 must be refused, and the record of why.
 
-    Any modeled quantity over a multivalent melt requires an oxygen
-    condition. For a redox-free melt, activity and other quantities follow
-    their identity profiles: required fO2 is an input, and not-applicable
-    fO2 is omitted rather than filled.
+    Melt activity takes oxygen only when a multivalent element is present.
+    Every other quantity follows its identity profile: a required fO2 is an
+    input, and a not-applicable fO2 is omitted rather than filled.
     """
 
     quantity = quantity_token(identity)
@@ -3624,13 +3623,6 @@ def oxygen_is_scorer_input(
         identity.species.formula,
         oxide_aliases=MELTS_OXIDE_ALIASES,
     )
-    if redox and quantity not in MELT_ACTIVITY_QUANTITIES:
-        qname = quantity.value if quantity is not None else "quantity"
-        return (
-            True,
-            f"{qname} over a melt with multivalent " + ", ".join(redox),
-            redox,
-        )
     if quantity in MELT_ACTIVITY_QUANTITIES:
         if redox:
             return True, "melt contains multivalent " + ", ".join(redox), redox

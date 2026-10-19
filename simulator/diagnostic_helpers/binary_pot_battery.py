@@ -4062,7 +4062,14 @@ def equilibrate_cell(
     if "fO2_log" in parameters:
         kwargs["fO2_log"] = fo2_log
     if "redox_mode" in parameters and po2.mode == PO2_NOT_AN_INPUT:
-        kwargs["redox_mode"] = REDOX_MODE_NOT_AN_INPUT
+        from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+        from simulator.melt_backend.base import multivalent_components
+
+        if not multivalent_components(
+            pot.composition_wt_pct,
+            oxide_aliases=MELTS_OXIDE_ALIASES,
+        ):
+            kwargs["redox_mode"] = REDOX_MODE_NOT_AN_INPUT
     if "po2_request" in parameters:
         kwargs["po2_request"] = po2
     if "call_timeout_s" in parameters:
