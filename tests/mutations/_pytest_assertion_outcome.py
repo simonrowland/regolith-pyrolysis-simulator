@@ -17,8 +17,9 @@ def pytest_assertion_failed(
     if "error collecting" in lowered_output:
         return False
 
-    summary_prefix = f"FAILED {node_id} - "
-    return any(
-        line.startswith(summary_prefix) and expected_reason in line
+    summary = f"FAILED {node_id}"
+    summary_matches = any(
+        line.strip() == summary or line.strip().startswith(f"{summary} - ")
         for line in output.splitlines()
     )
+    return summary_matches and expected_reason in output

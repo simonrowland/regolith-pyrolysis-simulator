@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
+import tempfile
 
 from _pytest_assertion_outcome import pytest_assertion_failed
 
@@ -53,21 +55,26 @@ def main() -> int:
     if source.count(CALL) != 1:
         raise SystemExit('expected one direct MAGEMin equilibrate call')
 
+    basetemp = tempfile.mkdtemp(prefix='magemin-equilibrate-')
     try:
         SOURCE.write_text(source.replace(CALL, BROAD, 1))
         env = os.environ.copy()
-        env['PYTHONPATH'] = str(ROOT)
+        env['PYTHONPATH'] = os.pathsep.join(
+            filter(None, (str(ROOT), env.get('PYTHONPATH')))
+        )
+        env['COLUMNS'] = '400'
         result = subprocess.run(
             [
                 sys.executable,
                 '-m',
                 'pytest',
                 '-q',
+                '-rf',
                 '-n',
                 '0',
                 '-p',
                 'no:cacheprovider',
-                '--basetemp=/private/tmp/claude-501/bugs1019-w2-00-pyt',
+                f'--basetemp={basetemp}',
                 TEST_NODE,
             ],
             cwd=ROOT,
@@ -77,7 +84,10 @@ def main() -> int:
             check=False,
         )
     finally:
-        SOURCE.write_text(source)
+        try:
+            SOURCE.write_text(source)
+        finally:
+            shutil.rmtree(basetemp)
 
     output = result.stdout + result.stderr
     if not pytest_assertion_failed(
