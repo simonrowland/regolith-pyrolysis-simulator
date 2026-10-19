@@ -122,7 +122,8 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
                 collect_locators(item)
 
     collect_locators(document)
-    assert len(locators) == 2068
+    # Typing Tables 7 and 9 adds 158 locators and 73 observations.
+    assert len(locators) == 2226
     assert all(
         locator["page"] == locator["pdf_page_index"] + 1
         and "published_page" in locator
@@ -185,7 +186,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     migrator.finalize()
     result = migrator.result
     assert result.validation.hard_issues == ()
-    assert len(result.observations) == 928
+    assert len(result.observations) == 1001
 
     partial_pressures = [
         row
