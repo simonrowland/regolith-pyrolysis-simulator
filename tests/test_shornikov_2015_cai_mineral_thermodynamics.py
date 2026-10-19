@@ -5,6 +5,8 @@ from pathlib import Path
 
 import yaml
 
+from tests.test_cheng_2021_phase_equilibria_extract import _locators
+
 
 EXTRACT = (
     Path(__file__).resolve().parents[1]
@@ -13,18 +15,6 @@ EXTRACT = (
     / "extracts"
     / "shornikov-2015-cai-mineral-thermodynamics.yaml"
 )
-
-
-def _locators(value: object):
-    if isinstance(value, dict):
-        locator = value.get("locator")
-        if isinstance(locator, dict):
-            yield locator
-        for child in value.values():
-            yield from _locators(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from _locators(child)
 
 
 def test_all_locators_map_printed_pdf_page_to_zero_based_index() -> None:
