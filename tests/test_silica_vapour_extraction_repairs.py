@@ -1,9 +1,11 @@
 from copy import deepcopy
+import csv
 from decimal import Decimal
 
+import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, StateTag
+from simulator.battery.enums import EvidenceClass, Quantity, StateTag
 from simulator.battery.migrate import (
     Migrator,
     REPO_ROOT,
@@ -165,6 +167,162 @@ def test_yakovlev_1984_o2_table_is_model_derived_with_located_points():
         assert condition.locator is not None
         assert condition.locator.table == "Po2"
         assert row.point_conditions["composition"].state.is_unknown
+
+
+def _assert_yakovlev_1984_figure_and_range_pins(extract, audit_rows):
+    printed_maxima = {
+        "yakovlev_1984_murchison_Fe_max_1450_1725C": ("Fe", 1e-2),
+        "yakovlev_1984_murchison_SiO_Mg_max_1750_1825C": ("SiO", 2e-2),
+        "yakovlev_1984_murchison_Mg_max_1750_1825C": ("Mg", 8.3e-3),
+        "yakovlev_1984_murchison_Ca_max_1950_2025C": ("Ca", 4.4e-4),
+    }
+    for observation_id, (species, expected_pressure) in printed_maxima.items():
+        row = next(
+            item for item in extract["species"][species]["observations"]
+            if item["observation_id"] == observation_id
+        )
+        assert float(row["values"]["p_torr"]) == expected_pressure
+        assert row["values"]["admission_status"] == "rejected"
+
+    literal_figure_pins = {
+        "F1-Ca-07": (2110, 2.4e-04, (1780, 880), (1780, 880)),
+        "F1-Mg-02": (1475, 2.4e-05, (868, 1177), (868, 1178)),
+        "F2-Ca-08": (2175, 2.9e-03, (1217, 410), (1217, 409)),
+        "F2-SiO-09": (1875, 6.3e-03, (678, 292), (680, 291)),
+    }
+
+    expected_counts = {
+        ("1", "SiO"): 8,
+        ("1", "Mg"): 12,
+        ("1", "Ca"): 5,
+        ("1", "Al"): 3,
+        ("2", "SiO"): 18,
+        ("2", "Mg"): 8,
+        ("2", "Ca"): 10,
+        ("2", "Al"): 5,
+    }
+    assert len(audit_rows) == sum(expected_counts.values()) == 69
+    for key, expected_count in expected_counts.items():
+        figure, species = key
+        sample = "Murchison" if figure == "1" else "CAI"
+        observation_id = f"yakovlev_1984_fig{figure}_{sample}_{species}_digitized"
+        observation = next(
+            item for item in extract["species"][species]["observations"]
+            if item["observation_id"] == observation_id
+        )
+        points = {point["point_id"]: point for point in observation["values"]["points"]}
+        rows = [row for row in audit_rows if (row["figure"], row["species"]) == key]
+        assert len(rows) == expected_count
+        assert len(points) == expected_count
+        for row in rows:
+            point = points[row["point_id"]]
+            assert point["T_C"] == int(row["stored_T_C"])
+            assert point["P"] == float(row["stored_p_torr"])
+            if row["point_id"] in literal_figure_pins:
+                temperature, pressure, read1, read2 = literal_figure_pins[row["point_id"]]
+                assert point["T_C"] == temperature
+                assert point["P"] == pressure
+                assert int(row["stored_T_C"]) == temperature
+                assert float(row["stored_p_torr"]) == pressure
+                assert (int(row["read1_x_px"]), int(row["read1_y_px"])) == read1
+                assert (int(row["read2_x_px"]), int(row["read2_y_px"])) == read2
+            assert point["marker_symbol"] == {
+                "open_circle": "open circle",
+                "open_square": "open square",
+                "filled_square": "filled square",
+                "open_triangle": "open triangle",
+            }[row["marker_symbol"]]
+            assert all(row[f"read{index}_{axis}_px"] for index in (1, 2) for axis in ("x", "y"))
+            assert float(row["read_difference_decades"]) <= 0.02
+            expected_uncertainty = abs(
+                float(row["read1_log10_p_torr"])
+                - float(row["read2_log10_p_torr"])
+            ) / 2
+            assert float(row["read_uncertainty_dex"]) == round(expected_uncertainty, 5)
+            composition = point["point_conditions"]["composition"]
+            assert composition["state"] == {
+                "tag": "unknown",
+                "reason": "numerical_bulk_composition_not_published",
+            }
+            assert composition["locator"]["figure"] == figure
+            assert composition["locator"]["published_page"] == 946
+            assert composition["locator"]["pdf_page_index"] == 2
+            note = composition["locator"]["note"]
+            assert "log10(p_torr)=" in note
+            assert f"({row['read1_x_px']},{row['read1_y_px']})" in note
+            assert f"({row['read2_x_px']},{row['read2_y_px']})" in note
+            assert "read uncertainty" in note and "dex" in note
+
+
+def test_yakovlev_1984_printed_maxima_and_digitized_figures_migrate_with_conditions():
+    extract_path = EXTRACTS / "kems-028-yakovlev-1984.yaml"
+    extract = yaml.safe_load(extract_path.read_text())
+    with (EXTRACTS / "kems-028-yakovlev-1984-figure-audit.csv").open(newline="") as file:
+        audit_rows = list(csv.DictReader(file))
+    _assert_yakovlev_1984_figure_and_range_pins(extract, audit_rows)
+
+    mutated = deepcopy(extract)
+    mutated_audit_rows = deepcopy(audit_rows)
+    mutated_point = next(
+        point
+        for observation in mutated["species"]["SiO"]["observations"]
+        for point in observation["values"].get("points", [])
+        if point["point_id"] == "F2-SiO-09"
+    )
+    mutated_row = next(row for row in mutated_audit_rows if row["point_id"] == "F2-SiO-09")
+    mutated_point["P"] *= 2
+    mutated_row["stored_p_torr"] = str(float(mutated_row["stored_p_torr"]) * 2)
+    with pytest.raises(AssertionError):
+        _assert_yakovlev_1984_figure_and_range_pins(mutated, mutated_audit_rows)
+    mutated = deepcopy(extract)
+    fe_max = next(
+        item for item in mutated["species"]["Fe"]["observations"]
+        if item["observation_id"] == "yakovlev_1984_murchison_Fe_max_1450_1725C"
+    )
+    fe_max["values"]["p_torr"] = float(fe_max["values"]["p_torr"]) * 2
+    with pytest.raises(AssertionError):
+        _assert_yakovlev_1984_figure_and_range_pins(mutated, audit_rows)
+
+    result = _migrate("kems-028-yakovlev-1984.yaml")
+    parent_ids = {
+        f"yakovlev_1984_fig{row['figure']}_{'Murchison' if row['figure'] == '1' else 'CAI'}_{row['species']}_digitized"
+        for row in audit_rows
+    }
+    observations = [
+        row for row in result.observations.values()
+        if any(parent_id in row.observation_id for parent_id in parent_ids)
+    ]
+    assert len(observations) == 69
+    _validate_rows(result, observations)
+    for audit_row in audit_rows:
+        figure = audit_row["figure"]
+        parent_id = (
+            f"yakovlev_1984_fig{figure}_"
+            f"{'Murchison' if figure == '1' else 'CAI'}_"
+            f"{audit_row['species']}_digitized"
+        )
+        temperature = Decimal(audit_row["stored_T_C"]) + Decimal("273.15")
+        matches = [
+            row for row in observations
+            if parent_id in row.observation_id
+            and row.identity.species.formula == audit_row["species"]
+            and row.identity.temperature_K.is_value
+            and row.identity.temperature_K.value == temperature
+        ]
+        assert len(matches) == 1, (parent_id, audit_row["point_id"])
+        observation = matches[0]
+        assert observation.identity.quantity.is_value
+        assert observation.identity.quantity.value is Quantity.P_PARTIAL
+        assert observation.value.point == convert_pressure_to_pa(
+            Decimal(audit_row["stored_p_torr"]), "torr"
+        )[0]
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        assert observation.point_conditions["temperature_K"].state.value == temperature
+        assert observation.point_conditions["temperature_K"].locator.figure == figure
+        composition = observation.point_conditions["composition"]
+        assert composition.state.is_unknown
+        assert composition.locator.figure == figure
 
 
 def test_yakovlev_shornikov_2011_about_sio_and_o2_values_keep_provenance():
