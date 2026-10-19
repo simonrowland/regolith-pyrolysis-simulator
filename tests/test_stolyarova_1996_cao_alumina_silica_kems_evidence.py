@@ -22,10 +22,18 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
         if observation["observation_id"].startswith("stolyarova_1996_table2_")
     ]
     assert len(observations) == 3
+    # Published p. 19 calculates p(O), p'(O) and p''(O) from this study's ion
+    # currents and Gurvich et al. (66) equilibrium constants, Eqs. (7)–(9).
+    # Table 2 footnote a (p. 20) says those columns were calculated. They are
+    # one class: model_derived, not a quotation and not a direct measurement.
+    method = document["extraction"]["method"]
+    assert "quoted as attributed" not in method
+    assert "model_derived" in method
+    assert "Eqs. (7)–(9)" in method
     assert [observation["values"]["method_class"] for observation in observations] == [
-        "quoted_attributed",
-        "quoted_attributed",
-        "quoted_attributed",
+        "model_derived",
+        "model_derived",
+        "model_derived",
     ]
     assert [observation["reaction_as_printed"] for observation in observations] == [
         "(MoO3) = (MoO2) + (O)",
@@ -71,6 +79,6 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
     assert len(oxygen_rows) == 55
     assert all(
         observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
         for observation in oxygen_rows
     )
