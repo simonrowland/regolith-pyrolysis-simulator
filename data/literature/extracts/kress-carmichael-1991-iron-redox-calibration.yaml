@@ -272,6 +272,20 @@ experiments:
     table: '4'
     row: Q01
   sample: {}
+  pressure_environment: &kc91_one_atm
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ferric/ferrous partitioning at one atmosphere
+        note: Printed 1 atm; converted with 1 atm = 101325 Pa.
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 3, pdf_page_index: 2, published_page: 84, section: Ferric/ferrous partitioning at one atmosphere}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
 - experiment_id: kc91_t4_Q02
   series: Table 4 drop-quench Q02
   method: quench_equilibration
@@ -282,6 +296,7 @@ experiments:
     table: '4'
     row: Q02
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q03
   series: Table 4 drop-quench Q03
   method: quench_equilibration
@@ -292,6 +307,7 @@ experiments:
     table: '4'
     row: Q03
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q04
   series: Table 4 drop-quench Q04
   method: quench_equilibration
@@ -302,6 +318,7 @@ experiments:
     table: '4'
     row: Q04
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q05
   series: Table 4 drop-quench Q05
   method: quench_equilibration
@@ -312,6 +329,7 @@ experiments:
     table: '4'
     row: Q05
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q06
   series: Table 4 drop-quench Q06
   method: quench_equilibration
@@ -322,6 +340,7 @@ experiments:
     table: '4'
     row: Q06
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q11
   series: Table 4 drop-quench Q11
   method: quench_equilibration
@@ -332,6 +351,7 @@ experiments:
     table: '4'
     row: Q11
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q12
   series: Table 4 drop-quench Q12
   method: quench_equilibration
@@ -342,6 +362,7 @@ experiments:
     table: '4'
     row: Q12
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q13
   series: Table 4 drop-quench Q13
   method: quench_equilibration
@@ -352,6 +373,7 @@ experiments:
     table: '4'
     row: Q13
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q14
   series: Table 4 drop-quench Q14
   method: quench_equilibration
@@ -362,6 +384,7 @@ experiments:
     table: '4'
     row: Q14
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q15
   series: Table 4 drop-quench Q15
   method: quench_equilibration
@@ -372,6 +395,7 @@ experiments:
     table: '4'
     row: Q15
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q18
   series: Table 4 drop-quench Q18
   method: quench_equilibration
@@ -382,6 +406,7 @@ experiments:
     table: '4'
     row: Q18
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q19
   series: Table 4 drop-quench Q19
   method: quench_equilibration
@@ -392,6 +417,7 @@ experiments:
     table: '4'
     row: Q19
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q21
   series: Table 4 drop-quench Q21
   method: quench_equilibration
@@ -402,6 +428,7 @@ experiments:
     table: '4'
     row: Q21
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q22
   series: Table 4 drop-quench Q22
   method: quench_equilibration
@@ -412,6 +439,7 @@ experiments:
     table: '4'
     row: Q22
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q23
   series: Table 4 drop-quench Q23
   method: quench_equilibration
@@ -422,6 +450,7 @@ experiments:
     table: '4'
     row: Q23
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q27
   series: Table 4 drop-quench Q27
   method: quench_equilibration
@@ -432,6 +461,7 @@ experiments:
     table: '4'
     row: Q27
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q29
   series: Table 4 drop-quench Q29
   method: quench_equilibration
@@ -442,6 +472,7 @@ experiments:
     table: '4'
     row: Q29
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q31
   series: Table 4 drop-quench Q31
   method: quench_equilibration
@@ -452,6 +483,7 @@ experiments:
     table: '4'
     row: Q31
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q32
   series: Table 4 drop-quench Q32
   method: quench_equilibration
@@ -462,6 +494,7 @@ experiments:
     table: '4'
     row: Q32
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q34
   series: Table 4 drop-quench Q34
   method: quench_equilibration
@@ -472,6 +505,7 @@ experiments:
     table: '4'
     row: Q34
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q41
   series: Table 4 drop-quench Q41
   method: quench_equilibration
@@ -482,6 +516,7 @@ experiments:
     table: '4'
     row: Q41
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q42
   series: Table 4 drop-quench Q42
   method: quench_equilibration
@@ -492,6 +527,7 @@ experiments:
     table: '4'
     row: Q42
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q43
   series: Table 4 drop-quench Q43
   method: quench_equilibration
@@ -502,6 +538,7 @@ experiments:
     table: '4'
     row: Q43
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q44
   series: Table 4 drop-quench Q44
   method: quench_equilibration
@@ -512,6 +549,7 @@ experiments:
     table: '4'
     row: Q44
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q51
   series: Table 4 drop-quench Q51
   method: quench_equilibration
@@ -522,6 +560,7 @@ experiments:
     table: '4'
     row: Q51
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q52
   series: Table 4 drop-quench Q52
   method: quench_equilibration
@@ -532,6 +571,7 @@ experiments:
     table: '4'
     row: Q52
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q53
   series: Table 4 drop-quench Q53
   method: quench_equilibration
@@ -542,6 +582,7 @@ experiments:
     table: '4'
     row: Q53
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q61
   series: Table 4 drop-quench Q61
   method: quench_equilibration
@@ -552,6 +593,7 @@ experiments:
     table: '4'
     row: Q61
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q62
   series: Table 4 drop-quench Q62
   method: quench_equilibration
@@ -562,6 +604,7 @@ experiments:
     table: '4'
     row: Q62
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q64
   series: Table 4 drop-quench Q64
   method: quench_equilibration
@@ -572,6 +615,7 @@ experiments:
     table: '4'
     row: Q64
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q65
   series: Table 4 drop-quench Q65
   method: quench_equilibration
@@ -582,6 +626,7 @@ experiments:
     table: '4'
     row: Q65
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t4_Q66
   series: Table 4 drop-quench Q66
   method: quench_equilibration
@@ -592,6 +637,7 @@ experiments:
     table: '4'
     row: Q66
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B27
   series: Table 5 reanalysis B27
   method: quench_equilibration
@@ -602,6 +648,7 @@ experiments:
     table: '5'
     row: B27
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B34
   series: Table 5 reanalysis B34
   method: quench_equilibration
@@ -612,6 +659,7 @@ experiments:
     table: '5'
     row: B34
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B44
   series: Table 5 reanalysis B44
   method: quench_equilibration
@@ -622,6 +670,7 @@ experiments:
     table: '5'
     row: B44
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B54
   series: Table 5 reanalysis B54
   method: quench_equilibration
@@ -632,6 +681,7 @@ experiments:
     table: '5'
     row: B54
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B64
   series: Table 5 reanalysis B64
   method: quench_equilibration
@@ -642,6 +692,7 @@ experiments:
     table: '5'
     row: B64
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B74
   series: Table 5 reanalysis B74
   method: quench_equilibration
@@ -652,6 +703,7 @@ experiments:
     table: '5'
     row: B74
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B76
   series: Table 5 reanalysis B76
   method: quench_equilibration
@@ -662,6 +714,7 @@ experiments:
     table: '5'
     row: B76
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B79
   series: Table 5 reanalysis B79
   method: quench_equilibration
@@ -672,6 +725,7 @@ experiments:
     table: '5'
     row: B79
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B82
   series: Table 5 reanalysis B82
   method: quench_equilibration
@@ -682,6 +736,7 @@ experiments:
     table: '5'
     row: B82
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B105
   series: Table 5 reanalysis B105
   method: quench_equilibration
@@ -692,6 +747,7 @@ experiments:
     table: '5'
     row: B105
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B108
   series: Table 5 reanalysis B108
   method: quench_equilibration
@@ -702,6 +758,7 @@ experiments:
     table: '5'
     row: B108
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B118
   series: Table 5 reanalysis B118
   method: quench_equilibration
@@ -712,6 +769,7 @@ experiments:
     table: '5'
     row: B118
   sample: {}
+  pressure_environment: *kc91_one_atm
 - experiment_id: kc91_t5_B120
   series: Table 5 reanalysis B120
   method: quench_equilibration
@@ -722,6 +780,7 @@ experiments:
     table: '5'
     row: B120
   sample: {}
+  pressure_environment: *kc91_one_atm
 species:
   SiO2:
     observations:
@@ -15685,6 +15744,18 @@ species:
         T_C: '1448'
         Fe2O3_wt_pct: '16.93'
         FeO_wt_pct: '5.41'
+        composition_wt_pct:
+          SiO2: '38.86'
+          TiO2: '0.00'
+          Al2O3: '17.00'
+          Fe2O3: '16.93'
+          FeO: '5.41'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '20.89'
+          Na2O: '0.00'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q01_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q01_FeO
@@ -15719,6 +15790,18 @@ species:
         T_C: '1448'
         Fe2O3_wt_pct: '16.81'
         FeO_wt_pct: '5.41'
+        composition_wt_pct:
+          SiO2: '38.94'
+          TiO2: '0.00'
+          Al2O3: '17.02'
+          Fe2O3: '16.81'
+          FeO: '5.41'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '20.82'
+          Na2O: '0.00'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q02_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q02_FeO
@@ -15753,6 +15836,18 @@ species:
         T_C: '1448'
         Fe2O3_wt_pct: '16.73'
         FeO_wt_pct: '5.29'
+        composition_wt_pct:
+          SiO2: '37.73'
+          TiO2: '0.00'
+          Al2O3: '17.67'
+          Fe2O3: '16.73'
+          FeO: '5.29'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '21.09'
+          Na2O: '0.00'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q03_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q03_FeO
@@ -15787,6 +15882,18 @@ species:
         T_C: '1448'
         Fe2O3_wt_pct: '16.61'
         FeO_wt_pct: '5.29'
+        composition_wt_pct:
+          SiO2: '39.20'
+          TiO2: '0.00'
+          Al2O3: '17.60'
+          Fe2O3: '16.61'
+          FeO: '5.29'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '20.95'
+          Na2O: '0.00'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q04_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q04_FeO
@@ -15821,6 +15928,18 @@ species:
         T_C: '1300'
         Fe2O3_wt_pct: '20.45'
         FeO_wt_pct: '1.58'
+        composition_wt_pct:
+          SiO2: '68.61'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '20.45'
+          FeO: '1.58'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.03'
+          Na2O: '8.30'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q05_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q05_FeO
@@ -15855,6 +15974,18 @@ species:
         T_C: '1300'
         Fe2O3_wt_pct: '20.08'
         FeO_wt_pct: '1.83'
+        composition_wt_pct:
+          SiO2: '66.02'
+          TiO2: '0.00'
+          Al2O3: '1.83'
+          Fe2O3: '20.08'
+          FeO: '1.83'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.01'
+          Na2O: '8.87'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q06_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q06_FeO
@@ -15889,6 +16020,18 @@ species:
         T_C: '1435'
         Fe2O3_wt_pct: '19.46'
         FeO_wt_pct: '2.70'
+        composition_wt_pct:
+          SiO2: '66.97'
+          TiO2: '0.00'
+          Al2O3: '0.01'
+          Fe2O3: '19.46'
+          FeO: '2.70'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.01'
+          Na2O: '9.98'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q11_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q11_FeO
@@ -15923,6 +16066,18 @@ species:
         T_C: '1435'
         Fe2O3_wt_pct: '19.07'
         FeO_wt_pct: '2.69'
+        composition_wt_pct:
+          SiO2: '68.44'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '19.07'
+          FeO: '2.69'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.01'
+          Na2O: '9.87'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q12_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q12_FeO
@@ -15957,6 +16112,18 @@ species:
         T_C: '1435'
         Fe2O3_wt_pct: '19.06'
         FeO_wt_pct: '2.87'
+        composition_wt_pct:
+          SiO2: '66.38'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '19.06'
+          FeO: '2.87'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.01'
+          Na2O: '10.60'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q13_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q13_FeO
@@ -15991,6 +16158,18 @@ species:
         T_C: '1435'
         Fe2O3_wt_pct: '17.45'
         FeO_wt_pct: '2.84'
+        composition_wt_pct:
+          SiO2: '62.32'
+          TiO2: '0.00'
+          Al2O3: '5.93'
+          Fe2O3: '17.45'
+          FeO: '2.84'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.02'
+          Na2O: '10.65'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q14_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q14_FeO
@@ -16025,6 +16204,18 @@ species:
         T_C: '1435'
         Fe2O3_wt_pct: '19.40'
         FeO_wt_pct: '2.89'
+        composition_wt_pct:
+          SiO2: '67.72'
+          TiO2: '0.00'
+          Al2O3: '0.02'
+          Fe2O3: '19.40'
+          FeO: '2.89'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.00'
+          Na2O: '9.09'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q15_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q15_FeO
@@ -16059,6 +16250,18 @@ species:
         T_C: '1435'
         Fe2O3_wt_pct: '22.08'
         FeO_wt_pct: '3.39'
+        composition_wt_pct:
+          SiO2: '55.79'
+          TiO2: '0.00'
+          Al2O3: '1.13'
+          Fe2O3: '22.08'
+          FeO: '3.39'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.01'
+          Na2O: '16.88'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q18_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q18_FeO
@@ -16093,6 +16296,18 @@ species:
         T_C: '1435'
         Fe2O3_wt_pct: '19.63'
         FeO_wt_pct: '2.45'
+        composition_wt_pct:
+          SiO2: '52.17'
+          TiO2: '0.00'
+          Al2O3: '4.02'
+          Fe2O3: '19.63'
+          FeO: '2.45'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.02'
+          Na2O: '18.44'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q19_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q19_FeO
@@ -16127,6 +16342,18 @@ species:
         T_C: '996'
         Fe2O3_wt_pct: '22.10'
         FeO_wt_pct: '0.14'
+        composition_wt_pct:
+          SiO2: '66.87'
+          TiO2: '0.00'
+          Al2O3: '0.04'
+          Fe2O3: '22.10'
+          FeO: '0.14'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.04'
+          Na2O: '9.56'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q21_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q21_FeO
@@ -16161,6 +16388,18 @@ species:
         T_C: '996'
         Fe2O3_wt_pct: '21.99'
         FeO_wt_pct: '0.23'
+        composition_wt_pct:
+          SiO2: '65.80'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '21.99'
+          FeO: '0.23'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.01'
+          Na2O: '10.27'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q22_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q22_FeO
@@ -16195,6 +16434,18 @@ species:
         T_C: '996'
         Fe2O3_wt_pct: '21.44'
         FeO_wt_pct: '0.34'
+        composition_wt_pct:
+          SiO2: '66.19'
+          TiO2: '0.00'
+          Al2O3: '0.00'
+          Fe2O3: '21.44'
+          FeO: '0.34'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.01'
+          Na2O: '10.69'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q23_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q23_FeO
@@ -16229,6 +16480,18 @@ species:
         T_C: '996'
         Fe2O3_wt_pct: '37.58'
         FeO_wt_pct: '0.28'
+        composition_wt_pct:
+          SiO2: '33.16'
+          TiO2: '0.00'
+          Al2O3: '2.71'
+          Fe2O3: '37.58'
+          FeO: '0.28'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.04'
+          Na2O: '24.55'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q27_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q27_FeO
@@ -16263,6 +16526,18 @@ species:
         T_C: '996'
         Fe2O3_wt_pct: '22.06'
         FeO_wt_pct: '0.27'
+        composition_wt_pct:
+          SiO2: '47.98'
+          TiO2: '0.00'
+          Al2O3: '3.92'
+          Fe2O3: '22.06'
+          FeO: '0.27'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '0.02'
+          Na2O: '24.76'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q29_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q29_FeO
@@ -16297,6 +16572,18 @@ species:
         T_C: '1288'
         Fe2O3_wt_pct: '33.31'
         FeO_wt_pct: '1.98'
+        composition_wt_pct:
+          SiO2: '27.97'
+          TiO2: '0.00'
+          Al2O3: '1.83'
+          Fe2O3: '33.31'
+          FeO: '1.98'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '33.64'
+          Na2O: '0.09'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q31_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q31_FeO
@@ -16331,6 +16618,18 @@ species:
         T_C: '1288'
         Fe2O3_wt_pct: '19.38'
         FeO_wt_pct: '2.77'
+        composition_wt_pct:
+          SiO2: '42.32'
+          TiO2: '0.00'
+          Al2O3: '11.91'
+          Fe2O3: '19.38'
+          FeO: '2.77'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '22.48'
+          Na2O: '0.09'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q32_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q32_FeO
@@ -16365,6 +16664,18 @@ species:
         T_C: '1288'
         Fe2O3_wt_pct: '22.58'
         FeO_wt_pct: '2.91'
+        composition_wt_pct:
+          SiO2: '42.86'
+          TiO2: '0.00'
+          Al2O3: '6.66'
+          Fe2O3: '22.58'
+          FeO: '2.91'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '23.45'
+          Na2O: '0.05'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q34_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q34_FeO
@@ -16399,6 +16710,18 @@ species:
         T_C: '1541'
         Fe2O3_wt_pct: '28.73'
         FeO_wt_pct: '5.98'
+        composition_wt_pct:
+          SiO2: '28.74'
+          TiO2: '0.00'
+          Al2O3: '1.63'
+          Fe2O3: '28.73'
+          FeO: '5.98'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '34.18'
+          Na2O: '0.01'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q41_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q41_FeO
@@ -16433,6 +16756,18 @@ species:
         T_C: '1541'
         Fe2O3_wt_pct: '16.46'
         FeO_wt_pct: '7.20'
+        composition_wt_pct:
+          SiO2: '40.04'
+          TiO2: '0.00'
+          Al2O3: '12.09'
+          Fe2O3: '16.46'
+          FeO: '7.20'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '22.40'
+          Na2O: '0.08'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q42_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q42_FeO
@@ -16467,6 +16802,18 @@ species:
         T_C: '1541'
         Fe2O3_wt_pct: '14.84'
         FeO_wt_pct: '6.69'
+        composition_wt_pct:
+          SiO2: '38.54'
+          TiO2: '0.00'
+          Al2O3: '18.77'
+          Fe2O3: '14.84'
+          FeO: '6.69'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '20.85'
+          Na2O: '0.07'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q43_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q43_FeO
@@ -16501,6 +16848,18 @@ species:
         T_C: '1541'
         Fe2O3_wt_pct: '17.34'
         FeO_wt_pct: '7.69'
+        composition_wt_pct:
+          SiO2: '43.23'
+          TiO2: '0.00'
+          Al2O3: '6.75'
+          Fe2O3: '17.34'
+          FeO: '7.69'
+          MnO: '0.00'
+          MgO: '0.00'
+          CaO: '23.82'
+          Na2O: '0.04'
+          K2O: '0.00'
+          P2O5: '0.00'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q44_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q44_FeO
@@ -16535,6 +16894,18 @@ species:
         T_C: '1354'
         Fe2O3_wt_pct: '17.05'
         FeO_wt_pct: '5.10'
+        composition_wt_pct:
+          SiO2: '44.71'
+          TiO2: '3.00'
+          Al2O3: '13.00'
+          Fe2O3: '17.05'
+          FeO: '5.10'
+          MnO: '0.18'
+          MgO: '5.46'
+          CaO: '9.06'
+          Na2O: '0.68'
+          K2O: '0.54'
+          P2O5: '0.31'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q51_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q51_FeO
@@ -16569,6 +16940,18 @@ species:
         T_C: '1354'
         Fe2O3_wt_pct: '13.75'
         FeO_wt_pct: '5.05'
+        composition_wt_pct:
+          SiO2: '46.56'
+          TiO2: '3.56'
+          Al2O3: '15.25'
+          Fe2O3: '13.75'
+          FeO: '5.05'
+          MnO: '0.25'
+          MgO: '4.65'
+          CaO: '7.48'
+          Na2O: '1.10'
+          K2O: '0.85'
+          P2O5: '0.38'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q52_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q52_FeO
@@ -16603,6 +16986,18 @@ species:
         T_C: '1354'
         Fe2O3_wt_pct: '16.72'
         FeO_wt_pct: '5.00'
+        composition_wt_pct:
+          SiO2: '45.56'
+          TiO2: '2.95'
+          Al2O3: '13.02'
+          Fe2O3: '16.72'
+          FeO: '5.00'
+          MnO: '0.16'
+          MgO: '5.45'
+          CaO: '9.11'
+          Na2O: '0.70'
+          K2O: '0.57'
+          P2O5: '0.31'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q53_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q53_FeO
@@ -16637,6 +17032,18 @@ species:
         T_C: '1451'
         Fe2O3_wt_pct: '15.50'
         FeO_wt_pct: '6.97'
+        composition_wt_pct:
+          SiO2: '45.36'
+          TiO2: '2.98'
+          Al2O3: '12.77'
+          Fe2O3: '15.50'
+          FeO: '6.97'
+          MnO: '0.16'
+          MgO: '5.47'
+          CaO: '9.09'
+          Na2O: '0.74'
+          K2O: '0.46'
+          P2O5: '0.32'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q61_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q61_FeO
@@ -16671,6 +17078,18 @@ species:
         T_C: '1451'
         Fe2O3_wt_pct: '11.89'
         FeO_wt_pct: '6.33'
+        composition_wt_pct:
+          SiO2: '47.91'
+          TiO2: '3.60'
+          Al2O3: '15.23'
+          Fe2O3: '11.89'
+          FeO: '6.33'
+          MnO: '0.22'
+          MgO: '4.59'
+          CaO: '7.45'
+          Na2O: '1.31'
+          K2O: '0.74'
+          P2O5: '0.26'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q62_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q62_FeO
@@ -16705,6 +17124,18 @@ species:
         T_C: '1451'
         Fe2O3_wt_pct: '12.44'
         FeO_wt_pct: '6.36'
+        composition_wt_pct:
+          SiO2: '46.66'
+          TiO2: '3.51'
+          Al2O3: '15.35'
+          Fe2O3: '12.44'
+          FeO: '6.36'
+          MnO: '0.26'
+          MgO: '4.69'
+          CaO: '7.52'
+          Na2O: '1.36'
+          K2O: '0.70'
+          P2O5: '0.26'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q64_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q64_FeO
@@ -16739,6 +17170,18 @@ species:
         T_C: '1451'
         Fe2O3_wt_pct: '11.30'
         FeO_wt_pct: '5.82'
+        composition_wt_pct:
+          SiO2: '46.86'
+          TiO2: '3.40'
+          Al2O3: '18.19'
+          Fe2O3: '11.30'
+          FeO: '5.82'
+          MnO: '0.21'
+          MgO: '4.17'
+          CaO: '7.01'
+          Na2O: '2.06'
+          K2O: '0.79'
+          P2O5: '0.24'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q65_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q65_FeO
@@ -16773,6 +17216,18 @@ species:
         T_C: '1451'
         Fe2O3_wt_pct: '10.59'
         FeO_wt_pct: '5.83'
+        composition_wt_pct:
+          SiO2: '46.66'
+          TiO2: '3.29'
+          Al2O3: '19.32'
+          Fe2O3: '10.59'
+          FeO: '5.83'
+          MnO: '0.21'
+          MgO: '4.11'
+          CaO: '6.91'
+          Na2O: '1.98'
+          K2O: '0.80'
+          P2O5: '0.26'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q66_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t4_Q66_FeO
@@ -16807,6 +17262,17 @@ species:
         T_C: '1437'
         Fe2O3_wt_pct: '9.54'
         FeO_wt_pct: '3.42'
+        composition_wt_pct:
+          SiO2: '50.46'
+          TiO2: '1.88'
+          Al2O3: '13.87'
+          Fe2O3: '9.54'
+          FeO: '3.42'
+          MnO: '0.17'
+          MgO: '6.84'
+          CaO: '10.65'
+          Na2O: '2.68'
+          K2O: '0.19'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B27_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B27_FeO
@@ -16849,6 +17315,17 @@ species:
         T_C: '1388'
         Fe2O3_wt_pct: '10.01'
         FeO_wt_pct: '2.83'
+        composition_wt_pct:
+          SiO2: '50.64'
+          TiO2: '1.89'
+          Al2O3: '13.93'
+          Fe2O3: '10.01'
+          FeO: '2.83'
+          MnO: '0.17'
+          MgO: '6.76'
+          CaO: '10.66'
+          Na2O: '2.66'
+          K2O: '0.19'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B34_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B34_FeO
@@ -16891,6 +17368,17 @@ species:
         T_C: '1485'
         Fe2O3_wt_pct: '8.39'
         FeO_wt_pct: '4.45'
+        composition_wt_pct:
+          SiO2: '50.61'
+          TiO2: '1.90'
+          Al2O3: '14.03'
+          Fe2O3: '8.39'
+          FeO: '4.45'
+          MnO: '0.17'
+          MgO: '6.66'
+          CaO: '10.61'
+          Na2O: '2.43'
+          K2O: '0.17'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B44_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B44_FeO
@@ -16933,6 +17421,17 @@ species:
         T_C: '1535'
         Fe2O3_wt_pct: '8.41'
         FeO_wt_pct: '4.43'
+        composition_wt_pct:
+          SiO2: '51.09'
+          TiO2: '1.89'
+          Al2O3: '13.94'
+          Fe2O3: '8.41'
+          FeO: '4.43'
+          MnO: '0.17'
+          MgO: '6.77'
+          CaO: '10.67'
+          Na2O: '2.43'
+          K2O: '0.17'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B54_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B54_FeO
@@ -16975,6 +17474,17 @@ species:
         T_C: '1584'
         Fe2O3_wt_pct: '7.59'
         FeO_wt_pct: '5.13'
+        composition_wt_pct:
+          SiO2: '51.00'
+          TiO2: '1.92'
+          Al2O3: '13.96'
+          Fe2O3: '7.59'
+          FeO: '5.13'
+          MnO: '0.17'
+          MgO: '6.86'
+          CaO: '10.69'
+          Na2O: '2.32'
+          K2O: '0.16'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B64_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B64_FeO
@@ -17017,6 +17527,17 @@ species:
         T_C: '1635'
         Fe2O3_wt_pct: '6.82'
         FeO_wt_pct: '5.56'
+        composition_wt_pct:
+          SiO2: '50.85'
+          TiO2: '1.89'
+          Al2O3: '13.73'
+          Fe2O3: '6.82'
+          FeO: '5.56'
+          MnO: '0.17'
+          MgO: '6.75'
+          CaO: '10.78'
+          Na2O: '2.20'
+          K2O: '0.16'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B74_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B74_FeO
@@ -17059,6 +17580,17 @@ species:
         T_C: '1342'
         Fe2O3_wt_pct: '7.56'
         FeO_wt_pct: '5.14'
+        composition_wt_pct:
+          SiO2: '51.24'
+          TiO2: '1.91'
+          Al2O3: '13.81'
+          Fe2O3: '7.56'
+          FeO: '5.14'
+          MnO: '0.17'
+          MgO: '6.78'
+          CaO: '10.52'
+          Na2O: '2.67'
+          K2O: '0.21'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B76_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B76_FeO
@@ -17101,6 +17633,17 @@ species:
         T_C: '1296'
         Fe2O3_wt_pct: '8.18'
         FeO_wt_pct: '4.71'
+        composition_wt_pct:
+          SiO2: '50.90'
+          TiO2: '1.91'
+          Al2O3: '13.85'
+          Fe2O3: '8.18'
+          FeO: '4.71'
+          MnO: '0.17'
+          MgO: '6.82'
+          CaO: '10.61'
+          Na2O: '2.69'
+          K2O: '0.20'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B79_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B79_FeO
@@ -17143,6 +17686,17 @@ species:
         T_C: '1249'
         Fe2O3_wt_pct: '8.91'
         FeO_wt_pct: '3.99'
+        composition_wt_pct:
+          SiO2: '50.38'
+          TiO2: '1.93'
+          Al2O3: '13.70'
+          Fe2O3: '8.91'
+          FeO: '3.99'
+          MnO: '0.17'
+          MgO: '6.93'
+          CaO: '10.54'
+          Na2O: '2.70'
+          K2O: '0.20'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B82_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B82_FeO
@@ -17185,6 +17739,17 @@ species:
         T_C: '1636'
         Fe2O3_wt_pct: '0.52'
         FeO_wt_pct: '10.89'
+        composition_wt_pct:
+          SiO2: '52.41'
+          TiO2: '2.00'
+          Al2O3: '14.26'
+          Fe2O3: '0.52'
+          FeO: '10.89'
+          MnO: '0.22'
+          MgO: '6.79'
+          CaO: '11.17'
+          Na2O: '0.56'
+          K2O: '0.13'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B105_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B105_FeO
@@ -17228,6 +17793,17 @@ species:
         T_C: '1548'
         Fe2O3_wt_pct: '2.11'
         FeO_wt_pct: '12.61'
+        composition_wt_pct:
+          SiO2: '50.19'
+          TiO2: '1.89'
+          Al2O3: '13.50'
+          Fe2O3: '2.11'
+          FeO: '12.61'
+          MnO: '0.22'
+          MgO: '6.54'
+          CaO: '10.53'
+          Na2O: '1.48'
+          K2O: '0.15'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B108_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B108_FeO
@@ -17270,6 +17846,17 @@ species:
         T_C: '1544'
         Fe2O3_wt_pct: '1.82'
         FeO_wt_pct: '10.39'
+        composition_wt_pct:
+          SiO2: '52.27'
+          TiO2: '1.95'
+          Al2O3: '13.95'
+          Fe2O3: '1.82'
+          FeO: '10.39'
+          MnO: '0.21'
+          MgO: '6.69'
+          CaO: '10.90'
+          Na2O: '1.23'
+          K2O: '0.14'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B118_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B118_FeO
@@ -17312,6 +17899,17 @@ species:
         T_C: '1632'
         Fe2O3_wt_pct: '1.80'
         FeO_wt_pct: '10.38'
+        composition_wt_pct:
+          SiO2: '52.83'
+          TiO2: '1.95'
+          Al2O3: '13.95'
+          Fe2O3: '1.80'
+          FeO: '10.38'
+          MnO: '0.23'
+          MgO: '6.87'
+          CaO: '10.93'
+          Na2O: '0.87'
+          K2O: '0.13'
         derived_from:
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B120_Fe2O3
         - kress-carmichael-1991-iron-redox-calibration::kc91_t5_B120_FeO

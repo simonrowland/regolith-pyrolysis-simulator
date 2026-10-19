@@ -9,7 +9,11 @@ import pytest
 import yaml
 
 from simulator.battery.enums import EvidenceClass, Quantity
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import (
+    Migrator,
+    fe3_fe2_ratio_from_oxide_wt_pct,
+    wt_pct_to_mole_fraction,
+)
 from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
     validate_extract_document,
@@ -76,6 +80,18 @@ TABLE3_RENDER = """
 211-213 initial 47.25 3.44 14.07 18.74 N.A. 4.71 7.38 3.35 1.06
 211-213 final 45.59 3.37 17.48 17.59 0.23 4.33 7.08 3.43 1.04
 """
+
+TABLE4_Q01_COMPOSITION = {
+    "SiO2": "38.86", "TiO2": "0.00", "Al2O3": "17.00",
+    "Fe2O3": "16.93", "FeO": "5.41", "MnO": "0.00",
+    "MgO": "0.00", "CaO": "20.89", "Na2O": "0.00",
+    "K2O": "0.00", "P2O5": "0.00",
+}
+TABLE5_B27_COMPOSITION = {
+    "SiO2": "50.46", "TiO2": "1.88", "Al2O3": "13.87",
+    "Fe2O3": "9.54", "FeO": "3.42", "MnO": "0.17",
+    "MgO": "6.84", "CaO": "10.65", "Na2O": "2.68", "K2O": "0.19",
+}
 
 
 def _document() -> dict:
@@ -236,6 +252,27 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
     ]
     assert len(reduced) == 46
     assert all(record.evidence.class_.value is EvidenceClass.MEASURED_REDUCED for record in reduced)
+    assert all(record.identity.composition.is_value for record in reduced)
+    assert all(
+        record.identity.total_pressure_Pa.is_value
+        and record.identity.total_pressure_Pa.value == Decimal("101325")
+        for record in reduced
+    )
+
+    for observation_id, expected_composition in (
+        ("kc91_fe3_t4_Q01", TABLE4_Q01_COMPOSITION),
+        ("kc91_fe3_t5_B27", TABLE5_B27_COMPOSITION),
+    ):
+        source = rows_by_id[observation_id]
+        assert source["values"]["composition_wt_pct"] == expected_composition
+        record = next(item for item in reduced if observation_id in item.observation_id)
+        expected_mole_fractions = wt_pct_to_mole_fraction(
+            {oxide: Decimal(amount) for oxide, amount in expected_composition.items()}
+        )
+        assert record.identity.composition.value.as_map() == expected_mole_fractions.as_map()
+
+    table4_ratio = next(record for record in reduced if "kc91_fe3_t4_Q01" in record.observation_id)
+    assert table4_ratio.point_conditions["fO2_log"].state.is_unknown
 
     table5_ratio = next(record for record in reduced if "kc91_fe3_t5_B27" in record.observation_id)
     assert table5_ratio.point_conditions["fO2_log"].state.value == Decimal("-0.68")
