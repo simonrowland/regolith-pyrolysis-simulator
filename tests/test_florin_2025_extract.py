@@ -36,7 +36,7 @@ def test_florin_2025_isotope_series_and_isolated_migration() -> None:
     elemental = by_id["florin_2025_table_3_elemental_residue_rows"]["values"]["series"]
     assert len(elemental) == 50
     assert elemental[0]["residue_ppm"] == "20653"
-    assert elemental[0]["f_Cu_as_printed"] == ".95"
+    assert elemental[0]["f_Cu_as_printed"] == "0.95"
     assert elemental[0]["S_ug_g_as_printed"] == "—"
     assert elemental[37]["S_ug_g_as_printed"] == "b.d.l."
 
