@@ -21,7 +21,11 @@ from tests.battery.test_migrate import _migrate_real_extract
 EXTRACT_NAME = "holzheid-lodders-2001-copper-solubility.yaml"
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data" / "literature" / "extracts" / EXTRACT_NAME
-CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS = (
+    Path(os.environ["REGOLITH_CORPUS_ROOT"])
+    if os.environ.get("REGOLITH_CORPUS_ROOT")
+    else Path.home() / "Repos" / "regolith-corpus"
+)
 TEXT = CORPUS / "text" / "holzheid-lodders-2001-copper-solubility" / "pdftotext-layout.txt"
 
 # (observation_id, printed snippet after minus/plus/less-than normalization, point value or None)
@@ -55,6 +59,8 @@ def _rows(document):
 
 
 def test_printed_cells_bind_to_the_run_line():
+    if not TEXT.is_file():
+        pytest.skip(f"corpus source text absent: {TEXT}")
     document = _document()
     rows = _rows(document)
     text = _norm(TEXT.read_text(encoding="utf-8"))
