@@ -5117,6 +5117,120 @@ def test_battery_hero_deck_uses_store_oxygen_request_for_axis() -> None:
     assert Decimal(str(point["fO2_Pa"])) == Decimal("10")
 
 
+def test_solved_effusion_po2_bar_keeps_its_binary_value() -> None:
+    notice = Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=(
+            score_mod.OXYGEN_BALANCE_NOTICE_PREFIX
+            + ' {"pO2_bar":2.747e-10}'
+        ),
+        origin=f"engine:{Engine.OPENIMCC.value}",
+    )
+    prediction = EnginePrediction(
+        engine=Engine.OPENIMCC,
+        channel="test",
+        execution=Execution(state=ExecutionState.PRODUCED),
+        notices=(notice,),
+    )
+
+    assert score_mod._solved_effusion_po2_bar(prediction).hex() == (
+        "0x1.2e092d150c4aap-32"
+    )
+
+
+def test_battery_hero_deck_uses_solved_oxygen_balance_notice() -> None:
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+    }
+    oxygen_identity = Identity(
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Fe", Phase.G),
+        temperature_K=State.of(Decimal("1200")),
+    )
+    fe = F.observation(
+        "solved-fe-reference",
+        "deck-solved-oxygen-experiment",
+        oxygen_identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    sio = F.observation(
+        "solved-sio-reference",
+        "deck-solved-oxygen-experiment",
+        replace(
+            oxygen_identity,
+            species=Species("SiO", Phase.G),
+        ),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    solved_notice = {
+        "kind": NoticeKind.SOURCE_DISAGREEMENT.value,
+        "origin": f"engine:{Engine.OPENIMCC.value}",
+        "reason": (
+            score_mod.OXYGEN_BALANCE_NOTICE_PREFIX
+            + ' {"kind":"fo2_oxygen_balance_effusion_solved",'
+            + '"oxygen_condition_source":"openimcc_oxygen_balance_condition_only",'
+            + '"pO2_bar":2.747e-10}'
+        ),
+    }
+    fe_row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity=Quantity.P_PARTIAL.value,
+        composition=composition,
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+    )
+    sio_row = _hero_deck_score_row(
+        rail=Rail.SIO_EVOLUTION.value,
+        formula="SiO",
+        quantity=Quantity.P_PARTIAL.value,
+        composition=composition,
+        residual_dex=Decimal("-0.25"),
+        candidate_value="1.5",
+    )
+    fe_row["reference"] = fe.observation_id
+    sio_row["reference"] = sio.observation_id
+    fe_row["notices"] = [solved_notice]
+    sio_row["notices"] = [solved_notice]
+
+    result = score_mod._battery_hero_deck_records(
+        [fe_row, sio_row],
+        observations={fe.observation_id: fe, sio.observation_id: sio},
+    )
+    redox = next(
+        point
+        for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+    )
+    evolution = next(
+        point
+        for point in result["points"]
+        if point["chart"] == "sio_evolution"
+    )
+    pO2_bar = Decimal("2.747e-10")
+    expected_delta_iw = pO2_bar.log10() - Decimal(
+        str(feo_iw_log10_fO2_bar(1200.0, a_feo=1.0))
+    )
+
+    assert redox["oxygen_mode"] == "solved"
+    assert redox["oxygen_source"] == "openimcc_oxygen_balance_condition_only"
+    assert redox["oxygen_kind"] == "fo2_oxygen_balance_effusion_solved"
+    assert float(redox["x_value"]).hex() == float(expected_delta_iw).hex()
+    assert Decimal(str(redox["fO2_Pa"])) == pO2_bar * Decimal("1e5")
+    assert evolution["oxygen_mode"] == "solved"
+    assert evolution["oxygen_source"] == redox["oxygen_source"]
+    assert evolution["oxygen_kind"] == redox["oxygen_kind"]
+    assert evolution["group_label"] == "10^-10–10^-9 bar"
+
+
 def test_battery_hero_residue_requires_typed_mass_loss_at_same_time() -> None:
     composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
