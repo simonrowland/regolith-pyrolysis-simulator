@@ -3384,9 +3384,7 @@ def test_cea_source_ref_and_relative_provenance():
     """Null-hypothesis (P2): Ag source_ref_code truncated; absolute Dropbox path."""
     c = load_cached_safe_yaml((EXTRACTS / "nasa-cea-thermo.yaml").read_text(encoding="utf-8"))
     assert c["species"]["Ag"]["observations"][0]["values"]["source_ref_code"] == "g10/97"
-    prov = c["extraction"]["provenance_path"]
-    assert not prov.startswith("/")
-    assert "docs-private" in prov
+    assert c["extraction"]["provenance_path"] == "raw/nasa-cea-thermo/nasa-cea-thermo.pdf"
 
 
 def test_lh84_top_level_payloads_not_empty():
