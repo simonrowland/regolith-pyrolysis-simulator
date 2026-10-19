@@ -50,7 +50,7 @@ species:
         - {element: Li, gamma_as_printed: '1.8 ± 0.2 – 15.4 ± 3.1', sources: '5'}
         - {element: V, gamma_as_printed: '4.8 ± 0.32', sources: '4'}
         - {element: Cu, gamma_as_printed: '3.5 – 11.8 ± 1.7', sources: '2, 3, 4, 5'}
-        - {element: Zn, gamma_as_printed: '1.9·10^-2 ± 1·10^-2 – 0.51 ± 0.13', sources: '1, 3, 4, 5'}
+        - {element: Zn, gamma_as_printed: '1.9·10^-2 ± 1·10^-2 – 0.51 ± 0.13', sources: '1, 4, 5'}
         - {element: Ga, gamma_as_printed: '1.82 ± 0.53', sources: '4'}
         - {element: Ge, gamma_as_printed: '3.7·10^-3 ± 1·10^-3 – 0.11 ± 0.01', sources: '4, 5'}
         - {element: As, gamma_as_printed: '—', sources: '—'}
@@ -78,7 +78,16 @@ species:
       values:
         method_class: measured_direct
         caption: 'The temperature and oxygen fugacity conditions used in experiments.'
-        reason: 'Conditions table not converted to observation rows in this bounded pass.'
+        row_count: 8
+        rows:
+        - {T_C: 1300, log_fO2: -0.68, air_ml_min: 200, CO_ml_min: 0, CO2_ml_min: 0, delta_IW: 10.08, delta_FMQ: 6.89}
+        - {T_C: 1300, log_fO2: -7, air_ml_min: 0, CO_ml_min: 10, CO2_ml_min: 190, delta_IW: 3.76, delta_FMQ: 0.57}
+        - {T_C: 1300, log_fO2: -9, air_ml_min: 0, CO_ml_min: 68, CO2_ml_min: 132, delta_IW: 1.76, delta_FMQ: -1.43}
+        - {T_C: 1300, log_fO2: -11, air_ml_min: 0, CO_ml_min: 163, CO2_ml_min: 37, delta_IW: -0.24, delta_FMQ: -3.43}
+        - {T_C: 1400, log_fO2: -0.68, air_ml_min: 200, CO_ml_min: 0, CO2_ml_min: 0, delta_IW: 9.03, delta_FMQ: 5.86}
+        - {T_C: 1400, log_fO2: -3.05, air_ml_min: 0, CO_ml_min: 0, CO2_ml_min: 200, delta_IW: 6.66, delta_FMQ: 3.49}
+        - {T_C: 1400, log_fO2: -6, air_ml_min: 0, CO_ml_min: 10, CO2_ml_min: 190, delta_IW: 3.71, delta_FMQ: 0.54}
+        - {T_C: 1400, log_fO2: -8, air_ml_min: 0, CO_ml_min: 67, CO2_ml_min: 133, delta_IW: 1.71, delta_FMQ: -1.46}
     - observation_id: van_der_waal_2023_table_2_3_initial_compositions
       type: experiment_series
       locator: {page: 65, pdf_page_index: 64, published_page: 26, table: '2.3'}
@@ -95,6 +104,126 @@ species:
         method_class: measured_direct
         caption: 'Chlorine abundances of IB experiments; includes volatility factors and chlorine fugacity.'
         reason: 'Relevant measured chlorine data remain for the follow-up extraction pass.'
+    - observation_id: van_der_waal_2023_thesis_figure_inventory
+      type: experiment_series
+      locator: {page: 11, pdf_page_index: 10, section: 'List of Figures'}
+      units: figure identifiers and captions as listed
+      values:
+        method_class: figure_only
+        caption: 'Thesis figure inventory; all figures remain deferred under the bounded thesis pass.'
+        figure_count: 111
+        rows:
+        - {figure: "1.1", caption: "The abundance of elements in the BSE relative that of CI carbonaceous chondrites, normalized to Mg = 1.0, plotted against condensation temperature. The shaded area shows the expected depletion trend based purely on volatile loss. Adapted from Wood et al. (2019)."}
+        - {figure: "1.2", caption: "Overview of the Zn isotopic composition of various (extra-)terrestrial materials. The dashed line represents the average δ66ZnLyon of the BSE (Chen et al., 2013a). 1Luck et al. (2005); 2Moynier et al. (2006); 3Moynier et al. (2007); 4Herzog et al. (2009); 5Moynier et al. (2009a); 6Moynier et al. (2010); Ghidan and Loss (2011); 8Lindsay et al. (2011); 9Moynier et al. (2011); 10Barrat et al. (2012); 11Paniello et al. (2012a); 12Paniello et al. (2012b); 13Chen et al. (2013b); 14Bridgestock et al. (2014); 15Kato et al. (2015); 16Pringle et al. (2017); 17Sossi et al. (2018b); 18Brugier et al. (2019). Chapter"}
+        - {figure: "2.1", caption: "The temporal evolution of the fraction of FeOT in the silicate glass (FeOt) relative to the shortest experiment (FeO0) at different fO2 for the SM composition, illustrating the effect of fO2 and capsule material. “(Fe sat)” indicates the Fe-presaturated Pt sample holders."}
+        - {figure: "2.2", caption: "Temporal evolution of the measured Zn abundance of GSE-1G. The solid black line is the GeoReM preferred abundance and the dotted red lines its associated error. The error bar in the bottom left illustrates the average error on each measured Zn data point. Chapter"}
+        - {figure: "3.1", caption: "Schematic depiction of the double spike taken from Rudge et al. (2009)."}
+        - {figure: "3.2", caption: "The effect of the double spike:sample ratio on the error of the double spike inversion. The red cross is the target double spike:sample ratio and the black crosses are the double spike:sample ratio of the samples. x"}
+        - {figure: "3.3", caption: "An example of a magnet scan of the Ba-doped unspiked Zn standard tuning solution for all collectors. Vertical scale was adjusted such that peaks of individual elements were clustered together. Interference-free isotopes of other potentially interfering elements Ni (64Ni) and Xe (128Xe2+, 132Xe2+, Xe2+, 136Xe2+) are shown near the top of the figure with colour-coded labels to match the lines."}
+        - {figure: "3.4", caption: "The temporal evolution of δ66ZnLyon (‰) of ETH-AA within a single run. Diamonds represents the average value of the individual measurements (circles) for with 2 s.d. on the average error bars."}
+        - {figure: "3.5", caption: "The temporal evolution of δ66ZnLyon (‰) of BCR-2 and IRMM-3702 between runs. Each colour corresponds to a different run. Diamonds represent averages values of the individual measurements (circles) for each run. Error bars represent 2 s.d. on the average within the run. The dashed black line is the average δ66ZnLyon and the solid lines represent 2 s.d. on the average of all measurements."}
+        - {figure: "3.6", caption: "Comparison of the BCR-2 and IRMM-3702 values with previous values reported in the literature. All errors are reported as 2 s.d. on the average, but most values from literature were converted to 2 s.d. from two standard errors or 95% confidence intervals."}
+        - {figure: "3.7", caption: "The shift in δ66Zn for the IRMM-3702 secondary standard as a function of increasing blank size. The measured blanks were included to illustrate that the measured blanks do not impact the measured δ66Zn beyond the analytical error. The dashed red line represents the ~0.05‰ per amu analytical error."}
+        - {figure: "3.8", caption: "The evolution of the Zn blank with time and illustration of how an increasingly rigorous cleaning procedure decreased the Zn blank."}
+        - {figure: "3.9", caption: "An integrated (22 passes) mass scan over the mass range between 120 amu and 142 amu. Numbers and elements indicate the (expected) peak positions for each mass. The intensity of the highest peak, 127I, is ~8∙10-5 V."}
+        - {figure: "3.10", caption: "Comparison of the effectivity of the Ba correction using different isotopes by plotting the Ba-corrected δ66ZnIRMM (‰) plotted against the xBa2+/64Zn intensity ratio, a measure of the amount of Ba. xi"}
+        - {figure: "3.11", caption: "(a) The linear growth of δ66Zn (‰) as a function of increasing I138Ba2+ without a Ba correction and (b) the evolution of Ba-corrected δ66Zn (‰), both as a function of increasing Ba concentration in a solution of constant composition. The red circle indicates a Ba-free measurement with an erroneous Ba correction."}
+        - {figure: "3.12", caption: "Comparison of the calculated and modelled Δ66Zn. The dashed line represents the one- to-one line. Erroneous corrections are indicated with a red outline. The inlay on the bottom-right shows the full range of samples and Δ66Zn. Information regarding individual samples can be found in Chapter 4, Table 4.1 and Chapter 5, Table 5.1."}
+        - {figure: "3.13", caption: "The measured 137Ba2+ and 138Ba2+ intensities plotted against each other. The dashed line represents the IUPAC reference isotope abundance ratio for 137Ba/138Ba. Red circles show the three separate sets of repeat analyses of sample Q52."}
+        - {figure: "3.14", caption: "(a) Plot showing how the slope of the Δ66Zn – 𝐼 138𝐵𝑎⁄𝐼 64𝑍𝑛 changes as a function of the double spike:sample ratio. (b) Plot of Δ66Zn against 𝐼 138𝐵𝑎⁄𝐼 64𝑍𝑛. Lines show the modelled Δ66Zn for different double spike:sample ratios."}
+        - {figure: "3.15", caption: "Plot of the 61Ni/64Zn intensity ratio as a function of the 61Ni intensity."}
+        - {figure: "3.16", caption: "Comparison of the calculated (data points) and modelled (dashed line) Δ66Zn. The inlay shows the two samples (Q20 and Q49) that require significant Ni corrections and their deviation from the modelled values. Chapter"}
+        - {figure: "4.1", caption: "Evolution of the total equilibrium partial pressures of monometallic trace element gas species as a function of fO2 at fixed temperature. Vertical lines indicate the experimental fO2 conditions."}
+        - {figure: "4.2", caption: "Compositional gradients for a refractory (V), low valence (Rb) and high valence moderately volatile (In) element in the three major element compositions at log(fO2) = -6 after 60 minutes. xii"}
+        - {figure: "4.3", caption: "Plot of compositional gradients from the sample – sample holder interface into the sample for a Pt sample holder. Measured concentrations were normalized to data point furthest away from sample holder. Error bar in bottom left indicates the average one standard deviation on the measurements."}
+        - {figure: "4.4", caption: "Temporal evolution of trace element abundances in the silicate melt normalized to the starting abundance in Table 2.2. (a) Germanium in the SM-2 experiments. Deviations from linearity in the log(fO2) = -8 time series is caused by the detection limit in LA-ICP-MS analysis. (b) Silver in the AN composition."}
+        - {figure: "4.5", caption: "The fO2 dependence of the volatility factor for the (a) SM, (b) IB, (c) AN, (d) SM-2 and (e) IB-G compositions."}
+        - {figure: "4.6", caption: "The compositional dependence of the volatility factor at (a) log(fO2) = -0.68, (b) log(fO2) = -3.05, (c) log(fO2) = -6 and (d) log(fO2) = -8."}
+        - {figure: "4.7", caption: "Example comparison of the fit, calculated using the modified HKL equation, to the measured trace element abundance."}
+        - {figure: "4.8", caption: "The volatility factor plotted against the CI chondrite normalized trace element abundance of the bulk silicate Earth, normalized to Mg for the (a) SM and (b) IB experiments at log(fO2) = -8 and (c) IB-G at log(fO2) = -9. Trace element abundance of the BSE and CI chondrites taken from Palme and O’Neill (2014)."}
+        - {figure: "4.9", caption: "The volatility factor plotted against the total equilibrium partial pressure of the oxide gas species for the (a) SM and (b) IB experiments at log(fO2) = -8 and (c) IB-G at log(fO2) = -9 assuming ideal trace element behaviour in the silicate melt."}
+        - {figure: "4.10", caption: "The volatility factor plotted against the total equilibrium partial pressure of the oxide gas species for the (a) SM and (b) IB experiments at log(fO2) = -8 and (c) IB-G at log(fO2) = -9 considering non-ideal trace element behaviour in the silicate melt. xiii"}
+        - {figure: "4.11", caption: "Log of the volatility factor plotted against the 50% condensation temperature for (a) SM and (b) IB at log(fO2) = -8 and (c) IB-G at log(fO2) = -9. The 50% condensation temperatures were taken from Wood et al. (2019)."}
+        - {figure: "4.12", caption: "The calculated 1% evaporation temperatures as a function of fO2."}
+        - {figure: "4.13", caption: "The 1% evaporation temperatures plotted against the log of volatility factor for the SM composition at log(fO2) = -8."}
+        - {figure: "4.14", caption: "Summary of the log(K*) calculated in Section 4.5 and log(K*) from literature."}
+        - {figure: "4.15", caption: "Plots of the equilibrium constant of the evaporation reaction of the pure species plotted against (a) log(K*) and (b) an experimental log(K) calculated by correcting log(K*) for non-ideal trace element behaviour in the melt. The dashed line is the one-to-one fit."}
+        - {figure: "4.16", caption: "Plot of RTln(K) against RTln(K*) to illustrate correlation between the two parameters."}
+        - {figure: "4.17", caption: "Three potential fits to the 60 minute fO2 series of In in the SM composition with (a) a linear y-axis and (b) logarithmic y-axis. LSQ is the sum of the non-linear least squares misfit between the data points and the model."}
+        - {figure: "4.18", caption: "Three potential fits to the 60 minute fO2 series of Sn in the SM composition. LSQ is the sum of the non-linear least squares misfit between the four data points and the model. Chapter"}
+        - {figure: "5.1", caption: "Overview of the Zn isotopic composition of various (extra-)terrestrial materials. The dashed line represents the average δ66ZnLyon of the BSE (Chen et al., 2013a). 1Luck et al. (2005); 2Moynier et al. (2006); 3Moynier et al. (2007); 4Herzog et al. (2009); 5Moynier et al. (2009a); 6Moynier et al. (2010); Ghidan and Loss (2011); 8Lindsay et al. (2011); 9Moynier et al. (2011); 10Barrat et al. (2012); 11Paniello et al. (2012a); 12Paniello et al. (2012b); 13Chen et al. (2013b); 14Bridgestock et al. (2014); 15Kato et al. (2015); 16Pringle et al. (2017); 17Sossi et al. (2018b); 18Brugier et al. (2019)."}
+        - {figure: "5.2", caption: "Comparison of Zn abundances obtained via isotope dilution and LA-ICP-MS measurements. The dashed line shows the one-to-one line. Error bars are 1 s.d. on the average. xiv"}
+        - {figure: "5.3", caption: "The effect of the Zn abundance on the accuracy of sample spiking. The dashed line indicates a one-to-one line. The dashed line is the one-to-one line and the red cross shows the expected spike:sample ratio of 1.4:1 ± 15% and compositional match of 1:1 ± 15%."}
+        - {figure: "5.4", caption: "The effect of the double spike:sample ratio on the error of the double spike inversion. The red cross is the target double spike:sample ratio and the black crosses are the double spike:sample ratio of the samples."}
+        - {figure: "5.5", caption: "The fraction of Zn in the doped starting material [XZn] added as reagent-grade ZnO plotted against δ66ZnLyon (‰) of the (un)doped starting materials and ZnO. Dashed lines represent the mixing lines between undoped starting material and ZnO. Main plot shows XZn > 0.8 with 0 < XZn < 1 shown in the top right."}
+        - {figure: "5.6", caption: "Plot of δ66ZnLyon (‰) and the ln of the volatility factor for the (a) SM and (b) IB composition."}
+        - {figure: "5.7", caption: "Plot of the time dependence of δ66ZnLyon (‰) at fixed fO2 for the (a) SM and (b) IB composition."}
+        - {figure: "5.8", caption: "Plot of the oxygen fugacity dependence of δ66ZnLyon (‰) at fixed runtimes for the (a) SM and (b) IB composition."}
+        - {figure: "5.9", caption: "A plot of volatile loss plotted as a function of the difference in isotopic composition of sample and starting material. Solid lines represent different fractionation factors."}
+        - {figure: "5.10", caption: "Comparison of the measured δ66ZnLyon (‰) as a function of the volatility factor for the SM composition (a) in air, (b) at log(fO2) = -3, (c) at log(fO2) = -6 and (d) at log(fO2) = -8. Coloured lines represent the different evaporation scenarios of Young et al. (2019) and Sossi et al. (2020) described in the main text."}
+        - {figure: "5.11", caption: "Comparison of the measured δ66ZnLyon (‰) as a function of the volatility factor for the IB composition (a) in air, (b) at log(fO2) = -3, (c) at log(fO2) = -6 and (d) at log(fO2) = -8. Coloured lines represent the different evaporation scenarios of Young et al. (2019) and Sossi et al. (2020) described in the main text. xv"}
+        - {figure: "5.12", caption: "The Zn isotopic composition of the Earth – Moon system compared to different model fits. Trace element and isotopic data for terrestrial and lunar mantles and individual lunar basalts from Moynier et al. (2006), Herzog et al. (2009), Paniello et al. (2012a), Chen et al. (2013a), Palme and O’Neill (2014), Kato et al. (2015) and Day et al. (2020a). Coloured lines represent different model fits using 𝛼66/64 for SM, IB and the three theoretical approaches discussed in Section 5.2.3.2."}
+        - {figure: "5.13", caption: "The Zn isotopic composition of the Martian mantle and meteorites (Paniello et al., 2012a; Paquet et al., 2023a), modelled using two separate chondrite starting compositions; (a) 95% EH enstatite chondrite + 5% carbonaceous chondrite and (b) 95% ordinary chondrite + 5% carbonaceous chondrite. Dashed lines represent best fit between average compositions. Coloured lines represent different model fits using 𝛼66/64 for SM, IB and the three theoretical approaches discussed in Section 5.2.3.2."}
+        - {figure: "5.14", caption: "The Zn isotopic composition of unbrecciated eucrite and diogenite meteorites and asteroid 4 Vesta (Paniello et al., 2012b), modelled using two separate chondrite starting compositions; (a) 85% EH enstatite chondrite + 15% CI carbonaceous chondrite and (b) 85% ordinary chondrite + 15% CI carbonaceous chondrite. Dashed lines represent best fit between average compositions. Coloured lines represent different model fits using 𝛼66/64 for SM, IB and the three theoretical approaches discussed in Section 5.2.3.2."}
+        - {figure: "5.15", caption: "The Zn isotopic composition of ureilites (Moynier et al., 2010; Brugier et al., 2019) modelled using a UPB with an enstatite chondrite starting composition. Coloured lines represent different model fits using 𝛼66/64 for SM, IB and the three theoretical approaches discussed in Section 5.2.3.2."}
+        - {figure: "5.16", caption: "The Zn isotopic composition of the Shallowater aubrite (Moynier et al., 2011) modelled using an APB with an enstatite chondrite starting composition. The [Zn] of individual samples was not reported, so average [Zn] of Shallowater aubrite was used. Coloured lines represent different model fits using 𝛼66/64 for SM, IB and the three theoretical approaches discussed in Section 5.2.3.2. xvi"}
+        - {figure: "5.17", caption: "The Zn isotopic composition of tektites (Moynier et al., 2009b; Rodovská et al., 2017; Jiang et al., 2019; Wimpenny et al., 2019) modelled using an average upper crust (Hu and Gao, 2008; Chen et al., 2013a) as the starting composition. Dashed lines represent best fits for each data set. Solid lines represent different model fits using 𝛼66/64 for SM, IB and the three theoretical approaches discussed in Section 5.2.3.2."}
+        - {figure: "5.18", caption: "The Zn isotopic composition of trinitites (Day et al., 2017; Wimpenny et al., 2019) modelled using an arkosic soil starting composition (Wimpenny et al., 2019). Dashed line represents best fit for the data set. Solid lines represent different model fits using 𝛼66/64 for SM, IB and the three theoretical approaches discussed in Section 5.2.3.2. xvii"}
+        - {figure: "A2.1", caption: "The relative partial pressures of Li (g), LiO (g) and LiO2 (g) plotted as a function of fO2."}
+        - {figure: "A2.2", caption: "The relative partial pressures of P (g), PO (g) and PO2 (g) plotted as a function of fO2."}
+        - {figure: "A2.3", caption: "The relative partial pressures of V (g), VO (g) and VO2 (g) plotted as a function of fO2."}
+        - {figure: "A2.4", caption: "The relative partial pressures of Cu (g) and CuO (g) plotted as a function of fO2."}
+        - {figure: "A2.5", caption: "The relative partial pressures of Ga (g) and GaO (g) plotted as a function of fO2."}
+        - {figure: "A2.6", caption: "The relative partial pressures of Ge (g) and GeO (g) plotted as a function of fO2."}
+        - {figure: "A2.7", caption: "The relative partial pressures of As (g) and AsO (g) plotted as a function of fO2."}
+        - {figure: "A2.8", caption: "The relative partial pressures of Cd (g) and CdO (g) plotted as a function of fO2."}
+        - {figure: "A2.9", caption: "The relative partial pressures of Sn (g) and SnO (g) plotted as a function of fO2."}
+        - {figure: "A2.10", caption: "The relative partial pressures of Sb (g) and SbO (g) plotted as a function of fO2."}
+        - {figure: "A2.11", caption: "The relative partial pressures of Cs (g) and CsO (g) plotted as a function of fO2."}
+        - {figure: "A2.12", caption: "The relative partial pressures of Pb (g) and PbO (g) plotted as a function of fO2."}
+        - {figure: "A2.13", caption: "The partial pressure of potential Li gas species as a function of oxygen fugacity."}
+        - {figure: "A2.14", caption: "The partial pressure of potential Ga gas species as a function of oxygen fugacity."}
+        - {figure: "A2.15", caption: "The partial pressure of potential As gas species as a function of oxygen fugacity."}
+        - {figure: "A2.16", caption: "The partial pressure of potential Rb gas species as a function of oxygen fugacity."}
+        - {figure: "A2.17", caption: "The partial pressure of potential In gas species as a function of oxygen fugacity."}
+        - {figure: "A2.18", caption: "The partial pressure of potential Sb gas species as a function of oxygen fugacity."}
+        - {figure: "A2.19", caption: "The partial pressure of potential Cs gas species as a function of oxygen fugacity."}
+        - {figure: "A2.20", caption: "The partial pressure of potential Tl gas species as a function of oxygen fugacity."}
+        - {figure: "A2.21", caption: "The partial pressure of potential Pb gas species as a function of oxygen fugacity."}
+        - {figure: "A2.22", caption: "The total partial pressure of trace elements considering all potential gas species. xviii"}
+        - {figure: "A2.23", caption: "The volatility factor plotted against the total equilibrium partial pressure of the oxide gas species for the (a) SM and (b) IB experiments at log(fO2) = -8 and (c) IB-G at log(fO2) = -9 assuming ideal trace element behaviour in the silicate melt."}
+        - {figure: "A2.24", caption: "The volatility factor plotted against the total equilibrium partial pressure of the oxide gas species for the (a) SM and (b) IB experiments at log(fO2) = -8 and (c) IB-G at log(fO2) = -9 considering non-ideal trace element behaviour in the silicate melt. Appendix"}
+        - {figure: "A3.1", caption: "The ratio of the total partial pressure of the Cu chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.2", caption: "The ratio of the total partial pressure of the Zn chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.3", caption: "The ratio of the total partial pressure of the Ga chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.4", caption: "The ratio of the total partial pressure of the Ge chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.5", caption: "The ratio of the total partial pressure of the As chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.6", caption: "The ratio of the total partial pressure of the Rb chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.7", caption: "The ratio of the total partial pressure of the Ag chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.8", caption: "The ratio of the total partial pressure of the Cd chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.9", caption: "The ratio of the total partial pressure of the In chloride and oxide gas species as a function of fCl2 and fO2. xix"}
+        - {figure: "A3.10", caption: "The ratio of the total partial pressure of the Sn chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.11", caption: "The ratio of the total partial pressure of the Sb chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.12", caption: "The ratio of the total partial pressure of the Cs chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.13", caption: "The ratio of the total partial pressure of the Tl chloride and oxide gas species as a function of fCl2 and fO2."}
+        - {figure: "A3.14", caption: "The ratio of the total partial pressure of the Tl chloride and oxide gas species as a function of fCl2 and fO2. Appendix"}
+        - {figure: "A5.1", caption: "Temporal evolution of the volatility factor for Li in all compositions."}
+        - {figure: "A5.2", caption: "Temporal evolution of the volatility factor for P in all compositions."}
+        - {figure: "A5.3", caption: "Temporal evolution of the volatility factor for V in all compositions."}
+        - {figure: "A5.4", caption: "Temporal evolution of the volatility factor for Cu in all compositions."}
+        - {figure: "A5.5", caption: "Temporal evolution of the volatility factor for Zn in all compositions."}
+        - {figure: "A5.6", caption: "Temporal evolution of the volatility factor for Ga in all compositions."}
+        - {figure: "A5.7", caption: "Temporal evolution of the volatility factor for Ge in all compositions."}
+        - {figure: "A5.8", caption: "Temporal evolution of the volatility factor for As in all compositions."}
+        - {figure: "A5.9", caption: "Temporal evolution of the volatility factor for Rb in all compositions."}
+        - {figure: "A5.10", caption: "Temporal evolution of the volatility factor for Ag in all compositions."}
+        - {figure: "A5.11", caption: "Temporal evolution of the volatility factor for Cd in all compositions."}
+        - {figure: "A5.12", caption: "Temporal evolution of the volatility factor for In in all compositions."}
+        - {figure: "A5.13", caption: "Temporal evolution of the volatility factor for Sn in all compositions."}
+        - {figure: "A5.14", caption: "Temporal evolution of the volatility factor for Sb in all compositions. xx"}
+        - {figure: "A5.15", caption: "Temporal evolution of the volatility factor for Cs in all compositions."}
+        - {figure: "A5.16", caption: "Temporal evolution of the volatility factor for Tl in all compositions."}
+        - {figure: "A5.17", caption: "Temporal evolution of the volatility factor for Pb in all compositions. xxi"}
     - observation_id: van_der_waal_2023_table_2_2_isotope_standard
       type: experiment_series
       locator: {page: 63, pdf_page_index: 62, table: '2.2'}
