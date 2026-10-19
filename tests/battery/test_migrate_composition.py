@@ -607,23 +607,13 @@ def test_round9_initial_charge_role_admits_map_and_keeps_note_as_provenance() ->
     )
 
     assert result is not None and result.state.is_value
-    assert result.state.value == wt_pct_to_mole_fraction(
+    assert result.state.value.components == wt_pct_to_mole_fraction(
         {"SiO2": Decimal("60"), "MgO": Decimal("40")}
-    )
+    ).components
     assert result.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
     assert result.inference is not None
     assert result.inference.relation == "wt_pct_to_mole_fraction"
     assert note in result.inference.inputs
-    expected = wt_pct_to_mole_fraction(
-        {name: Decimal(value) for name, value in oxide_map.items()}
-    )
-    assert results[1].state.value == expected
-    assert results[1].inference is not None
-    assert results[1].inference.relation == "wt_pct_to_mole_fraction"
-    assert results[2].inference is not None
-    assert results[2].inference.relation == (
-        "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction"
-    )
 
 
 def test_round9_catalogue_composition_note_does_not_change_admission() -> None:
@@ -703,7 +693,7 @@ def test_round9_catalogue_composition_note_does_not_change_admission() -> None:
         (
             None,
             "No composition was derived",
-            "SiO2 and K2O are not complements to 100; this sample contains MgO",
+            "SiO2 and K2O are NOT complements to 100; this sample contains MgO",
         ),
         outcomes,
         strict=True,
@@ -907,11 +897,7 @@ def test_noncomposition_values_in_britt_plante_and_van_limpt_are_ignored() -> No
                 ),
             ) == {"K2O": Decimal("21.14"), "SiO2": Decimal("78.86")}
             located = _composition_located_from_values(values, None)
-            assert located is not None and located.state.is_value
-            assert located.inference is not None
-            assert located.inference.relation == (
-                "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction"
-            )
+            assert located is None
         else:
             assert _initial_oxide_map_from_values(
                 values, refusal_reason=refusal
@@ -1029,9 +1015,9 @@ def test_markova_point_refusal_mutation_proof(monkeypatch: pytest.MonkeyPatch) -
         and observation.identity.temperature_K.value == target_t
     )
     assert row.identity.composition.is_value
-    assert row.identity.composition.value == wt_pct_to_mole_fraction(
+    assert row.identity.composition.value.components == wt_pct_to_mole_fraction(
         raw["values"]["composition_wt_pct"]
-    )
+    ).components
     assert normalized_composition(
         migrator.result.experiments[row.experiment_id], _bench(), row
     ).selected is not None

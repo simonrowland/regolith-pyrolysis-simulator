@@ -3550,7 +3550,10 @@ def _catalogue_composition_located_from_values(
 
     if not isinstance(values, Mapping) or values.get("composition_from_sample_catalog") is not True:
         return None
-    wt = _initial_oxide_map_from_values(values)
+    wt = _initial_oxide_map_from_values(
+        values,
+        declared_map=_declared_wt_composition_point_map(values, None),
+    )
     if not wt or len(wt) < 2:
         return None
     source_raw = values.get("composition_source") or values.get("composition_source_locator")
@@ -3584,7 +3587,11 @@ def _catalogue_composition_located_from_values(
     return Located(
         State.of(composition),
         locator=locator,
-        inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+        inference=wt_pct_to_mole_fraction_derivation(
+            wt,
+            locator,
+            source_note=values.get("composition_derivation"),
+        ),
     )
 
 
@@ -3723,6 +3730,8 @@ def _printed_map_payload(wt: Mapping[str, Decimal]) -> dict[str, str]:
 def wt_pct_to_mole_fraction_derivation(
     wt: Mapping[str, Decimal],
     locator: Locator | None,
+    *,
+    source_note: object = None,
 ) -> Derivation:
     params: list[tuple[str, Located[Decimal]]] = []
     for oxide, weight in wt.items():
@@ -3743,6 +3752,8 @@ def wt_pct_to_mole_fraction_derivation(
     inputs = [_WT_PCT_TO_MOLE_FRACTION_ARITHMETIC, "original_unit=wt_pct"]
     if any(str(oxide).strip() == "FeOT" for oxide in wt):
         inputs.append(_FEOT_COMPOSITION_DERIVATION_NOTE)
+    if isinstance(source_note, str) and source_note.strip():
+        inputs.append(source_note)
     return Derivation(
         relation="wt_pct_to_mole_fraction",
         inputs=tuple(inputs),
@@ -3755,7 +3766,7 @@ def _composition_located_from_values(
     values: object,
     locator: Locator | None,
 ) -> Located[Composition] | None:
-    """Retain provenance for declared complements and FeOT basis conversions."""
+    """Convert only typed initial maps or structurally signaled FeOT maps."""
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
     wt = _initial_oxide_map_from_values(
@@ -3765,25 +3776,19 @@ def _composition_located_from_values(
     if not wt:
         return None
     has_feot = any(str(oxide).strip() == "FeOT" for oxide in wt)
-    if not has_feot and (not isinstance(source_note, str) or not source_note.strip()):
+    role, _refusal = _declared_composition_role(values)
+    if not has_feot and role != INITIAL_CHARGE_ONLY_PROXY_FLAG:
         return None
-    derivation = wt_pct_to_mole_fraction_derivation(wt, locator)
-    if (
-        isinstance(source_note, str)
-        and "SiO2" in source_note
-        and "K2O" in source_note
-        and "100" in source_note
-    ):
-        # Plante prints K2O and declares SiO2 as 100-K2O; retain that source
-        # rule in the typed lineage instead of presenting the complement as a
-        # second measured oxide.
-        derivation = replace(
-            derivation,
-            relation=f"SiO2_wt_pct=100-K2O_wt_pct;{derivation.relation}",
-            inputs=(*derivation.inputs, "values.composition_derivation"),
-        )
+    derivation = wt_pct_to_mole_fraction_derivation(
+        wt,
+        locator,
+        source_note=source_note,
+    )
+    composition = wt_pct_to_mole_fraction(wt)
+    if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+        composition = replace(composition, proxy_flag=role)
     return Located(
-        State.of(wt_pct_to_mole_fraction(wt)),
+        State.of(composition),
         locator=locator,
         inference=derivation,
     )
