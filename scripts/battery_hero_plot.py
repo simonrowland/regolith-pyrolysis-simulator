@@ -1999,6 +1999,20 @@ def _draw_hero_sweet_spot(
             else "#eeeeee" if sparse else "#ffffff"
         )
         hatch = "///" if sparse else None
+        red, green, blue, _alpha = matplotlib.colors.to_rgba(fill)
+        luminance = sum(
+            weight
+            * (
+                channel / 12.92
+                if channel <= 0.04045
+                else ((channel + 0.055) / 1.055) ** 2.4
+            )
+            for channel, weight in (
+                (red, 0.2126),
+                (green, 0.7152),
+                (blue, 0.0722),
+            )
+        )
         axis.add_patch(
             Rectangle(
                 (x_low, y_low),
@@ -2010,11 +2024,7 @@ def _draw_hero_sweet_spot(
                 hatch=hatch,
             )
         )
-        label_color = (
-            "#f7f7f7"
-            if color_eligible and normalization(value) >= 0.55
-            else "#222222"
-        )
+        label_color = "#222222" if luminance >= 0.5 else "#f7f7f7"
         axis.text(
             (x_low + x_high) / 2,
             (y_low + y_high) / 2,
