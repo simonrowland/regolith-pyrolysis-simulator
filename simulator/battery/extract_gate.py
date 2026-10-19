@@ -270,22 +270,30 @@ def _formula_count(names: object) -> int:
     )
 
 
-def _composition_basis_issues(doc: object) -> list[str]:
+def _composition_issues(doc: object) -> list[str]:
     issues: list[str] = []
-    seen_bad: set[tuple[str, str]] = set()
+    seen_dropped: set[str] = set()
     seen_percent: set[tuple[str, str]] = set()
 
-    def check_basis(basis: object, path: str) -> None:
-        if basis is None:
-            return
-        token = str(basis).strip()
-        if token not in migrate.SUPPORTED_COMPOSITION_MOL_BASES:
-            key = (path, token)
-            if key not in seen_bad:
-                seen_bad.add(key)
-                issues.append(
-                    f"{path} uses unsupported composition basis {token!r}"
+    def check_migrated_composition(
+        mapping: Mapping[str, object], path: str, composition_key: str
+    ) -> None:
+        try:
+            composition, omitted = migrate._mole_fraction_composition_from_values(
+                mapping
+            )
+        except (TypeError, ValueError) as exc:
+            composition, omitted = None, (str(exc),)
+        if composition is None or omitted:
+            key = f"{path}.{composition_key}"
+            if key not in seen_dropped:
+                seen_dropped.add(key)
+                detail = (
+                    ", ".join(omitted[:3])
+                    if omitted
+                    else "no composition was produced"
                 )
+                issues.append(f"{key} was dropped by migration: {detail}")
 
     def check_amounts(amounts: list[tuple[str, object]], path: str) -> None:
         numeric = [_as_decimal(value) for _, value in amounts]
@@ -308,27 +316,30 @@ def _composition_basis_issues(doc: object) -> list[str]:
     for mapping, path in _mappings(doc):
         raw = mapping.get("composition_mol")
         if isinstance(raw, Mapping):
-            basis = migrate._declared_composition_mol_basis(mapping, raw)
-            check_basis(basis, f"{path}.composition_mol.basis")
+            check_migrated_composition(mapping, path, "composition_mol")
             check_amounts(_component_pairs(raw), f"{path}.composition_mol")
         elif isinstance(mapping.get("composition_mole_fraction"), Mapping):
             values = mapping["composition_mole_fraction"]
-            basis = values.get("basis", "printed_mole_fraction")
-            check_basis(basis, f"{path}.composition_mole_fraction.basis")
+            check_migrated_composition(
+                {"composition_mole_fraction": values},
+                path,
+                "composition_mole_fraction",
+            )
             check_amounts(
                 _component_pairs(values),
                 f"{path}.composition_mole_fraction",
             )
 
         if "components" in mapping and "amount_basis" in mapping:
-            basis = mapping.get("basis")
             amount_basis = str(mapping.get("amount_basis") or "")
             if amount_basis in {"", "mole_fraction"}:
-                # With no explicit amount_basis the migrator assumes a mole
-                # fraction. A declared inventory/mass basis carries its own
-                # interpretation, so its opaque provenance label is not an
-                # engine-basis token to reject here.
-                check_basis(basis, f"{path}.basis")
+                try:
+                    migrate._composition_from_plain(mapping)
+                except (TypeError, ValueError, KeyError) as exc:
+                    key = f"{path or 'composition'}.components"
+                    if key not in seen_dropped:
+                        seen_dropped.add(key)
+                        issues.append(f"{key} was dropped by migration: {exc}")
                 check_amounts(
                     _component_pairs(mapping),
                     path or "composition",
@@ -986,7 +997,7 @@ def evaluate_extract(
     _add(report, "locator-page-offset", "SOFT", locator_page_soft)
     _add(report, "locator-pdf", "SOFT", locator_pdf_soft)
     _add(report, "locator-legacy", "SOFT", locator_legacy_soft)
-    _add(report, "composition", "HARD", _composition_basis_issues(doc))
+    _add(report, "composition", "HARD", _composition_issues(doc))
     _add(report, "transition-composition", "HARD", _transition_composition_issues(doc))
     _add(report, "zero-uncertainty", "HARD", _uncertainty_issues(doc))
 

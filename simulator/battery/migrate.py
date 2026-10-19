@@ -3823,45 +3823,6 @@ _COMPOSITION_MOL_META_KEYS = frozenset(
 )
 _DEFAULT_COMPOSITION_MOL_BASIS = "printed_mole_fraction"
 
-# Composition.basis labels accepted by the extract migration. These include
-# descriptive provenance labels retained on migrated compositions as well as
-# the one-component pure-oxide case handled below.
-SUPPORTED_COMPOSITION_MOL_BASES = frozenset(
-    {
-        "Fe pure standard",
-        "Fe-Mo binary alloy",
-        "Fe-Mo_alloy",
-        "Fe-Sn_alloy",
-        "Pd pure standard",
-        "Saratov chondrule oxide composition as printed",
-        "derived_from_formula",
-        "elemental",
-        "formula-derived composition from printed mullite stoichiometry",
-        "formula-unit mole fraction calculated from printed mullite formula",
-        "measured 5aN-3 composition used as the starting composition",
-        "measured_as_printed",
-        "normalized_mole_fraction_from_published_Fo93Fa7",
-        "normalized_mole_fraction_from_published_xA_over_xC_and_xS",
-        "printed Saratov chondrule oxide composition",
-        "printed_formula_stoichiometry",
-        "printed_initial_mole_fractions",
-        "printed_metals",
-        "printed_mole_fraction",
-        "printed_oxides",
-        "printed_quasi_binary",
-        "printed_species",
-        "printed_x_Mo_axis",
-        "printed_x_e_Al2O3_mol_percent_axis",
-        "pure_oxide_system",
-        "simple_oxide_mole_fraction",
-        "sossi_2020_measured_oxide_mole_fraction",
-        "stoichiometric MgAl2O4 on the MgO–Al2O3 oxide-component basis",
-        "stoichiometric_Ca3SiO5_oxide_mole_fractions",
-        "total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled",
-    }
-)
-
-
 def _composition_mol_items(raw: object) -> Iterator[tuple[str, object]]:
     if not isinstance(raw, Mapping):
         return
