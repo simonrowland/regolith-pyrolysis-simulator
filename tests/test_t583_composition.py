@@ -22,6 +22,7 @@ from simulator.vapour_rail.channels import (
     REFUSAL_CARBON_SIDE_OWNER_MISSING,
     attempt_channel_composition,
 )
+from tools.compose_vapour_rail_carriers import typed_refusal
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,6 +71,38 @@ def test_all_878_needs_channel_rows_execute_typed_refusal() -> None:
             assert refusal.missing_channels, row
             assert all(channel in refusal.detail for channel in refusal.missing_channels)
         assert all(owner in refusal.detail for owner in refusal.missing_melt_owners)
+
+
+def test_typed_refusal_ignores_edits_to_missing_prose() -> None:
+    row = {
+        "element": "Ba",
+        "carrier": "Ba",
+        "verdict": "NEEDS-CHANNEL",
+        "pathway": "parent_oxide_x_halogen_exchange",
+        "required_channels": [CHANNEL_F2],
+        "missing": (
+            "NEEDS-CHANNEL: ligand fugacity channel for ['F']; "
+            "pathway=parent_oxide_x_halogen_exchange"
+        ),
+    }
+    edited_row = {
+        **row,
+        "missing": row["missing"].replace("['F']", "['S']"),
+    }
+
+    original_refusal = typed_refusal(row)
+    edited_refusal = typed_refusal(edited_row)
+
+    assert isinstance(original_refusal, ChannelCompositionRefusal)
+    assert isinstance(edited_refusal, ChannelCompositionRefusal)
+    assert original_refusal.missing_channels == edited_refusal.missing_channels == (
+        CHANNEL_F2,
+    )
+    assert (
+        original_refusal.missing_melt_owners
+        == edited_refusal.missing_melt_owners
+        == ("halide_reservoir_owner_missing",)
+    )
 
 
 def test_ba_pilot_three_way_split_and_owner_specific_refusals() -> None:
