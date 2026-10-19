@@ -134,6 +134,7 @@ class EngineSummary:
     refused_by_rail: Counter[str] = field(default_factory=Counter)
     not_observable_by_rail: Counter[str] = field(default_factory=Counter)
     excluded_d139_rows: int = 0
+    excluded_d139_by_rail: Counter[str] = field(default_factory=Counter)
     non_dex_rows: int = 0
     missing_identity_rows: int = 0
     source_relations: Counter[str] = field(default_factory=Counter)
@@ -187,12 +188,20 @@ class ScorePlotData:
     bin_width_K: float
 
 
-def _d139_exclusion_counts(data: ScorePlotData) -> tuple[tuple[str, int], ...]:
-    return tuple(
-        (engine, summary.excluded_d139_rows)
-        for engine in data.engines
-        if (summary := data.summaries[engine]).excluded_d139_rows
-    )
+def _d139_exclusion_counts(
+    data: ScorePlotData, *, rail: str | None = None
+) -> tuple[tuple[str, int], ...]:
+    counts: list[tuple[str, int]] = []
+    for engine in data.engines:
+        summary = data.summaries[engine]
+        count = (
+            summary.excluded_d139_rows
+            if rail is None
+            else summary.excluded_d139_by_rail[rail]
+        )
+        if count:
+            counts.append((engine, count))
+    return tuple(counts)
 
 
 @dataclass(frozen=True)
@@ -747,6 +756,7 @@ def read_scores(
                         # Use the scorer's d-139 output marker; do not infer calibration here.
                         if rail in selected:
                             summary.excluded_d139_rows += 1
+                            summary.excluded_d139_by_rail[rail] += 1
                         continue
                 formula = _species_formula(identity)
                 temperature_raw = _state_value(identity.get("temperature_K"))
@@ -2578,7 +2588,7 @@ def render_hero_charts(
                 "data with its pure-liquid model reference; main's fix is pending."
             )
         if rail == Rail.VAPOUR.value:
-            d139_counts = _d139_exclusion_counts(data)
+            d139_counts = _d139_exclusion_counts(data, rail=rail)
             if d139_counts:
                 counts = ", ".join(
                     f"{engine} {_compact_count(count)}"
