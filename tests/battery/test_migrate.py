@@ -6136,6 +6136,8 @@ def _series_census(
     extracts: Path, extracts_v2: Path
 ) -> tuple[dict[str, int], list[str], int, int, dict[str, dict[str, int]]]:
     from decimal import Decimal, InvalidOperation
+    from simulator.battery.migrate import _residue_component_field_sets
+    from simulator.yaml_cache import YAML12SafeLoader
 
     census: dict[str, int] = {}
     per_source: dict[str, dict[str, int]] = {}
@@ -6143,13 +6145,17 @@ def _series_census(
     n_numeric = 0
     n_unavailable = 0
     for src_path in sorted(extracts.glob("*.yaml")):
-        source = yaml.safe_load(src_path.read_text(encoding="utf-8"))
+        source = yaml.load(
+            src_path.read_text(encoding="utf-8"), Loader=YAML12SafeLoader
+        )
         if not isinstance(source, dict):
             continue
         store_path = extracts_v2 / src_path.name
         if not store_path.is_file():
             continue
-        stored = yaml.safe_load(store_path.read_text(encoding="utf-8"))
+        stored = yaml.load(
+            store_path.read_text(encoding="utf-8"), Loader=YAML12SafeLoader
+        )
         stored_observations = [
             o
             for o in (stored.get("observations") or [])
@@ -6180,11 +6186,7 @@ def _series_census(
                     if q_token == "residue_component_composition":
                         residue_fields = (
                             "residue_ppm",
-                            "SiO2_wt_pct",
-                            "Al2O3_wt_pct",
-                            "FeO_wt_pct",
-                            "MgO_wt_pct",
-                            "CaO_wt_pct",
+                            *_residue_component_field_sets(item)[0],
                         )
                         for field in residue_fields:
                             if field not in item:
@@ -13523,6 +13525,81 @@ def test_residue_component_quantity_aliases_keep_printed_values_and_missing_cell
         missing = select_declared_source(quantity.value, units, {field: None})
         assert not missing.available
         assert "null" in (missing.reason or "")
+
+
+def test_residue_series_scores_every_parseable_printed_oxide(
+    tmp_path: Path,
+) -> None:
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-026-markova-1984.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    row = next(
+        observation
+        for observation in source["species"]["SiO2"]["observations"]
+        if observation.get("observation_id")
+        == "markova_1984_table2_residual_melt_VI_lherzolite"
+    )
+    row["values"]["series"] = [
+        {
+            "T_C": 1475,
+            "mass_loss_pct": "1.46",
+            "SiO2_wt_pct": "44.4",
+            "TiO2_wt_pct": "1.23",
+            "Na2O_wt_pct": "0.44",
+        }
+    ]
+    migrated = _migrate_real_extract(
+        tmp_path, "kems-026-markova-1984.yaml", extract_doc=source
+    )
+    cells = {
+        observation.identity.species.formula: observation.value.point
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.observation_id.startswith(
+            "kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
+        and observation.identity.species.formula in {"SiO2", "TiO2", "Na2O"}
+        and observation.value.kind is ValueKind.POINT
+    }
+    assert cells == {
+        "SiO2": Decimal("44.4"),
+        "TiO2": Decimal("1.23"),
+        "Na2O": Decimal("0.44"),
+    }
+
+
+def test_unparseable_residue_oxide_field_is_a_typed_refusal(
+    tmp_path: Path,
+) -> None:
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-026-markova-1984.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    row = next(
+        observation
+        for observation in source["species"]["SiO2"]["observations"]
+        if observation.get("observation_id")
+        == "markova_1984_table2_residual_melt_VI_lherzolite"
+    )
+    row["values"]["series"] = [
+        {"T_C": 1475, "SiO2_wt_pct": "44.4", "UnobtainiumO2_wt_pct": "0.2"}
+    ]
+    migrated = _migrate_real_extract(
+        tmp_path, "kems-026-markova-1984.yaml", extract_doc=source
+    )
+    issues = [
+        issue
+        for issue in migrated.validation.issues
+        if "UnobtainiumO2_wt_pct" in issue.path
+    ]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert "parseable oxide formula" in issues[0].detail
 
 
 def test_hashimoto_row_left_live_diagnostics_are_final(
