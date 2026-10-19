@@ -11414,18 +11414,217 @@ class PrintedOxygenFacts:
     log_fO2_reference_Pa: Decimal = _BAR_PA
 
 
+# A named buffer (IW, FMQ, QFM, NNO), with or without an offset, is not an
+# absolute pressure. No temperature-dependent buffer curve is applied.
+_BUFFER_NAME_TOKENS = ("iw", "fmq", "qfm", "nno")
+_BOUNDED_FO2_REASON = (
+    "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
+)
+_BUFFER_RELATIVE_FO2_REASON = (
+    "buffer-relative fO2 ({buffer}) requires a "
+    "temperature-dependent buffer model; no fO2_Pa assigned"
+)
+
+
 def _rejected_log_fO2_reason(facts: PrintedOxygenFacts) -> str | None:
     if not facts.rejected_log_fO2:
         return None
-    return "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
+    return _BOUNDED_FO2_REASON
 
 
 def _log_fO2_to_pa(
     log10_fO2: Decimal, reference_pressure_pa: Decimal = _BAR_PA
 ) -> Decimal:
-    # fO2_Pa = 10^L × P_ref, where P_ref is 1e5 Pa (bar) or 101325 Pa (atm).
-    # Unit check: 10^L is dimensionless, so multiplying by P_ref leaves Pa.
+    # Printed log10 fO2 (bar) -> Pa = 10^x × 1e5.
+    # An atm frame uses 101325 Pa instead of 1e5. Callers pass that reference.
+    # Unit check: 10^x is dimensionless, so 10^x × Pa is Pa.
+    # Sanity: log10 fO2 = -9.56 (bar) -> 2.754e-5 Pa
+    # (1e5 × 10^-9.56 = 0.00002754228703338166448631210659 Pa).
     return reference_pressure_pa * (Decimal(10) ** log10_fO2)
+
+
+@dataclass(frozen=True)
+class PrintedOxygenDecision:
+    """Identity outcome for one printed oxygen fact.
+
+    ``log`` and ``pressure`` carry the converted pascal state. ``refusal``
+    is unknown, with the buffer or bounded reason. Whether that state
+    overwrites an inherited value is decided by ``_printed_oxygen_state_for``.
+    """
+
+    kind: str
+    state: State
+
+
+def _oxygen_pressure_point(located: object) -> Decimal | None:
+    if not isinstance(located, Located) or not located.state.is_value:
+        return None
+    raw = located.state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None:
+            return None
+        raw = raw.point
+    if isinstance(raw, Decimal) and raw.is_finite():
+        return raw
+    return None
+
+
+def _printed_oxygen_buffer_text(
+    raw_item: object,
+    point_conditions: Mapping[str, Any] | None,
+) -> str | None:
+    buffer_control = (point_conditions or {}).get("fO2_control")
+    if (
+        isinstance(buffer_control, Located)
+        and buffer_control.state.is_value
+        and isinstance(buffer_control.state.value, str)
+    ):
+        control_text = buffer_control.state.value
+        if any(token in control_text.casefold() for token in _BUFFER_NAME_TOKENS):
+            return control_text
+    if not isinstance(raw_item, Mapping):
+        return None
+    raw_buffer = raw_item.get("oxygen_buffer_as_published")
+    if isinstance(raw_buffer, str) and raw_buffer.strip():
+        return raw_buffer.strip()
+    for log_key in ("log_fO2", "log10_fO2"):
+        raw_log = raw_item.get(log_key)
+        if not isinstance(raw_log, Mapping):
+            continue
+        units = str(raw_log.get("units") or raw_log.get("unit") or "")
+        if any(token in units.casefold() for token in _BUFFER_NAME_TOKENS):
+            return units
+    return None
+
+
+def printed_oxygen_decision(
+    facts: PrintedOxygenFacts,
+    *,
+    raw_item: object,
+    point_conditions: Mapping[str, Any] | None,
+) -> PrintedOxygenDecision | None:
+    """Turn printed oxygen into one identity state, for every quantity.
+
+    ``facts`` are the facts ``_merge_printed_oxygen`` just computed, parent
+    fallback included. The bar-versus-atm reference lives on those facts and
+    is not stored on the point log, so a second row-only walk would miss both
+    the fallback and the frame.
+
+    Provenance stays split. The printed log remains on point_conditions
+    ``fO2_log`` with whatever inference it already had. ``identity.fO2_Pa``
+    is the converted pressure. A Derivation is not attached to the log:
+    ``score.point_value`` treats any inference as non-printed and would drop
+    the author's number. A printed pressure already carries its conversion
+    inference on point ``fO2_Pa``; this copies that pascal point and does
+    not add a second condition key.
+    """
+
+    buffer_text = _printed_oxygen_buffer_text(raw_item, point_conditions)
+    log_point = (
+        facts.log_fO2.state.value
+        if facts.log_fO2 is not None and facts.log_fO2.state.is_value
+        else None
+    )
+    has_log = isinstance(log_point, Decimal) and log_point.is_finite()
+    facts_pa = _oxygen_pressure_point(facts.oxygen_partial_pressure_Pa)
+    point_pa = _oxygen_pressure_point((point_conditions or {}).get("fO2_Pa"))
+    if facts.rejected_log_fO2 or (
+        buffer_text is not None
+        and not has_log
+        and facts_pa is None
+        and point_pa is None
+    ):
+        reason = (
+            _BUFFER_RELATIVE_FO2_REASON.format(buffer=buffer_text)
+            if buffer_text is not None
+            else _BOUNDED_FO2_REASON
+        )
+        return PrintedOxygenDecision("refusal", State.unknown(reason))
+    if has_log:
+        return PrintedOxygenDecision(
+            "log",
+            State.of(_log_fO2_to_pa(log_point, facts.log_fO2_reference_Pa)),
+        )
+    pressure = facts_pa if facts_pa is not None else point_pa
+    if pressure is None:
+        return None
+    return PrintedOxygenDecision("pressure", State.of(pressure))
+
+
+def _printed_oxygen_may_set(
+    identity: Identity,
+    decision: PrintedOxygenDecision | None,
+    *,
+    from_fallback: bool,
+) -> bool:
+    """True when this profile may carry a printed oxygen value.
+
+    Not-applicable axes stay not applicable. That covers fugacity,
+    equilibrium composition, and an unbuffered residue vacuum. A required
+    or uncompared axis, and an axis that already holds unknown or a value,
+    may be filled.
+
+    An unrecognized quantity has no profile. ``fill_identity`` returns
+    before it can strip the axis, and the historical copy kept a printed
+    pascal pressure there. A log conversion or a buffer refusal is not
+    written on that axis: there is no profile to accept it, and either
+    would drop the pressure the row already carried. A parent fallback is
+    not that printed pressure.
+    """
+
+    current = identity.fO2_Pa
+    if current is not None and current.is_not_applicable:
+        return False
+    quantity = identity.quantity
+    if not isinstance(quantity, State) or not quantity.is_value:
+        return (
+            not from_fallback
+            and decision is not None
+            and decision.kind == "pressure"
+            and decision.state.is_value
+        )
+    profile = profile_for(identity)
+    if "fO2_Pa" in profile.required or "fO2_Pa" in _uncompared_axes_for(identity):
+        return True
+    return current is not None and (current.is_unknown or current.is_value)
+
+
+def _printed_oxygen_state_for(
+    identity: Identity,
+    decision: PrintedOxygenDecision | None,
+    *,
+    from_fallback: bool,
+) -> State | None:
+    """State to write on identity.fO2_Pa, or None to leave the axis alone.
+
+    Oxygen printed on this row overwrites an inherited value. A parent or
+    experiment fallback fills only an unknown axis, so a row pressure is not
+    replaced by the series log and a series log does not clobber a value the
+    row already carried.
+    """
+
+    if decision is None or not _printed_oxygen_may_set(
+        identity, decision, from_fallback=from_fallback
+    ):
+        return None
+    current = identity.fO2_Pa
+    if from_fallback and current is not None and not current.is_unknown:
+        return None
+    if (
+        current is not None
+        and current.is_value
+        and decision.state.is_value
+        and current.value == decision.state.value
+    ):
+        return None
+    if (
+        current is not None
+        and current.is_unknown
+        and decision.state.is_unknown
+        and current.reason == decision.state.reason
+    ):
+        return None
+    return decision.state
 
 
 def _normalize_printed_token(raw: object) -> str:
@@ -12706,12 +12905,15 @@ class Migrator:
         fallback: Iterable[object] = (),
         *,
         skip_tables: bool = False,
-    ) -> dict[str, Located[Any]] | None:
+    ) -> tuple[dict[str, Located[Any]] | None, PrintedOxygenFacts, bool]:
         ratio_oxygen = collect_author_ratio_oxygen(specific, locator)
         facts = collect_printed_oxygen(specific, locator, skip_tables=skip_tables)
         ratio_payload = _has_author_ratio_oxygen_payload(specific)
+        used_fallback = False
         if ratio_oxygen is None and ratio_payload:
-            return point_conditions
+            # The ratio payload did not resolve. Do not fall through to a
+            # partial printed log or pressure.
+            return point_conditions, PrintedOxygenFacts(), False
         if (
             ratio_oxygen is None
             and facts.log_fO2 is None
@@ -12722,9 +12924,13 @@ class Migrator:
             ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
             if ratio_oxygen is None:
                 facts = collect_printed_oxygen(fallback, locator, skip_tables=True)
+            used_fallback = True
         if ratio_oxygen is not None:
             # The nested oxygen_partial_pressure is Plante's derived
             # congruent-vaporization condition, not a printed pO2 cell.
+            # Keep the printed log on the point condition, but hand identity
+            # an empty fact set so it copies this derived pressure instead of
+            # converting the log over it.
             facts = PrintedOxygenFacts(
                 log_fO2=facts.log_fO2,
                 log_fO2_reference_Pa=facts.log_fO2_reference_Pa,
@@ -12737,8 +12943,8 @@ class Migrator:
                     "fO2_log",
                     Located(State.unknown(refusal), locator=locator),
                 )
-                return merged
-            return point_conditions
+                return merged, facts, used_fallback
+            return point_conditions, facts, used_fallback
         merged = dict(point_conditions or {})
         if facts.log_fO2 is not None and "fO2_log" not in merged:
             merged["fO2_log"] = facts.log_fO2
@@ -12754,7 +12960,8 @@ class Migrator:
             # Per-row derived products span orders of magnitude; never collapse
             # them onto experiment.fO2_control.oxygen_partial_pressure_Pa.
             merged["fO2_Pa"] = ratio_oxygen
-        return merged or None
+        identity_facts = PrintedOxygenFacts() if ratio_oxygen is not None else facts
+        return merged or None, identity_facts, used_fallback
 
     def _experiment_identity_fields(
         self,
@@ -14694,20 +14901,6 @@ class Migrator:
                 composition_unknown_reason(composition_refusal)
             )
         derived_oxygen = collect_author_ratio_oxygen((values,), locator)
-        if raw_adm == AdmissionStatus.ADMITTED.value:
-            oxygen = derived_oxygen
-            if oxygen is None and not _has_author_ratio_oxygen_payload((values,)):
-                oxygen = collect_printed_oxygen(
-                    (values,), locator, skip_tables=True
-                ).oxygen_partial_pressure_Pa
-            if oxygen is not None and oxygen.state.is_value:
-                oxygen_value = oxygen.state.value
-                if (
-                    isinstance(oxygen_value, Value)
-                    and oxygen_value.kind is ValueKind.POINT
-                    and oxygen_value.point is not None
-                ):
-                    ident_kwargs["fO2_Pa"] = State.of(oxygen_value.point)
         if t_known is not None and q_token is not Quantity.TRANSITION_TEMPERATURE:
             ident_kwargs["temperature_K"] = State.of(t_known)
         elif t_known is None and t_sel.condition_ranges:
@@ -15072,7 +15265,7 @@ class Migrator:
             oxygen_roots.append(values)
         if isinstance(obs.get("equipment"), Mapping):
             oxygen_roots.append(obs["equipment"])
-        point_conditions = self._merge_printed_oxygen(
+        point_conditions, oxygen_facts, oxygen_from_fallback = self._merge_printed_oxygen(
             experiment_id,
             point_conditions,
             oxygen_roots,
@@ -15131,6 +15324,21 @@ class Migrator:
                         atmosphere_note, fo2_locator
                     )
             point_conditions = residue_conditions or None
+        # Printed oxygen beats a derived graphite C–CO pressure. Stamp it
+        # into ident_kwargs before experiment inheritance, which fills only
+        # axes still absent. The scratch fill decides whether this profile
+        # accepts the axis; a not-applicable axis is left alone.
+        oxygen_state = _printed_oxygen_state_for(
+            fill_identity(quantity, species, **ident_kwargs),
+            printed_oxygen_decision(
+                oxygen_facts,
+                raw_item=values if isinstance(values, Mapping) else None,
+                point_conditions=point_conditions,
+            ),
+            from_fallback=oxygen_from_fallback,
+        )
+        if oxygen_state is not None:
+            ident_kwargs["fO2_Pa"] = oxygen_state
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,
@@ -16584,26 +16792,6 @@ class Migrator:
                 charge=species.charge,
             )
         identity = fill_identity(quantity, species, **ident_kwargs)
-        if q_token_point is Quantity.FE3_FE2_RATIO and isinstance(raw_item, Mapping):
-            row_oxygen = collect_printed_oxygen((raw_item,), point_locator)
-            refusal = _rejected_log_fO2_reason(row_oxygen)
-            if refusal is not None:
-                identity = replace(
-                    identity,
-                    fO2_Pa=State.unknown(refusal),
-                )
-            elif row_oxygen.log_fO2 is not None:
-                # A printed point overrides series fO2; absence leaves the
-                # inherited series value unchanged.
-                identity = replace(
-                    identity,
-                    fO2_Pa=State.of(
-                        _log_fO2_to_pa(
-                            row_oxygen.log_fO2.state.value,
-                            row_oxygen.log_fO2_reference_Pa,
-                        )
-                    ),
-                )
         converted: Derivation | None = None
         if value_sel is not None and value_sel.available:
             emitted = value_sel.value
@@ -16746,7 +16934,7 @@ class Migrator:
         )
         if lab_pc:
             point_conditions = {**(point_conditions or {}), **lab_pc}
-        point_conditions = self._merge_printed_oxygen(
+        point_conditions, oxygen_facts, oxygen_from_fallback = self._merge_printed_oxygen(
             experiment_id,
             point_conditions,
             (raw_item,) if isinstance(raw_item, Mapping) else (),
@@ -17111,104 +17299,35 @@ class Migrator:
                 **parent_point_conditions,
                 **(point_conditions or {}),
             }
-        if (
-            q_token_point in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
-            and isinstance(raw_item, Mapping)
-        ):
-            row_oxygen = collect_printed_oxygen((raw_item,), point_locator)
-            buffer_text = None
-            buffer_name_tokens = ("iw", "fmq", "qfm", "nno")
-            buffer_control = (point_conditions or {}).get("fO2_control")
+        oxygen_state = _printed_oxygen_state_for(
+            identity,
+            printed_oxygen_decision(
+                oxygen_facts,
+                raw_item=raw_item if isinstance(raw_item, Mapping) else None,
+                point_conditions=point_conditions,
+            ),
+            from_fallback=oxygen_from_fallback,
+        )
+        if oxygen_state is not None:
+            identity = replace(identity, fO2_Pa=oxygen_state)
+        if q_token_point is Quantity.VALENCE_RATIO:
+            total_pressure = (point_conditions or {}).get("total_pressure_Pa")
             if (
-                isinstance(buffer_control, Located)
-                and buffer_control.state.is_value
-                and isinstance(buffer_control.state.value, str)
+                isinstance(total_pressure, Located)
+                and total_pressure.state.is_value
             ):
-                control_text = buffer_control.state.value
-                if any(
-                    token in control_text.casefold()
-                    for token in buffer_name_tokens
-                ):
-                    buffer_text = control_text
-            if buffer_text is None:
-                raw_buffer = raw_item.get("oxygen_buffer_as_published")
-                if isinstance(raw_buffer, str) and raw_buffer.strip():
-                    buffer_text = raw_buffer.strip()
-            if buffer_text is None:
-                for log_key in ("log_fO2", "log10_fO2"):
-                    raw_log = raw_item.get(log_key)
-                    if not isinstance(raw_log, Mapping):
-                        continue
-                    units = str(
-                        raw_log.get("units") or raw_log.get("unit") or ""
+                pressure_value = total_pressure.state.value
+                if isinstance(pressure_value, Value):
+                    pressure_value = (
+                        pressure_value.point
+                        if pressure_value.kind is ValueKind.POINT
+                        else None
                     )
-                    if any(
-                        token in units.casefold()
-                        for token in buffer_name_tokens
-                    ):
-                        buffer_text = units
-                        break
-            if row_oxygen.rejected_log_fO2 or (
-                q_token_point is Quantity.VALENCE_RATIO
-                and row_oxygen.log_fO2 is None
-                and buffer_text is not None
-                and row_oxygen.oxygen_partial_pressure_Pa is None
-            ):
-                reason = (
-                    f"buffer-relative fO2 ({buffer_text}) requires a "
-                    "temperature-dependent buffer model; no fO2_Pa assigned"
-                    if q_token_point is Quantity.VALENCE_RATIO
-                    and buffer_text is not None
-                    else "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
-                )
-                identity = replace(identity, fO2_Pa=State.unknown(reason))
-            elif row_oxygen.log_fO2 is not None:
-                # A printed absolute log takes precedence over a pO2 point.
-                identity = replace(
-                    identity,
-                    fO2_Pa=State.of(
-                        _log_fO2_to_pa(
-                            row_oxygen.log_fO2.state.value,
-                            row_oxygen.log_fO2_reference_Pa,
-                        )
-                    ),
-                )
-            elif identity.fO2_Pa is not None and identity.fO2_Pa.is_unknown:
-                # Printed pO2 is already converted by _merge_printed_oxygen.
-                # Copy its Pascal point into identity; do not convert twice.
-                oxygen_condition = (point_conditions or {}).get("fO2_Pa")
-                pressure = (
-                    oxygen_condition.state.value
-                    if isinstance(oxygen_condition, Located)
-                    and oxygen_condition.state.is_value
-                    else None
-                )
-                if (
-                    isinstance(pressure, Value)
-                    and pressure.kind is ValueKind.POINT
-                    and pressure.point is not None
-                ):
+                pressure_pa = _as_dec_or_none(pressure_value)
+                if pressure_pa is not None:
                     identity = replace(
-                        identity, fO2_Pa=State.of(pressure.point)
+                        identity, total_pressure_Pa=State.of(pressure_pa)
                     )
-            if q_token_point is Quantity.VALENCE_RATIO:
-                total_pressure = (point_conditions or {}).get("total_pressure_Pa")
-                if (
-                    isinstance(total_pressure, Located)
-                    and total_pressure.state.is_value
-                ):
-                    pressure_value = total_pressure.state.value
-                    if isinstance(pressure_value, Value):
-                        pressure_value = (
-                            pressure_value.point
-                            if pressure_value.kind is ValueKind.POINT
-                            else None
-                        )
-                    pressure_pa = _as_dec_or_none(pressure_value)
-                    if pressure_pa is not None:
-                        identity = replace(
-                            identity, total_pressure_Pa=State.of(pressure_pa)
-                        )
         if point_composition_refusal:
             child_printed_map = next(
                 (

@@ -1,15 +1,12 @@
-"""Pin migrated identity.fO2_Pa for printed oxygen on activity coefficients.
+"""Printed oxygen reaches identity.fO2_Pa for every accepting quantity.
 
 Pretorius and Muan is not on this base. Holzheid 1997 Table 3a and
 O'Neill and Eggins 2002 Table 7 are the rows that print a log fO2 on
-activity-coefficient observations. The current lift keeps the printed log
-on point conditions and leaves identity.fO2_Pa unknown unless a pascal
-pressure was already copied.
+activity-coefficient observations. The log stays on point conditions.
+identity.fO2_Pa is the same conversion used for redox rows.
 
-t-1360: a later commit teaches every accepting quantity to use the same
-log10(bar) -> Pa conversion. The Holzheid and NiO assertions below record
-the pre-change identities and are updated in that commit. The FeO pin and
-the -9.56 sanity value must not move.
+A named buffer offset is not converted. There is no buffer curve in this
+owner. A row with no printed oxygen stays unknown.
 """
 
 from __future__ import annotations
@@ -19,7 +16,8 @@ from pathlib import Path
 
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator, _log_fO2_to_pa
-from simulator.battery.records import Value
+from simulator.battery.records import Located, Value
+from tests.battery.test_migrate import _scalar_extract, _write_min_tree
 
 ROOT = Path(__file__).resolve().parents[2]
 _UNMAPPED = "no fO2_Pa mapped from source"
@@ -69,8 +67,7 @@ def test_log10_bar_to_pa_sanity_is_2_754e_5() -> None:
     assert abs(converted - Decimal("2.754e-5")) < Decimal("5e-9")
 
 
-def test_holzheid_v69_printed_log_does_not_reach_gamma_identity() -> None:
-    # Current behaviour. t-1360 fills identity.fO2_Pa from this printed log.
+def test_holzheid_v69_printed_log_reaches_gamma_identity() -> None:
     result = _migrated("holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml")
     observation = _one(
         result,
@@ -82,22 +79,23 @@ def test_holzheid_v69_printed_log_does_not_reach_gamma_identity() -> None:
     assert _decimal_point(log.state) == Decimal("-9.63")
     assert log.inference is None
     assert observation.identity.fO2_Pa is not None
-    assert observation.identity.fO2_Pa.is_unknown
-    assert observation.identity.fO2_Pa.reason == _UNMAPPED
+    assert observation.identity.fO2_Pa.is_value
+    assert observation.identity.fO2_Pa.value == _log_fO2_to_pa(Decimal("-9.63"))
 
 
-def test_oneill_nio_parent_log_does_not_reach_gamma_identity() -> None:
-    # The log is on the parent values, not the series row. Current behaviour
-    # copies it onto point conditions and still leaves identity unknown.
+def test_oneill_nio_parent_log_reaches_gamma_identity() -> None:
+    # The log is on the parent values, not the series row. Fallback facts
+    # carry the bar frame, and the child identity uses that conversion.
     result = _migrated("oneill-2002-feo-activity-coefficients-cmas.yaml")
     observation = _one(result, "oneill_2002_table7_nio", "row=ad-eutectic")
     assert observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
     log = observation.point_conditions["fO2_log"]
     assert _decimal_point(log.state) == Decimal("-12.61")
+    assert log.inference is None
     assert "fO2_Pa" not in (observation.point_conditions or {})
     assert observation.identity.fO2_Pa is not None
-    assert observation.identity.fO2_Pa.is_unknown
-    assert observation.identity.fO2_Pa.reason == _UNMAPPED
+    assert observation.identity.fO2_Pa.is_value
+    assert observation.identity.fO2_Pa.value == _log_fO2_to_pa(Decimal("-12.61"))
 
 
 def test_oneill_feo_gamma_identity_keeps_printed_pressure() -> None:
@@ -114,3 +112,140 @@ def test_oneill_feo_gamma_identity_keeps_printed_pressure() -> None:
     assert observation.identity.fO2_Pa is not None
     assert observation.identity.fO2_Pa.is_value
     assert observation.identity.fO2_Pa.value == printed
+    assert observation.identity.fO2_Pa.value == _log_fO2_to_pa(Decimal("-12.61"))
+
+
+def _migrate_fixture(tmp_path: Path, *, quantity: str, point: dict):
+    values = {
+        "quantity": quantity,
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "series": [point],
+    }
+    extract = _scalar_extract(
+        quantity=quantity,
+        units="dimensionless",
+        values=values,
+        obs_type="activity_coefficient",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row["standard_state"] = "pure liquid oxide"
+    row["phase"] = "l"
+    extract["species"] = {"FeO": {"observations": [row]}}
+    migrator = Migrator(root=_write_min_tree(tmp_path, extract))
+    migrator._migrate_extract(tmp_path / "data" / "literature" / "extracts" / "fixture-source.yaml")
+    migrator.finalize()
+    return migrator.result
+
+
+def _logged(result, quantity: Quantity, log: str):
+    expected = Decimal(log)
+    matches = []
+    for observation in result.observations.values():
+        identity_quantity = observation.identity.quantity
+        if not identity_quantity.is_value or identity_quantity.value is not quantity:
+            continue
+        located = (observation.point_conditions or {}).get("fO2_log")
+        if not isinstance(located, Located):
+            continue
+        if _decimal_point(located.state) == expected:
+            matches.append(observation)
+    assert len(matches) == 1, [item.observation_id for item in matches]
+    return matches[0]
+
+
+def test_activity_row_fO2_log_reaches_identity(tmp_path: Path) -> None:
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "log_fO2": {"value": "-9.56", "units": "log10(bar)"},
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    observation = _logged(result, Quantity.ACTIVITY, "-9.56")
+    log = observation.point_conditions["fO2_log"]
+    assert log.inference is None
+    assert observation.identity.fO2_Pa is not None
+    assert observation.identity.fO2_Pa.is_value
+    assert observation.identity.fO2_Pa.value == _log_fO2_to_pa(Decimal("-9.56"))
+    assert observation.identity.fO2_Pa.value == _LOG_MINUS_9_56_PA
+
+
+def test_gamma_row_fO2_log_reaches_identity(tmp_path: Path) -> None:
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity_coefficient",
+        point={
+            "T_K": 1673,
+            "gamma": "1.72",
+            "log_fO2": {"value": "-9.56", "units": "log10(bar)"},
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    observation = _logged(result, Quantity.ACTIVITY_COEFFICIENT, "-9.56")
+    assert observation.point_conditions["fO2_log"].inference is None
+    assert observation.identity.fO2_Pa is not None
+    assert observation.identity.fO2_Pa.is_value
+    assert observation.identity.fO2_Pa.value == _log_fO2_to_pa(Decimal("-9.56"))
+
+
+def test_activity_buffer_offset_stays_unknown(tmp_path: Path) -> None:
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": "FMQ+2.7"},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    matches = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+        and isinstance((observation.point_conditions or {}).get("fO2_control"), Located)
+    ]
+    assert len(matches) == 1
+    oxygen = matches[0].identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_unknown
+    assert oxygen.reason is not None
+    assert oxygen.reason.startswith("buffer-relative fO2 (")
+    assert "FMQ+2.7" in oxygen.reason
+    assert matches[0].point_conditions["fO2_control"].state.value == "FMQ+2.7"
+
+
+def test_activity_without_printed_oxygen_stays_unknown(tmp_path: Path) -> None:
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+    ]
+    assert rows
+    assert all(
+        observation.identity.fO2_Pa is not None
+        and observation.identity.fO2_Pa.is_unknown
+        and observation.identity.fO2_Pa.reason == _UNMAPPED
+        for observation in rows
+    )
+    assert all("fO2_log" not in (observation.point_conditions or {}) for observation in rows)
+    assert all("fO2_Pa" not in (observation.point_conditions or {}) for observation in rows)
