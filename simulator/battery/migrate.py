@@ -104,6 +104,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.stable_ids import (
     cao_raw_pca_id,
+    exploded_point_id,
     series_point_id,
     series_row_extra,
     temperature_token,
@@ -5274,26 +5275,12 @@ def _exploded_point_id(
     raw_item: object,
     row_extra: str | None,
 ) -> str:
-    """Child id for an exploded row. No encounter ordinal.
+    """Child id. The digest lives in ``stable_ids.exploded_point_id``.
 
-    A temperature uses the published-T key. A row without one uses the
-    printed row/content suffix from ``series_row_extra``. ``rows`` and
-    ``points`` are part of that suffix so two containers cannot merge.
+    The extract gate calls this name. It is not a second hash of the row.
     """
 
-    if coord is not None:
-        return series_point_id(parent_id, temperature=coord, extra=row_extra)
-    container = item.get("container") if isinstance(item, Mapping) else None
-    # A list row has no field names. Hash the printed payload so two rows in
-    # the same container do not collapse to one id. The container name keeps
-    # values.rows distinct from values.points.
-    suffix = row_extra
-    if not suffix:
-        blob = json.dumps(raw_item, sort_keys=True, default=str, separators=(",", ":"))
-        suffix = "h=" + hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
-    if isinstance(container, str) and container:
-        suffix = f"{container}:{suffix}"
-    return series_point_id(parent_id, extra=suffix)
+    return exploded_point_id(parent_id, item, coord, raw_item, row_extra)
 
 
 def _rekey_ordinal_point_observation_id(

@@ -8308,9 +8308,9 @@ def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
             payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
         ).encode()
     ).hexdigest()
-    # Adding the published point compositions changes content-stable point ids. This pin
-    # keeps their migrated ids and the existing reference states stable from this extract shape.
-    assert digest == "1c09862823fb9dd8daebaf6ed44053644f4330d5fec0dd0023cba7a32d564259"
+    # Locator and quote are not part of the row id. This pin is the migrated
+    # ids plus reference states for this extract: 137 table-3 rows.
+    assert digest == "fede7f83e059bab32f949fc9ea9cb165e515d9ac8c834f128ae1fb01297cd66a"
 
 
 def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(

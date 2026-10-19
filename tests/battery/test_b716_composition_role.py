@@ -151,23 +151,26 @@ def test_markova_1983_initial_sample_points_are_stamped(tmp_path) -> None:
     assert flags == {INITIAL_CHARGE_ONLY}
 
 
-# Hastie Table 2 (NBSIR 81-2279) point ids on green 61ec839da. Footnote a says
-# the System column prints initial compositions; only these four rows also
-# print a run K2O below that initial value (K1 "~ 14" vs 19.5, Western
-# "18.9-17.6" vs 22.7, Eastern "23.3-22.1" vs 23.6, K2 "6" vs 8.7).
+# Hastie Table 2 (NBSIR 81-2279). Footnote a says the System column prints
+# initial compositions; only these four rows also print a run K2O below that
+# initial value (K1 "~ 14" vs 19.5, Western "18.9-17.6" vs 22.7, Eastern
+# "23.3-22.1" vs 23.6, K2 "6" vs 8.7). Digests exclude the row note, so K1
+# and K2 are not the suffixes from before that exclusion. Matched by K2O
+# mole fraction: K1 0.160, Western 0.180, Eastern 0.205, K2 0.061.
 _HASTIE_ORIGINAL = "kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:"
 _HASTIE_SLAG_INITIAL_CHARGE_IDS = {
-    _HASTIE_ORIGINAL + "h=e3f647c078ee",  # K1
+    _HASTIE_ORIGINAL + "h=3469d4ac637d",  # K1
     _HASTIE_ORIGINAL + "h=c3c57e8f6757",  # synthetic Western
     _HASTIE_ORIGINAL + "h=5990a63e7c0b",  # synthetic Eastern
-    _HASTIE_ORIGINAL + "h=65d014284ac8",  # K2
+    _HASTIE_ORIGINAL + "h=d9b4727d07c1",  # K2
 }
 # Illite prints K2O 7.4 and no different run K2O: its map is the printed
 # analysis (df0dea51b kept it for that reason), so it carries no role.
+# The quoted copy's digest excludes its row locator and quote.
 _HASTIE_ILLITE_IDS = {
     _HASTIE_ORIGINAL + "h=0ec91612e9c7",
     "kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906"
-    "::rows:h=34540a470ebb",
+    "::rows:h=ceefccf067b4",
 }
 
 
