@@ -149,7 +149,7 @@ def test_aborting_running_request_reaps_and_restarts_its_worker_slot():
         first_pid = worker.process.pid
 
         assert first.cancel() is False
-        assert pool.abort_request(first) is True
+        assert pool._abort_request(first) is True
         with pytest.raises(EngineWorkerDied, match='worker exited without a result'):
             first.result(timeout=3.0)
         assert worker.process is None

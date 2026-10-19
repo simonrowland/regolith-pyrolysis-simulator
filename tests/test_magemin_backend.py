@@ -296,7 +296,7 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
         def submit(self, *_args, **_kwargs):
             return pending
 
-        def abort_request(self, future):
+        def _abort_request(self, future):
             assert future is pending
             assert future.cancel_attempted
             assert future.running()

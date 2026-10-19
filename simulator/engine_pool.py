@@ -675,6 +675,19 @@ class WarmEngineWorker:
             cleanup_group=True,
         )
 
+    def _abort_current_call(self) -> bool:
+        """Kill and reap the current worker without retiring this slot."""
+        with self._state_lock:
+            process, connection = self.process, self.connection
+        if process is None and connection is None:
+            return False
+        self._discard_current(
+            diagnostic=False,
+            expected_process=process,
+            expected_connection=connection,
+        )
+        return True
+
     def _stop_pair(
         self,
         process: Any,
@@ -835,6 +848,10 @@ class EngineWorkerPool:
         self._queue: queue.Queue[Any] = queue.Queue()
         self._workers = [worker_factory(index) for index in range(max(1, size))]
         self._threads: list[threading.Thread] = []
+        self._active_requests: dict[
+            Future, tuple[WarmEngineWorker, threading.Event]
+        ] = {}
+        self._active_requests_lock = threading.Lock()
         self._closed = False
         self._lifecycle_lock = threading.Lock()
         self._close_complete = threading.Event()
@@ -935,13 +952,10 @@ class EngineWorkerPool:
                     'engine worker pool is closed'
                 )
             # A queued item MUST have someone who will run it. `timeout_s` is
-            # not a wall on this call -- it is stashed in the queue item and
-            # enforced later by `_consume` -> `worker.call`. So the wall is
-            # enforced by the consumer thread, and with no consumer alive
-            # there is no wall at all: the future is never completed, and a
-            # caller awaiting it (magemin.py `_call_magemin` awaits with NO
-            # timeout, by design, precisely because it trusts this wall) parks
-            # in `waiter.acquire()` at 0.0% CPU forever.
+            # stashed in the queue item and enforced later by `_consume` ->
+            # `worker.call`; callers that need a whole-wait wall must also
+            # bound `Future.result()` in case a consumer exits after this
+            # check.
             #
             # 2026-08-29, reproduced: retire the only consumer, then submit --
             # `_closed` is still False so the old guard passed, and the future
@@ -971,6 +985,22 @@ class EngineWorkerPool:
             future: Future = Future()
             self._queue.put((future, request, timeout_s))
         return future
+
+    def _abort_request(self, future: Future) -> bool:
+        """Abort the worker currently running ``future`` and keep its slot.
+
+        The active-request lock prevents the consumer from releasing this
+        worker for its next request until the current process has been killed
+        and reaped. Pending futures have no assigned worker and return False.
+        """
+        with self._active_requests_lock:
+            active = self._active_requests.get(future)
+            if active is None:
+                return False
+            worker, call_finished = active
+            if call_finished.is_set():
+                return False
+            return worker._abort_current_call()
 
     def _start_and_consume(
         self,
@@ -1004,15 +1034,33 @@ class EngineWorkerPool:
                 if item is None:
                     return
                 future, request, timeout_s = item
-                if self._cancel_pending.is_set():
+                cancel_pending = False
+                with self._active_requests_lock:
+                    if self._cancel_pending.is_set():
+                        cancel_pending = True
+                    elif not future.set_running_or_notify_cancel():
+                        continue
+                    else:
+                        call_finished = threading.Event()
+                        self._active_requests[future] = (
+                            worker,
+                            call_finished,
+                        )
+                if cancel_pending:
                     future.cancel()
                     continue
-                if not future.set_running_or_notify_cancel():
-                    continue
                 try:
-                    future.set_result(worker.call(request, timeout_s=timeout_s))
+                    result = worker.call(request, timeout_s=timeout_s)
                 except BaseException as exc:
+                    call_finished.set()
+                    with self._active_requests_lock:
+                        self._active_requests.pop(future, None)
                     future.set_exception(exc)
+                else:
+                    call_finished.set()
+                    with self._active_requests_lock:
+                        self._active_requests.pop(future, None)
+                    future.set_result(result)
             finally:
                 self._queue.task_done()
 

@@ -94,6 +94,7 @@ library is called.
 from __future__ import annotations
 
 import builtins
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
 import fcntl
 import math
@@ -2249,18 +2250,39 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         float(call_timeout_s),
                     )
                 )
+                startup_timeout_s = float(self._config.get(
+                    'worker_startup_timeout_s', 30.0
+                ))
+                future_timeout_s = timeout_s + startup_timeout_s
+                if call_timeout_s is not None:
+                    future_timeout_s = min(
+                        future_timeout_s,
+                        float(call_timeout_s),
+                    )
                 try:
                     future = self._subprocess_pool.submit({
                         'bulk_projection': bulk_projection,
                         'temperature_C': temperature_C,
                         'pressure_kbar': pressure_kbar,
                         'fO2_log': fO2_log,
-                        # Let the pool's typed hard wall fire first. The inner
-                        # subprocess timeout is only a secondary containment
-                        # wall for platforms without process-group cleanup.
+                        # The pool's job wall starts after worker startup;
+                        # Future.result below also bounds queue/startup waits.
+                        # This subprocess wall is secondary containment for
+                        # platforms without process-group cleanup.
                         'call_timeout_s': timeout_s + 0.5,
                     }, timeout_s=timeout_s)
-                    return future.result()
+                    try:
+                        return future.result(timeout=future_timeout_s)
+                    except EngineWorkerTimeout:
+                        raise
+                    except FutureTimeoutError as exc:
+                        future.cancel()
+                        self._subprocess_pool._abort_request(future)
+                        raise EngineWorkerTimeout(
+                            'MAGEMin subprocess pool',
+                            future_timeout_s,
+                            phase='job',
+                        ) from exc
                 except EngineWorkerTimeout:
                     raise
                 except (
