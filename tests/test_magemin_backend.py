@@ -2108,6 +2108,38 @@ def test_magemin_db_projection_rejects_unknown_bulk_component():
         backend._build_db_bulk_projection({"SiO2": 50.0, "CO2": 1.0})
 
 
+def test_magemin_subprocess_argument_vector_matches_golden():
+    backend = MAGEMinBackend()
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._database = 'ig'
+    backend._config = {'fO2_buffer': 'nno'}
+    projection = backend._build_db_bulk_projection(
+        {'SiO2': 60.0, 'MgO': 40.0},
+    )
+
+    args, buffer_name, buffer_n, _warnings = (
+        backend._build_magemin_subprocess_args(
+            bulk_projection=projection,
+            temperature_C=1234.5,
+            pressure_kbar=10.0,
+            fO2_log=-8.0,
+        )
+    )
+
+    assert args == [
+        '/fake/MAGEMin',
+        '--Verb=0',
+        '--db=ig',
+        '--Temp=1234.500000',
+        '--Pres=10.000000',
+        '--sys_in=wt',
+        '--Bulk=60.000000,0.000000,0.000000,40.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000',
+        '--buffer=nno',
+        '--buffer_n=0.000000',
+    ]
+    assert (buffer_name, buffer_n) == ('nno', 0.0)
+
+
 def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
     backend = MAGEMinBackend()
     vector = backend._build_ig_bulk_vector({"FeO": 10.0, "Fe2O3": 1.0})
