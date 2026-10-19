@@ -39,10 +39,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, table: '3', row: CS1}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS1}}
+          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS1}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS1}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1500, value: 36.1, sample_id: CS1}
         uncertainty: '±0.07 mol%; confidence level not stated'
       - observation_id: nk24_cs1_cristobalite_cao
@@ -52,9 +52,9 @@ species:
         phase: cr
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, table: '3', row: CS1}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS1}}
+          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS1}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS1}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1500, value: 0.3, sample_id: CS1}
         uncertainty: '±0.1 mol%; confidence level not stated'
       - observation_id: nk24_cs2_liquid_cao
@@ -64,10 +64,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, table: '3', row: CS2}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS2}}
+          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS2}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS2}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1550, value: 34.7, sample_id: CS2}
         uncertainty: '±0.32 mol%; confidence level not stated'
       - observation_id: nk24_cs2_cristobalite_cao
@@ -77,9 +77,9 @@ species:
         phase: cr
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, table: '3', row: CS2}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS2}}
+          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS2}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS2}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1550, value: 0.2, sample_id: CS2}
         uncertainty: '±0.02 mol%; confidence level not stated'
       - observation_id: nk24_cs3_liquid_cao
@@ -89,10 +89,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS3}, locator: {page: 4, table: '3', row: CS3}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS3}}
+          sample_id: {state: {tag: value, value: CS3}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS3}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS3}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1600, value: 32.7, sample_id: CS3}
         uncertainty: '±0.14 mol%; confidence level not stated'
       - observation_id: nk24_cs4_slag_cao
@@ -102,10 +102,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS4}, locator: {page: 4, table: '3', row: CS4}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS4}}
+          sample_id: {state: {tag: value, value: CS4}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS4}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS4}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1680, value: 28.6, sample_id: CS4}
         uncertainty: '±0.12 mol%; confidence level not stated'
       - observation_id: nk24_cs5_slag_cao
@@ -115,10 +115,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, table: '3', row: CS5}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS5}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
           quench_state: {state: {tag: value, value: asserted_altered}, locator: {page: 4, published_page: 33689, pdf_page_index: 3, figure: '1', note: 'Panel (b): Microcrystalline materials formed on quenching'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS5}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS5}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1480, value: 41.8, sample_id: CS5}
         uncertainty: '±0.06 mol%; confidence level not stated'
       - observation_id: nk24_cs5_ps_woll_cao
@@ -128,10 +128,10 @@ species:
         phase: cr
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, table: '3', row: CS5}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS5}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
           quench_state: {state: {tag: value, value: asserted_altered}, locator: {page: 4, published_page: 33689, pdf_page_index: 3, figure: '1', note: 'Panel (b): Microcrystalline materials formed on quenching'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS5}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS5}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1480, value: 50.1, sample_id: CS5}
         uncertainty: '±0.08 mol%; confidence level not stated'
       - observation_id: nk24_cs6_slag_cao
@@ -141,10 +141,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, table: '3', row: CS6}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS6}}
+          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS6}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS6}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1465, value: 56.7, sample_id: CS6}
         uncertainty: '±0.14 mol%; confidence level not stated'
       - observation_id: nk24_cs6_ps_woll_cao
@@ -154,9 +154,9 @@ species:
         phase: cr
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, table: '3', row: CS6}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS6}}
+          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS6}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS6}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1465, value: 50.0, sample_id: CS6}
         uncertainty: '±0.12 mol%; confidence level not stated'
       - observation_id: nk24_cs7_slag_cao
@@ -166,10 +166,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, table: '3', row: CS7}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS7}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
           quench_state: {state: {tag: value, value: asserted_altered}, locator: {page: 4, published_page: 33689, pdf_page_index: 3, figure: '1', note: 'Panel (c): Microcrystalline materials formed on quenching'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, table: '3', row: CS7}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS7}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1465, value: 56.8, sample_id: CS7}
         uncertainty: '±0.27 mol%; confidence level not stated'
       - observation_id: nk24_cs7_alpha_c2s_cao
@@ -179,10 +179,10 @@ species:
         phase: cr
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, table: '3', row: CS7}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS7}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
           quench_state: {state: {tag: value, value: asserted_altered}, locator: {page: 4, published_page: 33689, pdf_page_index: 3, figure: '1', note: 'Panel (c): Microcrystalline materials formed on quenching'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, table: '3', row: CS7}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS7}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1465, value: 66.8, sample_id: CS7}
         uncertainty: '±0.12 mol%; confidence level not stated'
       - observation_id: nk24_cs8_slag1_cao
@@ -192,10 +192,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, table: '3', row: CS8}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, table: '3', row: CS8}}
+          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS8}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS8}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1697, value: 27.2, sample_id: CS8}
         uncertainty: '±0.16 mol%; confidence level not stated'
       - observation_id: nk24_cs8_slag2_cao
@@ -205,10 +205,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, table: '3', row: CS8}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, table: '3', row: CS8}}
+          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS8}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS8}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1697, value: 1.0, sample_id: CS8}
         uncertainty: '±0.16 mol%; confidence level not stated'
       - observation_id: nk24_t7_kanolt_1913_melting_point
@@ -216,56 +216,56 @@ species:
         locator: {page: 9, published_page: 33694, pdf_page_index: 8, table: '7', row: "Kanolt’1913 [16]", note: 'Table 7 methodology as printed: H2 atmosphere'}
         units: °C as printed
         point_conditions:
-          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Kanolt’1913 [16]"}}
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, pdf_page_index: 8, published_page: 33694, table: '7', row: "Kanolt’1913 [16]"}}
         values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2572, temperature_C_as_printed: 2572, attribution: "Kanolt’1913 [16]"}
       - observation_id: nk24_t7_schumacher_1926_melting_point
         type: transition_point
         locator: {page: 9, published_page: 33694, pdf_page_index: 8, table: '7', row: "Schumacher’1926 [17]", note: 'Table 7 methodology as printed: optical pyrometer, H2 atmosphere, tungsten crucible'}
         units: °C as printed
         point_conditions:
-          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Schumacher’1926 [17]"}}
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, pdf_page_index: 8, published_page: 33694, table: '7', row: "Schumacher’1926 [17]"}}
         values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2576, temperature_C_as_printed: 2576, attribution: "Schumacher’1926 [17]"}
       - observation_id: nk24_t7_doman_1963_melting_point
         type: transition_point
         locator: {page: 9, published_page: 33694, pdf_page_index: 8, table: '7', row: "Doman’1963 [18]", note: 'Table 7 methodology as printed: optical pyrometer, N2 atmosphere, crucible material not indicated'}
         units: °C as printed
         point_conditions:
-          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Doman’1963 [18]"}}
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, pdf_page_index: 8, published_page: 33694, table: '7', row: "Doman’1963 [18]"}}
         values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2625, temperature_C_as_printed: 2625, attribution: "Doman’1963 [18]"}
       - observation_id: nk24_t7_panek_1979_melting_point
         type: transition_point
         locator: {page: 9, published_page: 33694, pdf_page_index: 8, table: '7', row: "Panek’1979 [19]", note: 'Table 7 methodology as printed: reducing atmosphere, optical pyrometer'}
         units: °C as printed
         point_conditions:
-          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Panek’1979 [19]"}}
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, pdf_page_index: 8, published_page: 33694, table: '7', row: "Panek’1979 [19]"}}
         values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2637, temperature_C_as_printed: 2637, attribution: "Panek’1979 [19]"}
       - observation_id: nk24_t7_foex_1968_melting_point
         type: transition_point
         locator: {page: 9, published_page: 33694, pdf_page_index: 8, table: '7', row: "Foex’1968 [21]", note: 'Table 7 methodology as printed: solar/plasma furnaces, optical pyrometer'}
         units: °C as printed
         point_conditions:
-          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Foex’1968 [21]"}}
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, pdf_page_index: 8, published_page: 33694, table: '7', row: "Foex’1968 [21]"}}
         values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2950, temperature_C_as_printed: 2950, attribution: "Foex’1968 [21]"}
       - observation_id: nk24_t7_foex_1965_melting_point
         type: transition_point
         locator: {page: 9, published_page: 33694, pdf_page_index: 8, table: '7', row: "Foex’1965 [20]", note: 'Table 7 methodology as printed: solar furnace, optical pyrometer'}
         units: °C as printed
         point_conditions:
-          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Foex’1965 [20]"}}
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, pdf_page_index: 8, published_page: 33694, table: '7', row: "Foex’1965 [20]"}}
         values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2910, temperature_C_as_printed: 2910, attribution: "Foex’1965 [20]"}
       - observation_id: nk24_t7_traverse_1969_melting_point
         type: transition_point
         locator: {page: 9, published_page: 33694, pdf_page_index: 8, table: '7', row: "Traverse’1969 [22]", note: 'Table 7 methodology as printed: solar furnace, optical pyrometer, air atmosphere'}
         units: °C as printed
         point_conditions:
-          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Traverse’1969 [22]"}}
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, pdf_page_index: 8, published_page: 33694, table: '7', row: "Traverse’1969 [22]"}}
         values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2900, temperature_C_as_printed: 2900, attribution: "Traverse’1969 [22]"}
       - observation_id: nk24_t7_yamada_1986_melting_point
         type: transition_point
         locator: {page: 9, published_page: 33694, pdf_page_index: 8, table: '7', row: "Yamada’1986 [23]", note: 'Table 7 methodology as printed: arc imaging furnace'}
         units: °C as printed
         point_conditions:
-          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Yamada’1986 [23]"}}
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, pdf_page_index: 8, published_page: 33694, table: '7', row: "Yamada’1986 [23]"}}
         values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2899, temperature_C_as_printed: 2899, attribution: "Yamada’1986 [23]"}
       - observation_id: nk24_cs5_pseudowollastonite_liquidus
         type: transition_point
@@ -283,10 +283,10 @@ species:
           points:
             - T_C: 1480
               point_conditions:
-                sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, published_page: 33689, table: '3', row: CS5}}
-                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS5}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
                 quench_state: {state: {tag: value, value: asserted_altered}, locator: {page: 4, published_page: 33689, pdf_page_index: 3, figure: '1', note: 'Panel (b): Microcrystalline materials formed on quenching'}}
-                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Pseudowollastonite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS5}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Pseudowollastonite}}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS5}}
         uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
       - observation_id: nk24_cs6_pseudowollastonite_liquidus
         type: transition_point
@@ -304,9 +304,9 @@ species:
           points:
             - T_C: 1465
               point_conditions:
-                sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, published_page: 33689, table: '3', row: CS6}}
-                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
-                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Pseudowollastonite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS6}}
+                sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS6}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Pseudowollastonite}}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS6}}
         uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
       - observation_id: nk24_cs7_alpha_c2s_liquidus
         type: transition_point
@@ -324,10 +324,10 @@ species:
           points:
             - T_C: 1465
               point_conditions:
-                sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, published_page: 33689, table: '3', row: CS7}}
-                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS7}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
                 quench_state: {state: {tag: value, value: asserted_altered}, locator: {page: 4, published_page: 33689, pdf_page_index: 3, figure: '1', note: 'Panel (c): Microcrystalline materials formed on quenching'}}
-                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: 'α-C2S'}}, locator: {page: 4, published_page: 33689, table: '3', row: CS7}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: 'α-C2S'}}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS7}}
         uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
     context:
       - observation_id: nk24_t7_eriksson_1994_cao_melting_point_assessment
@@ -347,7 +347,7 @@ species:
         values:
           quantity: equilibrium_phase_composition
           printed_text: Crystal too small to measure
-          composition: {state: {tag: unknown, reason: Crystal too small to measure}, locator: {page: 4, table: '3', row: 'CS3 Cristobalite'}}
+          composition: {state: {tag: unknown, reason: Crystal too small to measure}, locator: {page: 4, pdf_page_index: 3, table: '3', row: 'CS3 Cristobalite'}}
       - observation_id: nk24_cs4_cristobalite_composition_unavailable
         type: refusal
         locator: {page: 4, published_page: 33689, pdf_page_index: 3, table: '3', row: 'CS4 Cristobalite'}
@@ -355,7 +355,7 @@ species:
         values:
           quantity: equilibrium_phase_composition
           printed_text: Crystals too small to measure
-          composition: {state: {tag: unknown, reason: Crystals too small to measure}, locator: {page: 4, table: '3', row: 'CS4 Cristobalite'}}
+          composition: {state: {tag: unknown, reason: Crystals too small to measure}, locator: {page: 4, pdf_page_index: 3, table: '3', row: 'CS4 Cristobalite'}}
       - observation_id: nk24_table4_stoichiometric_compound_properties
         type: model_table
         locator: {page: 5, published_page: 33690, pdf_page_index: 4, table: '4'}
@@ -1009,10 +1009,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, table: '3', row: CS1}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS1}}
+          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS1}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS1}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1500, value: 63.9, sample_id: CS1}
         uncertainty: '±0.07 mol%; confidence level not stated'
       - observation_id: nk24_cs1_cristobalite_sio2
@@ -1022,9 +1022,9 @@ species:
         phase: cr
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, table: '3', row: CS1}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS1}}
+          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS1}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS1}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1500, value: 99.7, sample_id: CS1}
         uncertainty: '±0.09 mol%; confidence level not stated'
       - observation_id: nk24_cs2_liquid_sio2
@@ -1034,10 +1034,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, table: '3', row: CS2}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS2}}
+          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS2}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS2}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1550, value: 65.3, sample_id: CS2}
         uncertainty: '±0.32 mol%; confidence level not stated'
       - observation_id: nk24_cs2_cristobalite_sio2
@@ -1047,9 +1047,9 @@ species:
         phase: cr
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, table: '3', row: CS2}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS2}}
+          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS2}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS2}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1550, value: 99.8, sample_id: CS2}
         uncertainty: '±0.01 mol%; confidence level not stated'
       - observation_id: nk24_cs3_liquid_sio2
@@ -1059,10 +1059,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS3}, locator: {page: 4, table: '3', row: CS3}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS3}}
+          sample_id: {state: {tag: value, value: CS3}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS3}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS3}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1600, value: 67.3, sample_id: CS3}
         uncertainty: '±0.14 mol%; confidence level not stated'
       - observation_id: nk24_cs4_slag_sio2
@@ -1072,10 +1072,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS4}, locator: {page: 4, table: '3', row: CS4}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS4}}
+          sample_id: {state: {tag: value, value: CS4}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS4}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS4}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1680, value: 71.4, sample_id: CS4}
         uncertainty: '±0.13 mol%; confidence level not stated'
       - observation_id: nk24_cs5_slag_sio2
@@ -1085,10 +1085,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, table: '3', row: CS5}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS5}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
           quench_state: {state: {tag: value, value: asserted_altered}, locator: {page: 4, published_page: 33689, pdf_page_index: 3, figure: '1', note: 'Panel (b): Microcrystalline materials formed on quenching'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS5}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS5}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1480, value: 58.2, sample_id: CS5}
         uncertainty: '±0.07 mol%; confidence level not stated'
       - observation_id: nk24_cs5_ps_woll_sio2
@@ -1098,10 +1098,10 @@ species:
         phase: cr
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, table: '3', row: CS5}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS5}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
           quench_state: {state: {tag: value, value: asserted_altered}, locator: {page: 4, published_page: 33689, pdf_page_index: 3, figure: '1', note: 'Panel (b): Microcrystalline materials formed on quenching'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS5}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS5}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1480, value: 49.9, sample_id: CS5}
         uncertainty: '±0.08 mol%; confidence level not stated'
       - observation_id: nk24_cs6_slag_sio2
@@ -1111,10 +1111,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, table: '3', row: CS6}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS6}}
+          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS6}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS6}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1465, value: 43.3, sample_id: CS6}
         uncertainty: '±0.14 mol%; confidence level not stated'
       - observation_id: nk24_cs6_ps_woll_sio2
@@ -1124,9 +1124,9 @@ species:
         phase: cr
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, table: '3', row: CS6}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS6}}
+          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS6}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS6}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1465, value: 50.0, sample_id: CS6}
         uncertainty: '±0.12 mol%; confidence level not stated'
       - observation_id: nk24_cs7_slag_sio2
@@ -1136,10 +1136,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, table: '3', row: CS7}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS7}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
           quench_state: {state: {tag: value, value: asserted_altered}, locator: {page: 4, published_page: 33689, pdf_page_index: 3, figure: '1', note: 'Panel (c): Microcrystalline materials formed on quenching'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, table: '3', row: CS7}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS7}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1465, value: 43.2, sample_id: CS7}
         uncertainty: '±0.27 mol%; confidence level not stated'
       - observation_id: nk24_cs7_alpha_c2s_sio2
@@ -1149,10 +1149,10 @@ species:
         phase: cr
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, table: '3', row: CS7}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS7}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
           quench_state: {state: {tag: value, value: asserted_altered}, locator: {page: 4, published_page: 33689, pdf_page_index: 3, figure: '1', note: 'Panel (c): Microcrystalline materials formed on quenching'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, table: '3', row: CS7}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS7}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1465, value: 33.2, sample_id: CS7}
         uncertainty: '±0.12 mol%; confidence level not stated'
       - observation_id: nk24_cs8_slag1_sio2
@@ -1162,10 +1162,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, table: '3', row: CS8}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, table: '3', row: CS8}}
+          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS8}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS8}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1697, value: 72.8, sample_id: CS8}
         uncertainty: '±0.17 mol%; confidence level not stated'
       - observation_id: nk24_cs8_slag2_sio2
@@ -1175,10 +1175,10 @@ species:
         phase: glass
         units: mol% as printed
         point_conditions:
-          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, table: '3', row: CS8}}
-          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
-          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, table: '3', row: CS8}}
+          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS8}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: 'Methodology', note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: CS8}}
         values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1697, value: 99.0, sample_id: CS8}
         uncertainty: '±0.16 mol%; confidence level not stated'
       - observation_id: nk24_cs1_cristobalite_liquidus
@@ -1197,9 +1197,9 @@ species:
           points:
             - T_C: 1500
               point_conditions:
-                sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, published_page: 33689, table: '3', row: CS1}}
-                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
-                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS1}}
+                sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS1}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS1}}
         uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
       - observation_id: nk24_cs2_cristobalite_liquidus
         type: transition_point
@@ -1217,9 +1217,9 @@ species:
           points:
             - T_C: 1550
               point_conditions:
-                sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, published_page: 33689, table: '3', row: CS2}}
-                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
-                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS2}}
+                sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS2}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS2}}
         uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
       - observation_id: nk24_cs3_cristobalite_liquidus
         type: transition_point
@@ -1237,9 +1237,9 @@ species:
           points:
             - T_C: 1600
               point_conditions:
-                sample_id: {state: {tag: value, value: CS3}, locator: {page: 4, published_page: 33689, table: '3', row: CS3}}
-                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
-                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS3}}
+                sample_id: {state: {tag: value, value: CS3}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS3}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS3}}
         uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
       - observation_id: nk24_cs4_cristobalite_liquidus
         type: transition_point
@@ -1257,9 +1257,9 @@ species:
           points:
             - T_C: 1680
               point_conditions:
-                sample_id: {state: {tag: value, value: CS4}, locator: {page: 4, published_page: 33689, table: '3', row: CS4}}
-                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
-                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS4}}
+                sample_id: {state: {tag: value, value: CS4}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS4}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS4}}
         uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
       - observation_id: nk24_cs8_slag1_cristobalite_liquidus
         type: transition_point
@@ -1278,11 +1278,11 @@ species:
           points:
             - T_C: 1697
               point_conditions:
-                sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, published_page: 33689, table: '3', row: CS8}}
-                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
-                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-                coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, published_page: 33689, table: '3', row: CS8}}
-                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS8}}
+                sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS8}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+                coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS8}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS8}}
         uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
       - observation_id: nk24_cs8_slag2_cristobalite_liquidus
         type: transition_point
@@ -1301,11 +1301,11 @@ species:
           points:
             - T_C: 1697
               point_conditions:
-                sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, published_page: 33689, table: '3', row: CS8}}
-                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
-                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
-                coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, published_page: 33689, table: '3', row: CS8}}
-                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS8}}
+                sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS8}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 33688, section: Methodology, note: 'Methodology reports that the brine can react with CaO-rich samples; dicalcium silicate crystals and corresponding glassy liquids react quite slowly under quenching conditions, and polishing removes any leached surface layer'}}
+                coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS8}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, pdf_page_index: 3, published_page: 33689, table: '3', row: CS8}}
         uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
     context:
       - observation_id: nk24_cs8_cristobalite_composition_unavailable
@@ -1316,7 +1316,7 @@ species:
           quantity: equilibrium_phase_composition
           sample_id: CS8
           printed_text: n/a**
-          composition: {state: {tag: unknown, reason: 'No accurate measurement; metastable phase expected to disappear with more equilibration time'}, locator: {page: 4, table: '3', row: 'CS8 Cristobalite'}}
+          composition: {state: {tag: unknown, reason: 'No accurate measurement; metastable phase expected to disappear with more equilibration time'}, locator: {page: 4, pdf_page_index: 3, table: '3', row: 'CS8 Cristobalite'}}
       - observation_id: nk24_discussion_silica_supercooled_heat_capacity_quoted
         type: source_text_numeric_values
         locator: {page: 6, published_page: 33691, pdf_page_index: 5, section: 'Thermodynamic data of CaO and SiO2'}

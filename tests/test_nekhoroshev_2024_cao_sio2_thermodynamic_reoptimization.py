@@ -33,9 +33,9 @@ def test_nekhoroshev_2024_phase_equilibria_and_review_fixes_migrate(
         for row in species.get("observations", [])
     }
 
-    # Every explicit PDF page index uses the zero-based locator field.
+    # page is the physical PDF page; every such locator carries the zero-based index.
     for locator in _walk_mappings(extract):
-        if "pdf_page_index" in locator and "page" in locator:
+        if "page" in locator and isinstance(locator["page"], int):
             assert locator["pdf_page_index"] == locator["page"] - 1
 
     # Table 3, PDF page 4 (published page 33689): literals checked against the paper.
