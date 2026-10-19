@@ -71,6 +71,10 @@ def _handle_sleeping_magemin_request(_resource, _request, _errlog):
         time.sleep(0.05)
 
 
+def _handle_successful_magemin_request(_resource, _request, _errlog):
+    return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+
 class _RegisteredMageminPool:
     def __init__(self):
         self.workers = (types.SimpleNamespace(
@@ -613,6 +617,39 @@ def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
     finally:
         pool.close(cancel_pending=True, timeout_s=3.0)
         waiter.join(timeout=1.0)
+
+
+def test_successful_magemin_worker_call_writes_no_timeout_record(tmp_path):
+    diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
+    pool = engine_pool.EngineWorkerPool(
+        lambda index: engine_pool.WarmEngineWorker(
+            name=f'fake MAGEMin slot {index}',
+            bootstrap=_bootstrap_sleeping_magemin_worker,
+            handler=_handle_successful_magemin_request,
+            startup_timeout_s=2.0,
+            call_timeout_s=1.0,
+            diagnostic_log_path=diagnostic_log_path,
+        ),
+        size=1,
+    )
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 1.0,
+        'worker_startup_timeout_s': 2.0,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    try:
+        assert backend._call_magemin(
+            projection,
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+            composition_mol={'SiO2': 0.5, 'MgO': 0.25},
+        ) == {'phases': {'liq': {'mass_kg': 1.0}}}
+        assert diagnostic_log_path.read_text(encoding='utf-8') == ''
+    finally:
+        pool.close(cancel_pending=True, timeout_s=3.0)
 
 
 def _assert_magemin_bulk_drop_projected(
