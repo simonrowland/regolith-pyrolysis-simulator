@@ -390,8 +390,11 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     residue_svg = Path(files["deck:residue-composition:svg"]).read_text(
         encoding="utf-8"
     )
+    sio_svg = Path(files["deck:sio-evolution:svg"]).read_text(encoding="utf-8")
     assert "engine-computed fO2 not yet available" in cross_svg
     assert "fraction evaporated is not recorded" in residue_svg
+    assert "no history rows" in sio_svg
+    assert "1970-01-01" not in sio_svg
 
 
 @pytest.mark.parametrize("view", ("species", "element"))
