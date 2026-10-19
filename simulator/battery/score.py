@@ -5989,6 +5989,24 @@ def predict_with_engine(
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
         )
+    if engine is Engine.MAGEMIN and quantity in _VAPOUR_EQUILIBRIUM:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "engine_missing_observable",
+                "engine": engine.value,
+                "observable": "vapour species",
+                "species": identity.species.formula,
+                "quantity": quantity.value,
+            },
+            identity=identity,
+        )
     if quantity is Quantity.FE3_FE2_RATIO:
         return _predict_fe_redox(engine, observation, identity, channel)
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:

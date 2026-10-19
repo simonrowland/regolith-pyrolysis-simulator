@@ -15,12 +15,14 @@ from simulator.battery.enums import (
     Authority,
     CellMaterial,
     Engine,
+    ExecutionState,
     FO2Channel,
     Fo2Mode,
     MethodToken,
     NoticeKind,
     Quantity,
     Rail,
+    RefusalReason,
     ValueKind,
 )
 from simulator.battery.fo2_ladder import (
@@ -393,6 +395,40 @@ def test_steurer_effusion_row_has_a_numeric_internal_residual() -> None:
         and "route=effusion_oxygen_balance" in notice.reason
         for notice in residual.notices
     )
+
+
+def test_magemin_refuses_knudsen_sio_for_missing_vapour_observable() -> None:
+    context = load_score_context(
+        sources=("steurer-1985-vapor-phase-pyrolysis",)
+    )
+    observation = context.observations[
+        "steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_sio_psat::T=3000.0:row=sio(g):h=377f06ee0c71"
+    ]
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        observation,
+        experiment=context.experiments[observation.experiment_id],
+    )
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "engine_missing_observable",
+        "engine": "magemin",
+        "observable": "vapour species",
+        "species": "SiO",
+        "quantity": "p_partial",
+    }
+
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.MAGEMIN,
+        context=context,
+        prediction=prediction,
+    )
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail["observable"] == "vapour species"
 
 
 def test_tier4_borrowed_intrinsic_is_the_same_on_every_engine() -> None:
