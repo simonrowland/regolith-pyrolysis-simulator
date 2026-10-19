@@ -335,6 +335,21 @@ class WarmEngineWorker:
         self.disabled = False
         self._state_lock = threading.Lock()
         self._pending_reap: list[Any] = []
+        self._pool_call_abort_event: threading.Event | None = None
+
+    def _begin_pool_call(self) -> threading.Event:
+        """Install the cancellation token before the pool enters ``call``."""
+        abort_event = threading.Event()
+        with self._state_lock:
+            if self._pool_call_abort_event is not None:
+                raise RuntimeError(f'{self.name} already has an active pool call')
+            self._pool_call_abort_event = abort_event
+        return abort_event
+
+    def _end_pool_call(self, abort_event: threading.Event) -> None:
+        with self._state_lock:
+            if self._pool_call_abort_event is abort_event:
+                self._pool_call_abort_event = None
 
     def start(self, *, timeout_s: Optional[float] = None) -> Any:
         """Start a fresh worker and wait for its bootstrap acknowledgement."""
@@ -342,6 +357,13 @@ class WarmEngineWorker:
         with self._state_lock:
             if self.disabled:
                 raise RuntimeError(f'{self.name} worker is disabled')
+            abort_event = self._pool_call_abort_event
+            if abort_event is not None and abort_event.is_set():
+                raise EngineWorkerTimeout(
+                    self.name,
+                    self.call_timeout_s,
+                    phase='job',
+                )
         context = multiprocessing.get_context('spawn')
         parent, child = context.Pipe(duplex=True)
         process = context.Process(
@@ -369,6 +391,14 @@ class WarmEngineWorker:
                 child.close()
                 parent.close()
                 raise RuntimeError(f'{self.name} worker is disabled')
+            if abort_event is not None and abort_event.is_set():
+                child.close()
+                parent.close()
+                raise EngineWorkerTimeout(
+                    self.name,
+                    self.call_timeout_s,
+                    phase='job',
+                )
             self.process = process
             self.connection = parent
             self.ready_payload = None
@@ -378,10 +408,19 @@ class WarmEngineWorker:
             still_ours = (
                 not self.disabled
                 and self.process is process
+                and not (
+                    abort_event is not None and abort_event.is_set()
+                )
             )
         if not still_ours:
             child.close()
             parent.close()
+            if abort_event is not None and abort_event.is_set():
+                raise EngineWorkerTimeout(
+                    self.name,
+                    self.call_timeout_s,
+                    phase='job',
+                )
             raise RuntimeError(f'{self.name} worker is disabled')
         try:
             process.start()
@@ -395,7 +434,11 @@ class WarmEngineWorker:
             raise
         child.close()
         with self._state_lock:
-            if self.disabled or self.process is not process:
+            if (
+                self.disabled
+                or self.process is not process
+                or (abort_event is not None and abort_event.is_set())
+            ):
                 cancelled = True
             else:
                 cancelled = False
@@ -410,6 +453,12 @@ class WarmEngineWorker:
                 diagnostic=False,
                 cleanup_group=True,
             )
+            if abort_event is not None and abort_event.is_set():
+                raise EngineWorkerTimeout(
+                    self.name,
+                    self.call_timeout_s,
+                    phase='job',
+                )
             raise RuntimeError(f'{self.name} worker is disabled')
         try:
             startup_timeout = self.startup_timeout_s
@@ -425,8 +474,17 @@ class WarmEngineWorker:
                         not self.disabled
                         and self.process is process
                         and self.connection is parent
+                        and not (
+                            abort_event is not None and abort_event.is_set()
+                        )
                     )
                 if not current:
+                    if abort_event is not None and abort_event.is_set():
+                        raise EngineWorkerTimeout(
+                            self.name,
+                            self.call_timeout_s,
+                            phase='job',
+                        )
                     raise RuntimeError(f'{self.name} worker is disabled')
                 remaining = deadline - time.monotonic()
                 if remaining <= 0.0:
@@ -478,6 +536,12 @@ class WarmEngineWorker:
                 or self.process is not process
                 or self.connection is not parent
             ):
+                if abort_event is not None and abort_event.is_set():
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        self.call_timeout_s,
+                        phase='job',
+                    )
                 raise RuntimeError(f'{self.name} worker is disabled')
             self.ready_payload = message[1]
             self.start_count += 1
@@ -485,13 +549,20 @@ class WarmEngineWorker:
 
     def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
         """Run one request; replace a dead or timed-out worker before return."""
+        timeout = self.call_timeout_s if timeout_s is None else max(
+            0.001, float(timeout_s))
         with self._state_lock:
             if self.disabled:
                 raise RuntimeError(f'{self.name} worker is disabled')
+            abort_event = self._pool_call_abort_event
+            if abort_event is not None and abort_event.is_set():
+                raise EngineWorkerTimeout(
+                    self.name,
+                    timeout,
+                    phase='job',
+                )
             process = self.process
             connection = self.connection
-        timeout = self.call_timeout_s if timeout_s is None else max(
-            0.001, float(timeout_s))
         if process is not None and not process.is_alive():
             _pool_debug(f'{self.name}: worker pid found dead at call entry')
             self._discard_current(
@@ -555,7 +626,23 @@ class WarmEngineWorker:
                 phase='job',
             )
         try:
-            connection.send(request)
+            with self._state_lock:
+                if abort_event is not None and abort_event.is_set():
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        timeout,
+                        phase='job',
+                    )
+                if (
+                    self.disabled
+                    or self.process is not process
+                    or self.connection is not connection
+                ):
+                    raise EngineWorkerDied(
+                        'call',
+                        f'{self.name} worker exited without a result',
+                    )
+                connection.send(request)
             deadline = time.monotonic() + remaining
             while True:
                 with self._state_lock:
@@ -675,9 +762,18 @@ class WarmEngineWorker:
             cleanup_group=True,
         )
 
-    def _abort_current_call(self) -> bool:
+    def _abort_current_call(
+        self,
+        abort_event: threading.Event | None = None,
+    ) -> bool:
         """Kill and reap the current worker without retiring this slot."""
         with self._state_lock:
+            if abort_event is None:
+                abort_event = self._pool_call_abort_event
+            elif abort_event is not self._pool_call_abort_event:
+                return False
+            if abort_event is not None:
+                abort_event.set()
             process, connection = self.process, self.connection
         if process is None and connection is None:
             return False
@@ -849,7 +945,8 @@ class EngineWorkerPool:
         self._workers = [worker_factory(index) for index in range(max(1, size))]
         self._threads: list[threading.Thread] = []
         self._active_requests: dict[
-            Future, tuple[WarmEngineWorker, threading.Event]
+            Future,
+            tuple[WarmEngineWorker, threading.Event, threading.Event],
         ] = {}
         self._active_requests_lock = threading.Lock()
         self._closed = False
@@ -1018,10 +1115,10 @@ class EngineWorkerPool:
                     pass
             if active is None:
                 return False
-            worker, call_finished = active
+            worker, call_finished, abort_event = active
             if call_finished.is_set():
                 return False
-            return worker._abort_current_call()
+            return worker._abort_current_call(abort_event)
 
     def _start_and_consume(
         self,
@@ -1063,9 +1160,11 @@ class EngineWorkerPool:
                         continue
                     else:
                         call_finished = threading.Event()
+                        abort_event = worker._begin_pool_call()
                         self._active_requests[future] = (
                             worker,
                             call_finished,
+                            abort_event,
                         )
                 if cancel_pending:
                     future.cancel()
@@ -1076,11 +1175,13 @@ class EngineWorkerPool:
                     call_finished.set()
                     with self._active_requests_lock:
                         self._active_requests.pop(future, None)
+                        worker._end_pool_call(abort_event)
                     future.set_exception(exc)
                 else:
                     call_finished.set()
                     with self._active_requests_lock:
                         self._active_requests.pop(future, None)
+                        worker._end_pool_call(abort_event)
                     future.set_result(result)
             finally:
                 self._queue.task_done()
