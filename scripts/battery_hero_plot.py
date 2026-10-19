@@ -2966,8 +2966,34 @@ def render_hero_deck_charts(
                         tuple(point for point in points if point.get("facet") == species),
                     )
                 )
+        elif chart == "polymerisation" and points:
+            point_facets = {
+                str(point.get("facet") or "unknown species") for point in points
+            }
+            hero_order = _hero_facets(data, source_rail)
+            ordered_facets = tuple(
+                facet for facet in hero_order if facet in point_facets
+            ) + tuple(sorted(point_facets - set(hero_order)))
+            current_groups.extend(
+                (
+                    facet,
+                    tuple(
+                        point
+                        for point in points
+                        if str(point.get("facet") or "unknown species") == facet
+                    ),
+                )
+                for facet in ordered_facets
+            )
         else:
             current_groups.append(("", tuple(points)))
+
+        current_groups_per_row = (
+            3 if chart in {"polymerisation", "redox_sensitivity"} else 1
+        )
+        current_row_count = max(
+            1, math.ceil(len(current_groups) / current_groups_per_row)
+        )
 
         sweet_spot_engines = tuple(
             engine
@@ -3010,7 +3036,10 @@ def render_hero_deck_charts(
             {reason for _engine, reason, _count in refusal_entries}
         )
         refusal_strip_height = max(0.55, refusal_reason_count * 0.15)
-        row_heights = [1.65, refusal_strip_height, 1.55]
+        row_heights = [1.65] * current_row_count + [
+            refusal_strip_height,
+            1.55,
+        ]
         row_heights.extend(2.4 for _ in sweet_spot_pairs)
         figure = plt.figure(figsize=(14.0, max(7.0, sum(row_heights) / 0.78)))
         grid = figure.add_gridspec(
@@ -3049,13 +3078,34 @@ def render_hero_deck_charts(
             fontsize=6,
         )
 
-        if chart == "redox_sensitivity":
-            for column, (species, species_points) in enumerate(current_groups):
-                axis = figure.add_subplot(grid[0, column * 2 : (column + 1) * 2])
+        if chart in {"polymerisation", "redox_sensitivity"}:
+            for group_index, (species, species_points) in enumerate(current_groups):
+                row = group_index // current_groups_per_row
+                column = group_index % current_groups_per_row
+                location = (
+                    grid[row, :]
+                    if chart == "polymerisation" and not species
+                    else grid[row, column * 2 : (column + 1) * 2]
+                )
+                axis = figure.add_subplot(location)
                 if species_points:
                     _draw_hero_deck_scatter(
                         axis, species_points, engine_colors=engine_colors
                     )
+                elif chart == "polymerisation":
+                    missing = sum(
+                        count
+                        for (missing_chart, _engine), count
+                        in data.hero_deck_unavailable_axis_counts.items()
+                        if missing_chart == chart
+                    )
+                    message = "No scorer-computed NBO/T rows have signed dex values."
+                    if missing:
+                        message += (
+                            f"  Rows without the required axis: "
+                            f"{_compact_count(missing)}."
+                        )
+                    _draw_hero_deck_unavailable(axis, message)
                 else:
                     axis.set_axis_off()
                     axis.text(
@@ -3067,7 +3117,8 @@ def render_hero_deck_charts(
                         va="center",
                         fontsize=7,
                     )
-                axis.set_title(species, loc="left", fontsize=7)
+                if species:
+                    axis.set_title(species, loc="left", fontsize=7)
                 axis.set_xlabel(x_label, fontsize=6)
                 axis.set_ylabel(y_label, fontsize=6)
         elif chart == "fo2_cross_comparison":
@@ -3221,7 +3272,7 @@ def render_hero_deck_charts(
             axis.set_xlabel(x_label, fontsize=6)
             axis.set_ylabel(y_label, fontsize=6)
 
-        refusal_axis = figure.add_subplot(grid[1, :])
+        refusal_axis = figure.add_subplot(grid[current_row_count, :])
         _draw_hero_refusals(
             refusal_axis,
             refusal_entries,
@@ -3230,7 +3281,7 @@ def render_hero_deck_charts(
         if refusal_axis.axison:
             refusal_axis.set_title("Refused scorer rows (not-observable rows separate)", loc="left", fontsize=6)
 
-        history_axis = figure.add_subplot(grid[2, :])
+        history_axis = figure.add_subplot(grid[current_row_count + 1, :])
         _draw_hero_history(
             history_axis,
             source_rail,
@@ -3241,7 +3292,7 @@ def render_hero_deck_charts(
 
         sweet_spot_axes: list[Axes] = []
         for pair_index, pair in enumerate(sweet_spot_pairs):
-            row_index = 3 + pair_index
+            row_index = current_row_count + 2 + pair_index
             for column, engine in enumerate(pair):
                 axis = figure.add_subplot(
                     grid[row_index, column * 3 : (column + 1) * 3]
