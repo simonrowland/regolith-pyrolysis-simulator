@@ -334,7 +334,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
                 1 for name, _hour, _size, _serialized in wire_samples
                 if name == "per_hour_summary"
             )
-            if summary_count >= 6 and state is not None:
+            if summary_count >= 12 and state is not None:
                 state["running"] = False
         return original_emit(event, payload, *args, **kwargs)
 
@@ -359,7 +359,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             },
         )
         rounds = 0
-        while len(tick_samples) < 6 and rounds < 40:
+        while len(tick_samples) < 12 and rounds < 40:
             rounds += 1
             if not captured_tasks:
                 break
@@ -372,18 +372,18 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
                         "make_decision",
                         {"choice": decision.get("recommendation")},
                     )
-        assert len(tick_samples) >= 6, tick_samples
+        assert len(tick_samples) >= 12, tick_samples
         for event, hour, size, _serialized in wire_samples:
             assert size < 120_000, (event, hour, size)
-        stable_tail = [size for _hour, size in tick_samples[2:6]]
+        stable_tail = [size for _hour, size in tick_samples[4:12]]
         assert max(stable_tail) - min(stable_tail) <= 1024, tick_samples
         for event in ("simulation_tick", "per_hour_summary"):
             hourly = [
                 (hour, size)
                 for name, hour, size, _serialized in wire_samples
                 if name == event and hour is not None
-            ][:6]
-            _assert_hourly_payload_slope_is_bounded(event, hourly[2:6])
+            ][:12]
+            _assert_hourly_payload_slope_is_bounded(event, hourly[4:12])
         assert all(
             '"padding"' not in serialized
             for event, _hour, _size, serialized in wire_samples
