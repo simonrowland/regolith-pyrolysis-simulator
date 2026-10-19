@@ -39,10 +39,6 @@ def _api() -> LedgerAPI:
     return LedgerAPI(sim)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="initial balance cleaning currently drops positive sub-tolerance mass",
-)
 def test_initial_balance_preserves_positive_sub_tolerance_mass():
     ledger = AtomLedger(initial_balances={"initial": {"Si": 3e-13}})
 
