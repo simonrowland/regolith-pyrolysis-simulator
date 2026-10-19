@@ -574,6 +574,25 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     unmarked_no_band["numeric"]["decision_band"] = None
     rows.append(unmarked_no_band)
 
+    uncalibrated_other_rail = _record(
+        engine="openimcc",
+        experiment="d139-openimcc-melt-activity",
+        formula="SiO2",
+        temperature_K=1150,
+        residual=2.5,
+        rail="melt_activity",
+        status="no_band",
+    )
+    uncalibrated_other_rail["candidate_observation"]["identity"]["quantity"] = "p_partial"
+    uncalibrated_other_rail["candidate_observation"]["notices"] = [
+        {
+            "kind": NoticeKind.UNVERIFIED_APPARATUS.value,
+            "reason": "calibration_not_grounded: No calibration entry has been recorded yet.",
+        }
+    ]
+    uncalibrated_other_rail["numeric"]["decision_band"] = None
+    rows.append(uncalibrated_other_rail)
+
     other_engine = _record(
         engine="thermoengine",
         experiment="d139-thermoengine",
@@ -598,7 +617,7 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     data = read_scores(residuals)
 
     openimcc = data.summaries["openimcc"]
-    assert openimcc.excluded_d139_rows == 1
+    assert openimcc.excluded_d139_rows == 2
     assert openimcc.scored_rows == 2
     assert openimcc.unique_points == 2
     assert openimcc.rms_dex == pytest.approx(5**0.5)
@@ -619,7 +638,7 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     )
     footer = files["species:tile_svg"].read_text(encoding="utf-8")
     assert (
-        "excluded under d-139: openimcc 1 uncalibrated KEMS p_partial, "
+        "excluded under d-139: openimcc 2 uncalibrated KEMS p_partial, "
         "thermoengine 1 uncalibrated KEMS p_partial"
     ) in footer
     hero_files = render_hero_charts(data, tmp_path / "hero-images")
