@@ -929,6 +929,36 @@ def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
     assert "main's fix is pending" in melt_svg
 
 
+def test_sweet_spot_plot_uses_scorer_color_eligibility() -> None:
+    cell = {
+        "sio2_lower": "0.2",
+        "sio2_upper": "0.25",
+        "temperature_lower_K": "1900",
+        "temperature_upper_K": "2000",
+        "n": 1,
+        "color_eligible": True,
+        "median_abs_dex": "0.25",
+    }
+    colormap = plt.get_cmap("viridis")
+    fig, axis = plt.subplots()
+    try:
+        assert _draw_hero_sweet_spot(
+            axis,
+            "openimcc",
+            [cell],
+            colormap=colormap,
+            normalization=Normalize(vmin=0, vmax=1),
+            x_limits=(0.2, 0.25),
+            temperature_limits=(1900, 2000),
+        )
+        assert axis.patches[0].get_facecolor() == pytest.approx(
+            colormap(0.25)
+        )
+        assert axis.patches[0].get_hatch() is None
+    finally:
+        plt.close(fig)
+
+
 def test_refusal_strip_uses_integer_unique_ticks() -> None:
     fig, axis = plt.subplots()
     _draw_hero_refusals(
