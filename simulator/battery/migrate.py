@@ -14324,21 +14324,6 @@ class Migrator:
             ident_kwargs["composition"] = composition_located.state
         elif initial_oxide_map:
             initial_composition = wt_pct_to_mole_fraction(initial_oxide_map)
-            if Path(source_key).name == "kems-020-hastie-1981-nbsir.yaml":
-                composition_role, role_refusal = _declared_composition_role(values)
-                if role_refusal is not None:
-                    self.result.add_queue(
-                        work.work_id,
-                        locator,
-                        ["composition"],
-                        role_refusal,
-                        source=source_key,
-                        observation_id=obs_id,
-                    )
-                if composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
-                    initial_composition = replace(
-                        initial_composition, proxy_flag=composition_role
-                    )
             ident_kwargs["composition"] = State.of(initial_composition)
         elif composition_refusal or q_token in _BULK_PROPERTY_QUANTITIES:
             ident_kwargs["composition"] = State.unknown(
