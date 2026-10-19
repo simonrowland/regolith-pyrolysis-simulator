@@ -15,7 +15,8 @@ const socket = io({
 });
 window.socket = socket;
 
-const SIMULATION_TICK_PAYLOAD_VERSION = 3;
+const SIMULATION_TICK_PAYLOAD_VERSION = 4;
+window.simulationTickPayloadVersion = SIMULATION_TICK_PAYLOAD_VERSION;
 window.requireSimulationTickPayloadVersion = function (data) {
     if (data && data.payload_version === SIMULATION_TICK_PAYLOAD_VERSION) {
         return true;
@@ -30,8 +31,16 @@ window.requireSimulationTickPayloadVersion = function (data) {
 };
 
 let simulationHistoryRunId = null;
+let simulationHistoryFetch = null;
 window.simulationPerHourSummaryHistory = [];
 window.latestPerHourSummary = null;
+
+function mergeSimulationHistory(snapshot, deltas) {
+    const rowsByHour = new Map();
+    for (const row of snapshot) rowsByHour.set(row.hour, row);
+    for (const row of deltas) rowsByHour.set(row.hour, row);
+    return [...rowsByHour.values()].sort((left, right) => left.hour - right.hour);
+}
 
 function rejectSimulationTickShape(message) {
     const detail = 'Invalid simulation_tick payload: ' + message;
@@ -41,40 +50,55 @@ function rejectSimulationTickShape(message) {
 }
 
 window.fetchSimulationHistory = async function () {
-    const response = await fetch('/api/simulation-history', {
-        credentials: 'same-origin',
-    });
-    if (!response.ok) {
-        throw new Error('Simulation history request failed (' + response.status + ')');
+    const request = {
+        runId: simulationHistoryRunId,
+        deltas: [],
+    };
+    simulationHistoryFetch = request;
+    try {
+        const response = await fetch('/api/simulation-history', {
+            credentials: 'same-origin',
+        });
+        if (!response.ok) {
+            throw new Error('Simulation history request failed (' + response.status + ')');
+        }
+        const payload = await response.json();
+        if (
+            !payload
+            || payload.payload_version !== SIMULATION_TICK_PAYLOAD_VERSION
+            || !Array.isArray(payload.per_hour_summary)
+        ) {
+            const message = 'Unsupported simulation history payload version: '
+                + String(payload && payload.payload_version)
+                + ' (expected ' + SIMULATION_TICK_PAYLOAD_VERSION + ')';
+            console.error(message);
+            const status = document.getElementById('status-text');
+            if (status) status.textContent = message;
+            return null;
+        }
+        if (
+            simulationHistoryFetch !== request
+            || simulationHistoryRunId !== request.runId
+            || payload.run_id !== request.runId
+        ) return null;
+        simulationHistoryRunId = payload.run_id;
+        window.simulationPerHourSummaryHistory = mergeSimulationHistory(
+            payload.per_hour_summary,
+            request.deltas,
+        );
+        window.latestPerHourSummary = (
+            window.simulationPerHourSummaryHistory.at(-1) || null
+        );
+        return payload;
+    } finally {
+        if (simulationHistoryFetch === request) simulationHistoryFetch = null;
     }
-    const payload = await response.json();
-    if (
-        !payload
-        || payload.payload_version !== SIMULATION_TICK_PAYLOAD_VERSION
-        || !Array.isArray(payload.per_hour_summary)
-    ) {
-        const message = 'Unsupported simulation history payload version: '
-            + String(payload && payload.payload_version)
-            + ' (expected ' + SIMULATION_TICK_PAYLOAD_VERSION + ')';
-        console.error(message);
-        const status = document.getElementById('status-text');
-        if (status) status.textContent = message;
-        return null;
-    }
-    if (
-        simulationHistoryRunId
-        && payload.run_id
-        && payload.run_id !== simulationHistoryRunId
-    ) return null;
-    simulationHistoryRunId = payload.run_id || simulationHistoryRunId;
-    window.simulationPerHourSummaryHistory = payload.per_hour_summary;
-    window.latestPerHourSummary = payload.per_hour_summary.at(-1) || null;
-    return payload;
 };
 
 socket.on('simulation_status', (data) => {
     if (data && data.status === 'started') {
         simulationHistoryRunId = data.run_id || null;
+        simulationHistoryFetch = null;
         window.simulationPerHourSummaryHistory = [];
         window.latestPerHourSummary = null;
     }
@@ -102,6 +126,9 @@ socket.on('simulation_tick', (data) => {
     simulationHistoryRunId = data.run_id || simulationHistoryRunId;
     window.simulationPerHourSummaryHistory.push(delta);
     window.latestPerHourSummary = delta;
+    if (simulationHistoryFetch?.runId === simulationHistoryRunId) {
+        simulationHistoryFetch.deltas.push(delta);
+    }
 });
 
 socket.on('simulation_complete', () => {

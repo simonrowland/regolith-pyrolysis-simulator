@@ -59,10 +59,96 @@ _RECIPE_DIR = _REPO_ROOT / "data" / "recipes"
 def _identified_socket_client(app):
     http_client = app.test_client()
     assert http_client.get("/").status_code == 200
-    return app_module.socketio.test_client(
+    client = app_module.socketio.test_client(
         app,
         flask_test_client=http_client,
     )
+    original_emit = client.emit
+
+    def emit_current_protocol(event, *args, **kwargs):
+        if event in {"start_simulation", "resume_simulation"}:
+            payload = args[0] if args else {}
+            if isinstance(payload, dict):
+                payload = {**payload, "payload_version": 4}
+                args = (payload, *args[1:]) if args else (payload,)
+            elif event == "resume_simulation" and not args:
+                args = ({"payload_version": 4},)
+        return original_emit(event, *args, **kwargs)
+
+    client.emit = emit_current_protocol
+    return client
+
+
+def test_socket_start_rejects_missing_protocol_version_with_reload_message():
+    app = app_module.create_app()
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    client = app_module.socketio.test_client(app, flask_test_client=http_client)
+    before = set(_simulations)
+    try:
+        client.emit("start_simulation", {
+            "backend": "internal-analytical",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+            "speed": 0,
+        })
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["error_type"] == "client_protocol_version_mismatch"
+        assert statuses[-1]["reload_required"] is True
+        assert "Reload this page" in statuses[-1]["message"]
+        assert set(_simulations) == before
+    finally:
+        client.disconnect()
+
+
+def test_socket_start_accepts_current_protocol_version(monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+    try:
+        client.emit("start_simulation", {
+            "payload_version": 4,
+            "backend": "internal-analytical",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+            "speed": 0,
+        })
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["status"] == "started"
+        assert statuses[-1].get("error_type") is None
+        assert len(set(_simulations) - before) == 1
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_socket_resume_rejects_missing_protocol_version_with_reload_message():
+    app = app_module.create_app()
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    client = app_module.socketio.test_client(app, flask_test_client=http_client)
+    try:
+        client.emit("resume_simulation")
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["error_type"] == "client_protocol_version_mismatch"
+        assert statuses[-1]["reload_required"] is True
+        assert "Reload this page" in statuses[-1]["message"]
+    finally:
+        client.disconnect()
 
 
 def _tag_with_id(source: str, element_id: str) -> str:

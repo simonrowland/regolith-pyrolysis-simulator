@@ -516,6 +516,7 @@ def test_start_racing_disconnect_cannot_publish_orphan(tmp_path, monkeypatch):
         lambda *_args, **_kwargs: None,
     )
     payload = {
+        "payload_version": 4,
         "backend": "internal-analytical",
         "feedstock": "lunar_mare_low_ti",
         "mass_kg": 1000,
@@ -1046,12 +1047,13 @@ def test_cross_transport_submit_replaces_prior_run_and_keeps_ledger_unique(
         "speed": 0,
         "track": "pyrolysis",
     }
+    socket_payload = {**payload, "payload_version": 4}
 
     try:
         if first_transport == "socket":
             first = socket_client.emit(
                 "start_simulation",
-                payload,
+                socket_payload,
                 callback=True,
             )
             prior_run_id = first["run_id"]
@@ -1072,7 +1074,7 @@ def test_cross_transport_submit_replaces_prior_run_and_keeps_ledger_unique(
             prior_run_id = response.get_json()["run_id"]
             replacement = socket_client.emit(
                 "start_simulation",
-                payload,
+                socket_payload,
                 callback=True,
             )
             replacement_run_id = replacement["run_id"]

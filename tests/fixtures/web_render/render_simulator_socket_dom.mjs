@@ -85,6 +85,15 @@ const context = {
       return { ok: false, status: 404 };
     }
     context.fetchCalls.push({ url, options });
+    if (input.defer_simulation_history_response) {
+      return new Promise(resolve => {
+        context.resolveSimulationHistoryFetch = () => resolve({
+          ok: true,
+          status: 200,
+          json: async () => input.simulation_history_response,
+        });
+      });
+    }
     return {
       ok: true,
       status: 200,
@@ -117,6 +126,12 @@ const simulationPerHourSummaryHistoryBeforeFetch = [
 const latestPerHourSummaryBeforeFetch = context.window.latestPerHourSummary || null;
 if (input.simulation_history_response) {
   emitEvent('simulation_complete', {});
+  if (input.simulation_tick_during_history_fetch) {
+    emitEvent('simulation_tick', input.simulation_tick_during_history_fetch);
+  }
+  if (context.resolveSimulationHistoryFetch) {
+    context.resolveSimulationHistoryFetch();
+  }
   await new Promise(resolve => setTimeout(resolve, 0));
 }
 const start = findById(body, 'btn-start');

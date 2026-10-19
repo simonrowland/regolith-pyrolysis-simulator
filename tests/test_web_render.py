@@ -147,6 +147,7 @@ def producer_backed_operator_tick(monkeypatch):
         client.emit(
             "start_simulation",
             {
+                "payload_version": 4,
                 "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
@@ -606,7 +607,7 @@ def test_disconnect_reconnect_resets_controls_and_decision_modal():
 def _minimal_tick_payload(**overrides):
     """Bare tick with the numeric fields the tick DOM path always reads."""
     payload = {
-        "payload_version": 3,
+        "payload_version": 4,
         "per_hour_summary_delta": {"hour": 70},
         "run_id": "run-1",
         "hour": 70,

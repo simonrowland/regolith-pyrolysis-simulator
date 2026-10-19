@@ -153,7 +153,7 @@ _BACKEND_WIRE_TOKEN_FIELDS = frozenset({
 _draft_validation_slots = threading.BoundedSemaphore(1)
 _registered_start_handler = None
 _registered_socketio = None
-SIMULATION_TICK_PAYLOAD_VERSION = 3
+SIMULATION_TICK_PAYLOAD_VERSION = 4
 _O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 _MAX_WEB_MASS_KG = 1_000_000_000.0
 _MAX_SIM_SPEED_SECONDS = 3600.0
@@ -3665,6 +3665,29 @@ def register_events(socketio):
     global _registered_socketio, _registered_start_handler
     _registered_socketio = socketio
 
+    def client_protocol_version_error(data, event_name: str):
+        received_version = (
+            data.get('payload_version') if isinstance(data, Mapping) else None
+        )
+        if (
+            isinstance(received_version, int)
+            and not isinstance(received_version, bool)
+            and received_version == SIMULATION_TICK_PAYLOAD_VERSION
+        ):
+            return None
+        return {
+            'status': 'error',
+            'error_type': 'client_protocol_version_mismatch',
+            'reload_required': True,
+            'expected_payload_version': SIMULATION_TICK_PAYLOAD_VERSION,
+            'received_payload_version': received_version,
+            'message': (
+                f'{event_name} requires simulator protocol version '
+                f'{SIMULATION_TICK_PAYLOAD_VERSION}. Reload this page before '
+                'starting or resuming a run.'
+            ),
+        }
+
     @socketio.on('connect')
     def handle_connect():
         with _run_command_lock:
@@ -3776,6 +3799,18 @@ def register_events(socketio):
                 'status': 'error',
                 'message': 'start_simulation payload must be an object',
             }, 'invalid_run_request')
+        if not command_mode:
+            protocol_error = client_protocol_version_error(
+                data, 'start_simulation'
+            )
+            if protocol_error is not None:
+                return reject(
+                    protocol_error,
+                    'client_protocol_version_mismatch',
+                    426,
+                )
+            data = dict(data)
+            data.pop('payload_version', None)
         if 'single_run' in data:
             try:
                 command_payload, parsed_single_run_context = (
@@ -4351,8 +4386,18 @@ def register_events(socketio):
             )
 
     @socketio.on('resume_simulation')
-    def handle_resume():
+    def handle_resume(data=None):
         sid = request.sid
+        protocol_error = client_protocol_version_error(
+            data, 'resume_simulation'
+        )
+        if protocol_error is not None:
+            socketio.emit(
+                'simulation_status',
+                protocol_error,
+                room=sid,
+            )
+            return
         state, lock = _current_simulation_state(sid)
         if not state or not lock:
             reject_control_without_active_run(sid, 'resume_simulation')

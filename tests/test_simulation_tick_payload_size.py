@@ -38,6 +38,7 @@ def _nbytes(obj) -> int:
 def _client_tick_result(
     ticks: list[dict[str, object]],
     history_response: dict[str, object] | None = None,
+    tick_during_history_fetch: dict[str, object] | None = None,
 ) -> dict:
     harness = _ROOT / "tests/fixtures/web_render/render_simulator_socket_dom.mjs"
     completed = subprocess.run(
@@ -47,6 +48,10 @@ def _client_tick_result(
             "decisions_script_path": str(_ROOT / "web/static/js/simulator-decisions.js"),
             "simulation_ticks": ticks,
             "simulation_history_response": history_response,
+            "simulation_tick_during_history_fetch": tick_during_history_fetch,
+            "defer_simulation_history_response": (
+                tick_during_history_fetch is not None
+            ),
         }),
         text=True,
         stdout=subprocess.PIPE,
@@ -188,7 +193,7 @@ def test_advisory_js_fetches_on_demand_full_records() -> None:
     socket_source = (_ROOT / "web/static/js/simulator-socket.js").read_text(
         encoding="utf-8"
     )
-    assert "SIMULATION_TICK_PAYLOAD_VERSION = 3" in socket_source
+    assert "SIMULATION_TICK_PAYLOAD_VERSION = 4" in socket_source
     assert "per_hour_summary_delta" in socket_source
     assert "fetchSimulationHistory" in socket_source
     assert "/api/simulation-history" in socket_source
@@ -383,7 +388,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             wire_samples.append((event, hour, len(serialized), serialized))
         if event == "simulation_tick" and isinstance(payload, dict):
             emitted = dict(payload)
-            assert emitted.get("payload_version") == 3
+            assert emitted.get("payload_version") == 4
             assert emitted["wall_risk_panel"].get("tick_view") == "compact"
             assert "zones" not in emitted["wall_risk_panel"]
             assert "stage_purity_report" not in emitted
@@ -425,6 +430,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             "start_simulation",
             {
                 "backend": "internal-analytical",
+                "payload_version": 4,
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -478,7 +484,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         history_response = http.get("/api/simulation-history")
         assert history_response.status_code == 200
         history = history_response.get_json()
-        assert history["payload_version"] == 3
+        assert history["payload_version"] == 4
         assert history["run_id"] == state["run_id"]
         assert len(per_hour_deltas) == len(history["per_hour_summary"])
         carrier_fields = {
@@ -522,6 +528,29 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         assert client_result["simulationPerHourSummaryHistory"] == history[
             "per_hour_summary"
         ]
+        race_snapshot = dict(history)
+        race_snapshot["per_hour_summary"] = [
+            history["per_hour_summary"][0],
+            {**tick_payloads[1]["per_hour_summary_delta"], "race_marker": "snapshot"},
+        ]
+        race_client_result = _client_tick_result(
+            [tick_payloads[0]],
+            race_snapshot,
+            tick_payloads[1],
+        )
+        assert race_client_result["simulationPerHourSummaryHistory"] == (
+            history["per_hour_summary"][:2]
+        )
+        mismatched_snapshot = dict(history)
+        mismatched_snapshot["run_id"] = "another-run"
+        mismatch_client_result = _client_tick_result(
+            [tick_payloads[0]],
+            mismatched_snapshot,
+            tick_payloads[1],
+        )
+        assert mismatch_client_result["simulationPerHourSummaryHistory"] == (
+            history["per_hour_summary"][:2]
+        )
         assert [
             call["url"] for call in client_result["simulationHistoryFetches"]
         ] == ["/api/simulation-history"]
