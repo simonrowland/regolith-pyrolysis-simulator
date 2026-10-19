@@ -1,8 +1,6 @@
 """SocketIO event handlers for the simulator interface."""
 
-import base64
 import copy
-import gzip
 import json
 import math
 import threading
@@ -155,7 +153,7 @@ _BACKEND_WIRE_TOKEN_FIELDS = frozenset({
 _draft_validation_slots = threading.BoundedSemaphore(1)
 _registered_start_handler = None
 _registered_socketio = None
-SIMULATION_TICK_PAYLOAD_VERSION = 2
+SIMULATION_TICK_PAYLOAD_VERSION = 3
 _O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 _MAX_WEB_MASS_KG = 1_000_000_000.0
 _MAX_SIM_SPEED_SECONDS = 3600.0
@@ -714,52 +712,32 @@ _PER_HOUR_CARRIER_MAP_FIELDS = (
 
 def _per_hour_summary_entry(
     summary: Mapping[str, object],
-    *,
-    for_live_event: bool = False,
 ) -> dict[str, object]:
-    """Build a history row or the smaller per-hour display event."""
+    """Build the compact per-hour row shared by tick and history payloads."""
     entry = copy.deepcopy(dict(summary))
     for key in _PER_HOUR_DETAIL_FIELDS:
         entry.pop(key, None)
-    if for_live_event:
-        for key in _PER_HOUR_CARRIER_MAP_FIELDS:
-            entry.pop(key, None)
-        redox_breakdown = entry.get('redox_source_breakdown')
-        if isinstance(redox_breakdown, Mapping):
-            # The live redox panel reads this projection; history retains the
-            # full breakdown for its on-demand fetch.
-            entry['redox_source_breakdown'] = {
-                key: redox_breakdown[key]
-                for key in (
-                    'applied_terms_mol_o2_equiv_by_label',
-                    'skipped_terms_mol_o2_equiv_by_label',
-                    'net_mol_o2_equiv',
-                    'delta_log10_fO2',
-                    'ferric_divergence',
-                    'source_campaign',
-                    'source_hour',
-                    'source_campaign_hour',
-                )
-                if key in redox_breakdown
-            }
+    for key in _PER_HOUR_CARRIER_MAP_FIELDS:
+        entry.pop(key, None)
+    redox_breakdown = entry.get('redox_source_breakdown')
+    if isinstance(redox_breakdown, Mapping):
+        # The live redox panel consumes this projection; verbose diagnostics
+        # remain available in the run capture and completion payload.
+        entry['redox_source_breakdown'] = {
+            key: redox_breakdown[key]
+            for key in (
+                'applied_terms_mol_o2_equiv_by_label',
+                'skipped_terms_mol_o2_equiv_by_label',
+                'net_mol_o2_equiv',
+                'delta_log10_fO2',
+                'ferric_divergence',
+                'source_campaign',
+                'source_hour',
+                'source_campaign_hour',
+            )
+            if key in redox_breakdown
+        }
     return entry
-
-
-def _per_hour_summary_delta(summary: Mapping[str, object]) -> dict[str, object]:
-    """Gzip one sanitized hourly entry to keep its wire size content-flat."""
-    entry = _per_hour_summary_entry(summary)
-    encoded = json.dumps(
-        entry,
-        sort_keys=True,
-        separators=(',', ':'),
-        allow_nan=False,
-    ).encode('utf-8')
-    return {
-        'encoding': 'gzip+base64-json',
-        'entry_gzip_base64': base64.b64encode(
-            gzip.compress(encoded, mtime=0)
-        ).decode('ascii'),
-    }
 
 
 def _browser_socket_payload(event: str, payload):
@@ -767,7 +745,7 @@ def _browser_socket_payload(event: str, payload):
         return payload
     emitted = dict(payload)
     if event == 'per_hour_summary':
-        return _per_hour_summary_entry(payload, for_live_event=True)
+        return _per_hour_summary_entry(payload)
     if event == 'simulation_tick':
         # This whole-train report is also included in simulation_complete. It
         # is not consumed from hourly ticks and grows as product is captured.
@@ -3357,7 +3335,7 @@ def _start_background_loop(
                         )
                         if isinstance(step_result.per_hour_summary, Mapping):
                             tick_data['per_hour_summary_delta'] = (
-                                _per_hour_summary_delta(
+                                _per_hour_summary_entry(
                                     step_result.per_hour_summary
                                 )
                             )

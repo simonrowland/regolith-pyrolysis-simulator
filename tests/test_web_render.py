@@ -606,11 +606,8 @@ def test_disconnect_reconnect_resets_controls_and_decision_modal():
 def _minimal_tick_payload(**overrides):
     """Bare tick with the numeric fields the tick DOM path always reads."""
     payload = {
-        "payload_version": 2,
-        "per_hour_summary_delta": {
-            "encoding": "gzip+base64-json",
-            "entry_gzip_base64": "test",
-        },
+        "payload_version": 3,
+        "per_hour_summary_delta": {"hour": 70},
         "run_id": "run-1",
         "hour": 70,
         "temperature_C": 1459.0,

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import base64
-import gzip
 import json
 import re
 from dataclasses import replace
@@ -190,7 +188,7 @@ def test_advisory_js_fetches_on_demand_full_records() -> None:
     socket_source = (_ROOT / "web/static/js/simulator-socket.js").read_text(
         encoding="utf-8"
     )
-    assert "SIMULATION_TICK_PAYLOAD_VERSION = 2" in socket_source
+    assert "SIMULATION_TICK_PAYLOAD_VERSION = 3" in socket_source
     assert "per_hour_summary_delta" in socket_source
     assert "fetchSimulationHistory" in socket_source
     assert "/api/simulation-history" in socket_source
@@ -385,16 +383,11 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             wire_samples.append((event, hour, len(serialized), serialized))
         if event == "simulation_tick" and isinstance(payload, dict):
             emitted = dict(payload)
-            assert emitted.get("payload_version") == 2
+            assert emitted.get("payload_version") == 3
             assert emitted["wall_risk_panel"].get("tick_view") == "compact"
             assert "zones" not in emitted["wall_risk_panel"]
             assert "stage_purity_report" not in emitted
-            assert emitted["per_hour_summary_delta"]["encoding"] == (
-                "gzip+base64-json"
-            )
-            assert isinstance(
-                emitted["per_hour_summary_delta"]["entry_gzip_base64"], str
-            )
+            assert emitted["per_hour_summary_delta"]["hour"] == emitted["hour"]
             tick_samples.append((int(emitted["hour"]), _nbytes(emitted)))
             tick_payloads.append(emitted)
             sid = kwargs.get("room")
@@ -485,7 +478,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         history_response = http.get("/api/simulation-history")
         assert history_response.status_code == 200
         history = history_response.get_json()
-        assert history["payload_version"] == 2
+        assert history["payload_version"] == 3
         assert history["run_id"] == state["run_id"]
         assert len(per_hour_deltas) == len(history["per_hour_summary"])
         carrier_fields = {
@@ -514,14 +507,18 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             )
             for event_summary in per_hour_deltas
         )
-        decoded_deltas = [
-            json.loads(gzip.decompress(base64.b64decode(
-                tick["per_hour_summary_delta"]["entry_gzip_base64"]
-            )))
-            for tick in tick_payloads
-        ]
-        assert decoded_deltas == history["per_hour_summary"]
+        assert per_hour_deltas == history["per_hour_summary"]
+        assert all(
+            carrier_fields.isdisjoint(history_entry)
+            for history_entry in history["per_hour_summary"]
+        )
+        deltas = [tick["per_hour_summary_delta"] for tick in tick_payloads]
+        assert deltas == history["per_hour_summary"]
         client_result = _client_tick_result(tick_payloads, history)
+        assert client_result["simulationPerHourSummaryHistoryBeforeFetch"] == (
+            deltas
+        )
+        assert client_result["latestPerHourSummaryBeforeFetch"] == deltas[-1]
         assert client_result["simulationPerHourSummaryHistory"] == history[
             "per_hour_summary"
         ]

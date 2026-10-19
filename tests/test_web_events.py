@@ -3559,9 +3559,7 @@ def test_tick_snapshot_is_built_before_concurrent_mutation(monkeypatch):
         assert mutation_done.is_set()
         assert sim.live_pressure == 2.0
         assert captured_ticks[0]["live_pressure"] == 1.0
-        assert captured_ticks[0]["per_hour_summary_delta"]["encoding"] == (
-            "gzip+base64-json"
-        )
+        assert captured_ticks[0]["per_hour_summary_delta"] == {"hour": 1}
         captured_tick = state["last_recipe_capture"]["tick"]
         assert captured_tick["live_pressure"] == 1.0
         assert captured_tick["per_hour_summary_delta"] == (

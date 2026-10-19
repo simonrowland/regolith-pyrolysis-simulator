@@ -15,7 +15,7 @@ const socket = io({
 });
 window.socket = socket;
 
-const SIMULATION_TICK_PAYLOAD_VERSION = 2;
+const SIMULATION_TICK_PAYLOAD_VERSION = 3;
 window.requireSimulationTickPayloadVersion = function (data) {
     if (data && data.payload_version === SIMULATION_TICK_PAYLOAD_VERSION) {
         return true;
@@ -85,8 +85,8 @@ socket.on('simulation_tick', (data) => {
     const delta = data && data.per_hour_summary_delta;
     if (
         !delta || typeof delta !== 'object' || Array.isArray(delta)
-        || delta.encoding !== 'gzip+base64-json'
-        || typeof delta.entry_gzip_base64 !== 'string'
+        || typeof delta.hour !== 'number'
+        || !Number.isFinite(delta.hour)
     ) {
         rejectSimulationTickShape('per_hour_summary_delta has an invalid shape');
         return;
@@ -100,6 +100,8 @@ socket.on('simulation_tick', (data) => {
         window.simulationPerHourSummaryHistory = [];
     }
     simulationHistoryRunId = data.run_id || simulationHistoryRunId;
+    window.simulationPerHourSummaryHistory.push(delta);
+    window.latestPerHourSummary = delta;
 });
 
 socket.on('simulation_complete', () => {
