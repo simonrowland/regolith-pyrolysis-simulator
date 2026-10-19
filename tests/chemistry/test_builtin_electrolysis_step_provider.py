@@ -485,10 +485,6 @@ def test_provider_rejects_wrong_intent(
     "control_name", ["dt_hr", "current_A", "voltage_V", "pO2_bar"]
 )
 @pytest.mark.parametrize("value", [1e-308, 1e30, 1e308])
-@pytest.mark.xfail(
-    strict=True,
-    reason="b-434: finite controls outside the electrolysis domain are admitted",
-)
 def test_provider_refuses_extreme_finite_electrolysis_controls(
     vapor_pressure_data,
     feedstocks_data,
@@ -530,7 +526,7 @@ def test_provider_refuses_extreme_finite_electrolysis_controls(
         )
     )
 
-    assert result.status == "refused"
+    assert result.status == "refused", result.diagnostic
     assert result.transition is None
     diagnostic = dict(result.diagnostic or {})
     assert (
@@ -539,14 +535,18 @@ def test_provider_refuses_extreme_finite_electrolysis_controls(
     )
     invalid_controls = diagnostic["invalid_controls"]
     assert control_name in invalid_controls
-    assert invalid_controls[control_name]
+    bound_direction = "below minimum" if value < 1.0 else "above maximum"
+    assert bound_direction in invalid_controls[control_name]
+    expected_units = {
+        "dt_hr": "hr",
+        "current_A": "A",
+        "voltage_V": "V",
+        "pO2_bar": "bar",
+    }
+    assert expected_units[control_name] in invalid_controls[control_name]
     assert diagnostic.get("energy_kWh", 0.0) == 0.0
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="b-434: non-finite Faraday extent is laundered by the melt cap",
-)
 def test_provider_refuses_nonfinite_faraday_extent(
     vapor_pressure_data,
     feedstocks_data,
@@ -561,15 +561,18 @@ def test_provider_refuses_nonfinite_faraday_extent(
     )
     view = ProviderAccountView(
         accounts={
-            "process.cleaned_melt": {
-                "SiO2": 10.0 / (MOLAR_MASS["SiO2"] / 1000.0),
-            },
+            "process.cleaned_melt": {"FeO": 10.0},
             "process.metal_phase": {},
             "terminal.oxygen_mre_anode_stored": {},
         },
         species_formula_registry=sim.species_formula_registry,
     )
     monkeypatch.setattr("simulator.state.FARADAY", 1e-308)
+    monkeypatch.setattr(
+        BuiltinElectrolysisStepProvider,
+        "_nernst_voltage",
+        staticmethod(lambda *args, **kwargs: 0.0),
+    )
     result = BuiltinElectrolysisStepProvider().dispatch(
         IntentRequest(
             intent=ChemistryIntent.ELECTROLYSIS_STEP,
@@ -581,12 +584,12 @@ def test_provider_refuses_nonfinite_faraday_extent(
                 "current_A": 100.0,
                 "dt_hr": 1.0,
                 "pO2_bar": 1.0,
-                "allowed_oxides": ["SiO2"],
+                "allowed_oxides": ["FeO"],
             },
         )
     )
 
-    assert result.status == "refused"
+    assert result.status == "refused", result.diagnostic
     assert result.transition is None
     diagnostic = dict(result.diagnostic or {})
     assert (
@@ -820,7 +823,7 @@ def test_live_mre_converts_ferric_inventory_to_ferrous_behavior(
             fe_redox_policy="kress91_live",
             control_inputs={
                 "voltage_V": 5.0,
-                "current_A": 1.0e9,
+                "current_A": 3000.0,
                 "dt_hr": 1.0,
                 "melt_fO2_log": -7.25,
             },
@@ -883,7 +886,7 @@ def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
         legacy = sim.electrolysis_model.step_hour(
             melt_state=sim.melt,
             voltage_V=5.0,
-            current_A=1.0e9,
+            current_A=3000.0,
             T_C=1575.0,
         )
         view = ProviderAccountView(
@@ -906,7 +909,7 @@ def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
                 fe_redox_policy="kress91_live",
                 control_inputs={
                     "voltage_V": 5.0,
-                    "current_A": 1.0e9,
+                    "current_A": 3000.0,
                     "dt_hr": 1.0,
                     "melt_fO2_log": fO2_log,
                     "allowed_oxides": ["FeO"],
@@ -1147,7 +1150,7 @@ def test_allowed_sio2_target_still_converts_ferric_inventory_to_ferrous(
             fe_redox_policy="kress91_live",
             control_inputs={
                 "voltage_V": 5.0,
-                "current_A": 1.0e9,
+                "current_A": 3000.0,
                 "dt_hr": 1.0,
                 "melt_fO2_log": -7.25,
                 "allowed_oxides": ["SiO2"],
@@ -1239,7 +1242,7 @@ def test_empty_allowed_oxides_filter_reduces_nothing_not_everything(
         )
         controls = {
             "voltage_V": 1.7,
-            "current_A": 1.0e9,
+            "current_A": 3000.0,
             "dt_hr": 1.0,
             "melt_fO2_log": -7.25,
         }
@@ -1969,7 +1972,7 @@ def test_provider_matches_legacy_feo_partition_with_ferric_present(
     sim.melt.temperature_C = 1600.0
 
     voltage_V = 5.0  # high enough to reduce both
-    current_A = 1.0e9
+    current_A = 3000.0
 
     legacy = sim.electrolysis_model.step_hour(
         melt_state=sim.melt,
