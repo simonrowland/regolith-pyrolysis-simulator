@@ -432,6 +432,7 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ln_fO2_temperature_delta,
     kress91_split,
+    legacy_iw_log10_fO2_bar,
     melt_mol_fractions_for_kress91,
     normalize_redox_state,
 )
@@ -7326,10 +7327,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostic_pressure_bar,
             floor_bar=self._vacuum_floor_bar(),
         )
-        log_iw = (
-            -27215.0 / T_K + 6.57
-            if T_K > 0.0
-            else math.log10(self._vacuum_floor_bar())
+        log_iw = legacy_iw_log10_fO2_bar(
+            T_K if T_K > 0.0 else 0.0,
+            vacuum_floor_bar=self._vacuum_floor_bar(),
         )
         base = {
             'fO2_log': float(fO2_log),
