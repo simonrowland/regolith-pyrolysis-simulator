@@ -1,0 +1,878 @@
+schema_version: literature_extract.v1
+source_id: le-losq-2023-alkali-aluminosilicate-glasses
+source:
+  citation: >-
+    Le Losq, C. and Baldoni, B. (2023). Machine Learning Modeling of the Atomic
+    Structure and Physical Properties of Alkali and Alkaline-Earth
+    Aluminosilicate Glasses and Melts. arXiv:2304.12123v2.
+  year: 2023
+  doi: not_printed
+  corpus_asset: raw/le-losq-2023-alkali-aluminosilicate-glasses/le-losq-2023-alkali-aluminosilicate-glasses.pdf
+extraction:
+  method: >-
+    Context-only review of the authoritative born-digital pdftotext-layout file.
+    The paper reports an i-Melt machine-learning model and its compiled datasets,
+    not new measured property rows. Tables 1 and 2 are model performance metrics;
+    Table 3 combines model-derived partial molar properties with literature
+    comparisons. The quoted partial heat-capacity values in the discussion are
+    contributions resolved by Al coordination, for which no matching store
+    quantity and sample composition are printed. Figure records have no numeric
+    points; every plotted figure is deferred to a figure pass.
+  date: '2026-10-19'
+  worker: codex-resume-38721-1792451527
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: le_losq_2023_table1_model_error_metrics
+        type: model_validation_table
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 7
+          table: '1'
+        units: property-specific units printed in each row
+        values:
+          quantity: unavailable
+          quantity_as_printed: RMSE, MAE and Raman MAPE between model predictions and measurements
+          method_class: model_derived
+          candidate_tokens_considered:
+            - viscosity
+            - density
+            - transition_temperature
+            - cp
+            - S
+          schema_gap: >-
+            These cells are prediction-error metrics, not values of the property
+            named in each row. The store has no prediction-error quantity.
+          row_count: 29
+          numeric_cells: 87
+          rows:
+            - property: 'Viscosity, log10 Pa·s (Adam-Gibbs theory)'
+              metric: RMSE
+              training: '0.2'
+              validation: '0.3'
+              testing: '0.4'
+            - property: 'Viscosity, log10 Pa·s (Adam-Gibbs theory)'
+              metric: MAE
+              training: '0.1'
+              validation: '0.1'
+              testing: '0.1'
+            - property: 'Viscosity, log10 Pa·s (Free Volume theory)'
+              metric: RMSE
+              training: '0.2'
+              validation: '0.2'
+              testing: '0.3'
+            - property: 'Viscosity, log10 Pa·s (Free Volume theory)'
+              metric: MAE
+              training: '0.1'
+              validation: '0.1'
+              testing: '0.1'
+            - property: 'Viscosity, log10 Pa·s (Vogel-Tamman-Fulcher equation)'
+              metric: RMSE
+              training: '0.2'
+              validation: '0.3'
+              testing: '0.3'
+            - property: 'Viscosity, log10 Pa·s (Vogel-Tamman-Fulcher equation)'
+              metric: MAE
+              training: '0.1'
+              validation: '0.1'
+              testing: '0.1'
+            - property: 'Viscosity, log10 Pa·s (MYEGA equation)'
+              metric: RMSE
+              training: '0.2'
+              validation: '0.3'
+              testing: '0.3'
+            - property: 'Viscosity, log10 Pa·s (MYEGA equation)'
+              metric: MAE
+              training: '0.1'
+              validation: '0.1'
+              testing: '0.1'
+            - property: 'Viscosity, log10 Pa·s (Avramov-Milchev theory)'
+              metric: RMSE
+              training: '0.2'
+              validation: '0.3'
+              testing: '0.3'
+            - property: 'Viscosity, log10 Pa·s (Avramov-Milchev theory)'
+              metric: MAE
+              training: '0.1'
+              validation: '0.1'
+              testing: '0.1'
+            - property: 'Density, g cm−3'
+              metric: RMSE
+              training: '0.01'
+              validation: '0.01'
+              testing: '0.02'
+            - property: 'Density, g cm−3'
+              metric: MAE
+              training: '0.004'
+              validation: '0.006'
+              testing: '0.006'
+            - property: 'Raman spectra, % median absolute percentage error'
+              metric: MAPE
+              training: '17'
+              validation: '17'
+              testing: '25'
+            - property: Refractive index
+              metric: RMSE
+              training: '0.003'
+              validation: '0.005'
+              testing: '0.006'
+            - property: Refractive index
+              metric: MAE
+              training: '0.0009'
+              validation: '0.0009'
+              testing: '0.0013'
+            - property: 'CTE, 10−6 K−1'
+              metric: RMSE
+              training: '1.0'
+              validation: '0.9'
+              testing: '1.1'
+            - property: 'CTE, 10−6 K−1'
+              metric: MAE
+              training: '0.4'
+              validation: '0.5'
+              testing: '0.5'
+            - property: 'Elastic modulus, GPa'
+              metric: RMSE
+              training: '4'
+              validation: '8'
+              testing: '6'
+            - property: 'Elastic modulus, GPa'
+              metric: MAE
+              training: '2'
+              validation: '2'
+              testing: '2'
+            - property: Abbe number
+              metric: RMSE
+              training: '1.1'
+              validation: '0.4'
+              testing: '3.7'
+            - property: Abbe number
+              metric: MAE
+              training: '0.3'
+              validation: '0.2'
+              testing: '0.5'
+            - property: 'Liquidus temperature, K'
+              metric: RMSE
+              training: '61'
+              validation: '66'
+              testing: '60'
+            - property: 'Liquidus temperature, K'
+              metric: MAE
+              training: '38'
+              validation: '39'
+              testing: '39'
+            - property: 'Glass transition temperature at 10^12 Pa·s, K'
+              metric: RMSE
+              training: '13'
+              validation: '16'
+              testing: '12'
+            - property: 'Glass transition temperature at 10^12 Pa·s, K'
+              metric: MAE
+              training: '5'
+              validation: '6'
+              testing: '9'
+            - property: 'Heat capacity, J mol−1 K−1'
+              metric: RMSE
+              training: '2'
+              validation: '3'
+              testing: '3'
+            - property: 'Heat capacity, J mol−1 K−1'
+              metric: MAE
+              training: '1'
+              validation: '3'
+              testing: '1'
+            - property: 'Glass entropy, J mol−1 K−1'
+              metric: RMSE
+              training: '0.5'
+              validation: '1.4'
+              testing: '0.8'
+            - property: 'Glass entropy, J mol−1 K−1'
+              metric: MAE
+              training: '0.3'
+              validation: '0.8'
+              testing: '0.3'
+      - observation_id: le_losq_2023_table2_prediction_interval_coverage
+        type: model_uncertainty_validation_table
+        locator:
+          page: 13
+          pdf_page_index: 12
+          published_page: 13
+          table: '2'
+        units: percent of test-data observations in stated 95% confidence intervals
+        values:
+          quantity: unavailable
+          quantity_as_printed: coverage percentages for model confidence intervals
+          method_class: model_derived
+          candidate_tokens_considered:
+            - viscosity
+            - density
+            - cp
+            - transition_temperature
+          schema_gap: >-
+            These percentages measure interval coverage, not the properties in
+            the dataset column. No store quantity represents model interval coverage.
+          row_count: 9
+          numeric_cells: 18
+          rows:
+            - dataset: Viscosity
+              MC_dropout: '90 %'
+              conformal_confidence_interval: '94 %'
+            - dataset: Density
+              MC_dropout: '87 %'
+              conformal_confidence_interval: '87 %'
+            - dataset: Raman spectra
+              MC_dropout: '70 %'
+              conformal_confidence_interval: '97 %'
+            - dataset: Refractive index
+              MC_dropout: '90 %'
+              conformal_confidence_interval: '97 %'
+            - dataset: CTE
+              MC_dropout: '84 %'
+              conformal_confidence_interval: '97 %'
+            - dataset: Elastic modulus
+              MC_dropout: '76 %'
+              conformal_confidence_interval: '94 %'
+            - dataset: Abbe number
+              MC_dropout: '81 %'
+              conformal_confidence_interval: '78 %'
+            - dataset: Liquidus temperature
+              MC_dropout: '85 %'
+              conformal_confidence_interval: '96 %'
+            - dataset: Heat capacity
+              MC_dropout: '57 %'
+              conformal_confidence_interval: '86 %'
+      - observation_id: le_losq_2023_table3_partial_molar_properties_context
+        type: model_and_literature_comparison_table
+        locator:
+          page: 14
+          pdf_page_index: 13
+          published_page: 14
+          table: '3'
+        units: partial molar volume in cm3 mol−1; liquid heat capacity in J mol−1 K−1
+        values:
+          quantity: unavailable
+          method_class: model_derived
+          candidate_tokens_considered:
+            - cp
+            - density
+            - partial_molar_enthalpy
+            - H_minus_H298
+          schema_gap: >-
+            The table's V_m values are partial molar volumes, for which the store
+            has no quantity token. The C_p values are partial contributions of
+            oxide components to liquid heat capacity, not whole-sample C_p rows;
+            the model results are not observations. The literature comparison
+            column gives ranges or temperature functions without a common printed
+            temperature and attributes the columns collectively, not individual cells.
+          partial_molar_volume_literature_attribution_as_printed:
+            - '[97]'
+            - '[98]'
+            - '[99]'
+            - '[47]'
+          partial_cp_literature_attribution_as_printed:
+            - '[40]'
+            - '[51]'
+          row_count: 6
+          data_cells: 36
+          rows:
+            - oxide: SiO2
+              Vm_quantiles_as_printed: ['24.1', '25.7', '27.1']
+              Vm_literature_as_printed: '26.0–27.5'
+              Cpliquid_model_as_printed: '80 ± 2'
+              Cpliquid_literature_as_printed: '81.37'
+            - oxide: Al2O3
+              Vm_quantiles_as_printed: ['34.5', '37.8', '38.4']
+              Vm_literature_as_printed: '37.0–39.0'
+              Cpliquid_model_as_printed: '118 ± 5 + 0.028 ± 0.006 × T'
+              Cpliquid_literature_as_printed: '130.2 + 0.0357 × T'
+            - oxide: Na2O
+              Vm_quantiles_as_printed: ['21.3', '22.9', '29.1']
+              Vm_literature_as_printed: '25.0–29.0'
+              Cpliquid_model_as_printed: '99 ± 7'
+              Cpliquid_literature_as_printed: '100.6'
+            - oxide: K2O
+              Vm_quantiles_as_printed: ['34.7', '36.9', '50.1']
+              Vm_literature_as_printed: '40.0–46.0'
+              Cpliquid_model_as_printed: '71 ± 14 + 0.017 ± 0.005 × T'
+              Cpliquid_literature_as_printed: '50.13 + 0.01578 × T'
+            - oxide: MgO
+              Vm_quantiles_as_printed: ['8.1', '13.1', '16.5']
+              Vm_literature_as_printed: '11.0–13.0'
+              Cpliquid_model_as_printed: '81 ± 8'
+              Cpliquid_literature_as_printed: '85.78'
+            - oxide: CaO
+              Vm_quantiles_as_printed: ['14.0', '14.9', '18.7']
+              Vm_literature_as_printed: '14.0–18.0'
+              Cpliquid_model_as_printed: '92 ± 11'
+              Cpliquid_literature_as_printed: '86.05'
+      - observation_id: le_losq_2023_text_quoted_partial_cp_al_coordination
+        type: quoted_literature_fact
+        locator:
+          page: 16
+          pdf_page_index: 15
+          published_page: 16
+          section: Discussion
+        units: J mol−1 K−1 at 300 K
+        attribution: '[116]'
+        values:
+          quantity: unavailable
+          quantity_as_printed: partial contributions of Al coordination states to calcium aluminosilicate glass C_p
+          method_class: quoted_attributed
+          candidate_tokens_considered:
+            - cp
+          schema_gap: >-
+            The quoted values are Al coordination-state contributions to a
+            glass heat capacity, not a sample C_p value. The source does not give
+            the calorimetric glass composition or a species for these separate
+            contributions, and no partial_molar_cp token exists.
+          temperature_as_printed: 300 K
+          coordination_number_4_Cp_J_mol-1_K-1_as_printed: '80.3'
+          coordination_number_5_Cp_J_mol-1_K-1_as_printed: '79.9'
+          coordination_number_6_Cp_J_mol-1_K-1_as_printed: '70.0'
+      - observation_id: le_losq_2023_text_model_partial_property_trends
+        type: model_result_context
+        locator:
+          page: 15
+          pdf_page_index: 14
+          published_page: 15
+          section: Discussion
+        units: cm3 mol−1 for V_m; J mol−1 K−1 for Cpliquid
+        values:
+          quantity: unavailable
+          method_class: model_derived
+          candidate_tokens_considered:
+            - cp
+            - density
+            - partial_molar_enthalpy
+          schema_gap: >-
+            The printed values are predicted partial molar volume and partial
+            heat-capacity contributions. Neither is a scored whole-sample
+            observation in the current schema.
+          trends_as_printed:
+            - 'Al2O3 partial V_m decreases from about 39 to about 35 cm3 mol−1 for X_Al > 0.3.'
+            - 'Na2O and K2O partial V_m increase by about 3 and about 5 cm3 mol−1, respectively, for X_Al > 0.3.'
+            - 'CaO partial V_m increases by about 2 cm3 mol−1; MgO partial V_m does not vary significantly with X_Al.'
+            - 'CaO partial Cpliquid increases by about 15 J mol−1 K−1 as X_Al increases.'
+            - 'Na2O and K2O partial Cpliquid decrease by about 11 and about 17 J mol−1 K−1, respectively, as X_Al increases.'
+            - 'Al2O3 partial Cpliquid increases by 20 to 25 J mol−1 K−1 in alkali melts, with a step near X_Al = 0.4.'
+            - 'In calc-alkaline melts Al2O3 partial Cpliquid increases from about 151 to about 172 J mol−1 K−1.'
+      - observation_id: le_losq_2023_figure1_dataset_composition_coverage
+        type: figure_record
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 3
+          figure: '1'
+        panel: a-i
+        attribution: i-Melt compiled datasets, as described in the Methods.
+        units: mole fractions of oxide components
+        values:
+          quantity: unavailable
+          quantity_as_printed: composition coverage of nine property datasets
+          method_class: model_derived
+          species_as_printed: [SiO2, Al2O3, Na2O, K2O, MgO, CaO]
+          phase_as_printed: melt or glass by panel
+          temperature_as_printed: not shown
+          axes_as_printed: ternary mole-fraction composition coordinates
+          caption: >-
+            Datasets for melt viscosity (a), glass Raman spectroscopy (b), glass
+            density (c), glass refractive index (d), liquid heat capacity (e),
+            glass Abbe Number (f), glass Elastic Modulus (g), glass coefficient
+            of thermal expansion (h), and liquidus temperature (i). Each symbol
+            corresponds to a sample.
+          marker_styles_as_printed: blue squares train; orange circles validation; green diamonds test
+          marker_count_basis: printed total composition count for each dataset; split color counts are not given
+          series:
+            - panel: a
+              name: Dviscosity
+              phase: melt
+              marker_count: 790
+              evidence_class: quoted_attributed
+            - panel: b
+              name: DRaman
+              phase: glass
+              marker_count: 252
+              evidence_class: quoted_attributed
+            - panel: c
+              name: Ddensity
+              phase: glass
+              marker_count: 668
+              evidence_class: quoted_attributed
+            - panel: d
+              name: Doptical
+              phase: glass
+              marker_count: 610
+              evidence_class: quoted_attributed
+            - panel: e
+              name: DCpliquid
+              phase: liquid
+              marker_count: 95
+              evidence_class: quoted_attributed
+            - panel: f
+              name: DAbbe
+              phase: glass
+              marker_count: 296
+              evidence_class: quoted_attributed
+            - panel: g
+              name: Delastic
+              phase: glass
+              marker_count: 1006
+              evidence_class: quoted_attributed
+            - panel: h
+              name: DCTE
+              phase: glass
+              marker_count: 2122
+              evidence_class: quoted_attributed
+            - panel: i
+              name: Dliquidus
+              phase: liquid
+              marker_count: 4505
+              evidence_class: quoted_attributed
+          digitisation: deferred to a figure pass
+      - observation_id: le_losq_2023_figure2_composition_count_bars
+        type: figure_record
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 4
+          figure: '2'
+        panel: a-b
+        attribution: i-Melt compiled datasets, as described in the caption.
+        units: number of compositions including each oxide component
+        values:
+          quantity: unavailable
+          quantity_as_printed: composition counts in viscosity and density datasets
+          method_class: model_derived
+          species_as_printed: [SiO2, Al2O3, Na2O, K2O, MgO, CaO]
+          phase_as_printed: viscosity dataset is melt; density dataset is glass
+          temperature_as_printed: not shown
+          axes_as_printed: x oxide component; y number of compositions including the element
+          caption: >-
+            Examples of the numbers of compositions including the different oxide
+            components in the viscosity and density datasets.
+          series:
+            - panel: a
+              name: Viscosity dataset
+              marker: bars
+              marker_count: 6
+              evidence_class: model_derived
+            - panel: b
+              name: Density dataset
+              marker: bars
+              marker_count: 6
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
+      - observation_id: le_losq_2023_figure3_prediction_measurement_comparison
+        type: figure_record
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 6
+          figure: '3'
+        panel: a-i
+        attribution: Measured values are from the i-Melt datasets; individual data references are not assigned by the caption.
+        units: property-specific units printed in each panel
+        values:
+          quantity: unavailable
+          quantity_as_printed: model predictions compared with measured dataset values
+          method_class: model_derived
+          species_as_printed: six-oxide alkali and alkaline-earth aluminosilicate systems
+          phase_as_printed: melt or glass by property panel
+          temperature_as_printed: varies by dataset; no shared T
+          axes_as_printed: x Measurements; y Predictions
+          caption: >-
+            Predictions against measured values for different available
+            observations. Blue squares, orange circles and green diamonds
+            distinguish the train, validation and testing data subsets.
+          series:
+            - panel: a
+              name: Viscosity, Adam-Gibbs
+              marker: train/validation/test subsets
+              marker_count: 790
+              evidence_class: model_derived
+            - panel: b
+              name: Glass entropy
+              marker: train/validation/test subsets
+              marker_count: not reported by dataset in the paper
+              evidence_class: model_derived
+            - panel: c
+              name: Glass density
+              marker: train/validation/test subsets
+              marker_count: 668
+              evidence_class: model_derived
+            - panel: d
+              name: Optical refractive index
+              marker: train/validation/test subsets
+              marker_count: 610
+              evidence_class: model_derived
+            - panel: e
+              name: Liquid heat capacity
+              marker: train/validation/test subsets
+              marker_count: 95
+              evidence_class: model_derived
+            - panel: f
+              name: Abbe number
+              marker: train/validation/test subsets
+              marker_count: 296
+              evidence_class: model_derived
+            - panel: g
+              name: Elastic modulus
+              marker: train/validation/test subsets
+              marker_count: 1006
+              evidence_class: model_derived
+            - panel: h
+              name: CTE
+              marker: train/validation/test subsets
+              marker_count: 2122
+              evidence_class: model_derived
+            - panel: i
+              name: Liquidus temperature
+              marker: train/validation/test subsets
+              marker_count: 4505
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
+      - observation_id: le_losq_2023_figure4_selected_composition_viscosity
+        type: figure_record
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 8
+          figure: '4'
+        panel: whole_figure
+        attribution: Experimental symbols are from the i-Melt database, as stated in the caption.
+        units: log10 Pa·s; 10^4/T in K−1
+        values:
+          quantity: viscosity
+          method_class: model_derived
+          species_as_printed:
+            - SiO2
+            - Al2O3
+            - albite
+            - orthoclase
+            - anorthite
+            - MgAl2Si2O8
+            - albite-anorthite
+            - Fe-free andesite
+          phase_as_printed: selected glasses and melts
+          temperature_as_printed: reciprocal temperature axis; no single T
+          axes_as_printed:
+            x: 10^4/T, K−1
+            y: viscosity, log10 Pa·s
+          caption: >-
+            Predictions of the viscosity of selected glass compositions using
+            the Adam-Gibbs and Free Volume theories. Symbols are experimental
+            values from i-Melt database and lines are model predictions using
+            two different theoretical frameworks.
+          series:
+            - name: i-Melt experimental data markers across compositions 1-8
+              marker: filled circles
+              marker_count: approximate; points overlap along curves
+              evidence_class: quoted_attributed
+            - name: Adam-Gibbs predictions
+              marker: solid lines
+              marker_count: 0
+              evidence_class: model_derived
+            - name: Free Volume predictions
+              marker: dashed lines
+              marker_count: 0
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
+      - observation_id: le_losq_2023_figure5_raman_spectra
+        type: figure_record
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 9
+          figure: '5'
+        panel: a-b
+        attribution: Measured spectra are from the i-Melt database as described in the text.
+        units: Raman shift in cm−1; intensity in arbitrary units; Al2O3 addition in mol fraction
+        values:
+          quantity: unavailable
+          quantity_as_printed: Raman spectra and Raman intensity map
+          method_class: model_derived
+          schema_gap: No Raman-intensity quantity token represents the plotted spectra or map.
+          species_as_printed:
+            - pyrope
+            - grossular
+            - MgAl2Si2O8
+            - anorthite
+            - orthoclase
+            - albite
+            - CaAl2O4
+            - SiO2
+            - soda-lime silicate float glass
+          phase_as_printed: glass
+          temperature_as_printed: not stated for the spectra
+          axes_as_printed:
+            panel_a_x: Raman shift ω, cm−1
+            panel_a_y: intensity, arbitrary units
+            panel_b_x: Raman shift ω, cm−1
+            panel_b_y: fraction of Al2O3 added to float glass
+            panel_b_color: Raman intensity, arbitrary units
+          caption: >-
+            (a) Examples of predicted Raman spectra for specific compositions
+            (dashed curves) represented on top of the measured ones (solid
+            lines). (b) 2D contour plot of the Raman spectral intensity as a
+            function of Raman shift and of the fraction of Al2O3 (mol %) added
+            into a soda-lime silicate float glass composition.
+          series:
+            - panel: a
+              name: measured and predicted spectra for eight compositions
+              marker: solid and dashed curves
+              marker_count: 0
+              evidence_class: model_derived
+            - panel: b
+              name: predicted Raman intensity field
+              marker: contour field
+              marker_count: 0
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
+      - observation_id: le_losq_2023_figure6_glass_transition_temperature
+        type: figure_record
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 10
+          figure: '6'
+        panel: whole_figure
+        attribution: Data symbols cite [82], [83], [84] and [85] in the caption.
+        units: K; dimensionless mixing fraction x
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species_as_printed:
+            - '(CaAl2Si2O8)x-(NaAlSi3O8)1-x'
+            - '(Mg1-xCax)3Al2Si3O12'
+            - 'Mg1-xCaxSiO3'
+            - 'NaxK1-x in float glass'
+            - 'Na2(1-x)CaxSi1.5O4'
+          phase_as_printed: glass
+          temperature_as_printed: glass transition temperature Tg, K
+          axes_as_printed:
+            x: x, fraction of mixed cations
+            y: glass transition temperature Tg, K
+          caption: >-
+            Comparison between data and model predictions of the glass
+            transition temperature Tg of different glass series in which Na-K,
+            Ca-Mg and Na-Ca are mixed, following a mixing fraction x. Symbols
+            are data from [82], [83], [84] and [85]. Lines are model predictions,
+            and shaded areas represent 95 % confidence intervals.
+          series:
+            - name: Na-Ca feldspar join
+              marker: right-facing triangles
+              marker_count: '~6'
+              evidence_class: quoted_attributed
+            - name: Mg-Ca garnet series
+              marker: circles
+              marker_count: '~5'
+              evidence_class: quoted_attributed
+            - name: Mg-Ca silicate series
+              marker: squares
+              marker_count: '~9'
+              evidence_class: quoted_attributed
+            - name: Na-K float glass
+              marker: downward triangles
+              marker_count: '~9'
+              evidence_class: quoted_attributed
+            - name: Na-Ca silicate series
+              marker: diamonds
+              marker_count: '~6'
+              evidence_class: quoted_attributed
+            - name: model predictions for the five data series
+              marker: lines with shaded 95 % intervals
+              marker_count: 0
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
+      - observation_id: le_losq_2023_figure7_fragility_model_consistency
+        type: figure_record
+        locator:
+          page: 12
+          pdf_page_index: 11
+          published_page: 12
+          figure: '7'
+        panel: whole_figure
+        attribution: Comparison lines cite Webb [89] and Russell and Giordano [90] in the caption.
+        units: dimensionless x ratio; fragility as plotted
+        values:
+          quantity: unavailable
+          quantity_as_printed: glass fragility against configurational heat-capacity/entropy ratio
+          method_class: model_derived
+          schema_gap: No quantity token represents the fragility plotted on the y-axis.
+          species_as_printed: alkali and alkaline-earth aluminosilicate melts
+          phase_as_printed: melt
+          temperature_as_printed: Tg in the configurational ratio; no single T
+          axes_as_printed:
+            x: Cpconf(Tg)/Sconf(Tg)
+            y: fragility
+          caption: >-
+            Glass fragility versus melt Cpconf(Tg)/Sconf(Tg) ratio. Symbols are
+            predictions of the machine learning framework on different subsets
+            of the Dviscosity dataset. Dashed and dashed-dotted lines show the
+            relationships reported by Webb [89] and Russell and Giordano [90].
+          series:
+            - name: multicomponent melts
+              marker: green triangles
+              marker_count: not enumerated; dense scatter
+              evidence_class: model_derived
+            - name: calc-alkaline melts
+              marker: red diamonds
+              marker_count: not enumerated; dense scatter
+              evidence_class: model_derived
+            - name: alkaline melts
+              marker: cyan circles
+              marker_count: not enumerated; dense scatter
+              evidence_class: model_derived
+            - name: SiO2-Al2O3 melts
+              marker: blue left-facing triangles
+              marker_count: not enumerated; dense scatter
+              evidence_class: model_derived
+            - name: aluminate melts
+              marker: magenta right-facing triangles
+              marker_count: not enumerated; dense scatter
+              evidence_class: model_derived
+            - name: melts with more than 95 mol% SiO2
+              marker: grey stars
+              marker_count: not enumerated; sparse scatter
+              evidence_class: model_derived
+            - name: Webb [89] W2008 relation
+              marker: dashed line
+              marker_count: 0
+              evidence_class: quoted_attributed
+            - name: Russell and Giordano [90] RG2017 relation
+              marker: dashed-dotted line
+              marker_count: 0
+              evidence_class: quoted_attributed
+          digitisation: deferred to a figure pass
+      - observation_id: le_losq_2023_figure8_density_prediction_and_uncertainty
+        type: figure_record
+        locator:
+          page: 14
+          pdf_page_index: 13
+          published_page: 14
+          figure: '8'
+        panel: a-b
+        attribution: Experimental circles are from the i-Melt database, as stated in the caption.
+        units: density in g cm−3; conformal interval width in g cm−3
+        values:
+          quantity: density
+          quantity_as_printed: density in panel a; width of associated 95% conformal intervals in panel b
+          quantity_by_panel:
+            a: density
+            b: unavailable
+          method_class: model_derived
+          candidate_tokens_considered:
+            - density
+          species_as_printed: CaO-Al2O3-SiO2 glass compositions
+          phase_as_printed: glass
+          temperature_as_printed: not stated
+          axes_as_printed: ternary CaO-Al2O3-SiO2 composition
+          schema_gap: The store has no quantity for the width of a model confidence interval shown in panel b.
+          caption: >-
+            Ternary diagrams of predicted density of CaO-Al2O3-SiO2 glasses (a)
+            and the width of the associated 95% conformal confidence intervals
+            (b). Circles are experimental data points from the i-Melt database.
+          series:
+            - panel: a
+              name: i-Melt glass density samples
+              marker: open circles over predicted-density field
+              marker_count: '~80; visually estimated, some overlap'
+              evidence_class: quoted_attributed
+            - panel: a
+              name: predicted density field
+              marker: model contour/background
+              marker_count: 0
+              evidence_class: model_derived
+            - panel: b
+              name: i-Melt glass density samples
+              marker: filled circles over confidence-width field
+              marker_count: '~80; same samples as panel a'
+              evidence_class: quoted_attributed
+            - panel: b
+              name: predicted 95% conformal interval width
+              marker: model contour/background
+              marker_count: 0
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
+      - observation_id: le_losq_2023_figure9_partial_molar_property_predictions
+        type: figure_record
+        locator:
+          page: 15
+          pdf_page_index: 14
+          published_page: 15
+          figure: '9'
+        panel: a-h
+        attribution: Present-work i-Melt model predictions.
+        units: cm3 mol−1 for V_m; J mol−1 K−1 for Cpliquid(Tg)
+        values:
+          quantity: unavailable
+          quantity_as_printed: partial molar volume and partial liquid heat-capacity contributions
+          method_class: model_derived
+          candidate_tokens_considered:
+            - cp
+            - density
+            - partial_molar_enthalpy
+          schema_gap: No token represents partial molar volume or component partial Cpliquid.
+          species_as_printed: SiO2, Al2O3 and Na2O, K2O, MgO or CaO modifiers by system
+          phase_as_printed: glass
+          temperature_as_printed: Cpliquid evaluated at Tg; Tg varies by composition
+          axes_as_printed:
+            x: Al2O3/(Al2O3+modifier oxide)
+            y_top: partial molar V_m
+            y_bottom: partial molar Cpliquid(Tg)
+          caption: >-
+            Predicted partial molar volumes in glasses and partial molar
+            contributions to liquid heat capacity of SiO2, Al2O3 and metal-cation
+            oxides as a function of Al2O3/(Al2O3+modifier oxide), in sodium,
+            potassium, magnesium and calcium aluminosilicate systems. The SiO2
+            mole fraction is fixed at 0.5. Shading shows 95% confidence intervals.
+          series:
+            - name: model curves for four modifier-oxide systems and three oxide components
+              marker: solid median curves with shaded intervals
+              marker_count: 0
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
+      - observation_id: le_losq_2023_figure10_alumina_partial_property_by_coordination
+        type: figure_record
+        locator:
+          page: 16
+          pdf_page_index: 15
+          published_page: 16
+          figure: '10'
+        panel: a-b
+        attribution: Coordination compilation is described as using [47]; partial-property values are model predictions.
+        units: J mol−1 K−1 for liquid heat capacity; cm3 mol−1 for molar volume
+        values:
+          quantity: unavailable
+          quantity_as_printed: Al2O3 partial liquid heat capacity and partial molar volume against Al coordination number
+          method_class: model_derived
+          candidate_tokens_considered:
+            - cp
+            - density
+          schema_gap: No token represents partial molar volume or component partial heat capacity.
+          species_as_printed: Al2O3 component in aluminosilicate glasses
+          phase_as_printed: glass
+          temperature_as_printed: Cpliquid at Tg; Tg varies by composition
+          axes_as_printed:
+            x: average coordination number of Al3+
+            panel_a_y: partial molar Cpliquid of Al2O3 at Tg
+            panel_b_y: partial molar volume of Al2O3
+          caption: >-
+            Partial molar contribution of Al2O3 to the liquid heat capacity at
+            the glass transition temperature Tg (a) and to the glass molar
+            volume (b) as a function of the mean coordination number of Al3+.
+          series:
+            - panel: a
+              name: coordination-composition comparison
+              marker: grey circles
+              marker_count: not enumerated; points overlap near coordination number 4
+              evidence_class: model_derived
+            - panel: b
+              name: coordination-composition comparison
+              marker: purple squares
+              marker_count: not enumerated; points overlap near coordination number 4
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
