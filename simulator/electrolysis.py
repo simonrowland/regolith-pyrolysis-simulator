@@ -78,6 +78,7 @@ diagnostic output, not certification evidence.
 from __future__ import annotations
 
 import math
+import sys
 from typing import Dict, List, Mapping, Tuple
 
 from simulator.chemistry.ellingham_thermo import (
@@ -135,6 +136,31 @@ MRE_FIXED_REDUCIBLE_OXIDES = tuple(
     oxide for oxide in DECOMP_VOLTAGES
     if oxide != 'Fe2O3'
 )
+
+
+def mre_control_out_of_domain_controls(
+    controls: Mapping[str, float],
+) -> dict[str, str]:
+    """Return finite controls outside the supported MRE operating window."""
+
+    domain_bounds = {
+        "dt_hr": (sys.float_info.min, 1.0, "hr"),
+        "current_A": (sys.float_info.min, 3000.0, "A"),
+        "voltage_V": (sys.float_info.min, 5.0, "V"),
+        "pO2_bar": (1e-9, 1.0, "bar"),
+    }
+    out_of_domain: dict[str, str] = {}
+    for name, (minimum, maximum, unit) in domain_bounds.items():
+        if name not in controls:
+            continue
+        value = controls[name]
+        if value == 0.0 and name != "pO2_bar":
+            continue
+        if value < minimum:
+            out_of_domain[name] = f"below minimum {minimum:g} {unit}"
+        elif value > maximum:
+            out_of_domain[name] = f"above maximum {maximum:g} {unit}"
+    return out_of_domain
 
 
 def _without_mre_quantities(diagnostic: Mapping[str, object]) -> dict[str, object]:

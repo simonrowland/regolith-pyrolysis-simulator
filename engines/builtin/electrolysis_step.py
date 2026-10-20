@@ -79,7 +79,6 @@ defence.
 from __future__ import annotations
 
 import math
-import sys
 from collections import defaultdict
 from collections.abc import Mapping
 from typing import Any
@@ -309,6 +308,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             _without_mre_quantities,
             coerce_gas_product_fugacity_bar,
             current_efficiency_diagnostic,
+            mre_control_out_of_domain_controls,
             mre_selectivity_weight,
             uncertified_multi_oxide_partition_targets,
         )
@@ -326,8 +326,13 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             return wrong_intent
 
         controls = unpack_controls(request)
-        validated, invalid_controls, out_of_domain_controls = (
-            self._validate_controls(request, controls)
+        validated, invalid_controls = self._validate_controls(request, controls)
+        out_of_domain_controls = mre_control_out_of_domain_controls(
+            {
+                name: value
+                for name, value in validated.items()
+                if name not in invalid_controls
+            }
         )
         if out_of_domain_controls:
             return self._invalid_result(
@@ -1103,7 +1108,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
     def _validate_controls(
         request: IntentRequest,
         controls: Mapping[str, Any],
-    ) -> tuple[dict[str, float], dict[str, str], dict[str, str]]:
+    ) -> tuple[dict[str, float], dict[str, str]]:
         raw_values = {
             "voltage_V": (
                 0.0
@@ -1165,24 +1170,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         ):
             invalid["temperature_C"] = "must_be_above_absolute_zero"
 
-        domain_bounds = {
-            "dt_hr": (sys.float_info.min, 1.0, "hr"),
-            "current_A": (sys.float_info.min, 3000.0, "A"),
-            "voltage_V": (sys.float_info.min, 5.0, "V"),
-            "pO2_bar": (1e-9, 1.0, "bar"),
-        }
-        out_of_domain: dict[str, str] = {}
-        for name, (minimum, maximum, unit) in domain_bounds.items():
-            if name not in values or name in invalid:
-                continue
-            value = values[name]
-            if value == 0.0 and name != "pO2_bar":
-                continue
-            if value < minimum:
-                out_of_domain[name] = f"below minimum {minimum:g} {unit}"
-            elif value > maximum:
-                out_of_domain[name] = f"above maximum {maximum:g} {unit}"
-        return values, invalid, out_of_domain
+        return values, invalid
 
     @staticmethod
     def _coerce_allowed_oxides(
