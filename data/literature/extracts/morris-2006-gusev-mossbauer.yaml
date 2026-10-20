@@ -23,8 +23,7 @@ notes:
 - Table 5 contains 82 target rows although the methods text reports 86 targets. Tables 1–3 contain 83 unique sample
   IDs; Table 3 prints A472RU0 for Keystone_Haunch, while Table 5 prints A472RB0. Both are retained as printed; no
   missing target rows or ID corrections are inferred.
-- Fe3+/FeT is printed as an author-reduced result. The required indexed corpus table asset is absent; the values
-  and printed inputs remain in context and in the untracked Table 5 CSV for controller seating and a follow-up derivation.
+- Table 5 target Fe3+/FeT ratios and measurement windows remain in context because these are whole-sample Mössbauer results without a melt-equilibrium temperature or fO2; they are not melt redox observables. The printed areas, ratios, target names, and windows are preserved; no ratio is recomputed and no temperature midpoint is assigned.
 - Figure 2 caption prints 210–70 K for its Keel spectrum while the panel and Table 5 show 210–270 K; the caption
   is retained as printed and the internal mismatch is noted in its figure record.
 species:
@@ -667,9 +666,9 @@ species:
         candidate_tokens:
         - valence_ratio
         - fe3_fe2_ratio
-        disposition_reason: The phase-area percentages have no matching quantity token. Printed Fe3+/FeT values
-          are preserved as author-reduced results; deriving store rows requires the missing tables:morris-2006-gusev-mossbauer
-          asset (controller). Temperature is printed as a measurement interval, not a point.
+        disposition_reason: whole-sample Mossbauer of a multiphase rock/soil; no melt-equilibrium temperature or fO2; not
+          a melt redox observable (controller ruling 2026-10-20)
+        phase_area_disposition_reason: Phase-area fractions have no matching quantity token and remain as printed context.
         attribution_as_printed: Morris et al. MER Spirit MIMOS II measurements and author-reduced Mössbauer fits.
         page_locators:
         - page: 8
@@ -974,7 +973,6 @@ species:
           \ Wiley Online Library on [09/10/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions)\
           \ on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons\
           \ License"
-        derivation_note: derivation pending a corpus table asset (controller)
         rows:
         - sample_id: A014SU0
           target_name: FirstSoil
@@ -2703,7 +2701,6 @@ species:
         target_count_discrepancy_note: The paper's methods text says spectra from 86 targets; Table 5 prints 82
           target rows. Tables 1–3 show 83 unique sample IDs, including A472RU0 (Keystone_Haunch), while Table 5
           prints A472RB0 (Keystone_Haunch). Both identifiers are retained as printed; no rows are inferred.
-        follow_up_csv_untracked: .agent-scratch/fam23-tables/morris-2006-gusev-mossbauer/table5.csv
         footnotes_as_printed:
           a: Uncertainty in subspectral area is ±2% absolute unless otherwise stated.
           b: Uncertainty in Fe3+/FeT is ±0.03.

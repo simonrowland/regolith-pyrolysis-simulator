@@ -23,9 +23,7 @@ notes:
   has 94 target rows; the target name and full location block are retained because some printed sample IDs recur.
 - The paper reports 95 analyzed targets in its text; Table 3 contains 94 rows. B033RR0 is listed in Table 1 but
   has no Table 3 area row, so no 95th area record is inferred.
-- For Table 3 derived Fe3+/FeT values, the required corpus table asset is absent from the indexed corpus. Values
-  and all inputs are retained in context and in the untracked follow-up CSV; follow-up derived rows are pending
-  controller seating of that asset.
+- Table 3 target Fe3+/FeT ratios and measurement windows remain in context because these are whole-sample Mössbauer results without a melt-equilibrium temperature or fO2; they are not melt redox observables. The printed areas, ratios, target names, and windows are preserved; no ratio is recomputed and no temperature midpoint is assigned.
 - The table draft tool could not emit a mapping because this paper has no MinerU table source; there is no second
   table implementation to commit.
 species:
@@ -2824,18 +2822,15 @@ species:
           b: Uncertainty in subspectral area is ±3% absolute.
           c: Because Mt = Mt(3) + Mt(2.5), Sum = Ol + Px + npOx + Jar + Fe3D3 + Mt + Hm + a-(Fe,Ni)0.
           d: Fe3+/FeT = (npOx + Jar + Fe3D3 + Mt(3) + 0.5(Mt(2.5)) + Hm)/Sum. Uncertainty in Fe3+/FeT is ±0.03.
-        derivation_note: derivation pending a corpus table asset (controller)
         note: Each row binds the printed sample identifier, target name, named location block, individual printed
           area strings including superscript uncertainty marks, printed Fe3+/FeT, and the printed temperature window.
           Repeated sample identifiers remain separate where target names differ.
         candidate_tokens:
         - valence_ratio
         - fe3_fe2_ratio
-        disposition_reason: The phase-area fractions have no matching quantity token. The printed Fe3+/FeT ratio
-          is author-reduced from fitted subspectral areas (Table 3 footnote d); creating its derived row needs a
-          tables:morris-2006-meridiani-mossbauer asset that is not indexed in this seat, so its printed value and
-          inputs are preserved here and in the untracked follow-up CSV. Temperature is printed as a measurement
-          window, not a point, so no midpoint is assigned.
+        disposition_reason: whole-sample Mossbauer of a multiphase rock/soil; no melt-equilibrium temperature or fO2; not
+          a melt redox observable (controller ruling 2026-10-20)
+        phase_area_disposition_reason: Phase-area fractions have no matching quantity token and remain as printed context.
     - observation_id: morris_2006_meridiani_table4_context
       type: measured_table_context
       locator:

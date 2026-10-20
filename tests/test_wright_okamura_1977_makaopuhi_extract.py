@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,9 +28,8 @@ TABLE17_RENDER_GRID = {
     ("TiO2", "68-1-7"): ".45", ("TiO2", "68-1-14"): ".33", ("TiO2", "A12-9"): ".24",
 }
 
-# Independent transcription of the six single-phase glass columns in Table
-# 10A from the 600 dpi render of physical PDF page 32. Pumice columns are not
-# included because they are whole-sample bulk, not phase compositions.
+# Independent transcription of the six multiphase whole-sample analyses in
+# Table 10A from the 600 dpi render of physical PDF page 32.
 TABLE10A_SAMPLES = ("M1-1G", "M-3", "M-8", "M-12", "M-18", "M-22")
 TABLE10A_RENDER_ROWS = {
     "SiO2": ("50.06", "50.27", "50.29", "50.45", "50.33", "50.09"),
@@ -64,7 +63,7 @@ TABLE11_RENDER_GRID = {
     ("Na2O", "69-1-22"): "2.73", ("K2O", "69-1-22"): "0.80",
     ("H2O", "69-1-22"): "0.12", ("TiO2", "69-1-22"): "3.89",
     ("P2O5", "69-1-22"): "0.41", ("MnO", "69-1-22"): "0.20",
-    ("CO2", "69-1-22"): "0.02", ("Cl", "69-1-22"): "0.03",
+    ("CO2", "69-1-22"): "0.0", ("Cl", "69-1-22"): "0.03",
     ("F", "69-1-22"): "0.06",
 }
 
@@ -108,15 +107,37 @@ def test_render_grids_bind_each_component_and_migrate_with_conditions():
         and row["values"].get("quantity") == "equilibrium_phase_composition"
     }
     assert table17 == TABLE17_RENDER_GRID
-    assert table10a == TABLE10A_RENDER_GRID
+    assert table10a == {}
     assert table11 == TABLE11_RENDER_GRID
+    table10_context = next(
+        row for row in source["species"]["SiO2"]["context"]
+        if row["observation_id"] == "wright_okamura_table_10_context"
+    )
+    context_samples = table10_context["values"]["sample_analyses_as_printed"]
+    table10_context_grid = {
+        (formula, row["sample_id_as_published"]): value
+        for row in context_samples
+        for formula, value in row["components_as_printed"].items()
+    }
+    table10_context_ratios = {
+        row["sample_id_as_published"]: row["valence_ratio_as_printed"]
+        for row in context_samples
+    }
+    assert table10_context_grid == TABLE10A_RENDER_GRID
+    assert table10_context_ratios == TABLE10A_RATIOS
+    assert "typed_glass_samples" not in table10_context["values"]
+    assert "whole-sample bulk of a multiphase rock; not a single-phase composition" in table10_context["values"]["disposition_reason"]
+    m18_context = next(row for row in context_samples if row["sample_id_as_published"] == "M-18")
+    assert m18_context["temperature_as_printed"] == "¹≥1,160 °C (thermocouple reading during collection; Table 16)"
+    assert all(row["values"].get("sample_id_as_published") != "M-18" for _, row in rows)
+    assert all(row["locator"].get("table") != "10" for _, row in rows)
 
     typed_components = [
         (formula, row)
         for formula, row in rows
         if row["values"].get("quantity") == "equilibrium_phase_composition"
     ]
-    assert len(typed_components) == 129
+    assert len(typed_components) == 39
     assert all(row["values"]["component_as_published"] == formula for formula, row in typed_components)
     assert all(row["phase"] == "glass" for _, row in typed_components)
     assert all(row["locator"]["page"] == row["locator"]["pdf_page_index"] + 1 for _, row in typed_components)
@@ -132,7 +153,7 @@ def test_render_grids_bind_each_component_and_migrate_with_conditions():
         for formula, row in rows
         if formula == "Fe" and row["locator"].get("table") == "11"
     }
-    assert table10a_ratios == TABLE10A_RATIOS
+    assert table10a_ratios == {}
     assert table11_ratios == {"69-1-22": TABLE11_RATIO}
     expected_sample_types = {
         "M1-1G": "Glassy skin on lava lake surface",
@@ -143,11 +164,8 @@ def test_render_grids_bind_each_component_and_migrate_with_conditions():
         "M-22": "Melt dipped from rising lava lake",
     }
     assert {
-        row["values"]["sample_id_as_published"]: row["values"]["sample_type_as_printed"]
-        for _, row in rows
-        if row["locator"].get("table") == "10"
-        and row["values"].get("quantity") == "equilibrium_phase_composition"
-        and row["values"]["component_as_published"] == "SiO2"
+        row["sample_id_as_published"]: row["sample_type_as_printed"]
+        for row in context_samples
     } == expected_sample_types
     table11_glass = next(
         row for _, row in rows
@@ -171,8 +189,9 @@ def test_render_grids_bind_each_component_and_migrate_with_conditions():
     migrator.finalize()
     result = migrator.result
     migrated = [row for row in result.observations.values() if row.source_id == SID]
-    assert len(migrated) == 136
+    assert len(migrated) == 40
     assert not result.validation.hard_issues
+    assert all(row.value.kind is not ValueKind.UNAVAILABLE for row in migrated)
     source_formula_by_id = {row["observation_id"]: formula for formula, row in rows}
     source_row_by_id = {row["observation_id"]: row for _, row in rows}
     for row in migrated:
@@ -194,19 +213,14 @@ def test_every_typed_quantity_has_a_species_formula_and_all_tables_figures_are_a
     source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     rows = all_observations(source)
     typed = [(formula, row) for formula, row in rows if row["values"].get("quantity")]
-    assert len(typed) == 136
+    assert len(typed) == 40
     assert all(row["locator"]["page"] == row["locator"]["pdf_page_index"] + 1 for _, row in typed)
     assert all(row["point_conditions"]["T_C"] for _, row in typed)
     assert all(row["point_conditions"]["quench_state"] for _, row in typed)
     for _, row in typed:
         table = row["locator"].get("table")
         sample_id = row["values"].get("sample_id_as_published")
-        if table == "10":
-            assert row["point_conditions"]["quench_state"]["locator"]["page"] == 41
-            expected_t_page = 31 if sample_id in {"M-3", "M-8", "M-12", "M-22"} else 41
-            assert row["point_conditions"]["T_C"]["locator"]["page"] == expected_t_page
-            assert row["point_conditions"]["T_C"]["locator"]["pdf_page_index"] == expected_t_page - 1
-        elif table == "11":
+        if table == "11":
             assert row["point_conditions"]["T_C"]["locator"]["page"] == 31
             assert row["point_conditions"]["quench_state"]["locator"]["page"] == 57
         elif table == "17":

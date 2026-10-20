@@ -6,11 +6,15 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import ValueKind
+from simulator.battery.migrate import Migrator
+
 ROOT = Path(__file__).resolve().parents[1]
 SID = "morris-2006-meridiani-mossbauer"
 EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
 CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
 PDF = CORPUS / "raw" / SID / f"{SID}.pdf"
+TEXT = CORPUS / "text" / SID / "pdftotext-layout.txt"
 
 # Independent transcription from the 600 dpi Table 3 renders, physical PDF pages 8–9.
 RENDER_GRID = {
@@ -61,8 +65,12 @@ def test_table3_render_grid_binds_phase_areas_target_and_temperature_window():
     for key, expected in RENDER_GRID.items():
         for field, value in expected.items():
             assert actual[key][field] == value, (key, field, actual[key][field], value)
-    assert table3["values"]["derivation_note"] == "derivation pending a corpus table asset (controller)"
-    assert "not a point" in table3["values"]["disposition_reason"]
+    assert table3["values"]["disposition_reason"] == (
+        "whole-sample Mossbauer of a multiphase rock/soil; no melt-equilibrium temperature or fO2; "
+        "not a melt redox observable (controller ruling 2026-10-20)"
+    )
+    assert "valence_ratio" in table3["values"]["candidate_tokens"]
+    assert "derivation_note" not in table3["values"]
     assert table3["values"]["target_count_in_Table_3"] == 94
     assert table3["values"]["target_count_reported_in_text"] == 95
     assert "B033RR0" in table3["values"]["target_count_discrepancy_note"]
@@ -93,3 +101,21 @@ def test_all_tables_have_a_disposition_and_figures_are_deferred_without_points()
         assert "points" not in values
         assert len(values["marker_count_per_series"]) == len(values["series"])
         assert all(isinstance(count, int) or isinstance(count, str) for count in values["marker_count_per_series"])
+
+
+@pytest.mark.skipif(not PDF.is_file() or not TEXT.is_file(), reason=f"corpus source is unavailable: {SID}")
+def test_context_only_extract_migrates_no_unavailable_scored_observations():
+    index = {
+        SID: {
+            "corpus": {
+                "raw": {"path": str(PDF), "present": PDF.is_file()},
+                "text": {"path": str(TEXT), "exists": TEXT.is_file()},
+            }
+        }
+    }
+    migrator = Migrator(root=ROOT, index=index, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    observations = [row for row in migrator.result.observations.values() if row.source_id == SID]
+    assert observations == []
+    assert not [row for row in observations if row.value.kind is ValueKind.UNAVAILABLE]

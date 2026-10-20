@@ -6,11 +6,15 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import ValueKind
+from simulator.battery.migrate import Migrator
+
 ROOT = Path(__file__).resolve().parents[1]
 SID = "morris-2006-gusev-mossbauer"
 EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
 CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
 PDF = CORPUS / "raw" / SID / f"{SID}.pdf"
+TEXT = CORPUS / "text" / SID / "pdftotext-layout.txt"
 
 # Independent Table 5 transcription from 600 dpi renders of physical PDF pages 8–9.
 RENDER_GRID = {
@@ -55,7 +59,12 @@ def test_table5_render_grid_binds_every_area_cell_to_target_block_and_temperatur
             else:
                 observed = row[field]
             assert observed == value, (key, field, observed, value)
-    assert table5["values"]["derivation_note"] == "derivation pending a corpus table asset (controller)"
+    assert table5["values"]["disposition_reason"] == (
+        "whole-sample Mossbauer of a multiphase rock/soil; no melt-equilibrium temperature or fO2; "
+        "not a melt redox observable (controller ruling 2026-10-20)"
+    )
+    assert "valence_ratio" in table5["values"]["candidate_tokens"]
+    assert "derivation_note" not in table5["values"]
     assert table5["values"]["target_count_reported_in_text"] == 86
     assert table5["values"]["target_count_in_Table_5"] == 82
     assert "A472RU0" in table5["values"]["target_count_discrepancy_note"]
@@ -93,3 +102,21 @@ def test_all_tables_have_dispositions_and_all_figures_are_deferred_without_point
     figure2 = next(row for row in figures if row["locator"]["figure"] == "2")
     assert "210–70 K" in figure2["values"]["caption"]
     assert "210–270 K" in figure2["values"]["temperature_as_printed"]
+
+
+@pytest.mark.skipif(not PDF.is_file() or not TEXT.is_file(), reason=f"corpus source is unavailable: {SID}")
+def test_context_only_extract_migrates_no_unavailable_scored_observations():
+    index = {
+        SID: {
+            "corpus": {
+                "raw": {"path": str(PDF), "present": PDF.is_file()},
+                "text": {"path": str(TEXT), "exists": TEXT.is_file()},
+            }
+        }
+    }
+    migrator = Migrator(root=ROOT, index=index, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    observations = [row for row in migrator.result.observations.values() if row.source_id == SID]
+    assert observations == []
+    assert not [row for row in observations if row.value.kind is ValueKind.UNAVAILABLE]

@@ -36,7 +36,7 @@ T3_GRID = {
         "YG-51b": "45.3(2)|4.12(3)|10.35(4)|7.55(6)|0.46(5)|20.4(1)|10.81(4)|0.34(1)|0.079(6)|0|0.374(1)",
         "BG-49": "40.0(2)|11.47(4)|7.69(4)|7.87(2)|0.4(6)|24.7(1)|6.76(4)|0.30(1)|0.077(3)|0|0",
         "PPG-3": "48.78(6)|0.646(8)|13.27(5)|9.64(3)|0.20(2)|13.8(2)|11.65(3)|<0.02|0.23(1)|1.369(6)|0.640(9)",
-        "PPG-4": "48.9(3)|0.65(1)|14.75(7)|9.04(1)|0.19(2)|13.64(9)|11.98(4)|0.02|0.247(9)|0.550(5)|0.219(5)",
+        "PPG-4": "48.9(3)|0.65(1)|14.75(7)|9.04(1)|0.19(2)|13.64(9)|11.98(4)|0.02(1)|0.247(9)|0.550(5)|0.219(5)",
         "PPG-5d": "50.1(2)|0.68(2)|15.1(1)|8.17(5)|0.2(1)|13.4(2)|12.44(9)|0.21(7)|0.32(2)|0|0",
         "PPG-7a": "49.5(1)|0.65(1)|14.4(1)|8.84(4)|0.20(1)|13.7(1)|12.02(3)|0.015(5)|0.26(2)|0.551(6)|0.227(5)",
     },
@@ -53,8 +53,8 @@ T3_GRID = {
         "BG-49": "37.1(1)|0.31(8)|0.036(3)|33.7(1)|na|27.7(1)|0.168(6)|0.042(5)|0|0",
         "PPG-3": "37.5(4)|<0.02|0.12(1)|40.0(2)|0.20(2)|20.2(2)|0.28(1)|0.189(9)|0.338(6)|0.346(6)",
         "PPG-4": "38.1(2)|<0.02|0.09(2)|38.5(2)|0.22(2)|21.9(2)|0.29(4)|0.23(1)|0.109(7)|0.148(9)",
-        "PPG-5d": "38.2(2)|0.08(6)|0.08(6)|39.1(6)|0.23(1)|20.87(3)|0.28(4)|0.33(2)|0|0",
-        "PPG-7a": "38.2(2)|0.07(1)|0.07(1)|39.2(1)|0.21(2)|20.8(1)|0.26(2)|0.25(1)|0.100(5)|0.136(7)",
+        "PPG-5d": "38.2(2)|<0.02|0.08(6)|39.1(6)|0.23(1)|20.87(3)|0.28(4)|0.33(2)|0|0",
+        "PPG-7a": "38.2(2)|<0.02|0.07(1)|39.2(1)|0.21(2)|20.8(1)|0.26(2)|0.25(1)|0.100(5)|0.136(7)",
     },
 }
 T3_META = {
@@ -122,7 +122,7 @@ def test_hanson_rows_migrate_with_species_temperature_and_printed_oxygen_conditi
     result = migrate_extract()
     observations = [row for row in result.observations.values() if row.source_id == SID]
     source = load_extract()
-    assert len(observations) == 402
+    assert len(observations) == 400
     assert not result.validation.hard_issues
     assert all(row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION for row in observations)
     assert all(row.identity.temperature_K.is_value for row in observations)
@@ -161,9 +161,25 @@ def test_hanson_rows_migrate_with_species_temperature_and_printed_oxygen_conditi
         for point in row.get("values", {}).get("points", [])
         if point.get("value") is None
     ]
-    assert len(unavailable) == 16
+    assert len(unavailable) == 18
     assert all("value_as_published" in point and point.get("unavailable_reason") for point in unavailable)
     assert all(row.value.kind is not ValueKind.UNAVAILABLE for row in observations)
+    ppg4_na2o = next(
+        point
+        for row in source["species"]["Na2O"]["observations"]
+        if row["observation_id"] == "hj98_t3_glass_na2o"
+        for point in row["values"]["points"]
+        if point["sample_id_as_published"] == "PPG-4"
+    )
+    assert ppg4_na2o["value_as_published"] == "0.02(1)"
+    assert ppg4_na2o["sigma"] == "0.01"
+    assert all(
+        "1 atm = 101325 Pa" in point["point_conditions"]["total_pressure_Pa"]["note"]
+        for body in source["species"].values()
+        for observation in body["observations"]
+        if observation["observation_id"].startswith("hj98_t3_")
+        for point in observation["values"].get("points", [])
+    )
 
 
 def test_context_preserves_non_token_table_rows_and_deferred_figure_records():
