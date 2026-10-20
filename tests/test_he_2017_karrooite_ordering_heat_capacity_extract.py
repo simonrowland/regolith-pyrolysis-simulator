@@ -110,6 +110,27 @@ def _assert_source_pins(document: dict, table1_grid=TABLE1_RENDER_GRID) -> None:
         "142.8(2)",
     ]
 
+    prose_context = {
+        "he2017_prose_vibrational_entropy_difference": ("4.6(2)", ["S"], 16),
+        "he2017_prose_excess_vibrational_enthalpy": (
+            "0.66(5)", ["delta_fH", "H_minus_H298"], 17
+        ),
+        "he2017_prose_quoted_total_excess_enthalpy": (
+            "5.8(5)", ["delta_fH", "H_minus_H298"], 17
+        ),
+        "he2017_prose_extrapolated_ordered_standard_entropy": ("126.1", ["S"], 17),
+    }
+    for observation_id, (printed_value, candidates, page) in prose_context.items():
+        row = contexts[observation_id]
+        assert row["type"] == "table_record"
+        assert row["locator"]["page"] == page
+        assert row["values"]["value_as_printed"] == printed_value
+        assert row["values"]["candidate_tokens_considered"] == candidates
+        assert row["values"]["admission_status"] == "context_only"
+    assert "not as a calorimetrically measured standard entropy at 298 K" in contexts[
+        "he2017_prose_extrapolated_ordered_standard_entropy"
+    ]["values"]["schema_gap"]
+
     figures = [record for record in contexts.values() if record["type"] == "figure_record"]
     assert len(figures) == 13
     assert {figure["locator"]["figure"] for figure in figures} == {
@@ -152,6 +173,14 @@ def test_mutating_an_extract_grid_cell_breaks_the_source_pins() -> None:
         _assert_source_pins(mutated)
 
 
+def test_mutating_an_extrapolated_entropy_context_value_breaks_the_source_pins() -> None:
+    mutated = deepcopy(_document())
+    row = _context_by_id(mutated)["he2017_prose_extrapolated_ordered_standard_entropy"]
+    row["values"]["value_as_printed"] = "126.2"
+    with pytest.raises(AssertionError):
+        _assert_source_pins(mutated)
+
+
 def test_isolated_migration_keeps_controller_ruled_context_unscored() -> None:
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
@@ -160,6 +189,7 @@ def test_isolated_migration_keeps_controller_ruled_context_unscored() -> None:
     assert migrator.result.observations == {}
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
+    assert sum(len(rows) for rows in migrator.result.context_by_work.values()) == 23
 
 
 def test_all_locators_match_physical_pdf_pages() -> None:
@@ -183,3 +213,16 @@ def test_all_locators_match_physical_pdf_pages() -> None:
             page,
             label,
         )
+
+    paragraph_pins = {
+        16: [r"difference in the vibrational entropy is 4\.6\(2\)"],
+        17: [r"excess vibrational enthalpy of\s+0\.66\(5\)", r"standard entropy of 126\.1"],
+    }
+    for page, patterns in paragraph_pins.items():
+        result = subprocess.run(
+            ["pdftotext", "-f", str(page), "-l", str(page), "-layout", str(PDF), "-"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        assert all(re.search(pattern, result.stdout, re.I) for pattern in patterns), page

@@ -52,7 +52,8 @@ scope_assessment:
         components. Those component values have no distinct token and must not
         be filed as total S. Per controller ruling t-1382, keep the totals in
         context with candidate token S and method measured_reduced pending a
-        corpus TABLE_CSV asset; do not edit the generated INDEX.
+        corpus TABLE_CSV asset; do not edit the generated INDEX. The 126.1 value is context-only because the prose
+        describes an extrapolation from experimental data, not a calorimetrically measured standard entropy at 298 K.
   figure_only_candidate: >-
     Figure 10 contains measured Cp points, but figure digitization is deferred
     by the family rule. Figures 11–12 are calculated or reduced curves and
@@ -264,6 +265,83 @@ species:
             - {sample_state: 'X = 0.37(1), Exp.', S_vib_as_printed: '129.4(1)', S_config_as_printed: '13.4(2)', S_total_as_printed: '142.8(2)'}
           capture_note: derivation pending a corpus table asset (controller, t-1382)
 
+      - observation_id: he2017_prose_vibrational_entropy_difference
+        type: table_record
+        locator:
+          page: 16
+          published_page: 16
+          pdf_page_index: 15
+          paragraph: difference in vibrational entropy between the two ordering states
+        units: J mol−1 K−1
+        values:
+          quantity_as_printed: difference in vibrational entropy
+          candidate_tokens_considered:
+          - S
+          method_class: measured_reduced
+          admission_status: context_only
+          value_as_printed: 4.6(2)
+          temperature_as_printed: 298 K
+          ordering_states_as_printed: X = 0.14(1) and X = 0.37(1)
+          schema_gap: S represents an absolute standard entropy; the printed value is a difference between vibrational
+            entropy components for two ordering states.
+      - observation_id: he2017_prose_excess_vibrational_enthalpy
+        type: table_record
+        locator:
+          page: 17
+          published_page: 17
+          pdf_page_index: 16
+          paragraph: corresponding excess vibrational enthalpy
+        units: kJ mol−1
+        values:
+          quantity_as_printed: excess vibrational enthalpy between ordering states
+          candidate_tokens_considered:
+          - delta_fH
+          - H_minus_H298
+          method_class: measured_reduced
+          admission_status: context_only
+          value_as_printed: 0.66(5)
+          ordering_states_as_printed: X = 0.14(1) and X = 0.37(1)
+          schema_gap: The printed value is an excess vibrational enthalpy difference between ordering states,
+            not a formation enthalpy or an enthalpy increment from 298 K.
+      - observation_id: he2017_prose_quoted_total_excess_enthalpy
+        type: table_record
+        locator:
+          page: 17
+          published_page: 17
+          pdf_page_index: 16
+          paragraph: total excess enthalpy
+        units: kJ mol−1
+        values:
+          quantity_as_printed: total excess enthalpy between ordering states
+          candidate_tokens_considered:
+          - delta_fH
+          - H_minus_H298
+          method_class: quoted_attributed
+          admission_status: context_only
+          value_as_printed: 5.8(5)
+          attribution: Xirouchakis et al. [20]
+          ordering_states_as_printed: X = 0.14(1) and X = 0.37(1)
+          schema_gap: The value is quoted from an earlier thermodynamic modeling study as an excess enthalpy
+            difference, not a formation enthalpy or an enthalpy increment from 298 K.
+      - observation_id: he2017_prose_extrapolated_ordered_standard_entropy
+        type: table_record
+        locator:
+          page: 17
+          published_page: 17
+          pdf_page_index: 16
+          paragraph: extrapolation of our experimental data for fully ordered MgTi2O5
+        units: J mol−1 K−1
+        values:
+          quantity_as_printed: extrapolated standard entropy of fully ordered MgTi2O5
+          candidate_tokens_considered:
+          - S
+          method_class: measured_reduced
+          admission_status: context_only
+          value_as_printed: '126.1'
+          species: MgTi2O5
+          schema_gap: The prose describes 126.1 J mol−1 K−1 as an extrapolation from experimental data, not
+            as a calorimetrically measured standard entropy at 298 K.
+          capture_note: extrapolated value; no measured point is claimed
       - observation_id: he2017_figure1_structure
         type: figure_record
         locator: {page: 3, published_page: 3, pdf_page_index: 2, figure: '1'}
