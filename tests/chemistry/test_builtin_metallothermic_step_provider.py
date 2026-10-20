@@ -60,6 +60,7 @@ from simulator.chemistry.melt_activity import (
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
+    ellingham_fit_segments,
 )
 from simulator.chemistry.kernel import (
     AtomBalanceError,
@@ -72,6 +73,7 @@ from simulator.chemistry.kernel import (
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.magemin import MAGEMinBackend
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.state import (
     MOLAR_MASS,
     CampaignPhase,
@@ -242,6 +244,34 @@ def test_ellingham_authority_flag_is_consumed_by_metallothermic_diagnostic():
         "limited_species"
     ]
     assert set(limited) == {"Na", "Ti"}
+
+
+def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
+    liquid_na2o_segment = next(
+        segment
+        for segment in ellingham_fit_segments("Na")
+        if "Na2O(l)" in segment.phase_basis
+    )
+
+    # 1100 C uses the alpha-Na2O segment today, while the activity coefficient
+    # is referenced to liquid NaO0.5. The 1150 C recipe point is above the
+    # 1405.2 K Na2O melt transition and already selects the liquid segment.
+    for temperature_C in (1100.0, 1150.0):
+        _priority, diagnostic = (
+            BuiltinMetallothermicStepProvider._na_thermo_priority(
+                ("FeO",),
+                temperature_C,
+                {"Na2O": 1.0, "FeO": 1.0},
+            )
+        )
+        temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
+        expected_standard_delta_g = liquid_na2o_segment.delta_g_kJ_per_mol_O2(
+            temperature_K
+        )
+
+        assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
+            expected_standard_delta_g
+        )
 
 
 def test_reconstructed_mn_authority_is_not_mislabeled_as_fit_extrapolation():
