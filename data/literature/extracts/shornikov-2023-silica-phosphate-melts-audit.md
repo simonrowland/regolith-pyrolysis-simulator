@@ -49,7 +49,11 @@ Fig. 2 caption: SiO2 (1) and P4O10 (2) activities and mixing energies (3, 4) at 
 | Fig. 3B curve 5 | refused | Continuous calculated mixing energy. The printed −33 kJ/mol is the stored prose value. The curve was not digitized. |
 | Fig. 3B curve 6 | refused | Continuous line. Caption assigns it to Rahman et al. (2013). |
 | Fig. 4 lines 1, 2, 4, 5, 6, 7, 8 | refused | Continuous calculated partial pressures over SiP2O7. Numerals are labels. |
-| Fig. 4 symbol 3 | refused | Four open circles, overlapping, on a short line, with one error bar. 600 dpi crop of the cluster, PDF page 5. Caption assigns symbol 3 to Lopatin and Semenov (1995). Centres were not stored. |
+| Fig. 4 symbol 3, open circle | refused | (2004.8, 4601.0), 600 dpi, PDF page 5. Hole centroid. This circle overlaps the next one, so the hole is smaller (area 370 px versus about 760). Centre uncertainty about ±8 px. Caption assigns symbol 3 to Lopatin and Semenov (1995). No pressure stored. |
+| Fig. 4 symbol 3, open circle | refused | (2019.0, 4629.1), 600 dpi. Hole centroid, 24 of 24 annulus samples dark. Uncertainty about ±3 px. Cited series. No pressure stored. |
+| Fig. 4 symbol 3, open circle | refused | (2059.4, 4619.9), 600 dpi. Same hole test. Cited series. No pressure stored. |
+| Fig. 4 symbol 3, open circle | refused | (2121.8, 4617.8), 600 dpi. Same hole test. Cited series. No pressure stored. |
+| Fig. 4 symbol 3, open circle | refused | (2189.4, 4574.1), 600 dpi. Rightmost circle, clear of the cluster. Cited series. No pressure stored. |
 | Fig. 5A blue curve 3 | refused | Calculated SiO2 activity at 2000 K. No blue marker thicker than the line. |
 | Fig. 5A blue curve 6 | refused | Calculated P4O10 activity at 2000 K. Same color check. The open circles nearby are red and black, not this line. |
 | Fig. 5A red curves 1 and 4 and their circles | refused | ZnO–P4O10 at 1300 K. Caption assigns them to Shornikov et al. (1996). Not read. |
