@@ -34,6 +34,44 @@ _BODY_VACUUM_FLOOR_BAR = {
 }
 
 
+class CoverGasCompositionUnavailable(ValueError):
+    """The declared cover gas does not specify a usable composition."""
+
+
+def cover_gas_partial_pressures(
+    atmosphere: str, total_pressure: float,
+) -> dict[str, float]:
+    """Project the existing atmosphere declaration to known gas partials.
+
+    Output pressure units match the input (bar or mbar).
+
+    A percentage specifies that species only; the unreported balance is not
+    invented as oxygen. Air explicitly denotes the 0.21 oxygen mole fraction.
+    """
+    pressure = float(total_pressure)
+    if not math.isfinite(pressure) or pressure < 0.0:
+        raise ValueError("cover-gas total_pressure must be finite and >= 0")
+    if pressure == 0.0:
+        return {}
+    token = str(atmosphere).strip().upper().replace(" ", "")
+    if token == "AIR":
+        return {"O2": pressure * 0.21, "N2": pressure * 0.79}
+    if token in {"CO2", "O2", "N2", "AR", "KR", "HE"}:
+        return {token: pressure}
+    if token.endswith("%CO2"):
+        try:
+            fraction = float(token[:-4]) / 100.0
+        except ValueError:
+            fraction = math.nan
+        if math.isfinite(fraction) and 0.0 < fraction <= 1.0:
+            # Ideal gas: p_i = y_i P. y_i is dimensionless, so bar stays bar;
+            # y=1 gives pure gas and y->0 gives no partial of this species.
+            return {"CO2": pressure * fraction}
+    raise CoverGasCompositionUnavailable(
+        f"cover-gas composition missing or unknown in atmosphere={atmosphere!r}"
+    )
+
+
 def normalize_body_name(body: object) -> str:
     """Return the canonical body token, or empty string for unknown/missing."""
 

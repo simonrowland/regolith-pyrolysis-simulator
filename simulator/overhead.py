@@ -53,6 +53,7 @@ import math
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Optional
 
+from simulator.environment import cover_gas_partial_pressures
 from simulator.state import (
     GAS_CONSTANT,  # R: J/(mol·K)
     MOLAR_MASS,  # g/mol
@@ -1160,7 +1161,8 @@ class OverheadGasModel:
 
         if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
             gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
-                gas.composition.get('CO2', 0.0), melt.p_total_mbar * 0.96)  # mbar — CO2 partial pressure; 0.96 mole fraction
+                gas.composition.get('CO2', 0.0), cover_gas_partial_pressures(
+                    '96% CO2', melt.p_total_mbar)['CO2'])  # mbar — cover-gas partial pressure
         elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — inert-sweep total pressure floor
             # Kr audit 2026-07-25: key the sweep balance partial off the
@@ -1272,7 +1274,8 @@ class OverheadGasModel:
         if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — CO2 total pressure floor
             gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
-                gas.composition.get('CO2', 0.0), melt.p_total_mbar * 0.96)  # mbar — CO2 partial pressure; 0.96 mole fraction
+                gas.composition.get('CO2', 0.0), cover_gas_partial_pressures(
+                    '96% CO2', melt.p_total_mbar)['CO2'])  # mbar — cover-gas partial pressure
         elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — sweep total pressure floor
             # Kr audit 2026-07-25: same stamped-carrier fix as the
