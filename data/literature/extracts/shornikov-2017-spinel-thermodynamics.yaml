@@ -221,6 +221,36 @@ fidelity_samples:
       pdf_page_index: 2
       figure: '2'
       note: Figure 2 series 16 at the 1950 K read. 600 dpi render.
+  - path: species.MgO.observations[shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8].values.points[5].activity
+    value: '0.328'
+    locator:
+      page: 5
+      published_page: 291
+      pdf_page_index: 4
+      figure: '4'
+      note: >-
+        Figure 4 panel (a), series 8 at 2008 K. 600 dpi render.
+        Local-stroke centre (1360.5, 1059.0) in the figure crop.
+  - path: species.MgO.observations[shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8].values.points[6].activity
+    value: '0.326'
+    locator:
+      page: 5
+      published_page: 291
+      pdf_page_index: 4
+      figure: '4'
+      note: >-
+        Figure 4 panel (a), series 8 at 2051 K. 600 dpi render.
+        Local-stroke centre (1440.0, 1061.5) in the figure crop.
+  - path: species.MgO.observations[shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8].values.points[7].activity
+    value: '0.342'
+    locator:
+      page: 5
+      published_page: 291
+      pdf_page_index: 4
+      figure: '4'
+      note: >-
+        Figure 4 panel (a), series 8 at 2101 K. 600 dpi render.
+        Local-stroke centre (1532.0, 1044.5) in the figure crop.
 experiments:
   - experiment_id: shornikov_2017_spinel_thermodynamics_kems
     method: knudsen_effusion
@@ -1145,12 +1175,14 @@ species:
             The 1950 K centre is crop (1576.4, 1002.1), in the open
             interior. The 2210 K and 2252 K markers were re-read on the
             1200 dpi render. A crossing outline is not by itself a reason
-            to refuse. Refused, each by temperature. About 1420 K, crop x
-            900–1050 and y 940–1060: the symbols are open squares and
-            rectangles, not series 16. About 1640 K, crop x 1180–1280:
-            up-triangles, and the crossing outlines hide any centre. About
-            1780–1840 K, crop x 1320–1450: up-triangles, open and filled,
-            not series 16. Legend symbols near crop x 2078 are not data.
+            to refuse. Refused, each by the symbol the render shows. About
+            1310–1439 K, crop x 847–994 and y 974–1044: open and filled
+            squares, not series 16. About 1620–1840 K, crop x 1200–1450:
+            up-triangles, open and half-filled, not series 16. The open
+            right triangle at the right edge of that band is the stored
+            1863 K point. Above that chain the symbol is a filled right
+            triangle, series 13, not series 16. Legend symbols near crop
+            x 2078 are not data.
             Error-bar ends were not read. The least-squares constants of
             this series are Table 1. MinerU's chart table was ignored.
       - observation_id: shornikov_2017_spinel_thermodynamics_fig3_pressures
@@ -1197,35 +1229,43 @@ species:
             reference-pressure measurement. The pure-oxide-at-experiment-T
             ruling was not applied. No melting point was used.
           reason: >-
-            Series 8 is the open right-pointing triangle with no bar.
-            Five centres on panel (a) and seven on panel (b) are the
-            activity observations. Refused on panel (a), one marker at a
-            time. About 1643 K, crop (688, 1318): up-triangle, series 1-4.
-            About 1692 K, crop (779, 1272): up-triangle, series 1-4. About
-            1742 K, crop (870, 1304): up-triangle, series 1-4. About 1789 K,
-            crop (958, 1288): up-triangle, series 1-4. About 1843 K, crop
-            (1057, 1263): two up-triangles, series 1-4. About 1873 K, crop
-            (1111, 1250): up-triangles share a mass with a right-pointing
-            outline, so no series-8 centre is assigned. About 1861 K, crop
-            (1086, 1134): the symbol has its own vertical bar, series 5 or
-            6. About 1933 K, crop (1222, 1098): vertical bar, series 5 or 6.
-            About 1944 K, crop (1242, 1103): vertical bar, series 5 or 6.
-            About 1954 K, crop (1261, 1090): filled right triangle, series
-            7. About 1980 K, crop (1310, 1013): vertical bar, series 5 or 6.
-            About 1988 K, crop (1323, 1082): the filled triangle and the
-            next outline share the tip, so the centre is not assigned.
-            About 2008 K, crop (1361, 1059): two open right triangles share
-            the left side, so the centre is not given to one series-8
-            marker. About 2051 K, crop (1440, 1062): a second outline runs
-            along the lower edge and the left side is a solid stroke, so
-            this is not one open series-8 triangle. About 2080 K, crop
-            (1460, 980): vertical bar, series 5 or 6. About 2101 K, crop
-            (1532, 1044): vertical bar, series 5 or 6. About 2174 K, crop
-            (1666, 944): vertical bar, series 5 or 6. About 2274 K, crop
-            (1852, 906): vertical bar, series 5 or 6. The open triangle at
-            crop (1633, 799) is the legend key. Refused on panel (b). About
-            1423 K, crop (283, 2527): up-triangle, series 1-4. About 1471 K,
-            crop (370, 2642): up-triangle, series 1-4. About 1520 K, crop
+            Series 8 is the open right-pointing triangle with one left
+            stroke. A series 5 or 6 bar is the vertical stroke that extends
+            past the triangle. Two left strokes that join at the corners
+            are not that open triangle. Eight centres on panel (a) and seven on panel (b)
+            are the activity observations. Refused on panel (a), one marker
+            at a time. About 1425 K, crop (286, 741): up-triangle, series
+            1-4. About 1522 K, crop (465, 692): up-triangle, series 1-4.
+            About 1576 K, crop (565, 631): up-triangle, series 1-4. About
+            1672 K, crop (741, 751): up-triangle, series 1-4. About 1861 K,
+            crop (1090.5, 1132.5): two left strokes. At 1200 dpi the white
+            gap is 20 px (10 px at 600 dpi) and the strokes join for 8 rows
+            at the top and 8 rows at the bottom. That is not the single
+            left stroke of an open series-8 triangle. About 1643 K,
+            crop (688, 1318): up-triangle, series
+            1-4. About 1692 K, crop (779, 1272): up-triangle, series 1-4.
+            About 1742 K, crop (870, 1304): up-triangle, series 1-4. About
+            1789 K, crop (958, 1288): up-triangle, series 1-4. About 1843 K,
+            crop (1057, 1263): two up-triangles, series 1-4. About 1873 K,
+            crop (1111, 1250): up-triangles and a right-pointing outline are
+            one mass, so no open centre is assigned. About 1933 K, crop
+            (1222, 1098), and about 1944 K, crop (1242, 1103): the white
+            gaps are 10 to 15 px wide and run into a filled triangle, so
+            they are not a series-8 interior. About 1954 K, crop
+            (1261, 1090): filled right triangle, series 7. About 1980 K,
+            crop (1310, 1013): the bar extends past the triangle, series 5
+            or 6. About 1988 K, crop (1323, 1082): the white region is about
+            20 px wide and sits on the filled triangle's tip, so no
+            series-8 centre is there. About 2042 K, crop (1424, 880): the
+            bar extends past the triangle and a horizontal stroke crosses
+            it, series 5 or 6. About 2080 K, crop (1460, 980): the
+            bar extends past the triangle, series 5 or 6. About 2174 K,
+            crop (1666, 944): the bar extends past the triangle, series 5
+            or 6. About 2274 K, crop (1852, 906): the bar extends past the
+            triangle, series 5 or 6. The open triangle at crop (1633, 799)
+            is the legend key. Refused on panel (b). About 1423 K, crop
+            (283, 2527): up-triangle, series 1-4. About 1471 K, crop
+            (370, 2642): up-triangle, series 1-4. About 1520 K, crop
             (462, 2669): up-triangle, series 1-4. About 1521 K, crop
             (464, 2615): up-triangle, series 1-4. About 1571 K, crop
             (555, 2658): up-triangle, series 1-4. About 1576 K, crop
@@ -1233,19 +1273,23 @@ species:
             (643, 2642): up-triangle, series 1-4. About 1627 K, crop
             (658, 2675): up-triangle, series 1-4. About 1671 K, crops
             (740, 2587), (740, 2628) and (740, 2669): three up-triangles,
-            series 1-4. About 1843 K, crop (1057, 2168): up-triangle,
+            series 1-4. About 1772 K, crop (926, 2371): up-triangle with
+            the upper half filled, not series 8. About 1843 K, crop
+            (1057, 2168): up-triangle,
             series 1-4. About 1850 K, crop (1080, 2280): an up-triangle and
-            a right triangle share one outline, so neither centre is
-            assigned. About 1955 K, crop (1263, 2157): the right triangle
-            is filled on its left half, so the centre is not an open
-            series-8 interior. About 2053 K, crop (1443, 2321): filled
-            right triangle, series 7. About 2103 K, crop (1535.5, 2329.5):
-            the glyph is an open right triangle with its own vertical bar.
-            The two strokes are 11 px apart and join at the top and at the
-            bottom, as on the barred marker at 1861 K on panel (a). Series
-            5 or 6. A neighbour tip lies further left. The open triangle at
-            crop (1650, 2114) is the legend key. MinerU's scatter table was
-            ignored.
+            a right triangle are one mass, so no open centre is assigned.
+            About 1955 K, crop (1263, 2157): the right triangle is filled
+            on its left half, so the centre is not an open series-8
+            interior. About 2053 K, crop (1443, 2321): filled right
+            triangle, series 7. About 2103 K, crop (1535.5, 2329.5): two
+            left strokes, the same pattern as the 1861 K panel-(a) glyph.
+            At 1200 dpi the white gap is 20 px (10 px at 600 dpi) and the
+            strokes join for 4 rows at the top and 4 rows at the bottom.
+            The 2162 K series-8 triangle on this panel has one left stroke.
+            The 2174 K panel-(a) glyph is the bar that extends past the
+            triangle. The 2103 K glyph matches the 1861 K glyph, not those
+            two. The open triangle at crop (1650, 2114) is
+            the legend key. MinerU's scatter table was ignored.
       - observation_id: shornikov_2017_spinel_thermodynamics_fig5_phase_diagram
         type: figure_context_not_digitised
         locator:
@@ -1284,9 +1328,11 @@ species:
             bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
             and ±0.010 in activity. The points from 2161 K upward lie in the
             crystal-state range 2048–2298 K that the paper takes from
-            reference [54] by equations (16) and (17). The 1917 K point is
-            below that range. The reference sentence is equations (12)
-            and (13) for every point.
+            reference [54] by equations (16) and (17). The 1917 K and
+            2008 K points are below that range. The 2051 K and 2101 K
+            points lie inside it. The reference sentence is equations (12)
+            and (13) for every point. The pure-oxide-at-experiment-T ruling
+            was not applied.
         units: dimensionless
         phase: cr
         standard_state: >-
@@ -1365,6 +1411,49 @@ species:
                 pdf_page_index: 4
                 figure: '4'
                 note: Panel (a) series 8. Crop centre (1905.5, 961.0).
+            - T_K: '2008'
+              activity: '0.328'
+              crop_pixel_xy: [1360, 1059]
+              unrounded_T_K: '2008.03'
+              unrounded_activity: '0.3281'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: >-
+                  Panel (a) series 8. Crop centre (1360.5, 1059.0), page
+                  pixel (3920, 1494). Neighbouring outlines meet the left
+                  side. The centre is in the open interior.
+            - T_K: '2051'
+              activity: '0.326'
+              crop_pixel_xy: [1440, 1062]
+              unrounded_T_K: '2051.18'
+              unrounded_activity: '0.3257'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: >-
+                  Panel (a) series 8. Crop centre (1440.0, 1061.5), page
+                  pixel (4000, 1496). A second outline runs along the lower
+                  edge. The centre is in the open interior.
+            - T_K: '2101'
+              activity: '0.342'
+              crop_pixel_xy: [1532, 1044]
+              unrounded_T_K: '2101.11'
+              unrounded_activity: '0.3424'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: >-
+                  Panel (a) series 8. Crop centre (1532.0, 1044.5), page
+                  pixel (4092, 1480). The bar that extends past a triangle
+                  belongs to the marker above this one. The centre is in
+                  the open interior.
         uncertainty:
           value: '0.010'
           unit: dimensionless
@@ -1402,10 +1491,11 @@ species:
             bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
             and ±0.0049 in activity. The points from 2162 K upward are the
             high-temperature tail, in the crystal-state range 2048–2298 K
-            from reference [54] by equations (16) and (17). The 1917 K point
-            and the 1954 K point are below that range. The 2009 K point lies
-            inside it. The reference sentence is equations (12) and (13) for
-            every point. The pure-oxide-at-experiment-T ruling was not applied.
+            from reference [54] by equations (16) and (17). The 1917 K,
+            1954 K, and 2009 K points are below that range. 2009 K is not
+            inside it. The reference sentence is equations (12) and (13)
+            for every point. The pure-oxide-at-experiment-T ruling was not
+            applied.
         units: dimensionless
         phase: cr
         standard_state: >-
