@@ -47,6 +47,18 @@ def intrinsic_melt_fO2(
     )['fO2_log'])
 
 
+def legacy_iw_log10_fO2_bar(
+    temperature_K: float,
+    *,
+    vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+) -> float:
+    """Return the diagnostic IW reference with its historical vacuum floor."""
+    temperature = float(temperature_K)
+    if temperature > 0.0:
+        return conventional_iw_log10_fO2_bar(temperature)
+    return math.log10(vacuum_floor_bar)
+
+
 KRESS91_MOL_FRACTION_OXIDES = (
     'SiO2',
     'TiO2',

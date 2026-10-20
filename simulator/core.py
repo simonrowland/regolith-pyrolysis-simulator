@@ -432,7 +432,6 @@ from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     kress91_intrinsic_state,
     initialize_feedstock_iron,
-    conventional_iw_log10_fO2_bar,
     CONVENTIONAL_IW_SOURCE,
     kress91_oxygen_demand_mol,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
@@ -441,6 +440,7 @@ from simulator.fe_redox import (
     normalize_redox_state,
     native_fe_equilibrium_extent,
     NativeFePrecipitationNotice,
+    legacy_iw_log10_fO2_bar,
 )
 from simulator.melt_regime import (
     MeltRegime,
@@ -7120,10 +7120,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostic_pressure_bar,
             floor_bar=self._vacuum_floor_bar(),
         )
-        log_iw = (
-            conventional_iw_log10_fO2_bar(T_K)
-            if T_K > 0.0
-            else math.log10(self._vacuum_floor_bar())
+        log_iw = legacy_iw_log10_fO2_bar(
+            T_K,
+            vacuum_floor_bar=self._vacuum_floor_bar(),
         )
         base = {
             'fO2_log': float(fO2_log),

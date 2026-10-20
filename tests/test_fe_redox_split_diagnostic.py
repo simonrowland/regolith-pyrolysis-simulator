@@ -13,6 +13,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import CampaignPhase
+from simulator.fe_redox import legacy_iw_log10_fO2_bar
 from tests.chemistry.conftest import _seed_melt_redox
 
 
@@ -73,12 +74,19 @@ def test_legacy_iw_diagnostic_output_float_hex_grid() -> None:
         "-0x1.29d97fd7388c7p+1",
     )
 
-    actual_iw_hex = tuple(
-        sim._compute_fe_redox_split_diagnostic(temperature_K)["iw_log"].hex()
-        for temperature_K in temperatures_K
-    )
+    diagnostic_iw_hex = []
+    legacy_iw_hex = []
+    for temperature_K in temperatures_K:
+        diagnostic_iw = sim._compute_fe_redox_split_diagnostic(temperature_K)["iw_log"]
+        legacy_iw = legacy_iw_log10_fO2_bar(
+            temperature_K,
+            vacuum_floor_bar=sim._vacuum_floor_bar(),
+        )
+        diagnostic_iw_hex.append(diagnostic_iw.hex())
+        legacy_iw_hex.append(legacy_iw.hex())
 
-    assert actual_iw_hex == expected_iw_hex
+    assert tuple(diagnostic_iw_hex) == expected_iw_hex
+    assert tuple(legacy_iw_hex) == expected_iw_hex
 
 
 def test_fe_redox_split_snapshot_field_is_diagnostic_only() -> None:
