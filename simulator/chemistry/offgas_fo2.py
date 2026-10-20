@@ -650,6 +650,7 @@ def water_gas_shift_log10_K(
 
 def co2_dissociation_partials_bar(
     T_K: float, p_CO2_initial_bar: float, p_O2_ledger_bar: float,
+    *, total_pressure_bar: float | None = None, p_inert_initial_bar: float = 0.0,
 ) -> dict[str, Any]:
     """Closed gas-phase CO2 ⇌ CO + 1/2 O2 at the transport gas temperature.
 
@@ -666,8 +667,30 @@ def co2_dissociation_partials_bar(
         raise OffgasFO2Unavailable("CO2 and ledger O2 partial pressures are required") from exc
     if not all(math.isfinite(p) and p >= 0.0 for p in (c, b)):
         raise OffgasFO2Unavailable("CO2 and ledger O2 partial pressures must be finite and >= 0")
+    inert = 0.0
+    if total_pressure_bar is not None:
+        if isinstance(total_pressure_bar, bool) or isinstance(p_inert_initial_bar, bool):
+            raise OffgasFO2Unavailable("pressure inputs must be numbers, not booleans")
+        try:
+            total_pressure_bar = float(total_pressure_bar)
+            inert = float(p_inert_initial_bar)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise OffgasFO2Unavailable("total pressure and inert partial pressure are required") from exc
+        if not all(math.isfinite(p) and p >= 0.0 for p in (total_pressure_bar, inert)):
+            raise OffgasFO2Unavailable("total pressure and inert partial pressure must be finite and >= 0")
+        if (c + b + inert > 0.0) != (total_pressure_bar > 0.0):
+            raise OffgasFO2Unavailable("nonzero total pressure requires a nonzero gas boundary")
+        if not math.isfinite(1.5 * c + b + inert):
+            raise OffgasFO2Unavailable("aggregate gas boundary pressure must be finite")
     if c == 0.0:
-        return {"p_O2_bar": b, "p_CO_bar": 0.0, "p_CO2_bar": 0.0, "notices": []}
+        result = {"p_O2_bar": b, "p_CO_bar": 0.0, "p_CO2_bar": 0.0, "notices": []}
+        if total_pressure_bar is not None:
+            denominator = b + inert
+            result.update(
+                p_O2_bar=b / denominator * total_pressure_bar if denominator else 0.0,
+                p_inert_bar=inert / denominator * total_pressure_bar if denominator else 0.0,
+            )
+        return result
     polys = load_buffer_polynomials()
     reference_bar = polys["O2"].reference_pressure_Pa / 100_000.0
     if any(polys[s].reference_pressure_Pa != polys["O2"].reference_pressure_Pa
@@ -707,19 +730,27 @@ def co2_dissociation_partials_bar(
             'reason': 'van\'t Hoff boundary enthalpy extension of the existing CEA CO couple',
         })
     Kd = math.exp(ln_Kd)
+    # At fixed final P, reaction extent q adds q/2 to the initial total
+    # c+b+i, so multiply ALL partials by s=P/(c+b+i+q/2). The same Kd
+    # residual uses sqrt[s*(b+q/2)/p°]; q/(c-q) is scale-invariant.
+    # s is dimensionless (bar/bar), final partials sum to P. q=0 recovers
+    # the inlet composition; i->infinity makes the reacting gas dilute.
     lo, hi = 0.0, (1.0 if Kd > 0.0 else 0.0)
     for _ in range(1075):  # binary64 fraction, including subnormals
         fraction = (lo + hi) / 2.0
         if fraction == lo or fraction == hi:
             break
         q = c * fraction
-        residual = fraction * math.sqrt((b + q / 2.0) / reference_bar) - Kd * (1.0 - fraction)
+        oxygen = b + q / 2.0
+        if total_pressure_bar is not None:
+            oxygen = oxygen / (c + b + inert + q / 2.0) * total_pressure_bar
+        residual = fraction * math.sqrt(oxygen / reference_bar) - Kd * (1.0 - fraction)
         if residual > 0.0:
             hi = fraction
         else:
             lo = fraction
     q = c * ((lo + hi) / 2.0)
-    return {
+    result = {
         "p_O2_bar": b + q / 2.0,
         "p_CO_bar": q,
         "p_CO2_bar": c - q,
@@ -734,6 +765,12 @@ def co2_dissociation_partials_bar(
             "reason": "Fast CO2/CO/O2 equilibration assumed; residence time and catalysis unverified, especially in cold gas",
         }],
     }
+    if total_pressure_bar is not None:
+        denominator = c + b + inert + q / 2.0
+        for key in ('p_O2_bar', 'p_CO_bar', 'p_CO2_bar'):
+            result[key] = result[key] / denominator * total_pressure_bar
+        result['p_inert_bar'] = inert / denominator * total_pressure_bar
+    return result
 
 
 def shift_extent(

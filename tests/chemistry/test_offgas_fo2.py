@@ -34,12 +34,61 @@ from simulator.chemistry.offgas_fo2 import (
     load_buffer_polynomials,
     shift_extent,
     water_gas_shift_log10_K,
+    co2_dissociation_partials_bar,
 )
 
 
 @pytest.fixture(scope="module")
 def polys():
     return load_buffer_polynomials()
+
+
+@pytest.mark.parametrize('carbon,oxygen,inert', [
+    (0.006, 0.0, 0.0), (0.005, 0.0002, 0.0008), (0.0001, 0.0, 0.0059),
+])
+def test_co2_fixed_final_pressure_uses_same_thermodynamics(polys, carbon, oxygen, inert):
+    result = co2_dissociation_partials_bar(
+        1800.0, carbon, oxygen, total_pressure_bar=0.006,
+        p_inert_initial_bar=inert,
+    )
+    assert sum(result[k] for k in ('p_CO2_bar', 'p_CO_bar', 'p_O2_bar', 'p_inert_bar')) == pytest.approx(0.006)
+    # Dimensionless reaction quotient for CO2 -> CO + O2/2, independently
+    # evaluated from the source Gibbs records rather than a second K fit.
+    delta_g_over_rt = (polys['CO'].evaluate(1800.0).g_over_RT
+                       + polys['O2'].evaluate(1800.0).g_over_RT / 2.0
+                       - polys['CO2'].evaluate(1800.0).g_over_RT)
+    standard_bar = polys['O2'].reference_pressure_Pa / 100000.0
+    quotient = result['p_CO_bar'] / result['p_CO2_bar'] * math.sqrt(result['p_O2_bar'] / standard_bar)
+    assert math.log(quotient) == pytest.approx(-delta_g_over_rt)
+    if inert:
+        assert result['p_CO_bar'] / result['p_inert_bar'] == pytest.approx(
+            2.0 * (result['p_O2_bar'] / result['p_inert_bar'] - oxygen / inert)
+        )
+    else:
+        assert result['p_CO_bar'] == pytest.approx(2.0 * result['p_O2_bar'])
+
+
+def test_fixed_pressure_inert_only_has_physical_zero_oxygen():
+    result = co2_dissociation_partials_bar(
+        1800.0, 0.0, 0.0, total_pressure_bar=0.006, p_inert_initial_bar=0.006,
+    )
+    assert result['p_O2_bar'] == 0.0
+    assert result['p_inert_bar'] == 0.006
+
+
+def test_fixed_pressure_tiny_oxygen_boundary_stays_finite():
+    result = co2_dissociation_partials_bar(
+        1800.0, 0.0, 1e-320, total_pressure_bar=0.006,
+    )
+    assert result['p_O2_bar'] == 0.006
+
+
+def test_fixed_pressure_refuses_overflowing_aggregate_boundary():
+    with pytest.raises(OffgasFO2Unavailable, match='aggregate gas boundary'):
+        co2_dissociation_partials_bar(
+            1800.0, 1e308, 1e308, total_pressure_bar=0.006,
+            p_inert_initial_bar=1e308,
+        )
 
 
 def test_buffer_polynomial_source_values_are_pinned_before_loader_reuse(polys):
