@@ -4426,6 +4426,31 @@ def test_completion_payload_exposes_final_mass_reconciliation():
     assert "residual_inventory_kg" in payload
 
 
+def test_completion_payload_marks_missing_metal_product_story_unavailable(
+    monkeypatch,
+):
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    monkeypatch.setattr(
+        web_events,
+        "classify_products",
+        lambda _sim: {
+            "ingots_metals": {
+                "class_total_kg": None,
+                "flag": {
+                    "status": "unavailable",
+                    "authority": "unavailable",
+                    "reason": "EvaporationFluxConfigurationError: Si transport missing",
+                },
+            }
+        },
+    )
+
+    payload = _completion_payload(sim)
+
+    assert payload["product_story"]["metal_ingots"]["class_total_kg"] is None
+    assert payload["product_story_status"] == "unavailable"
+
+
 def test_live_completion_payload_propagates_composition_projected_notice(
     monkeypatch,
 ):
