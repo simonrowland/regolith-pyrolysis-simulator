@@ -1,0 +1,550 @@
+schema_version: literature_extract.v1
+source_id: he-2017-karrooite-ordering-heat-capacity
+source:
+  citation: >-
+    He, M., Winkler, B., Bauer, J. D., Bayarjargal, L., Ruiz-Fuertes, J.,
+    Alencar, I., Morgenroth, W., Refson, K., and Milman, V. (2017). Lattice
+    dynamics and Mg/Ti order in orthorhombic pseudobrookite-type MgTi2O5.
+    Journal of Alloys and Compounds, 699, 16–24.
+  doi: 10.1016/j.jallcom.2016.12.217
+  year: 2017
+  corpus_asset: raw/he-2017-karrooite-ordering-heat-capacity/he-2017-karrooite-ordering-heat-capacity.pdf
+  corpus_sha256: 9d60b405b98cd3f3bef3e95e527e48c38d563a8752b0915d236985a67323cf25
+extraction:
+  method: >-
+    Born-digital pdftotext-layout transcription. The MinerU table tool found no
+    content-list JSON. Tables 1–5 were checked against physical PDF pages 7,
+    10, 14, and 15 rendered at 600 dpi. Figures 1–12 are records only; figure
+    values are not digitized.
+  date: '2026-10-20'
+  worker: fam24-1020
+review_status: draft
+scope_assessment:
+  tables:
+    - table: '1'
+      disposition: context-no-token
+      reason: >-
+        Candidate tokens cp, S, delta_fH, and H_minus_H298 do not fit synthesis
+        conditions, lattice parameters, Rietveld factors, bond lengths, or the
+        Mg/Ti disorder parameter X.
+    - table: '2'
+      disposition: context-no-token
+      reason: >-
+        Candidate thermochemistry tokens cp, S, delta_fH, and H_minus_H298 do
+        not type Raman frequencies or activities. Experimental columns are
+        quoted from [8, 36].
+    - table: '3'
+      disposition: context-no-token
+      reason: >-
+        Candidate thermochemistry tokens cp, S, delta_fH, and H_minus_H298 do
+        not type IR frequencies or activities. Experimental columns are quoted
+        from [37, 38].
+    - table: '4'
+      disposition: context-model
+      reason: >-
+        Elastic stiffness coefficients and the DFT bulk modulus have no matching
+        quantity token; the paper labels the table as theory.
+    - table: '5'
+      disposition: pending-lineage-resolution
+      reason: >-
+        Two experimental total standard entropy values fit S, but Table 5
+        computes each from the printed vibrational and configurational
+        components. Those component values have no distinct token and must not
+        be filed as total S. The generated INDEX has no TABLE_CSV asset for
+        this source, and its rules forbid editing INDEX.
+  figure_only_candidate: >-
+    Figure 10 contains measured Cp points, but figure digitization is deferred
+    by the family rule. Figures 11–12 are calculated or reduced curves and
+    remain unscored context.
+species:
+  MgTi2O5:
+    observations: []
+    context:
+      - observation_id: he2017_table1_synthesis_and_refinement
+        type: table_record
+        locator:
+          page: 7
+          published_page: 7
+          pdf_page_index: 6
+          table: '1'
+        units: as printed in Table 1
+        values:
+          quantity: unavailable
+          method_class: measured_direct
+          schema_gap: >-
+            The store has no token for synthesis protocol, unit-cell dimensions,
+            Rietveld fit statistics, interatomic distances, angles, or the Mg/Ti
+            disorder parameter X.
+          sample_columns: [1, 2, 3, 4, 5, 6, 7]
+          rows_as_printed:
+            milling_time_h: [0, 0, 3, 3, 3, 3, 3]
+            sintering_temperature_K: [1373, 1473, 1173, 1273, 1373, 1473, 1473]
+            sintering_time_h: [4, 4, 15, 4, 4, 4, 4]
+            annealing_temperature_K: ['-', '-', '-', '-', '-', '-', 873]
+            annealing_time_h: ['-', '-', '-', '-', '-', '-', 1500]
+            purity_wt_pct: ['98(1)', '99(1)', 100, 100, 100, 100, 100]
+            a_A: ['3.7439(1)', '3.7433(1)', '3.7448(1)', '3.7437(1)', '3.7444(1)', '3.7456(1)', '3.7386(1)']
+            b_A: ['9.7384(1)', '9.7381(1)', '9.7422(1)', '9.7422(1)', '9.7432(1)', '9.7463(1)', '9.7192(1)']
+            c_A: ['9.9956(1)', '10.0012(1)', '9.9958(1)', '9.9989(1)', '9.9960(1)', '9.9939(1)', '10.0160(1)']
+            volume_A3: ['364.44(1)', '364.57(1)', '364.67(1)', '364.67(1)', '364.71(1)', '364.84(1)', '363.95(1)']
+            M1_O1_length_A: ['2.014(1)', '2.025(3)', '2.023(1)', '2.026(1)', '2.017(1)', '1.975(2)', '2.076(2)']
+            M2_O1_length_A: ['2.067(1)', '2.054(4)', '2.065(1)', '2.059(1)', '2.075(1)', '2.109(2)', '2.011(2)']
+            O1_M1_O1_angle_deg: ['136.8(1)', '135.1(4)', '135.4(2)', '134.9(1)', '135.5(4)', '143.1(3)', '128.4(2)']
+            Rp_pct: [16.7, 12.9, 15.1, 13.6, 13.5, 15.1, 15.9]
+            Rwp_pct: [26.4, 20.8, 22.2, 21.7, 20.5, 24.9, 25.8]
+            chi2: [1.10, 1.09, 0.98, 1.04, 1.01, 1.15, 1.15]
+            disorder_parameter_X: ['0.30(1)', '0.30(1)', '0.33(1)', '0.33(1)', '0.34(1)', '0.37(1)', '0.14(1)']
+          notes:
+            - X is calculated from the refined lattice parameter b using X = 8.6909b - 84.334 [21].
+            - Dashes in annealing-condition rows are preserved as printed; they are not zeros.
+
+      - observation_id: he2017_table2_raman_modes
+        type: table_record
+        locator:
+          page: 10
+          published_page: 10
+          pdf_page_index: 9
+          table: '2'
+        units: Raman shift cm−1; Raman activity Å4/amu
+        values:
+          quantity: unavailable
+          schema_gap: The store has no token for Raman mode frequency or Raman activity.
+          quoted_attributions: '[8, 36] as assigned by the table columns'
+          columns_as_printed: [mode, theory_nu_X0_cm-1, theory_gamma_A4_amu, exp_X014_nu_cm-1, exp_X037_nu_cm-1, exp_X0070_ref36_nu_cm-1, exp_X0485_ref36_nu_cm-1, exp_Xunknown_ref8_nu_cm-1]
+          rows_as_printed:
+            - [B1g (1), 144, 201, '155.4(5)', '160.3(5)', '165.3(3)', '168(1)', 165]
+            - [B2g (1), 146, 7, '-', '-', '-', '-', '-']
+            - [B3g (1), 193, 9, '-', '-', '-', '-', '-']
+            - [Ag (1), 197, 17, '-', '-', '-', '-', '-']
+            - [B1g (2), 200, 28, '199.6(5)', '204.6(5)', '206.8(3)', '198(1)', 207]
+            - [B2g (2), 203, 10, '-', '-', '-', '-', '-']
+            - [B1g (3), 245, 243, '250.1(5)', '251.4(5)', '-', '260.7(5)', 259]
+            - [Ag (2), 256, 153, '263(1)', '264.7(5)', '270.34(3)', '274(2)', '-']
+            - [B3g (2), 278, 11, '-', '-', '-', '-', '-']
+            - [B3g (3), 284, 8, '-', '-', '-', '-', '-']
+            - [Ag (3), 321, 135, '324.4(5)', '-', '329.1(1)', '-', '323.8(8)']
+            - [Ag (4), 364, 29, '364.5(5)', '359(1)', '369.9(1)', '356(1)', '-']
+            - [B3g (4), 384, 66, '390.0(5)', '-', '-', '-', '-']
+            - [Ag (5), 415, 85, '417.1(5)', '-', '421.9(1)', '448(2)', '-']
+            - [B3g (5), 448, 4, '-', '-', '-', '-', '-']
+            - [B1g (4), 473, 249, '477.4(5)', '483.8(5)', '499(13)', '-', 491]
+            - [Ag (6), 477, 61, '-', '-', '-', '-', '-']
+            - [B3g (6), 488, 27, '-', '-', '-', '-', '-']
+            - [Ag (7), 519, 11, '-', '-', '522(1)', '-', '-']
+            - [B2g (3), 579, 14, '-', '-', '-', '593(3)', '-']
+            - [B1g (5), 604, 790, '640.1(5)', '649.4(5)', '632(1)', '653(3)', 654]
+            - [B3g (7), 633, 7, '-', '-', '-', '-', '-']
+            - [B3g (8), 766, 8, '-', '-', '-', '-', '-']
+            - [Ag (8), 775, 1137, '784.4(5)', '782.5(5)', '789.92(1)', '779.2(1)', 798]
+            - [Overtone, 849, '-', '901(1)', '902(1)', '913.0(2)', '908.7(4)', 915]
+
+      - observation_id: he2017_table3_infrared_modes
+        type: table_record
+        locator:
+          page: 14
+          published_page: 14
+          pdf_page_index: 13
+          table: '3'
+        units: IR frequency cm−1; IR activity Debye/Å2/amu
+        values:
+          quantity: unavailable
+          schema_gap: The store has no token for IR mode frequency or IR activity.
+          quoted_attributions: '[37, 38] as assigned by the table columns'
+          columns_as_printed: [mode, theory_nu_X0_cm-1, theory_gamma_Debye_A2_amu, exp_X011_ref37_nu_cm-1, exp_X034_ref38_nu_cm-1]
+          rows_as_printed:
+            - [B1u (1), 119, 3, '-', '-']
+            - [B1u (2), 208, 94, '-', '-']
+            - [B2u (1), 210, 4, '-', '-']
+            - [B3u (1), 240, 27, '-', '-']
+            - [B1u (3), 257, 12, '-', '-']
+            - [B2u (2), 275, 68, '-', '-']
+            - [B3u (2), 294, 26, '-', '-']
+            - [B2u (3), 322, 12, '-', '-']
+            - [B1u (4), 361, 0.1, '-', '-']
+            - [B2u (4), 371, 8, '-', '-']
+            - [B3u (3), 396, 166, '-', '425.99']
+            - [B2u (5), 437, 27, '-', '-']
+            - [B1u (5), 451, 30, '-', '-']
+            - [B3u (4), 538, 10, '509.8', '505.30']
+            - [B1u (6), 561, 0.2, '-', '-']
+            - [B2u (6), 620, 6, '641.2', '648.03']
+            - [B1u (7), 723, 6, '-', '-']
+            - [B2u (7), 752, 52, '-', '-']
+
+      - observation_id: he2017_table4_elastic_stiffness
+        type: table_record
+        locator:
+          page: 15
+          published_page: 15
+          pdf_page_index: 14
+          table: '4'
+        units: GPa
+        values:
+          quantity: unavailable
+          method_class: model_derived
+          schema_gap: The store has no quantity token for elastic stiffness coefficients or bulk modulus.
+          model_as_printed: DFT calculations for fully ordered MgTi2O5
+          cij_as_printed:
+            c11: '300(1)'
+            c22: '269(1)'
+            c33: '244(1)'
+            c44: '76(1)'
+            c55: '85(1)'
+            c66: '53(1)'
+            c12: '145(1)'
+            c13: '105(1)'
+            c23: '87(1)'
+          bulk_modulus_K_GPa_as_printed: '161(1)'
+          quoted_experimental_bulk_modulus_GPa: '167(1)'
+          quoted_attribution: '[30]'
+
+      - observation_id: he2017_table5_components_and_nonscorable_values
+        type: table_record
+        locator:
+          page: 15
+          published_page: 15
+          pdf_page_index: 14
+          table: '5'
+        units: 'H_vib: kJ mol−1; S_vib, S_config, and S: J mol−1 K−1; all per mole of formula unit'
+        values:
+          method_class: mixed
+          rows_as_printed:
+            H_vib_X0_DFT_kJ_mol-1: '23.43'
+            H_vib_X014_exp_kJ_mol-1: '22.12(3)'
+            H_vib_X037_exp_kJ_mol-1: '22.78(3)'
+            S_vib_X0_DFT_J_mol-1_K-1: '134.24'
+            S_vib_X014_exp_J_mol-1_K-1: '124.8(1)'
+            S_vib_X037_exp_J_mol-1_K-1: '129.4(1)'
+            S_vib_Xunknown_Todd_1952_J_mol-1_K-1: '127.2(8)'
+            S_config_X0_DFT_J_mol-1_K-1: '0'
+            S_config_X014_exp_J_mol-1_K-1: '7.6(4)'
+            S_config_X037_exp_J_mol-1_K-1: '13.4(2)'
+            S_total_X0_DFT_J_mol-1_K-1: '134.24'
+            S_total_X014_exp_J_mol-1_K-1: '132.4(4)'
+            S_total_X037_exp_J_mol-1_K-1: '142.8(2)'
+            S_total_X0_model_ref20_J_mol-1_K-1: '149.55'
+          notes:
+            - >-
+              H_vib is not delta_fH, H_minus_H298, heat of solution, or heat of
+              formation; the store has no token for this printed vibrational
+              enthalpy component.
+            - >-
+              S_vib and S_config are partial entropy components; a standalone
+              S token would falsely label either component as total standard
+              entropy. No component-specific Quantity token exists.
+            - >-
+              The Todd [39] value is a quoted vibrational entropy with unknown
+              ordering state, not total standard entropy.
+            - >-
+              X=0 values are DFT or model results, not measurements; kept here
+              as context and not admitted as observations.
+            - >-
+              The two experimental S_total rows are pending TABLE_CSV lineage
+              registration; the generated INDEX has no asset for this source.
+
+      - observation_id: he2017_figure1_structure
+        type: figure_record
+        locator: {page: 3, published_page: 3, pdf_page_index: 2, figure: '1'}
+        panel: whole_figure; panels a, b, and c
+        units: not applicable (crystal-structure schematic)
+        values:
+          quantity: unavailable
+          schema_gap: No Quantity token for a polyhedral structure drawing.
+          species: MgTi2O5
+          phase: orthorhombic pseudobrookite-type crystalline structure
+          temperature_as_printed: not stated
+          axes_as_printed: not applicable
+          caption: >-
+            Polyhedral structure of orthorhombic pseudobrookite-type MgTi2O5
+            with MO6 octahedra (M = Mg/Ti) in Cmcm space group setting. The red,
+            green and gray spheres denote oxygen atoms, M1 sites and M2 sites,
+            respectively. The black rectangles show the unit cell dimensions.
+            (a) and (b) present views along [100] and [010], respectively. (c)
+            gives the corner-sharing of 2 M1 octahedra and 2 M2 octahedra via
+            the bridging oxygen O1.
+          series:
+            - {name: structure schematic, marker_count: 0, evidence_class: model_derived}
+          attribution: present study
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure2_xrd
+        type: figure_record
+        locator: {page: 8, published_page: 8, pdf_page_index: 7, figure: '2'}
+        panel: whole_figure
+        units: intensity arbitrary units; 2theta degrees
+        values:
+          quantity: unavailable
+          schema_gap: No Quantity token for diffraction intensity or Rietveld residual.
+          species: [MgTi2O5, Si internal standard]
+          phase: crystalline MgTi2O5 and crystalline silicon
+          temperature_as_printed: synthesis at 1173 K; measurement temperature not stated
+          axes_as_printed: {x: '2theta (degrees)', y: 'Intensity (a.u.)'}
+          caption: >-
+            Rietveld refinement results of XPRD data for pure MgTi2O5 synthesized
+            at 1173 K with 10 wt% silicon internal standard. Bottom black curve
+            is the difference between observed data (black circles) and
+            calculated data (continuous red curve); bottom tickmarks indicate
+            Bragg reflections.
+          series:
+            - {name: observed diffraction data, marker: black circles, marker_count: not_countable_from_render, evidence_class: measured_direct}
+            - {name: calculated diffraction fit, marker: red continuous curve, marker_count: 0, evidence_class: model_derived}
+            - {name: fit difference, marker: black curve, marker_count: 0, evidence_class: model_derived}
+            - {name: Bragg reflection ticks, marker: vertical ticks, marker_count: not_countable_from_render, evidence_class: model_derived}
+          attribution: present study
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure3_order_parameter
+        type: figure_record
+        locator: {page: 9, published_page: 9, pdf_page_index: 8, figure: '3'}
+        panel: whole_figure
+        units: X dimensionless; temperature K
+        values:
+          quantity: unavailable
+          schema_gap: No Quantity token for the Mg/Ti disorder parameter X.
+          species: MgTi2O5
+          phase: crystalline MgTi2O5
+          temperature_as_printed: 600–2000 K axis
+          axes_as_printed: {x: 'Temperature (K)', y: 'Mg/Ti disorder parameter X'}
+          caption: >-
+            Dependence of Mg/Ti disorder parameter X on synthesis conditions.
+            Filled squares and circles are this study with and without milling;
+            the filled diamond is annealed at 873 K; open triangles are
+            annealed-and-quenched data [22]; open squares are in-situ HT XRD
+            data [18]. T-independent and T-dependent models are from [19], and
+            the blue-dashed model is from [20].
+          series:
+            - {name: 'this study, 3 h ball milling, filled squares', marker_count: 4, evidence_class: measured_direct}
+            - {name: 'this study, without ball milling, filled circles', marker_count: 2, evidence_class: measured_direct}
+            - {name: 'this study, annealed, filled diamond', marker_count: 1, evidence_class: measured_direct}
+            - {name: 'Yang and Hazen 1998, annealed and quenched, open triangles', marker_count: 5, evidence_class: quoted_attributed}
+            - {name: 'Brown and Navrotsky 1989, in-situ HT XRD, open squares', marker_count: 3, evidence_class: quoted_attributed}
+            - {name: Xirouchakis et al. 2002, T-independent model, marker_count: 0, evidence_class: model_derived}
+            - {name: Xirouchakis et al. 2002, T-dependent model, marker_count: 0, evidence_class: model_derived}
+            - {name: Ghiorso et al. 1999, model, marker_count: 0, evidence_class: model_derived}
+          attribution: 'mixed: present study, [18], [19], [20], and [22] as printed'
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure4_raman_spectra
+        type: figure_record
+        locator: {page: 11, published_page: 11, pdf_page_index: 10, figure: '4'}
+        panel: whole_figure
+        units: Raman shift cm−1; intensity arbitrary units
+        values:
+          quantity: unavailable
+          schema_gap: No Quantity token for Raman spectra or frequencies.
+          species: MgTi2O5
+          phase: crystalline MgTi2O5 samples
+          temperature_as_printed: ambient conditions
+          axes_as_printed: {x: 'Raman shift (cm−1)', y: 'Intensity (arb. unit)'}
+          caption: >-
+            Raman spectra of disordered MgTi2O5. Dashed line guides the eye to
+            the Raman shift. Tickmarks show observed Raman band positions; the
+            three red tickmarks are valid only for X=0.14(1).
+          series:
+            - {name: X=0.37(1) spectrum, marker: continuous spectrum, marker_count: 0, evidence_class: measured_direct}
+            - {name: X=0.33(1) spectrum, marker: continuous spectrum, marker_count: 0, evidence_class: measured_direct}
+            - {name: X=0.30(1) spectrum, marker: continuous spectrum, marker_count: 0, evidence_class: measured_direct}
+            - {name: X=0.14(1) spectrum, marker: continuous spectrum, marker_count: 0, evidence_class: measured_direct}
+            - {name: observed band tickmarks, marker: vertical ticks, marker_count: 12, evidence_class: measured_direct}
+          attribution: present study
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure5_raman_comparison
+        type: figure_record
+        locator: {page: 11, published_page: 11, pdf_page_index: 10, figure: '5'}
+        panel: (a) and (b)
+        units: Raman shift cm−1; intensity arbitrary units
+        values:
+          quantity: unavailable
+          schema_gap: No Quantity token for Raman spectra or frequencies.
+          species: MgTi2O5
+          phase: crystalline MgTi2O5
+          temperature_as_printed: ambient conditions
+          axes_as_printed:
+            panel_a: Raman shift (cm−1) and normalized intensity (arb. unit)
+            panel_b: experimental versus theoretical Raman shift (cm−1)
+          caption: >-
+            (a) Theoretical Raman spectrum with band assignment of fully ordered
+            MgTi2O5 compared with the measured spectrum at X=0.14(1). (b)
+            Theoretical Raman shifts against experimentally determined values.
+          series:
+            - {name: panel a measured spectrum, marker: continuous curve, marker_count: 0, evidence_class: measured_direct}
+            - {name: panel a DFT spectrum, marker: continuous curve, marker_count: 0, evidence_class: model_derived}
+            - {name: panel b experiment X=0.14(1), marker: filled blue circles, marker_count: 12, evidence_class: measured_direct}
+            - {name: panel b experiment X=0.37(1), marker: open triangles, marker_count: 9, evidence_class: measured_direct}
+            - {name: panel b 1:1 reference, marker: dotted line, marker_count: 0, evidence_class: model_derived}
+          attribution: present study
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure6_raman_order_relation
+        type: figure_record
+        locator: {page: 12, published_page: 12, pdf_page_index: 11, figure: '6'}
+        panel: whole_figure
+        units: Raman shift cm−1; X dimensionless
+        values:
+          quantity: unavailable
+          schema_gap: No Quantity token for Raman frequency or Mg/Ti disorder parameter X.
+          species: MgTi2O5
+          phase: crystalline MgTi2O5
+          temperature_as_printed: ambient conditions for Raman measurements
+          axes_as_printed: {x: 'Mg/Ti disorder parameter X', y: 'B1g(5) Raman shift (cm−1)'}
+          caption: >-
+            Frequencies of the observed B1g(5) Raman mode against X. Filled
+            squares are this study, open circles are Liermann et al. [36], a
+            dashed line is a linear fit, and a filled triangle is the DFT datum.
+          series:
+            - {name: 'present study, filled squares', marker_count: 5, evidence_class: measured_direct}
+            - {name: 'Liermann et al. [36], open circles', marker_count: 2, evidence_class: quoted_attributed}
+            - {name: equal-weight linear fit, marker_count: 0, evidence_class: model_derived}
+            - {name: fully ordered DFT datum, filled triangle, marker_count: 1, evidence_class: model_derived}
+          attribution: 'mixed: present study, DFT, and [36] as printed'
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure7_mode_displacement
+        type: figure_record
+        locator: {page: 12, published_page: 12, pdf_page_index: 11, figure: '7'}
+        panel: whole_figure
+        units: not applicable (eigenvector schematic)
+        values:
+          quantity: unavailable
+          schema_gap: No Quantity token for a phonon displacement drawing.
+          species: MgTi2O5
+          phase: fully ordered crystalline structure
+          temperature_as_printed: not stated
+          axes_as_printed: not applicable
+          caption: >-
+            Oxygen O1 motions corresponding to the B1g(5) Raman mode of fully
+            ordered MgTi2O5 in the (100) plane; eigenvector is shown by black
+            arrows.
+          series:
+            - {name: displacement eigenvector schematic, marker_count: 0, evidence_class: model_derived}
+          attribution: present study
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure8_infrared_absorption
+        type: figure_record
+        locator: {page: 13, published_page: 13, pdf_page_index: 12, figure: '8'}
+        panel: whole_figure
+        units: absorption arbitrary units; wavenumber cm−1
+        values:
+          quantity: unavailable
+          schema_gap: No Quantity token for infrared spectrum or IR frequency.
+          species: MgTi2O5
+          phase: fully ordered crystalline structure
+          temperature_as_printed: not stated
+          axes_as_printed: {x: 'Wave number (cm−1)', y: 'Absorption (arb. unit)'}
+          caption: Computed infrared absorption of fully ordered MgTi2O5.
+          series:
+            - {name: DFT fully ordered infrared spectrum, marker: continuous curve, marker_count: 0, evidence_class: model_derived}
+          attribution: present study
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure9_elastic_stiffness
+        type: figure_record
+        locator: {page: 16, published_page: 16, pdf_page_index: 15, figure: '9'}
+        panel: whole_figure
+        units: stiffness scale GPa
+        values:
+          quantity: unavailable
+          schema_gap: No Quantity token for elastic stiffness.
+          species: MgTi2O5
+          phase: fully ordered crystalline structure
+          temperature_as_printed: not stated
+          axes_as_printed: principal directions e1, e2, e3; scale 1 GPa
+          caption: >-
+            Representation surface of the longitudinal elastic stiffness of
+            fully ordered MgTi2O5, plotted with WinTensor software [52].
+          series:
+            - {name: DFT representation surface, marker_count: 0, evidence_class: model_derived}
+          attribution: present study
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure10_heat_capacity
+        type: figure_record
+        locator: {page: 16, published_page: 16, pdf_page_index: 15, figure: '10'}
+        panel: whole_figure
+        units: J mol−1 K−1 per mole of formula unit
+        values:
+          quantity: cp
+          species: MgTi2O5
+          phase: crystalline MgTi2O5 samples
+          temperature_as_printed: 2–300 K for this study; 50–300 K for Todd [39]
+          axes_as_printed: {x: 'Temperature (K)', y: 'Heat capacity (J mol−1 K−1)'}
+          caption: >-
+            Low-temperature heat capacities of MgTi2O5. Black continuous curve
+            is DFT for fully ordered MgTi2O5; filled blue squares and red
+            circles are measured data from this study at X=0.14(1) and
+            X=0.37(1); open circles are Todd [39] data at unknown X.
+          series:
+            - {name: DFT fully ordered curve, marker: continuous black curve, marker_count: 0, evidence_class: model_derived}
+            - {name: this study X=0.14(1), marker: filled blue squares, marker_count: not_countable_from_render, evidence_class: measured_direct}
+            - {name: this study X=0.37(1), marker: filled red circles, marker_count: not_countable_from_render, evidence_class: measured_direct}
+            - {name: Todd 1952 X unknown, marker: open circles, marker_count: not_countable_from_render, evidence_class: quoted_attributed}
+          attribution: 'mixed: present study, DFT, and Todd [39]'
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure11_configurational_entropy
+        type: figure_record
+        locator: {page: 17, published_page: 17, pdf_page_index: 16, figure: '11'}
+        panel: whole_figure
+        units: J mol−1 K−1 per mole of formula unit
+        values:
+          quantity: S
+          method_class: model_derived
+          species: MgTi2O5
+          phase: crystalline MgTi2O5 ordering states
+          temperature_as_printed: standard configurational entropies tabulated at 298 K; no temperature axis
+          axes_as_printed: {x: 'Mg/Ti disorder parameter X', y: 'S_config (J K−1)'}
+          caption: >-
+            Dependence of configurational entropy on X, calculated from
+            equation 1. The 5.9(6) J mol−1 K−1 excess from X=0.14(1) to
+            X=0.37(1) is marked.
+          series:
+            - {name: equation 1 curve, marker_count: 0, evidence_class: model_derived}
+            - {name: tabulated X=0.14(1) and X=0.37(1) states, marker: square and circle, marker_count: 2, evidence_class: measured_reduced}
+            - {name: 'ordered, fully disordered, and anti-ordered endpoints', marker_count: 3, evidence_class: model_derived}
+          attribution: present study; equation 1; references [18, 19, 53]
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure12a_excess_vibrational_enthalpy
+        type: figure_record
+        locator: {page: 17, published_page: 17, pdf_page_index: 16, figure: '12'}
+        panel: a
+        units: plotted as ΔH × 10−3 J; per mole of formula unit
+        values:
+          quantity: unavailable
+          schema_gap: >-
+            The figure plots a difference between two samples' vibrational
+            enthalpies; the available H_minus_H298 token does not represent
+            this excess quantity.
+          species: MgTi2O5
+          phase: crystalline MgTi2O5 samples
+          temperature_as_printed: 0–300 K
+          axes_as_printed: {x: 'Temperature (K)', y: 'ΔH (×10−3 J)'}
+          caption: >-
+            Low-temperature excess vibrational enthalpy between samples with
+            X=0.37(1) and X=0.14(1).
+          series:
+            - {name: excess vibrational enthalpy curve, marker_count: 0, evidence_class: measured_reduced}
+          attribution: present study
+          digitisation: deferred to a figure pass
+
+      - observation_id: he2017_figure12b_excess_vibrational_entropy
+        type: figure_record
+        locator: {page: 17, published_page: 17, pdf_page_index: 16, figure: '12'}
+        panel: b
+        units: J K−1 per mole of formula unit
+        values:
+          quantity: unavailable
+          schema_gap: The figure plots excess entropy between two samples, not total standard entropy S.
+          species: MgTi2O5
+          phase: crystalline MgTi2O5 samples
+          temperature_as_printed: 0–300 K
+          axes_as_printed: {x: 'Temperature (K)', y: 'ΔS (J K−1)'}
+          caption: >-
+            Low-temperature excess vibrational entropy between samples with
+            X=0.37(1) and X=0.14(1).
+          series:
+            - {name: excess vibrational entropy curve, marker_count: 0, evidence_class: measured_reduced}
+          attribution: present study
+          digitisation: deferred to a figure pass
