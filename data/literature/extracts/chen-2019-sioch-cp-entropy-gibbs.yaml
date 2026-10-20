@@ -11,8 +11,7 @@ extraction:
   date: '2026-10-20'
   worker: fam30-1020
   source_note: Tables 5-12 are measured molar heat-capacity tables; every printed numeric Cp point is retained in its printed
-    unit and precision. Tables 1-4 and 13-25 dispositions are recorded under context; full numeric grids are in the accompanying
-    MinerU table drafts. Figures 1-4 are retained as deferred figure records without numeric points.
+    unit and precision. Tables 1-3 and residual Table 4 values, plus model-derived Tables 13-21, are retained in context; numeric grids are transcribed in this extract. Figures 1-4 are retained as deferred figure records without numeric points.
 review_status: draft
 notes:
 - text: Table 1 identifies eight whole-film samples. Each Cp observation binds values.sample_id to the table sample number;
@@ -43,6 +42,7 @@ species:
         column: measured molar heat capacity
       phase: glass
       units: J/mol/K
+      per: mol_atom
       values:
         quantity: cp
         method_class: measured_direct
@@ -111,12 +111,6 @@ species:
           cp: '1.5260e-3'
         - T_K: '6.7703'
           cp: '1.5641e-3'
-        - T_K: '7.0686'
-          cp: '1.8421e-3'
-        - T_K: '7.3747'
-          cp: '1.8876e-3'
-        - T_K: '7.7028'
-          cp: '2.4597e-3'
         - T_K: '8.0373'
           cp: '2.6511e-3'
         - T_K: '8.3929'
@@ -179,12 +173,6 @@ species:
           cp: '0.63725'
         - T_K: '54.292'
           cp: '0.79903'
-        - T_K: '59.314'
-          cp: '0.99136'
-        - T_K: '64.811'
-          cp: '1.2085'
-        - T_K: '70.818'
-          cp: '1.4657'
         - T_K: '77.385'
           cp: '1.7752'
         - T_K: '84.561'
@@ -249,7 +237,7 @@ species:
             pdf_page_index: 3
             table: '5'
             note: The table footnote states 1.2 mPa during measurements.
-    - observation_id: chen2019_table7_sample300_cp
+    - observation_id: chen2019_table6_sample300_cp
       type: heat_capacity_and_heat_content_series
       locator:
         page: 5
@@ -259,6 +247,7 @@ species:
         column: measured molar heat capacity
       phase: glass
       units: J/mol/K
+      per: mol_atom
       values:
         quantity: cp
         method_class: measured_direct
@@ -465,7 +454,7 @@ species:
             pdf_page_index: 4
             table: '6'
             note: The table footnote states 1.2 mPa during measurements.
-    - observation_id: chen2019_table8_sample844_cp
+    - observation_id: chen2019_table7_sample844_cp
       type: heat_capacity_and_heat_content_series
       locator:
         page: 5
@@ -475,6 +464,7 @@ species:
         column: measured molar heat capacity
       phase: glass
       units: J/mol/K
+      per: mol_atom
       values:
         quantity: cp
         method_class: measured_direct
@@ -681,7 +671,7 @@ species:
             pdf_page_index: 4
             table: '7'
             note: The table footnote states 1.2 mPa during measurements.
-    - observation_id: chen2019_table9_sample539_cp
+    - observation_id: chen2019_table8_sample539_cp
       type: heat_capacity_and_heat_content_series
       locator:
         page: 6
@@ -691,6 +681,7 @@ species:
         column: measured molar heat capacity
       phase: glass
       units: J/mol/K
+      per: mol_atom
       values:
         quantity: cp
         method_class: measured_direct
@@ -897,7 +888,7 @@ species:
             pdf_page_index: 5
             table: '8'
             note: The table footnote states 1.2 mPa during measurements.
-    - observation_id: chen2019_table10_sample338_cp
+    - observation_id: chen2019_table9_sample338_cp
       type: heat_capacity_and_heat_content_series
       locator:
         page: 6
@@ -907,6 +898,7 @@ species:
         column: measured molar heat capacity
       phase: glass
       units: J/mol/K
+      per: mol_atom
       values:
         quantity: cp
         method_class: measured_direct
@@ -1113,7 +1105,7 @@ species:
             pdf_page_index: 5
             table: '9'
             note: The table footnote states 1.2 mPa during measurements.
-    - observation_id: chen2019_table11_sample248_cp
+    - observation_id: chen2019_table10_sample248_cp
       type: heat_capacity_and_heat_content_series
       locator:
         page: 7
@@ -1123,6 +1115,7 @@ species:
         column: measured molar heat capacity
       phase: glass
       units: J/mol/K
+      per: mol_atom
       values:
         quantity: cp
         method_class: measured_direct
@@ -1329,7 +1322,7 @@ species:
             pdf_page_index: 6
             table: '10'
             note: The table footnote states 1.2 mPa during measurements.
-    - observation_id: chen2019_table12_sample149_cp
+    - observation_id: chen2019_table11_sample149_cp
       type: heat_capacity_and_heat_content_series
       locator:
         page: 7
@@ -1339,6 +1332,7 @@ species:
         column: measured molar heat capacity
       phase: glass
       units: J/mol/K
+      per: mol_atom
       values:
         quantity: cp
         method_class: measured_direct
@@ -1545,7 +1539,7 @@ species:
             pdf_page_index: 6
             table: '11'
             note: The table footnote states 1.2 mPa during measurements.
-    - observation_id: chen2019_table13_sample659_cp
+    - observation_id: chen2019_table12_sample659_cp
       type: heat_capacity_and_heat_content_series
       locator:
         page: 8
@@ -1555,6 +1549,7 @@ species:
         column: measured molar heat capacity
       phase: glass
       units: J/mol/K
+      per: mol_atom
       values:
         quantity: cp
         method_class: measured_direct
@@ -1771,6 +1766,7 @@ species:
         column: measured molar heat capacity
       phase: glass
       units: J/mol/K
+      per: mol_atom
       values:
         quantity: cp
         method_class: measured_direct
@@ -1805,6 +1801,494 @@ species:
             pdf_page_index: 4
             table: '5'
             note: The continued table footnote states 1.2 mPa during measurements.
+    - observation_id: chen2019_table4_sampleR337_delta_fH
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'R337'
+        delta_f_H: -37.50
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 5.85, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sampleR337_S
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'R337'
+        entropy: 8.80
+        note: The paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.18, units: J/mol/K}
+
+    - observation_id: chen2019_table4_sampleR337_delta_fG
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'R337'
+        value: -32.21
+        quantity_as_published: delta_f_G
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 5.85, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample300_delta_fH
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '300'
+        delta_f_H: -133.15
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 1.98, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample300_S
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '300'
+        entropy: 10.59
+        note: The paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.21, units: J/mol/K}
+
+    - observation_id: chen2019_table4_sample300_delta_fG
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '300'
+        value: -125.55
+        quantity_as_published: delta_f_G
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 1.98, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample844_delta_fH
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '844'
+        delta_f_H: -266.47
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 1.00, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample844_S
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '844'
+        entropy: 13.02
+        note: The paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.26, units: J/mol/K}
+
+    - observation_id: chen2019_table4_sample844_delta_fG
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '844'
+        value: -252.66
+        quantity_as_published: delta_f_G
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 1.00, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample539_delta_fH
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '539'
+        delta_f_H: -174.21
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 1.27, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample539_S
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '539'
+        entropy: 11.18
+        note: The paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.22, units: J/mol/K}
+
+    - observation_id: chen2019_table4_sample539_delta_fG
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '539'
+        value: -159.58
+        quantity_as_published: delta_f_G
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 1.27, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample338_delta_fH
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '338'
+        delta_f_H: -149.40
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.77, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample338_S
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '338'
+        entropy: 17.46
+        note: The paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.35, units: J/mol/K}
+
+    - observation_id: chen2019_table4_sample338_delta_fG
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '338'
+        value: -136.92
+        quantity_as_published: delta_f_G
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.78, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample248_delta_fH
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '248'
+        delta_f_H: -133.71
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 2.84, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample248_S
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '248'
+        entropy: 9.66
+        note: The paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.02, units: J/mol/K}
+
+    - observation_id: chen2019_table4_sample248_delta_fG
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '248'
+        value: -122.45
+        quantity_as_published: delta_f_G
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 2.84, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample149_delta_fH
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '149'
+        delta_f_H: -82.78
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.72, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample149_S
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '149'
+        entropy: 14.40
+        note: The paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.29, units: J/mol/K}
+
+    - observation_id: chen2019_table4_sample149_delta_fG
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '149'
+        value: -69.64
+        quantity_as_published: delta_f_G
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.72, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample659_delta_fH
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '659'
+        delta_f_H: -133.61
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 5.23, units: kJ/mol}
+
+    - observation_id: chen2019_table4_sample659_S
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '659'
+        entropy: 11.77
+        note: The paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 0.24, units: J/mol/K}
+
+    - observation_id: chen2019_table4_sample659_delta_fG
+      type: gibbs_table
+      locator: {page: 4, pdf_page_index: 3, table: '4'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fG
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: '659'
+        value: -122.23
+        quantity_as_published: delta_f_G
+        note: Formation from elements; the paper defines a mole as a gram-atom.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 4, pdf_page_index: 3, table: '4'}
+      uncertainty: {reported_status: printed, value: 5.23, units: kJ/mol}
+
     context:
     - observation_id: chen2019_table1_context
       type: printed_table_context
@@ -2057,7 +2541,7 @@ species:
           - '-115.08'
         - - '6'
           - '1.87'
-          - --228.27
+          - '-228.27'
           - '1.057'
           - '-125.91'
           - '2.783'
@@ -2110,10 +2594,9 @@ species:
         quantity: model_derived_table_values
         table_number: 4
         disposition: context_derived_values
-        reason: Table 4 reports formation enthalpy, standard entropy, entropy of formation and Gibbs energy. These have existing
-          thermochemistry quantity tokens, so the printed values are carried in the context payload here while the CP series
-          remain scored. Table 4 cells include source attribution and uncertainty annotations; no uncertainty is parsed as
-          a zero.
+        reason: Formation enthalpy, standard entropy, and Gibbs energy rows are typed as points below. Drop-solution enthalpy,
+          oxidation enthalpy, and entropy of formation remain printed context because they are not the requested formation
+          quantities. Table 4 cells include source attribution and uncertainty annotations; no uncertainty is parsed as a zero.
         printed_rows:
         - - 'Sample #'
           - Film Type
@@ -2123,7 +2606,7 @@ species:
           - ${\mathrm{S}}^{0}\left( {\mathrm{J} \cdot {\mathrm{K}}^{-1} \cdot {\mathrm{{mol}}}^{-1}}\right)$
           - $\Delta {\mathrm{S}}_{\mathrm{f},\mathrm{{ele}}}^{\mathrm{o}}\left( {\mathrm{J} \cdot {\mathrm{K}}^{-1} \cdot
             {\mathrm{{mol}}}^{-1}}\right)$
-          - $\Delta {\mathrm{G}}_{\mathrm{f},\mathrm{{ele}}}^{\mathrm{o}}\left( {\mathrm{K} \cdot {\mathrm{{mol}}}^{-1}}\right)$
+          - $\Delta {\mathrm{G}}_{\mathrm{f},\mathrm{{ele}}}^{\mathrm{o}}\left( {\mathrm{kJ} \cdot {\mathrm{{mol}}}^{-1}}\right)$
         - - ${\mathrm{R337}}^{\mathrm{a}}$
           - a-SiCH $^{\mathrm{b}}$
           - $- {458.32} \pm {5.80}{\left( 7\right) }^{\mathrm{c},\mathrm{d}}$
@@ -2190,16 +2673,17 @@ species:
           - $- {122.23} \pm {5.23}$
         schema_gap: The formation functions use Table 3 drop-solution enthalpies, which have no matching store token. Derived
           formation thermochemistry is pending a corpus table asset (controller, t-1382); source table cells are in .agent-scratch/oxide-thermochemistry-tables/chen-2019-sioch-cp-entropy-gibbs/table-4.csv.
-    - observation_id: chen2019_table14_context
+    - observation_id: chen2019_table13_context
       type: printed_table_context
       locator:
         page: 10
         pdf_page_index: 9
-        table: '14'
+        table: '13'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
-        table_number: 14
+        method_class: model_derived
+        table_number: 13
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -2216,52 +2700,52 @@ species:
           - '#659'
         - - Low T Fits
           - $\gamma/J·K^{-2}·mol^{-1}$
-          - $8.32·10^{-5}$
-          - $2.43·10^{-5}$
-          - $6.27·10^{-5}$
+          - '8.32e-5'
+          - '2.43e-5'
+          - '6.27e-5'
           - '0.000281'
           - '0'
-          - $6.01·10^{-5}$
+          - '6.01e-5'
           - '0'
           - '0.000829'
         - - Low T Fits
           - $B_3/J·K^{-4}$
-          - $2.20·10^{-6}$
-          - $6.13·10^{-5}$
-          - $9.41·10^{-6}$
-          - $2.07·10^{-6}$
+          - '2.20e-6'
+          - '6.13e-5'
+          - '9.41e-6'
+          - '2.07e-6'
           - '0.000187'
-          - $7.52·10^{-6}$
+          - '7.52e-6'
           - '0.000342'
-          - $1.80·10^{-5}$
+          - '1.80e-5'
         - - Low T Fits
           - $B_5/J·K^{-6}$
-          - $2.72·10^{-8}$
-          - $-5.60·10^{-8}$
-          - $3.01·10^{-7}$
-          - $4.15·10^{-7}$
-          - $-9.70·10^{-7}$
-          - $1.53·10^{-7}$
-          - $-2.30·10^{-6}$
-          - $-1.20·10^{-8}$
+          - '2.72e-8'
+          - '-5.60e-8'
+          - '3.01e-7'
+          - '4.15e-7'
+          - '-9.70e-7'
+          - '1.53e-7'
+          - '-2.30e-6'
+          - '-1.20e-8'
         - - Low T Fits
           - $B_7/J·K^{-8}$
-          - $-6.80·10^{-11}$
-          - $-1.90·10^{-10}$
-          - $-1.40·10^{-9}$
-          - $-2.20·10^{-9}$
-          - $2.92·10^{-9}$
-          - $-8.50·10^{-10}$
-          - $7.43·10^{-09}$
+          - '-6.80e-11'
+          - '-1.90e-10'
+          - '-1.40e-9'
+          - '-2.20e-9'
+          - '2.92e-9'
+          - '-8.50e-10'
+          - '7.43e-09'
           - '0'
         - - Low T Fits
           - $B_9/J·K^{-10}$
           - '0'
           - '0'
-          - $2.46·10^{-12}$
-          - $4.22·10^{-12}$
+          - '2.46e-12'
+          - '4.22e-12'
           - '0'
-          - $1.72·10^{-12}$
+          - '1.72e-12'
           - '0'
           - '0'
         - - Low T Fits
@@ -2337,7 +2821,7 @@ species:
         - - Mid T Fits
           - $A_3/J·K^{-4}·mol^{-1}$
           - '-0.00031'
-          - $-4.08·10^{-5}$
+          - '-4.08e-5'
           - '-0.00025'
           - '0.000213'
           - '-0.0002'
@@ -2346,40 +2830,40 @@ species:
           - '-0.00058'
         - - Mid T Fits
           - $A_4/J·K^{-5}·mol^{-1}$
-          - $9.37·10^{-6}$
-          - $6.00·10^{-7}$
-          - $6.27·10^{-6}$
-          - $-1.00·10^{-5}$
-          - $5.18·10^{-6}$
-          - $3.71·10^{-6}$
-          - $5.69·10^{-6}$
-          - $1.48·10^{-5}$
+          - '9.37e-6'
+          - '6.00e-7'
+          - '6.27e-6'
+          - '-1.00e-5'
+          - '5.18e-6'
+          - '3.71e-6'
+          - '5.69e-6'
+          - '1.48e-5'
         - - Mid T Fits
           - $A_5/J·K^{-6}·mol^{-1}$
-          - $-1.40·^{-7}$
-          - $-3.83·^{-9}$
-          - $-8.50·10^{-8}$
-          - $2.40·10^{-7}$
-          - $-6.90·10^{-8}$
-          - $-5.20·10^{-8}$
-          - $-6.50·10^{-8}$
-          - $-1.90·^{-7}$
+          - '-1.40e-7'
+          - '-3.83e-9'
+          - '-8.50e-8'
+          - '2.40e-7'
+          - '-6.90e-8'
+          - '-5.20e-8'
+          - '-6.50e-8'
+          - '-1.90e-7'
         - - Mid T Fits
           - $A_6/J·K^{-7}·mol^{-1}$
-          - $7.95·10^{-10}$
+          - '7.95e-10'
           - '0'
-          - $4.57·10^{-10}$
-          - $-2.90·10^{-9}$
-          - $3.56·10^{-10}$
-          - $2.81·10^{-10}$
-          - $2.99·10^{-10}$
-          - $9.49·10^{-10}$
+          - '4.57e-10'
+          - '-2.90e-9'
+          - '3.56e-10'
+          - '2.81e-10'
+          - '2.99e-10'
+          - '9.49e-10'
         - - Mid T Fits
           - $A_7/J·K^{-8}·mol^{-1}$
           - '0'
           - '0'
           - '0'
-          - $1.40·10^{-11}$
+          - '1.40e-11'
           - '0'
           - '0'
           - '0'
@@ -2399,7 +2883,7 @@ species:
           - 12.87–49.53
           - 13.55–50.82
           - 11.77–50.93
-          - 12.41–0.52
+          - 12.41–50.52
           - 6.35–54.97
           - 11.87–45.28
           - 7.93–54.75
@@ -2456,14 +2940,14 @@ species:
           - '0'
         - - High T Fits
           - $A_2/J·K^{-2}·mol^{-1}$
-          - $2.20·10^{-5}$
+          - '2.20e-5'
           - '0'
           - '0'
-          - $4.40·10^{-5}$
+          - '4.40e-5'
           - '0'
           - '0'
-          - $-2.90·10^{-5}$
-          - $4.04·10^{-5}$
+          - '-2.90e-5'
+          - '4.04e-5'
         - - High T Fits
           - '%RMS'
           - '0.4415'
@@ -2487,8 +2971,8 @@ species:
     - observation_id: chen2019_table15_context
       type: printed_table_context
       locator:
-        page: 10
-        pdf_page_index: 9
+        page: 11
+        pdf_page_index: 10
         table: '15'
       units: as printed in table headers
       values:
@@ -2741,22 +3225,259 @@ species:
     - observation_id: chen2019_table16_context
       type: printed_table_context
       locator:
-        page: 11
-        pdf_page_index: 10
+        page: 12
+        pdf_page_index: 11
         table: '16'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
+        method_class: model_derived
         table_number: 16
+        sample_id: a-SiOCH #844
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
-        printed_rows: []
+        printed_rows:
+        - - T/K
+          - $C_{p,m}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{\text{T}}S_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{\text{T}}H_{\text{m}}^{\text{o}}/kJ·mol^{-1}$
+          - $\varphi_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1,b}$
+        - - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - '1'
+          - $3.482·10^{-4}$
+          - $1.144·10^{-4}$
+          - $8.590·10^{-8}$
+          - $2.848·10^{-5}$
+        - - '2'
+          - $3.387·10^{-3}$
+          - $1.030·10^{-3}$
+          - $1.572·10^{-6}$
+          - $2.444·10^{-4}$
+        - - '3'
+          - '0.01244'
+          - $3.878·10^{-3}$
+          - $8.896·10^{-6}$
+          - $9.125·10^{-4}$
+        - - '4'
+          - '0.02894'
+          - $9.535·10^{-3}$
+          - $2.895·10^{-5}$
+          - $2.296·10^{-3}$
+        - - '5'
+          - '0.05295'
+          - '0.01844'
+          - $6.929·10^{-5}$
+          - $4.578·10^{-3}$
+        - - '6'
+          - '0.08382'
+          - '0.03072'
+          - $1.371·10^{-4}$
+          - $7.865·10^{-3}$
+        - - '7'
+          - '0.12048'
+          - '0.04633'
+          - $2.389·10^{-4}$
+          - '0.01221'
+        - - '8'
+          - '0.16166'
+          - '0.06506'
+          - $3.796·10^{-4}$
+          - '0.01761'
+        - - '9'
+          - '0.20692'
+          - '0.08668'
+          - $5.636·10^{-4}$
+          - '0.02406'
+        - - '10'
+          - '0.25552'
+          - '0.11097'
+          - $7.945·10^{-4}$
+          - '0.03151'
+        - - '15'
+          - '0.53143'
+          - '0.26529'
+          - $2.744·10^{-3}$
+          - '0.08235'
+        - - '20'
+          - '0.83285'
+          - '0.45917'
+          - $6.150·10^{-3}$
+          - '0.15168'
+        - - '25'
+          - '1.1401'
+          - '0.67798'
+          - '0.01108'
+          - '0.23473'
+        - - '30'
+          - '1.4486'
+          - '0.91309'
+          - '0.01755'
+          - '0.32801'
+        - - '35'
+          - '1.7599'
+          - '1.1597'
+          - '0.02557'
+          - '0.42909'
+        - - '40'
+          - '2.0753'
+          - '1.4153'
+          - '0.03516'
+          - '0.53631'
+        - - '45'
+          - '2.3934'
+          - '1.6781'
+          - '0.04633'
+          - '0.64851'
+        - - '50'
+          - '2.7113'
+          - '1.9467'
+          - '0.05909'
+          - '0.76486'
+        - - '60'
+          - '3.3397'
+          - '2.4967'
+          - '0.08935'
+          - '1.0075'
+        - - '70'
+          - '3.9554'
+          - '3.0580'
+          - '0.12585'
+          - '1.2602'
+        - - '80'
+          - '4.5444'
+          - '3.6250'
+          - '0.16837'
+          - '1.5203'
+        - - '90'
+          - '5.1027'
+          - '4.1928'
+          - '0.21663'
+          - '1.7857'
+        - - '100'
+          - '5.6296'
+          - '4.7579'
+          - '0.27032'
+          - '2.0547'
+        - - '110'
+          - '6.1267'
+          - '5.3180'
+          - '0.32912'
+          - '2.3260'
+        - - '120'
+          - '6.5964'
+          - '5.8714'
+          - '0.39276'
+          - '2.5984'
+        - - '130'
+          - '7.0415'
+          - '6.4172'
+          - '0.46097'
+          - '2.8712'
+        - - '140'
+          - '7.4647'
+          - '6.9546'
+          - '0.53352'
+          - '3.1438'
+        - - '150'
+          - '7.8684'
+          - '7.4835'
+          - '0.61020'
+          - '3.4155'
+        - - '160'
+          - '8.2547'
+          - '8.0037'
+          - '0.69083'
+          - '3.6860'
+        - - '170'
+          - '8.6255'
+          - '8.5154'
+          - '0.77524'
+          - '3.9551'
+        - - '180'
+          - '8.9822'
+          - '9.0185'
+          - '0.86329'
+          - '4.2225'
+        - - '190'
+          - '9.3261'
+          - '9.5135'
+          - '0.95484'
+          - '4.4880'
+        - - '200'
+          - '9.6582'
+          - '10.000'
+          - '1.0498'
+          - '4.7514'
+        - - '210'
+          - '9.9795'
+          - '10.479'
+          - '1.1480'
+          - '5.0128'
+        - - '220'
+          - '10.291'
+          - '10.951'
+          - '1.2493'
+          - '5.2720'
+        - - '230'
+          - '10.592'
+          - '11.415'
+          - '1.3538'
+          - '5.5291'
+        - - '240'
+          - '10.885'
+          - '11.872'
+          - '1.4611'
+          - '5.7839'
+        - - '250'
+          - '11.169'
+          - '12.322'
+          - '1.5714'
+          - '6.0364'
+        - - '260'
+          - '11.445'
+          - '12.766'
+          - '1.6845'
+          - '6.2867'
+        - - '270'
+          - '11.713'
+          - '13.203'
+          - '1.8003'
+          - '6.5348'
+        - - '273.15'
+          - '11.796'
+          - '13.339'
+          - '1.8373'
+          - '6.6125'
+        - - '280'
+          - '11.974'
+          - '13.633'
+          - '1.9187'
+          - '6.7806'
+        - - '290'
+          - '12.227'
+          - '14.058'
+          - '2.0398'
+          - '7.0243'
+        - - '298.15'
+          - '12.428'
+          - '14.400'
+          - '2.1402'
+          - '7.2212'
+        - - '300'
+          - '12.473'
+          - '14.477'
+          - '2.1633'
+          - '7.2657'
     - observation_id: chen2019_table17_context
       type: printed_table_context
       locator:
-        page: 11
-        pdf_page_index: 10
+        page: 12
+        pdf_page_index: 11
         table: '17'
       units: as printed in table headers
       values:
@@ -3004,8 +3725,8 @@ species:
     - observation_id: chen2019_table18_context
       type: printed_table_context
       locator:
-        page: 12
-        pdf_page_index: 11
+        page: 13
+        pdf_page_index: 12
         table: '18'
       units: as printed in table headers
       values:
@@ -3253,8 +3974,8 @@ species:
     - observation_id: chen2019_table19_context
       type: printed_table_context
       locator:
-        page: 12
-        pdf_page_index: 11
+        page: 14
+        pdf_page_index: 13
         table: '19'
       units: as printed in table headers
       values:
@@ -3489,308 +4210,18 @@ species:
           - '10.842'
           - '1.7628'
           - '4.7634'
-        - - '298.15'
-          - '12.200'
-          - '11.176'
-          - '1.8611'
-          - '4.9341'
-        - - '300'
-          - '12.264'
-          - '11.252'
-          - '1.8837'
-          - '4.9729'
     - observation_id: chen2019_table20_context
       type: printed_table_context
       locator:
-        page: 13
-        pdf_page_index: 12
+        page: 15
+        pdf_page_index: 14
         table: '20'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
+        method_class: model_derived
         table_number: 20
-        disposition: context_model
-        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
-          are context. The full printed cells are preserved below.
-        printed_rows: []
-    - observation_id: chen2019_table21_context
-      type: printed_table_context
-      locator:
-        page: 13
-        pdf_page_index: 12
-        table: '21'
-      units: as printed in table headers
-      values:
-        quantity: model_derived_table_values
-        table_number: 21
-        disposition: context_model
-        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
-          are context. The full printed cells are preserved below.
-        printed_rows:
-        - - T/K
-          - $C_{p,m}/J·K^{-1}·mol^{-1}$
-          - $\Delta^{T}S_{m}^{o}/J·K^{-1}·mol^{-1}$
-          - $\Delta^{T}H_{m}^{o}/kJ·mol^{-1}$
-          - $\varphi_{m}^{o}/J·K^{-1}·mol^{-1,b}$
-        - - '0'
-          - '0'
-          - '0'
-          - '0'
-          - '0'
-        - - '1'
-          - $1.865·10^{-4}$
-          - $6.227·10^{-5}$
-          - $4.669·10^{-8}$
-          - $1.558·10^{-5}$
-        - - '2'
-          - $1.521·10^{-3}$
-          - $5.000·10^{-4}$
-          - $7.509·10^{-7}$
-          - $1.245·10^{-4}$
-        - - '3'
-          - $5.504·10^{-3}$
-          - $1.752·10^{-3}$
-          - $3.971·10^{-6}$
-          - $4.286·10^{-4}$
-        - - '4'
-          - '0.01366'
-          - $4.340·10^{-3}$
-          - $1.316·10^{-5}$
-          - $1.050·10^{-3}$
-        - - '5'
-          - '0.02681'
-          - $8.705·10^{-3}$
-          - $3.296·10^{-5}$
-          - $2.112·10^{-3}$
-        - - '6'
-          - '0.04514'
-          - '0.01514'
-          - $6.852·10^{-5}$
-          - $3.717·10^{-3}$
-        - - '7'
-          - '0.06843'
-          - '0.02378'
-          - $1.249·10^{-4}$
-          - $5.939·10^{-3}$
-        - - '8'
-          - '0.09622'
-          - '0.03469'
-          - $2.069·10^{-4}$
-          - $8.827·10^{-3}$
-        - - '9'
-          - '0.12802'
-          - '0.04782'
-          - $3.187·10^{-4}$
-          - '0.01241'
-        - - '10'
-          - '0.16340'
-          - '0.06311'
-          - $4.641·10^{-4}$
-          - '0.01670'
-        - - '15'
-          - '0.38360'
-          - '0.16880'
-          - $1.805·10^{-3}$
-          - '0.04850'
-        - - '20'
-          - '0.65971'
-          - '0.31580'
-          - $4.392·10^{-3}$
-          - '0.09618'
-        - - '25'
-          - '0.98253'
-          - '0.49685'
-          - $8.479·10^{-3}$
-          - '0.15768'
-        - - '30'
-          - '1.3495'
-          - '0.70777'
-          - '0.01429'
-          - '0.23139'
-        - - '35'
-          - '1.7566'
-          - '0.94589'
-          - '0.02204'
-          - '0.31615'
-        - - '40'
-          - '2.1948'
-          - '1.2088'
-          - '0.03191'
-          - '0.41105'
-        - - '45'
-          - '2.6497'
-          - '1.4935'
-          - '0.04402'
-          - '0.51532'
-        - - '50'
-          - '3.1059'
-          - '1.7963'
-          - '0.05841'
-          - '0.62814'
-        - - '60'
-          - '4.0238'
-          - '2.4430'
-          - '0.09402'
-          - '0.87604'
-        - - '70'
-          - '4.9123'
-          - '3.1309'
-          - '0.13875'
-          - '1.1487'
-        - - '80'
-          - '5.7306'
-          - '3.8410'
-          - '0.19203'
-          - '1.4407'
-        - - '90'
-          - '6.4846'
-          - '4.5601'
-          - '0.25315'
-          - '1.7473'
-        - - '100'
-          - '7.1826'
-          - '5.2799'
-          - '0.32153'
-          - '2.0646'
-        - - '110'
-          - '7.8322'
-          - '5.9953'
-          - '0.39664'
-          - '2.3894'
-        - - '120'
-          - '8.4389'
-          - '6.7031'
-          - '0.47803'
-          - '2.7195'
-        - - '130'
-          - '9.0073'
-          - '7.4012'
-          - '0.56529'
-          - '3.0528'
-        - - '140'
-          - '9.5414'
-          - '8.0885'
-          - '0.65806'
-          - '3.3880'
-        - - '150'
-          - '10.045'
-          - '8.7641'
-          - '0.75602'
-          - '3.7240'
-        - - '160'
-          - '10.520'
-          - '9.4277'
-          - '0.85886'
-          - '4.0598'
-        - - '170'
-          - '10.970'
-          - '10.079'
-          - '0.96633'
-          - '4.3948'
-        - - '180'
-          - '11.398'
-          - '10.718'
-          - '1.0782'
-          - '4.7284'
-        - - '190'
-          - '11.806'
-          - '11.346'
-          - '1.1942'
-          - '5.0602'
-        - - '200'
-          - '12.197'
-          - '11.961'
-          - '1.3143'
-          - '5.3899'
-        - - '210'
-          - '12.571'
-          - '12.565'
-          - '1.4381'
-          - '5.7173'
-        - - '220'
-          - '12.932'
-          - '13.159'
-          - '1.5656'
-          - '6.0421'
-    - observation_id: chen2019_table22_context
-      type: printed_table_context
-      locator:
-        page: 14
-        pdf_page_index: 13
-        table: '22'
-      units: as printed in table headers
-      values:
-        quantity: model_derived_table_values
-        table_number: 22
-        disposition: context_model
-        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
-          are context. The full printed cells are preserved below.
-        printed_rows:
-        - - T/K
-          - $C_{p,m}/J·K^{-1}·mol^{-1}$
-          - $\Delta^{\text{T}}S_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1}$
-          - $\Delta^{\text{T}}H_{\text{m}}^{\text{o}}/kJ·mol^{-1}$
-          - $\varphi_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1,b}$
-        - - '230'
-          - '13.280'
-          - '13.741'
-          - '1.6967'
-          - '6.3642'
-        - - '240'
-          - '13.617'
-          - '14.313'
-          - '1.8312'
-          - '6.6835'
-        - - '250'
-          - '13.943'
-          - '14.876'
-          - '1.9690'
-          - '7.0000'
-        - - '260'
-          - '14.261'
-          - '15.429'
-          - '2.1100'
-          - '7.3136'
-        - - '270'
-          - '14.572'
-          - '15.973'
-          - '2.2542'
-          - '7.6243'
-        - - '273.15'
-          - '14.668'
-          - '16.143'
-          - '2.3003'
-          - '7.7215'
-        - - '280'
-          - '14.875'
-          - '16.509'
-          - '2.4014'
-          - '7.9320'
-        - - '290'
-          - '15.171'
-          - '17.036'
-          - '2.5517'
-          - '8.2369'
-        - - '298.15'
-          - '15.409'
-          - '17.460'
-          - '2.6763'
-          - '8.4832'
-        - - '300'
-          - '15.462'
-          - '17.555'
-          - '2.7048'
-          - '8.5388'
-    - observation_id: chen2019_table23_context
-      type: printed_table_context
-      locator:
-        page: 14
-        pdf_page_index: 13
-        table: '23'
-      units: as printed in table headers
-      values:
-        quantity: model_derived_table_values
-        table_number: 23
+        sample_id: a-SiOCH #149
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -4030,265 +4461,217 @@ species:
           - '9.7339'
           - '1.6760'
           - '4.1474'
-    - observation_id: chen2019_table24_context
+    - observation_id: chen2019_table21_context
       type: printed_table_context
       locator:
         page: 15
         pdf_page_index: 14
-        table: '24'
+        table: '21'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
-        table_number: 24
+        table_number: 21
+        sample_id: a-SiOCH #659
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
         printed_rows:
         - - T/K
           - $C_{p,m}/J·K^{-1}·mol^{-1}$
-          - $\Delta^{\text{T}}S_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1}$
-          - $\Delta^{\text{T}}H_{\text{m}}^{\text{o}}/kJ·mol^{-1}$
-          - $\varphi_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1,b}$
+          - $\Delta^{T}S_{m}^{o}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}H_{m}^{o}/kJ·mol^{-1}$
+          - $\varphi_{m}^{o}/J·K^{-1}·mol^{-1,b}$
         - - '0'
           - '0'
           - '0'
           - '0'
           - '0'
         - - '1'
-          - $3.482·10^{-4}$
-          - $1.144·10^{-4}$
-          - $8.590·10^{-8}$
-          - $2.848·10^{-5}$
+          - $1.865·10^{-4}$
+          - $6.227·10^{-5}$
+          - $4.669·10^{-8}$
+          - $1.558·10^{-5}$
         - - '2'
-          - $3.387·10^{-3}$
-          - $1.030·10^{-3}$
-          - $1.572·10^{-6}$
-          - $2.444·10^{-4}$
+          - $1.521·10^{-3}$
+          - $5.000·10^{-4}$
+          - $7.509·10^{-7}$
+          - $1.245·10^{-4}$
         - - '3'
-          - '0.01244'
-          - $3.878·10^{-3}$
-          - $8.896·10^{-6}$
-          - $9.125·10^{-4}$
+          - $5.504·10^{-3}$
+          - $1.752·10^{-3}$
+          - $3.971·10^{-6}$
+          - $4.286·10^{-4}$
         - - '4'
-          - '0.02894'
-          - $9.535·10^{-3}$
-          - $2.895·10^{-5}$
-          - $2.296·10^{-3}$
+          - '0.01366'
+          - $4.340·10^{-3}$
+          - $1.316·10^{-5}$
+          - $1.050·10^{-3}$
         - - '5'
-          - '0.05295'
-          - '0.01844'
-          - $6.929·10^{-5}$
-          - $4.578·10^{-3}$
+          - '0.02681'
+          - $8.705·10^{-3}$
+          - $3.296·10^{-5}$
+          - $2.112·10^{-3}$
         - - '6'
-          - '0.08382'
-          - '0.03072'
-          - $1.371·10^{-4}$
-          - $7.865·10^{-3}$
+          - '0.04514'
+          - '0.01514'
+          - $6.852·10^{-5}$
+          - $3.717·10^{-3}$
         - - '7'
-          - '0.12048'
-          - '0.04633'
-          - $2.389·10^{-4}$
-          - '0.01221'
+          - '0.06843'
+          - '0.02378'
+          - $1.249·10^{-4}$
+          - $5.939·10^{-3}$
         - - '8'
-          - '0.16166'
-          - '0.06506'
-          - $3.796·10^{-4}$
-          - '0.01761'
+          - '0.09622'
+          - '0.03469'
+          - $2.069·10^{-4}$
+          - $8.827·10^{-3}$
         - - '9'
-          - '0.20692'
-          - '0.08668'
-          - $5.636·10^{-4}$
-          - '0.02406'
+          - '0.12802'
+          - '0.04782'
+          - $3.187·10^{-4}$
+          - '0.01241'
         - - '10'
-          - '0.25552'
-          - '0.11097'
-          - $7.945·10^{-4}$
-          - '0.03151'
+          - '0.16340'
+          - '0.06311'
+          - $4.641·10^{-4}$
+          - '0.01670'
         - - '15'
-          - '0.53143'
-          - '0.26529'
-          - $2.744·10^{-3}$
-          - '0.08235'
+          - '0.38360'
+          - '0.16880'
+          - $1.805·10^{-3}$
+          - '0.04850'
         - - '20'
-          - '0.83285'
-          - '0.45917'
-          - $6.150·10^{-3}$
-          - '0.15168'
+          - '0.65971'
+          - '0.31580'
+          - $4.392·10^{-3}$
+          - '0.09618'
         - - '25'
-          - '1.1401'
-          - '0.67798'
-          - '0.01108'
-          - '0.23473'
+          - '0.98253'
+          - '0.49685'
+          - $8.479·10^{-3}$
+          - '0.15768'
         - - '30'
-          - '1.4486'
-          - '0.91309'
-          - '0.01755'
-          - '0.32801'
+          - '1.3495'
+          - '0.70777'
+          - '0.01429'
+          - '0.23139'
         - - '35'
-          - '1.7599'
-          - '1.1597'
-          - '0.02557'
-          - '0.42909'
+          - '1.7566'
+          - '0.94589'
+          - '0.02204'
+          - '0.31615'
         - - '40'
-          - '2.0753'
-          - '1.4153'
-          - '0.03516'
-          - '0.53631'
+          - '2.1948'
+          - '1.2088'
+          - '0.03191'
+          - '0.41105'
         - - '45'
-          - '2.3934'
-          - '1.6781'
-          - '0.04633'
-          - '0.64851'
+          - '2.6497'
+          - '1.4935'
+          - '0.04402'
+          - '0.51532'
         - - '50'
-          - '2.7113'
-          - '1.9467'
-          - '0.05909'
-          - '0.76486'
+          - '3.1059'
+          - '1.7963'
+          - '0.05841'
+          - '0.62814'
         - - '60'
-          - '3.3397'
-          - '2.4967'
-          - '0.08935'
-          - '1.0075'
+          - '4.0238'
+          - '2.4430'
+          - '0.09402'
+          - '0.87604'
         - - '70'
-          - '3.9554'
-          - '3.0580'
-          - '0.12585'
-          - '1.2602'
+          - '4.9123'
+          - '3.1309'
+          - '0.13875'
+          - '1.1487'
         - - '80'
-          - '4.5444'
-          - '3.6250'
-          - '0.16837'
-          - '1.5203'
+          - '5.7306'
+          - '3.8410'
+          - '0.19203'
+          - '1.4407'
         - - '90'
-          - '5.1027'
-          - '4.1928'
-          - '0.21663'
-          - '1.7857'
+          - '6.4846'
+          - '4.5601'
+          - '0.25315'
+          - '1.7473'
         - - '100'
-          - '5.6296'
-          - '4.7579'
-          - '0.27032'
-          - '2.0547'
+          - '7.1826'
+          - '5.2799'
+          - '0.32153'
+          - '2.0646'
         - - '110'
-          - '6.1267'
-          - '5.3180'
-          - '0.32912'
-          - '2.3260'
+          - '7.8322'
+          - '5.9953'
+          - '0.39664'
+          - '2.3894'
         - - '120'
-          - '6.5964'
-          - '5.8714'
-          - '0.39276'
-          - '2.5984'
+          - '8.4389'
+          - '6.7031'
+          - '0.47803'
+          - '2.7195'
         - - '130'
-          - '7.0415'
-          - '6.4172'
-          - '0.46097'
-          - '2.8712'
+          - '9.0073'
+          - '7.4012'
+          - '0.56529'
+          - '3.0528'
         - - '140'
-          - '7.4647'
-          - '6.9546'
-          - '0.53352'
-          - '3.1438'
+          - '9.5414'
+          - '8.0885'
+          - '0.65806'
+          - '3.3880'
         - - '150'
-          - '7.8684'
-          - '7.4835'
-          - '0.61020'
-          - '3.4155'
+          - '10.045'
+          - '8.7641'
+          - '0.75602'
+          - '3.7240'
         - - '160'
-          - '8.2547'
-          - '8.0037'
-          - '0.69083'
-          - '3.6860'
+          - '10.520'
+          - '9.4277'
+          - '0.85886'
+          - '4.0598'
         - - '170'
-          - '8.6255'
-          - '8.5154'
-          - '0.77524'
-          - '3.9551'
+          - '10.970'
+          - '10.079'
+          - '0.96633'
+          - '4.3948'
         - - '180'
-          - '8.9822'
-          - '9.0185'
-          - '0.86329'
-          - '4.2225'
+          - '11.398'
+          - '10.718'
+          - '1.0782'
+          - '4.7284'
         - - '190'
-          - '9.3261'
-          - '9.5135'
-          - '0.95484'
-          - '4.4880'
+          - '11.806'
+          - '11.346'
+          - '1.1942'
+          - '5.0602'
         - - '200'
-          - '9.6582'
-          - '10.000'
-          - '1.0498'
-          - '4.7514'
+          - '12.197'
+          - '11.961'
+          - '1.3143'
+          - '5.3899'
         - - '210'
-          - '9.9795'
-          - '10.479'
-          - '1.1480'
-          - '5.0128'
+          - '12.571'
+          - '12.565'
+          - '1.4381'
+          - '5.7173'
         - - '220'
-          - '10.291'
-          - '10.951'
-          - '1.2493'
-          - '5.2720'
-        - - '230'
-          - '10.592'
-          - '11.415'
-          - '1.3538'
-          - '5.5291'
-        - - '240'
-          - '10.885'
-          - '11.872'
-          - '1.4611'
-          - '5.7839'
-        - - '250'
-          - '11.169'
-          - '12.322'
-          - '1.5714'
-          - '6.0364'
-        - - '260'
-          - '11.445'
-          - '12.766'
-          - '1.6845'
-          - '6.2867'
-        - - '270'
-          - '11.713'
-          - '13.203'
-          - '1.8003'
-          - '6.5348'
-        - - '273.15'
-          - '11.796'
-          - '13.339'
-          - '1.8373'
-          - '6.6125'
-        - - '280'
-          - '11.974'
-          - '13.633'
-          - '1.9187'
-          - '6.7806'
-        - - '290'
-          - '12.227'
-          - '14.058'
-          - '2.0398'
-          - '7.0243'
-        - - '298.15'
-          - '12.428'
-          - '14.400'
-          - '2.1402'
-          - '7.2212'
-        - - '300'
-          - '12.473'
-          - '14.477'
-          - '2.1633'
-          - '7.2657'
-    - observation_id: chen2019_table25_context
+          - '12.932'
+          - '13.159'
+          - '1.5656'
+          - '6.0421'
+    - observation_id: chen2019_table21_continued_context
       type: printed_table_context
       locator:
-        page: 15
-        pdf_page_index: 14
-        table: '25'
+        page: 16
+        pdf_page_index: 15
+        table: '21'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
-        table_number: 25
+        table_number: 21
+        sample_id: a-SiOCH #659
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -4298,86 +4681,56 @@ species:
           - $\Delta^{\text{T}}S_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1}$
           - $\Delta^{\text{T}}H_{\text{m}}^{\text{o}}/kJ·mol^{-1}$
           - $\varphi_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1,b}$
-        - - '0'
-          - '0'
-          - '0'
-          - '0'
-          - '0'
-        - - '1'
-          - $8.584·10^{-4}$
-          - $8.361·10^{-4}$
-          - $4.200·10^{-7}$
-          - $4.161·10^{-4}$
-        - - '2'
-          - $3.125·10^{-3}$
-          - $1.934·10^{-3}$
-          - $2.125·10^{-6}$
-          - $8.719·10^{-4}$
-        - - '3'
-          - '0.01065'
-          - $4.407·10^{-3}$
-          - $8.472·10^{-6}$
-          - $1.583·10^{-3}$
-        - - '4'
-          - '0.02459'
-          - $9.232·10^{-3}$
-          - $2.558·10^{-5}$
-          - $2.837·10^{-3}$
-        - - '5'
-          - '0.04412'
-          - '0.01672'
-          - $5.951·10^{-5}$
-          - $4.821·10^{-3}$
-        - - '6'
-          - '0.06816'
-          - '0.02683'
-          - $1.153·10^{-4}$
-          - $7.611·10^{-3}$
-        - - '7'
-          - '0.09584'
-          - '0.03937'
-          - $1.970·10^{-4}$
-          - '0.01122'
-        - - '8'
-          - '0.12651'
-          - '0.05414'
-          - $3.080·10^{-4}$
-          - '0.01564'
-        - - '9'
-          - '0.15973'
-          - '0.07094'
-          - $4.509·10^{-4}$
-          - '0.02084'
-        - - '10'
-          - '0.19516'
-          - '0.08958'
-          - $6.282·10^{-4}$
-          - '0.02676'
-        - - '15'
-          - '0.39812'
-          - '0.20574'
-          - $2.095·10^{-3}$
-          - '0.06609'
-        - - '20'
-          - '0.62213'
-          - '0.35083'
-          - $4.643·10^{-3}$
-          - '0.11867'
-        - - '25'
-          - '0.84835'
-          - '0.51391'
-          - $8.318·10^{-3}$
-          - '0.18117'
-        - - '30'
-          - '1.0821'
-          - '0.68905'
-          - '0.01314'
-          - '0.25108'
-        - - '35'
-          - '1.3315'
-          - '0.87436'
-          - '0.01917'
-          - '0.32676'
+        - - '230'
+          - '13.280'
+          - '13.741'
+          - '1.6967'
+          - '6.3642'
+        - - '240'
+          - '13.617'
+          - '14.313'
+          - '1.8312'
+          - '6.6835'
+        - - '250'
+          - '13.943'
+          - '14.876'
+          - '1.9690'
+          - '7.0000'
+        - - '260'
+          - '14.261'
+          - '15.429'
+          - '2.1100'
+          - '7.3136'
+        - - '270'
+          - '14.572'
+          - '15.973'
+          - '2.2542'
+          - '7.6243'
+        - - '273.15'
+          - '14.668'
+          - '16.143'
+          - '2.3003'
+          - '7.7215'
+        - - '280'
+          - '14.875'
+          - '16.509'
+          - '2.4014'
+          - '7.9320'
+        - - '290'
+          - '15.171'
+          - '17.036'
+          - '2.5517'
+          - '8.2369'
+        - - '298.15'
+          - '15.409'
+          - '17.460'
+          - '2.6763'
+          - '8.4832'
+        - - '300'
+          - '15.462'
+          - '17.555'
+          - '2.7048'
+          - '8.5388'
     - observation_id: chen2019_figure1_pxrd
       type: figure_record
       locator:
@@ -4534,7 +4887,7 @@ fidelity_samples:
     table: '5'
     row: 'a-SiCH #R337'
     column: T/K and Cp,m/J K−1 mol−1
-- path: species.SiOCH.observations[chen2019_table7_sample300_cp].values.series[0]
+- path: species.SiOCH.observations[chen2019_table6_sample300_cp].values.series[0]
   value:
     T_K: '1.8416'
     cp: '4.7419e-4'
@@ -4543,7 +4896,7 @@ fidelity_samples:
     pdf_page_index: 4
     table: '6'
     row: 'a-SiCH #300'
-- path: species.SiOCH.observations[chen2019_table13_sample659_cp].values.series[0]
+- path: species.SiOCH.observations[chen2019_table12_sample659_cp].values.series[0]
   value:
     T_K: '1.8304'
     cp: '2.2792e-3'
