@@ -311,7 +311,6 @@ _NO_FEASIBLE_CONFIG_FAILURE_CATEGORIES = frozenset(
         FailureCategory.INVALID_PATCH.value,
         FailureCategory.INVALID_RECIPE.value,
         FailureCategory.NON_FINITE_PAYLOAD.value,
-        FailureCategory.STALE_PROFILE.value,
         FailureCategory.ZERO_INPUT_BASIS_BREACH.value,
     }
 )

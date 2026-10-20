@@ -5558,24 +5558,28 @@ def test_all_infeasible_completes_with_no_feasible_winner(tmp_path) -> None:
 
 
 def test_stale_profile_refusal_flows_through_study_as_named_failure(tmp_path) -> None:
-    with pytest.raises(study.StudyNoFeasibleError, match="stale_profile"):
-        study.run(
-            _stale_melt_target_profile(),
-            FEEDSTOCK,
-            "random",
-            "internal-analytical",
-            1,
-            1,
-            tmp_path,
-            seed=7,
-        )
+    result = study.run(
+        _stale_melt_target_profile(),
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        1,
+        1,
+        tmp_path,
+        seed=7,
+    )
 
     pareto_payload = json.loads((tmp_path / "pareto.json").read_text())
     provenance = _read_provenance(tmp_path)
+    leaderboard = list(csv.DictReader((tmp_path / "leaderboard.csv").open()))
 
+    assert result.status == "completed-no-feasible-winner"
+    assert result.winner is None
     assert pareto_payload["failure_counts"] == {"stale_profile": 1}
     assert provenance[0]["status"] == "stale_profile"
     assert provenance[0]["failure_category"] == "stale_profile"
+    assert leaderboard[0]["rank"] == "1"
+    assert leaderboard[0]["composition_target:stale-profile-target"] == ""
     assert "delivered_stream_purity" in provenance[0]["notes"][0]
     assert "residual_rump_at_stop" in provenance[0]["notes"][0]
     assert "FORCE_PROFILES=1" in provenance[0]["notes"][0]

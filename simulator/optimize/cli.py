@@ -9,12 +9,14 @@ from pathlib import Path
 import sys
 from typing import Sequence
 
+from simulator.config import DEFAULT_DATA_DIR
 from simulator.backend_names import canonical_backend_name
-from simulator.scalar_boundary import (
-    is_declared_real_scalar,
-)
+from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.optimize.evaluate import _is_stale_profile_refusal
 from simulator.optimize.profiles import (
     ProfileValidationError,
+    _load_yaml_mapping,
+    _resolve_profile_path,
     constrained_max_profile,
     load_profile,
 )
@@ -230,6 +232,10 @@ def _resolve_profile_arg(profile: str, parser: argparse.ArgumentParser):
     try:
         return load_profile(profile)
     except ProfileValidationError as exc:
+        if _is_stale_profile_refusal(exc):
+            return _load_yaml_mapping(
+                _resolve_profile_path(profile, data_dir=DEFAULT_DATA_DIR)
+            )
         profile_path = Path(profile)
         if not profile_path.exists() and profile_path.suffix not in {".yaml", ".yml"}:
             parser.exit(
