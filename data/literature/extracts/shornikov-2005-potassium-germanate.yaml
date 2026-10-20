@@ -13,7 +13,7 @@ extraction:
     (c), (d) and (e) series-4 stars that sit clear of the other glyphs were read from labelled ticks. Panel
     (e) stars inside the frame but above the highest labelled tick are in-frame extrapolations, and the
     half-width is the distance past that tick. Panel (b) stars are drawn inside the series-3 squares and
-    stay deferred on the corrected log scale. Fig. 5 series-4 open stars each have a centre on the 600 dpi page. No Fig. 5 value is stored, because the composition is not a labelled-tick read on the panel that carries the star. Those reads stay context. Delta_fG/(RT) and delta_fS have no
+    stay deferred on the corrected log scale. Fig. 5 series-4 open stars each have a centre on the 600 dpi page. Panel (i) stars are read from the labelled ticks and stay context. The endpoint beside the 100 mol percent tick has no stored value, because the two centre estimates differ by about 10 px. The other Fig. 5 panels are not calibrated. Those reads stay context. Delta_fG/(RT) and delta_fS have no
     quantity, and the melt delta_fH is not one oxide partial enthalpy.
   date: '2026-10-20'
   worker: t1372-w2-w8-t1
@@ -2323,125 +2323,197 @@ species:
         marker_centre_px: '(2556, 1534)'
         dpi: '600'
         reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
-    - observation_id: ge_2005_fig5_i_star_1
+    - observation_id: ge_2005_fig5_i_endpoint_100
       type: figure_marker_deferred
       locator:
         page: 8
         pdf_page_index: 7
         published_page: 1352
         figure: '5'
-        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 1. Centre: template peak. Page px (3199, 729). Match score 0.691. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+        note: 'Panel (i). Open star at the top of the series-4 curve, beside the labelled 100 mol% tick at y 534.5. The glyph is inside the frame. Two centre estimates do not agree within 8 px. The seed (3387, 541) sits in the upper notch. The ink-box centre (3377.5, 551.5) sits where two guide lines meet the star. The estimates differ by about 10 px in x and 10 px in y. No value is stored.'
       units: as reported
       values:
         decision: deferred
         panel: 'i'
         marker: open star
         series_as_printed: '4'
+        dpi: '600'
+        reason: 'Endpoint beside the labelled 100 mol% tick. Two centre estimates differ by about 10 px, so no value.'
+    - observation_id: ge_2005_fig5_i_star_1
+      type: formation_entropy_schema_gap
+      method_class: figure_only
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (i), top right. Labelled vertical tick lines, the tick not the glyph: 100 mol% GeO2 at y 534.5, 90 at 756.5, 80 at 978.5, 70 at 1200.5, 60 at 1422.5, 50 at 1645.0, 40 at 1867.0. Least squares y = -22.208929*mol% + 2755.2679, residuals px 0.125, 0.036, -0.054, -0.143, -0.232, 0.179, 0.089, rms 0.138. Labelled horizontal tick lines: 12 at x 2907.0, 8 at 3063.5, 4 at 3219.5, 0 at 3375.5, -4 at 3531.5, -8 at 3688.0. The stub at x 3562 has no numeral and is not used. Least squares x = -39.035714*delta_fS + 3375.5714, residuals px -0.143, 0.214, 0.071, -0.071, -0.214, 0.143, rms 0.154, with delta_fS in J/(mol K). The axis title prints delta_fS(T), J/(mol K). Caption temperature 1473 K. Centre is the template peak, checked on a 600 dpi crop. An 8 px centre error is 0.36 mol% and 0.20 J/(mol K). The mol% is this axis read. It is not a printed sample cell. This star, page px (3199, 729), match score 0.691. Axis read 91.237 mol% GeO2 and 4.523 J/(mol K).'
+      units: J/(mol K)
+      values:
+        delta_fS_J_mol_K: '4.523'
+        T_K: '1473'
+        composition_mol_percent_GeO2_axis_read: '91.237'
+        composition_mol:
+          GeO2: '0.91237'
+          K2O: '0.08763'
+          basis: figure_axis_read
+        series_as_printed: '4'
+        marker: open star
         marker_centre_px: '(3199, 729)'
         dpi: '600'
-        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+        read_half_width_J_mol_K: '0.20'
+        read_half_width_mol_percent: '0.36'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints delta_fS(T), J/(mol K).'
     - observation_id: ge_2005_fig5_i_star_2
-      type: figure_marker_deferred
+      type: formation_entropy_schema_gap
+      method_class: figure_only
       locator:
         page: 8
         pdf_page_index: 7
         published_page: 1352
         figure: '5'
-        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 2. Centre: template peak. Page px (3074, 906). Match score 0.691. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
-      units: as reported
+        note: 'Panel (i), top right. Labelled vertical tick lines, the tick not the glyph: 100 mol% GeO2 at y 534.5, 90 at 756.5, 80 at 978.5, 70 at 1200.5, 60 at 1422.5, 50 at 1645.0, 40 at 1867.0. Least squares y = -22.208929*mol% + 2755.2679, residuals px 0.125, 0.036, -0.054, -0.143, -0.232, 0.179, 0.089, rms 0.138. Labelled horizontal tick lines: 12 at x 2907.0, 8 at 3063.5, 4 at 3219.5, 0 at 3375.5, -4 at 3531.5, -8 at 3688.0. The stub at x 3562 has no numeral and is not used. Least squares x = -39.035714*delta_fS + 3375.5714, residuals px -0.143, 0.214, 0.071, -0.071, -0.214, 0.143, rms 0.154, with delta_fS in J/(mol K). The axis title prints delta_fS(T), J/(mol K). Caption temperature 1473 K. Centre is the template peak, checked on a 600 dpi crop. An 8 px centre error is 0.36 mol% and 0.20 J/(mol K). The mol% is this axis read. It is not a printed sample cell. This star, page px (3074, 906), match score 0.691. Axis read 83.267 mol% GeO2 and 7.726 J/(mol K).'
+      units: J/(mol K)
       values:
-        decision: deferred
-        panel: 'i'
-        marker: open star
+        delta_fS_J_mol_K: '7.726'
+        T_K: '1473'
+        composition_mol_percent_GeO2_axis_read: '83.267'
+        composition_mol:
+          GeO2: '0.83267'
+          K2O: '0.16733'
+          basis: figure_axis_read
         series_as_printed: '4'
+        marker: open star
         marker_centre_px: '(3074, 906)'
         dpi: '600'
-        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+        read_half_width_J_mol_K: '0.20'
+        read_half_width_mol_percent: '0.36'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints delta_fS(T), J/(mol K).'
     - observation_id: ge_2005_fig5_i_star_3
-      type: figure_marker_deferred
+      type: formation_entropy_schema_gap
+      method_class: figure_only
       locator:
         page: 8
         pdf_page_index: 7
         published_page: 1352
         figure: '5'
-        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 3. Centre: template peak. Page px (3010, 1151). Match score 0.699. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
-      units: as reported
+        note: 'Panel (i), top right. Labelled vertical tick lines, the tick not the glyph: 100 mol% GeO2 at y 534.5, 90 at 756.5, 80 at 978.5, 70 at 1200.5, 60 at 1422.5, 50 at 1645.0, 40 at 1867.0. Least squares y = -22.208929*mol% + 2755.2679, residuals px 0.125, 0.036, -0.054, -0.143, -0.232, 0.179, 0.089, rms 0.138. Labelled horizontal tick lines: 12 at x 2907.0, 8 at 3063.5, 4 at 3219.5, 0 at 3375.5, -4 at 3531.5, -8 at 3688.0. The stub at x 3562 has no numeral and is not used. Least squares x = -39.035714*delta_fS + 3375.5714, residuals px -0.143, 0.214, 0.071, -0.071, -0.214, 0.143, rms 0.154, with delta_fS in J/(mol K). The axis title prints delta_fS(T), J/(mol K). Caption temperature 1473 K. Centre is the template peak, checked on a 600 dpi crop. An 8 px centre error is 0.36 mol% and 0.20 J/(mol K). The mol% is this axis read. It is not a printed sample cell. This star, page px (3010, 1151), match score 0.699. Axis read 72.235 mol% GeO2 and 9.365 J/(mol K).'
+      units: J/(mol K)
       values:
-        decision: deferred
-        panel: 'i'
-        marker: open star
+        delta_fS_J_mol_K: '9.365'
+        T_K: '1473'
+        composition_mol_percent_GeO2_axis_read: '72.235'
+        composition_mol:
+          GeO2: '0.72235'
+          K2O: '0.27765'
+          basis: figure_axis_read
         series_as_printed: '4'
+        marker: open star
         marker_centre_px: '(3010, 1151)'
         dpi: '600'
-        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+        read_half_width_J_mol_K: '0.20'
+        read_half_width_mol_percent: '0.36'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints delta_fS(T), J/(mol K).'
     - observation_id: ge_2005_fig5_i_star_4
-      type: figure_marker_deferred
+      type: formation_entropy_schema_gap
+      method_class: figure_only
       locator:
         page: 8
         pdf_page_index: 7
         published_page: 1352
         figure: '5'
-        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 4. Centre: template peak. Page px (2950, 1272). Match score 0.561. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
-      units: as reported
+        note: 'Panel (i), top right. Labelled vertical tick lines, the tick not the glyph: 100 mol% GeO2 at y 534.5, 90 at 756.5, 80 at 978.5, 70 at 1200.5, 60 at 1422.5, 50 at 1645.0, 40 at 1867.0. Least squares y = -22.208929*mol% + 2755.2679, residuals px 0.125, 0.036, -0.054, -0.143, -0.232, 0.179, 0.089, rms 0.138. Labelled horizontal tick lines: 12 at x 2907.0, 8 at 3063.5, 4 at 3219.5, 0 at 3375.5, -4 at 3531.5, -8 at 3688.0. The stub at x 3562 has no numeral and is not used. Least squares x = -39.035714*delta_fS + 3375.5714, residuals px -0.143, 0.214, 0.071, -0.071, -0.214, 0.143, rms 0.154, with delta_fS in J/(mol K). The axis title prints delta_fS(T), J/(mol K). Caption temperature 1473 K. Centre is the template peak, checked on a 600 dpi crop. An 8 px centre error is 0.36 mol% and 0.20 J/(mol K). The mol% is this axis read. It is not a printed sample cell. This star, page px (2950, 1272), match score 0.561. Axis read 66.787 mol% GeO2 and 10.902 J/(mol K).'
+      units: J/(mol K)
       values:
-        decision: deferred
-        panel: 'i'
-        marker: open star
+        delta_fS_J_mol_K: '10.902'
+        T_K: '1473'
+        composition_mol_percent_GeO2_axis_read: '66.787'
+        composition_mol:
+          GeO2: '0.66787'
+          K2O: '0.33213'
+          basis: figure_axis_read
         series_as_printed: '4'
+        marker: open star
         marker_centre_px: '(2950, 1272)'
         dpi: '600'
-        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+        read_half_width_J_mol_K: '0.20'
+        read_half_width_mol_percent: '0.36'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints delta_fS(T), J/(mol K).'
     - observation_id: ge_2005_fig5_i_star_5
-      type: figure_marker_deferred
+      type: formation_entropy_schema_gap
+      method_class: figure_only
       locator:
         page: 8
         pdf_page_index: 7
         published_page: 1352
         figure: '5'
-        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 5. Centre: template peak. Page px (2924, 1360). Match score 0.536. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
-      units: as reported
+        note: 'Panel (i), top right. Labelled vertical tick lines, the tick not the glyph: 100 mol% GeO2 at y 534.5, 90 at 756.5, 80 at 978.5, 70 at 1200.5, 60 at 1422.5, 50 at 1645.0, 40 at 1867.0. Least squares y = -22.208929*mol% + 2755.2679, residuals px 0.125, 0.036, -0.054, -0.143, -0.232, 0.179, 0.089, rms 0.138. Labelled horizontal tick lines: 12 at x 2907.0, 8 at 3063.5, 4 at 3219.5, 0 at 3375.5, -4 at 3531.5, -8 at 3688.0. The stub at x 3562 has no numeral and is not used. Least squares x = -39.035714*delta_fS + 3375.5714, residuals px -0.143, 0.214, 0.071, -0.071, -0.214, 0.143, rms 0.154, with delta_fS in J/(mol K). The axis title prints delta_fS(T), J/(mol K). Caption temperature 1473 K. Centre is the template peak, checked on a 600 dpi crop. An 8 px centre error is 0.36 mol% and 0.20 J/(mol K). The mol% is this axis read. It is not a printed sample cell. This star, page px (2924, 1360), match score 0.536. Axis read 62.825 mol% GeO2 and 11.568 J/(mol K).'
+      units: J/(mol K)
       values:
-        decision: deferred
-        panel: 'i'
-        marker: open star
+        delta_fS_J_mol_K: '11.568'
+        T_K: '1473'
+        composition_mol_percent_GeO2_axis_read: '62.825'
+        composition_mol:
+          GeO2: '0.62825'
+          K2O: '0.37175'
+          basis: figure_axis_read
         series_as_printed: '4'
+        marker: open star
         marker_centre_px: '(2924, 1360)'
         dpi: '600'
-        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+        read_half_width_J_mol_K: '0.20'
+        read_half_width_mol_percent: '0.36'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints delta_fS(T), J/(mol K).'
     - observation_id: ge_2005_fig5_i_star_6
-      type: figure_marker_deferred
+      type: formation_entropy_schema_gap
+      method_class: figure_only
       locator:
         page: 8
         pdf_page_index: 7
         published_page: 1352
         figure: '5'
-        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 6. Centre: template peak. Page px (2916, 1423). Match score 0.545. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
-      units: as reported
+        note: 'Panel (i), top right. Labelled vertical tick lines, the tick not the glyph: 100 mol% GeO2 at y 534.5, 90 at 756.5, 80 at 978.5, 70 at 1200.5, 60 at 1422.5, 50 at 1645.0, 40 at 1867.0. Least squares y = -22.208929*mol% + 2755.2679, residuals px 0.125, 0.036, -0.054, -0.143, -0.232, 0.179, 0.089, rms 0.138. Labelled horizontal tick lines: 12 at x 2907.0, 8 at 3063.5, 4 at 3219.5, 0 at 3375.5, -4 at 3531.5, -8 at 3688.0. The stub at x 3562 has no numeral and is not used. Least squares x = -39.035714*delta_fS + 3375.5714, residuals px -0.143, 0.214, 0.071, -0.071, -0.214, 0.143, rms 0.154, with delta_fS in J/(mol K). The axis title prints delta_fS(T), J/(mol K). Caption temperature 1473 K. Centre is the template peak, checked on a 600 dpi crop. An 8 px centre error is 0.36 mol% and 0.20 J/(mol K). The mol% is this axis read. It is not a printed sample cell. This star, page px (2916, 1423), match score 0.545. Axis read 59.988 mol% GeO2 and 11.773 J/(mol K).'
+      units: J/(mol K)
       values:
-        decision: deferred
-        panel: 'i'
-        marker: open star
+        delta_fS_J_mol_K: '11.773'
+        T_K: '1473'
+        composition_mol_percent_GeO2_axis_read: '59.988'
+        composition_mol:
+          GeO2: '0.59988'
+          K2O: '0.40012'
+          basis: figure_axis_read
         series_as_printed: '4'
+        marker: open star
         marker_centre_px: '(2916, 1423)'
         dpi: '600'
-        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+        read_half_width_J_mol_K: '0.20'
+        read_half_width_mol_percent: '0.36'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints delta_fS(T), J/(mol K).'
     - observation_id: ge_2005_fig5_i_star_7
-      type: figure_marker_deferred
+      type: formation_entropy_schema_gap
+      method_class: figure_only
       locator:
         page: 8
         pdf_page_index: 7
         published_page: 1352
         figure: '5'
-        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 7. Centre: template peak. Page px (2891, 1530). Match score 0.670. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
-      units: as reported
+        note: 'Panel (i), top right. Labelled vertical tick lines, the tick not the glyph: 100 mol% GeO2 at y 534.5, 90 at 756.5, 80 at 978.5, 70 at 1200.5, 60 at 1422.5, 50 at 1645.0, 40 at 1867.0. Least squares y = -22.208929*mol% + 2755.2679, residuals px 0.125, 0.036, -0.054, -0.143, -0.232, 0.179, 0.089, rms 0.138. Labelled horizontal tick lines: 12 at x 2907.0, 8 at 3063.5, 4 at 3219.5, 0 at 3375.5, -4 at 3531.5, -8 at 3688.0. The stub at x 3562 has no numeral and is not used. Least squares x = -39.035714*delta_fS + 3375.5714, residuals px -0.143, 0.214, 0.071, -0.071, -0.214, 0.143, rms 0.154, with delta_fS in J/(mol K). The axis title prints delta_fS(T), J/(mol K). Caption temperature 1473 K. Centre is the template peak, checked on a 600 dpi crop. An 8 px centre error is 0.36 mol% and 0.20 J/(mol K). The mol% is this axis read. It is not a printed sample cell. This star, page px (2891, 1530), match score 0.670. Axis read 55.170 mol% GeO2 and 12.414 J/(mol K).'
+      units: J/(mol K)
       values:
-        decision: deferred
-        panel: 'i'
-        marker: open star
+        delta_fS_J_mol_K: '12.414'
+        T_K: '1473'
+        composition_mol_percent_GeO2_axis_read: '55.170'
+        composition_mol:
+          GeO2: '0.55170'
+          K2O: '0.44830'
+          basis: figure_axis_read
         series_as_printed: '4'
+        marker: open star
         marker_centre_px: '(2891, 1530)'
         dpi: '600'
-        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+        read_half_width_J_mol_K: '0.20'
+        read_half_width_mol_percent: '0.36'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints delta_fS(T), J/(mol K).'
     - observation_id: ge_2005_fig5_b_star_1
       type: figure_marker_deferred
       locator:

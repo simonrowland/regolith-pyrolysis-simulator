@@ -101,9 +101,10 @@ GeO2 activities on panel (b) were not admitted. On the corrected scale, six of t
 - Fig. 4: the axis label prints `log p(i, 1033 K)` and the caption prints 1300 K. Both are on the 600 dpi page. Every marker is refused because the temperature is not unique. The three series are filled circles (p(GeO)), squares (p(K)) and triangles (p(O2)).
 - Fig. 5, published page 1352, PDF page 8, 600 dpi, 5100×6600. Caption: thermodynamic data for melts in (1) Na2O–SiO2, (2) Na2O–GeO2, (3) K2O–SiO2 and (4) K2O–GeO2 at 1473 K. Panels, confirmed by the panel letter on the render: top row (c) (f) (i), middle row (b) (e) (h), bottom row (a) (d) (g). (a, b) activities, (c) Gibbs energy of melt formation, (d, e) partial enthalpies, (f) enthalpy of melt formation, (g, h) partial entropies. The caption text for (i) says enthalpy. The panel (i) axis prints an entropy.
 - Legend on panel (i), 600 dpi: open triangle = 1, open circle = 2, filled triangle = 3, open star = 4. Series 1, 2 and 3 are replots of [20], [43] and [46]. One refusal row per panel. Their centres were not stored.
-- Series 4 is this work. Every open star below has its own context row. No Fig. 5 value is stored. Panel (c) is the only panel whose horizontal axis was calibrated, and its vertical axis prints no mol% numerals (the left margin and the gap to panel (f) are blank). Panel (i) prints mol% 40 to 100 on its own ticks. Those tick y values do not match panel (c) (the offset grows from 3.5 px to 21.5 px), so the labels were not copied onto any other panel. The other panels were not calibrated on labelled ticks in this pass.
+- Series 4 is this work. Every open star below has its own context row. Panel (c) horizontal axis is calibrated, and its vertical axis prints no mol% numerals (the left margin and the gap to panel (f) are blank), so those readings are not stored. Panel (i) is calibrated on both labelled axes and the seven series-4 stars are stored as context. The mol% labels on panel (i) were not copied onto any other panel: the tick y values do not match panel (c). The other panels were not calibrated on labelled ticks.
 - Panel (c) labelled horizontal tick lines, the tick not the glyph: 0, −2, −4, −6, −8, −10, −12 at x 550.5, 711.5, 873.5, 1034.5, 1196.5, 1357.5, 1518.5. Least squares x = −80.6964·(ΔfG/(RT)) + 550.4643, residuals 0.04, −0.36, 0.25, −0.14, 0.46, 0.07, −0.32 px, rms 0.28 px. The reading in the table is not stored. Uncertainty 0.10 for an 8 px centre error.
 - Centres are template-match peaks unless the evidence column says otherwise. The template is the star at panel (c) page px (1219, 1170), with the guide line masked out of the match. A crop of each listed peak is an open star. Centre uncertainty 8 px, except the panel (b) top star.
+- Panel (i) labelled vertical tick lines, the tick not the glyph: 100, 90, 80, 70, 60, 50, 40 mol% GeO2 at y 534.5, 756.5, 978.5, 1200.5, 1422.5, 1645.0, 1867.0. Least squares y = −22.208929·mol% + 2755.2679, residuals 0.125, 0.036, −0.054, −0.143, −0.232, 0.179, 0.089 px, rms 0.138. Labelled horizontal tick lines: 12, 8, 4, 0, −4, −8 J/(mol K) at x 2907.0, 3063.5, 3219.5, 3375.5, 3531.5, 3688.0. The stub at x 3562 has no numeral and is not used. Least squares x = −39.035714·ΔfS + 3375.5714, residuals −0.143, 0.214, 0.071, −0.071, −0.214, 0.143 px, rms 0.154. An 8 px centre error is 0.36 mol% and 0.20 J/(mol K). The axis title prints ΔfS(T), J/(mol K). Caption temperature 1473 K. The mol% is the axis read, not a printed sample cell. These rows stay context: there is no formation-entropy quantity.
 
 | panel | n | page px | decision | evidence |
 | --- | --- | --- | --- | --- |
@@ -121,13 +122,14 @@ GeO2 activities on panel (b) were not admitted. On the corrected scale, six of t
 | (f) series 4 | 5 | (2440, 1364) | deferred, no value | open star on a 600 dpi crop |
 | (f) series 4 | 6 | (2486, 1428) | deferred, no value | open star on a 600 dpi crop |
 | (f) series 4 | 7 | (2556, 1534) | deferred, no value | open star on a 600 dpi crop |
-| (i) series 4 | 1 | (3199, 729) | deferred, no value | open star on a 600 dpi crop |
-| (i) series 4 | 2 | (3074, 906) | deferred, no value | open star on a 600 dpi crop |
-| (i) series 4 | 3 | (3010, 1151) | deferred, no value | open star on a 600 dpi crop |
-| (i) series 4 | 4 | (2950, 1272) | deferred, no value | open star on a 600 dpi crop |
-| (i) series 4 | 5 | (2924, 1360) | deferred, no value | open star on a 600 dpi crop |
-| (i) series 4 | 6 | (2916, 1423) | deferred, no value | open star on a 600 dpi crop |
-| (i) series 4 | 7 | (2891, 1530) | deferred, no value | open star on a 600 dpi crop |
+| (i) endpoint | — | (3387, 541) and (3377.5, 551.5) | deferred, no value | open star beside the labelled 100 tick. The two centres differ by about 10 px. Not read |
+| (i) series 4 | 1 | (3199, 729) | read, context | 91.237 mol% GeO2, 4.523 J/(mol K), ±0.36 mol% and ±0.20 J/(mol K) |
+| (i) series 4 | 2 | (3074, 906) | read, context | 83.267 mol%, 7.726 J/(mol K) |
+| (i) series 4 | 3 | (3010, 1151) | read, context | 72.235 mol%, 9.365 J/(mol K) |
+| (i) series 4 | 4 | (2950, 1272) | read, context | 66.787 mol%, 10.902 J/(mol K) |
+| (i) series 4 | 5 | (2924, 1360) | read, context | 62.825 mol%, 11.568 J/(mol K) |
+| (i) series 4 | 6 | (2916, 1423) | read, context | 59.988 mol%, 11.773 J/(mol K) |
+| (i) series 4 | 7 | (2891, 1530) | read, context | 55.170 mol%, 12.414 J/(mol K) |
 | (b) series 4 | 1 | (638, 2633) | deferred, no value | open star touching the series-2 circle. Centre is the dark centroid of box x 632-644, y 2625-2642, not the template peak (627, 2639). Uncertainty 6 px |
 | (b) series 4 | 2 | (687, 2823) | deferred, no value | open star on a 600 dpi crop |
 | (b) series 4 | 3 | (803, 3073) | deferred, no value | open star on a 600 dpi crop |
@@ -171,7 +173,7 @@ GeO2 activities on panel (b) were not admitted. On the corrected scale, six of t
 | (g) series 4 | 7 | (3455, 5339) | deferred, no value | open star on a 600 dpi crop |
 | (h) spacing gap | — | near (3760, 2634) | refused | filled triangle against a filled circle, beside the printed 90 mol% label. No open star. The six stars below leave this gap |
 
-Panel (b) top star and the panel (h) gap are the two places where a seventh series-4 marker would complete the spacing shared by panels (c), (f), (i), (a), (d) and (g). On (b) the star is there and touches the circle. On (h) the glyph is series 3. No other series-4 star was left without a centre.
+Panel (b) top star and the panel (h) gap are the two places where a seventh series-4 marker would complete the spacing shared by panels (c), (f), (a), (d) and (g). On (b) the star is there and touches the circle. On (h) the glyph is series 3. Panel (i) has those seven stars plus an eighth glyph beside the labelled 100 mol% tick. That endpoint is deferred: the upper-notch seed (3387, 541) and the ink-box centre (3377.5, 551.5) differ by about 10 px, so no value is stored.
 
 ## Standard state for the K2O activities
 
