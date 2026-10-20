@@ -1,7 +1,6 @@
 """Pin Ban-ya et al. prose composition summaries and deferred figure records."""
 from __future__ import annotations
 
-import os
 import subprocess
 from decimal import Decimal
 from pathlib import Path
@@ -11,10 +10,11 @@ import yaml
 
 from simulator.battery.enums import Phase, ValueKind
 from simulator.battery.migrate import Migrator
+from tests.literature_extract_test_helpers import corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/banya-2004-sulphide-capacity-cao-al2o3.yaml"
-CORPUS_ROOT = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS_ROOT = corpus_root()
 PDF = CORPUS_ROOT / "raw/banya-2004-sulphide-capacity-cao-al2o3/banya-2004-sulphide-capacity-cao-al2o3.pdf"
 
 
