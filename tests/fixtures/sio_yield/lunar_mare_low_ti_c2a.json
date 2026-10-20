@@ -10116,7 +10116,22 @@
       }
     },
     "nominal_verdict": null,
-    "verdict": "non-authoritative"
+    "verdict": "non-authoritative",
+    "refusal": {
+      "reason": "Zero wall deposition cannot be certified from non-authoritative wall-routing evidence.",
+      "code": "wall_deposit_vapour_carrier_non_authoritative",
+      "authoritative": false,
+      "authoritative_for_deposit_mass": false,
+      "authoritative_for_coating": false,
+      "authoritative_for_resinter": false,
+      "severity": "warning",
+      "output_status": "status_bearing",
+      "refusal_events": 4,
+      "affected_species": [
+        "SiO"
+      ],
+      "authority_detail_path": "fouling_rate.sticking_alpha_authority"
+    }
   },
   "sio_yield_pct_of_feedstock": 1.04099076417e-06,
   "industrial_benchmark_pct": [
