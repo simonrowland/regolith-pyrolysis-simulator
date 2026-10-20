@@ -380,12 +380,9 @@ class EquilibriumMixin:
         ellingham_extrapolations = {}
         vapor_pressure_authority_limits = {}
         warnings = []
-        # b-149 instance 3: typed notes on the `_sz_omit` paths in this
-        # method (missing activity, activity-threshold skip, P <= 1e-15 Pa).
-        # Those omissions keep status='ok' with a note. Other continues in
-        # this method (inactive row, missing parent, A<=0, oxide-vapor
-        # outside valid_range_K) still omit without a note.
+        # b-149: type pressure omissions and out-of-domain continuations.
         from simulator.silent_zero import (
+            CATEGORY_MARK,
             CATEGORY_PROVEN_ZERO,
             CATEGORY_REFUSE,
             ZeroBecause,
@@ -396,7 +393,7 @@ class EquilibriumMixin:
 
         silent_zero_notes: list = []
 
-        def _sz_omit(
+        def _sz_note(
             species_id: str,
             because: ZeroBecause,
             *,
@@ -425,18 +422,18 @@ class EquilibriumMixin:
 
         def _sz_activity_skip(species_id: str, oxide_activity_obj) -> None:
             if oxide_activity_obj is None:
-                _sz_omit(
+                _sz_note(
                     species_id,
                     ZeroBecause.MISSING_ACTIVITY,
                     field='oxide_activity',
                     detail=(
                         'melt_oxide_activity returned None; species omitted '
-                        'from vapor_pressures while status stays ok'
+                        'from vapor_pressures'
                     ),
                     category=CATEGORY_REFUSE,
                 )
             else:
-                _sz_omit(
+                _sz_note(
                     species_id,
                     ZeroBecause.PROVEN_BELOW_THRESHOLD,
                     field='oxide_activity',
@@ -450,17 +447,51 @@ class EquilibriumMixin:
                 )
 
         def _sz_below_threshold(species_id: str, p_pa: float, field: str) -> None:
-            _sz_omit(
+            _sz_note(
                 species_id,
                 ZeroBecause.PROVEN_BELOW_THRESHOLD,
                 field=field,
                 detail=(
                     f'{field}={p_pa!r} <= 1e-15 Pa; key omitted from '
-                    f'vapor_pressures_Pa while status=ok (distinguishable '
-                    f'proven-small zero)'
+                    f'vapor_pressures_Pa (distinguishable proven-small zero)'
                 ),
                 category=CATEGORY_PROVEN_ZERO,
             )
+
+        def _usable_antoine_coefficients(
+            antoine: object,
+        ) -> tuple[float, float, float] | None:
+            if not isinstance(antoine, Mapping):
+                return None
+            try:
+                coefficients = (
+                    float(antoine.get('A', 0) or 0),
+                    float(antoine.get('B', 0) or 0),
+                    float(antoine.get('C', 0) or 0),
+                )
+            except (TypeError, ValueError):
+                return None
+            if not all(math.isfinite(value) for value in coefficients):
+                return None
+            if coefficients[0] <= 0.0:
+                return None
+            return coefficients
+
+        coefficient_refusal = False
+
+        def _sz_refuse_missing_coefficient(species_id: str) -> None:
+            nonlocal coefficient_refusal
+            _sz_note(
+                species_id,
+                ZeroBecause.MISSING_COEFFICIENT,
+                field='antoine_coefficients',
+                detail=(
+                    'reason=missing_or_invalid_antoine_coefficients; '
+                    'pressure unavailable'
+                ),
+                category=CATEGORY_REFUSE,
+            )
+            coefficient_refusal = True
 
         pseudo_warning_seen = getattr(
             self,
@@ -644,11 +675,11 @@ class EquilibriumMixin:
                         sp_data,
                         coefficient_block,
                     )
-                A = antoine.get('A', 0)
-                B = antoine.get('B', 0)
-                C = antoine.get('C', 0)
-                if P_reference_Pa is None and not (A > 0 and T_K > 300):
+                coefficients = _usable_antoine_coefficients(antoine)
+                if P_reference_Pa is None and coefficients is None:
+                    _sz_refuse_missing_coefficient(species)
                     continue
+                A, B, C = coefficients or (0.0, 0.0, 0.0)
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
                 )
@@ -800,10 +831,12 @@ class EquilibriumMixin:
             liquid_rxn = liquid_rxn_early
             if liquid_rxn is not None and fit_target != FIT_TARGET_STANDARD_REACTION:
                 antoine_liq = liquid_rxn.get("antoine", {}) or {}
-                A_l = float(antoine_liq.get("A", 0.0) or 0.0)
-                B_l = float(antoine_liq.get("B", 0.0) or 0.0)
-                C_l = float(antoine_liq.get("C", 0.0) or 0.0)
-                if not (A_l > 0.0 and T_K > 300.0):
+                liquid_coefficients = _usable_antoine_coefficients(antoine_liq)
+                if liquid_coefficients is None:
+                    _sz_refuse_missing_coefficient(species)
+                    continue
+                A_l, B_l, C_l = liquid_coefficients
+                if T_K <= 300.0:
                     continue
                 valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
                 if valid_liq is not None:
@@ -887,10 +920,12 @@ class EquilibriumMixin:
             gas_rail_rxn = gas_rail_rxn_early
             if gas_standard_rail and gas_rail_rxn is not None:
                 antoine_gas = gas_rail_rxn.get("antoine", {}) or {}
-                A_g = float(antoine_gas.get("A", 0.0) or 0.0)
-                B_g = float(antoine_gas.get("B", 0.0) or 0.0)
-                C_g = float(antoine_gas.get("C", 0.0) or 0.0)
-                if not (A_g > 0.0 and T_K > 300.0):
+                gas_coefficients = _usable_antoine_coefficients(antoine_gas)
+                if gas_coefficients is None:
+                    _sz_refuse_missing_coefficient(species)
+                    continue
+                A_g, B_g, C_g = gas_coefficients
+                if T_K <= 300.0:
                     continue
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
@@ -1046,7 +1081,7 @@ class EquilibriumMixin:
                     # skip is not derived from the 1e-15 Pa vapor-pressure
                     # omit; tagging it missing_activity would still launder
                     # a computed activity into a missing-input story.
-                    _sz_omit(
+                    _sz_note(
                         species,
                         ZeroBecause.PROVEN_BELOW_THRESHOLD,
                         field='a_FeO_authoritative',
@@ -1233,23 +1268,61 @@ class EquilibriumMixin:
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
 
         for name, data in oxide_vapors_data.items():
-            antoine = data.get('antoine', {})
-            A = antoine.get('A', 0)
-            B = antoine.get('B', 0)
-            C = antoine.get('C', 0)
+            antoine = data.get('antoine', {}) or {}
+            coefficients = _usable_antoine_coefficients(antoine)
             valid = data.get('valid_range_K', [0, 9999])
 
-            if A > 0 and valid[0] <= T_K <= valid[1]:
-                log_P = _antoine_log10_pressure(A, B, C, T_K)
-                P_sat = _pow10_pressure_or_raise(
-                    log_P,
-                    species=name,
-                    field="P_sat",
-                )
-            else:
-                # Out-of-range or A <= 0: omit without a silent-zero note
-                # on this path (the `_sz_omit` helpers are not called).
+            if coefficients is None:
+                _sz_refuse_missing_coefficient(name)
                 continue
+            A, B, C = coefficients
+            out_of_range = (
+                isinstance(valid, (list, tuple))
+                and len(valid) == 2
+                and (T_K < float(valid[0]) or T_K > float(valid[1]))
+            )
+            if out_of_range:
+                valid_low, valid_high = float(valid[0]), float(valid[1])
+                certified_band = (
+                    data.get('source_certified_range_K')
+                    or antoine.get('source_certified_range_K')
+                )
+                certified_band_text = 'unavailable'
+                if (
+                    isinstance(certified_band, (list, tuple))
+                    and len(certified_band) == 2
+                ):
+                    certified_band_text = (
+                        f'[{float(certified_band[0]):g}, '
+                        f'{float(certified_band[1]):g}]'
+                    )
+                detail = (
+                    'reason=temperature_outside_valid_range_K '
+                    'authority_level=extrapolated '
+                    f'certified_band_K={certified_band_text} '
+                    f'valid_range_K=[{valid_low:g}, {valid_high:g}] '
+                    f'temperature_K={T_K:g}'
+                )
+                _sz_note(
+                    name,
+                    ZeroBecause.OUT_OF_DOMAIN_MARKED,
+                    field='valid_range_K',
+                    detail=detail,
+                    category=CATEGORY_MARK,
+                )
+                warnings.append(
+                    f'oxide_vapor_pressure_outside_valid_range: species={name} '
+                    f'temperature_K={T_K:.3f} '
+                    f'authority_level=extrapolated '
+                    f'valid_range_K=[{valid_low:g}, {valid_high:g}]'
+                )
+
+            log_P = _antoine_log10_pressure(A, B, C, T_K)
+            P_sat = _pow10_pressure_or_raise(
+                log_P,
+                species=name,
+                field="P_sat",
+            )
 
             parent_oxide = data.get('parent_oxide', '')
             if parent_oxide:
@@ -1322,7 +1395,7 @@ class EquilibriumMixin:
 
             if P_sat > 1e-15:
                 vapor_pressures[name] = P_sat
-                vapor_pressure_sources[name] = vapor_pressure_source_label(
+                source_label = vapor_pressure_source_label(
                     'builtin_authoritative',
                     data,
                     coefficient_block=COEFF_BLOCK_ANTOINE,
@@ -1331,6 +1404,11 @@ class EquilibriumMixin:
                         name in ellingham_extrapolations
                     ),
                 )
+                if out_of_range:
+                    source_label = (
+                        f'{source_label}:extrapolated_beyond_valid_range_K'
+                    )
+                vapor_pressure_sources[name] = source_label
                 warn_pseudo_vapor_pressure_fallback(
                     name,
                     data,
@@ -1360,10 +1438,8 @@ class EquilibriumMixin:
                 consumer='legacy-equilibrium-fallback',
             ),
         }
-        # b-149: merge notes collected on the `_sz_omit` paths. This
-        # completed path sets status='ok'; invalid T/P already returned
-        # out_of_domain above. Oxide-vapor valid_range_K misses remain
-        # un-noted on this path.
+        # Missing coefficients refuse the result; out-of-range Antoine
+        # predictions remain available with a typed notice.
         if silent_zero_notes:
             merge_notes_into_mapping(_eq_diagnostics, silent_zero_notes)
         return EquilibriumResult(
@@ -1382,6 +1458,6 @@ class EquilibriumMixin:
             activity_coefficients=activities,
             fO2_log=intrinsic_fO2_log,
             warnings=warnings,
-            status='ok',
+            status='refused' if coefficient_refusal else 'ok',
             diagnostics=_eq_diagnostics,
         )
