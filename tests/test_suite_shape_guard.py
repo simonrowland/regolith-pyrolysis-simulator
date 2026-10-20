@@ -30,6 +30,7 @@ import json
 import re
 from importlib import import_module
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -185,6 +186,36 @@ def _group_names(item) -> list[str]:
         elif "name" in mark.kwargs:
             names.append(str(mark.kwargs["name"]))
     return sorted(set(names))
+
+
+def test_suite_shape_roster_drift_is_checked_under_mark_expression(
+    monkeypatch,
+) -> None:
+    fake_roster = frozenset({("tests/test_fake.py", "test_phantom")})
+    full_collection = [
+        {
+            "nodeid": "tests/test_fake.py::test_unrostered_heavy",
+            "timeout_s": GLOBAL_TIMEOUT_CEILING_S + 1,
+        }
+    ]
+    monkeypatch.setitem(globals(), "HEAVY_ROSTER", fake_roster)
+    monkeypatch.setitem(
+        globals(), "_collect_full_suite_items", lambda: full_collection
+    )
+    monkeypatch.setitem(globals(), "_nightly_yield_violations", lambda: [])
+    request = SimpleNamespace(
+        session=SimpleNamespace(items=[]),
+        config=SimpleNamespace(
+            option=SimpleNamespace(markexpr="not nightly")
+        ),
+    )
+
+    with pytest.raises(AssertionError) as exc_info:
+        test_suite_shape_heavy_tests_are_grouped_and_rostered(request)
+
+    message = str(exc_info.value)
+    assert "test_phantom" in message
+    assert "test_unrostered_heavy" in message
 
 
 def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
