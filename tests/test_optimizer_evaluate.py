@@ -4773,6 +4773,7 @@ def test_physics_refused_is_infeasible_trial_with_note() -> None:
         executor=FakeExecutor(
             _execution(
                 status="refused",
+                snapshots=(),
                 error_message="Knudsen refusal",
                 reason="free molecular",
             )
@@ -4783,6 +4784,25 @@ def test_physics_refused_is_infeasible_trial_with_note() -> None:
     assert result.failure_category is FailureCategory.PHYSICS_REFUSED
     assert result.objectives is None
     assert "free molecular" in result.notes
+
+
+def test_physics_refusal_with_populated_mass_balance_breach_aborts() -> None:
+    snapshot = _snapshot(mass_balance_error_pct=5.1e-12)
+
+    with pytest.raises(EngineBugAbort, match="mass balance breach"):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(
+                _execution(
+                    status="refused",
+                    snapshots=(snapshot,),
+                    reason="free molecular",
+                )
+            ),
+        )
 
 
 def _typed_refusal_execution(reason: str) -> SimpleNamespace:
