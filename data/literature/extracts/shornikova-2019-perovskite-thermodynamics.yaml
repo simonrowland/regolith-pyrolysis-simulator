@@ -2369,8 +2369,8 @@ species:
         caption_as_printed: 'Fig. 3. Activities of (a) CaO and (b) TiO2 in perovskite, determined via (1–3) Knudsen effusion mass spectrometry in [46, 47] and this work, respectively; and (4, 5) in studying the heterogeneous equilibria of multicomponent melts in [44, 45], respectively.'
         equation_5_as_printed: 'a_CaO = p_CaO / p°_CaO = p_Ca p_O / (p°_Ca p°_O)'
         equation_6_as_printed: 'a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O)'
-        stored_counts: 'Fig. 3a series 3, 16 open circles. Fig. 3b series 3, 12 open circles.'
-        refused: 'Series 1 filled circles and series 2 half-filled circles carry the error bars and are [46] and [47]. Series 4 and 5 triangles are [44] and [45]. The legend open circle at page pixel (2213, 3127) is the series-3 key, not a datum. The open circle at (1534, 2812) has that literature error bar through it. The white lens at (1195, 3044) is the overlap of two stored circles, not a third centre. The open arc just left of the Fig. 3a circle at (1521.50, 967.00) has no pixel whose ray median matches the 37 px inner radius (best median 31.5, std 12.5, at x=1482, y=1002). The leftmost open circle of the Fig. 3b high-temperature cluster has no pixel whose ray median matches the 32 px inner radius (best median 27 at x=1885, y=2604).'
+        stored_counts: 'Fig. 3a series 3, 18 open circles. Fig. 3b series 3, 15 open circles.'
+        refused: 'Series 1 filled circles and series 2 half-filled circles carry the error bars and are [46] and [47]. Series 4 and 5 triangles are [44] and [45]. The legend open circle at page pixel (2213, 3127) is a complete ring, 36 of 36 rays at radius 32 px, and it is the series-3 key, not a datum. Stored this round: (1534.00, 2812.00), 250 degrees at radius 31 px; (1198.00, 3048.00), 240 degrees at radius 31.5 px, 48 px from the stored circle at (1231, 3083); (1485.00, 1001.00), the single arc that covers both (1463, 981) and (1487, 1000); (1887.00, 2604.00), 230 degrees at radius 31 px; (2001.00, 840.00), the single arc that covers both (1963, 846) and (2004, 841). Still refused: (1640, 911) is the literature half-filled symbol, even though 160 degrees of a 36 px ring are visible at (1644, 913). (1634, 967) has no single centre: the best sectors are 150 degrees and the candidate centres sit 16 px apart at radii 19 to 31. (1065, 3176) has a 170 degree sector at radius 25 to 28 px, short of the series radius 32 px, and the centre moves 14 px between the two best fits.'
     - observation_id: shornikova_2019_fig4_pressures_from_ref2
       type: figure_context
       locator:
@@ -2419,6 +2419,146 @@ species:
         cell_material: This paper does not restate the cell material.
   CaO:
     observations:
+    - observation_id: shornikova_2019_fig3a_CaO_t2251_4
+      type: activity_coefficient
+      experiment: shornikova-2019-fig3a
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1432
+        figure: '3'
+        panel: a
+        series: '3'
+        marker_symbol: open circle
+        note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3a temperature ticks, least-squares residual 0: 1800 at x=933.5, 2000 at x=1406.5, 2200 at x=1879.5, 2400 at x=2352.5. T/K = 1800 + (x - 933.5)*(200/473), 473 px per 200 K. Activity ticks, residual 0: 0.03 at y=702.5, 0.02 at y=1166.5, 0.01 at y=1630.5. a = 0.03 - (y - 702.5)*(0.01/464), 464 px per 0.01. The frame at y=1861 is not a labelled zero; the same line places it at a=0.00503. Series 3, open circle, CaO. Page pixel (2001.00, 840.00). Read activity = 0.0270 ± 0.0005; T = 2251.4 ± 6 K. 200 of 360 degrees at radius 34.5 px, std 1.7 px. The stored circle at (2034.50, 868.50) is 44 px away. The nominations (1963, 846) and (2004, 841) are this one arc."
+      T_range_K: [2251.4, 2251.4]
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: CaO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: lime
+            component_basis: CaO
+        inferred: true
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (5) is printed a_CaO = p_CaO / p°_CaO = p_Ca p_O / (p°_Ca p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_CaO is the partial pressure over the pure oxide at the temperature of this point. CaO melts at 2843 K in Table 2 of this paper, the lowest CaO melting temperature that table lists. The stable phase at 2251.4 K is crystalline lime, 592 K below that melting point. No CaO transition lies within 100 K of 2251.4 K. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 10 K above 2241 K, so the sample phase stored here is liquid perovskite. The point is within 100 K of that melting temperature."
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 1431
+          equation: '5'
+          figure: '3'
+          note: Equations (5) and the pure-component sentence on published page 1431. The temperature is the Fig. 3 read.
+      units: dimensionless activity
+      uncertainty:
+        value: '0.0005'
+        unit: activity
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.0005 in activity and ±6 K. The paper prints no error bar on this open circle. 200 of 360 degrees at radius 34.5 px, std 1.7 px. The stored circle at (2034.50, 868.50) is 44 px away. The nominations (1963, 846) and (2004, 841) are this one arc."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2251.4'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1432
+            figure: '3'
+            panel: a
+            note: Temperature is the Fig. 3 x-axis read for this open circle.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2251.4'
+        temperature_K: 2251.4
+        activity: '0.0270'
+        composition_mol:
+          basis: pure_oxide_system
+          CaTiO3: '1'
+        page_pixel_x: '2001.00'
+        page_pixel_y: '840.00'
+    - observation_id: shornikova_2019_fig3a_CaO_t2033_2
+      type: activity_coefficient
+      experiment: shornikova-2019-fig3a
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1432
+        figure: '3'
+        panel: a
+        series: '3'
+        marker_symbol: open circle
+        note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3a temperature ticks, least-squares residual 0: 1800 at x=933.5, 2000 at x=1406.5, 2200 at x=1879.5, 2400 at x=2352.5. T/K = 1800 + (x - 933.5)*(200/473), 473 px per 200 K. Activity ticks, residual 0: 0.03 at y=702.5, 0.02 at y=1166.5, 0.01 at y=1630.5. a = 0.03 - (y - 702.5)*(0.01/464), 464 px per 0.01. The frame at y=1861 is not a labelled zero; the same line places it at a=0.00503. Series 3, open circle, CaO. Page pixel (1485.00, 1001.00). Read activity = 0.0236 ± 0.0005; T = 2033.2 ± 6 K. 210 degrees, 21 of 36 rays, at radius 35 px, std 1.8 px, against the series radius 37 px. The series-3 circle at (1521.50, 967.00) is 50 px away. The nominations (1463, 981) and (1487, 1000) are this one arc."
+      T_range_K: [2033.2, 2033.2]
+      phase: cr
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: CaO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: lime
+            component_basis: CaO
+        inferred: true
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (5) is printed a_CaO = p_CaO / p°_CaO = p_Ca p_O / (p°_Ca p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_CaO is the partial pressure over the pure oxide at the temperature of this point. CaO melts at 2843 K in Table 2 of this paper, the lowest CaO melting temperature that table lists. The stable phase at 2033.2 K is crystalline lime, 810 K below that melting point. No CaO transition lies within 100 K of 2033.2 K. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 208 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 1431
+          equation: '5'
+          figure: '3'
+          note: Equations (5) and the pure-component sentence on published page 1431. The temperature is the Fig. 3 read.
+      units: dimensionless activity
+      uncertainty:
+        value: '0.0005'
+        unit: activity
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.0005 in activity and ±6 K. The paper prints no error bar on this open circle. 210 degrees, 21 of 36 rays, at radius 35 px, std 1.8 px, against the series radius 37 px. The series-3 circle at (1521.50, 967.00) is 50 px away. The nominations (1463, 981) and (1487, 1000) are this one arc."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2033.2'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1432
+            figure: '3'
+            panel: a
+            note: Temperature is the Fig. 3 x-axis read for this open circle.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2033.2'
+        temperature_K: 2033.2
+        activity: '0.0236'
+        composition_mol:
+          basis: pure_oxide_system
+          CaTiO3: '1'
+        page_pixel_x: '1485.00'
+        page_pixel_y: '1001.00'
     - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r02_c02
       type: transition_point
       locator:
@@ -4297,6 +4437,207 @@ species:
         page_pixel_y: '925.00'
   TiO2:
     observations:
+    - observation_id: shornikova_2019_fig3b_TiO2_t2268_1
+      type: activity_coefficient
+      experiment: shornikova-2019-fig3b
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1432
+        figure: '3'
+        panel: b
+        series: '3'
+        marker_symbol: open circle
+        note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1887.00, 2604.00). Read activity = 0.2419 ± 0.001; T = 2268.1 ± 4 K. 230 of 360 degrees at radius 31 px, std 1.4 px. The stored circle at (1931.50, 2598.50) is 45 px away."
+      T_range_K: [2268.1, 2268.1]
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: TiO2
+              phase:
+                tag: value
+                value: l
+            component_basis: TiO2
+        inferred: true
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2268.1 K is 83 K above 2185 K and above the stated ±10 K band, so the stable phase of the pure oxide is the liquid. The point is 83 K from 2185 K. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 27 K above 2241 K, so the sample phase stored here is liquid perovskite. The point is within 100 K of that melting temperature."
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 1431
+          equation: '6'
+          figure: '3'
+          note: Equations (6) and the pure-component sentence on published page 1431. The temperature is the Fig. 3 read.
+      units: dimensionless activity
+      uncertainty:
+        value: '0.001'
+        unit: activity
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.001 in activity and ±4 K. The paper prints no error bar on this open circle. 230 of 360 degrees at radius 31 px, std 1.4 px. The stored circle at (1931.50, 2598.50) is 45 px away."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2268.1'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1432
+            figure: '3'
+            panel: b
+            note: Temperature is the Fig. 3 x-axis read for this open circle.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2268.1'
+        temperature_K: 2268.1
+        activity: '0.2419'
+        composition_mol:
+          basis: pure_oxide_system
+          CaTiO3: '1'
+        page_pixel_x: '1887.00'
+        page_pixel_y: '2604.00'
+    - observation_id: shornikova_2019_fig3b_TiO2_t1940_2
+      type: activity_coefficient
+      experiment: shornikova-2019-fig3b
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1432
+        figure: '3'
+        panel: b
+        series: '3'
+        marker_symbol: open circle
+        note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1198.00, 3048.00). Read activity = 0.1518 ± 0.001; T = 1940.2 ± 4 K. 240 of 360 degrees at radius 31.5 px, std 1.3 px. The stored circle at (1231.00, 3083.00) is 48 px away, so this is a separate centre."
+      T_range_K: [1940.2, 1940.2]
+      phase: cr
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: TiO2
+              phase:
+                tag: value
+                value: cr
+            component_basis: TiO2
+        inferred: true
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1940.2 K is 245 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 301 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 1431
+          equation: '6'
+          figure: '3'
+          note: Equations (6) and the pure-component sentence on published page 1431. The temperature is the Fig. 3 read.
+      units: dimensionless activity
+      uncertainty:
+        value: '0.001'
+        unit: activity
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.001 in activity and ±4 K. The paper prints no error bar on this open circle. 240 of 360 degrees at radius 31.5 px, std 1.3 px. The stored circle at (1231.00, 3083.00) is 48 px away, so this is a separate centre."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1940.2'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1432
+            figure: '3'
+            panel: b
+            note: Temperature is the Fig. 3 x-axis read for this open circle.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1940.2'
+        temperature_K: 1940.2
+        activity: '0.1518'
+        composition_mol:
+          basis: pure_oxide_system
+          CaTiO3: '1'
+        page_pixel_x: '1198.00'
+        page_pixel_y: '3048.00'
+    - observation_id: shornikova_2019_fig3b_TiO2_t2100_1
+      type: activity_coefficient
+      experiment: shornikova-2019-fig3b
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1432
+        figure: '3'
+        panel: b
+        series: '3'
+        marker_symbol: open circle
+        note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1534.00, 2812.00). Read activity = 0.1997 ± 0.001; T = 2100.1 ± 4 K. 250 of 360 degrees at radius 31 px, std 1.4 px, against the series radius 32 px. A literature error bar crosses the missing sector."
+      T_range_K: [2100.1, 2100.1]
+      phase: cr
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: TiO2
+              phase:
+                tag: value
+                value: cr
+            component_basis: TiO2
+        inferred: true
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2100.1 K is 85 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. The point is 85 K from 2185 K. Table 2 also lists 2098 K, and this point is 2 K from that lower melting temperature. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 141 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 1431
+          equation: '6'
+          figure: '3'
+          note: Equations (6) and the pure-component sentence on published page 1431. The temperature is the Fig. 3 read.
+      units: dimensionless activity
+      uncertainty:
+        value: '0.001'
+        unit: activity
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.001 in activity and ±4 K. The paper prints no error bar on this open circle. 250 of 360 degrees at radius 31 px, std 1.4 px, against the series radius 32 px. A literature error bar crosses the missing sector."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2100.1'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1432
+            figure: '3'
+            panel: b
+            note: Temperature is the Fig. 3 x-axis read for this open circle.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2100.1'
+        temperature_K: 2100.1
+        activity: '0.1997'
+        composition_mol:
+          basis: pure_oxide_system
+          CaTiO3: '1'
+        page_pixel_x: '1534.00'
+        page_pixel_y: '2812.00'
     - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r16_c02
       type: transition_point
       locator:
