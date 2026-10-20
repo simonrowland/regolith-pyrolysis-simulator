@@ -4594,7 +4594,7 @@ def test_completion_ceramic_panel_classifies_product_story_refractory_slice(
     monkeypatch.setattr(
         web_events,
         "_product_story_payload",
-        lambda _sim, *, terminal_rump_by_species: {
+        lambda _sim, *, terminal_rump_by_species, classification: {
             "refractory_ceramic": {
                 "species_kg": {
                     species: round(mass, 2)
