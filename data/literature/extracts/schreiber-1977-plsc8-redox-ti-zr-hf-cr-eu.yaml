@@ -9,10 +9,9 @@ source:
   year: 1977
 extraction:
   method: >-
-    Scanned LPSC proceedings article transcribed from MinerU OCR. Table 3 was
-    checked against a 600 dpi render of physical PDF page 16 (printed page
-    1800). Table 1 bulk compositions and Table 2 fitted reduction enthalpies
-    are retained in context. Figure values are not digitised.
+    Scanned LPSC proceedings article transcribed from MinerU OCR. Tables 1
+    and 2 were checked against 600 dpi renders of physical PDF pages 4 and 9;
+    Table 3 was checked against page 16. Figure values are not digitised.
   date: '2026-10-20'
   worker: fam27-1020
 review_status: draft
@@ -80,6 +79,52 @@ species:
                 composition: {state: {tag: unknown, reason: Table 3 identifies the material only as synthetic glass.}, locator: {page: 16, pdf_page_index: 15, published_page: 1800, table: '3'}}
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 16, pdf_page_index: 15, published_page: 1800, table: '3'}}
     context:
+      - observation_id: schreiber_1977_table1_synthetic_and_basalt_compositions
+        type: table
+        locator: {page: 4, pdf_page_index: 3, published_page: 1788, table: '1'}
+        units: wt% oxides except Eu in ppm, as printed
+        values:
+          quantity: bulk melt compositions and basalt comparison ranges
+          candidate_tokens: [composition]
+          table_row_count: 11
+          reason: >-
+            Whole-sample melt recipes and compiled basalt ranges are context;
+            they are not individual phase compositions. Dashes are unreported.
+          footnotes:
+            - Each synthetic melt contained only a single redox oxide, either Ti, Cr, or Eu oxide.
+            - FAS is 53% forsterite, 27% anorthite, and 20% silica by weight.
+            - FAD is 25% forsterite, 6% anorthite, and 69% diopside by weight.
+            - Parenthesized TiO2 values are approximate ZrO2 or HfO2 concentrations when substituted for TiO2.
+            - Basalt ranges are cited to Taylor (1975).
+            - The Earth Eu value is cited to Haskin et al. (1968).
+          table_rows:
+            - {oxide: SiO2, FAS: '53.9', FAD: '51.1', Earth: '44-53', Moon: '37-49'}
+            - {oxide: Al2O3, FAS: '10.7', FAD: '2.9', Earth: '13-19', Moon: '7-14'}
+            - {oxide: FeO, FAS: '—', FAD: '—', Earth: '7-14', Moon: '18-23'}
+            - {oxide: MnO, FAS: '—', FAD: '—', Earth: '0.09-0.3', Moon: '0.21-0.29'}
+            - {oxide: MgO, FAS: '29.3', FAD: '26.1', Earth: '4-10', Moon: '6-17'}
+            - {oxide: CaO, FAS: '5.7', FAD: '19.1', Earth: '8-12', Moon: '8-12'}
+            - {oxide: Na2O, FAS: '—', FAD: '—', Earth: '1.8-3.8', Moon: '0.1-0.5'}
+            - {oxide: K2O, FAS: '—', FAD: '—', Earth: '0.3-1.9', Moon: '0.2-0.3'}
+            - {oxide: TiO2, FAS: '(1.3)^4', FAD: '(1.3)^4', Earth: '0.9-3.3', Moon: '0.3-13'}
+            - {oxide: Cr2O3, FAS: '(0.1-0.6)', FAD: '(0.1-0.8)', Earth: '0.005-0.04', Moon: '0.12-0.70'}
+            - {oxide: Eu(ppm), FAS: '(9300)', FAD: '(10600)', Earth: '1.9^6', Moon: '0.21-2.6'}
+      - observation_id: schreiber_1977_table2_reduction_enthalpies
+        type: table
+        locator: {page: 9, pdf_page_index: 8, published_page: 1793, table: '2'}
+        units: kcal/mole of O2 as printed
+        values:
+          quantity: fitted standard reduction reaction enthalpy
+          method_class: model_derived
+          candidate_tokens: [delta_fH]
+          table_row_count: 3
+          reason: >-
+            These fitted reduction reaction enthalpies are not standard
+            formation enthalpies from elements; no matching store token exists.
+          table_rows:
+            - {redox_couple: Ti(IV)->Ti(III), FAS: '70 ± 28', FAD: '71 ± 19', average: '70 ± 23'}
+            - {redox_couple: Eu(III)->Eu(II), FAS: '44 ± 35', FAD: '36 ± 16', average: '40 ± 25'}
+            - {redox_couple: Cr(III)->Cr(II), FAS: '35 ± 12', FAD: '38 ± 3', average: '36 ± 8'}
       - observation_id: schreiber_1977_table3_current_cr_estimate
         type: table
         locator: {page: 16, pdf_page_index: 15, published_page: 1800, table: '3', row: 'Cr(III)-Cr(II), this study'}
@@ -416,3 +461,15 @@ species:
         locator: {page: 16, pdf_page_index: 15, published_page: 1800, table: '3', row: 'Zr(IV)-Zr(III)'}
         units: dimensionless fraction as printed
         values: {quantity: Zr(III) fraction in this study, method_class: model_derived, admission_status: typed_unavailable, reason: 'Printed zero is a study estimate, not a measured value; family instructions permit measured Zr/Hf values only.'}
+      - observation_id: schreiber_1977_zr_table3_postulated_prior_fraction
+        type: table
+        locator: {page: 16, pdf_page_index: 15, published_page: 1800, table: '3', row: 'Zr(IV)-Zr(III), previous studies'}
+        units: dimensionless fraction as printed
+        values:
+          quantity: postulated Zr(III) fraction in lunar basalts
+          method_class: quoted_attributed
+          attribution: Postulated by Garg and Ehmann (1976)
+          admission_status: typed_unavailable
+          candidate_tokens: [valence_ratio]
+          value_as_published: 0.15-0.25
+          reason: The row is explicitly postulated, not a measured Zr value.
