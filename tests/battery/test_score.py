@@ -5976,6 +5976,141 @@ def test_unknown_sample_phase_activity_stays_on_the_melt_activity_rail() -> None
     assert _residual_engine_observable(residual_to_plain(residual)) is True
 
 
+_SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID = "sample_phase_crystalline_vs_liquid_engine"
+
+
+def _vapour_over_sample_form(form: str):
+    """Mg partial pressure over a sample whose form token is ``form``.
+
+    Tabulation keeps the effusion gate from firing, so a melt sample and
+    a non-liquid engine reach the stub predictor. The gas species stays
+    Phase.G; the sample phase is only the experiment form.
+    """
+
+    base = F.tabulation_experiment()
+    experiment = replace(
+        base, sample=replace(base.sample, form=F.located(form))
+    )
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("MgO", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        F.psat_identity("Mg", T_K=Decimal("2100")),
+        quantity=Quantity.P_PARTIAL,
+        composition=State.of(composition),
+        fO2_Pa=State.of(Decimal("1e-3")),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+        reservoir=State.unknown("source condensed reservoir not grounded"),
+    )
+    reference = F.observation(
+        "spinel-vapour-mg",
+        experiment.experiment_id,
+        identity,
+        Decimal("1e-5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="spinel-vapour",
+    )
+    return experiment, reference
+
+
+def _score_sample_phase_vapour(reference, experiment, engine):
+    calls: list[str] = []
+
+    def predict(engine_arg, obs, **_kwargs):
+        calls.append(obs.observation_id)
+        produced = _predict(Decimal("2e-5"), obs.identity)
+        return replace(produced, engine=engine_arg)
+
+    residual, _candidate = compile_residual(
+        reference,
+        engine,
+        context=_context(F.work(), experiment, reference),
+        comparison_ids={reference.observation_id},
+        predict=predict,
+    )
+    return residual, calls
+
+
+def test_crystalline_sample_vapour_is_out_of_domain_for_a_liquid_engine() -> None:
+    """Vapour over a typed crystal does not test a liquid-engine score."""
+
+    from simulator.battery.migrate import phase_for_sample_form
+
+    assert phase_for_sample_form("condensed_solid") is Phase.CR
+    assert phase_for_sample_form("Condensed_Solid") is Phase.CR
+    assert (
+        phase_for_sample_form(
+            "Sintered stoichiometric spinel sample and spinel solid-solution compositions"
+        )
+        is None
+    )
+    assert phase_for_sample_form("oxide melt samples") is None
+    assert phase_for_sample_form(None) is None
+
+    experiment, reference = _vapour_over_sample_form("condensed_solid")
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == []
+    assert residual.rail is Rail.VAPOUR
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail["reason"] == _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    assert residual.refusal.detail["sample_phase"] == Phase.CR.value
+    assert residual.refusal.detail["quantity"] == Quantity.P_PARTIAL.value
+    assert _residual_engine_observable(residual_to_plain(residual)) is False
+
+    direct = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment
+    )
+    assert direct.value is None
+    assert direct.refusal_reason is RefusalReason.UNSUPPORTED
+    assert direct.refusal_detail["reason"] == _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    assert direct.execution.state is ExecutionState.NOT_PROBED
+    assert direct.execution.call_evidence is None
+
+
+@pytest.mark.parametrize("form", ("condensed_liquid", "oxide melt samples"))
+def test_melt_or_untyped_sample_vapour_stays_scored(form: str) -> None:
+    """A melt token and untyped prose stay on the liquid-engine path."""
+
+    experiment, reference = _vapour_over_sample_form(form)
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.VAPOUR
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.refusal is None or (
+        residual.refusal.detail.get("reason") != _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    )
+
+
+def test_non_liquid_engine_scores_vapour_over_a_crystalline_sample() -> None:
+    """A non-liquid engine is not the liquid-engine domain refusal."""
+
+    experiment, reference = _vapour_over_sample_form("condensed_solid")
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.MAGEMIN
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.VAPOUR
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.refusal is None or (
+        residual.refusal.detail.get("reason") != _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    )
+
+
 def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None:
     from simulator.battery.score import (
         ENGINE_CHANNELS,

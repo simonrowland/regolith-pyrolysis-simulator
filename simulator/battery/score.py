@@ -88,6 +88,7 @@ from simulator.battery.migrate import (
     convert_pressure_to_pa,
     observation_matches_source_tokens,
     path_matches_source_tokens,
+    phase_for_sample_form,
     source_filter_tokens,
     to_plain,
 )
@@ -669,6 +670,9 @@ def no_headline_rail_reason(
 SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE = (
     "sample_phase_not_melt_activity_observable"
 )
+SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE = (
+    "sample_phase_crystalline_vs_liquid_engine"
+)
 
 
 def crystalline_sample_detail(
@@ -710,6 +714,50 @@ def melt_activity_sample_phase_refusal(
         phase_token(identity.species),
         quantity=quantity,
         reason=SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE,
+    )
+
+
+def _experiment_sample_phase(experiment: Experiment | None) -> Phase | None:
+    """Sample phase from ``experiment.sample.form`` through PHASE_MAP.
+
+    The store does not carry a typed Phase on the experiment. A missing
+    form and untyped prose are None and stay on the scoring path.
+    """
+
+    if experiment is None:
+        return None
+    form = experiment.sample.form
+    if form is None or not form.state.is_value:
+        return None
+    value = form.state.value
+    if not isinstance(value, str):
+        return None
+    return phase_for_sample_form(value)
+
+
+def vapour_crystalline_sample_liquid_engine_refusal(
+    identity: Identity,
+    *,
+    engine: Engine,
+    experiment: Experiment | None,
+) -> dict[str, object] | None:
+    """Detail when crystalline-sample vapour is outside a liquid engine.
+
+    The sample phase is the experiment form, not the gas species. A
+    liquid engine consumes that sample as one homogeneous liquid, so a
+    typed crystal is another phase. Non-liquid engines are not this
+    refusal. ``None`` means score it.
+    """
+
+    if engine not in SINGLE_LIQUID_ENGINES:
+        return None
+    quantity = quantity_token(identity)
+    if quantity is not Quantity.P_PARTIAL:
+        return None
+    return crystalline_sample_detail(
+        _experiment_sample_phase(experiment),
+        quantity=quantity,
+        reason=SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE,
     )
 
 
@@ -4840,6 +4888,15 @@ def predict_with_engine(
             refusal_detail={"reason": "species_formula_unparsed", "formula": formula},
             identity=identity,
         )
+    vapour_phase_detail = vapour_crystalline_sample_liquid_engine_refusal(
+        identity,
+        engine=engine,
+        experiment=experiment,
+    )
+    if vapour_phase_detail is not None:
+        return _sample_phase_not_observable_prediction(
+            engine, identity, vapour_phase_detail
+        )
     static_equilibrium_pressure = (
         quantity is Quantity.P_SAT
         and experiment is not None
@@ -6923,6 +6980,21 @@ def compile_residual(
         if apparatus_flagged
         else gates
     )
+    if isinstance(identity, Identity):
+        vapour_phase_detail = vapour_crystalline_sample_liquid_engine_refusal(
+            identity,
+            engine=engine,
+            experiment=experiment,
+        )
+        if vapour_phase_detail is not None:
+            # Phase identity, not an apparatus or engine result. A typed
+            # crystal is out of domain for a liquid engine whether or not
+            # the effusion gate would also refuse. The row stays counted.
+            return _refused(
+                RefusalReason.UNSUPPORTED,
+                vapour_phase_detail,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+            )
     if not gates.passed and not apparatus_flagged:
         return _refused(
             gates.reason or RefusalReason.INVALID_SOURCE,
@@ -11006,6 +11078,11 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
     reason = str(refusal.get("reason") or "")
     detail = refusal.get("detail")
     detail_reason = str(detail.get("reason") or "") if isinstance(detail, Mapping) else ""
+    if (
+        reason == RefusalReason.UNSUPPORTED.value
+        and detail_reason == SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE
+    ):
+        return False
     if (
         rail == Rail.MELT_ACTIVITY.value
         and reason == RefusalReason.UNSUPPORTED.value
