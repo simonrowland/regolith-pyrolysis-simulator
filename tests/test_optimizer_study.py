@@ -5083,6 +5083,9 @@ def test_physics_policy_version_is_excluded_from_eval_cache_key(
         changed_version
     )
 
+    # PHYSICS_GATE_VERSION is a label. Green excludes it from the eval cache
+    # key; corpus_version is the cache lever. A version-string edit must not
+    # change physics_constraints_digest.
     assert current_digest == changed_digest
     assert current_cache_key == changed_cache_key
     assert current_recipe_id == changed_recipe_id

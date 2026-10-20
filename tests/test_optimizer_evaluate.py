@@ -32,6 +32,7 @@ from simulator.chemistry.kernel import (
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.config import load_config_bundle
 from simulator.core import PoisonedHourError, PoisonedHourState
+from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.recipe_errors import MalformedRecipeError
 from simulator.electrolysis import (
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
@@ -76,7 +77,7 @@ from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
 from simulator.runner import RunnerError, _force_builtin_vapor_pressure
 from simulator.session import SimSession, SimSessionConfig
-from simulator.state import CampaignPhase, HourSnapshot
+from simulator.state import CampaignPhase, EvaporationFlux, HourSnapshot
 from simulator.transport_regime import TransportRegimeRefusal
 from optimizer_fixtures import StubSmokeConstraintSet
 
@@ -345,9 +346,13 @@ def _trace(
         product_ledger_kg={"SiO": 95.0},
         terminal_rump_by_species_kg={"CaO": 2.0},
         condensed_by_stage_species_delta=condensed,
-        wall_deposit_by_segment_species_kg={},
-        wall_zone_by_segment={},
+        wall_deposit_by_segment_species_kg={("hot_wall", "SiO"): 0.0},
+        wall_zone_by_segment={"hot_wall": "Hot"},
         wall_deposit_by_segment_species_delta=({},),
+        wall_deposit_sticking_authority=wall_deposit_sticking_authority_status(
+            {("hot_wall", "SiO"): 0.0},
+            {},
+        ),
     )
 
 
@@ -3127,6 +3132,8 @@ def test_trace_only_out_of_domain_earned_rump_terminal_scores_earned_crash() -> 
 def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic() -> None:
     trace = _trace()
     delattr(trace, "wall_deposit_by_segment_species_delta")
+    delattr(trace, "wall_deposit_sticking_authority")
+    trace.wall_deposit_by_segment_species_kg = {}
     result = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
@@ -3138,24 +3145,54 @@ def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic(
         executor=FakeExecutor(_execution(trace=trace)),
     )
 
-    assert result.feasible
-    assert result.failure_category is None
-    assert result.objectives is not None
-    assert result.failing_gates == ()
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    # Green attaches a complete objective vector on an infeasible candidate.
+    # The coating verdict excludes it from best(); the vector is not a pass.
+    assert result.failing_gates == ("coating",)
     coating = result.feasibility_margins["coating"]
     # A non-authoritative runner report cannot turn nominal ledger zero into a pass.
     assert coating.observed is None
     assert coating.status == "unavailable"
     assert coating.authoritative is False
     assert coating.status_payload["coating_constraint_mode"] == (
-        "no_unqualified_deposition"
+        "upstream_deposit_fraction"
     )
     assert coating.status_payload["coating_constraint_authoritative"] is False
     # Sourcing proof: the delta heuristic was deleted from the trace above, so
     # the per-campaign deposition rate in the payload can only have come from
     # the runner wall-fouling report.
     assert coating.status_payload["wall_deposit_kg_per_campaign"] == 0.0
-    assert "non-authoritative: coating feasibility unconstrained" in coating.detail
+    assert "coating unavailable" in coating.detail
+
+
+def test_optimizer_overlay_bounds_refused_wall_species_from_snapshot_flux() -> None:
+    trace = _trace()
+    trace.wall_deposit_sticking_authority = {
+        "authoritative_for_deposit_mass": False,
+        "code": "wall_saturation_pressure_refused",
+        "wall_saturation_pressure_refused_species": ["CrO2"],
+    }
+    snapshot = _snapshot()
+    snapshot.duration_h = 2.0
+    snapshot.evap_flux = EvaporationFlux(species_kg_hr={"CrO2": 2.0e-4})
+    execution = _execution(trace=trace, snapshots=(snapshot,))
+
+    overlay = evaluate_module._trace_with_optimizer_coating_report(
+        execution,
+        PhysicsConstraintSet(active_gates=("coating",)),
+        spec=SimpleNamespace(mass_kg=1.0),
+    )
+    report = overlay.wall_fouling_report
+
+    assert report[
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+    ] == {"CrO2": pytest.approx(4.0e-4)}
+    coating = PhysicsConstraintSet(active_gates=("coating",)).coating(
+        overlay
+    )
+    assert coating.feasible
+    assert coating.status_payload["coating_warning_flags"][0]["species"] == "CrO2"
 
 
 def test_optimizer_coating_overlay_preserves_proven_zero_authority() -> None:
@@ -3223,14 +3260,14 @@ def test_runner_wall_fouling_report_emits_continuous_optimizer_margin(
     assert result.feasible
     assert result.failing_gates == ()
     coating = result.feasibility_margins["coating"]
-    assert coating.margin < 0.0
-    assert coating.observed == pytest.approx(9.0)
+    assert coating.margin == pytest.approx(0.0)
+    assert coating.observed == pytest.approx(5.0e-4)
     assert coating.status_payload["campaigns_to_resinter_worst_segment"] == pytest.approx(9.0)
     assert coating.status_payload["campaigns_to_resinter_total"] == pytest.approx(12.0)
     assert coating.status_payload["resinter_threshold_kg"] == pytest.approx(4.5)
     assert coating.status_payload["wall_deposit_kg_per_campaign"] == pytest.approx(0.5)
     assert coating.status_payload["sticking_alpha_authority"] == {
-        "citation_status": "CITED"
+        "citation_status": "CITED",
     }
 
 
@@ -3290,11 +3327,11 @@ def test_parametric_runner_fouling_report_binds_no_unqualified_deposition(
         executor=FakeExecutor(_execution()),
     )
 
-    assert not result.feasible
-    assert result.failing_gates == ("coating",)
+    assert result.feasible
+    assert result.failing_gates == ()
     coating = result.feasibility_margins["coating"]
-    assert not coating.feasible
-    assert coating.authoritative
+    assert coating.feasible
+    assert coating.authoritative is False
     report = result.feasibility_margins["coating"].status_payload
     assert report["campaigns_to_resinter"] == "resinter_threshold_kg / 0.5"
     assert report["resinter_threshold_basis"] == "parameter required"
@@ -3305,7 +3342,7 @@ def test_parametric_runner_fouling_report_binds_no_unqualified_deposition(
     assert report["status"] == "warning"
     assert report["verdict"] == "non-authoritative"
     assert report["nominal_verdict"] == "slow-fouling"
-    assert report["coating_constraint_mode"] == "no_unqualified_deposition"
+    assert report["coating_constraint_mode"] == "upstream_deposit_fraction"
     assert report["coating_constraint_authoritative"] is True
 
 
@@ -4425,7 +4462,7 @@ def test_real_backend_out_of_domain_subsolidus_rump_terminal_is_scored_success()
     assert trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
 
 
-def test_out_of_domain_earned_rump_terminal_composition_target_scores_success(
+def test_out_of_domain_earned_rump_with_wall_deposit_is_excluded_by_coating_gate(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import simulator.runner as runner_module
@@ -4451,7 +4488,7 @@ def test_out_of_domain_earned_rump_terminal_composition_target_scores_success(
     trace = _trace()
     delattr(trace, "terminal_rump_by_species_kg")
     trace.condensed_by_stage_species_delta = ({(3, "SiO"): 20.0},)
-    trace.wall_deposit_by_segment_species_kg = {("hot_wall", "SiO2"): 0.25}
+    trace.wall_deposit_by_segment_species_kg = {("hot_wall", "SiO2"): 0.75}
     trace.wall_zone_by_segment = {"hot_wall": "Hot"}
     profile = _composition_eval_profile(
         "terminal_rump_earned",
@@ -4485,34 +4522,17 @@ def test_out_of_domain_earned_rump_terminal_composition_target_scores_success(
         executor=FakeExecutor(execution),
     )
 
-    assert result.feasible
-    assert result.failure_category is None
-    assert result.objectives is not None
-    assert result.objectives.as_mapping()["composition_target:pc-terminal-rump-earned"] == (
-        pytest.approx(1.0)
-    )
-    assert "rump_terminal" in result.feasibility_margins
-    rump_margin = result.feasibility_margins["rump_terminal"]
-    assert rump_margin.feasible
-    assert rump_margin.observed == pytest.approx(0.0)
-    assert rump_margin.margin >= 0.0
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert result.objectives is None
+    assert result.failing_gates == ("coating",)
     assert result.run_reference is not None
-    result_trace = result.run_reference.trace
-    assert result_trace["rump_terminal"]["status"] == "earned"
-    assert result_trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
-    assert result_trace["composition_target"]["terminal_rump_source"] == "earned_crash"
-    saturation = result_trace["knob_saturation"]
-    assert saturation["schema_version"] == "knob-saturation-v1"
-    assert saturation["red_flag"] is False
-    assert {row["key"] for row in saturation["knobs"]} == {
-        "campaigns.C0b_p_cleanup.pO2_mbar_default"
-    }
     assert result.run_reference.product_summary[
         "wall_deposit_kg_by_segment_species"
-    ]["hot_wall"]["SiO2"] == pytest.approx(0.25)
+    ]["hot_wall"]["SiO2"] == pytest.approx(0.75)
     assert result.run_reference.product_summary[
         "wall_deposit_kg_by_zone_species"
-    ]["Hot"]["SiO2"] == pytest.approx(0.25)
+    ]["Hot"]["SiO2"] == pytest.approx(0.75)
 
 
 def test_kernel_liquidus_account_overrides_reach_alphamelts_provider() -> None:
