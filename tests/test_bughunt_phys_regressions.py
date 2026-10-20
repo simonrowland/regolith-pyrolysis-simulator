@@ -954,6 +954,24 @@ def _refusal_step_sim() -> PyrolysisSimulator:
     return sim
 
 
+def test_successful_step_shares_committed_yield_disposition_rows() -> None:
+    class CommittedRow:
+        def __deepcopy__(self, _memo):
+            raise AssertionError(
+                "committed yield row must stay off the hot deepcopy path"
+            )
+
+    row = CommittedRow()
+    key = (0, "C0", 0)
+    sim = _refusal_step_sim()
+    sim._yield_disposition_ledger_snapshots = {key: row}
+    sim._step_one_hour = lambda: HourSnapshot(hour=4)
+
+    assert sim.step().hour == 4
+    assert sim._yield_disposition_ledger_snapshots[key] is row
+    assert sim.runtime_state == {"plain": {"value": 1}}
+
+
 def test_terminal_refusal_restores_inserted_yield_rows_and_copies_other_roots() -> None:
     refusal = EvaporationFluxRefusal("terminal", {"reason": "yield-rows"})
     key = (0, "C0", 0)
