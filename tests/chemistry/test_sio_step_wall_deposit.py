@@ -7,6 +7,8 @@ from typing import Any
 
 import pytest
 
+from simulator.accounting import resolve_species_formula
+from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator import condensation as condensation_module
 from simulator.condensation import (
     CondensationModel,
@@ -330,6 +332,53 @@ def test_hot_wall_na_physisorber_reevaporates_against_own_psat():
         alpha_s=1.0,
         regime_factor=1.0,
     ) == 0.0
+
+
+@pytest.mark.parametrize(
+    "carrier_species, species_formula_registry",
+    [
+        ("H2", None),
+        ("hydrogen_carrier", {"hydrogen_carrier": {"formula": "H2"}}),
+    ],
+    ids=("parsed_formula", "registry_formula"),
+)
+def test_flowing_species_partial_pressure_includes_formula_only_carrier(
+    carrier_species: str,
+    species_formula_registry: dict[str, dict[str, str]] | None,
+) -> None:
+    assert carrier_species not in condensation_module.MOLAR_MASS
+    carrier_molar_mass_kg_mol = resolve_species_formula(
+        carrier_species,
+        species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    one_mol_per_hour = condensation_module.MOLAR_MASS["Na"] / 1000.0
+    rates = {
+        "Na": one_mol_per_hour,
+        carrier_species: carrier_molar_mass_kg_mol,
+    }
+    resolver_options = (
+        {}
+        if species_formula_registry is None
+        else {"species_formula_registry": species_formula_registry}
+    )
+
+    partial_pressures_pa = _flowing_species_partial_pressures_pa(
+        rates,
+        1000.0,
+        **resolver_options,
+    )
+
+    assert partial_pressures_pa == pytest.approx(
+        {"Na": 500.0, carrier_species: 500.0}
+    )
+
+
+def test_flowing_species_partial_pressure_refuses_unresolvable_species() -> None:
+    with pytest.raises(UnknownSpeciesError):
+        _flowing_species_partial_pressures_pa(
+            {"unresolved_species": 1.0},
+            1000.0,
+        )
 
 
 def test_flowing_species_partial_pressure_limits() -> None:
