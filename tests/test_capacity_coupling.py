@@ -494,8 +494,9 @@ def test_real_finite_capacity_result_drives_live_short_session_once(monkeypatch)
     assert shadow_results[0].mass_closure_error_pct <= 5.0e-12
 
 
-def test_all_zero_capacity_flux_preserves_and_routes_live_carrier_authority(
-    monkeypatch,
+@pytest.mark.parametrize("rate_kg_hr", (0.0, 5e-13))
+def test_capacity_flux_preserves_and_routes_live_carrier_authority(
+    monkeypatch, rate_kg_hr,
 ):
     active = _real_capacity_sim()
     active.start_campaign(CampaignPhase.C0)
@@ -512,7 +513,7 @@ def test_all_zero_capacity_flux_preserves_and_routes_live_carrier_authority(
         material_origin="feedstock",
     )
 
-    rate_kg_hr = 0.0
+    expected_rates = {"Fe": rate_kg_hr} if rate_kg_hr > 0.0 else {}
     carrier_record = {
         "species_id": "Fe",
         "pressure": {"kind": "value", "pa": 1.0},
@@ -536,7 +537,7 @@ def test_all_zero_capacity_flux_preserves_and_routes_live_carrier_authority(
         "certification_ceiling": "never",
     }
     live_flux = EvaporationFlux(
-        species_kg_hr={},
+        species_kg_hr=expected_rates,
         carrier_authority_by_species={
             "Fe": carrier_record,
             "Na": refused_na_record,
@@ -551,7 +552,7 @@ def test_all_zero_capacity_flux_preserves_and_routes_live_carrier_authority(
         assert isinstance(result, CapacityShadowResult)
         return replace(
             result,
-            evaporation_flux_kg_hr={},
+            evaporation_flux_kg_hr=expected_rates,
         )
 
     monkeypatch.setattr(active, "_compute_capacity_coupling_shadow", solved_shadow)
@@ -578,7 +579,7 @@ def test_all_zero_capacity_flux_preserves_and_routes_live_carrier_authority(
 
     assert routed_fluxes
     routed = routed_fluxes[0]
-    assert routed.species_kg_hr == {}
+    assert routed.species_kg_hr == expected_rates
     assert routed.carrier_authority_by_species == {
         "Fe": carrier_record,
         "Na": refused_na_record,

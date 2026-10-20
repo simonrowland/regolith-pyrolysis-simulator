@@ -28,15 +28,15 @@ def _flux(species_kg_hr: dict[str, float]) -> EvaporationFlux:
     ("available_kg", "rate_kg_hr", "production_hex", "battery_hex"),
     (
         (2.0, 2.0, "0x1.f3e58f03a254ep-1", "0x1.f3e58f03a254fp-1"),
-        (2e-12, 2e-12, "0x0.0p+0", "0x1.12d235385dd86p-40"),
-        (2.0, 1e6, "0x1.34c1e7d008214p+0", "0x1.34c1e7d008216p+0"),
+        (2e-12, 2e-12, "0x1.12d235385dd85p-40", "0x1.12d235385dd86p-40"),
+        (2.0, 1e6, "0x1.34c1e7d008215p+0", "0x1.34c1e7d008216p+0"),
     ),
 )
 def test_finite_parent_numeric_pin(
     vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
     available_kg, rate_kg_hr, production_hex, battery_hex,
 ):
-    """SC333-16 pre-move output pin; changes require an explicit value report."""
+    """SC333-16 output pin; intentional policy moves are listed in the report."""
     from simulator.accounting.formulas import parse_formula
     from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
 
@@ -64,6 +64,117 @@ def test_finite_parent_numeric_pin(
     )
     assert production.get("Mg", 0.0).hex() == production_hex
     assert battery_kg.hex() == battery_hex
+
+
+def test_finite_parent_limits_keep_all_representable_mass():
+    from simulator.chemistry.depletion import _finite_parent_debit
+
+    # The first-order half-life definition supplies an independent anchor.
+    assert _finite_parent_debit(2e-12, 2e-12 * math.log(2.0), 1.0) == pytest.approx(
+        1e-12, rel=1e-15, abs=0.0
+    )
+    # Differential limit: for k*dt << 1, debit tends to requested_rate*dt.
+    assert _finite_parent_debit(2.0, 2e-20, 1.0) == pytest.approx(
+        2e-20, rel=1e-15, abs=0.0
+    )
+    assert _finite_parent_debit(2e-12, 2e-12, 1e6) == 2e-12
+    assert _finite_parent_debit(2e-12, 0.0, 1.0) == 0.0
+
+
+def test_trace_parent_depletion_matches_battery_across_old_cutoffs(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    from simulator.accounting.formulas import parse_formula
+    from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
+
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    mg_mass = parse_formula("Mg").molar_mass_kg_per_mol()
+    mgo_mass = parse_formula("MgO").molar_mass_kg_per_mol()
+    ratio = sim._evaporation_stoich("Mg", _species_data(sim, "Mg"))[
+        "oxide_per_product_kg"
+    ]
+    for available_kg in (2e-12, 1e-12, 5e-13):
+        # Product-rate sweep plus the brief's separate parent-demand k=1 case.
+        for rate_kg_hr in (2e-12, 1.5e-12, 1e-12, 5e-13, available_kg / ratio):
+            production = sim._analytic_evaporation_depletion_rates(
+                {"Mg": rate_kg_hr}, dt_hr=1.0, phase_scalar=1.0,
+                cleaned_melt_kg={"MgO": available_kg}, available_o2_kg=0.0,
+            ).get("Mg", 0.0)
+            monkeypatch.setattr(
+                "simulator.battery.residue._finite_step_fluxes",
+                lambda *args, **kwargs: {"Mg": rate_kg_hr / 3600.0},
+            )
+            battery = integrate_residue_inventory(
+                {"MgO": available_kg / mgo_mass},
+                (ResidueChannel("Mg", "Mg", "MgO", 1.0, "matched demand"),),
+                lambda inventory, logp: {"Mg": 1.0},
+                temperature_K=2000.0, duration_s=3600.0,
+                area_evolution_m2=(1.0,), buffered_fO2_log=-6.0,
+            )
+            assert production > 0.0
+            assert production == pytest.approx(
+                battery.evaporated_mol["Mg"] * mg_mass, rel=1e-14, abs=0.0
+            )
+            if rate_kg_hr == available_kg / ratio:
+                assert production * ratio / available_kg == pytest.approx(
+                    1.0 - 1.0 / math.e, rel=1e-15, abs=0.0
+                )
+
+
+def test_trace_product_commits_coupled_mass_and_zero_product_keeps_parent(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.accounting.formulas import parse_formula
+    from simulator.condensation import CondensationRouteResult
+
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    available_kg = 2e-12
+    for raw_rate in (0.0, 2e-12, 1.5e-12, 1e-12, 5e-13):
+        sim.atom_ledger = sim._new_atom_ledger()
+        sim.atom_ledger.load_external_mol(
+            "process.cleaned_melt",
+            {"MgO": available_kg / parse_formula("MgO").molar_mass_kg_per_mol()},
+            source="trace parent", material_origin="feedstock",
+        )
+        sim._chem_kernel = sim._build_chemistry_kernel()
+        requested = _flux({"Mg": raw_rate})
+        requested.alpha_authority_status_by_species["Mg"] = "extrapolated"
+        depleted = sim._apply_analytic_evaporation_depletion(requested)
+        rate = depleted.species_kg_hr.get("Mg", 0.0)
+        if rate > 0.0:
+            assert depleted.alpha_authority_status_by_species["Mg"] == "extrapolated"
+            before = sim.atom_ledger.mol_by_account()
+            refused = sim._route_evaporated_species_to_condensation(
+                CondensationRouteResult(
+                    remaining_by_species={"Mg": rate},
+                    condensation_authority_by_species={"Mg": {"status": "refused"}},
+                ),
+                "Mg", rate, apply_evaporative_redox_source_terms=False,
+            )
+            assert refused["evaporation_transition"] is None
+            assert sim.atom_ledger.mol_by_account() == before
+        outcome = sim._route_evaporated_species_to_condensation(
+            CondensationRouteResult(remaining_by_species={"Mg": rate}), "Mg", rate,
+            apply_evaporative_redox_source_terms=False,
+        )
+        melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+        overhead = sim.atom_ledger.kg_by_account("process.overhead_gas")
+        oxygen = sim.atom_ledger.kg_by_account("reservoir.fo2_buffer")
+        if raw_rate == 0.0:
+            assert outcome.get("evaporation_transition") is None
+            assert melt["MgO"] == available_kg
+            assert overhead == oxygen == {}
+        else:
+            assert outcome.get("evaporation_transition") is not None
+            assert overhead["Mg"] == pytest.approx(rate, rel=1e-14, abs=0.0)
+            assert oxygen["O2"] > 0.0
+            assert 0.0 < melt["MgO"] < available_kg
+        total = sum(melt.values()) + sum(overhead.values()) + sum(oxygen.values())
+        assert abs(total - available_kg) / available_kg * 100.0 <= 5e-12
 
 
 def test_parent_grouped_analytic_depletion_is_shared_and_deterministic(
@@ -257,16 +368,18 @@ def test_depletion_output_ignores_tier_one_phase_context_fields(
     assert actual.total_kg_hr == expected.total_kg_hr
 
 
+@pytest.mark.parametrize("available_o2_kg", (0.001, 5e-13))
 def test_o2_consuming_vapors_share_overhead_o2_reactant(
-    vapor_pressure_data, feedstocks_data, setpoints_data
+    vapor_pressure_data, feedstocks_data, setpoints_data, available_o2_kg
 ):
+    from simulator.chemistry.depletion import _finite_parent_debit
+
     sim = _build_sim(
         "lunar_mare_low_ti",
         vapor_pressure_data,
         feedstocks_data,
         setpoints_data,
     )
-    available_o2_kg = 0.001
     sim.atom_ledger.load_external(
         "process.overhead_gas", {"O2": available_o2_kg},
         source="test O2 reactant",
@@ -285,23 +398,18 @@ def test_o2_consuming_vapors_share_overhead_o2_reactant(
         stoich["O2_per_product_kg"])
     parent_only_product_kg = (
         available_cr2o3_kg
-        * (-math.expm1(-3.0))
+        * (1.0 - 1.0 / math.e**3)
         / stoich["oxide_per_product_kg"]
     )
     parent_only_o2_draw_kg = parent_only_product_kg * abs(
         stoich["O2_per_product_kg"])
-    expected_fraction = max(
-        0.0,
-        min(
-            math.nextafter(1.0, 0.0),
-            -math.expm1(-(parent_only_o2_draw_kg / available_o2_kg)),
-        ),
+    expected_o2_draw_kg = _finite_parent_debit(
+        available_o2_kg, parent_only_o2_draw_kg, 1.0,
     )
-    expected_o2_draw_kg = available_o2_kg * expected_fraction
 
     assert required_o2_kg <= available_o2_kg
     assert required_o2_kg < parent_only_o2_draw_kg
-    assert required_o2_kg == pytest.approx(expected_o2_draw_kg, rel=1e-12)
+    assert required_o2_kg == pytest.approx(expected_o2_draw_kg, rel=1e-12, abs=0.0)
 
 
 def test_representative_c2a_parent_pool_depletes_as_tail_not_dump(

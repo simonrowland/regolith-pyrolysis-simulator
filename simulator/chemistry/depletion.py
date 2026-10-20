@@ -15,8 +15,16 @@ def _finite_parent_debit(
     and rate must use the same amount unit (kg or mol), and rate and dt
     reciprocal time units. Zero demand transfers nothing; large k*dt
     approaches the available inventory without exceeding it.
+
+    No numerical mass cutoff: the mol ledger retains positive sub-tolerance
+    amounts, so discarding a representable product would suppress a real
+    transfer. Callers split this debit among products stoichiometrically and
+    commit all coupled legs together; a dropped product must never debit its
+    parent. Full depletion may round to the inventory, with no artificial
+    nextafter remainder. Callers supply positive inventory and nonnegative
+    rate and dt.
     """
     k = requested_parent_rate / available_parent
     fraction = -math.expm1(-k * dt)
-    fraction = max(0.0, min(math.nextafter(1.0, 0.0), fraction))
+    fraction = max(0.0, min(1.0, fraction))
     return available_parent * fraction

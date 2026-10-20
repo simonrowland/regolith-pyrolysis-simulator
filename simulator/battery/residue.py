@@ -18,6 +18,7 @@ from simulator.battery.oxygen_balance import (
     _VacuumOxygenChannel,
     _solve_vacuum_oxygen_balance,
 )
+from simulator.chemistry.depletion import _finite_parent_debit
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
@@ -706,12 +707,8 @@ def integrate_residue_inventory(
             )
             if available_parent <= 0.0 or requested_parent_rate <= 0.0:
                 continue
-            # Analytic first-order depletion in mol: 1-exp(-k*dt), with
-            # k = requested parent mol s^-1 / current parent mol.
-            debit = available_parent * -math.expm1(
-                -requested_parent_rate * dt_s / available_parent
-            )
-            debit = min(available_parent, max(0.0, debit))
+            debit = _finite_parent_debit(
+                available_parent, requested_parent_rate, dt_s)
             actual_parent_debits[parent] = debit
             inventory[parent] = max(0.0, available_parent - debit)
             for term, product_rate in parent_channels:

@@ -1368,7 +1368,7 @@ class EvaporationMixin:
                         ),
                         'melt_fe_applied_kg_hr': float(gated_rate_kg_hr),
                     }
-            if gated_rate_kg_hr > 1e-12:
+            if gated_rate_kg_hr > 0.0:
                 flux.species_kg_hr[species] = gated_rate_kg_hr
                 alpha_authority_status = alpha_authority_statuses.get(species)
                 if alpha_authority_status is not None:
@@ -3767,7 +3767,7 @@ class EvaporationMixin:
                 for species, status in (
                     evap_flux.alpha_authority_status_by_species.items()
                 )
-                if float(effective_rates.get(species, 0.0)) > 1.0e-12
+                if float(effective_rates.get(species, 0.0)) > 0.0
             },
             # Canonical serialized answers are treated as immutable evidence;
             # depletion changes rates only and can safely share the records.
@@ -3803,7 +3803,7 @@ class EvaporationMixin:
                 float(raw_rates_kg_hr.get(species, 0.0))
                 * phase_scalar
             )
-            if raw_rate_kg_hr <= 1e-12:
+            if raw_rate_kg_hr <= 0.0:
                 continue
             sp_data = metals_data.get(species, {})
             if not sp_data:
@@ -3812,7 +3812,7 @@ class EvaporationMixin:
             parent_oxide = stoich['parent_oxide']
             oxide_per_product_kg = float(stoich['oxide_per_product_kg'])
             parent_draw_kg_hr = raw_rate_kg_hr * oxide_per_product_kg
-            if parent_draw_kg_hr <= 1e-12:
+            if parent_draw_kg_hr <= 0.0:
                 continue
             parent_groups[parent_oxide].append({
                 'species': species,
@@ -3828,7 +3828,7 @@ class EvaporationMixin:
             available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
             total_parent_draw_kg_hr = sum(
                 entry['parent_draw_kg_hr'] for entry in entries)
-            if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= 1e-12:
+            if available_parent_kg <= 0.0 or total_parent_draw_kg_hr <= 0.0:
                 continue
             parent_draw_kg = _finite_parent_debit(
                 available_parent_kg, total_parent_draw_kg_hr, dt_hr)
@@ -3839,7 +3839,7 @@ class EvaporationMixin:
                     * share
                     / float(entry['stoich']['oxide_per_product_kg'])
                 )
-                if product_kg > 1e-12:
+                if product_kg > 0.0:
                     effective_rates[entry['species']] = product_kg / dt_hr
 
         o2_draws: list[tuple[str, float]] = []
@@ -3849,14 +3849,14 @@ class EvaporationMixin:
                 rate_kg_hr = float(effective_rates.get(species, 0.0))
                 O2_per_product_kg = float(
                     entry['stoich'].get('O2_per_product_kg', 0.0))
-                if rate_kg_hr > 1e-12 and O2_per_product_kg < -1e-12:
+                if rate_kg_hr > 0.0 and O2_per_product_kg < 0.0:
                     o2_draws.append(
                         (species, rate_kg_hr * abs(O2_per_product_kg)))
         total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
-        if total_o2_draw_kg_hr <= 1e-12:
+        if total_o2_draw_kg_hr <= 0.0:
             return effective_rates
 
-        if available_o2_kg <= 1e-12:
+        if available_o2_kg <= 0.0:
             for species, _draw in o2_draws:
                 effective_rates.pop(species, None)
             return effective_rates
@@ -3865,7 +3865,7 @@ class EvaporationMixin:
             float(available_o2_kg), total_o2_draw_kg_hr, dt_hr)
         by_species_draw = dict(o2_draws)
         for species, required_o2_kg_hr in o2_draws:
-            if required_o2_kg_hr <= 1e-12:
+            if required_o2_kg_hr <= 0.0:
                 continue
             allowed_draw_kg = (
                 allowed_o2_draw_kg
@@ -3875,7 +3875,7 @@ class EvaporationMixin:
             current_rate = float(effective_rates.get(species, 0.0))
             allowed_rate = current_rate * (
                 allowed_draw_kg / by_species_draw[species])
-            if allowed_rate <= 1e-12:
+            if allowed_rate <= 0.0:
                 effective_rates.pop(species, None)
             else:
                 effective_rates[species] = min(current_rate, allowed_rate)
@@ -3928,7 +3928,7 @@ class EvaporationMixin:
         that remains free in ``process.overhead_gas`` after all committed
         baffle, wall, and retained-holdup routing. The separately recorded
         ``_ledger_committed_evap_flux_this_tick`` excludes any carrier whose
-        coupled transition was rejected at the numerical floor; the caller
+        evaporation transition was refused; the caller
         uses that committed flux for reporting, transport, and energy.
 
         Between the two kernel commits the vapor passes through overhead_gas.
@@ -4101,7 +4101,7 @@ class EvaporationMixin:
                 for species, status in (
                     evap_flux.alpha_authority_status_by_species.items()
                 )
-                if float(residual_species_kg_hr.get(species, 0.0)) > 1.0e-12
+                if float(residual_species_kg_hr.get(species, 0.0)) > 0.0
             },
             carrier_authority_by_species=(
                 evap_flux.carrier_authority_by_species
@@ -4158,7 +4158,7 @@ class EvaporationMixin:
             return {}
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
-        if available_kg <= 1e-12:
+        if available_kg <= 0.0:
             return {}
         remaining_kg_hr = route_result.remaining_by_species.get(
             species, 0.0)
@@ -4594,12 +4594,12 @@ class EvaporationMixin:
         oxide_removed = rate_kg_per_tick * stoich['oxide_per_product_kg']
         product_kg = rate_kg_per_tick
 
-        if oxide_removed <= 1e-12:
+        if oxide_removed <= 0.0:
             return (0.0, None) if return_transition else 0.0
 
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(parent_oxide, 0.0)
-        if available_kg <= 1e-12:
+        if available_kg <= 0.0:
             return (0.0, None) if return_transition else 0.0
 
         # Mirror the legacy validation: the AccountingError surface is

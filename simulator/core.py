@@ -14087,12 +14087,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     for species, rate in (
                         capacity_result.evaporation_flux_kg_hr.items()
                     )
-                    if float(rate) > 1.0e-12
+                    if float(rate) > 0.0
                 }
                 live_rates = {
                     species: float(rate)
                     for species, rate in live_effective_flux.species_kg_hr.items()
-                    if float(rate) > 1.0e-12
+                    if float(rate) > 0.0
                 }
                 assert set(live_rates) == set(solved_rates)
                 assert all(
@@ -14109,7 +14109,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     for species, rate in (
                         solved_rates.items()
                     )
-                    if float(rate) > 1.0e-12
+                    if float(rate) > 0.0
                 }
                 evap_flux.alpha_authority_status_by_species = {
                     species: status

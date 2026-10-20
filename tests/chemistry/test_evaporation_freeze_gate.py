@@ -1054,11 +1054,13 @@ def test_evaporation_missing_data_raises_typed_refusal(
         assert sim._last_evaporation_flux_diagnostic[key] == value
 
 
+@pytest.mark.parametrize("raw_rate", (10.0, 2e-12))
 def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    raw_rate,
 ):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
@@ -1073,7 +1075,7 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
                 status='ok',
-                diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
+                diagnostic={'evaporation_flux_kg_hr': {'Na': raw_rate}},
             )
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
             gate_calls += 1
@@ -1106,7 +1108,9 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
         rates.append(flux.species_kg_hr.get('Na', 0.0))
         factors.append(sim._last_freeze_gate_diagnostic['liquid_fraction'])
 
-    assert rates == pytest.approx([0.0, 5.0, 10.0])
+    assert rates == pytest.approx(
+        [0.0, raw_rate * 0.5, raw_rate], rel=1e-12, abs=0.0,
+    )
     assert factors == pytest.approx([0.0, 0.5, 1.0])
     assert rates == sorted(rates)
     assert gate_calls == 1

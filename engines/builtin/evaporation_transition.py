@@ -88,9 +88,6 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
-_NUMERICAL_FLOOR_KG = 1.0e-12
-
-
 class BuiltinEvaporationTransitionProvider(ChemistryProvider):
     """Authoritative ``EVAPORATION_TRANSITION`` provider.
 
@@ -205,8 +202,8 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         O2_kg = rate_kg_hr * dt_hr * O2_per_product_kg
 
         if (
-            oxide_removed <= _NUMERICAL_FLOOR_KG
-            or available_kg <= _NUMERICAL_FLOOR_KG
+            oxide_removed <= 0.0
+            or available_kg <= 0.0
         ):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
@@ -216,7 +213,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
                 diagnostic={
                     "credited_condensed_kg": 0.0,
                     "reason_skipped": (
-                        "below numerical floor or no parent-oxide stock"
+                        "nonpositive transfer or no parent-oxide stock"
                     ),
                 },
             )
@@ -273,39 +270,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             species, condensed_kg, sp_data, registry,
             resolve_species_formula,
         )
-        coupled_leg_kg = {
-            "parent_oxide": oxide_removed,
-            "remaining_vapor": remaining_kg,
-            "oxygen_coproduct": abs(O2_kg),
-            **{
-                f"condensed:{product_species}": (
-                    float(product_mol)
-                    * resolve_species_formula(
-                        product_species,
-                        registry,
-                    ).molar_mass_kg_per_mol()
-                )
-                for product_species, product_mol in condensed_product_mol.items()
-            },
-        }
-        subfloor_legs = {
-            name: kg
-            for name, kg in coupled_leg_kg.items()
-            if 0.0 < kg <= _NUMERICAL_FLOOR_KG
-        }
-        if subfloor_legs:
-            return IntentResult(
-                intent=ChemistryIntent.EVAPORATION_TRANSITION,
-                status="ok",
-                transition=None,
-                control_audit=control_audit,
-                diagnostic={
-                    "credited_condensed_kg": 0.0,
-                    "reason_skipped": "coupled stoichiometric leg below numerical floor",
-                    "subfloor_legs_kg": subfloor_legs,
-                },
-            )
-
         # ------------------------------------------------------------------
         # Build the mol-native proposal. Per-account species_mol dicts:
         #   debits:  process.cleaned_melt -> {parent_oxide: mol}
@@ -321,9 +285,8 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         if oxide_mol > 0.0:
             debits["process.cleaned_melt"] = {parent_oxide: oxide_mol}
 
-        # Once the parent debit clears the transition floor, retain every
-        # positive stoichiometric leg. Dropping a smaller coproduct here makes
-        # individually admitted carrier transitions lose atoms cumulatively.
+        # Retain every positive stoichiometric leg, including sub-tolerance
+        # amounts supported by the ledger. Dropping a coproduct loses atoms.
         if condensed_kg > 0.0 and condensed_product_mol:
             credits["process.condensation_train"] = dict(condensed_product_mol)
 
