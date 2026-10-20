@@ -810,6 +810,12 @@ def _na_activity_reference_standard_delta_g_kj_per_mol_o2(
         ellingham_segment_for_temperature,
     )
 
+    active = ellingham_segment_for_temperature("Na", T_K)
+    if "Na2O(l)" in active.phase_basis:
+        # At and above Tm, including fit extrapolation, preserve the existing
+        # Ellingham result and its caller-owned authority diagnostics exactly.
+        return active.delta_g_kJ_per_mol_O2(T_K)
+
     liquid_points, melting_temperature_K, delta_h_fus_kJ_per_mol_na2o = (
         _na2o_janaf_liquid_source_data()
     )
@@ -827,19 +833,18 @@ def _na_activity_reference_standard_delta_g_kj_per_mol_o2(
             f"JANAF Na2O(l) does not cover {target_K:g} K"
         )
 
-    if 1300.0 <= T_K <= 1400.0:
-        # Na-013 prints supercooled-liquid values at 1300 and 1400 K.
-        # Premise: 4 Na + O2 -> 2 Na2O(l) = 4 NaO0.5(l). Algebra: the
-        # liquid NaO0.5 activity basis therefore uses 2*ΔfG°(Na2O(l)) per
-        # mol O2. Units: JANAF ΔfG° is kJ/mol Na2O; ×2 gives kJ/mol O2.
-        # Interpolate only within these supercooled-liquid table rows.
-        supercooled_points = tuple(
-            point for point in liquid_points if point[0] <= 1400.0
-        )
-        return 2.0 * interpolate(supercooled_points, T_K)
-
-    if T_K >= 1500.0:
-        return 2.0 * interpolate(liquid_points, T_K)
+    submelt_points = tuple(
+        point for point in liquid_points if point[0] < melting_temperature_K
+    )
+    if (
+        submelt_points
+        and submelt_points[0][0] <= T_K <= submelt_points[-1][0]
+    ):
+        # Premise: the activity reference is pure-liquid NaO0.5. For
+        # 4 Na + O2 -> 2 Na2O(l) = 4 NaO0.5(l), algebra gives
+        # ΔG°/mol O2 = 2*ΔfG°(Na2O(l)). JANAF values are kJ/mol Na2O, so
+        # multiplying by 2 gives the required kJ/mol O2.
+        return 2.0 * interpolate(submelt_points, T_K)
 
     segments = ellingham_fit_segments("Na")
     alpha_gas = next(
@@ -848,57 +853,36 @@ def _na_activity_reference_standard_delta_g_kj_per_mol_o2(
         if "Na(g)" in segment.phase_basis
         and "Na2O(alpha)" in segment.phase_basis
     )
-
-    if T_K < 1300.0 or 1400.0 < T_K <= melting_temperature_K + 1e-9:
-        # Premise: activity uses pure-liquid NaO0.5. Below Na-013's first
-        # liquid row, or between its 1400 K supercooled row and the Tm marker,
-        # use the JANAF alpha rail plus fusion correction. Algebra per mol
-        # Na2O: ΔG°_liq = ΔG°_alpha + ΔH_fus(1-T/Tm); two Na2O form per mol O2,
-        # so the correction is multiplied by 2. On the low-temperature beta
-        # rail, add (ΔG_alpha-ΔG_beta) on the common Na(g) rail; the sodium
-        # terms cancel and preserve the active Na(g) or Na(l) reference.
-        # Units: ΔG and ΔH_fus are kJ/mol Na2O before ×2, yielding kJ/mol O2.
-        # At the JANAF Tm=1405.2 K, 2*47.696*(1-1405.2/1405.2)=0.000
-        # kJ/mol O2; the alpha rail is -381.50944 kJ/mol O2 there, so both
-        # rails agree within 1e-3 kJ/mol O2.
-        if T_K < 1300.0:
-            active = ellingham_segment_for_temperature("Na", T_K)
-            if "Na2O(alpha)" in active.phase_basis:
-                alpha_on_active_metal_rail = active.delta_g_kJ_per_mol_O2(T_K)
-            else:
-                beta_gas = next(
-                    segment
-                    for segment in segments
-                    if "Na(g)" in segment.phase_basis
-                    and "Na2O(beta)" in segment.phase_basis
-                )
-                alpha_on_active_metal_rail = (
-                    active.delta_g_kJ_per_mol_O2(T_K)
-                    + alpha_gas.delta_g_kJ_per_mol_O2(T_K)
-                    - beta_gas.delta_g_kJ_per_mol_O2(T_K)
-                )
-        else:
-            alpha_on_active_metal_rail = alpha_gas.delta_g_kJ_per_mol_O2(
-                T_K
-            )
-        return alpha_on_active_metal_rail + 2.0 * (
-            delta_h_fus_kJ_per_mol_na2o
-            * (1.0 - T_K / melting_temperature_K)
+    if "Na2O(alpha)" in active.phase_basis:
+        alpha_on_active_metal_rail = active.delta_g_kJ_per_mol_O2(T_K)
+    else:
+        beta_gas = next(
+            segment
+            for segment in segments
+            if "Na(g)" in segment.phase_basis
+            and "Na2O(beta)" in segment.phase_basis
+        )
+        alpha_on_active_metal_rail = (
+            active.delta_g_kJ_per_mol_O2(T_K)
+            + alpha_gas.delta_g_kJ_per_mol_O2(T_K)
+            - beta_gas.delta_g_kJ_per_mol_O2(T_K)
         )
 
-    # The JANAF transition row has no formation-Gibbs cell. Join its
-    # coexistence limit to the first printed liquid row above Tm.
-    liquid_at_1500 = next(
-        value for temperature, value in liquid_points if temperature == 1500.0
+    # Premise: below the liquid table's coverage, the activity still uses
+    # pure-liquid NaO0.5 while the Ellingham rail uses Na2O(alpha) or beta.
+    # Algebra per mol Na2O: ΔG°_liq = ΔG°_alpha + ΔH_fus(1-T/Tm); two Na2O
+    # form per mol O2, so multiply the correction by 2. On a beta rail,
+    # (ΔG_alpha-ΔG_beta) on the common Na(g) rail converts oxide phase while
+    # preserving the active Na(g) or Na(l) reactant state.
+    # Units: both dG and ΔH_fus are kJ/mol Na2O before ×2, yielding kJ/mol O2.
+    # As T approaches the JANAF Tm=1405.2 K from below, the correction tends
+    # to 2*47.696*(1-1405.2/1405.2)=0.000 kJ/mol O2; the alpha rail is
+    # -381.50944 kJ/mol O2 there, so the limiting liquid value matches it
+    # within 1e-3 kJ/mol O2. The exact Tm itself keeps the existing liquid fit.
+    return alpha_on_active_metal_rail + 2.0 * (
+        delta_h_fus_kJ_per_mol_na2o
+        * (1.0 - T_K / melting_temperature_K)
     )
-    points = (
-        (
-            melting_temperature_K,
-            alpha_gas.delta_g_kJ_per_mol_O2(melting_temperature_K) / 2.0,
-        ),
-        (1500.0, liquid_at_1500),
-    )
-    return 2.0 * interpolate(points, T_K)
 
 
 def na_reductant_activity_shift_kj_per_mol_o2(
