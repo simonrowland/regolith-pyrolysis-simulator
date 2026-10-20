@@ -128,6 +128,23 @@ species:
             phase: phase of displayed mixtures not specified in Figure 4
             temperature: 1273–1673 K, per series below
           standard_state_locator: {page: 9, pdf_page_index: 8, section: Procedure}
+          standard_state_inference:
+            inferred: true
+            basis: >-
+              The printed definition uses a_i = p_i/p_i^0, with p_i^0 the
+              vapour pressure of pure Na2O. NIST-JANAF Fourth Edition (Chase,
+              1998), Table Na2O, places the beta-to-alpha transition at
+              1243.15 K and alpha-to-liquid transition at 1405.2 K. The phase
+              is assigned from those stable intervals; series within about
+              100 K of a transition are listed below.
+            phase_by_series_temperature_K:
+              '1273': Na2O alpha crystal
+              '1282': Na2O alpha crystal
+              '1373': Na2O alpha crystal
+              '1473': Na2O liquid
+              '1573': Na2O liquid
+              '1673': Na2O liquid
+            near_transition_series_temperature_K: ['1273', '1282', '1373', '1473']
           axes_as_printed: 'x: X(Na2O); y: Na2O activity (log scale)'
           caption: 'Comparison of calculated and experimental Na2O activities for the system Na2O*SiO2.'
           panel: single
@@ -264,6 +281,18 @@ species:
             phase: phase of displayed mixtures not specified in Figure 5
             temperature: 1343 K
           standard_state_locator: {page: 9, pdf_page_index: 8, section: Procedure}
+          standard_state_inference:
+            inferred: true
+            basis: >-
+              The printed definition uses a_i = p_i/p_i^0, with p_i^0 the
+              vapour pressure of pure Na2O. NIST-JANAF Fourth Edition (Chase,
+              1998), Table Na2O, places the beta-to-alpha transition at
+              1243.15 K and alpha-to-liquid transition at 1405.2 K. The phase
+              is assigned from those stable intervals; this 1343 K series is
+              within about 100 K of the alpha-to-liquid transition.
+            phase_by_series_temperature_K:
+              '1343': Na2O alpha crystal
+            near_transition_series_temperature_K: ['1343']
           axes_as_printed: 'x: N(CaO)/mol; y: Na2O activity (log scale)'
           caption: 'Comparison of calculated and experimental Na2O activities for the system Na2O*SiO2*CaO.'
           panel: single
@@ -531,6 +560,16 @@ species:
             The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
             pressure of the pure component; the phase of the pure-oxide
             reference is not specified.
+          standard_state_inference:
+            inferred: false
+            reference_phase: unknown
+            basis: >-
+              The reference is pure K2O, but its melting temperature is not
+              settled: NIST-JANAF Fourth Edition lists crystalline K2O only,
+              while Lamoreaux and Hildenbrand (1984), J. Phys. Chem. Ref. Data
+              13, 151-173, DOI 10.1063/1.555706, describe conflicting and
+              uncertain K2O fusion estimates. The phase is therefore left
+              unknown for these activity series.
           series:
             - name: K2O mole fraction 0.02, 1273 K
               marker_count: 0

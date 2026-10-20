@@ -3,6 +3,7 @@
 from collections import Counter
 from copy import deepcopy
 from pathlib import Path
+import re
 
 import pytest
 import yaml
@@ -108,10 +109,40 @@ def test_deferred_figures_keep_identity_series_and_no_numeric_points() -> None:
             assert all(series.get("standard_state_as_printed") for series in values["series"])
             assert values["standard_state_locator"]["page"] == 9
             assert values["standard_state_locator"]["page"] == values["standard_state_locator"]["pdf_page_index"] + 1
-            assert all(
-                "phase of the pure-oxide reference is not specified" in series["standard_state_as_printed"]
-                for series in values["series"]
-            )
+            if formula == "Na2O":
+                inference = values["standard_state_inference"]
+                phase_by_temperature = inference["phase_by_series_temperature_K"]
+                assert inference["inferred"] is True
+                assert "NIST-JANAF Fourth Edition" in inference["basis"]
+                if str(row["locator"]["figure"]) == "4":
+                    assert phase_by_temperature == {
+                        "1273": "Na2O alpha crystal",
+                        "1282": "Na2O alpha crystal",
+                        "1373": "Na2O alpha crystal",
+                        "1473": "Na2O liquid",
+                        "1573": "Na2O liquid",
+                        "1673": "Na2O liquid",
+                    }
+                    assert set(inference["near_transition_series_temperature_K"]) == {
+                        "1273", "1282", "1373", "1473"
+                    }
+                else:
+                    assert phase_by_temperature == {"1343": "Na2O alpha crystal"}
+                    assert inference["near_transition_series_temperature_K"] == ["1343"]
+                for series in values["series"]:
+                    match = re.search(r"(\d{4}) K", series["name"])
+                    temperature = match.group(1) if match else values["identity"]["temperature"].split()[0]
+                    assert temperature in phase_by_temperature
+            elif formula == "K2O":
+                inference = values["standard_state_inference"]
+                assert inference["inferred"] is False
+                assert inference["reference_phase"] == "unknown"
+                assert "uncertain K2O fusion estimates" in inference["basis"]
+            else:
+                assert all(
+                    "phase of the pure-oxide reference is not specified" in series["standard_state_as_printed"]
+                    for series in values["series"]
+                )
 
 
 def test_isolated_migration_has_no_scored_observations_or_hard_issues() -> None:
