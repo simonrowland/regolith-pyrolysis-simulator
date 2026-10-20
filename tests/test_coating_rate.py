@@ -680,8 +680,8 @@ def test_coating_diagnostic_output_does_not_depend_on_local_magemin_config(
     import json
     from unittest.mock import patch
 
-    from engines.magemin.provider import MAGEMinShadowProvider
     from simulator import engine_local_config
+    from simulator.melt_backend.magemin import MAGEMinBackend
     from simulator.melt_backend.liquidus import LiquidusSolidusResult
     from tests.coating_diagnostic_output import (
         produce_default_coating_diagnostic,
@@ -697,33 +697,14 @@ def test_coating_diagnostic_output_does_not_depend_on_local_magemin_config(
     )
     absent_config = tmp_path / "absent-engines.local.toml"
 
-    class FakeMAGEMinBackend:
-        _bridge = "test"
-
-        @staticmethod
-        def is_available() -> bool:
-            return True
-
-        @staticmethod
-        def get_engine_version() -> str:
-            return "synthetic-magemin"
-
-        @staticmethod
-        def find_liquidus_solidus(**_kwargs) -> LiquidusSolidusResult:
-            return LiquidusSolidusResult(
-                liquidus_T_C=1800.0,
-                solidus_T_C=1200.0,
-                liquid_fraction=1.0,
-                status="ok",
-            )
+    fake_liquidus = LiquidusSolidusResult(
+        liquidus_T_C=1800.0,
+        solidus_T_C=1200.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
 
     def run_with_config(config_path):
-        def ensure_backend(provider):
-            if engine_local_config.configured_magemin_binary_path() is None:
-                return None
-            provider._backend = FakeMAGEMinBackend()
-            return provider._backend
-
         with (
             patch.object(
                 engine_local_config,
@@ -731,13 +712,23 @@ def test_coating_diagnostic_output_does_not_depend_on_local_magemin_config(
                 lambda: config_path,
             ),
             patch.object(
-                MAGEMinShadowProvider,
-                "_ensure_backend",
-                ensure_backend,
+                MAGEMinBackend,
+                "_locate_binary",
+                return_value=None,
             ),
             patch(
-                "simulator.melt_backend.magemin.MAGEMinBackend._locate_binary",
-                return_value=None,
+                "engines.magemin.provider._SHADOW_BACKEND_CONFIG",
+                {"python_bridge": "subprocess", "warm_worker": False},
+            ),
+            patch.object(
+                MAGEMinBackend,
+                "find_liquidus_solidus",
+                return_value=fake_liquidus,
+            ),
+            patch.object(
+                MAGEMinBackend,
+                "get_engine_version",
+                return_value="synthetic-magemin",
             ),
         ):
             actual_bytes, _engagement = produce_default_coating_diagnostic()
