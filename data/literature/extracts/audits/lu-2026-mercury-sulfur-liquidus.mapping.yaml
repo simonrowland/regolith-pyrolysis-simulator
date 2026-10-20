@@ -1,0 +1,65 @@
+schema_version: literature_extract_mapping_audit.v1
+source_id: lu-2026-mercury-sulfur-liquidus
+source_text: text/lu-2026-mercury-sulfur-liquidus/pdftotext-layout.txt
+table_tool_status: No MinerU markdown/content-list tables are present for this born-digital source, so the table converter cannot draft or emit. The authoritative pdftotext-layout tables were transcribed by hand and checked against 600 dpi PDF page renders.
+tables:
+  - table: '1'
+    locator: {page: 2, pdf_page_index: 1, published_page: 2, table: '1'}
+    printed_data_rows: 7
+    columns_as_printed:
+      - oxide composition: SiO2, TiO2, Al2O3, Cr2O3, MnO, MgO, CaO, Na2O, K2O, P2O5, Total
+      - source mixture: silicate, Fe, FeS, Bulk S content (%)
+    mapped_fields:
+      - context.values.rows
+      - context.values.starting_mixtures
+      - linked as initial-composition conditions by Table 2 system and Fe/FeS source
+    disposition: >-
+      Candidate tokens equilibrium_phase_composition and liquidus_composition do not fit the compiled EH-EL silicate composition or the nominal Mer10/Mer20 starting silicate compositions: these are not analyzed equilibrium phase results or a liquidus composition. Preserve the printed rows in context; the four source mixtures are initial recipe proportions and are not converted into reconstructed final oxide compositions. EH-EL data are attributed to Berthet et al. (2009) and Jarosewich (1990), as cited in section 2.1; Mer10/Mer20 are present-work nominal compositions.
+    blank_cell_policy: Empty printed cells remain blank; no values are copied from adjacent rows.
+    render_check: All printed cells and headings were checked against the 600 dpi render of physical PDF page 2.
+  - table: '2'
+    locator: {page: 3, pdf_page_index: 2, published_page: 3, table: '2'}
+    printed_data_rows: 61
+    columns_as_printed:
+      - sample
+      - T (°C)
+      - P (GPa)
+      - Fe or S source
+      - Time (min)
+      - ΔIW(Si-SiO2)
+      - Experimental phases
+      - S(Sil) (wt.%)
+    mapped_fields:
+      - sample -> point_conditions.sample_id and values.sample_id
+      - T -> values.T_C; migrator-derived identity temperature
+      - P -> point_conditions.pressure_GPa, retained as printed
+      - Fe or S source -> point_conditions.source_blend_as_published linked to Table 1
+      - Time -> point_conditions.duration_min
+      - ΔIW(Si-SiO2) -> point_conditions.fO2_delta_IW with printed IW reference and stated calculation provenance; not converted to absolute log fO2
+      - Experimental phases -> point_conditions.assemblage_as_published and values.phase_assemblage_as_published
+      - S(Sil) -> measured_direct equilibrium_phase_composition, component S in silicate glass, with printed asterisk retained for sulfide saturation
+    disposition: >-
+      All 61 printed silicate-glass sulfur cells are typed. A liquid observation is filed under its sole coexisting silicate solid's container only when exactly one silicate solid (Fo or Ens) occurs; rows with no silicate solid or both Fo and Ens are filed under SiO2. values.formula=S preserves the measured component identity regardless of filing container. Phase proportions in parentheses are mass-balance outputs without a phase-fraction token and remain verbatim in the printed assemblage string. FeSi, FeS and FeMgS are identified by the caption as metallic/sulfide melts, not silicate solids.
+    duplicate_cells: Repeated sample labels A052 and B052 are retained as separate rows because their temperatures differ; the row locator includes the row number and T.
+    blank_cell_policy: No blank or dash is filled from an adjacent row; every nonblank body cell in the table is retained in the independent test grid.
+    render_check: All 61 x 8 body cells and headings were checked against the 600 dpi render of physical PDF page 3.
+text_values:
+  - section: '3.3 Liquidus temperatures'
+    printed_values: 16
+    locator_pages: [5, 6]
+    mapped_fields: transition_point / transition_temperature / property_kind liquidus
+    disposition: Author estimates printed as ±12.5 °C are retained with the uncertainty and the printed liquidus phase, pressure, bulk sulfur and silicate-melt sulfur. The same points in Fig. 5 are noted as secondary locators, not duplicated observations.
+figures:
+  - {figure: '1', page: 4, records: 1, numeric_points: 0}
+  - {figure: '2', page: 5, records: 1, numeric_points: 0}
+  - {figure: '3', page: 6, records: 1, numeric_points: 0}
+  - {figure: '4', page: 7, records: 1, numeric_points: 0}
+  - {figure: '5', page: 8, records: 1, numeric_points: 0}
+  - {figure: '6', page: 9, records: 2, numeric_points: 0}
+  - {figure: '7', page: 10, records: 1, numeric_points: 0}
+  - {figure: '8', page: 10, records: 2, numeric_points: 0}
+  - {figure: '9', page: 11, records: 2, numeric_points: 0}
+supplementary_data:
+  item: Supplementary Dataset 1
+  availability: absent from /Users/simonrowland/Repos/regolith-corpus/raw/lu-2026-mercury-sulfur-liquidus and text/lu-2026-mercury-sulfur-liquidus
+  effect: Full per-run EPMA composition and standard deviations for all phases cannot be transcribed from the available PDF; the absence is recorded in the extract context.
