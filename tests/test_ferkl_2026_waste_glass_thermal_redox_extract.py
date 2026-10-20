@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
@@ -61,7 +62,8 @@ def _assert_table2_matches(document: dict, grid: list[dict[str, str]]) -> None:
 def _assert_table3_matches(document: dict, grid: list[dict[str, str]]) -> None:
     typed = {}
     for body in document["species"].values():
-        for observation in body.get("observations", ()):
+        records = [*body.get("observations", ()), *body.get("context", ())]
+        for observation in records:
             if observation.get("values", {}).get("quantity") != "valence_ratio":
                 continue
             column = observation["values"]["printed_ratio_as"]
@@ -78,6 +80,28 @@ def _assert_table3_matches(document: dict, grid: list[dict[str, str]]) -> None:
         "xanes_Cr3_Crtot": ("Cr3+/Crtot", "xanes"),
     }
     assert len(typed) == 28
+    rapidox_context = [
+        (formula, record)
+        for formula, body in document["species"].items()
+        for record in body.get("context", ())
+        if "rapidox" in record.get("observation_id", "")
+    ]
+    assert len(rapidox_context) == 3
+    assert sum(len(record["values"]["points"]) for _, record in rapidox_context) == 16
+    for _, record in rapidox_context:
+        values = record["values"]
+        assert record["type"] == "model_derived_ratio_series"
+        assert values["method_class"] == "model_derived"
+        assert "admission_status" not in values
+        assert record["derived_from"] == [
+            f"tables:{SID}:t1",
+            f"tables:{SID}:t3",
+        ]
+        assert (
+            "Equation (1), ln(w_red/w_ox) = α − (σ/4) ln(pO2) − ΔH/(RT)"
+            in record["derivation"]["relation"]
+        )
+        assert "Rapidox pO2" in record["derivation"]["relation"]
     estimated_po2 = _context_record(
         document, "ferkl_2026_table3_xanes_derived_pO2_comparison_values"
     )["values"]["rows"]
@@ -136,6 +160,10 @@ def test_render_transcriptions_pin_context_and_typed_rows_and_mutations_fail() -
     assert _csv_rows(TABLES / "t1.csv") == table1
     assert _csv_rows(TABLES / "t2.csv") == table2
     assert _csv_rows(TABLES / "t3.csv") == table3
+    for asset in document["source_files"]["files"]:
+        declared_path = ROOT / asset["path"]
+        assert declared_path.is_file()
+        assert hashlib.sha256(declared_path.read_bytes()).hexdigest() == asset["sha256"]["value"]
     _assert_table1_matches(document, table1)
     _assert_table2_matches(document, table2)
     _assert_table3_matches(document, table3)
@@ -149,7 +177,7 @@ def test_render_transcriptions_pin_context_and_typed_rows_and_mutations_fail() -
     changed_document = deepcopy(document)
     rapidox_fe = next(
         observation
-        for observation in changed_document["species"]["Fe"]["observations"]
+        for observation in changed_document["species"]["Fe"]["context"]
         if observation["observation_id"] == "ferkl_2026_table3_rapidox_fe2_fraction"
     )
     rapidox_fe["values"]["points"][0]["value_as_published"] = "0.8"
@@ -166,14 +194,14 @@ def test_isolated_migration_preserves_species_samples_conditions_and_quench() ->
 
     assert result.validation is not None
     assert result.validation.hard_issues == ()
-    assert len(result.observations) == 28
+    assert len(result.observations) == 12
 
     source_by_id = {
         observation["observation_id"]: (formula, observation)
         for formula, body in document["species"].items()
         for observation in body.get("observations", ())
     }
-    assert len(source_by_id) == 5
+    assert len(source_by_id) == 2
     migrated_by_id = {
         source_id: [
             observation
@@ -193,8 +221,7 @@ def test_isolated_migration_preserves_species_samples_conditions_and_quench() ->
             assert migrated.admission.status.value == "admitted"
             assert migrated.identity.quantity.value.value == "valence_ratio"
             assert migrated.evidence.class_.value == "measured_reduced"
-            expected_phase = "l" if "rapidox" in source_id else "glass"
-            assert migrated.identity.species.phase.value.value == expected_phase
+            assert migrated.identity.species.phase.value.value == "glass"
             conditions = migrated.point_conditions or {}
             assert conditions["sample_id"].state.is_value
             assert conditions["sample_id"].state.value in expected_samples
@@ -206,14 +233,8 @@ def test_isolated_migration_preserves_species_samples_conditions_and_quench() ->
             assert conditions["oxygen_partial_pressure"].state.is_value
             assert conditions["oxygen_partial_pressure"].locator is not None
             assert migrated.identity.fO2_Pa.value == conditions["oxygen_partial_pressure"].state.value
-            if "rapidox" in source_id:
-                assert migrated.identity.temperature_K.is_value
-                assert migrated.identity.temperature_K.value == Decimal("1423.15")
-                assert conditions["temperature_K"].state.value == Decimal("1423.15")
-                assert migrated.identity.fO2_Pa.value > 0
-            else:
-                assert migrated.identity.temperature_K.is_unknown
-                assert conditions["temperature_K"].state.is_unknown
+            assert migrated.identity.temperature_K.is_unknown
+            assert conditions["temperature_K"].state.is_unknown
 
     xanes_points = [
         point

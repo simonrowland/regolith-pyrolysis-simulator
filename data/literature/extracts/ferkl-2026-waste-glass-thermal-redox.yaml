@@ -16,19 +16,19 @@ source_files:
   files:
   - asset_id: tables:ferkl-2026-waste-glass-thermal-redox:t1
     role: table_csv
-    path: tables/ferkl-2026-waste-glass-thermal-redox/t1.csv
+    path: data/literature/tables/ferkl-2026-waste-glass-thermal-redox/t1.csv
     sha256:
       tag: value
       value: 3a95d124abfae9747c2d273ca22a529430a7636f81c81ca2084f29e83c6863e9
   - asset_id: tables:ferkl-2026-waste-glass-thermal-redox:t2
     role: table_csv
-    path: tables/ferkl-2026-waste-glass-thermal-redox/t2.csv
+    path: data/literature/tables/ferkl-2026-waste-glass-thermal-redox/t2.csv
     sha256:
       tag: value
       value: 6b592a07450cfeca36534f253948512966a1cf3ff76e69bd2ca69b4af0887ca1
   - asset_id: tables:ferkl-2026-waste-glass-thermal-redox:t3
     role: table_csv
-    path: tables/ferkl-2026-waste-glass-thermal-redox/t3.csv
+    path: data/literature/tables/ferkl-2026-waste-glass-thermal-redox/t3.csv
     sha256:
       tag: value
       value: 7af8d46279ac73b351f205ffe1c89e90786bde830b0f41b1a3b88a0473dace39
@@ -58,564 +58,18 @@ extraction:
       represents sigma, alpha, and reaction enthalpy together'
     '2': 'context-no-token: target recipes are not measured final glass composition; complete rows bind the typed
       redox points by sample_id'
-    '3': 'typed: 28 valence-ratio observations; Rapidox pO2 is the printed condition; estimated XANES pO2 comparison
-      values remain model context'
+    '3': 'typed: 12 XANES measured valence-ratio observations; 16 Rapidox Equation (1) estimates remain model context; Rapidox pO2 is the printed condition; estimated XANES pO2 comparison values remain model context'
     '4': 'context-no-token: particle diameters, volume fraction, and number density have no matching token'
     '5': 'context-model: fitted partial hydroxyl/water proxy has no matching token; Al-19_MF value unavailable because
       the sample was too opaque'
 review_status: draft
 fidelity_samples:
-- path: species.Fe.observations[ferkl_2026_table3_rapidox_fe2_fraction].values.points[0].value
-  value: '0.422'
-  note: Table 3, LAWC100_R Rapidox Fe2+/Fetot; physical PDF page 7, 600 dpi render.
 - path: species.Cr.observations[ferkl_2026_table3_xanes_cr3_fraction].values.points[5].value
   value: '0.78'
   note: Table 3, Al-19_MF XANES Cr3+/Crtot; physical PDF page 7, 600 dpi render.
-- path: species.V.observations[ferkl_2026_table3_rapidox_v4_fraction].values.points[2].value
-  value: '0.036'
-  note: Table 3, APPS-09 Rapidox V4+/Vtot; physical PDF page 7, 600 dpi render.
 species:
   Fe:
     observations:
-    - observation_id: ferkl_2026_table3_rapidox_fe2_fraction
-      type: concentration_series
-      locator:
-        page: 7
-        published_page: 6
-        pdf_page_index: 6
-        table: '3'
-        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator
-          in the original table asset.
-      phase: l
-      regime: in_situ_redox
-      units: dimensionless fraction as printed
-      method_as_printed: Rapidox oxygen partial pressure with Equation (1) redox reduction; model parameters are
-        collected from cited literature in Table 1.
-      uncertainty:
-        note: No uncertainty is printed for the Rapidox-derived ratio values.
-      values:
-        quantity: valence_ratio
-        method_class: measured_reduced
-        admission_status: admitted
-        valence_basis:
-          numerator_oxidation_states:
-          - 2
-          denominator_kind: total_element
-          denominator_oxidation_state: null
-          value_form: fraction
-        printed_ratio_as: Fe2+/Fetot
-        points:
-        - sample_as_published: LAWC100_R
-          row_as_printed: LAWC100_R
-          value: '0.422'
-          value_as_published: '0.422'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: LAWC100_R
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100_R
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '0.0026'
-              units: Pa
-              state:
-                tag: value
-                value: '0.0026'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100_R
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 2.6 × 10−3 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100_R
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: value
-                value: N2 atmosphere during melting
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-                note: The LAWC100_R sample was melted under nitrogen; it was subsequently air-quenched with the
-                  other samples.
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: LAWC100
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: LAWC100
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-        - sample_as_published: LAWC100
-          row_as_printed: LAWC100
-          value: '0.029'
-          value_as_published: '0.029'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: LAWC100
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '890'
-              units: Pa
-              state:
-                tag: value
-                value: '890'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 8.9 × 10^2 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: unknown
-                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: LAWC100
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: LAWC100
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-        - sample_as_published: LAWA44
-          row_as_printed: LAWA44
-          value: '0.013'
-          value_as_published: '0.013'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: LAWA44
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWA44
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '29000'
-              units: Pa
-              state:
-                tag: value
-                value: '29000'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWA44
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 2.9 × 10^4 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWA44
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: unknown
-                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: LAWA44
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: LAWA44
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-        - sample_as_published: APPS-09
-          row_as_printed: APPS-09
-          value: '0.029'
-          value_as_published: '0.029'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: APPS-09
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '950'
-              units: Pa
-              state:
-                tag: value
-                value: '950'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 9.5 × 10^2 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: unknown
-                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: APPS-09
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: APPS-09
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-        - sample_as_published: APPS-09_MF
-          row_as_printed: APPS-09_MF
-          value: '0.009'
-          value_as_published: '0.009'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: APPS-09_MF
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09_MF
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '100000'
-              units: Pa
-              state:
-                tag: value
-                value: '100000'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09_MF
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 1.0 × 10^5 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09_MF
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: unknown
-                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: APPS-09
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: APPS-09
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-        - sample_as_published: Al-19_MF
-          row_as_printed: Al-19_MF
-          value: '0.009'
-          value_as_published: '0.009'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: Al-19_MF
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: Al-19_MF
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '100000'
-              units: Pa
-              state:
-                tag: value
-                value: '100000'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: Al-19_MF
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 1.0 × 10^5 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: Al-19_MF
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: unknown
-                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: Al-19_MF
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: Al-19_MF
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-      derived_from:
-      - tables:ferkl-2026-waste-glass-thermal-redox:t1
-      - tables:ferkl-2026-waste-glass-thermal-redox:t3
-      derivation:
-        relation: The authors used Equation (1), ln(w_red/w_ox) = α − (σ/4) ln(pO2) − ΔH/(RT), to report the Table
-          3 redox fraction from the Rapidox pO2 condition and the corresponding literature parameters in Table 1;
-          the emitted ratio is copied from Table 3, not recomputed.
-        inputs:
-        - tables:ferkl-2026-waste-glass-thermal-redox:t1
-        - tables:ferkl-2026-waste-glass-thermal-redox:t3
-        output_unit: fraction
     - observation_id: ferkl_2026_table3_xanes_fe2_fraction
       type: concentration_series
       locator:
@@ -2083,10 +1537,549 @@ species:
         quantity_token: unavailable
         schema_gap: No existing quantity token represents thermal conductivity; the plotted class distributions
           are model estimates.
+    - observation_id: ferkl_2026_table3_rapidox_fe2_fraction
+      type: model_derived_ratio_series
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator
+          in the original table asset.
+      phase: l
+      regime: in_situ_redox
+      units: dimensionless fraction as printed
+      method_as_printed: Rapidox oxygen partial pressure with Equation (1) redox reduction; model parameters are
+        collected from cited literature in Table 1.
+      uncertainty:
+        note: No uncertainty is printed for the Rapidox-derived ratio values.
+      values:
+        quantity: valence_ratio
+        method_class: model_derived
+        valence_basis:
+          numerator_oxidation_states:
+          - 2
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Fe2+/Fetot
+        points:
+        - sample_as_published: LAWC100_R
+          row_as_printed: LAWC100_R
+          value: '0.422'
+          value_as_published: '0.422'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: LAWC100_R
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100_R
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '0.0026'
+              units: Pa
+              state:
+                tag: value
+                value: '0.0026'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100_R
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 2.6 × 10−3 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100_R
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: value
+                value: N2 atmosphere during melting
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+                note: The LAWC100_R sample was melted under nitrogen; it was subsequently air-quenched with the
+                  other samples.
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: LAWC100
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: LAWC100
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+        - sample_as_published: LAWC100
+          row_as_printed: LAWC100
+          value: '0.029'
+          value_as_published: '0.029'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: LAWC100
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '890'
+              units: Pa
+              state:
+                tag: value
+                value: '890'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 8.9 × 10^2 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: unknown
+                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: LAWC100
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: LAWC100
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+        - sample_as_published: LAWA44
+          row_as_printed: LAWA44
+          value: '0.013'
+          value_as_published: '0.013'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: LAWA44
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWA44
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '29000'
+              units: Pa
+              state:
+                tag: value
+                value: '29000'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWA44
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 2.9 × 10^4 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWA44
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: unknown
+                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: LAWA44
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: LAWA44
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+        - sample_as_published: APPS-09
+          row_as_printed: APPS-09
+          value: '0.029'
+          value_as_published: '0.029'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: APPS-09
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '950'
+              units: Pa
+              state:
+                tag: value
+                value: '950'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 9.5 × 10^2 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: unknown
+                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: APPS-09
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: APPS-09
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+        - sample_as_published: APPS-09_MF
+          row_as_printed: APPS-09_MF
+          value: '0.009'
+          value_as_published: '0.009'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: APPS-09_MF
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09_MF
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '100000'
+              units: Pa
+              state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09_MF
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 1.0 × 10^5 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09_MF
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: unknown
+                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: APPS-09
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: APPS-09
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+        - sample_as_published: Al-19_MF
+          row_as_printed: Al-19_MF
+          value: '0.009'
+          value_as_published: '0.009'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: Al-19_MF
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: Al-19_MF
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '100000'
+              units: Pa
+              state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: Al-19_MF
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 1.0 × 10^5 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: Al-19_MF
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: unknown
+                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: Al-19_MF
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: Al-19_MF
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+      derived_from:
+      - tables:ferkl-2026-waste-glass-thermal-redox:t1
+      - tables:ferkl-2026-waste-glass-thermal-redox:t3
+      derivation:
+        relation: The authors used Equation (1), ln(w_red/w_ox) = α − (σ/4) ln(pO2) − ΔH/(RT), to report the Table
+          3 redox fraction from the Rapidox pO2 condition and the corresponding literature parameters in Table 1;
+          the emitted ratio is copied from Table 3, not recomputed.
+        inputs:
+        - tables:ferkl-2026-waste-glass-thermal-redox:t1
+        - tables:ferkl-2026-waste-glass-thermal-redox:t3
+        output_unit: fraction
   V:
-    observations:
+    observations: []
+    context:
     - observation_id: ferkl_2026_table3_rapidox_v4_fraction
-      type: concentration_series
+      type: model_derived_ratio_series
       locator:
         page: 7
         published_page: 6
@@ -2103,8 +2096,7 @@ species:
         note: No uncertainty is printed for the Rapidox-derived ratio values.
       values:
         quantity: valence_ratio
-        method_class: measured_reduced
-        admission_status: admitted
+        method_class: model_derived
         valence_basis:
           numerator_oxidation_states:
           - 4
@@ -2460,545 +2452,6 @@ species:
         output_unit: fraction
   Cr:
     observations:
-    - observation_id: ferkl_2026_table3_rapidox_cr3_fraction
-      type: concentration_series
-      locator:
-        page: 7
-        published_page: 6
-        pdf_page_index: 6
-        table: '3'
-        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator
-          in the original table asset.
-      phase: l
-      regime: in_situ_redox
-      units: dimensionless fraction as printed
-      method_as_printed: Rapidox oxygen partial pressure with Equation (1) redox reduction; model parameters are
-        collected from cited literature in Table 1.
-      uncertainty:
-        note: No uncertainty is printed for the Rapidox-derived ratio values.
-      values:
-        quantity: valence_ratio
-        method_class: measured_reduced
-        admission_status: admitted
-        valence_basis:
-          numerator_oxidation_states:
-          - 3
-          denominator_kind: total_element
-          denominator_oxidation_state: null
-          value_form: fraction
-        printed_ratio_as: Cr3+/Crtot
-        points:
-        - sample_as_published: LAWC100_R
-          row_as_printed: LAWC100_R
-          value: '0.98'
-          value_as_published: '0.98'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: LAWC100_R
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100_R
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '0.0026'
-              units: Pa
-              state:
-                tag: value
-                value: '0.0026'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100_R
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 2.6 × 10−3 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100_R
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: value
-                value: N2 atmosphere during melting
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-                note: The LAWC100_R sample was melted under nitrogen; it was subsequently air-quenched with the
-                  other samples.
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: LAWC100
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: LAWC100
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-        - sample_as_published: LAWC100
-          row_as_printed: LAWC100
-          value: '0.94'
-          value_as_published: '0.94'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: LAWC100
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '890'
-              units: Pa
-              state:
-                tag: value
-                value: '890'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 8.9 × 10^2 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWC100
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: unknown
-                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: LAWC100
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: LAWC100
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-        - sample_as_published: LAWA44
-          row_as_printed: LAWA44
-          value: '0.53'
-          value_as_published: '0.53'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: LAWA44
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWA44
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '29000'
-              units: Pa
-              state:
-                tag: value
-                value: '29000'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWA44
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 2.9 × 10^4 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: LAWA44
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: unknown
-                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: LAWA44
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: LAWA44
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-        - sample_as_published: APPS-09
-          row_as_printed: APPS-09
-          value: '0.94'
-          value_as_published: '0.94'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: APPS-09
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '950'
-              units: Pa
-              state:
-                tag: value
-                value: '950'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 9.5 × 10^2 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: unknown
-                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: APPS-09
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: APPS-09
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-        - sample_as_published: APPS-09_MF
-          row_as_printed: APPS-09_MF
-          value: '0.30'
-          value_as_published: '0.30'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: APPS-09_MF
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09_MF
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '100000'
-              units: Pa
-              state:
-                tag: value
-                value: '100000'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09_MF
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 1.0 × 10^5 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: APPS-09_MF
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: unknown
-                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: APPS-09
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: APPS-09
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-        - sample_as_published: Al-19_MF
-          row_as_printed: Al-19_MF
-          value: '0.31'
-          value_as_published: '0.31'
-          point_conditions:
-            sample_id:
-              state:
-                tag: value
-                value: Al-19_MF
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: Al-19_MF
-                column: Sample
-            temperature_K:
-              state:
-                tag: value
-                value: '1423.15'
-              locator:
-                page: 6
-                published_page: 5
-                pdf_page_index: 5
-                section: Redox State
-                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
-            oxygen_partial_pressure:
-              value: '100000'
-              units: Pa
-              state:
-                tag: value
-                value: '100000'
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: Al-19_MF
-                column: Rapidox pO2 (Pa)
-              note: Rapidox result printed as 1.0 × 10^5 Pa; pressure exponent is parsed without changing the reported
-                condition.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: Total pressure is not reported for the furnace measurements.
-              locator:
-                page: 7
-                published_page: 6
-                pdf_page_index: 6
-                table: '3'
-                row: Al-19_MF
-                column: Rapidox pO2 (Pa)
-            atmosphere:
-              state:
-                tag: unknown
-                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
-              locator:
-                page: 5
-                published_page: 4
-                pdf_page_index: 4
-                section: Sample Preparation
-            composition:
-              state:
-                tag: unknown
-                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
-                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
-                  partial composition is substituted.
-              locator:
-                page: 4
-                published_page: 3
-                pdf_page_index: 3
-                table: '2'
-                row: Al-19_MF
-                column: target mass%
-                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
-          composition_as_published:
-            table: '2'
-            sample_column: Al-19_MF
-            basis: target mass percent
-            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
-          T_C: '1150'
-          uncertainty:
-            kind: none
-      derived_from:
-      - tables:ferkl-2026-waste-glass-thermal-redox:t1
-      - tables:ferkl-2026-waste-glass-thermal-redox:t3
-      derivation:
-        relation: The authors used Equation (1), ln(w_red/w_ox) = α − (σ/4) ln(pO2) − ΔH/(RT), to report the Table
-          3 redox fraction from the Rapidox pO2 condition and the corresponding literature parameters in Table 1;
-          the emitted ratio is copied from Table 3, not recomputed.
-        inputs:
-        - tables:ferkl-2026-waste-glass-thermal-redox:t1
-        - tables:ferkl-2026-waste-glass-thermal-redox:t3
-        output_unit: fraction
     - observation_id: ferkl_2026_table3_xanes_cr3_fraction
       type: concentration_series
       locator:
@@ -3610,4 +3063,543 @@ species:
             section: XANES measurement
             note: The paper reports Fe and Cr edge spectra and reference materials, but does not tabulate the spectral
               fit inputs.
+        output_unit: fraction
+    context:
+    - observation_id: ferkl_2026_table3_rapidox_cr3_fraction
+      type: model_derived_ratio_series
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        note: The six Table 3 samples are bound individually by sample_id; values have the same Table 3 locator
+          in the original table asset.
+      phase: l
+      regime: in_situ_redox
+      units: dimensionless fraction as printed
+      method_as_printed: Rapidox oxygen partial pressure with Equation (1) redox reduction; model parameters are
+        collected from cited literature in Table 1.
+      uncertainty:
+        note: No uncertainty is printed for the Rapidox-derived ratio values.
+      values:
+        quantity: valence_ratio
+        method_class: model_derived
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        printed_ratio_as: Cr3+/Crtot
+        points:
+        - sample_as_published: LAWC100_R
+          row_as_printed: LAWC100_R
+          value: '0.98'
+          value_as_published: '0.98'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: LAWC100_R
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100_R
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '0.0026'
+              units: Pa
+              state:
+                tag: value
+                value: '0.0026'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100_R
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 2.6 × 10−3 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100_R
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: value
+                value: N2 atmosphere during melting
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+                note: The LAWC100_R sample was melted under nitrogen; it was subsequently air-quenched with the
+                  other samples.
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: LAWC100
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: LAWC100
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+        - sample_as_published: LAWC100
+          row_as_printed: LAWC100
+          value: '0.94'
+          value_as_published: '0.94'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: LAWC100
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '890'
+              units: Pa
+              state:
+                tag: value
+                value: '890'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 8.9 × 10^2 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWC100
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: unknown
+                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: LAWC100
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: LAWC100
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+        - sample_as_published: LAWA44
+          row_as_printed: LAWA44
+          value: '0.53'
+          value_as_published: '0.53'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: LAWA44
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWA44
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '29000'
+              units: Pa
+              state:
+                tag: value
+                value: '29000'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWA44
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 2.9 × 10^4 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: LAWA44
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: unknown
+                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: LAWA44
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: LAWA44
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+        - sample_as_published: APPS-09
+          row_as_printed: APPS-09
+          value: '0.94'
+          value_as_published: '0.94'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: APPS-09
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '950'
+              units: Pa
+              state:
+                tag: value
+                value: '950'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 9.5 × 10^2 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: unknown
+                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: APPS-09
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: APPS-09
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+        - sample_as_published: APPS-09_MF
+          row_as_printed: APPS-09_MF
+          value: '0.30'
+          value_as_published: '0.30'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: APPS-09_MF
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09_MF
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '100000'
+              units: Pa
+              state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09_MF
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 1.0 × 10^5 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: APPS-09_MF
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: unknown
+                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: APPS-09
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: APPS-09
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+        - sample_as_published: Al-19_MF
+          row_as_printed: Al-19_MF
+          value: '0.31'
+          value_as_published: '0.31'
+          point_conditions:
+            sample_id:
+              state:
+                tag: value
+                value: Al-19_MF
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: Al-19_MF
+                column: Sample
+            temperature_K:
+              state:
+                tag: value
+                value: '1423.15'
+              locator:
+                page: 6
+                published_page: 5
+                pdf_page_index: 5
+                section: Redox State
+                note: Rapidox pO2 is measured at 1150°C; Kelvin equivalent is retained for canonical identity.
+            oxygen_partial_pressure:
+              value: '100000'
+              units: Pa
+              state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: Al-19_MF
+                column: Rapidox pO2 (Pa)
+              note: Rapidox result printed as 1.0 × 10^5 Pa; pressure exponent is parsed without changing the reported
+                condition.
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not reported for the furnace measurements.
+              locator:
+                page: 7
+                published_page: 6
+                pdf_page_index: 6
+                table: '3'
+                row: Al-19_MF
+                column: Rapidox pO2 (Pa)
+            atmosphere:
+              state:
+                tag: unknown
+                reason: The melting atmosphere for this sample is not specified in the sample-preparation text.
+              locator:
+                page: 5
+                published_page: 4
+                pdf_page_index: 4
+                section: Sample Preparation
+            composition:
+              state:
+                tag: unknown
+                reason: Table 2 reports a target recipe rather than measured final composition. The full recipe
+                  includes elemental Cl and F, which the existing mass-percent identity map cannot represent; no
+                  partial composition is substituted.
+              locator:
+                page: 4
+                published_page: 3
+                pdf_page_index: 3
+                table: '2'
+                row: Al-19_MF
+                column: target mass%
+                note: The complete target row is preserved in the Table 2 context record and table CSV asset.
+          composition_as_published:
+            table: '2'
+            sample_column: Al-19_MF
+            basis: target mass percent
+            note: Composition is the target recipe printed in Table 2, not a measured final-glass analysis.
+          T_C: '1150'
+          uncertainty:
+            kind: none
+      derived_from:
+      - tables:ferkl-2026-waste-glass-thermal-redox:t1
+      - tables:ferkl-2026-waste-glass-thermal-redox:t3
+      derivation:
+        relation: The authors used Equation (1), ln(w_red/w_ox) = α − (σ/4) ln(pO2) − ΔH/(RT), to report the Table
+          3 redox fraction from the Rapidox pO2 condition and the corresponding literature parameters in Table 1;
+          the emitted ratio is copied from Table 3, not recomputed.
+        inputs:
+        - tables:ferkl-2026-waste-glass-thermal-redox:t1
+        - tables:ferkl-2026-waste-glass-thermal-redox:t3
         output_unit: fraction
