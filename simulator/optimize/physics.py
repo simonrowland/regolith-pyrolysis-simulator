@@ -2083,12 +2083,30 @@ def _coating_from_upstream_deposit_fraction_report(
             reason.setdefault("flags", _coating_authority_flags(authority))
             violation_reasons.append(reason)
 
+    if certain_deposit_kg > limit_kg:
+        reason_payload = {
+            key: _plain_value(certain_records[0][key])
+            for key in ("campaign", "segment", "species", "zone")
+            if len(certain_records) == 1 and key in certain_records[0]
+        }
+        violation_reasons.append(
+            _coating_reason_record(
+                "upstream_wall_deposit_fraction_exceeded",
+                authority=authority,
+                **reason_payload,
+                deposit_kg_per_campaign=certain_deposit_kg,
+                threshold_kg_per_campaign=limit_kg,
+                feedstock_charge_mass_kg=charge_mass_kg,
+                deposit_fraction=certain_deposit_kg / charge_mass_kg,
+            )
+        )
+
     unavailable_reason = _coating_wall_quantity_unavailable(
         report,
         authority,
         include_coverage_unknown=True,
     )
-    if unavailable_reason:
+    if unavailable_reason and certain_deposit_kg <= limit_kg:
         return _coating_fraction_unavailable_margin(
             report=report,
             authority=authority,
@@ -2108,7 +2126,7 @@ def _coating_from_upstream_deposit_fraction_report(
 
     refused_bound_kg = sum(refused_bounds.get(species, 0.0) for species in refused_species)
     upper_bound_kg = certain_deposit_kg + refused_bound_kg
-    if refused_species and upper_bound_kg > limit_kg:
+    if refused_species and certain_deposit_kg <= limit_kg and upper_bound_kg > limit_kg:
         return _coating_fraction_unavailable_margin(
             report=report,
             authority=authority,
@@ -2129,24 +2147,6 @@ def _coating_from_upstream_deposit_fraction_report(
             limit_kg=limit_kg,
             certain_deposit_kg=certain_deposit_kg,
             upper_bound_kg=upper_bound_kg,
-        )
-
-    if not refused_species and certain_deposit_kg > limit_kg:
-        reason_payload = {
-            key: _plain_value(certain_records[0][key])
-            for key in ("campaign", "segment", "species", "zone")
-            if len(certain_records) == 1 and key in certain_records[0]
-        }
-        violation_reasons.append(
-            _coating_reason_record(
-                "upstream_wall_deposit_fraction_exceeded",
-                authority=authority,
-                **reason_payload,
-                deposit_kg_per_campaign=certain_deposit_kg,
-                threshold_kg_per_campaign=limit_kg,
-                feedstock_charge_mass_kg=charge_mass_kg,
-                deposit_fraction=certain_deposit_kg / charge_mass_kg,
-            )
         )
 
     if not violation_reasons and diagnostics.get(

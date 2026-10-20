@@ -737,6 +737,56 @@ def test_d045_refused_species_bound_above_threshold_is_unavailable() -> None:
     }]
 
 
+def test_d045_certain_deposit_over_limit_violates_with_bounded_refused_species() -> None:
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=6.0e-4,
+        unqualified_deposition_rate_kg_per_campaign=6.0e-4,
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["CrO2"],
+        },
+        wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign={
+            "CrO2": 1.0e-4,
+        },
+    )
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
+    assert coating.status_payload["coating_violation_reasons"][0]["reason"] == (
+        "upstream_wall_deposit_fraction_exceeded"
+    )
+
+
+def test_d045_certain_deposit_over_limit_violates_with_unbounded_refused_species() -> None:
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=6.0e-4,
+        unqualified_deposition_rate_kg_per_campaign=6.0e-4,
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["CrO2"],
+        },
+    )
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
+    assert coating.status_payload["coating_violation_reasons"][0]["reason"] == (
+        "upstream_wall_deposit_fraction_exceeded"
+    )
+
+
+def test_d045_certain_deposit_equal_to_limit_is_clear_without_refused_species() -> None:
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=5.0e-4,
+        unqualified_deposition_rate_kg_per_campaign=5.0e-4,
+    )
+
+    assert coating.feasible
+    assert coating.status_payload["coating_verdict"] == "clear"
+    assert coating.status_payload["coating_violation_reasons"] == []
+
+
 def test_d045_refused_species_without_flux_bound_is_unavailable() -> None:
     report = _d045_report(
         sticking_alpha_authority={
