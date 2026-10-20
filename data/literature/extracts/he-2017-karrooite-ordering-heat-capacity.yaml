@@ -45,13 +45,14 @@ scope_assessment:
         Elastic stiffness coefficients and the DFT bulk modulus have no matching
         quantity token; the paper labels the table as theory.
     - table: '5'
-      disposition: pending-lineage-resolution
+      disposition: context-measured-lineage-pending
       reason: >-
         Two experimental total standard entropy values fit S, but Table 5
         computes each from the printed vibrational and configurational
         components. Those component values have no distinct token and must not
-        be filed as total S. The generated INDEX has no TABLE_CSV asset for
-        this source, and its rules forbid editing INDEX.
+        be filed as total S. Per controller ruling t-1382, keep the totals in
+        context with candidate token S and method measured_reduced pending a
+        corpus TABLE_CSV asset; do not edit the generated INDEX.
   figure_only_candidate: >-
     Figure 10 contains measured Cp points, but figure digitization is deferred
     by the family rule. Figures 11–12 are calculated or reduced curves and
@@ -240,7 +241,28 @@ species:
               as context and not admitted as observations.
             - >-
               The two experimental S_total rows are pending TABLE_CSV lineage
-              registration; the generated INDEX has no asset for this source.
+              registration; the controller directs context parking under
+              ruling t-1382.
+
+      - observation_id: he2017_table5_standard_entropy_pending_asset
+        type: table_record
+        locator:
+          page: 15
+          published_page: 15
+          pdf_page_index: 14
+          table: '5'
+        units: J mol−1 K−1 per mole of formula unit
+        values:
+          quantity: S
+          candidate_token: standard entropy
+          method_class: measured_reduced
+          species: MgTi2O5
+          phase: crystalline MgTi2O5
+          T_K: 298
+          rows_as_printed:
+            - {sample_state: 'X = 0.14(1), Exp.', S_vib_as_printed: '124.8(1)', S_config_as_printed: '7.6(4)', S_total_as_printed: '132.4(4)'}
+            - {sample_state: 'X = 0.37(1), Exp.', S_vib_as_printed: '129.4(1)', S_config_as_printed: '13.4(2)', S_total_as_printed: '142.8(2)'}
+          capture_note: derivation pending a corpus table asset (controller, t-1382)
 
       - observation_id: he2017_figure1_structure
         type: figure_record
@@ -318,9 +340,9 @@ species:
             - {name: 'this study, annealed, filled diamond', marker_count: 1, evidence_class: measured_direct}
             - {name: 'Yang and Hazen 1998, annealed and quenched, open triangles', marker_count: 5, evidence_class: quoted_attributed}
             - {name: 'Brown and Navrotsky 1989, in-situ HT XRD, open squares', marker_count: 3, evidence_class: quoted_attributed}
-            - {name: Xirouchakis et al. 2002, T-independent model, marker_count: 0, evidence_class: model_derived}
-            - {name: Xirouchakis et al. 2002, T-dependent model, marker_count: 0, evidence_class: model_derived}
-            - {name: Ghiorso et al. 1999, model, marker_count: 0, evidence_class: model_derived}
+            - {name: 'Xirouchakis et al. 2002, T-independent model', marker_count: 0, evidence_class: model_derived}
+            - {name: 'Xirouchakis et al. 2002, T-dependent model', marker_count: 0, evidence_class: model_derived}
+            - {name: 'Ghiorso et al. 1999, model', marker_count: 0, evidence_class: model_derived}
           attribution: 'mixed: present study, [18], [19], [20], and [22] as printed'
           digitisation: deferred to a figure pass
 
@@ -396,7 +418,7 @@ species:
             - {name: 'present study, filled squares', marker_count: 5, evidence_class: measured_direct}
             - {name: 'Liermann et al. [36], open circles', marker_count: 2, evidence_class: quoted_attributed}
             - {name: equal-weight linear fit, marker_count: 0, evidence_class: model_derived}
-            - {name: fully ordered DFT datum, filled triangle, marker_count: 1, evidence_class: model_derived}
+            - {name: 'fully ordered DFT datum, filled triangle', marker_count: 1, evidence_class: model_derived}
           attribution: 'mixed: present study, DFT, and [36] as printed'
           digitisation: deferred to a figure pass
 
