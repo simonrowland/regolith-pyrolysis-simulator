@@ -8,14 +8,14 @@ Not a duplicate. No extract on this base cites this title or this symposium. It 
 
 ## What was admitted
 
-35 Fig. 1 activities at 2100 K, `method_class: figure_only`. CaO 8 filled circles, TiO2 7 up-triangles, SiO2 6 down-triangles, CaTiO3 8 open squares, CaTiSiO5 6 open circles. The stored number is log10 a from the tick calibration. `activity` is 10 to that power, six decimal places. Composition is the digitised mol% SiO2 with the balance CaTiO3.
+36 Fig. 1 activities at 2100 K, `method_class: figure_only`. CaO 8 filled circles, TiO2 7 up-triangles, SiO2 6 down-triangles, CaTiO3 8 open squares, CaTiSiO5 7 open circles. The stored number is log10 a from the tick calibration. `activity` is 10 to that power, six decimal places. Composition is the digitised mol% SiO2 with the balance CaTiO3.
 
 8 Fig. 2 series-3 readings of Δf G_T/RT at 2100 K. These stay in context. The axis is dimensionless, the caption does not name the formation reaction, and Quantity has no Δf G/RT token. They are not stored as delta_fG.
 
 Refused, one marker at a time:
 
 - TiO2 and SiO2 at about 40 mol% SiO2. They merge into one filled diamond. The core is one blob at page pixel (2628.7, 1054.7). Neither centre was stored.
-- CaTiSiO5 at about 20 mol% SiO2. Only an arc remains above the series 4 square. A ring fit snapped onto the square. Not stored.
+- CaTiSiO5 at about 20 mol% SiO2 is stored. The visible arc is 261 degrees on the series-5 inner radius of 21 px, the radius of the clean circle at (2905, 956). The centre is (2084.0, 937.0), log10 a = −0.215, 20.37 mol% SiO2. The series-4 square at (2074.0, 980.6) hides the lower arc, so the uncertainty stays ±0.03 and ±0.4 mol%.
 - Fig. 2 series 1 (filled circles, SiO2–MgAl2O4, 2050 K, reference [13]) and series 2 (up-triangles, SiO2–CaAl2O4, 1933 K, reference [14]). Other papers.
 - The three symbols stacked near 71 mol% SiO2 are the Fig. 2 legend, not data.
 
@@ -63,3 +63,54 @@ Series 3 down-triangle cores, Δf G_T/RT ±0.02 (±0.03 at x=0, where the axis c
 | 40.00 | −2.932 |
 | 50.00 | −2.580 |
 | 60.02 | −2.105 |
+
+## This-work markers
+
+One row per stored marker. The TiO2 and SiO2 pair at about 40 mol% SiO2 remains one filled blob at (2628.7, 1054.7) and is not in this table.
+
+| series | species | x | y | value | decision |
+| --- | --- | --- | --- | --- | --- |
+| /4 open square | CaTiO3 | 1516.0 | 852.0 | activity=1.000000 | read |
+| /4 open square | CaTiO3 | 1796.0 | 850.0 | activity=1.011579 | read |
+| /4 open square | CaTiO3 | 2074.0 | 980.6 | activity=0.472063 | read |
+| /4 open square | CaTiO3 | 2350.0 | 1163.5 | activity=0.162181 | read |
+| /4 open square | CaTiO3 | 2444.0 | 1231.9 | activity=0.108893 | read |
+| /4 open square | CaTiO3 | 2632.0 | 1368.0 | activity=0.049204 | read |
+| /4 open square | CaTiO3 | 2905.0 | 1590.5 | activity=0.013428 | read |
+| /4 open square | CaTiO3 | 3183.0 | 1782.6 | activity=0.004375 | read |
+| /3 filled down-triangle | CaTiO3 | 1584.4 | 4658.7 | quantity_as_printed=Delta_f G_T / RT; axis_delta_fG_over_RT=-2.543; x_SiO2_mol_pct=0.36 | read |
+| /3 filled down-triangle | CaTiO3 | 1851.8 | 4887.5 | quantity_as_printed=Delta_f G_T / RT; axis_delta_fG_over_RT=-2.901; x_SiO2_mol_pct=10.00 | read |
+| /3 filled down-triangle | CaTiO3 | 2130.8 | 5034.3 | quantity_as_printed=Delta_f G_T / RT; axis_delta_fG_over_RT=-3.130; x_SiO2_mol_pct=20.06 | read |
+| /3 filled down-triangle | CaTiO3 | 2405.3 | 5035.9 | quantity_as_printed=Delta_f G_T / RT; axis_delta_fG_over_RT=-3.133; x_SiO2_mol_pct=29.97 | read |
+| /3 filled down-triangle | CaTiO3 | 2498.5 | 5005.2 | quantity_as_printed=Delta_f G_T / RT; axis_delta_fG_over_RT=-3.085; x_SiO2_mol_pct=33.33 | read |
+| /3 filled down-triangle | CaTiO3 | 2683.6 | 4907.5 | quantity_as_printed=Delta_f G_T / RT; axis_delta_fG_over_RT=-2.932; x_SiO2_mol_pct=40.00 | read |
+| /3 filled down-triangle | CaTiO3 | 2960.8 | 4682.4 | quantity_as_printed=Delta_f G_T / RT; axis_delta_fG_over_RT=-2.580; x_SiO2_mol_pct=50.00 | read |
+| /3 filled down-triangle | CaTiO3 | 3238.6 | 4378.9 | quantity_as_printed=Delta_f G_T / RT; axis_delta_fG_over_RT=-2.105; x_SiO2_mol_pct=60.02 | read |
+| /3 filled down-triangle | SiO2 | 1796.7 | 1901.0 | activity=0.002193 | read |
+| /3 filled down-triangle | SiO2 | 2074.1 | 1535.5 | activity=0.018493 | read |
+| /3 filled down-triangle | SiO2 | 2350.4 | 1259.4 | activity=0.092683 | read |
+| /3 filled down-triangle | SiO2 | 2443.4 | 1186.4 | activity=0.141906 | read |
+| /3 filled down-triangle | SiO2 | 2903.3 | 924.2 | activity=0.656145 | read |
+| /3 filled down-triangle | SiO2 | 3182.3 | 871.8 | activity=0.891251 | read |
+| /1 filled circle | CaO | 1530.2 | 1480.4 | activity=0.025527 | read |
+| /1 filled circle | CaO | 1797.0 | 1480.6 | activity=0.025527 | read |
+| /1 filled circle | CaO | 2074.2 | 1679.9 | activity=0.007962 | read |
+| /1 filled circle | CaO | 2350.7 | 1877.7 | activity=0.002512 | read |
+| /1 filled circle | CaO | 2443.7 | 1940.2 | activity=0.001746 | read |
+| /1 filled circle | CaO | 2628.2 | 2052.3 | activity=0.000906 | read |
+| /1 filled circle | CaO | 2905.3 | 2184.7 | activity=0.000419 | read |
+| /1 filled circle | CaO | 3183.0 | 2252.2 | activity=0.000282 | read |
+| /2 filled up-triangle | TiO2 | 1529.5 | 1096.6 | activity=0.239883 | read |
+| /2 filled up-triangle | TiO2 | 1796.6 | 1093.8 | activity=0.243781 | read |
+| /2 filled up-triangle | TiO2 | 2074.7 | 1024.3 | activity=0.365595 | read |
+| /2 filled up-triangle | TiO2 | 2350.5 | 1009.5 | activity=0.399025 | read |
+| /2 filled up-triangle | TiO2 | 2443.6 | 1016.3 | activity=0.383707 | read |
+| /2 filled up-triangle | TiO2 | 2905.0 | 1129.1 | activity=0.198609 | read |
+| /2 filled up-triangle | TiO2 | 3182.5 | 1253.9 | activity=0.095719 | read |
+| /5 open circle | CaTiSiO5 | 1794.0 | 1188.0 | activity=0.140605 | read |
+| /5 open circle | CaTiSiO5 | 2084.0 | 937.0 | activity=0.609537 | read |
+| /5 open circle | CaTiSiO5 | 2349.0 | 861.0 | activity=0.948418 | read |
+| /5 open circle | CaTiSiO5 | 2447.0 | 850.0 | activity=1.011579 | read |
+| /5 open circle | CaTiSiO5 | 2626.0 | 868.0 | activity=0.909913 | read |
+| /5 open circle | CaTiSiO5 | 2905.0 | 950.0 | activity=0.564937 | read |
+| /5 open circle | CaTiSiO5 | 3185.0 | 1071.0 | activity=0.278612 | read |

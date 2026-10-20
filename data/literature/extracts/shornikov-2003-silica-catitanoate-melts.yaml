@@ -679,10 +679,10 @@ species:
         values:
           T_K: '2100'
           series_as_printed: "1 CaO, 2 TiO2, 3 SiO2, 4 CaTiO3, 5 CaTiSiO5; present study"
-          stored_count: 35
+          stored_count: 36
           refused:
             - "TiO2 and SiO2 at about 40 mol% SiO2: one filled diamond, page pixel (2628.7, 1054.7)"
-            - "CaTiSiO5 open circle at about 20 mol% SiO2: arc only, above the series 4 square"
+            - "CaTiSiO5 open circle at about 20 mol% SiO2: stored at (2084.0, 937.0), log10 a = -0.215"
       - observation_id: shornikov_2003_fig2_series3_x0_36
         type: figure_melt_formation_gibbs
         locator:
@@ -2498,6 +2498,71 @@ species:
         composition_basis: mole fraction from the digitised mol% SiO2; the balance is CaTiO3
         page_pixel_x: '1794.0'
         page_pixel_y: '1188.0'
+        read_uncertainty_log10: '0.03'
+        read_uncertainty_mol_pct: '0.4'
+    - observation_id: shornikov_2003_fig1_titanite_x20_37
+      type: activity_coefficient
+      experiment: shornikov-2003-fig1-2100k
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 115
+        figure: '1'
+        series: '5'
+        marker_symbol: open circle
+        note: >-
+          600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0
+          at y=852.0, -1 at y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5
+          px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol% at x=3737.0. (3737.0-1519.5)/80
+          = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+          px. Series 5, open circle, CaTiSiO5. Page pixel (2084.0, 937.0). Read log10 a = -0.215
+          ± 0.03; x(SiO2) = 20.37 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The
+          centre is the constrained fit of the dark pixels on the series-5 inner radius, 21 px,
+          measured on the clean circle at (2905, 956) where 25 of 36 rays agree. The visible arc
+          spans 261 degrees. Fit centres run from x=2080 to x=2088, so the uncertainty is widened.
+          The series-4 square at (2074.0, 980.6) hides the lower part of the ring.
+      T_range_K: [2100, 2100]
+      phase: l
+      standard_state: >-
+        Fig. 1 plots a(CaTiSiO5) in the SiO2-CaTiO3 melt at 2100 K. The paper does not give a
+        reference-state sentence for the titanite activity. The phase is not stated.
+      units: dimensionless activity
+      uncertainty:
+        value: '0.03'
+        unit: log10 activity
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: Read uncertainty is ±0.03 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker. The lower arc is hidden by the series-4 square.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2100'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 115
+            figure: '1'
+            note: The Fig. 1 caption states 2100 K.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2100'
+        temperature_K: 2100
+        activity: '0.609537'
+        log10_activity: '-0.215'
+        x_SiO2_mol_pct: '20.37'
+        x_SiO2_mol_pct_pixel: '20.37'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.203700'
+          CaTiO3: '0.796300'
+        composition_basis: mole fraction from the digitised mol% SiO2; the balance is CaTiO3
+        page_pixel_x: '2084.0'
+        page_pixel_y: '937.0'
         read_uncertainty_log10: '0.03'
         read_uncertainty_mol_pct: '0.4'
     - observation_id: shornikov_2003_fig1_titanite_x29_93
