@@ -94,10 +94,10 @@ species:
                 value: cr
               polymorph:
                 tag: unknown
-                reason: unrecognised polymorph 'wurtzite'
+                reason: polymorph not named in Table 6
             component_basis: ZnO
         inferred: true
-        note: The activity is referenced to pure ZnO(s); the paper does not name a polymorph in Table 6, and the store has no wurtzite polymorph token.
+        note: The activity is referenced to pure ZnO(s); the paper does not name a polymorph in Table 6.
     - observation_id: itoh_1989_zno_solid_zinc_silicate_p006_t02_r03_c04
       type: activity_coefficient
       locator:
@@ -162,10 +162,10 @@ species:
                 value: cr
               polymorph:
                 tag: unknown
-                reason: unrecognised polymorph 'wurtzite'
+                reason: polymorph not named in Table 6
             component_basis: ZnO
         inferred: true
-        note: The activity is referenced to pure ZnO(s); the paper does not name a polymorph in Table 6, and the store has no wurtzite polymorph token.
+        note: The activity is referenced to pure ZnO(s); the paper does not name a polymorph in Table 6.
     - observation_id: itoh_1989_zno_solid_zinc_silicate_p006_t02_r04_c02
       type: activity_coefficient
       locator:
@@ -236,10 +236,10 @@ species:
                 value: cr
               polymorph:
                 tag: unknown
-                reason: unrecognised polymorph 'wurtzite'
+                reason: polymorph not named in Table 6
             component_basis: ZnO
         inferred: true
-        note: The activity is referenced to pure ZnO(s); the paper does not name a polymorph in Table 6, and the store has no wurtzite polymorph token.
+        note: The activity is referenced to pure ZnO(s); the paper does not name a polymorph in Table 6.
     - observation_id: itoh_1989_zno_solid_zinc_silicate_p006_t02_r04_c04
       type: activity_coefficient
       locator:
@@ -304,10 +304,10 @@ species:
                 value: cr
               polymorph:
                 tag: unknown
-                reason: unrecognised polymorph 'wurtzite'
+                reason: polymorph not named in Table 6
             component_basis: ZnO
         inferred: true
-        note: The activity is referenced to pure ZnO(s); the paper does not name a polymorph in Table 6, and the store has no wurtzite polymorph token.
+        note: The activity is referenced to pure ZnO(s); the paper does not name a polymorph in Table 6.
     - observation_id: itoh_1989_table_3_M1_zno_composition
       type: equilibrium_phase_composition
       locator:
@@ -2105,15 +2105,24 @@ species:
         intercept_as_printed: '-46590'
         slope_as_printed: '16.79'
         temperature_range_as_printed: 1073–1275 K
-    - observation_id: itoh_1989_eq10_zno_standard_formation_free_energy_fit
+    - observation_id: itoh_1989_eq12_zno_standard_formation_free_energy_fit
       type: typed_context
-      locator: {page: 4, published_page: 688, pdf_page_index: 3, equation: '10'}
+      locator: {page: 4, published_page: 688, pdf_page_index: 3, equation: '12'}
       units: J/mol
       values:
         method_class: model_derived
         quantity_as_printed: standard formation free-energy fit
         equation_as_printed: ΔG°ZnO/J mol-1 = -355940 + 108.53 T/K ± 190
         temperature_range_as_printed: 823–1073 K
+    - observation_id: itoh_1989_eq10_zno_standard_formation_free_energy_fit
+      type: typed_context
+      locator: {page: 3, published_page: 687, pdf_page_index: 2, equation: '10'}
+      units: J/mol
+      values:
+        method_class: model_derived
+        quantity_as_printed: standard formation free-energy fit for cell (V)
+        equation_as_printed: ΔG°ZnO/J mol-1 = -351540 + 105.00 T/K ± 120
+        temperature_range_as_printed: 840–1017 K
   SiO2:
     observations:
     - observation_id: itoh_1989_zno_solid_zinc_silicate_p006_t02_r03_c03

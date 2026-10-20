@@ -35,7 +35,8 @@ def test_printed_antimony_activity_coefficient_fit_is_preserved_as_context() -> 
         row for row in document["species"]["Sb"]["context"]
         if row["observation_id"] == "tsukihashi_1985_distribution_ratios_no_store_token"
     )
-    assert sb_ratios["values"]["antimony_slag_to_lead_alloy_ratio"] == "0.58"
+    assert sb_ratios["values"]["antimony_carbon_saturated_iron_to_lead_alloy_ratio"] == "0.58"
+    assert "carbon-saturated molten iron / Pb alloy" in sb_ratios["values"]["antimony_ratio_conditions_as_printed"]
 
 
 def test_distribution_and_activity_figures_are_deferred_without_points() -> None:

@@ -171,7 +171,7 @@ def test_table6_silica_reference_is_quartz_and_solid_solutions_stay_crystal() ->
     migrated = _migrate(EXTRACT)
     zno_activity = next(row for row in document["species"]["ZnO"]["observations"] if row.get("locator", {}).get("table") == "6")
     assert zno_activity["standard_state"]["state"]["value"]["endmember"]["polymorph"]["tag"] == "unknown"
-    assert zno_activity["standard_state"]["state"]["value"]["endmember"]["polymorph"]["reason"] == "unrecognised polymorph 'wurtzite'"
+    assert zno_activity["standard_state"]["state"]["value"]["endmember"]["polymorph"]["reason"] == "polymorph not named in Table 6"
     for row in migrated.observations.values():
         if row.source_id == yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))["source_id"] and "table_5_" in row.observation_id:
             assert row.identity.species.phase.value.value == "cr"
@@ -183,5 +183,13 @@ def test_formation_free_energy_fits_remain_context_with_printed_equations() -> N
     zno_context = document["species"]["ZnO"]["context"]
     eq8 = next(row for row in cu2o_context if row["observation_id"] == "itoh_1989_eq8_cu2o_standard_formation_free_energy_fit")
     eq10 = next(row for row in zno_context if row["observation_id"] == "itoh_1989_eq10_zno_standard_formation_free_energy_fit")
+    eq12 = next(row for row in zno_context if row["observation_id"] == "itoh_1989_eq12_zno_standard_formation_free_energy_fit")
     assert eq8["values"]["equation_as_printed"] == "ΔG°Cu2O/J mol-1 = -166690 + 71.03 T/K ± 100"
-    assert eq10["values"]["equation_as_printed"] == "ΔG°ZnO/J mol-1 = -355940 + 108.53 T/K ± 190"
+    assert eq10["locator"]["equation"] == "10"
+    assert eq10["locator"]["published_page"] == 687
+    assert eq10["values"]["equation_as_printed"] == "ΔG°ZnO/J mol-1 = -351540 + 105.00 T/K ± 120"
+    assert eq10["values"]["temperature_range_as_printed"] == "840–1017 K"
+    assert eq12["locator"]["equation"] == "12"
+    assert eq12["locator"]["published_page"] == 688
+    assert eq12["values"]["equation_as_printed"] == "ΔG°ZnO/J mol-1 = -355940 + 108.53 T/K ± 190"
+    assert eq12["values"]["temperature_range_as_printed"] == "823–1073 K"

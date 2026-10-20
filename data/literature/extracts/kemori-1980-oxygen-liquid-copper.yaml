@@ -408,9 +408,10 @@ species:
         candidate_quantities: [interaction_parameter]
         reason: >-
           Table 3 reports oxygen self-interaction coefficients fitted from
-          electrochemical data. The table's regression rows are retained here
-          pending verification of the interaction_parameter encoding for this
-          printed concentration-dependent form.
+          electrochemical data. The ε° coefficients and concentration
+          intervals are typed as interaction_parameter observations; this
+          context record retains the table locator and the separate solubility
+          fits reported in the same table.
         values:
           table_as_printed: ε°ₒ values and concentration intervals, Table 3
           solubility_fits:
