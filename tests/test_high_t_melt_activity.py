@@ -351,16 +351,22 @@ def _history_request(composition, temperature_K, hour, previous=None):
 
 def test_successful_openimcc_physics_is_bit_identical() -> None:
     result = _provider().dispatch(_history_request(BASE_MELT_MOL, 2400.65, 61))
-    # Re-measured after merging green a822c275f: d-173 moves the engine pin
-    # from e975edd to e1423d8. d-071 moves it again. The hash was
-    # 0dbdc3673e0d640898dad7b848278f93322c0b48898050618b21811bd63c7e78
-    # through openimcc 1942696. 249fde5 (MgAl2O4 fusion) and 100df4f
-    # (FeO(l) re-anchor) change the pressures. ccabd0b keeps those
-    # pressures and changes the hash because the pack version, digest
-    # and engine binding are inside it. JSON round-trips preserve float bits.
+    # sha256 of json.dumps(_physics(result), sort_keys=True). _physics is
+    # the pressures, activities, sources, numerator provenance, and
+    # warnings. The provenance copies the K2O exclusion reason, and that
+    # reason embeds Gamma(KO0.5) from _K2O_PACK_EVALUATIONS_BY_DIGEST.
+    # The completed d-071 default row prints 2.14e-6 and 1.12e-5, so those
+    # strings are inside the hashed text. Direct call against openimcc
+    # ccabd0b gives
+    # 0f90f3fd63c8cff60ebdb8256de0b830ef866d86dbf5aa9cc49b02b922d1dbe2.
+    # e12fc971… is that same dispatch before the table strings replaced
+    # the exclusion text. Pressures are unchanged by the table: the hash
+    # was 0dbdc367… through 1942696, moved at 249fde5 and 100df4f, and
+    # ccabd0b changed it again through the pack version, digest, and
+    # binding. JSON round-trips preserve float bits.
     assert hashlib.sha256(
         json.dumps(_physics(result), sort_keys=True).encode()
-    ).hexdigest() == "e12fc971020c2d350193a6bbf5e57990e7a51b85f8a19c78bb41ee5e5b7c1901"
+    ).hexdigest() == "0f90f3fd63c8cff60ebdb8256de0b830ef866d86dbf5aa9cc49b02b922d1dbe2"
 
 
 @pytest.mark.parametrize("gap_K, hour_gap", [
@@ -808,11 +814,11 @@ def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> N
         temperature_K=refused_65["T_K"], authority=authority_65,
     )
     # d-071. The reference line is the historical c2b7b4e probe gammas.
-    # Live probe gammas move at openimcc 249fde5, so the ratio leaves 0
-    # (it was 1.7673900327583708e-15 through 1942696) and becomes
-    # 0.011330388717366009. 100df4f / ccabd0b hold this value. The old
-    # ±0.01 band contained both 0 and the new ratio; this band does not
-    # contain 0.
+    # The ratio was 1.7673900327583708e-15 through openimcc 1942696, inside
+    # the old ±0.01 band around 0. Live probe gammas move at 249fde5 to
+    # 0.011330388717366009, which lies outside that band (0.01133 > 0.01).
+    # 100df4f changes it to 0.011330355283529284; ccabd0b holds that value.
+    # This abs=0.0005 band excludes 0.
     assert (activity_65.effective_gamma - reference) / reference == pytest.approx(
         0.011330355283529284, abs=0.0005,
     )

@@ -21,10 +21,15 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 # Ref DG46-MASSON65. The Fe–Mg–Si pots move with that standard state. The largest
 # relative shifts are the high-oxygen polymers (Si3 about -22% at 1200 K with no
 # cell, W4O12 about +22% at 1700 K on W), because pO2 moves and those stoichiometries
-# amplify it. CaO–SiO2 pressures do not move. At 1200 K the Fe-019 supercooled-liquid
-# notice drops: the liquid row is no longer the JANAF fusion marker, so Fe and FeO
-# domain flags are absent. The Fe and FeO channel class becomes janaf_fitted. The
-# oxide authority primary_measurement_reanchored (rank 4) outranks the gas JANAF fit
+# amplify it. CaO–SiO2 pressures do not move. At 1200 K the Fe and FeO domain
+# flags are None. That is the current openimcc output: gas.py _source_model_flag
+# emits the supercooled notice only when the liquid Ref is Fe-019 or JANAF, and
+# the row is now DG46-MASSON65. The redox metadata flags the Darken-Gurry/Masson
+# correction as a linear extrapolation outside 1649.15–1766.15 K, and that gas
+# matcher does not read the band. This pin records the engine output. It does
+# not accept 1200 K as inside the anchor band. 1700 K is inside that band.
+# The Fe and FeO channel class becomes janaf_fitted. The oxide authority
+# primary_measurement_reanchored (rank 4) outranks the gas JANAF fit
 # (rank 3), and the channel keeps the least-authoritative row. 249fde5 still reported
 # janaf_transcribed. ccabd0b keeps the 100df4f pressures and the new class.
 # Float outputs are stored as float.hex strings so these are exact pins.
