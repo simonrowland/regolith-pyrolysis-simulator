@@ -3576,14 +3576,19 @@ def _profile_thermal_window_schedule(
 ) -> Mapping[str, Any] | None:
     campaign = str(run_options.get("campaign", "") or "")
     temp_range = _profile_campaign_setting(profile, campaign, "temp_range_C")
-    bounds = _numeric_interval(temp_range)
-    if bounds is None:
+    if temp_range is None:
         return None
-    low_C, high_C = bounds
-    if high_C < low_C:
-        raise EvaluationInputError(
-            f"{campaign}.temp_range_C must be ascending; got {temp_range!r}"
+    try:
+        preheat_interval = resolve_thermal_preheat_interval(
+            temp_range,
+            _profile_campaign_setting(profile, campaign, "preheat_ramp_C_per_hr"),
+            _profile_campaign_setting(profile, campaign, "ramp_rate_C_per_hr"),
         )
+    except ValueError as exc:
+        raise EvaluationInputError(
+            f"{campaign}.temp_range_C preheat interval is invalid: {exc}"
+        ) from exc
+    low_C, high_C = preheat_interval.low_C, preheat_interval.high_C
     ceiling_C, ceiling_bound = _furnace_ceiling_C(
         constraints,
         setpoints,
@@ -3604,16 +3609,6 @@ def _profile_thermal_window_schedule(
         raise EvaluationInputError(
             f"{campaign}.duration_h must be positive for thermal window scheduling"
         )
-    try:
-        preheat_interval = resolve_thermal_preheat_interval(
-            temp_range,
-            _profile_campaign_setting(profile, campaign, "preheat_ramp_C_per_hr"),
-            _profile_campaign_setting(profile, campaign, "ramp_rate_C_per_hr"),
-        )
-    except ValueError as exc:
-        raise EvaluationInputError(
-            f"{campaign}.temp_range_C preheat interval is invalid: {exc}"
-        ) from exc
     preheat_ramp = preheat_interval.ramp_rate_C_per_hr
     preheat_hours = preheat_interval.hours
     total_hours = int(math.ceil(preheat_hours + duration_h))

@@ -93,9 +93,7 @@ def test_three_preheat_readers_refuse_the_same_invalid_inputs(
         lambda _campaign: {"preheat_ramp_C_per_hr": ramp_rate},
     )
     with pytest.raises(ValueError):
-        recipe_db_profile._thermal_window_preheat_hours(
-            "C0", temperature_range
-        )
+        recipe_db_profile._campaign_preheat_interval("C0", temperature_range)
 
     monkeypatch.setattr(
         recipe_db_profile,
@@ -183,9 +181,9 @@ def test_three_preheat_readers_agree_on_valid_intervals(
         "_setpoint_campaign_config",
         lambda _campaign: {"preheat_ramp_C_per_hr": ramp_rate},
     )
-    script_hours = recipe_db_profile._thermal_window_preheat_hours(
+    script_hours = recipe_db_profile._campaign_preheat_interval(
         "C0", profile["run"]["temp_range_C"]
-    )
+    ).hours
     assert evaluate_hours == expected_hours
     assert script_hours == expected_hours
 
