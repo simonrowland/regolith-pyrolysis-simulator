@@ -11,6 +11,7 @@ import pytest
 
 from simulator.condensation import _coerce_alpha_s
 from simulator.silent_zero import (
+    CATEGORY_MARK,
     CATEGORY_PROVEN_ZERO,
     CATEGORY_REFUSE,
     SCHEMA_V1,
@@ -453,6 +454,88 @@ def test_internal_analytical_feo_below_threshold_vs_missing_activity() -> None:
         and n.get("doctrine_category") == CATEGORY_REFUSE
         for n in host_notes
     )
+
+
+def _internal_analytical_host(
+    *, temperature_K: float, composition_wt_pct: dict, vapor_pressures: dict
+) -> SimpleNamespace:
+    from simulator.equilibrium import EquilibriumMixin
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    return SimpleNamespace(
+        melt=SimpleNamespace(
+            temperature_C=temperature_K - CELSIUS_TO_KELVIN_OFFSET,
+            p_total_mbar=0.0,
+            composition_wt_pct=lambda: composition_wt_pct,
+            oxygen_reservoir=None,
+            melt_fO2_log=-9.0,
+        ),
+        _headspace_transport_pO2_bar=lambda: 1e-12,
+        _vacuum_floor_bar=lambda: 1e-12,
+        atom_ledger=None,
+        _ELLINGHAM_THERMO=EquilibriumMixin._ELLINGHAM_THERMO,
+        vapor_pressures=vapor_pressures,
+        _silent_zero_notes=[],
+    )
+
+
+def test_internal_analytical_missing_metal_coefficients_refuse() -> None:
+    from simulator.equilibrium import EquilibriumMixin
+
+    sim = _internal_analytical_host(
+        temperature_K=1700.0,
+        composition_wt_pct={"FeO": 100.0},
+        vapor_pressures={
+            "metals": {"Fe": {"parent_oxide": "FeO"}},
+            "oxide_vapors": {},
+        },
+    )
+
+    result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+    assert result.status == "refused"
+    notes = result.diagnostics.get("silent_zero_notes") or []
+    note = next(
+        n
+        for n in notes
+        if n.get("species") == "Fe"
+        and n.get("zero_because") == ZeroBecause.MISSING_COEFFICIENT.value
+    )
+    assert note["doctrine_category"] == CATEGORY_REFUSE
+    assert note["field"] == "antoine_coefficients"
+
+
+def test_internal_analytical_out_of_range_oxide_pressure_is_flagged() -> None:
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.equilibrium import EquilibriumMixin
+
+    sim = _internal_analytical_host(
+        temperature_K=1300.0,
+        composition_wt_pct={"SiO2": 100.0},
+        vapor_pressures={
+            "metals": {},
+            "oxide_vapors": {
+                "SiO": VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"],
+            },
+        },
+    )
+
+    result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+    assert result.status == "ok"
+    assert result.vapor_pressures_Pa["SiO"] > 1e-15
+    notes = result.diagnostics.get("silent_zero_notes") or []
+    note = next(
+        n
+        for n in notes
+        if n.get("species") == "SiO"
+        and n.get("zero_because") == ZeroBecause.OUT_OF_DOMAIN_MARKED.value
+    )
+    assert note["doctrine_category"] == CATEGORY_MARK
+    detail = note.get("detail") or ""
+    assert "reason=temperature_outside_valid_range_K" in detail
+    assert "authority_level=extrapolated" in detail
+    assert "valid_range_K=[1400, 2273.15]" in detail
 
 
 # ---------------------------------------------------------------------------
