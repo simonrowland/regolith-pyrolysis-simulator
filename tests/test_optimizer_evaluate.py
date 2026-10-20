@@ -3166,6 +3166,37 @@ def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic(
     assert "coating unavailable" in coating.detail
 
 
+def test_diverted_stage3_bypass_wall_deposit_is_scored_as_upstream() -> None:
+    trace = _trace()
+    trace.stage3_route_diagnostic = {"stage3_route": "divert"}
+    trace.wall_deposit_by_segment_species_kg = {
+        ("stage_3_bypass_to_stage_4", "Na"): 0.75,
+    }
+    trace.wall_zone_by_segment = {"stage_3_bypass_to_stage_4": "Hot"}
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_composition_eval_profile(
+            "residual_rump_at_stop",
+            target_id="diverted-stage3-wall-deposit",
+        ),
+        executor=FakeExecutor(_execution(trace=trace)),
+    )
+
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    coating = result.feasibility_margins["coating"]
+    reason = coating.status_payload["coating_violation_reasons"][0]
+    record = coating.status_payload["upstream_wall_deposit_records"][0]
+    assert reason["reason"] == "upstream_wall_deposit_fraction_exceeded"
+    assert reason["segment"] == "stage_3_bypass_to_stage_4"
+    assert reason["deposit_kg_per_campaign"] == pytest.approx(0.75)
+    assert record["scope"] == "upstream"
+    assert record["segment"] == "stage_3_bypass_to_stage_4"
+
+
 def test_optimizer_overlay_bounds_refused_wall_species_from_snapshot_flux() -> None:
     trace = _trace()
     trace.wall_deposit_sticking_authority = {
@@ -3237,6 +3268,32 @@ def test_optimizer_overlay_null_refused_species_stays_flux_bounded() -> None:
     assert coating.feasible
     assert coating.status == "warning"
     assert coating.status_payload["coating_warning_flags"][0]["species"] == "CrO2"
+
+    from simulator.cost_parameters import CostParameters
+
+    execution.simulator.record.cost_rollup = {
+        "run_input_cost": {"owner_ratify_money_projection": 20.0},
+    }
+    summary = objective_module.product_summary(
+        execution,
+        {"feedstock": "lunar_mare_low_ti"},
+        cost_parameters=CostParameters(
+            electricity_cost_per_kWh=1.0,
+            furnace_resinter_cost_usd=1.0,
+            depreciation_expense_per_run=1.0,
+            generic_reagent_cost_per_kg=1.0,
+            shuttle_reagent_replacement_cost_per_kg={
+                "Na": 1.0,
+                "K": 1.0,
+                "Mg": 1.0,
+                "Ca": 1.0,
+            },
+        ),
+        coating_margin=coating,
+    )
+    assert summary["coating_status"] == "warning"
+    assert "coating_unavailable_reason" not in summary
+    assert summary["furnace_amortization_cost_per_run_usd"] is not None
 
 
 def test_parametric_null_campaign_deposit_is_unavailable(

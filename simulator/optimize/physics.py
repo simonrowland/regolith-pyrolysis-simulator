@@ -22,7 +22,10 @@ from simulator.accounting.completeness import (
 )
 from simulator.accounting.queries import AccountingQueries
 from simulator.condensation_routing import accepted_species_for_stage_number
-from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.diagnostics import (
+    _carrier_is_inapplicable,
+    wall_deposit_sticking_authority_status,
+)
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.trace import WALL_DEPOSIT_ZONE_NAMES
 
@@ -578,6 +581,7 @@ class PhysicsConstraintSet:
                 deposit_records=deposit_records,
                 diagnostics=diagnostics,
             )
+            warning_flags = _coating_dew_point_warnings(diagnostics, authority)
             unavailable_reason = _coating_wall_quantity_unavailable(authority)
             common_payload = {
                 **authority,
@@ -586,6 +590,7 @@ class PhysicsConstraintSet:
                     COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
                 ),
                 "coating_violation_reasons": reasons,
+                "coating_warning_flags": warning_flags,
             }
             if unavailable_reason:
                 return GateMargin(
@@ -703,7 +708,11 @@ class PhysicsConstraintSet:
                 threshold=self.coating_min_campaigns_to_resinter,
                 observed=float(worst_observed),
                 detail=detail,
-                status="available" if authoritative else "warning",
+                status=(
+                    "warning"
+                    if (warning_flags and not reasons) or not authoritative
+                    else "available"
+                ),
                 authoritative=authoritative,
                 output_status=str(authority.get("output_status", "authoritative")),
                 status_reason=(
@@ -723,8 +732,10 @@ class PhysicsConstraintSet:
         """Classify the runner's worst-segment lifespan verdict.
 
         Authority controls the label only. Predicted upstream deposition and
-        upstream chemistry findings remain hard no-coating violations; a
-        refused wall quantity is unavailable rather than a zero.
+        silica exposure remain hard no-coating violations. A dew-point
+        finding is a warning on this path as well as the fraction path. A
+        refused wall quantity that cannot be bounded is unavailable rather
+        than a zero.
         """
         if not isinstance(report, Mapping):
             raise CoatingFeasibilityReportError(
@@ -802,6 +813,10 @@ class PhysicsConstraintSet:
                 output_status=output_status,
                 status_reason=status_reason,
             )
+        warning_flags = _coating_dew_point_warnings(
+            diagnostics,
+            authority_payload,
+        )
         unavailable_reason = _coating_wall_quantity_unavailable(
             report,
             authority_payload,
@@ -872,6 +887,7 @@ class PhysicsConstraintSet:
                         "coating_verdict": "unavailable",
                         "coating_unavailable_reason": unavailable_reason,
                         "coating_violation_reasons": reasons,
+                        "coating_warning_flags": warning_flags,
                         "coating_positive_deposit_tolerance_kg_per_campaign": (
                             COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
                         ),
@@ -897,7 +913,11 @@ class PhysicsConstraintSet:
                 threshold=threshold,
                 observed=rate,
                 detail=detail,
-                status="available" if coating_authoritative else "warning",
+                status=(
+                    "warning"
+                    if (warning_flags and not violated) or not coating_authoritative
+                    else "available"
+                ),
                 authoritative=coating_authoritative,
                 output_status=output_status,
                 status_reason=(
@@ -912,6 +932,7 @@ class PhysicsConstraintSet:
                     "constraint_mode": "continuous",
                     "coating_verdict": "violated" if violated else "clear",
                     "coating_violation_reasons": reasons,
+                    "coating_warning_flags": warning_flags,
                     "coating_positive_deposit_tolerance_kg_per_campaign": (
                         COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
                     ),
@@ -978,6 +999,7 @@ class PhysicsConstraintSet:
                     "coating_verdict": "unavailable",
                     "coating_unavailable_reason": unavailable_reason,
                     "coating_violation_reasons": reasons,
+                    "coating_warning_flags": warning_flags,
                     "coating_positive_deposit_tolerance_kg_per_campaign": (
                         COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
                     ),
@@ -1009,7 +1031,11 @@ class PhysicsConstraintSet:
             threshold=self.coating_min_campaigns_to_resinter,
             observed=observed,
             detail=detail,
-            status="available" if authoritative else "warning",
+            status=(
+                "warning"
+                if (warning_flags and not violated) or not authoritative
+                else "available"
+            ),
             authoritative=authoritative,
             output_status=output_status,
             status_reason="" if authoritative else status_reason,
@@ -1018,6 +1044,7 @@ class PhysicsConstraintSet:
                 "constraint_mode": "continuous",
                 "coating_verdict": "violated" if violated else "clear",
                 "coating_violation_reasons": reasons,
+                "coating_warning_flags": warning_flags,
                 "coating_positive_deposit_tolerance_kg_per_campaign": (
                     COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
                 ),
@@ -2022,14 +2049,7 @@ def _coating_from_upstream_deposit_fraction_report(
                 )
             )
 
-    for finding in diagnostics.get("upstream_hot_wall_findings", ()):
-        warning_flags.append(
-            _coating_reason_record(
-                "upstream_hot_wall_supersaturation",
-                authority=authority,
-                finding=_plain_value(finding),
-            )
-        )
+    warning_flags.extend(_coating_dew_point_warnings(diagnostics, authority))
 
     for species in refused_species:
         if species in refused_bounds:
@@ -2063,42 +2083,18 @@ def _coating_from_upstream_deposit_fraction_report(
             reason.setdefault("flags", _coating_authority_flags(authority))
             violation_reasons.append(reason)
 
-    non_refusal_unavailable = _coating_fraction_wall_quantity_unavailable(
+    unavailable_reason = _coating_wall_quantity_unavailable(
         report,
         authority,
-        refused_species,
+        include_coverage_unknown=True,
     )
-    missing_bounds = [
-        species for species in refused_species if species not in refused_bounds
-    ]
-    if non_refusal_unavailable:
+    if unavailable_reason:
         return _coating_fraction_unavailable_margin(
             report=report,
             authority=authority,
             threshold=threshold,
             output_status=output_status,
-            reason=non_refusal_unavailable,
-            violation_reasons=violation_reasons,
-            warning_flags=warning_flags,
-            refused_species=refused_species,
-            not_applicable_species=not_applicable_species,
-            not_applicable_by_species=not_applicable_by_species,
-            refused_bounds=refused_bounds,
-            charge_mass_kg=charge_mass_kg,
-            limit_kg=limit_kg,
-            certain_deposit_kg=certain_deposit_kg,
-        )
-    if missing_bounds:
-        return _coating_fraction_unavailable_margin(
-            report=report,
-            authority=authority,
-            threshold=threshold,
-            output_status=output_status,
-            reason=(
-                "wall saturation pressure refused for "
-                + ", ".join(missing_bounds)
-                + "; vapour flux upper bound unavailable"
-            ),
+            reason=unavailable_reason,
             violation_reasons=violation_reasons,
             warning_flags=warning_flags,
             refused_species=refused_species,
@@ -2451,24 +2447,12 @@ def _coating_not_applicable_carriers(
     carriers = authority.get("vapour_carrier_authority_by_species", {})
     if isinstance(carriers, Mapping):
         for item, record in carriers.items():
-            if not isinstance(record, Mapping) or not _is_inapplicable_carrier(record):
+            if not isinstance(record, Mapping) or not _carrier_is_inapplicable(record):
                 continue
             key = str(item)
             species.add(key)
             records[key] = _plain_value(record)
     return tuple(sorted(species)), records
-
-
-def _is_inapplicable_carrier(record: Mapping[str, Any]) -> bool:
-    if str(record.get("refusal_code", "")) == "inapplicable_by_declared_predicate":
-        return True
-    extra = record.get("extra")
-    evidence = extra.get("applicability_evidence") if isinstance(extra, Mapping) else None
-    return (
-        isinstance(evidence, Mapping)
-        and str(evidence.get("code", evidence.get("refusal_code", "")))
-        == "inapplicable_by_declared_predicate"
-    )
 
 
 def _coating_refused_flux_bounds(
@@ -2518,44 +2502,6 @@ def _coating_refused_flux_bounds(
     return bounds
 
 
-def _coating_fraction_wall_quantity_unavailable(
-    report: Mapping[str, Any],
-    authority: Mapping[str, Any],
-    refused_species: tuple[str, ...],
-) -> str:
-    for source in (report, authority):
-        if not isinstance(source, Mapping):
-            continue
-        if source.get("wall_quantity_unavailable") is True:
-            if refused_species:
-                continue
-            return str(
-                source.get("status_reason")
-                or source.get("message")
-                or "wall quantity unavailable"
-            )
-        code = str(source.get("code", "")).lower()
-        if (
-            "saturation_pressure_refused" in code
-            or "wall_saturation_pressure_refused" in code
-        ) and not refused_species:
-            return str(
-                source.get("status_reason")
-                or source.get("message")
-                or "wall saturation pressure was refused"
-            )
-        if code == "wall_deposit_coverage_unknown":
-            return str(source.get("message") or "wall deposit quantity is unavailable")
-        lowered_reason = str(source.get("status_reason", "")).lower()
-        if (
-            "wall saturation pressure" in lowered_reason
-            and "refus" in lowered_reason
-            and not refused_species
-        ):
-            return str(source.get("status_reason"))
-    return ""
-
-
 def _unique_coating_records(
     records: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
@@ -2568,6 +2514,25 @@ def _unique_coating_records(
         seen.add(key)
         unique.append(record)
     return unique
+
+
+def _coating_dew_point_warnings(
+    diagnostics: Mapping[str, Any] | None,
+    authority: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    """b-282 dew point is a warning on every coating path, not a veto."""
+
+    findings = (diagnostics or {}).get("upstream_hot_wall_findings", ())
+    if not isinstance(findings, (tuple, list)):
+        return []
+    return _unique_coating_records([
+        _coating_reason_record(
+            "upstream_hot_wall_supersaturation",
+            authority=authority,
+            finding=_plain_value(finding),
+        )
+        for finding in findings
+    ])
 
 
 def _coating_violation_reasons(
@@ -2626,14 +2591,6 @@ def _coating_violation_reasons(
             )
         )
     diagnostics = diagnostics or {}
-    for finding in diagnostics.get("upstream_hot_wall_findings", ()):
-        reasons.append(
-            _coating_reason_record(
-                "upstream_hot_wall_supersaturation",
-                authority=authority,
-                finding=_plain_value(finding),
-            )
-        )
     for finding in diagnostics.get("silica_exposed_to_alkali_findings", ()):
         reasons.append(
             _coating_reason_record(
@@ -2675,21 +2632,27 @@ def _coating_wall_quantity_unavailable(
     *sources: Mapping[str, Any] | None,
     include_coverage_unknown: bool = False,
 ) -> str:
-    for source in sources:
-        if not isinstance(source, Mapping):
-            continue
-        if source.get("wall_quantity_unavailable") is True:
-            return str(source.get("status_reason") or source.get("message") or "wall quantity unavailable")
-        refusal_species = source.get("wall_saturation_pressure_refused_species")
-        refusal_map = source.get("wall_saturation_pressure_refusals_by_species")
-        if refusal_species or refusal_map:
+    """One owner: a wall quantity is unavailable only when it cannot be bounded.
+
+    A refused species that still has a vapour-flux bound is not unavailable
+    here. The fraction gate compares that bound with the d-045 limit.
+    Extrapolation prose and a carrier '=refused' token are not a refusal.
+    """
+
+    mappings = [source for source in sources if isinstance(source, Mapping)]
+    refused_species = _coating_wall_refused_species(*mappings)
+    for source in mappings:
+        if source.get("wall_quantity_unavailable") is True and not refused_species:
             return str(
                 source.get("status_reason")
                 or source.get("message")
-                or "wall saturation pressure was refused"
+                or "wall quantity unavailable"
             )
-        code = str(source.get("code", ""))
-        if "wall_saturation_pressure_refused" in code:
+        code = str(source.get("code", "")).lower()
+        if (
+            "saturation_pressure_refused" in code
+            or "wall_saturation_pressure_refused" in code
+        ) and not refused_species:
             return str(
                 source.get("status_reason")
                 or source.get("message")
@@ -2697,20 +2660,42 @@ def _coating_wall_quantity_unavailable(
             )
         if include_coverage_unknown and code == "wall_deposit_coverage_unknown":
             return str(source.get("message") or "wall deposit quantity is unavailable")
-        status = str(source.get("status", ""))
-        if status == "unavailable" or source.get("output_status") == "unavailable":
-            return str(source.get("status_reason") or source.get("message") or "wall quantity unavailable")
-        status_reason = str(source.get("status_reason", ""))
-        lowered_reason = status_reason.lower()
+        lowered_reason = str(source.get("status_reason", "")).lower()
+        if "wall saturation unavailable" in lowered_reason:
+            return str(source.get("status_reason"))
         if (
-            "wall saturation unavailable" in lowered_reason
-            or (
-                "wall saturation" in lowered_reason
-                and "refus" in lowered_reason
-            )
+            "wall saturation pressure" in lowered_reason
+            and "refus" in lowered_reason
+            and not refused_species
         ):
-            return status_reason
-    return ""
+            return str(source.get("status_reason"))
+        if (
+            str(source.get("status", "")) == "unavailable"
+            or source.get("output_status") == "unavailable"
+        ):
+            return str(
+                source.get("status_reason")
+                or source.get("message")
+                or "wall quantity unavailable"
+            )
+    if not refused_species:
+        return ""
+    bounds: dict[str, float] = {}
+    for source in mappings:
+        bounds.update(_coating_refused_flux_bounds(source, refused_species))
+    missing = [species for species in refused_species if species not in bounds]
+    if not missing:
+        return ""
+    for source in mappings:
+        reason = str(source.get("status_reason") or "")
+        lowered = reason.lower()
+        if "wall saturation" in lowered and "refus" in lowered:
+            return reason
+    return (
+        "wall saturation pressure refused for "
+        + ", ".join(missing)
+        + "; vapour flux upper bound unavailable"
+    )
 
 
 def _coating_report_authority(report: Mapping[str, Any]) -> Mapping[str, Any]:

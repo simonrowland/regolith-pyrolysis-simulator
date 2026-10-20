@@ -768,6 +768,29 @@ def coating_summary_with_grounded_authority(
         authority["codes"] = codes
 
     authoritative = bool(authority.get("authoritative_for_coating", False))
+    incoming_unavailable = (
+        str(result.get("coating_status", "")) == "unavailable"
+        or str(result.get("coating_verdict", "")) == "unavailable"
+    )
+    result["wall_deposit_sticking_authority"] = _plain_mapping(authority)
+    if incoming_unavailable:
+        # Keep a gate-unavailable coating unavailable. Do not relabel it as
+        # available or warning, and do not invent a furnace price.
+        result["coating_authoritative"] = False
+        result["coating_status"] = "unavailable"
+        reason = str(
+            result.get("coating_unavailable_reason")
+            or result.get("coating_status_reason")
+            or "coating wall evidence unavailable"
+        )
+        result["coating_status_reason"] = reason
+        result["coating_unavailable_reason"] = reason
+        result["coating_output_status"] = str(
+            result.get("coating_output_status")
+            or authority.get("output_status")
+            or "unavailable"
+        )
+        return result
     result["coating_authoritative"] = authoritative
     result["coating_status"] = "available" if authoritative else "warning"
     result["coating_output_status"] = str(
@@ -777,7 +800,6 @@ def coating_summary_with_grounded_authority(
     result["coating_status_reason"] = (
         "" if authoritative else str(authority.get("message", "non-authoritative coating"))
     )
-    result["wall_deposit_sticking_authority"] = _plain_mapping(authority)
     return result
 
 

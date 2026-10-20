@@ -934,8 +934,11 @@ def test_review_table_fe_1400_c_100_pa_fails_from_dew_point_finding() -> None:
         _valid_trace_object(wall_fouling_report=report)
     ).margins["coating"]
 
-    assert not coating.feasible
-    assert coating.status_payload["coating_violation_reasons"][0]["reason"] == (
+    assert coating.feasible
+    assert coating.status == "warning"
+    assert coating.status_payload["coating_verdict"] == "clear"
+    assert coating.status_payload["coating_violation_reasons"] == []
+    assert coating.status_payload["coating_warning_flags"][0]["reason"] == (
         "upstream_hot_wall_supersaturation"
     )
 
