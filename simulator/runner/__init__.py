@@ -3893,7 +3893,29 @@ def _wall_fouling_report(
         "verdict": verdict,
     }
     if availability.refusal is not None:
-        report["refusal"] = availability.refusal
+        refusal = availability.refusal
+        refusal_authority = refusal["authority"]
+        report["refusal"] = {
+            "reason": refusal["reason"],
+            "code": refusal_authority["code"],
+            "authoritative": refusal_authority["authoritative"],
+            "authoritative_for_deposit_mass": (
+                refusal_authority["authoritative_for_deposit_mass"]
+            ),
+            "authoritative_for_coating": (
+                refusal_authority["authoritative_for_coating"]
+            ),
+            "authoritative_for_resinter": (
+                refusal_authority["authoritative_for_resinter"]
+            ),
+            "severity": refusal_authority["severity"],
+            "output_status": refusal_authority["output_status"],
+            "refusal_events": refusal["refusal_events"],
+            "affected_species": refusal_authority.get(
+                "wall_saturation_pressure_refused_species", []
+            ),
+            "authority_detail_path": "fouling_rate.sticking_alpha_authority",
+        }
     return report
 
 
