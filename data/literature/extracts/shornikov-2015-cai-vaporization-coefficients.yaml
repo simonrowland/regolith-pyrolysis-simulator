@@ -7,7 +7,7 @@ source:
   corpus_asset: raw/shornikov-2015-cai-vaporization-coefficients/shornikov-2015-cai-vaporization-coefficients.pdf
   corpus_sha256: 6c200e01f13ab9675d1407d4f90d65af90a58bd2a53b97e0b65bebd98903c390
 extraction:
-  method: mineru_table_draft emit of the αvap column only, then a field move onto values.alpha. MinerU tagged data rows as header, which drops ± and range cells, so the scratch CSV set those rows to body after the 600 dpi render confirmed every αvap cell. No digit was changed. Temperature ranges were not passed through the temperature column, because a range is not a point; T_range_K was attached from the temperature cell. A printed power of ten inside a cell was applied to that cell. Printed ranges have no stored midpoint. Prose coefficients that are not table cells were added from the same pages. Table 5 columns other than αvap (cr) were not emitted. Figs. 1 and 2 were not digitized.
+  method: mineru_table_draft emit of the αvap column only, then a field move onto values.alpha. MinerU tagged data rows as header, which drops ± and range cells, so the scratch CSV set those rows to body after the 600 dpi render confirmed every αvap cell. No digit was changed. Temperature ranges were not passed through the temperature column, because a range is not a point; T_range_K was attached from the temperature cell. A printed power of ten inside a cell was applied to that cell. A printed range is values.alpha_range [low, high], with the printed text kept and no midpoint. Asterisk cells and the crystalline FeO evaluation are model_derived from the citations the paper prints. Prose coefficients that are not table cells were added from the same pages. Table 5 columns other than αvap (cr) were not emitted. Fig. 1 markers are cited literature or a calculated curve and were not digitized. Fig. 2 was not digitized.
   date: '2026-10-20'
   worker: t1372-w5
 review_status: draft
@@ -44,10 +44,17 @@ species:
         note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient in this table was determined only for the crystalline phase. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
       units: dimensionless
       mineru_flags: []
+      derived_from:
+      - Knyazeva and Vasil'ev, 1972
+      derivation:
+        relation: Calculated in the course of this research. The table footnote marks this cell with an asterisk. The reference cell names Knyazeva and Vasil'ev, 1972. This paper does not print the numeric inputs of that calculation.
+        output_unit: dimensionless
+        inputs:
+        - Knyazeva and Vasil'ev, 1972
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Knyazeva and Vasil''ev, 1972. The calculation inputs are not stored in this extract, so the row is quoted_attributed rather than model_derived.'
+        method_class: model_derived
+        attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Knyazeva and Vasil''ev, 1972.'
         alpha_as_printed: '0.79 ± 0.20*'
         alpha: '0.79'
         crucible_or_matrix_as_printed: 'Ni'
@@ -72,10 +79,17 @@ species:
         note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
       units: dimensionless
       mineru_flags: []
+      derived_from:
+      - Claasen and Veenemans, 1933
+      derivation:
+        relation: Calculated in the course of this research. The table footnote marks this cell with an asterisk. The reference cell names Claasen and Veenemans, 1933. This paper does not print the numeric inputs of that calculation.
+        output_unit: dimensionless
+        inputs:
+        - Claasen and Veenemans, 1933
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Claasen and Veenemans, 1933. The calculation inputs are not stored in this extract, so the row is quoted_attributed rather than model_derived.'
+        method_class: model_derived
+        attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Claasen and Veenemans, 1933.'
         alpha_as_printed: '1.11 ± 0.30*'
         alpha: '1.11'
         crucible_or_matrix_as_printed: 'Pt'
@@ -106,6 +120,9 @@ species:
         attribution: Compiled from Sata et al., 1982. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.80–0.52'
         alpha_range_as_printed: '0.80–0.52'
+        alpha_range:
+        - '0.52'
+        - '0.80'
         crucible_or_matrix_as_printed: 'W'
         temperature_K_as_printed: '1773–2173'
       phase: cr
@@ -113,7 +130,7 @@ species:
       - 1773
       - 2173
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r05_c04
       type: alpha
       locator:
@@ -202,6 +219,9 @@ species:
         attribution: Compiled from Sata, 1983. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.04–0.21'
         alpha_range_as_printed: '0.04–0.21'
+        alpha_range:
+        - '0.04'
+        - '0.21'
         crucible_or_matrix_as_printed: 'W'
         temperature_K_as_printed: '1621–2133'
       phase: cr
@@ -209,7 +229,7 @@ species:
       - 1621
       - 2133
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r03_c04
       type: alpha
       locator:
@@ -229,6 +249,9 @@ species:
         attribution: Compiled from Sasamoto et al., 1974. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.10–0.34'
         alpha_range_as_printed: '0.10–0.34'
+        alpha_range:
+        - '0.10'
+        - '0.34'
         crucible_or_matrix_as_printed: 'W'
         gas_phase_component_as_printed: 'Mg'
         temperature_K_as_printed: '1673–2073'
@@ -237,7 +260,7 @@ species:
       - 1673
       - 2073
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r04_c04
       type: alpha
       locator:
@@ -257,6 +280,9 @@ species:
         attribution: Compiled from Sata and Lee, 1978. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.06–0.17'
         alpha_range_as_printed: '0.06–0.17'
+        alpha_range:
+        - '0.06'
+        - '0.17'
         crucible_or_matrix_as_printed: 'W'
         temperature_K_as_printed: '1685–2089'
       phase: cr
@@ -264,7 +290,7 @@ species:
       - 1685
       - 2089
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r05_c04
       type: alpha
       locator:
@@ -284,6 +310,9 @@ species:
         attribution: Compiled from Peleg and Alcock, 1974. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.25–0.40'
         alpha_range_as_printed: '0.25–0.40'
+        alpha_range:
+        - '0.25'
+        - '0.40'
         crucible_or_matrix_as_printed: 'W'
         temperature_K_as_printed: '1800–1900'
       phase: cr
@@ -291,7 +320,7 @@ species:
       - 1800
       - 1900
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r06_c04
       type: alpha
       locator:
@@ -337,6 +366,9 @@ species:
         attribution: Compiled from Hashimoto, 1990. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.12–0.22'
         alpha_range_as_printed: '0.12–0.22'
+        alpha_range:
+        - '0.12'
+        - '0.22'
         crucible_or_matrix_as_printed: 'C'
         gas_phase_component_as_printed: 'Mg'
         temperature_K_as_printed: '1873–2173'
@@ -345,7 +377,7 @@ species:
       - 1873
       - 2173
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r08_c04
       type: alpha
       locator:
@@ -385,10 +417,17 @@ species:
       units: dimensionless
       mineru_flags:
       - non_numeric_in_numeric_column
+      derived_from:
+      - Lukin and Poluboyarinov, 1964
+      derivation:
+        relation: Calculated in the course of this research. The table footnote marks this cell with an asterisk. The reference cell names Lukin and Poluboyarinov, 1964. This paper does not print the numeric inputs of that calculation.
+        output_unit: dimensionless
+        inputs:
+        - Lukin and Poluboyarinov, 1964
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Lukin and Poluboyarinov, 1964. The calculation inputs are not stored in this extract, so the row is quoted_attributed rather than model_derived.'
+        method_class: model_derived
+        attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Lukin and Poluboyarinov, 1964.'
         alpha_as_printed: '0.59 ± 0.20*'
         alpha: '0.59'
         crucible_or_matrix_as_printed: 'W'
@@ -487,6 +526,9 @@ species:
         attribution: Compiled from Takigawa et al., 2012. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.10–0.01'
         alpha_range_as_printed: '0.10–0.01'
+        alpha_range:
+        - '0.01'
+        - '0.10'
         crucible_or_matrix_as_printed: 'Ir'
         temperature_K_as_printed: '1873–2063'
       T_range_K:
@@ -494,7 +536,7 @@ species:
       - 2063
       phase: cr
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r04_c04
       type: alpha
       locator:
@@ -514,13 +556,16 @@ species:
         attribution: Compiled from Sata, 1983. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.11–1.00'
         alpha_range_as_printed: '0.11–1.00'
+        alpha_range:
+        - '0.11'
+        - '1.00'
         crucible_or_matrix_as_printed: 'W'
         temperature_K_as_printed: '2077–2322'
       T_range_K:
       - 2077
       - 2322
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r05_c04
       type: alpha
       locator:
@@ -540,6 +585,9 @@ species:
         attribution: Compiled from Burns et al., 1964; Burns, 1966. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.28–0.30'
         alpha_range_as_printed: '0.28–0.30'
+        alpha_range:
+        - '0.28'
+        - '0.30'
         crucible_or_matrix_as_printed: 'Al2O3'
         gas_phase_component_as_printed: 'Al'
         temperature_K_as_printed: '2128–2318'
@@ -547,7 +595,7 @@ species:
       - 2128
       - 2318
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r06_c04
       type: alpha
       locator:
@@ -567,6 +615,9 @@ species:
         attribution: Compiled from Burns et al., 1964; Burns, 1966. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.20–0.29'
         alpha_range_as_printed: '0.20–0.29'
+        alpha_range:
+        - '0.20'
+        - '0.29'
         crucible_or_matrix_as_printed: 'Al2O3'
         gas_phase_component_as_printed: 'AlO'
         temperature_K_as_printed: '2128–2318'
@@ -574,7 +625,7 @@ species:
       - 2128
       - 2318
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r07_c04
       type: alpha
       locator:
@@ -594,6 +645,9 @@ species:
         attribution: Compiled from Burns et al., 1964; Burns, 1966. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.19–0.27'
         alpha_range_as_printed: '0.19–0.27'
+        alpha_range:
+        - '0.19'
+        - '0.27'
         crucible_or_matrix_as_printed: 'Al2O3'
         gas_phase_component_as_printed: 'Al2O'
         temperature_K_as_printed: '2128–2318'
@@ -601,7 +655,7 @@ species:
       - 2128
       - 2318
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r08_c04
       type: alpha
       locator:
@@ -621,6 +675,9 @@ species:
         attribution: Compiled from Burns et al., 1964; Burns, 1966. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.26–0.28'
         alpha_range_as_printed: '0.26–0.28'
+        alpha_range:
+        - '0.26'
+        - '0.28'
         crucible_or_matrix_as_printed: 'Al2O3'
         gas_phase_component_as_printed: 'O'
         temperature_K_as_printed: '2128–2318'
@@ -628,7 +685,7 @@ species:
       - 2128
       - 2318
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r09_c04
       type: alpha
       locator:
@@ -674,13 +731,16 @@ species:
         attribution: Compiled from Peleg and Alcock, 1974. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.24–0.49'
         alpha_range_as_printed: '0.24–0.49'
+        alpha_range:
+        - '0.24'
+        - '0.49'
         crucible_or_matrix_as_printed: 'Al2O3'
         temperature_K_as_printed: '1800–1900'
       T_range_K:
       - 1800
       - 1900
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r11_c04
       type: alpha
       locator:
@@ -726,13 +786,16 @@ species:
         attribution: Compiled from Wolff and Alcock, 1962. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '0.067–0.18'
         alpha_range_as_printed: '0.067–0.18'
+        alpha_range:
+        - '0.067'
+        - '0.18'
         crucible_or_matrix_as_printed: 'W'
         temperature_K_as_printed: '2000–2310'
       T_range_K:
       - 2000
       - 2310
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r13_c04
       type: alpha
       locator:
@@ -960,7 +1023,7 @@ species:
       values:
         quantity: alpha
         method_class: quoted_attributed
-        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        attribution: Shornikov (2015) Table 5 cell. Table 5 prints 0.32 ± 0.02. The abstract and the conclusions print 0.33 ± 0.02. Those are not the same number. The 0.33 ± 0.02 recommendation is a separate row.
         alpha_as_printed: '0.32 ± 0.02'
         alpha: '0.32'
       phase: cr
@@ -1007,6 +1070,9 @@ species:
         attribution: Compiled from Firsova and Nesmeyanov, 1960. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '$(2.2–3.6) \times 10^{-2}$'
         alpha_range_as_printed: '0.022–0.036'
+        alpha_range:
+        - '0.022'
+        - '0.036'
         crucible_or_matrix_as_printed: 'Mo, W, Ir, Pt–Rh'
         gas_phase_component_as_printed: 'SiO'
         temperature_K_as_printed: '1692–1739'
@@ -1015,7 +1081,7 @@ species:
       - 1739
       phase: cr
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r03_c04
       type: alpha
       locator:
@@ -1091,6 +1157,9 @@ species:
         attribution: Compiled from Hashimoto, 1990. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '$(1.1–1.5) \times 10^{-2}$'
         alpha_range_as_printed: '0.011–0.015'
+        alpha_range:
+        - '0.011'
+        - '0.015'
         crucible_or_matrix_as_printed: 'C'
         temperature_K_as_printed: '1833–1958'
       T_range_K:
@@ -1098,7 +1167,7 @@ species:
       - 1958
       phase: cr
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r06_c04
       type: alpha
       locator:
@@ -1228,13 +1297,16 @@ species:
         attribution: Compiled from Hashimoto, 1990. That experiment is not stored in this extract, so the row is quoted_attributed.
         alpha_as_printed: '$(3.8–4.8) \times 10^{-2}$'
         alpha_range_as_printed: '0.038–0.048'
+        alpha_range:
+        - '0.038'
+        - '0.048'
         crucible_or_matrix_as_printed: 'C'
         temperature_K_as_printed: '2173–2373'
       T_range_K:
       - 2173
       - 2373
       uncertainty:
-        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+        note: Printed text is alpha_range_as_printed, including a decreasing cell. values.alpha_range is [low, high]. No midpoint is stored.
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r03_c08
       type: alpha
       locator:
@@ -1265,12 +1337,34 @@ species:
         pdf_page_index: 5
         published_page: 1085
         figure: '1'
-        note: Two panels, log p (atm) versus 10^4/T, with a top T axis. Panel (a) is SiO and panel (b) is SiO2. Lines 1–6 are continuous calculated or previously published curves. No discrete measurement markers. The lines overlap on a log axis, so no point was read.
+        note: 600 dpi page. Both panels are log p (atm) versus 10^4/T, with a top T axis. Open circles are present. They were not digitized. None is a measurement made in this paper.
       units: not applicable
       values:
         method_class: quoted_unattributed
-        reason: context only; curve digitizing on this log plot is refused
+        reason: Each series is cited literature or a calculated curve. No this-paper marker was digitized.
         caption_as_printed: (1) total vapor pressure over SiO2 estimated according to Langmuir (Hashimoto, 1990) from a graphite crucible; (2–5) partial pressures of SiO or SiO2 by Knudsen effusion mass spectrometry (Shornikov et al., 1998, 1999) from Pt, Ir, W, and Mo cells; (6) calculated in this publication from Glushko et al. (1978–1982) for chemically neutral conditions.
+        series_refused:
+        - id: '1'
+          citation: Hashimoto, 1990
+          what: Open circles on line 1 in both panels. Panel (a), log p(SiO), has three circles on the high-temperature limb of the step and six on the low-temperature limb. Panel (b), log p(SiO2), has three and five. Langmuir total pressure from a graphite crucible. Literature, not this paper.
+        - id: '2'
+          citation: Shornikov et al., 1998, 1999
+          what: Pt-cell partial pressure. A stroke with no open circle separable from the line. Prior KEMS paper.
+        - id: '3'
+          citation: Shornikov et al., 1998, 1999
+          what: Ir-cell partial pressure. A stroke with no open circle separable from the line. Prior KEMS paper.
+        - id: '4'
+          citation: Shornikov et al., 1998, 1999
+          what: W-cell partial pressure. A stroke with no open circle separable from the line. Prior KEMS paper.
+        - id: '5'
+          citation: Shornikov et al., 1998, 1999
+          what: Mo-cell partial pressure. A stroke with no open circle separable from the line. Prior KEMS paper.
+        - id: '6'
+          citation: calculated in this publication from Glushko et al., 1978–1982
+          what: Solid calculated curve for chemically neutral conditions, with a step near 10^4/T = 5.0. No marker on the curve.
+        prose_bounds:
+        - Mo-cell p(SiO) differs by almost 10^2 from the p(SiO) calculated for chemically neutral conditions (published p. 1085, Fig. 1a).
+        - p(SiO2) values for cells of any type agree with the thermochemical values within unsystematic errors no greater than 15% (published p. 1085, Fig. 1b).
     - observation_id: shornikov_2015_fig2_stars_not_read
       type: figure_context
       locator:
@@ -1316,15 +1410,16 @@ species:
         row_label: $TiO_2$
         column_header: αvap (cr)
         published_page: 1086
-        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. Published p. 1084 says this recommended coefficient was calculated for the dominant gas-phase component TiO. That sentence follows the Semenov 0.20 ± 0.04 value and belongs to this 0.23 ± 0.02 recommendation.
       units: dimensionless
       mineru_flags: []
       values:
         quantity: alpha
         method_class: quoted_attributed
-        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree. The dominant gas-phase component named for this recommendation is TiO.
         alpha_as_printed: '0.23 ± 0.02'
         alpha: '0.23'
+        gas_phase_component_as_printed: TiO
       phase: cr
       uncertainty:
         note: Printed plus-minus on the αvap cell. The central value is values.alpha.
@@ -1348,7 +1443,6 @@ species:
         alpha: '0.20'
         alpha_as_printed: '0.20 ± 0.04'
         temperature_K_as_printed: '1920'
-        gas_phase_component_as_printed: 'TiO'
       phase: cr
       T_range_K:
       - 1920
@@ -1389,7 +1483,7 @@ species:
       values:
         quantity: alpha
         method_class: quoted_attributed
-        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        attribution: Shornikov (2015) Table 5 cell. Table 5 prints 1.00 ± 0.30. The abstract and the conclusions print 1.00 ± 0.20. Those are not the same uncertainty. The 1.00 ± 0.20 evaluation is a separate row.
         alpha_as_printed: '1.00 ± 0.30'
         alpha: '1.00'
       phase: cr
@@ -1408,10 +1502,19 @@ species:
       uncertainty:
         note: Printed ±0.20 on αvap(FeO, cr).
         printed: '±0.20'
+      derived_from:
+      - Darken and Gurry, 1946
+      - Glushko et al., 1978–1982
+      derivation:
+        relation: Evaluated in this study on the basis of experimental data (Darken and Gurry, 1946) and calculations using thermochemical information from Glushko et al. (1978–1982). This paper does not print those input numbers.
+        output_unit: dimensionless
+        inputs:
+        - Darken and Gurry, 1946
+        - Glushko et al., 1978–1982
       values:
         quantity: alpha
-        method_class: quoted_attributed
-        attribution: Evaluated in this study from Darken and Gurry (1946) and thermochemical data in Glushko et al. (1978–1982). The inputs are not stored here, so the row is quoted_attributed rather than model_derived.
+        method_class: model_derived
+        attribution: Evaluated in this study from experimental data (Darken and Gurry, 1946) and thermochemical data in Glushko et al. (1978–1982).
         alpha: '1.00'
         alpha_as_printed: '1.00 ± 0.20'
         temperature_K_as_printed: '1373–1623'
