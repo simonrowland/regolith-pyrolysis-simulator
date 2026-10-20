@@ -153,23 +153,21 @@ def mre_control_domain_assessment(
     invalid_controls: dict[str, str] = {}
     validated: dict[str, float] = {}
     for name, raw_value in raw_controls.items():
-        value = (
-            0.0
-            if name in ("current_A", "voltage_V") and raw_value is None
-            else raw_value
-        )
-        if isinstance(value, bool) or not is_declared_real_scalar(
-            value,
+        if raw_value is None:
+            invalid_controls[name] = "missing"
+            continue
+        if isinstance(raw_value, bool) or not is_declared_real_scalar(
+            raw_value,
             allow_numeric_str=True,
         ):
             invalid_controls[name] = (
                 "boolean_not_allowed"
-                if isinstance(value, bool)
+                if isinstance(raw_value, bool)
                 else "not_declared_real_scalar"
             )
             continue
         try:
-            numeric_value = float(value)
+            numeric_value = float(raw_value)
         except (TypeError, ValueError, OverflowError):
             invalid_controls[name] = "not_numeric"
             continue
