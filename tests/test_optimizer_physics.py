@@ -669,6 +669,31 @@ def test_unconfigured_kg_limit_does_not_fail_authoritative_coating_gate() -> Non
     assert "absolute kg limit unconfigured" in coating.detail
 
 
+def test_wall_pressure_refusal_without_deposit_is_unavailable_for_direct_gate() -> None:
+    trace = _trace(
+        condensed=({(3, "SiO"): 20.0},),
+        wall=({},),
+        wall_deposit_sticking_authority={
+            "wall_saturation_pressure_refusals_by_species": {
+                "SiO": {
+                    "hot_wall": {
+                        "status": "refused",
+                        "output_status": "status_bearing",
+                    }
+                }
+            }
+        },
+    )
+
+    coating = PhysicsConstraintSet().coating(trace)
+
+    assert coating.feasible
+    assert coating.status == "unavailable"
+    assert coating.authoritative is False
+    assert coating.observed is None
+    assert math.isinf(coating.margin)
+
+
 def test_coating_and_segment_allowable_readout_reports_small_wall_deposit_margin() -> None:
     constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
         ("hot_wall", "SiO"): ThresholdSpec(
