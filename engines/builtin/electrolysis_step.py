@@ -327,18 +327,18 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
 
         controls = unpack_controls(request)
         validated, invalid_controls = self._validate_controls(request, controls)
-        out_of_domain_controls, control_notices = mre_control_domain_assessment(
+        invalid_domain_controls, control_notices = mre_control_domain_assessment(
             {
                 name: value
                 for name, value in validated.items()
                 if name not in invalid_controls
             }
         )
-        if out_of_domain_controls:
+        if invalid_domain_controls:
             return self._invalid_result(
                 request,
                 reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
-                invalid=out_of_domain_controls,
+                invalid=invalid_domain_controls,
                 energy_kWh=0.0,
             )
         if invalid_controls:

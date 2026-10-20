@@ -91,7 +91,7 @@ from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
 )
 from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_reference
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -141,48 +141,112 @@ MRE_FIXED_REDUCIBLE_OXIDES = tuple(
 def mre_control_domain_assessment(
     controls: Mapping[str, float],
 ) -> tuple[dict[str, str], list[dict[str, object]]]:
-    """Separate invalid MRE operating controls from low-pO2 extrapolation."""
+    """Refuse numerically invalid controls and flag finite band excursions."""
 
-    # Time, current, and voltage bounds are the built-in cell's supported
-    # operating envelope. The pO2 interval is the empirical certification
-    # band for the ideal-gas anode activity; its low-pressure Nernst extension
-    # remains computable and is reported as extrapolated.
+    # These are certified operating bands, not terminal physics limits:
+    # finite controls outside them remain computable and are reported as
+    # extrapolated. The pO2 interval is the empirical certification band for
+    # the ideal-gas anode activity.
     domain_bounds = {
-        "dt_hr": (sys.float_info.min, 1.0, "hr"),
-        "current_A": (sys.float_info.min, 3000.0, "A"),
-        "voltage_V": (sys.float_info.min, 5.0, "V"),
+        "dt_hr": (0.0, 1.0, "hr"),
+        "current_A": (0.0, 3000.0, "A"),
+        "voltage_V": (0.0, 5.0, "V"),
         "pO2_bar": (1e-9, 1.0, "bar"),
     }
-    out_of_domain: dict[str, str] = {}
+    invalid_controls: dict[str, str] = {}
     notices: list[dict[str, object]] = []
     for name, (minimum, maximum, unit) in domain_bounds.items():
         if name not in controls:
             continue
         value = controls[name]
-        if value == 0.0 and name != "pO2_bar":
+        if not math.isfinite(value):
+            invalid_controls[name] = "must be finite"
+            continue
+        if value < 0.0 or (name == "pO2_bar" and value == 0.0):
+            invalid_controls[name] = (
+                "must be positive"
+                if name == "pO2_bar"
+                else "must be nonnegative"
+            )
+            continue
+        if 0.0 < value < sys.float_info.min:
+            # IEEE-754 subnormals have fewer reliable significant bits, and
+            # MRE products involving efficiency, time, or energy can underflow
+            # them to zero. Reject those values as invalid input; finite values
+            # below a certified band remain extrapolatable.
+            invalid_controls[name] = (
+                f"below minimum normal binary64 value "
+                f"{sys.float_info.min:g} {unit}"
+            )
+            continue
+        if name == "pO2_bar" and value > sys.float_info.max / PA_PER_BAR:
+            # pO2 is supplied in bar but participates in the physical pressure
+            # state expressed in Pa elsewhere in the simulator. Beyond this
+            # ratio, the same pressure cannot be represented in binary64 Pa.
+            invalid_controls[name] = (
+                "above maximum binary64-safe pressure "
+                f"{sys.float_info.max / PA_PER_BAR:g} bar "
+                "(bar-to-Pa conversion exceeds binary64 range)"
+            )
+            continue
+        if value == 0.0:
             continue
         if value < minimum:
             control_reason = f"below minimum {minimum:g} {unit}"
-            if name == "pO2_bar" and value >= sys.float_info.min:
-                notices.append({
-                    "kind": "out_of_certified_band",
-                    "control": name,
-                    "reason": MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
-                    "control_reason": control_reason,
-                    "authority_level": "extrapolated",
-                    "certified_band": {name: (minimum, maximum)},
-                })
-            else:
-                # IEEE-754 subnormals have reduced relative precision and
-                # sufficiently small values can round to zero in downstream
-                # products. Keep those finite values on the invalid-input
-                # side; ordinary low-pressure values are still extrapolated.
-                out_of_domain[name] = control_reason
         elif value > maximum:
-            # The MRE anode model has no compressed-gas state or fugacity
-            # correction above its 1-bar reference atmosphere.
-            out_of_domain[name] = f"above maximum {maximum:g} {unit}"
-    return out_of_domain, notices
+            control_reason = f"above maximum {maximum:g} {unit}"
+        else:
+            continue
+        notices.append({
+            "kind": "out_of_certified_band",
+            "control": name,
+            "reason": MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+            "control_reason": control_reason,
+            "authority_level": "extrapolated",
+            "certified_band": {name: (minimum, maximum)},
+        })
+
+    if invalid_controls:
+        return invalid_controls, notices
+
+    # Guard the exact binary64 intermediates used by MRE: hours to seconds,
+    # current times duration for Faraday extent, and voltage-current-duration
+    # for energy. These bounds are derived from sys.float_info.max rather than
+    # a hand-picked control cutoff, so finite out-of-band values predict until
+    # an actual operation would overflow.
+    maximum = sys.float_info.max
+    dt_hr = controls.get("dt_hr", 1.0)
+    current_A = controls.get("current_A", 0.0)
+    voltage_V = controls.get("voltage_V", 0.0)
+    if dt_hr > maximum / 3600.0:
+        invalid_controls["dt_hr"] = (
+            "above maximum binary64-safe duration "
+            f"{maximum / 3600.0:g} hr (seconds conversion overflows binary64)"
+        )
+    else:
+        duration_s = dt_hr * 3600.0
+        if duration_s > 0.0 and current_A > maximum / duration_s:
+            invalid_controls["current_A"] = (
+                "above maximum binary64-safe current "
+                f"{maximum / duration_s:g} A "
+                "(Faraday charge exceeds binary64 range)"
+            )
+    if current_A > 0.0 and voltage_V > maximum / current_A:
+        invalid_controls["voltage_V"] = (
+            "above maximum binary64-safe voltage "
+            f"{maximum / current_A:g} V "
+            "(voltage-current product exceeds binary64 range)"
+        )
+    elif current_A > 0.0 and voltage_V > 0.0:
+        energy_intermediate = voltage_V * current_A
+        if dt_hr > 0.0 and energy_intermediate > maximum / dt_hr:
+            invalid_controls["voltage_V"] = (
+                "above maximum binary64-safe voltage for requested duration "
+                f"{maximum / current_A / dt_hr:g} V "
+                "(energy product exceeds binary64 range)"
+            )
+
+    return invalid_controls, notices
 
 
 def _without_mre_quantities(diagnostic: Mapping[str, object]) -> dict[str, object]:
@@ -702,10 +766,22 @@ class ElectrolysisModel:
                 energy_kWh:         float
         """
         voltage_V = _require_finite_real("voltage_V", voltage_V)
-        current_A = _require_finite_real("current_A", current_A, minimum=0.0)
+        current_A = _require_finite_real("current_A", current_A)
+        pO2_bar = _require_finite_real("pO2_bar", pO2_bar)
         T_C = _require_finite_real("T_C", T_C)
         if T_C + CELSIUS_TO_KELVIN_OFFSET <= 0.0:
             raise ValueError("T_C must be above absolute zero")
+        invalid_controls, control_notices = mre_control_domain_assessment({
+            "dt_hr": 1.0,
+            "current_A": current_A,
+            "voltage_V": voltage_V,
+            "pO2_bar": pO2_bar,
+        })
+        if invalid_controls:
+            return {
+                "reason_refused": MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                "invalid_controls": invalid_controls,
+            }
         comp = melt_state.composition_wt_pct()
         gas_product_fugacity_bar = coerce_gas_product_fugacity_bar(
             gas_product_fugacity_bar
@@ -751,6 +827,8 @@ class ElectrolysisModel:
             'mre_raw_margin_refused_targets': {},
             'mre_phase_refused_targets': {},
         }
+        if control_notices:
+            result['notices'] = control_notices
 
         # Find all reducible species at this voltage
         reducible = []
