@@ -17,7 +17,7 @@ Four calculated activities, read from the text on the 600 dpi PDF page 1, not fr
 
 `x` beyond the printed 50 mol% is arithmetic: x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = 0.20. `composition_mol.basis` is `printed_mole_fraction`. The arithmetic sentence is `composition_basis_note`.
 
-Evidence is `model_derived`. `derived_from` is the printed citation Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, reference [1], which the abstract names as the ideal associated solutions model. The input activities are not printed here and were not invented. `admission_status` is `rejected`, so these rows are not comparison candidates. `type` is `activity_coefficient` because that is the closed observation type; `values.quantity` is `activity` and the number is `values.activity`. Fidelity samples pin `field: activity` and do not label the observable as `activity_coefficient`.
+Evidence is `model_derived`. `derived_from` is the printed citation Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, reference [1], which the abstract names as the ideal associated solutions model. That lineage is a printed citation, not a battery parent id. The input activities are not printed here and were not invented. `admission_status` is `rejected`, so these rows are not comparison candidates. `type` is `activity_coefficient` because that is the closed observation type; `values.quantity` is `activity` and the number is `values.activity`. Fidelity samples pin `field: activity` and do not label the observable as `activity_coefficient`.
 
 No numeric fugacity is printed. The title's fugacity is a context row.
 
