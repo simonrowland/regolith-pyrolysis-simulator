@@ -46,7 +46,7 @@ Published page 1432 is PDF page 5 (pdf_page_index 4), not page 4. The caption as
 
 Both panels were calibrated from the inward tick stubs on the 600 dpi render. Fig. 3a: 473 px per 200 K, residual 0 on 1800, 2000, 2200, 2400; 464 px per 0.01 in activity, residual 0 on 0.03, 0.02, 0.01. The unlabelled frame is at a = 0.00503, not at zero. Fig. 3b: least-squares temperature residuals at most 1.24 K; activity residuals at most 0.000034. The unlabelled frame is at a = 0.0498.
 
-A marker is a centre, or an assignable exposed arc, inside a stated uncertainty. The uncertainty is wider when only an arc is visible. An open-circle centre is a white pixel whose rays meet the stroke near the series radius, 37 px on panel a and 32 px on panel b. Twenty-two Fig. 3a circles and nineteen Fig. 3b circles are stored. Round 4 reads an exposed outer arc when the white interior is the overlap of two rings. The edge is the leftmost or rightmost dark pixel on each row, channel max < 90, and the centre is the circle through that edge. Isolated circles (ray std under 2 px) are stored at ±0.0002 and ±2 K on panel a, and at ±0.001 and ±3 K on panel b. Circles whose neighbour cuts the ring are stored wider: ±0.0005 and ±4 K, or ±0.002 and ±5 K. Each centre was checked against the 600 dpi render.
+A marker is a centre, or an assignable exposed arc, inside a stated uncertainty. The uncertainty is wider when only an arc is visible. An open-circle centre is a white pixel whose rays meet the stroke near the series radius, 37 px on panel a and 32 px on panel b. Twenty-two Fig. 3a circles and twenty-two Fig. 3b circles are stored. Round 4 reads an exposed outer arc when the white interior is the overlap of two rings. The edge is the leftmost or rightmost dark pixel on each row, channel max < 90, and the centre is the circle through that edge. Isolated circles (ray std under 2 px) are stored at ±0.0002 and ±2 K on panel a, and at ±0.001 and ±3 K on panel b. Circles whose neighbour cuts the ring are stored wider: ±0.0005 and ±4 K, or ±0.002 and ±5 K. Each centre was checked against the 600 dpi render.
 
 Each overlapping pair is stored as two rows:
 
@@ -71,11 +71,11 @@ Round 4 also stores these exposed arcs:
 - (1705.36, 2667.78), TiO2, 2181.7 K, activity 0.2289. Left arc, radius 41.62 px, rms 0.43 px, 34 px from (1739.00, 2663.00). TiO2 is crystalline, 3 K below 2185 K and inside the ±10 K band. The sample is crystalline perovskite, 59 K below 2241 K.
 - (1381.92, 2935.86), TiO2, 2027.8 K, activity 0.1745. Left arc, radius 42.83 px, rms 0.55 px, 50 px from (1430.00, 2923.00). TiO2 is crystalline, 70 K from the lower listed melting temperature 2098 K. The sample is crystalline perovskite, 213 K below 2241 K.
 
-Deferred, one marker at a time. The arc is not clean enough to store:
+t1380 reads the three arcs that round 4 left deferred. The centre is the circle through the exposed outer-left edge of one stroke, not the leftmost dark pixel of the whole crop. A full-crop leftmost-dark fit mixes the neighbour rings: rms 1.23 px, 3.03 px and 5.25 px. Those fits are not stored. The edge used here is the leftmost pixel of the run that is 4–16 px wide and whose left edge lies in the stated x band. It is the same centre at thresholds 70, 90, 110 and 130.
 
-- (1273, 3028), crop x=1235-1310, y=2990-3070. Leftmost-dark centre (1277.16, 3028.57), radius 44.19 px, rms 1.24 px, 30 px from the stored circle at (1307.00, 3025.00).
-- (1402, 2944), crop x=1365-1445, y=2905-2985. Leftmost-dark rms 3.31 px.
-- (1854, 2598), crop x=1815-1895, y=2560-2640. Leftmost-dark radius 28.14 px, rms 8.39 px.
+- (1267.85, 3029.34), TiO2, 1973.5 K, activity 0.1556. Radius 37.72 px, rms 0.872 px, 33 rows, centre sigma 1.52 px in x. The midline centre is 1.76 px away. Uncertainty ±0.0005 and ±2 K, which covers that shift. 39 px from the stored circle at (1307.00, 3025.00). TiO2 is crystalline, 212 K below 2185 K. The sample is crystalline perovskite, 268 K below 2241 K.
+- (1398.77, 2942.46), TiO2, 2035.8 K, activity 0.1732. Radius 39.48 px, rms 0.352 px, 46 rows, centre sigma 0.97 px in x. Uncertainty ±0.0005 and ±1 K. The stored circle at (1381.92, 2935.86) is the left-hand ring, 18 px away, and is unchanged. TiO2 is crystalline, 62 K from the lower listed melting temperature 2098 K. The sample is crystalline perovskite, 205 K below 2241 K.
+- (1857.18, 2598.45), TiO2, 2253.9 K, activity 0.2430. Radius 40.08 px, rms 0.333 px, 54 rows. The midline centre is 0.93 px away. Uncertainty ±0.0005 and ±1 K. 34 px from (1822.91, 2603.56) and 30 px from (1887.00, 2604.00). The pure oxide is liquid, 69 K above 2185 K. The sample is liquid perovskite, 13 K above 2241 K.
 
 The same page says the crystalline-state activities at 2182–2241 K were determined using the data in [47]. The caption still assigns the open circles to this work, so those points are stored, with that sentence left in the audit rather than used to drop them.
 
@@ -130,6 +130,6 @@ Emit cannot put `transition_temperature` on `T_K`, and one mapping cannot carry 
 | b/3 open circle | TiO2 | 1822.91 | 2603.56 | activity=0.2420 | read |
 | b/3 open circle | TiO2 | 1705.36 | 2667.78 | activity=0.2289 | read |
 | b/3 open circle | TiO2 | 1381.92 | 2935.86 | activity=0.1745 | read |
-| b/3 open arc | TiO2 | 1273 | 3028 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=1235-1310, y=2990-3070; leftmost-dark rms 1.24 px |
-| b/3 open arc | TiO2 | 1402 | 2944 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=1365-1445, y=2905-2985; leftmost-dark rms 3.31 px |
-| b/3 open arc | TiO2 | 1854 | 2598 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=1815-1895, y=2560-2640; leftmost-dark rms 8.39 px |
+| b/3 open circle | TiO2 | 1267.85 | 3029.34 | activity=0.1556 | read: arc-fit, rms 0.872 px, ±0.0005, ±2 K, 1973.5 K |
+| b/3 open circle | TiO2 | 1398.77 | 2942.46 | activity=0.1732 | read: arc-fit, rms 0.352 px, ±0.0005, ±1 K, 2035.8 K |
+| b/3 open circle | TiO2 | 1857.18 | 2598.45 | activity=0.2430 | read: arc-fit, rms 0.333 px, ±0.0005, ±1 K, 2253.9 K |

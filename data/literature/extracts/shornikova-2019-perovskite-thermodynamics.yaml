@@ -5162,6 +5162,231 @@ species:
           CaTiO3: '1'
         page_pixel_x: '1381.92'
         page_pixel_y: '2935.86'
+    - observation_id: shornikova_2019_fig3b_TiO2_t1973_5
+      type: activity_coefficient
+      experiment: shornikova-2019-fig3b
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1432
+        figure: '3'
+        panel: b
+        series: '3'
+        marker_symbol: open circle
+        note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1267.85, 3029.34). Read activity = 0.1556 ± 0.0005; T = 1973.5 ± 2 K. Exposed left arc. Dark pixel means channel max < 90. Leftmost dark pixel of the stroke whose left edge lies in x=1229-1258, on rows y=2999-3057 where that stroke is 4-16 px wide. Centre (1267.85, 3029.34), radius 37.72 px, rms 0.872 px, 33 rows, max residual 1.69 px. Centre sigma (1.52, 0.33, 1.31) px. The stroke midline fits (1269.60, 3028.89), 1.76 px away. Identical at thresholds 70, 90, 110 and 130. A full-crop leftmost-dark fit mixes the neighbour ring and has rms 1.23 px; it is not stored. The stored circle at (1307.00, 3025.00) is 39 px away. Read uncertainty ±2 K covers the 1.52 px centre sigma and the 1.76 px outer-to-midline shift (0.8 K)."
+      T_range_K: [1973.5, 1973.5]
+      phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: TiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: rutile
+            component_basis: TiO2
+        inferred: true
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1973.5 K is 212 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 268 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 1431
+          equation: '6'
+          figure: '3'
+          note: Equations (6) and the pure-component sentence on published page 1431. The temperature is the Fig. 3 read.
+      units: dimensionless activity
+      uncertainty:
+        value: '0.0005'
+        unit: activity
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.0005 in activity and ±2 K. The paper prints no error bar on this open circle. Exposed left arc. Dark pixel means channel max < 90. Leftmost dark pixel of the stroke whose left edge lies in x=1229-1258, on rows y=2999-3057 where that stroke is 4-16 px wide. Centre (1267.85, 3029.34), radius 37.72 px, rms 0.872 px, 33 rows, max residual 1.69 px. Centre sigma (1.52, 0.33, 1.31) px. The stroke midline fits (1269.60, 3028.89), 1.76 px away. Identical at thresholds 70, 90, 110 and 130. A full-crop leftmost-dark fit mixes the neighbour ring and has rms 1.23 px; it is not stored. The stored circle at (1307.00, 3025.00) is 39 px away. Read uncertainty ±2 K covers the 1.52 px centre sigma and the 1.76 px outer-to-midline shift (0.8 K)."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1973.5'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1432
+            figure: '3'
+            panel: b
+            note: Temperature is the Fig. 3 x-axis read for this open circle.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1973.5'
+        temperature_K: 1973.5
+        activity: '0.1556'
+        composition_mol:
+          basis: pure_oxide_system
+          CaTiO3: '1'
+        page_pixel_x: '1267.85'
+        page_pixel_y: '3029.34'
+    - observation_id: shornikova_2019_fig3b_TiO2_t2035_8
+      type: activity_coefficient
+      experiment: shornikova-2019-fig3b
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1432
+        figure: '3'
+        panel: b
+        series: '3'
+        marker_symbol: open circle
+        note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1398.77, 2942.46). Read activity = 0.1732 ± 0.0005; T = 2035.8 ± 1 K. Exposed left arc of the middle ring. Dark pixel means channel max < 90. Leftmost dark pixel of the stroke whose left edge lies in x=1354-1385, on rows y=2918-2968 where that stroke is 4-16 px wide. Centre (1398.77, 2942.46), radius 39.48 px, rms 0.352 px, 46 rows, max residual 0.95 px. Centre sigma (0.97, 0.17, 0.92) px. The stroke midline fits (1399.13, 2942.47), 0.36 px away. The stored circle at (1381.92, 2935.86) is the left-hand ring, 18 px away, and is not this centre. The stored circle at (1430.00, 2923.00) is 36 px away. A full-crop leftmost-dark fit has rms 3.03 px and is not stored. Read uncertainty ±1 K covers the 0.97 px centre sigma."
+      T_range_K: [2035.8, 2035.8]
+      phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: TiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: rutile
+            component_basis: TiO2
+        inferred: true
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2035.8 K is 149 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2 also lists 2098 K, and this point is 62 K from that lower melting temperature. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 205 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 1431
+          equation: '6'
+          figure: '3'
+          note: Equations (6) and the pure-component sentence on published page 1431. The temperature is the Fig. 3 read.
+      units: dimensionless activity
+      uncertainty:
+        value: '0.0005'
+        unit: activity
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.0005 in activity and ±1 K. The paper prints no error bar on this open circle. Exposed left arc of the middle ring. Dark pixel means channel max < 90. Leftmost dark pixel of the stroke whose left edge lies in x=1354-1385, on rows y=2918-2968 where that stroke is 4-16 px wide. Centre (1398.77, 2942.46), radius 39.48 px, rms 0.352 px, 46 rows, max residual 0.95 px. Centre sigma (0.97, 0.17, 0.92) px. The stroke midline fits (1399.13, 2942.47), 0.36 px away. The stored circle at (1381.92, 2935.86) is the left-hand ring, 18 px away, and is not this centre. The stored circle at (1430.00, 2923.00) is 36 px away. A full-crop leftmost-dark fit has rms 3.03 px and is not stored. Read uncertainty ±1 K covers the 0.97 px centre sigma."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2035.8'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1432
+            figure: '3'
+            panel: b
+            note: Temperature is the Fig. 3 x-axis read for this open circle.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2035.8'
+        temperature_K: 2035.8
+        activity: '0.1732'
+        composition_mol:
+          basis: pure_oxide_system
+          CaTiO3: '1'
+        page_pixel_x: '1398.77'
+        page_pixel_y: '2942.46'
+    - observation_id: shornikova_2019_fig3b_TiO2_t2253_9
+      type: activity_coefficient
+      experiment: shornikova-2019-fig3b
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1432
+        figure: '3'
+        panel: b
+        series: '3'
+        marker_symbol: open circle
+        note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1857.18, 2598.45). Read activity = 0.2430 ± 0.0005; T = 2253.9 ± 1 K. Exposed left arc of the middle ring. Dark pixel means channel max < 90. Leftmost dark pixel of the stroke whose left edge lies in x=1810-1842, on rows y=2575-2629 where that stroke is 4-16 px wide. Centre (1857.18, 2598.45), radius 40.08 px, rms 0.333 px, 54 rows. Centre sigma (0.60, 0.13) px. The stroke midline fits (1858.11, 2598.35), 0.93 px away. The same edge at thresholds 70, 90, 110 and 130. A full-crop leftmost-dark fit mixes the neighbour rings and has rms above 5 px; it is not stored. The stored circles at (1822.91, 2603.56) and (1887.00, 2604.00) are 34 px and 30 px away."
+      T_range_K: [2253.9, 2253.9]
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: TiO2
+              phase:
+                tag: value
+                value: l
+            component_basis: TiO2
+        inferred: true
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2253.9 K is 69 K above 2185 K and above the stated ±10 K band, so the stable phase of the pure oxide is the liquid. The point is 69 K from 2185 K. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 13 K above 2241 K, so the sample phase stored here is liquid perovskite. The point is within 100 K of that melting temperature."
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 1431
+          equation: '6'
+          figure: '3'
+          note: Equations (6) and the pure-component sentence on published page 1431. The temperature is the Fig. 3 read.
+      units: dimensionless activity
+      uncertainty:
+        value: '0.0005'
+        unit: activity
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.0005 in activity and ±1 K. The paper prints no error bar on this open circle. The radius residual is 0.33 px (0.16 K, 0.00007 activity). The stored ±1 K covers the 0.93 px shift from the outer edge to the stroke midline. Exposed left arc of the middle ring. Dark pixel means channel max < 90. Leftmost dark pixel of the stroke whose left edge lies in x=1810-1842, on rows y=2575-2629 where that stroke is 4-16 px wide. Centre (1857.18, 2598.45), radius 40.08 px, rms 0.333 px, 54 rows. Centre sigma (0.60, 0.13) px. The stroke midline fits (1858.11, 2598.35), 0.93 px away. The same edge at thresholds 70, 90, 110 and 130. A full-crop leftmost-dark fit mixes the neighbour rings and has rms above 5 px; it is not stored. The stored circles at (1822.91, 2603.56) and (1887.00, 2604.00) are 34 px and 30 px away."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2253.9'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1432
+            figure: '3'
+            panel: b
+            note: Temperature is the Fig. 3 x-axis read for this open circle.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2253.9'
+        temperature_K: 2253.9
+        activity: '0.2430'
+        composition_mol:
+          basis: pure_oxide_system
+          CaTiO3: '1'
+        page_pixel_x: '1857.18'
+        page_pixel_y: '2598.45'
     - observation_id: shornikova_2019_fig3b_TiO2_t2268_1
       type: activity_coefficient
       experiment: shornikova-2019-fig3b
