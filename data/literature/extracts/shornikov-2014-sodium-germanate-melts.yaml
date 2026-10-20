@@ -7,9 +7,10 @@ source:
   corpus_asset: raw/shornikov-2014-sodium-germanate-melts/shornikov-2014-sodium-germanate-melts.pdf
 extraction:
   method: 'MinerU tables were converted and compared with the text layer. The 600 dpi render of PDF page
-    2 confirmed every stored digit. Two formulas were hand-corrected from that render: liquid Na4Ge9O20
-    (MinerU Na4Ge9O2) and liquid GeO2 (MinerU a leading superscript 0). Five Table 1 entropy dashes were
-    not stored.'
+    2 confirmed every stored digit. The liquid GeO2 cell was hand-corrected. MinerU printed a leading
+    superscript 0, which is the standard-state mark, value -292.357. The liquid cell prints Na4Ge9O2.
+    That printed label is kept, and Na4Ge9O20 is an inferred correction. Five Table 1 entropy dashes
+    were not stored. Table 1 enthalpies are stored per mol_species. The header prints kJ/mole.'
   date: '2026-10-20'
   worker: t1372-w2-w8-t1
 review_status: draft
@@ -76,10 +77,11 @@ species:
         T_K: '1400'
         attribution: Fan et al. (1993)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '5.00'
@@ -149,10 +151,11 @@ species:
         T_K: '1300'
         attribution: Kozhina and Shultz (2000)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '1.70'
@@ -187,10 +190,11 @@ species:
         T_K: '1400'
         attribution: Fan et al. (1993)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '4.00'
@@ -225,10 +229,11 @@ species:
         T_K: '1450'
         attribution: Kozhina and Shultz (1995)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '4.18'
@@ -335,10 +340,11 @@ species:
         T_K: '1300'
         attribution: Kozhina and Shultz (2000)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '1.70'
@@ -373,10 +379,11 @@ species:
         T_K: '1400'
         attribution: Fan et al. (1993)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '5.00'
@@ -411,10 +418,11 @@ species:
         T_K: '1450'
         attribution: Kohsaka et al. (1978)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '5.43'
@@ -449,10 +457,11 @@ species:
         T_K: '1450'
         attribution: Kozhina and Shultz (1995)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '4.18'
@@ -610,10 +619,11 @@ species:
         T_K: '1300'
         attribution: Kozhina and Shultz (2000)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '1.70'
@@ -648,10 +658,11 @@ species:
         T_K: '1400'
         attribution: Fan et al. (1993)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '3.00'
@@ -686,10 +697,11 @@ species:
         T_K: '1450'
         attribution: Kozhina and Shultz (1995)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '4.18'
@@ -796,10 +808,11 @@ species:
         T_K: '1300'
         attribution: Kozhina and Shultz (2000)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '1.70'
@@ -834,10 +847,11 @@ species:
         T_K: '1400'
         attribution: Fan et al. (1993)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '3.00'
@@ -872,10 +886,11 @@ species:
         T_K: '1450'
         attribution: Kohsaka et al. (1978)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '5.43'
@@ -910,10 +925,11 @@ species:
         T_K: '1450'
         attribution: Kozhina and Shultz (1995)
         reaction_as_printed: formation from the simple oxides
+        per_as_printed: 'Table 1 header prints kJ/mole. Stored per mol_species.'
         standard_state: 'Table 1 caption, published page 52: enthalpies and entropies of sodium germanates
           formation from the simple oxides. The paper does not state whether each simple oxide is the
           pure solid or the pure liquid.'
-      per: mol_compound
+      per: mol_species
       uncertainty:
         kind: printed
         value: '4.18'
@@ -968,15 +984,21 @@ species:
         pdf_page_index: 1
         published_page: 52
         table: '2'
-        row_label: Na4Ge9O20
+        row_label: Na4Ge9O2
         column_header: ΔfG°1500, l
-        note: MinerU read the liquid formula as Na4Ge9O2. The 600 dpi page prints Na4Ge9O20, the same
-          formula as the solid cell, value −3625.145. Hand-corrected from the render.
+        note: 'The liquid cell prints Na4Ge9O2 next to -3625.145. The text layer of PDF page 2 and the
+          600 dpi page agree on that label. The solid cell on the same row prints Na4Ge9O20, and every
+          Table 1 row for this compound prints Na4Ge9O20. Na4Ge9O20 is an inferred correction of a dropped
+          final 0. The page is not claimed to print Na4Ge9O20 in the liquid cell. The value -3625.145
+          is the printed cell.'
       units: kJ/mol
       values:
         quantity: delta_fG
         method_class: model_derived
         value: '-3625.145'
+        formula_as_printed: Na4Ge9O2
+        formula_inferred: Na4Ge9O20
+        formula_inference: 'The liquid label drops the final 0 of Na4Ge9O20. The solid cell on the same row and every Table 1 row print Na4Ge9O20.'
         T_K: '1500'
         attribution: Table 2, calculated in the present study from Glushko et al. (1978–1982), Fan (1993),
           Kozhina and Shultz (1995, 2000).

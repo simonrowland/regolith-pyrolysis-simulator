@@ -16,10 +16,12 @@ The 600 dpi page matches MinerU and the text layer on every enthalpy and entropy
 
 Twenty-five ΔfG° at 1500 K, from the elements, calculated in this study. `model_derived`. The cited sources are named and their numbers are not printed, so there is no `derived_from` link (b-767). O2 = 0.000 is the printed element reference and is stored. Empty liquid cells are not stored as zero.
 
-Hand corrections from the 600 dpi page, stated here:
+Provenance, stated here:
 
-- Liquid formula MinerU `Na4Ge9O2` is printed Na4Ge9O20, value −3625.145.
+- The liquid cell prints Na4Ge9O2 next to −3625.145. The PDF text layer and the page agree. The solid cell on the same row prints Na4Ge9O20, and every Table 1 row for this compound prints Na4Ge9O20. Na4Ge9O20 is an inferred correction of a dropped final 0. The page is not claimed to print Na4Ge9O20 in the liquid cell. The value −3625.145 is the printed cell. The species key stays Na4Ge9O20 as that inferred formula.
 - Liquid label MinerU `^0 GeO2` is GeO2 with a leading superscript 0, read as the standard-state mark, value −292.357.
+
+Table 1 header prints kJ/mole. Those fifteen enthalpies are stored per mol_species.
 
 ## Figures
 
