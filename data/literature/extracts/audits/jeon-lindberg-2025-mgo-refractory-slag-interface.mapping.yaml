@@ -1,0 +1,36 @@
+source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
+tables:
+  '2':
+    physical_page: 7
+    published_page: 6
+    components: &id001
+    - MgO
+    - Al2O3
+    - Cr2O3
+    - C
+    - CaO
+    - FeO
+    - SiO2
+    render_checked: true
+    typed_points: 15
+  '3':
+    physical_page: 8
+    published_page: 7
+    components: *id001
+    render_checked: true
+    typed_points: 14
+excluded_context:
+- composite and metal EDS points
+- Table 1 recipes and pre-test characterizations
+figures_deferred:
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+- 7
+- 8
+- 9
+- 10
+- 11
