@@ -187,12 +187,12 @@ def _refusal_reason_definition_literals(tree):
         and len(value.args) == 1
         and isinstance(value.args[0], ast.Set)
     )
-    literals = {
-        node for node in ast.walk(value.args[0])
-        if isinstance(node, ast.Constant) and isinstance(node.value, str)
-    }
-    assert literals
-    return literals
+    elements = value.args[0].elts
+    assert elements and all(
+        isinstance(element, ast.Constant) and isinstance(element.value, str)
+        for element in elements
+    ), "refusal reason frozenset elements must be plain string constants"
+    return set(elements)
 
 
 def _evidence_marker_reader_sites(source, relative):
@@ -238,6 +238,13 @@ def test_evidence_marker_scan_exempts_only_refusal_vocabulary_definition():
     assert _evidence_marker_reader_sites(
         definition, owner
     ) == []
+
+    for unsafe_definition in (
+        f"_SYSTEM_CLASS_REFUSAL_REASONS = frozenset({{(key := {reason!r})}})",
+        f"_SYSTEM_CLASS_REFUSAL_REASONS = frozenset({{payload.get({reason!r})}})",
+    ):
+        with pytest.raises(AssertionError, match="plain string constants"):
+            _evidence_marker_reader_sites(unsafe_definition, owner)
 
     reassigned_key = f"{definition}\nkey = {reason!r}\npayload.get(key)\nkey = 'ordinary'"
     assert _evidence_marker_reader_sites(reassigned_key, owner) == [
