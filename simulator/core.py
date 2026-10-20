@@ -9652,6 +9652,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     backend_kwargs['vapor_transport_pO2_bar'] = (
                         self._vapor_pressure_dispatch_pO2_bar()
                     )
+                if self._backend_accepts_kwarg('vapor_transport_floor_bar'):
+                    backend_kwargs['vapor_transport_floor_bar'] = (
+                        self._vacuum_floor_bar()
+                    )
                 if self._backend_accepts_kwarg('composition_mol_by_account'):
                     backend_kwargs['composition_mol_by_account'] = (
                         backend_composition_by_account)
