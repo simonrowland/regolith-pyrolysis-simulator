@@ -36,6 +36,8 @@ def test_lee_bruckner_table_values_migrate_as_species_bound_points():
         else:
             assert observation.identity.quantity.value is Quantity.DENSITY
             assert observation.identity.species.formula == "unknown"
+            assert observation.derivation.output_unit == "kg_per_m3"
+            assert observation.notices == ()
         assert observation.point_conditions["T_C"].state.tag.value == "unknown"
         assert observation.point_conditions["T_C"].locator is not None
         assert observation.point_conditions["composition"].state.tag.value == "unknown"
@@ -66,8 +68,15 @@ def test_lee_bruckner_table_values_migrate_as_species_bound_points():
         observation for observation in observations
         if "::lee_bruckner_1984_table1_glass_density::" in observation.observation_id
     )
-    assert density.value.point == Decimal("2.388")
+    assert density.value.point == Decimal("2388")
+    assert density.derivation.output_unit == "kg_per_m3"
+    assert density.notices == ()
     assert density.identity.species.formula == "unknown"
+    printed_density = source["species"]["Cr"]["observations"][0]["values"][
+        "points"
+    ][0]
+    assert printed_density["value_as_published"] == "2.388"
+    assert printed_density["unit"] == "g/cm3"
 
     assert check_all_fidelity_samples_match(source, label=EXTRACT.stem) == []
     mutated = deepcopy(source)

@@ -3135,6 +3135,15 @@ def convert_volume_to_m3(
     return None, f"unmapped volume unit {units!r}"
 
 
+def convert_density_to_kg_per_m3(
+    value: Decimal, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Normalize the printed density unit to the quantity token's SI unit."""
+    if units == "g/cm3":
+        return value * Decimal("1000"), "g_per_cm3_to_kg_per_m3"
+    return None, f"unmapped density unit {units!r}"
+
+
 # trail -> (factor, arithmetic, output_unit, original_unit)
 _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "Torr_to_Pa": (
@@ -3178,6 +3187,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "m_kg_per_m2 = m_g_per_cm2 × 10",
         "kg_per_m2",
         "g_per_cm2",
+    ),
+    "g_per_cm3_to_kg_per_m3": (
+        Decimal("1000"),
+        "rho_kg_per_m3 = rho_g_per_cm3 × 1000",
+        "kg_per_m3",
+        "g_per_cm3",
     ),
     "mg_per_cm2_to_kg_per_m2": (
         Decimal("100"),
@@ -8321,6 +8336,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "delta_q_replicate_1",
         "delta_q_replicate_2",
     ),
+    Quantity.DENSITY: ("density_g_cm3", "value"),
     Quantity.FUGACITY: (
         "fCl2_bar",
         "fugacity_bar",
@@ -9385,6 +9401,19 @@ def _selection_from_named_field(
         amount = _numeric_field(payload, key)
         if amount is None:
             continue
+        if q_token is Quantity.DENSITY:
+            amount, trail = convert_density_to_kg_per_m3(
+                amount, _printed_unit_for_field(payload, key) or units
+            )
+            if amount is None:
+                return _unavailable_selection(
+                    trail or "density has no supported printed unit",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(amount, key, trail, payload, condition_ranges)
         if q_token is Quantity.MASS_LOSS_AREAL_DENSITY:
             amount, trail = convert_areal_mass_to_kg_per_m2(amount, units)
             if amount is None:
