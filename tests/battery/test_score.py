@@ -6355,6 +6355,16 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     assert "sf04-magma-companion-workbook" in expand_coefficient_sources(
         d066_source
     )
+    # d-071 reuses the version string 1.0.4-d066-v2 at ccabd0b. The alias
+    # maps only to the SF04 workbook. Shornikov 2017, Darken & Gurry 1946
+    # and Masson 1965 are not store ids, and the invalid FeO(l)
+    # independent_check is not an extra ancestor.
+    d066_v2_source = openimcc_pack_coefficient_sources("1.0.4-d066-v2")
+    assert d066_v2_source == ("openimcc-v1.0.4-d066-v2",)
+    assert expand_coefficient_sources(d066_v2_source) == (
+        "sf04-magma-companion-workbook",
+    )
+    assert lineage_complete_for(d066_v2_source) is True
 
 
 @pytest.mark.parametrize(

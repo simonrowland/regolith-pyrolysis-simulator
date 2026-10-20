@@ -372,6 +372,18 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
+    # d-071 default, openimcc ccabd0b, pack 1.0.4-d066-v2. The bridge reports
+    # this alias and no citation string. It still expands only to the SF04
+    # workbook, the same store id as the earlier packs. Shornikov 2017
+    # (DOI 10.1134/S0036024417020303, MgAl2O4 fusion enthalpy, Table 2 p. 290),
+    # Darken & Gurry 1946 (DOI 10.1021/ja01209a030) and Masson 1965 are
+    # coefficient inputs of the pack and are not store extracts on this seat.
+    # The 2018 spinel work shornikov-2018-spinel-solid-solutions is a different
+    # paper. There is no external-source token that resolves, so those
+    # citations are not invented as store ids. The FeO(l) independent_check
+    # now names Darken & Gurry, which is the fit source itself. That check is
+    # invalid until the openimcc d-008 wording fix and is not an ancestor.
+    "openimcc-v1.0.4-d066-v2": ("sf04-magma-companion-workbook",),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
