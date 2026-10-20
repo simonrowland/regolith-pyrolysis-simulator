@@ -483,6 +483,23 @@ class PhysicsConstraintSet:
             has_wall_deposit = any(kg > _EPS for kg in by_campaign.values())
             authority = _coating_authority_status(trace, by_campaign)
             authoritative = _authority_is_authoritative(authority)
+            if (
+                not authoritative
+                and not has_wall_deposit
+                and authority.get("wall_saturation_pressure_refused_species")
+            ):
+                return self.coating_from_fouling_report({
+                    "campaigns_to_resinter_total": None,
+                    "wall_deposit_kg_per_campaign": None,
+                    "authoritative_for_resinter": False,
+                    "output_status": str(
+                        authority.get("output_status") or "status_bearing"
+                    ),
+                    "status_reason": str(
+                        authority.get("message")
+                        or "wall saturation pressure was refused"
+                    ),
+                })
             zone_by_segment: Mapping[Any, Any] | None = None
             if has_wall_deposit:
                 zone_by_segment = getattr(trace, "wall_zone_by_segment", None)

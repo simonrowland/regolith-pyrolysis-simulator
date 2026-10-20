@@ -1896,6 +1896,7 @@ def _tap_coating_product_summary(
                 **_furnace_lifespan_cost_summary_from_raw(
                     raw_by_segment,
                     campaigns_elapsed=campaigns_elapsed,
+                    authority=authority,
                 ),
                 **_coating_authority_summary(authority),
             }
@@ -1937,6 +1938,7 @@ def _tap_coating_product_summary(
             **_furnace_lifespan_cost_summary_from_raw(
                 raw_by_segment,
                 campaigns_elapsed=campaigns_elapsed,
+                authority=authority,
             ),
             **_coating_authority_summary(authority),
         }
@@ -3853,6 +3855,8 @@ def _coating_product_summary(
         **_furnace_lifespan_cost_summary_from_raw(
             raw_by_segment,
             campaigns_elapsed=campaigns_elapsed,
+            authority=authority,
+            coating_margin=coating_margin,
         ),
         **_coating_authority_summary(authority),
     })
@@ -4390,6 +4394,7 @@ def _furnace_lifespan_cost_summary(
         campaigns_elapsed=(
             _campaigns_elapsed(run_execution) if run_execution is not None else 1.0
         ),
+        authority=_coating_authority_status(raw, run_execution),
     )
 
 
@@ -4397,6 +4402,8 @@ def _furnace_lifespan_cost_summary_from_raw(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
     *,
     campaigns_elapsed: float = 1.0,
+    authority: Mapping[str, Any] | None = None,
+    coating_margin: Any = None,
 ) -> Mapping[str, Any]:
     elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
     if elapsed <= 0.0:
@@ -4411,22 +4418,51 @@ def _furnace_lifespan_cost_summary_from_raw(
     })
     total_wall_load_kg = cumulative_total_wall_load_kg / elapsed
     threshold = _wall_resinter_threshold_kg()
+    if threshold is not None and threshold <= 0.0:
+        raise ObjectiveComputationError("resinter_threshold_kg must be positive")
+    lifetime = _coating_lifetime_projection(
+        wall_deposit_by_segment_species,
+        campaigns_elapsed=elapsed,
+        authority=authority,
+        coating_margin=coating_margin,
+    )
+    wall_deposit_unavailable = (
+        lifetime["has_positive_qualified_fouling"] is None
+    )
     summary: dict[str, Any] = {
         "furnace_lifespan_consumed_fraction": None,
-        "lifespan_cost_status": "threshold_unavailable",
+        "lifespan_cost_status": (
+            "wall_deposit_unavailable"
+            if wall_deposit_unavailable
+            else "threshold_unavailable"
+        ),
         "lifespan_cost_status_reason": (
-            "resinter_threshold_kg is null; furnace lifespan cost is not priced"
+            str(authority.get("message", "wall deposit is unavailable"))
+            if wall_deposit_unavailable and isinstance(authority, Mapping)
+            else (
+                "wall deposit is unavailable"
+                if wall_deposit_unavailable
+                else "resinter_threshold_kg is null; furnace lifespan cost is not priced"
+            )
         ),
         "resinter_threshold_kg": threshold,
-        "wall_deposit_total_kg": total_wall_load_kg,
-        "wall_deposit_kg_by_species": by_species,
-        "wall_deposit_cumulative_total_kg": cumulative_total_wall_load_kg,
-        "wall_deposit_cumulative_kg_by_species": cumulative_by_species,
+        "wall_deposit_total_kg": (
+            None if wall_deposit_unavailable else total_wall_load_kg
+        ),
+        "wall_deposit_kg_by_species": (
+            None if wall_deposit_unavailable else by_species
+        ),
+        "wall_deposit_cumulative_total_kg": (
+            None if wall_deposit_unavailable else cumulative_total_wall_load_kg
+        ),
+        "wall_deposit_cumulative_kg_by_species": (
+            None if wall_deposit_unavailable else cumulative_by_species
+        ),
     }
+    if wall_deposit_unavailable:
+        return MappingProxyType(summary)
     if threshold is None:
         return MappingProxyType(summary)
-    if threshold <= 0.0:
-        raise ObjectiveComputationError("resinter_threshold_kg must be positive")
     summary["furnace_lifespan_consumed_fraction"] = total_wall_load_kg / threshold
     summary["lifespan_cost_status"] = "available"
     summary["lifespan_cost_status_reason"] = ""
@@ -4679,10 +4715,15 @@ def _marginal_extraction_cost_summary(
     # Marginal extraction cost = variable energy + reagent replacement loss +
     # per-run furnace depreciation. Capital purchase and launch costs are not
     # included in this run-local objective.
+    depreciation_usd = depreciation["depreciation_expense_per_run_usd"]
     total = (
-        energy_cost_usd
-        + float(reagent["reagent_cost_usd"])
-        + float(depreciation["depreciation_expense_per_run_usd"])
+        None
+        if depreciation_usd is None
+        else (
+            energy_cost_usd
+            + float(reagent["reagent_cost_usd"])
+            + float(depreciation_usd)
+        )
     )
     return MappingProxyType({
         "schema_version": "optimizer-marginal-cost-v1",
@@ -4812,6 +4853,18 @@ def _depreciation_expense_per_run_summary(
             ),
             "campaigns_to_resinter": None,
             "resinter_threshold_kg": None,
+            "wall_deposit_total_kg": None,
+        })
+    if summary.get("lifespan_cost_status") == "wall_deposit_unavailable":
+        return MappingProxyType({
+            "status": "wall_deposit_unavailable",
+            "furnace_resinter_cost_usd": cost_parameters.furnace_resinter_cost_usd,
+            "depreciation_expense_per_run_usd": None,
+            "configured_default_depreciation_expense_per_run_usd": (
+                cost_parameters.depreciation_expense_per_run
+            ),
+            "campaigns_to_resinter": None,
+            "resinter_threshold_kg": summary.get("resinter_threshold_kg"),
             "wall_deposit_total_kg": None,
         })
     threshold = summary.get("resinter_threshold_kg")
