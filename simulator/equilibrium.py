@@ -356,6 +356,11 @@ class EquilibriumMixin:
             )
 
         T_K = float(self.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        campaign = getattr(self.melt, 'campaign', None)
+        campaign_name = str(getattr(campaign, 'name', '') or '')
+        process_phase = (
+            'stage0' if campaign_name in {'C0', 'C0B'} else 'hot_train'
+        )
         if T_K < 400:
             # Reached only after the control guard: T_K is finite and > 0 K,
             # p_total_mbar is finite and >= 0. On this cold path the
@@ -477,10 +482,10 @@ class EquilibriumMixin:
                 return None
             return coefficients
 
-        coefficient_refusal = False
+        pressure_refusal = False
 
         def _sz_refuse_missing_coefficient(species_id: str) -> None:
-            nonlocal coefficient_refusal
+            nonlocal pressure_refusal
             _sz_note(
                 species_id,
                 ZeroBecause.MISSING_COEFFICIENT,
@@ -491,7 +496,71 @@ class EquilibriumMixin:
                 ),
                 category=CATEGORY_REFUSE,
             )
-            coefficient_refusal = True
+            pressure_refusal = True
+
+        def _sz_refuse_missing_reference_model(
+            species_id: str,
+            detail: str,
+        ) -> None:
+            nonlocal pressure_refusal
+            _sz_note(
+                species_id,
+                ZeroBecause.MISSING_THERMO,
+                field='reference_pressure_model',
+                detail=detail,
+                category=CATEGORY_REFUSE,
+            )
+            pressure_refusal = True
+
+        def _compiled_vapour_rail_catalog():
+            catalog = getattr(self, 'vapour_rail_catalog', None)
+            if catalog is not None:
+                return catalog
+            payload = getattr(self.vapor_pressures, 'catalog_payload', None)
+            if payload is None:
+                return None
+            from simulator.vapour_rail.catalog import compiled_catalog_for
+
+            return compiled_catalog_for(payload)
+
+        def _active_metal_source_oxide(species_id: str, parent_oxide: str) -> bool:
+            if parent_oxide == 'FeO':
+                activity = max(
+                    0.0,
+                    float(
+                        feo_activity_diagnostic.get(
+                            'a_FeO_authoritative',
+                            0.0,
+                        )
+                        or 0.0
+                    ),
+                )
+                if activity <= 1e-10:
+                    _sz_note(
+                        species_id,
+                        ZeroBecause.PROVEN_BELOW_THRESHOLD,
+                        field='a_FeO_authoritative',
+                        detail=(
+                            f'a_FeO_authoritative={activity!r} <= 1e-10; '
+                            'species omitted by the activity skip'
+                        ),
+                        category=CATEGORY_PROVEN_ZERO,
+                    )
+                    return False
+                return True
+
+            activity = melt_oxide_activity(
+                parent_oxide,
+                melt_account_mol,
+                cation_mol_fraction=cation_mol_fraction,
+                temperature_K=T_K,
+            )
+            if activity is None:
+                return False
+            if activity.activity <= 1e-10:
+                _sz_activity_skip(species_id, activity)
+                return False
+            return True
 
         pseudo_warning_seen = getattr(
             self,
@@ -640,16 +709,13 @@ class EquilibriumMixin:
                     fit_target == FIT_TARGET_STANDARD_REACTION
                     and bool(sp_data.get("prefer_compiled_reference_pressure_model"))
                 ):
-                    from simulator.vapour_rail.catalog import compiled_catalog_for
-
-                    catalog = getattr(self, "vapour_rail_catalog", None)
-                    if catalog is None:
-                        payload = getattr(self.vapor_pressures, "catalog_payload", None)
-                        if payload is not None:
-                            catalog = compiled_catalog_for(payload)
+                    catalog = _compiled_vapour_rail_catalog()
                     if catalog is None:
                         raise RuntimeError(f"{species} requires its melt-source catalog reaction")
-                    compiled_reference_evaluator = catalog.evaluator_for_hot_train(species)
+                    compiled_reference_evaluator = catalog.evaluator_for_hot_train(
+                        species,
+                        process_phase=process_phase,
+                    )
                     P_reference_Pa = compiled_reference_evaluator.evaluate(
                         T_K, source_activity=1.0,
                         pO2_bar=compiled_reference_evaluator.pO2_reference_bar,
@@ -677,9 +743,13 @@ class EquilibriumMixin:
                     )
                 coefficients = _usable_antoine_coefficients(antoine)
                 if P_reference_Pa is None and coefficients is None:
+                    if not _active_metal_source_oxide(species, parent_oxide):
+                        continue
                     _sz_refuse_missing_coefficient(species)
                     continue
-                A, B, C = coefficients or (0.0, 0.0, 0.0)
+                if P_reference_Pa is None:
+                    assert coefficients is not None
+                    A, B, C = coefficients
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
                 )
@@ -830,14 +900,16 @@ class EquilibriumMixin:
             # Al/Ti/Cr/Mn: liquid-oxide standard reaction (pairing fix).
             liquid_rxn = liquid_rxn_early
             if liquid_rxn is not None and fit_target != FIT_TARGET_STANDARD_REACTION:
+                if T_K <= 300.0:
+                    continue
                 antoine_liq = liquid_rxn.get("antoine", {}) or {}
                 liquid_coefficients = _usable_antoine_coefficients(antoine_liq)
                 if liquid_coefficients is None:
+                    if not _active_metal_source_oxide(species, parent_oxide):
+                        continue
                     _sz_refuse_missing_coefficient(species)
                     continue
                 A_l, B_l, C_l = liquid_coefficients
-                if T_K <= 300.0:
-                    continue
                 valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
                 if valid_liq is not None:
                     vlo, vhi = valid_liq
@@ -919,14 +991,16 @@ class EquilibriumMixin:
             # Ca/Mg gas rail: liquid-oxide standard reaction (pairing fix).
             gas_rail_rxn = gas_rail_rxn_early
             if gas_standard_rail and gas_rail_rxn is not None:
+                if T_K <= 300.0:
+                    continue
                 antoine_gas = gas_rail_rxn.get("antoine", {}) or {}
                 gas_coefficients = _usable_antoine_coefficients(antoine_gas)
                 if gas_coefficients is None:
+                    if not _active_metal_source_oxide(species, parent_oxide):
+                        continue
                     _sz_refuse_missing_coefficient(species)
                     continue
                 A_g, B_g, C_g = gas_coefficients
-                if T_K <= 300.0:
-                    continue
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
                     melt_account_mol,
@@ -1268,25 +1342,148 @@ class EquilibriumMixin:
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
 
         for name, data in oxide_vapors_data.items():
-            antoine = data.get('antoine', {}) or {}
-            coefficients = _usable_antoine_coefficients(antoine)
-            valid = data.get('valid_range_K', [0, 9999])
-
-            if coefficients is None:
-                _sz_refuse_missing_coefficient(name)
-                continue
-            A, B, C = coefficients
-            out_of_range = (
-                isinstance(valid, (list, tuple))
-                and len(valid) == 2
-                and (T_K < float(valid[0]) or T_K > float(valid[1]))
+            parent_oxide = data.get('parent_oxide', '')
+            activity_exponent = float(
+                data.get('oxide_activity_exponent', 1.0)
             )
+            oxide_activity = None
+            if parent_oxide:
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide,
+                    melt_account_mol,
+                    cation_mol_fraction=cation_mol_fraction,
+                    temperature_K=T_K,
+                )
+                if oxide_activity is None:
+                    continue
+
+            reference_model = data.get('reference_pressure_model')
+            compiled_evaluator = None
+            if isinstance(reference_model, Mapping):
+                from simulator.vapour_rail.catalog import (
+                    CatalogCompileError,
+                    HotTrainInapplicable,
+                )
+
+                catalog = _compiled_vapour_rail_catalog()
+                if catalog is None:
+                    _sz_refuse_missing_reference_model(
+                        name,
+                        'reason=declared_pressure_model_unavailable; '
+                        'compiled vapour-rail catalog is absent',
+                    )
+                    continue
+                try:
+                    compiled_evaluator = catalog.evaluator_for_hot_train(
+                        name,
+                        process_phase=process_phase,
+                    )
+                except HotTrainInapplicable:
+                    continue
+                except CatalogCompileError as exc:
+                    _sz_refuse_missing_reference_model(
+                        name,
+                        'reason=declared_pressure_model_unavailable; '
+                        f'detail={exc}',
+                    )
+                    continue
+
+            retain_analytical_channel = (
+                compiled_evaluator is not None
+                or bool(data.get('retain_analytical_pressure_channel'))
+            )
+            if oxide_activity is not None and (
+                oxide_activity.activity <= 0.0
+                or (
+                    not retain_analytical_channel
+                    and oxide_activity.activity <= 1e-10
+                )
+            ):
+                _sz_activity_skip(name, oxide_activity)
+                continue
+            if oxide_activity is not None:
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
+                activity_provenance[name] = oxide_activity.provenance()
+
+            antoine = data.get('antoine', {}) or {}
+            if compiled_evaluator is not None:
+                coefficient_block = 'compiled_reference_pressure_model'
+                source_activity = 1.0
+                if oxide_activity is not None:
+                    if data.get('source_activity_basis') == 'parent_oxide':
+                        source_activity = (
+                            oxide_activity.thermodynamic_parent_activity()
+                        )
+                        activities[name] = source_activity
+                    else:
+                        source_activity = oxide_activity.activity
+                        activities[name] = source_activity
+                evaluator_pO2_bar = pO2_bar
+                if (
+                    compiled_evaluator.oxygen_fugacity_channel
+                    == 'intrinsic_melt'
+                ):
+                    evaluator_pO2_bar = melt_dissociation_pO2_bar
+                try:
+                    evaluation = compiled_evaluator.evaluate(
+                        T_K,
+                        source_activity=max(source_activity, 1e-300),
+                        pO2_bar=evaluator_pO2_bar,
+                    )
+                except CatalogCompileError as exc:
+                    _sz_refuse_missing_reference_model(
+                        name,
+                        'reason=declared_pressure_model_evaluation_failed; '
+                        f'detail={exc}',
+                    )
+                    continue
+                P_sat = _require_finite_vapor_value(
+                    evaluation.pressure_pa,
+                    species=name,
+                    field='P_sat_reference_pressure_model',
+                )
+                valid = compiled_evaluator.valid_temperature_K
+                out_of_range = evaluation.out_of_range
+                pO2_exponent = 0.0
+            else:
+                coefficient_block = COEFF_BLOCK_ANTOINE
+                coefficients = _usable_antoine_coefficients(antoine)
+                if coefficients is None:
+                    _sz_refuse_missing_coefficient(name)
+                    continue
+                A, B, C = coefficients
+                valid = data.get('valid_range_K', [0, 9999])
+                out_of_range = (
+                    isinstance(valid, (list, tuple))
+                    and len(valid) == 2
+                    and (T_K < float(valid[0]) or T_K > float(valid[1]))
+                )
+                log_P = _antoine_log10_pressure(A, B, C, T_K)
+                P_sat = _pow10_pressure_or_raise(
+                    log_P,
+                    species=name,
+                    field="P_sat",
+                )
+                pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
+                if oxide_activity is not None:
+                    activities[name] = oxide_activity.activity
+                    a_ox = oxide_activity.equivalent_parent_activity(
+                        activity_exponent
+                    )
+                    P_sat = _require_finite_vapor_value(
+                        P_sat * max(a_ox, 0.0) ** activity_exponent,
+                        species=name,
+                        field="P_sat_activity",
+                    )
+
             if out_of_range:
                 valid_low, valid_high = float(valid[0]), float(valid[1])
-                certified_band = (
-                    data.get('source_certified_range_K')
-                    or antoine.get('source_certified_range_K')
-                )
+                certified_band = data.get('source_certified_range_K')
+                if compiled_evaluator is None:
+                    certified_band = certified_band or antoine.get(
+                        'source_certified_range_K'
+                    )
                 certified_band_text = 'unavailable'
                 if (
                     isinstance(certified_band, (list, tuple))
@@ -1317,41 +1514,6 @@ class EquilibriumMixin:
                     f'valid_range_K=[{valid_low:g}, {valid_high:g}]'
                 )
 
-            log_P = _antoine_log10_pressure(A, B, C, T_K)
-            P_sat = _pow10_pressure_or_raise(
-                log_P,
-                species=name,
-                field="P_sat",
-            )
-
-            parent_oxide = data.get('parent_oxide', '')
-            if parent_oxide:
-                activity_exponent = float(
-                    data.get('oxide_activity_exponent', 1.0)
-                )
-                oxide_activity = melt_oxide_activity(
-                    parent_oxide,
-                    melt_account_mol,
-                    cation_mol_fraction=cation_mol_fraction,
-                    temperature_K=T_K,
-                )
-                if oxide_activity is None or oxide_activity.activity <= 1e-10:
-                    _sz_activity_skip(name, oxide_activity)
-                    continue
-                if oxide_activity.warning:
-                    warnings.append(oxide_activity.warning)
-                a_ox = oxide_activity.equivalent_parent_activity(
-                    activity_exponent
-                )
-                activities[name] = oxide_activity.activity
-                activity_provenance[name] = oxide_activity.provenance()
-                P_sat = _require_finite_vapor_value(
-                    P_sat * max(a_ox, 0.0) ** activity_exponent,
-                    species=name,
-                    field="P_sat_activity",
-                )
-
-            pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
             if pO2_exponent:
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
@@ -1393,12 +1555,14 @@ class EquilibriumMixin:
                     field="P_sat_suppressed",
                 )
 
-            if P_sat > 1e-15:
+            if P_sat > 0.0 and (
+                retain_analytical_channel or P_sat > 1e-15
+            ):
                 vapor_pressures[name] = P_sat
                 source_label = vapor_pressure_source_label(
                     'builtin_authoritative',
                     data,
-                    coefficient_block=COEFF_BLOCK_ANTOINE,
+                    coefficient_block=coefficient_block,
                     temperature_K=T_K,
                     authority_limited_by_ellingham_fit_range=(
                         name in ellingham_extrapolations
@@ -1458,6 +1622,6 @@ class EquilibriumMixin:
             activity_coefficients=activities,
             fO2_log=intrinsic_fO2_log,
             warnings=warnings,
-            status='refused' if coefficient_refusal else 'ok',
+            status='refused' if pressure_refusal else 'ok',
             diagnostics=_eq_diagnostics,
         )
