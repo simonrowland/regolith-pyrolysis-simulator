@@ -1,0 +1,188 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2003-silica-catitanoate-melts
+source:
+  citation: >-
+    Shornikov, S. I. and Archakov, I. Yu. (2003). Mass spectrometric study of
+    thermodynamic properties of the SiO2–CaTiO3 melts. The supplied PDF prints
+    pages 112–116 and does not name the proceedings. Shornikova (2019), Russ.
+    J. Phys. Chem. A 93, 1428, reference [47], identifies it as Proceedings of
+    the 2nd International Symposium on High Temperature Mass Spectrometry,
+    ed. L. Kudin, M. Butman, and A. Smirnov (ISUCST, Ivanovo, 2003), p. 112.
+  year: 2003
+extraction:
+  method: >-
+    No MinerU table. Prose and figure captions transcribed from pdftotext and
+    checked against the 600 dpi render of PDF page 4. Figure markers were not
+    digitized.
+  date: '2026-10-20'
+  worker: t1372-w1-w4-t1
+review_status: draft
+species:
+  CaTiO3:
+    observations: []
+    context:
+      - observation_id: shornikov_2003_apparatus
+        type: apparatus
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 113
+          section: Experimental
+        units: as printed
+        values:
+          instrument: MI 1201 mass spectrometer
+          cells: molybdenum effusion cells
+          vaporization_effusion_area_ratio_as_printed: more then 200
+          pyrometer: AOP-66
+          temperature_uncertainty_as_printed: less than 10 K at 2400 K
+          background_as_printed: less than 10^-10 atm
+          T_range_as_printed: 1582-2529 K
+          compositions_mol_pct_SiO2: "0.00, 10.00, 20.00, 30.00, 33.33, 40.00, 50.00, 60.00"
+      - observation_id: shornikov_2003_vapour_reactions
+        type: vapour_species
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 113
+          section: Results and discussion
+          equation: "1-3"
+        units: as printed
+        values:
+          reactions_as_printed:
+            - "[CaO] = (Ca) + (O)"
+            - "[TiO2] = (TiO) + (O)"
+            - "[SiO2] = (SiO) + (O)"
+          CaTiO3_gas: negligible; not used in the calculations
+          partial_pressures: not tabulated
+      - observation_id: shornikov_2003_x_star
+        type: composition_anchor
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 114
+          note: >-
+            x*(i) where CaTiO3 crystallizes from the melt. This is a composition
+            anchor for a*(i), not an activity.
+        units: mol% SiO2
+        values:
+          x_star_SiO2_mol_pct_as_printed: "10.94±0.18"
+          T_K: "2100"
+          sentence_as_printed: >-
+            where a*(i) is the activity of the i component of the CaTiO3
+            compound crystallized from the SiO2-CaTiO3 melt at the concentration
+            equal to x*(i). The values of x*(i) were determined according to
+            the experimental data on the melts vaporization as 10.94±0.18 mole
+            % of SiO2 at 2100 K.
+      - observation_id: shornikov_2003_fig1_not_digitized
+        type: figure_context
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 115
+          figure: "1"
+          note: >-
+            600 dpi page, 4959 by 7017 px. Integer log10 a(i) ticks, residuals
+            zero: 0 at y=852.0, -1 at y=1246.5, -2 at y=1641.0, -3 at y=2035.5,
+            -4 at y=2430.0. Scale 394.5 px per log unit. x ticks: 0 mol% at
+            x=1519.5 and 80 mol% at x=3737.0, 277.1875 px per 10 mol%. Minor
+            ticks lie halfway between those labels. Markers were not stored.
+            Filled and open symbols overlap, and an open-circle template also
+            matched other symbols and the legend. A point could not be assigned
+            to one series within a stated read uncertainty.
+        units: log10 activity, dimensionless
+        values:
+          T_K: "2100"
+          series_as_printed: "1 CaO, 2 TiO2, 3 SiO2, 4 CaTiO3, 5 CaTiSiO5; present study"
+          reason_not_stored: overlapping symbols; series not separable within a stated uncertainty
+      - observation_id: shornikov_2003_fig2_not_digitized
+        type: figure_context
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 115
+          figure: "2"
+          note: >-
+            Same 600 dpi page. Series 3 is this study. Series 1 and 2 are other
+            papers and were not read. The y ticks were not fitted to the printed
+            labels, so series 3 was not stored.
+        units: dimensionless Delta_f G over R T
+        values:
+          series_1: "SiO2–MgAl2O4 at 2050 K, reference [13]"
+          series_2: "SiO2–CaAl2O4 at 1933 K, reference [14]"
+          series_3: "SiO2–CaTiO3 at 2100 K, this study"
+          standard_state: >-
+            The Fig. 2 caption does not state the formation reaction or whether
+            the reference oxides are solid or liquid. The phase is not stated.
+  SiO2:
+    observations: []
+    context:
+      - observation_id: shornikov_2003_sio2_activity_reference
+        type: activity_reference
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 114
+          equation: "5"
+        units: dimensionless
+        values:
+          standard_state: >-
+            Equation (5) integrates ln a(SiO2) from x(SiO2)=1. The samples stop
+            at 60.00 mol% SiO2, so pure silica was not measured in the cell.
+            The paper does not state whether the x(SiO2)=1 anchor is the pure
+            solid or the pure liquid. Phase is not stated. No activity point
+            was stored.
+          reference_kind: integration anchor at x(SiO2)=1, not a pure oxide measured in the cell
+  CaO:
+    observations: []
+    context:
+      - observation_id: shornikov_2003_cao_activity_reference
+        type: activity_reference
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 114
+          equation: "6"
+        units: dimensionless
+        values:
+          standard_state: >-
+            Equation (6) anchors ln a(CaO) at a*(CaO), the activity of the CaO
+            component of the CaTiO3 compound crystallized from the melt at
+            x*(SiO2)=10.94±0.18 mol% at 2100 K. This is a component in a
+            crystallized compound at x*, not a pure oxide. The phase of a pure
+            CaO endmember is not stated. No activity point was stored.
+          reference_kind: component in crystallized CaTiO3 at x*
+  TiO2:
+    observations: []
+    context:
+      - observation_id: shornikov_2003_tio2_activity_reference
+        type: activity_reference
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 114
+          equation: "7"
+        units: dimensionless
+        values:
+          standard_state: >-
+            Equation (7) anchors ln a(TiO2) at a*(TiO2), the activity of the
+            TiO2 component of the CaTiO3 compound crystallized from the melt at
+            x*(SiO2)=10.94±0.18 mol% at 2100 K. This is a component in a
+            crystallized compound at x*, not a pure oxide. The phase of a pure
+            TiO2 endmember is not stated. No activity point was stored.
+          reference_kind: component in crystallized CaTiO3 at x*
+  CaTiSiO5:
+    observations: []
+    context:
+      - observation_id: shornikov_2003_titanite_activity_reference
+        type: activity_reference
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 114
+          figure: "1"
+        units: dimensionless
+        values:
+          standard_state: >-
+            Fig. 1 plots a(CaTiSiO5). The paper does not state a reference
+            state for the titanite activity. Phase is not stated. No activity
+            point was stored.
