@@ -1665,7 +1665,11 @@ def test_provider_transitional_hkl_upper_bound_ignores_viscous_p_bulk():
 
 
 @pytest.mark.xdist_group("serial")
-def test_provider_refuses_missing_species_transport_parameters():
+def test_provider_refuses_missing_species_transport_parameters(monkeypatch):
+    from simulator.condensation import _LENNARD_JONES_PARAMS
+
+    # Keep this test on the generic refusal path after Si's sourced row lands.
+    monkeypatch.delitem(_LENNARD_JONES_PARAMS, "Si", raising=False)
     result = _w3_result_with_controls(
         1.0,
         overhead_pressure_pa=1000.0,
@@ -1693,6 +1697,105 @@ def test_provider_refuses_missing_species_transport_parameters():
     assert result.warnings[0].startswith(
         "missing Chapman-Enskog transport parameters for sampled species:"
     )
+
+
+@pytest.mark.xdist_group("serial")
+def test_missing_transport_channel_is_unavailable_downstream(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.condensation import _LENNARD_JONES_PARAMS
+    from simulator.optimize.physics import target_species_yield_report
+    from simulator.three_product_report import classify_products
+    from simulator.accounting.completeness import (
+        CompletionContractBlocked,
+        completion_contracts_for_campaign,
+        vapor_contract_completeness,
+    )
+    from simulator.accounting.queries import AccountingQueries
+    from simulator.optimize.objective import (
+        ObjectiveComputationError,
+        _metric_value,
+    )
+
+    # Missing-input regression remains meaningful after Si's source row lands.
+    monkeypatch.delitem(_LENNARD_JONES_PARAMS, "Si", raising=False)
+    result = _w3_result_with_controls(
+        1.0,
+        overhead_pressure_pa=1000.0,
+        vapour_batch_flux_pressures_Pa={"Na": 100.0, "Si": 100.0},
+        molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
+        stoich_by_species={
+            "Na": {"parent_oxide": "Na2O", "oxide_per_product_kg": 1.347},
+            "Si": {"parent_oxide": "SiO2", "oxide_per_product_kg": 2.139},
+        },
+        available_oxide_kg={"Na": 10.0, "Si": 10.0},
+        alpha={"Na": 0.5, "Si": 0.5},
+    )
+    na_only = _w3_result_with_controls(1.0, overhead_pressure_pa=1000.0)
+    assert result.status == "ok"
+    assert "Si" not in result.diagnostic["evaporation_flux_kg_hr"]
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] == (
+        na_only.diagnostic["evaporation_flux_kg_hr"]["Na"]
+    )
+    refusal = result.diagnostic["missing_transport_parameters"]["Si"]
+    assert refusal["status"] == "unavailable"
+    assert refusal["refusal_type"] == "EvaporationFluxConfigurationError"
+
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    sim.melt.temperature_C = 1500.0
+    original_dispatch = sim._dispatch_only
+
+    def dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return result
+        return original_dispatch(intent, *args, **kwargs)
+
+    monkeypatch.setattr(sim, "_dispatch_only", dispatch)
+    monkeypatch.setattr(sim, "_freeze_gate_enabled", lambda: False)
+    equilibrium = SimpleNamespace(
+        vapor_pressures_Pa={"Fe": 1.0},
+        vapor_pressures_source={},
+        activity_coefficients={},
+        diagnostics={},
+        liquid_fraction=1.0,
+    )
+    flux = sim._calculate_evaporation(equilibrium)
+    assert "Si" not in flux.species_kg_hr
+    assert flux.species_kg_hr["Na"] > 0.0
+
+    report = target_species_yield_report(sim, target_species=("Na", "SiO"))
+    assert report["targets"]["Na"]["yield_fraction"] is not None
+    assert report["targets"]["SiO"]["yield_fraction"] is None
+    assert "EvaporationFluxConfigurationError" in report["targets"]["SiO"]["reason"]
+    products = classify_products(sim)
+    assert products["metals_plus_O2"]["class_total_kg"] is None
+    assert products["metals_plus_O2"]["flag"]["status"] == "unavailable"
+    with pytest.raises(
+        ObjectiveComputationError,
+        match="EvaporationFluxConfigurationError",
+    ):
+        _metric_value("Si_kg", sim, {"Si": 1.0}, products)
+
+    si_contract = next(
+        contract
+        for contract in completion_contracts_for_campaign(sim.setpoints, "C2A")
+        if contract.element == "Si"
+    )
+    with pytest.raises(
+        CompletionContractBlocked,
+        match="EvaporationFluxConfigurationError",
+    ):
+        vapor_contract_completeness(si_contract, AccountingQueries(sim))
+
+    # A later successful hour cannot erase the incomplete earlier channel.
+    snapshot = sim._make_snapshot()
+    snapshot.evap_flux = flux
+    sim.record.snapshots.append(snapshot)
+    sim._last_evaporation_flux_diagnostic = {}
+    report = target_species_yield_report(sim, target_species=("SiO",))
+    assert report["targets"]["SiO"]["yield_fraction"] is None
 
 
 @pytest.mark.parametrize(
