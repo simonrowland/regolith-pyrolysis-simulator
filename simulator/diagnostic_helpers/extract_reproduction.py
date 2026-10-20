@@ -459,6 +459,8 @@ _MARKER_REFUSALS = {
 
 # Exact existing source vocabulary. Unknown spellings must not gain admission.
 _EVIDENCE_VOCABULARY = {
+    # Refusal reason found by the marker-key guard; no source value is admitted.
+    "missing_system_class": {},
     **{key: {**_ROLE_REFUSALS, "measured": None}
        for key in ("class", "class_tag", "scientific_class")},
     "evidence_kind": {**_ROLE_REFUSALS, **_MARKER_REFUSALS},
