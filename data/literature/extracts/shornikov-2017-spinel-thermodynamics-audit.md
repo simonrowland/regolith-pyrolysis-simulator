@@ -29,6 +29,7 @@ pdftotext `-bbox` on this file uses a top-left origin. Page renders are 600 dpi 
 | 2 | 288 | Table 1 this-work row: Knudsen mass spectrometry, 1851–2298, −12.02 ± 1.14, 5.03 ± 0.56, This work | top-origin band covering that row and its neighbours |
 | 4 | 290 | Table 2 MgAl2O4 block. The last row before Al2O3 is 2420 ± 25, 55.81 ± 4.62, 23.06 ± 1.73, This work | the whole Table 2 body |
 | 6 | 292 | Prose: ΔH_T = 43.79 ± 4.84 kJ/mol and ΔS_T = 28.09 ± 1.64 J/(mol K), liquid state, equation (19) | the paragraph that prints those constants |
+| 5 | 291 | Figure 4 series 8. Open right-pointing triangles, no bar, both panels, above about 2160 K | the figure crop, then each stored centre again |
 
 Neighbour rows on pages 2 and 4 match pdftotext, so the this-work row is not a shifted literature row.
 
@@ -44,6 +45,11 @@ Five scored rows, all `measured_reduced`, stoichiometric MgAl2O4 (MgO 0.5, Al2O3
 - Table 2 T_melt = 2420 ± 25 K. Quantity `transition_temperature`, `property_kind: melting_point`.
 - Prose liquid-state ΔH_T = 43.79 ± 4.84 kJ/mol. Quantity `delta_fH`, phase `l`. The sentence does not print a temperature, so the point temperature stays unknown.
 
+Eight Figure 4 activities, `figure_only`, stoichiometric spinel. Quantity `activity` on type `activity_coefficient`. Uncertainty is the read, not a printed ±.
+
+- Panel (a) a(MgO): 0.368 at 2161 K, 0.388 at 2218 K, 0.406 at 2257 K, 0.425 at 2304 K. Read uncertainty ±0.010 and ±5.4 K.
+- Panel (b) a(Al2O3): 0.211 at 2162 K, 0.202 at 2220 K, 0.203 at 2259 K, 0.200 at 2306 K. Read uncertainty ±0.005 and ±5.4 K.
+
 ## What was refused
 
 Two formation entropies are stored and marked `typed_refusal`. The schema has no `delta_fS` token. They are not stored as absolute entropy `S`.
@@ -58,14 +64,14 @@ Two formation entropies are stored and marked `typed_refusal`. The schema has no
 - Figure 1: literature heat capacity. Not read.
 - Figure 2: pointwise ΔG. Series 16 (this study) sits on the same trend as series 13 and 15. The least-squares result is already Table 1. No point was read. MinerU’s chart table was ignored.
 - Figure 3: pressures over spinel cited as reference [1], the evaporation paper already extracted. Not re-read.
-- Figure 4: activities. Linear axes. Series 8 (this work) is open right-pointing triangles. Series 5–7 are the same family and overlap series 8 from about 1850 K to 2300 K on both panels. No marker can be assigned to this work within a stated activity uncertainty. No activity number is stored. MinerU’s scatter table was ignored.
+- Figure 4: activities. Linear axes, calibrated from the tick marks on the 600 dpi render of PDF page 5. Series 8 is the open right-pointing triangle with no bar. Eight centres were stored, four on each panel, all above about 2160 K. Read uncertainty is ±10 px (±5.4 K, and ±0.010 or ±0.005 in activity). Markers below that, barred triangles, filled triangles, legend keys, and any outline that shares a centre were not stored. The refused set is named in the figure-4 context row. MinerU’s scatter table was ignored.
 - Figure 5: MgAl2O4–SiO2 phase diagram cited to [55]. Not this paper’s measurements. MinerU’s contour table was ignored.
 
 ## Standard state
 
-No activity row was admitted, so migration is not asked to resolve a Raoultian endmember from this extract.
+Two activity rows were read from Figure 4, series 8. Both carry the equation (12)–(13) sentence.
 
-Equations (12)–(13), PDF page 5, published page 291: “where p_i and p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.” The paper does not say whether that pure-component oxide is solid or liquid, and it does not say that the reference pressure was measured in the cell at the experiment temperature or tabulated at that temperature. The 2026-10-20 pure-oxide-at-T ruling was not applied. No melting point was used. The figure-4 context row records that sentence. It does not say “Raoultian” and it does not name pure solid or pure liquid MgO.
+Equations (12)–(13), PDF page 5, published page 291: “where p_i and p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.” The prose says the phase of that pure-component oxide is not stated, and the temperature of the reference measurement is not stated. `reference_state_from_extract` returns unknown on “not stated” before it looks for a Raoultian endmember. The prose does not say “Raoultian” and it does not name pure solid or pure liquid MgO, so `_standard_state_from_extract_text` does not replace that unknown. The stored points are all above 2160 K, inside the crystal-state interval 2048–2298 K that the paper takes from reference [54] by equations (16) and (17). The paper does not say the pure oxide was measured in the cell at the experiment temperature. The 2026-10-20 pure-oxide-at-T ruling was not applied. No melting point was used. “Crystal state” names the spinel. `phase: cr` is that spinel phase.
 
 “Crystalline” and “liquid” in equations (20)–(22) and in the liquid-state paragraph are the spinel phase, not the oxide reference. The formation rows say the paper does not state the oxide phase. That prose is not on an activity row, so the activity mapper does not read it.
 

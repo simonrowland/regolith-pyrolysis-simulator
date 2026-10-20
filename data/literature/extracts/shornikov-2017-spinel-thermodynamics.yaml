@@ -16,6 +16,9 @@ extraction:
     hyphen. Table 2 column headers were rewritten from the render because
     MinerU had folded the MgO body rows into the header. The liquid-state
     pair on published page 292 is prose, added by hand from that render.
+    Figure 4 series 8 was read from the 600 dpi render of PDF page 5.
+    Tick marks were calibrated in linear space. Each stored centre was
+    re-read on that render. Overlapped markers were not stored.
   date: '2026-10-20'
   worker: t1372-w1-w3-t1
 review_status: draft
@@ -79,6 +82,26 @@ fidelity_samples:
       pdf_page_index: 5
       equation: '19'
       note: Liquid-state formation enthalpy in the prose on PDF page 6.
+  - path: species.MgO.observations[shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8].values.points[0].activity
+    value: '0.368'
+    locator:
+      page: 5
+      published_page: 291
+      pdf_page_index: 4
+      figure: '4'
+      note: >-
+        Figure 4 panel (a), first stored series-8 point. 600 dpi render.
+        Bounding-box centre (1641.5, 1018.5) in the figure crop.
+  - path: species.Al2O3.observations[shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8].values.points[0].activity
+    value: '0.211'
+    locator:
+      page: 5
+      published_page: 291
+      pdf_page_index: 4
+      figure: '4'
+      note: >-
+        Figure 4 panel (b), first stored series-8 point. 600 dpi render.
+        Bounding-box centre (1644.5, 2341.5) in the figure crop.
 experiments:
   - experiment_id: shornikov_2017_spinel_thermodynamics_kems
     method: knudsen_effusion
@@ -589,11 +612,18 @@ species:
             reference-pressure measurement. The pure-oxide-at-experiment-T
             ruling was not applied. No melting point was used.
           reason: >-
-            Both panels are linear. Series 8 is open right-pointing triangles.
-            Series 5–7 are the same family of triangles and overlap series 8
-            from about 1850 K to 2300 K. A marker cannot be assigned to this
-            work within a stated activity uncertainty. No activity number is
-            stored. MinerU's invented scatter table was ignored.
+            Series 8 is the open right-pointing triangle with no bar.
+            Four separable markers on each panel, all above about 2160 K,
+            are the activity observations. Refused on panel (a): every
+            marker left of crop x about 1600 (below about 2140 K), where
+            open triangles carry a vertical bar (series 5 and 6), filled
+            right triangles (series 7), or two outlines share one centre.
+            The open triangle at crop (1633, 799) is the legend key.
+            Refused on panel (b): the legend key at crop (1650, 2114)
+            beside the printed 8; the filled right triangle near crop
+            x 1400 and y 2330; the open triangle near crop x 1500 and
+            y 2330, which a vertical bar crosses. Up-triangles are
+            series 1–4. MinerU's scatter table was ignored.
       - observation_id: shornikov_2017_spinel_thermodynamics_fig5_phase_diagram
         type: figure_context_not_digitised
         locator:
@@ -608,3 +638,208 @@ species:
           reason: >-
             Figure 5 is a cited phase diagram, not a measurement of this paper.
             MinerU's invented contour table was ignored.
+  MgO:
+    observations:
+      - observation_id: shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8
+        type: activity_coefficient
+        regime: knudsen_effusion
+        locator: &fig4a_locator
+          page: 5
+          published_page: 291
+          pdf_page_index: 4
+          figure: '4'
+          equation: '12-13'
+          note: >-
+            Panel (a), series 8, open right-pointing triangles with no bar.
+            600 dpi render of PDF page 5. The figure crop origin is page
+            pixel (2560, 435), top-left, y downward. Temperature ticks are
+            linear: 1400 K at crop x 239.5, 1600 K at 609.5, 1800 K at 977.5,
+            2000 K at 1345.5, 2200 K at 1714.0. Slope 0.5427 K per px.
+            Tick-fit residual under 0.5 K. Activity ticks are linear: 0 at
+            crop y 1393.5, 0.2 at 1189.5, 0.4 at 985.5, 0.6 at 782.0, 0.8 at
+            578.5, 1.0 at 374.5, 1.2 at 174.5. Slope -0.000983 per px.
+            Tick-fit residual under 0.002. The stored coordinate is the
+            bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
+            and ±0.010 in activity. These points lie above 2160 K, in the
+            crystal-state range 2048–2298 K that the paper takes from
+            reference [54] by equations (16) and (17).
+        units: dimensionless
+        phase: cr
+        standard_state: >-
+          Equations (12) and (13), PDF page 5, published page 291: a(MgO) =
+          p(MgO)/p°(MgO) = p(Mg)p(O)/(p°(Mg)p°(O)). The paper prints that
+          p_i and p_i° are the partial pressures of the components of the
+          gas phase over spinel and simple oxide (pure component),
+          respectively. The phase of that pure-component simple oxide is not
+          stated, and the temperature of the reference-pressure measurement
+          is not stated. The pure-oxide-at-experiment-T ruling was not
+          applied. Crystal in "crystal state" names the spinel, not the
+          reference oxide.
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        values:
+          quantity: activity
+          method_class: figure_only
+          formula: MgO
+          activity_name_as_reported: a_MgO
+          series_as_printed: '8'
+          points:
+            - T_K: '2161'
+              activity: '0.368'
+              crop_pixel_xy: [1642, 1018]
+              unrounded_T_K: '2160.54'
+              unrounded_activity: '0.3680'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: Panel (a) series 8. Crop centre (1641.5, 1018.5).
+            - T_K: '2218'
+              activity: '0.388'
+              crop_pixel_xy: [1748, 998]
+              unrounded_T_K: '2218.07'
+              unrounded_activity: '0.3876'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: Panel (a) series 8. Crop centre (1747.5, 998.5).
+            - T_K: '2257'
+              activity: '0.406'
+              crop_pixel_xy: [1820, 980]
+              unrounded_T_K: '2257.15'
+              unrounded_activity: '0.4063'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: Panel (a) series 8. Crop centre (1819.5, 979.5).
+            - T_K: '2304'
+              activity: '0.425'
+              crop_pixel_xy: [1906, 961]
+              unrounded_T_K: '2303.83'
+              unrounded_activity: '0.4245'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: Panel (a) series 8. Crop centre (1905.5, 961.0).
+        uncertainty:
+          value: '0.010'
+          unit: dimensionless
+          basis: visual read uncertainty
+          confidence_level: not_stated
+          note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+        point_conditions:
+          composition: *spinel_composition
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *fig4a_locator
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *fig4a_locator
+  Al2O3:
+    observations:
+      - observation_id: shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8
+        type: activity_coefficient
+        regime: knudsen_effusion
+        locator: &fig4b_locator
+          page: 5
+          published_page: 291
+          pdf_page_index: 4
+          figure: '4'
+          equation: '12-13'
+          note: >-
+            Panel (b), series 8, open right-pointing triangles with no bar.
+            Same 600 dpi crop and the same temperature ticks as panel (a):
+            1400 K at crop x 239.5 and 2200 K at crop x 1714.0, slope
+            0.5427 K per px, tick-fit residual under 0.5 K. Activity ticks
+            are linear: 0 at crop y 2771.5, 0.1 at 2567.5, 0.2 at 2363.5,
+            0.3 at 2159.5, 0.4 at 1955.5, 0.5 at 1751.5, 0.6 at 1551.5.
+            Slope -0.000491 per px. Tick-fit residual under 0.0011. Crop
+            origin is page pixel (2560, 435). The stored coordinate is the
+            bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
+            and ±0.0049 in activity. These points are the high-temperature
+            tail, in the crystal-state range 2048–2298 K from reference [54]
+            by equations (16) and (17).
+        units: dimensionless
+        phase: cr
+        standard_state: >-
+          Equations (12) and (13), PDF page 5, published page 291, give
+          a(Al2O3) as the partial-pressure ratio over spinel and over the
+          simple oxide (pure component). The paper prints that p_i and p_i°
+          are the partial pressures of the components of the gas phase over
+          spinel and simple oxide (pure component), respectively. The phase
+          of that pure-component simple oxide is not stated, and the
+          temperature of the reference-pressure measurement is not stated.
+          The pure-oxide-at-experiment-T ruling was not applied. Crystal in
+          "crystal state" names the spinel, not the reference oxide.
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        values:
+          quantity: activity
+          method_class: figure_only
+          formula: Al2O3
+          activity_name_as_reported: a_Al2O3
+          series_as_printed: '8'
+          points:
+            - T_K: '2162'
+              activity: '0.211'
+              crop_pixel_xy: [1644, 2342]
+              unrounded_T_K: '2162.17'
+              unrounded_activity: '0.2109'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: Panel (b) series 8. Crop centre (1644.5, 2341.5).
+            - T_K: '2220'
+              activity: '0.202'
+              crop_pixel_xy: [1750, 2360]
+              unrounded_T_K: '2219.70'
+              unrounded_activity: '0.2018'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: Panel (b) series 8. Crop centre (1750.5, 2360.0).
+            - T_K: '2259'
+              activity: '0.203'
+              crop_pixel_xy: [1823, 2358]
+              unrounded_T_K: '2259.05'
+              unrounded_activity: '0.2028'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: Panel (b) series 8. Crop centre (1823.0, 2358.0).
+            - T_K: '2306'
+              activity: '0.200'
+              crop_pixel_xy: [1910, 2364]
+              unrounded_T_K: '2306.27'
+              unrounded_activity: '0.2001'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: Panel (b) series 8. Crop centre (1910.0, 2363.5).
+        uncertainty:
+          value: '0.005'
+          unit: dimensionless
+          basis: visual read uncertainty
+          confidence_level: not_stated
+          note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+        point_conditions:
+          composition: *spinel_composition
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *fig4b_locator
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *fig4b_locator
