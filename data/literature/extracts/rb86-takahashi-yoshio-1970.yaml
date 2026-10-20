@@ -1,0 +1,618 @@
+schema_version: literature_extract.v1
+source_id: rb86-takahashi-yoshio-1970
+source:
+  citation: >-
+    Takahashi, K. and Yoshio, T. (1970). Energy Relations in Alkali Silicates by
+    Solution Calorimetry (Thermochemical Investigations of Glasses Part I).
+    Yogyo-Kyokai-Shi, 78(893), 35–44. DOI 10.2109/jcersj1950.78.35.
+  doi: 10.2109/jcersj1950.78.35
+  year: 1970
+extraction:
+  method: >-
+    MinerU table drafts with all printed table cells retained in context because
+    no existing quantity token fits the measured dissolution heats; table and
+    figure locators checked against 600 dpi page renders and pdftotext -layout.
+  date: '2026-10-20'
+  worker: fam24-1020
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: takahashi_yoshio_1970_table_1_crystallization_conditions
+        type: data_table_context
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 31
+          table: '1'
+        units: °C; hr
+        values:
+          table_title_as_printed: Crystallization temperature and time required for alkali silicate glasses
+          quantity_as_printed: glass crystallization heat-treatment temperature and time
+          quantity_token: unavailable
+          candidate_tokens_considered:
+            - transition_temperature
+          method_class: measured_direct
+          admission_status: context_only
+          schema_gap: >-
+            These are temperatures and durations used to crystallize prepared
+            samples, not measured phase-transition temperatures.
+          row_fields_as_printed:
+            - composition
+            - crystallization temperature (°C)
+            - crystallization time (hr)
+          rows:
+            - ['Li2O·2 SiO2', '590', '10']
+            - ['2 Li2O·3 SiO2', '550', '10']
+            - ['Li2O·SiO2', '600', '50']
+            - ['Na2O·4 SiO2', '700', '79']
+            - ['Na2O·3 SiO2', '660', '40']
+            - ['Na2O·2 SiO2', '625', '30']
+            - ['2 Na2O·3 SiO2', '650', '10']
+            - ['Na2O·SiO2', '600', '50']
+            - ['2 Na2O·SiO2', '700', '10']
+            - ['K2O·2 SiO2', '630', '47']
+            - ['K2O·SiO2', '570', '37']
+            - ['Rb2O·2 SiO2', '690', '35']
+      - observation_id: takahashi_yoshio_1970_table_2_hf_concentration
+        type: data_table_context
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 31
+          table: '2'
+        units: wt%; cal/g·deg; kcal/mole
+        values:
+          table_title_as_printed: Dependence of heat of solution of Na2O·2SiO2 glass on HF concentration
+          quantity_as_printed: solvent specific heat and heat of solution
+          quantity_token: unavailable
+          candidate_tokens_considered:
+            - heat_capacity
+            - partial_molar_enthalpy
+          method_class: measured_direct
+          admission_status: context_only
+          schema_gap: >-
+            The heat-capacity column is mass-specific in cal/g·deg and the heat
+            of solution has no matching store token; partial_molar_enthalpy is
+            not a dissolution heat.
+          provenance_note: >-
+            The 5% HF specific heat 0.947 is attributed to reference [10] in the
+            text discussing Table 3. Table 2 does not separately attribute the
+            other concentrations.
+          row_fields_as_printed:
+            - HF concentration (wt%)
+            - specific heat of solvent (cal/g·deg)
+            - heat of solution (kcal/mole)
+          rows:
+            - ['3', '0.962', '99.9']
+            - ['4', '0.954', '102.7']
+            - ['5', '0.947', '103.3']
+            - ['10', '0.908', '105.8']
+            - ['20', '0.834', '105.0']
+            - ['39', '0.690', '99.3']
+      - observation_id: takahashi_yoshio_1970_table_3_hf_dissolution
+        type: data_table_context
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 31
+          table: '3'
+        units: cal/g; kcal/SiO2; kcal/Na2O
+        values:
+          table_title_as_printed: Heats of solution of sodium silicates in 5% HF aqueous solution at 25°C
+          quantity_as_printed: heat of solution
+          quantity_token: unavailable
+          candidate_tokens_considered:
+            - partial_molar_enthalpy
+            - delta_fH
+            - heat_of_fusion
+          method_class: measured_direct
+          admission_status: context_only
+          schema_gap: >-
+            The printed values are heats of dissolution. The store has no
+            dissolution-enthalpy token; partial_molar_enthalpy is not an
+            integral heat of solution, delta_fH is formation from elements, and
+            heat_of_fusion is a different reaction.
+          row_fields_as_printed:
+            - composition
+            - phase
+            - heat of solution (cal/g)
+            - heat of solution (kcal/SiO2)
+            - heat of solution (kcal/Na2O)
+          rows:
+            - ['SiO2', 'glass', '-557.4', '-33.5', blank]
+            - ['SiO2', 'crystal', '-519.4', '-31.2', blank]
+            - ['Na2O·4 SiO2', 'glass', '-560.1', '-42.3', '-169.3']
+            - ['Na2O·4 SiO2', 'crystal', '-527.4', '-39.9', '-159.4']
+            - ['Na2O·3 SiO2', 'glass', '-564.6', '-45.6', '-136.8']
+            - ['Na2O·3 SiO2', 'crystal', '-531.9', '-42.9', '-128.8']
+            - ['Na2O·2 SiO2', 'glass', '-566.7', '-51.6', '-103.2']
+            - ['Na2O·2 SiO2', 'crystal', '-526.2', '-47.9', '-95.8']
+            - ['2 Na2O·3 SiO2', 'glass', '-588.5', '-59.7', '-89.5']
+            - ['2 Na2O·3 SiO2', 'crystal', '-536.3', '-54.4', '-81.6']
+            - ['Na2O·SiO2', 'glass', '-609.0', '-74.3', '-74.3']
+            - ['Na2O·SiO2', 'crystal', '-538.1', '-65.7', '-65.7']
+            - ['2 Na2O·SiO2', 'glass', '-497.1', '-91.5', '-45.7']
+            - ['2 Na2O·SiO2', 'crystal', '-460.6', '-84.8', '-42.4']
+      - observation_id: takahashi_yoshio_1970_table_4_water_dissolution
+        type: data_table_context
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 32
+          table: '4'
+        units: cal/g; kcal/SiO2; kcal/Na2O
+        values:
+          table_title_as_printed: Heats of solution of sodium silicates in distilled water at 25°C
+          quantity_as_printed: heat of solution
+          quantity_token: unavailable
+          candidate_tokens_considered:
+            - partial_molar_enthalpy
+            - delta_fH
+          method_class: measured_direct
+          admission_status: context_only
+          schema_gap: >-
+            These are heats of dissolution in distilled water and no store token
+            represents that reaction enthalpy.
+          row_fields_as_printed:
+            - composition
+            - phase
+            - heat of solution (cal/g)
+            - heat of solution (kcal/SiO2)
+            - heat of solution (kcal/Na2O)
+          rows:
+            - ['Na2O·2 SiO2', 'glass', '-37.5', '-3.4', '-6.8']
+            - ['Na2O·2 SiO2', 'crystal', '-27.9', '-2.5', '-5.1']
+            - ['Na2O·SiO2', 'glass', '-118.2', '-14.5', '-14.5']
+            - ['Na2O·SiO2', 'crystal', '-55.8', '-6.8', '-6.8']
+            - ['2 Na2O·SiO2', 'glass', '-151.4', '-27.9', '-14.0']
+            - ['2 Na2O·SiO2', 'crystal', '-108.5', '-20.0', '-10.0']
+      - observation_id: takahashi_yoshio_1970_table_5_other_alkali_dissolution
+        type: data_table_context
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 33
+          table: '5'
+        units: cal/g; kcal/SiO2; kcal/Na2O
+        values:
+          table_title_as_printed: Heats of solution in Li2O-SiO2, K2O-SiO2 and Rb2O-SiO2 in 5% HF aqueous solution at 25°C
+          quantity_as_printed: heat of solution
+          quantity_token: unavailable
+          candidate_tokens_considered:
+            - partial_molar_enthalpy
+            - delta_fH
+          method_class: measured_direct
+          admission_status: context_only
+          schema_gap: >-
+            These are heats of dissolution and no existing store token fits the
+            reaction enthalpy. The third unit header is retained exactly as
+            printed even though it says kcal/Na2O for Li, K and Rb rows.
+          row_fields_as_printed:
+            - composition
+            - phase
+            - heat of solution (cal/g)
+            - heat of solution (kcal/SiO2)
+            - heat of solution (kcal/Na2O)
+          rows:
+            - ['Li2O·2 SiO2', 'crystal', '-571.8', '-42.9', '-85.8']
+            - ['2 Li2O·3 SiO2', 'glass', '-728.6', '-58.3', '-87.4']
+            - ['2 Li2O·3 SiO2', 'crystal', '-635.3', '-50.8', '-76.2']
+            - ['Li2O·SiO2', 'crystal', '-665.3', '-59.9', '-59.9']
+            - ['K2O·2 SiO2', 'glass', '-469.4', '-50.3', '-100.6']
+            - ['K2O·2 SiO2', 'crystal', '-453.5', '-48.6', '-97.2']
+            - ['K2O·SiO2', 'glass', '-453.9', '-70.0', '-70.0']
+            - ['K2O·SiO2', 'crystal', '-439.8', '-67.9', '-67.9']
+            - ['Rb2O·2 SiO2', 'crystal', '-334.9', '-51.4', '-102.8']
+      - observation_id: takahashi_yoshio_1970_table_6_quoted_heats_of_formation
+        type: data_table_context
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 33
+          table: '6'
+        attribution: >-
+          [15] J. H. Sharp, G. W. Brindley, and B. N. Narahari Achar, Journal of
+          the American Ceramic Society 49(7), 379–382 (1966), as cited in the
+          paper's reference list.
+        units: kcal/mole
+        values:
+          table_title_as_printed: Heats of formation of glasses and crystals in Na2O-SiO2
+          quantity_as_printed: heat of formation
+          quantity_token: unavailable
+          candidate_tokens_considered:
+            - delta_fH
+          method_class: quoted_attributed
+          admission_status: context_only
+          schema_gap: >-
+            The table prints positive heat-release magnitudes. DELTA_FH is a
+            signed enthalpy; storing these as printed under delta_fH would give
+            the wrong sign, while sign conversion is prohibited for this task.
+          sign_convention_note: >-
+            Equation (10) places +568 on the product side for formation of
+            Na2O·2SiO2, so the printed positive number denotes heat released.
+          row_fields_as_printed:
+            - composition
+            - phase
+            - heat of formation (kcal/mole)
+          rows:
+            - ['Na2O·2 SiO2', 'glass', '568']
+            - ['Na2O·2 SiO2', 'crystal', '575']
+            - ['Na2O·SiO2', 'glass', '356']
+            - ['Na2O·SiO2', 'crystal', '365']
+            - ['2 Na2O·SiO2', 'glass', '529']
+            - ['2 Na2O·SiO2', 'crystal', '536']
+      - observation_id: takahashi_yoshio_1970_table_7_poly_silicic_acid_size
+        type: data_table_context
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 35
+          table: '7'
+        units: average number of Si; dimensionless ratio
+        values:
+          table_title_as_printed: Average numbers of Si in poly-silicic acid discrete anions when linear chains are assumed
+          quantity_as_printed: average polymerized Si count and glass-to-crystal ratio
+          quantity_token: unavailable
+          candidate_tokens_considered:
+            - delta_fH
+            - entropy
+          method_class: model_derived
+          admission_status: context_only
+          schema_gap: >-
+            These are structural estimates derived under the printed linear-chain
+            assumption and have no matching thermochemistry token.
+          row_fields_as_printed:
+            - composition
+            - average Si count from glass
+            - average Si count from crystal
+            - ratio of glass count to crystal count
+          rows:
+            - ['Na2O·2 SiO2', '4.0', '6.0', '0.67']
+            - ['Na2O·SiO2', '1.7', '2.0', '0.85']
+      - observation_id: takahashi_yoshio_1970_table_8_solution_heat_differences
+        type: data_table_context
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 35
+          table: '8'
+        units: kcal/SiO2; dimensionless ratio
+        values:
+          table_title_as_printed: Difference in heat of solution between glass and crystal in 5% HF and distilled water at 25°C
+          quantity_as_printed: glass-crystal heat-of-solution difference and ratio
+          quantity_token: unavailable
+          candidate_tokens_considered:
+            - partial_molar_enthalpy
+            - delta_fH
+          method_class: measured_reduced
+          admission_status: context_only
+          schema_gap: >-
+            This is a phase-to-phase difference in dissolution heat, not a
+            partial molar enthalpy or an element-based formation enthalpy.
+          row_fields_as_printed:
+            - composition
+            - difference in 5% HF aqueous solution (kcal/SiO2)
+            - difference in distilled water (kcal/SiO2)
+            - B/A
+          rows:
+            - ['Na2O·2 SiO2', '3.7', '0.9', '0.24']
+            - ['Na2O·SiO2', '8.6', '7.7', '0.90']
+            - ['2 Na2O·SiO2', '6.7', '7.9', '1.18']
+          second_locator_note: >-
+            The 5% HF differences 3.7 and 8.6 are also printed in Table 10 on
+            physical page 9; those duplicate values are cross-referenced there.
+      - observation_id: takahashi_yoshio_1970_table_9_polysilicic_acid_heats
+        type: data_table_context
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 35
+          table: '9'
+        units: kcal/mole
+        values:
+          table_title_as_printed: Heats of formation of poly-silicic acid formed by dissolution of glasses and crystals in distilled water
+          quantity_as_printed: heat of formation of dissolved poly-silicic acids
+          quantity_token: unavailable
+          candidate_tokens_considered:
+            - delta_fH
+          method_class: model_derived
+          admission_status: context_only
+          schema_gap: >-
+            These are derived heats for polysilicic acid formed by dissolution,
+            not heats of formation from elements; delta_fH does not fit.
+          row_fields_as_printed:
+            - composition
+            - phase
+            - heat of formation (kcal/mole)
+            - shared difference in heat of formation (kcal/mole)
+          rows:
+            - ['Na2O·2 SiO2', 'glass', '561', '29']
+            - ['Na2O·2 SiO2', 'crystal', '532', 'shared value 29 from glass row']
+            - ['Na2O·SiO2', 'glass', '336', '12']
+            - ['Na2O·SiO2', 'crystal', '324', 'shared value 12 from glass row']
+      - observation_id: takahashi_yoshio_1970_table_10_alkali_heat_differences
+        type: data_table_context
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 37
+          table: '10'
+        units: kcal/SiO2
+        values:
+          table_title_as_printed: Difference in heat of solution between alkali silicate glasses and crystals in 5% HF aqueous solution at 25°C
+          quantity_as_printed: glass-crystal heat-of-solution difference
+          quantity_token: unavailable
+          candidate_tokens_considered:
+            - partial_molar_enthalpy
+            - delta_fH
+          method_class: measured_reduced
+          admission_status: context_only
+          schema_gap: >-
+            The table reports heat-of-solution differences. The store has no
+            quantity token for this phase-to-phase difference.
+          row_fields_as_printed:
+            - composition
+            - glass and crystal heat-of-solution cells (kcal/SiO2)
+            - difference in heat of solution (kcal/SiO2)
+          rows:
+            - ['2 Li2O·3 SiO2', '-58.3', '-50.8', '7.5']
+            - ['2 Na2O·3 SiO2', '-59.7', '-54.4', '5.3']
+            - ['Na2O·2 SiO2', '-51.6', '-47.9', '3.7']
+            - ['K2O·2 SiO2', '-50.3', '-48.6', '1.7']
+            - ['Na2O·SiO2', '-74.3', '-65.7', '8.6']
+            - ['K2O·SiO2', '-70.0', '-67.9', '2.1']
+          duplicate_locator_sources:
+            - composition: 2 Li2O·3 SiO2
+              source_table: '5'
+              source_page: 5
+              note: Heat cells repeat Table 5; Table 10 is the second locator.
+            - composition: 2 Na2O·3 SiO2
+              source_table: '3'
+              source_page: 3
+              note: Heat cells repeat Table 3; Table 10 is the second locator.
+            - composition: Na2O·2 SiO2
+              source_table: '3'
+              source_page: 3
+              note: Heat cells repeat Table 3; Table 10 is the second locator.
+            - composition: K2O·2 SiO2
+              source_table: '5'
+              source_page: 5
+              note: Heat cells repeat Table 5; Table 10 is the second locator.
+            - composition: Na2O·SiO2
+              source_table: '3'
+              source_page: 3
+              note: Heat cells repeat Table 3; Table 10 is the second locator.
+            - composition: K2O·SiO2
+              source_table: '5'
+              source_page: 5
+              note: Heat cells repeat Table 5; Table 10 is the second locator.
+          duplicate_values_note: >-
+            These are second table locators for measurements already retained
+            from Table 3 or Table 5. Differences 3.7 and 8.6 also appear in
+            Table 8. Their printed cells are retained here as second locators;
+            no additional observation is created.
+      - observation_id: takahashi_yoshio_1970_figure_1_apparatus
+        type: figure_record
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 30
+          figure: '1'
+        panel: whole_figure
+        attribution: Apparatus shown for the present solution-calorimetry study.
+        units: not applicable
+        values:
+          quantity: unavailable
+          quantity_as_printed: apparatus schematic
+          schema_gap: The figure depicts equipment and has no plotted quantity.
+          species: [alkali silicate samples]
+          phase: glass or crystal powder in solution-calorimetry apparatus
+          temperature_as_printed: not stated in figure
+          axes_as_printed: none
+          caption: Fig. 1. Apparatus for the measurement of heat of solution.
+          series: []
+          digitisation: deferred to a figure pass
+      - observation_id: takahashi_yoshio_1970_figure_2a_hf_solution_heats
+        type: figure_record
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 32
+          figure: '2'
+        panel: A
+        attribution: Present-work measurements summarized from Tables 3 and 4.
+        units: kcal/Na2O
+        values:
+          quantity: unavailable
+          quantity_as_printed: heat of solution per Na2O
+          schema_gap: No store quantity token represents integral heat of solution.
+          species: [Na2O-SiO2]
+          phase: glass and crystal samples
+          temperature_as_printed: 25°C
+          axes_as_printed:
+            x: Na2O (mole%)
+            y: Heats of solution per Na2O (kcal/Na2O)
+          caption: >-
+            Fig. 2. Heats of solution of sodium silicate glasses and crystals in
+            5% HF aqueous solution and in distilled water at 25°C.
+          series:
+            - name: Glasses in 5% HF aqueous solution
+              marker: open circle
+              marker_count: 6
+              evidence_class: measured_direct
+            - name: Crystals in 5% HF aqueous solution
+              marker: filled circle
+              marker_count: 6
+              evidence_class: measured_direct
+            - name: Glasses in distilled water
+              marker: open square
+              marker_count: 3
+              evidence_class: measured_direct
+            - name: Crystals in distilled water
+              marker: filled square
+              marker_count: 3
+              evidence_class: measured_direct
+          digitisation: deferred to a figure pass
+      - observation_id: takahashi_yoshio_1970_figure_2b_hf_solution_heats
+        type: figure_record
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 32
+          figure: '2'
+        panel: B
+        attribution: Present-work measurements summarized from Tables 3 and 4.
+        units: kcal/SiO2
+        values:
+          quantity: unavailable
+          quantity_as_printed: heat of solution per SiO2
+          schema_gap: No store quantity token represents integral heat of solution.
+          species: [Na2O-SiO2]
+          phase: glass and crystal samples
+          temperature_as_printed: 25°C
+          axes_as_printed:
+            x: Na2O (mole%)
+            y: Heats of solution per SiO2 (kcal/SiO2)
+          caption: >-
+            Fig. 2. Heats of solution of sodium silicate glasses and crystals in
+            5% HF aqueous solution and in distilled water at 25°C.
+          series:
+            - name: Glasses in 5% HF aqueous solution
+              marker: open circle
+              marker_count: 6
+              evidence_class: measured_direct
+            - name: Crystals in 5% HF aqueous solution
+              marker: filled circle
+              marker_count: 6
+              evidence_class: measured_direct
+            - name: Glasses in distilled water
+              marker: open square
+              marker_count: 3
+              evidence_class: measured_direct
+            - name: Crystals in distilled water
+              marker: filled square
+              marker_count: 3
+              evidence_class: measured_direct
+          digitisation: deferred to a figure pass
+      - observation_id: takahashi_yoshio_1970_figure_3_solution_calorimetry_schematic
+        type: figure_record
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 32
+          figure: '3'
+        panel: whole_figure
+        attribution: Schematic explanation by the authors.
+        units: not applicable
+        values:
+          quantity: unavailable
+          quantity_as_printed: schematic enthalpy relation between glass and crystal dissolution
+          schema_gap: The figure is a reaction schematic with no numeric points.
+          species: [Na2O-SiO2]
+          phase: glass, crystal and aqueous solution products
+          temperature_as_printed: not stated in figure; adjacent discussion gives 25°C
+          axes_as_printed: none
+          caption: Fig. 3. Schematic representation for solution calorimetry in 5% HF aqueous solution.
+          series: []
+          digitisation: deferred to a figure pass
+      - observation_id: takahashi_yoshio_1970_figure_4_alkali_solution_heats
+        type: figure_record
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 36
+          figure: '4'
+        panel: whole_figure
+        attribution: Present-work measurements summarized from Tables 3 and 5.
+        units: kcal/SiO2
+        values:
+          quantity: unavailable
+          quantity_as_printed: heat of solution per SiO2
+          schema_gap: No store quantity token represents integral heat of solution.
+          species: [Li2O-SiO2, Na2O-SiO2, K2O-SiO2, Rb2O-SiO2]
+          phase: glass and crystal samples as marked in the legend
+          temperature_as_printed: 25°C
+          axes_as_printed:
+            x: Alkali oxide (mole%)
+            y: Heat of solution (kcal/SiO2)
+          caption: >-
+            Fig. 4. Heats of solution of alkali silicate glasses and crystals in
+            5% HF aqueous solution at 25°C.
+          series:
+            - name: Li2O-SiO2 glass
+              marker: open inverted triangle
+              marker_count: 1
+              evidence_class: measured_direct
+            - name: Li2O-SiO2 crystals
+              marker: filled inverted triangle
+              marker_count: 3
+              evidence_class: measured_direct
+            - name: Na2O-SiO2 glasses
+              marker: open triangle
+              marker_count: 6
+              evidence_class: measured_direct
+            - name: Na2O-SiO2 crystals
+              marker: filled triangle
+              marker_count: 6
+              evidence_class: measured_direct
+            - name: K2O-SiO2 glasses
+              marker: open circle
+              marker_count: 2
+              evidence_class: measured_direct
+            - name: K2O-SiO2 crystals
+              marker: patterned circle
+              marker_count: 2
+              evidence_class: measured_direct
+            - name: Rb2O-SiO2 crystal
+              marker: filled square
+              marker_count: 1
+              evidence_class: measured_direct
+          digitisation: deferred to a figure pass
+      - observation_id: takahashi_yoshio_1970_figure_5_crystallization_heats
+        type: figure_record
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 36
+          figure: '5'
+        panel: whole_figure
+        attribution: >-
+          The authors derive the plotted crystallization-heat relation from
+          enthalpy-difference results and a cited silica value as described in
+          the text following Figure 5.
+        units: kcal/SiO2
+        values:
+          quantity: unavailable
+          quantity_as_printed: heat of crystallization
+          schema_gap: No store token represents this plotted crystallization heat.
+          species: [Na2O-SiO2]
+          phase: glass to crystal
+          temperature_as_printed: 25°C
+          axes_as_printed:
+            x: Na2O (mole%)
+            y: Heat of crystallization (kcal/SiO2)
+          caption: Fig. 5. Heats of crystallization of sodium silicates at 25°C.
+          series:
+            - name: Sodium silicate crystallization-heat curve
+              marker: plotted symbols
+              marker_count: 6
+              evidence_class: measured_reduced
+            - name: A component curve
+              marker: dashed line
+              marker_count: 0
+              evidence_class: model_derived
+            - name: B component curve
+              marker: solid line
+              marker_count: 0
+              evidence_class: model_derived
+            - name: C component curve
+              marker: dashed line
+              marker_count: 0
+              evidence_class: model_derived
+            - name: D component curve
+              marker: dashed line
+              marker_count: 0
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass

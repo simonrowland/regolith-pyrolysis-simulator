@@ -1,0 +1,68 @@
+source_id: rb86-takahashi-yoshio-1970
+note: >-
+  These are table dispositions rather than an emit mapping. mineru_table_draft
+  emits only scored observation rows and requires a supported quantity token;
+  all numeric tables in this paper are retained in context because no token
+  matches their printed quantities. The context-only source therefore has no
+  valid emit mapping.
+tables:
+  - draft_table: p003-t01
+    page: 3
+    table: '1'
+    candidate_tokens: [transition_temperature]
+    disposition: context
+    reason: Crystallization heat-treatment temperatures and durations are preparation conditions rather than phase-transition measurements.
+  - draft_table: p003-t02
+    page: 3
+    table: '2'
+    candidate_tokens: [heat_capacity, partial_molar_enthalpy]
+    disposition: context
+    reason: The solvent specific-heat units are mass-specific and the heat-of-solution quantity has no store token.
+  - draft_table: p003-t03
+    page: 3
+    table: '3'
+    candidate_tokens: [partial_molar_enthalpy, delta_fH, heat_of_fusion]
+    disposition: context
+    reason: Measured heats of dissolution do not match partial molar enthalpy, formation from elements, or fusion.
+  - draft_table: p004-t04
+    page: 4
+    table: '4'
+    candidate_tokens: [partial_molar_enthalpy, delta_fH]
+    disposition: context
+    reason: Measured heats of dissolution in water have no matching quantity token.
+  - draft_table: p005-t05
+    page: 5
+    table: '5'
+    candidate_tokens: [partial_molar_enthalpy, delta_fH]
+    disposition: context
+    reason: Measured heats of dissolution have no matching quantity token; preserve the printed kcal/Na2O header for all alkali rows.
+  - draft_table: p005-t06
+    page: 5
+    table: '6'
+    candidate_tokens: [delta_fH]
+    disposition: context
+    reason: Quoted positive heat-release magnitudes would need a forbidden sign conversion to become signed formation enthalpies.
+  - draft_table: p007-t07
+    page: 7
+    table: '7'
+    candidate_tokens: [delta_fH, entropy]
+    disposition: context
+    reason: Polymerized Si counts and ratios are derived structural estimates under a linear-chain assumption.
+  - draft_table: p007-t08
+    page: 7
+    table: '8'
+    candidate_tokens: [partial_molar_enthalpy, delta_fH]
+    disposition: context
+    reason: Phase-to-phase differences in heat of solution do not match either candidate quantity.
+  - draft_table: p007-t09
+    page: 7
+    table: '9'
+    candidate_tokens: [delta_fH]
+    disposition: context
+    reason: The derived heats describe polysilicic acid formed by dissolution and are not formation from elements.
+  - draft_table: p009-t10
+    page: 9
+    table: '10'
+    candidate_tokens: [partial_molar_enthalpy, delta_fH]
+    disposition: context
+    reason: Heat-of-solution differences have no store token; repeated table cells are retained as second locators without creating additional observations.
