@@ -737,6 +737,107 @@ def test_d045_refused_species_bound_above_threshold_is_unavailable() -> None:
     }]
 
 
+def test_d045_certain_deposit_over_limit_violates_with_bounded_refused_species() -> None:
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=6.0e-4,
+        unqualified_deposition_rate_kg_per_campaign=6.0e-4,
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["CrO2"],
+        },
+        wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign={
+            "CrO2": 1.0e-4,
+        },
+    )
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
+    assert coating.status_payload["coating_violation_reasons"][0]["reason"] == (
+        "upstream_wall_deposit_fraction_exceeded"
+    )
+    assert coating.status_payload[
+        "upstream_wall_deposit_upper_bound_kg_per_campaign"
+    ] == pytest.approx(7.0e-4)
+    assert coating.observed == pytest.approx(7.0e-4)
+
+
+def test_d045_certain_deposit_over_limit_violates_with_unbounded_refused_species() -> None:
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=6.0e-4,
+        unqualified_deposition_rate_kg_per_campaign=6.0e-4,
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["CrO2"],
+        },
+    )
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
+    assert coating.status_payload["coating_violation_reasons"][0]["reason"] == (
+        "upstream_wall_deposit_fraction_exceeded"
+    )
+    assert coating.status_payload[
+        "upstream_wall_deposit_upper_bound_kg_per_campaign"
+    ] is None
+    assert coating.observed == pytest.approx(6.0e-4)
+
+
+def test_d045_over_limit_with_partial_refused_bounds_does_not_zero_fill_total() -> None:
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=6.0e-4,
+        unqualified_deposition_rate_kg_per_campaign=6.0e-4,
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["CrO2", "SiO"],
+        },
+        wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign={
+            "CrO2": 1.0e-4,
+        },
+    )
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
+    assert coating.status_payload[
+        "upstream_wall_deposit_upper_bound_kg_per_campaign"
+    ] is None
+    assert coating.observed == pytest.approx(6.0e-4)
+
+
+def test_d045_two_refused_species_bounds_are_summed_before_limit_check() -> None:
+    coating = _d045_coating(
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["CrO2", "SiO"],
+        },
+        wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign={
+            "CrO2": 3.0e-4,
+            "SiO": 3.0e-4,
+        },
+    )
+
+    assert not coating.feasible
+    assert coating.status == "unavailable"
+    assert coating.status_payload["coating_verdict"] == "unavailable"
+    assert coating.status_payload[
+        "upstream_wall_deposit_upper_bound_kg_per_campaign"
+    ] == pytest.approx(6.0e-4)
+
+
+def test_d045_certain_deposit_equal_to_limit_is_clear_without_refused_species() -> None:
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=5.0e-4,
+        unqualified_deposition_rate_kg_per_campaign=5.0e-4,
+    )
+
+    assert coating.feasible
+    assert coating.status_payload["coating_verdict"] == "clear"
+    assert coating.status_payload["coating_violation_reasons"] == []
+
+
 def test_d045_refused_species_without_flux_bound_is_unavailable() -> None:
     report = _d045_report(
         sticking_alpha_authority={
