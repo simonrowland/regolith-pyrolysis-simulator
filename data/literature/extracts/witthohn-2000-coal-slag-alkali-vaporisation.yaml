@@ -1,0 +1,567 @@
+schema_version: literature_extract.v1
+source_id: witthohn-2000-coal-slag-alkali-vaporisation
+figure_policy: Figures are deferred to a figure pass; no numeric figure points are stored.
+source:
+  citation: >-
+    Witthohn, A., Oltjen, L., Biedenkopf, P. and Hilpert, K. (2000). Thermodynamic
+    activities of Na and K in coal slags and their vaporisation. Sixth
+    International Conference on Molten Slags, Fluxes and Salts, paper 041,
+    unpaginated 18-page proceedings manuscript.
+  doi: null
+  year: 2000
+  corpus_asset: raw/witthohn-2000-coal-slag-alkali-vaporisation/witthohn-2000-coal-slag-alkali-vaporisation.pdf
+  corpus_sha256: 782f1d7ae062c22000805b300124305312dd80e8290560b1a7643bb5c6c68af3
+extraction:
+  method: >-
+    Born-digital proceedings manuscript transcribed from pdftotext-layout.txt;
+    the corpus copy has no MinerU table blocks, and the table tool does not
+    accept pdftotext-only input. Table 1 was checked cell by cell against the
+    600 dpi physical page 15 render. Figure captions and series metadata were
+    checked against page-scoped text and 600 dpi renders on physical pages 16–18.
+    No figure values were digitised.
+  date: '2026-10-20'
+  worker: fam22-1020
+review_status: draft
+species:
+  Na2O:
+    observations: []
+    context:
+      - observation_id: witthohn_2000_table1_bulk_coal_ash_and_slag_compositions
+        type: bulk_composition_table
+        locator: {page: 15, pdf_page_index: 14, table: '1'}
+        units: mass fraction [%] as printed; temperature in °C
+        values:
+          quantity: bulk coal-ash and plant-slag chemical composition
+          method_class: measured_direct
+          admission_status: typed_unavailable
+          candidate_quantity_tokens:
+            - equilibrium_phase_composition
+            - residue_component_composition
+            - condensate_composition
+          reason: >-
+            Table 1 reports bulk oxide chemistry of combustion ashes and plant
+            slags. It is not a controlled equilibrium-phase composition, an
+            evaporation residue, or a condensate, so none of the candidate
+            composition tokens describes the measured material.
+          sample_classes_as_printed: >-
+            A–D: lignite laboratory ashes from the Rheinland; E: hard-coal
+            laboratory ash from the Saar; F–G: hard-coal plant slags from the
+            Saar. The paper says F and G are quenched liquid slags from the
+            combustor and granular-bed removal devices, respectively.
+          footnotes_as_printed: >-
+            1) ashing or local maximum particle temperature; 2) mass fraction
+            [%]; 3) not analyzed; 4) TiO2, BaO, SrO, MnO.
+          rows_as_printed: |-
+            Sample | A | B | C | D | E | F | G
+            Temperature 1) [°C] | 450 | 450 | 450 | 550 | 575 | ≈1500 | ≈1400
+            Ash content 2) | 9.6 | 12.6 | 9.9 | 6.2 | 8.4 | – | –
+            SiO2 2) | 42.4 | 46.7 | 36.4 | 12.7 | 38.3 | 42.0 | 40.9
+            Al2O3 | 2.8 | 3.1 | 4.2 | 2.1 | 18.3 | 24.3 | 24.3
+            Fe2O3 | 8.9 | 7.0 | 10.2 | 11.1 | 11.4 | 14.9 | 11.2
+            CaO | 19.3 | 15.5 | 17.4 | 38.1 | 8.5 | 9.4 | 9.7
+            MgO | 3.0 | 4.3 | 7.6 | 3.5 | 2.8 | 2.6 | 3.0
+            Na2O | <0.1 | 0.5 | 1.5 | 0.3 | 1.1 | 1.2 | 1.5
+            K2O | 0.3 | 0.4 | 0.5 | 0.1 | 1.7 | 1.7 | 1.7
+            SO3 | 12.5 | 15.0 | 11.6 | 14.4 | 9.2 | <0.1 | <0.1
+            P2O5 | <0.1 | <0.1 | <0.1 | 0.1 | 0.2 | 0.3 | 0.3
+            CO2 | 5.9 | 3.0 | 5.1 | – (3; not analyzed) | 12.5 | <0.1 | <0.1
+            Cl | 0.3 | 0.1 | 0.3 | 0.5 | <0.1 | – | –
+            Rest 4) | 1.8 | 0.8 | 1.2 | 0.5 | 2.8 | 1.4 | 2.1
+            Sum | 97.2 | 96.4 | 96.0 | 83.4 | 106.8 | 97.8 | 94.7
+          additional_unlabelled_printed_text: K11.10/12.10/14.10/4.1/7.5/7.2/7.3
+          note: >-
+            The printed <0.1 entries are limits, not point values; dashes are
+            unreported values. The trailing string below Sum is preserved
+            without interpretation because Table 1 does not label it.
+      - observation_id: witthohn_2000_kems_calibration_and_pressure_relation
+        type: experimental_method_context
+        locator: {page: 5, pdf_page_index: 4, section: Experimental}
+        units: p_i in Pa; T_i in K; I_i in 1/s or A; sigma_i in m2
+        values:
+          quantity: KEMS partial-pressure calibration method
+          method_class: measured_direct
+          admission_status: typed_unavailable
+          reason: >-
+            This is the printed apparatus conversion relation and calibration
+            provenance, not a pointwise partial-pressure result. Figure 2 and
+            Figure 3 contain the plotted measurements and are deferred.
+          relation_as_printed: p_i = K I_i T_i / (a_i sigma_i)
+          calibration_as_printed: The calibration constant K was determined with pure silver as a reference.
+          inputs_as_printed: >-
+            The isotopic abundance a_i and ionisation cross-section sigma_i
+            are taken from data collections. Samples were heated in steps of
+            about 50 K, each followed by signal registration.
+      - observation_id: witthohn_2000_figure1_apparatus
+        type: figure
+        locator: {page: 16, pdf_page_index: 15, figure: '1'}
+        units: not applicable (schematic)
+        values:
+          quantity: figure_record
+          method_class: figure_only
+          admission_status: figure_only
+          typed_quantity_as_printed: KEMS apparatus schematic
+          identity:
+            species: not applicable; no chemical species plotted
+            formula: not applicable
+            phase: not applicable; apparatus schematic
+            temperature: Knudsen cell heating system shown as <1800 °C; no data temperature
+          axes_as_printed: no axes; apparatus schematic
+          panel: single
+          caption: 'Principle of Knudsen effusion mass spectrometry.'
+          series:
+            - {name: apparatus schematic, marker_count: 0}
+          points: []
+          attribution: apparatus used in this work
+          digitisation: deferred to a figure pass
+      - observation_id: witthohn_2000_figure4_na2o_activity
+        type: figure
+        locator: {page: 17, pdf_page_index: 16, figure: '4'}
+        units: dimensionless activity; T in K
+        values:
+          quantity: figure_record
+          method_class: figure_only
+          admission_status: figure_only
+          typed_quantity_as_printed: activity
+          identity:
+            species: Na2O
+            formula: Na2O
+            phase: phase of displayed mixtures not specified in Figure 4
+            temperature: 1273–1673 K, per series below
+          standard_state_locator: {page: 9, pdf_page_index: 8, section: Procedure}
+          axes_as_printed: 'x: X(Na2O); y: Na2O activity (log scale)'
+          caption: 'Comparison of calculated and experimental Na2O activities for the system Na2O*SiO2.'
+          panel: single
+          series:
+            - name: Yamaguchi et al., 1273 K
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Yamaguchi et al., as labelled in Figure 4; cited reference is 1982.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Yamaguchi et al., 1373 K
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Yamaguchi et al., as labelled in Figure 4; cited reference is 1982.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Yamaguchi et al., 1473 K
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Yamaguchi et al., as labelled in Figure 4; cited reference is 1982.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Yamaguchi et al., 1573 K
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Yamaguchi et al., as labelled in Figure 4; cited reference is 1982.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Yamaguchi et al., 1673 K
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Yamaguchi et al., as labelled in Figure 4; cited reference is 1982.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Tsukihashi and Sano, 1373 K
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Tsukihashi, Sano, as labelled in Figure 4; cited reference is 1985.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Tsukihashi and Sano, 1473 K
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Tsukihashi, Sano, as labelled in Figure 4; cited reference is 1985.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Tsukihashi and Sano, 1573 K
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Tsukihashi, Sano, as labelled in Figure 4; cited reference is 1985.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Neudorf and Elliott, 1282 K
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Neudorf, Elliott, as labelled in Figure 4; cited reference is 1980.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Rego et al., 1673 K
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Rego et al., as labelled in Figure 4; cited reference is 1985.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: FACT calculation, 1273 K
+              marker_count: 0
+              attribution: FACT 2.1 calculation in this work; modified quasi-chemical model.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified.
+            - name: FACT calculation, 1373 K
+              marker_count: 0
+              attribution: FACT 2.1 calculation in this work; modified quasi-chemical model.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified.
+            - name: FACT calculation, 1473 K
+              marker_count: 0
+              attribution: FACT 2.1 calculation in this work; modified quasi-chemical model.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified.
+            - name: FACT calculation, 1573 K
+              marker_count: 0
+              attribution: FACT 2.1 calculation in this work; modified quasi-chemical model.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified.
+            - name: FACT calculation, 1673 K
+              marker_count: 0
+              attribution: FACT 2.1 calculation in this work; modified quasi-chemical model.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified.
+          points: []
+          digitisation: deferred to a figure pass
+      - observation_id: witthohn_2000_figure5_na2o_activity
+        type: figure
+        locator: {page: 18, pdf_page_index: 17, figure: '5'}
+        units: dimensionless activity; N(CaO) in mol; T in K
+        values:
+          quantity: figure_record
+          method_class: figure_only
+          admission_status: figure_only
+          typed_quantity_as_printed: activity
+          identity:
+            species: Na2O
+            formula: Na2O
+            phase: phase of displayed mixtures not specified in Figure 5
+            temperature: 1343 K
+          standard_state_locator: {page: 9, pdf_page_index: 8, section: Procedure}
+          axes_as_printed: 'x: N(CaO)/mol; y: Na2O activity (log scale)'
+          caption: 'Comparison of calculated and experimental Na2O activities for the system Na2O*SiO2*CaO.'
+          panel: single
+          series:
+            - name: Neudorf and Elliott, Na2O:SiO2 = 0.394 mol:1.258 mol
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Neudorf, Elliott, as labelled in Figure 5; cited reference is 1980.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Neudorf and Elliott, Na2O:SiO2 = 0.474 mol:1.175 mol
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Neudorf, Elliott, as labelled in Figure 5; cited reference is 1980.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: Neudorf and Elliott, Na2O:SiO2 = 0.555 mol:1.092 mol
+              marker_count: unresolved_due_to_overlapping_symbols
+              attribution: Neudorf, Elliott, as labelled in Figure 5; cited reference is 1980.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified. The reference basis used by the
+                cited series is not further stated here.
+            - name: FACT calculation, Na2O:SiO2 = 0.394 mol:1.258 mol
+              marker_count: 0
+              attribution: FACT 2.1 calculation in this work; modified quasi-chemical model.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified.
+            - name: FACT calculation, Na2O:SiO2 = 0.474 mol:1.175 mol
+              marker_count: 0
+              attribution: FACT 2.1 calculation in this work; modified quasi-chemical model.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified.
+            - name: FACT calculation, Na2O:SiO2 = 0.555 mol:1.092 mol
+              marker_count: 0
+              attribution: FACT 2.1 calculation in this work; modified quasi-chemical model.
+              standard_state_as_printed: >-
+                The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+                pressure of the pure component; the phase of the pure-oxide
+                reference is not specified.
+          marker_count_note: The three cited-data series overlap in the plot and cannot be counted separately with confidence.
+          points: []
+          digitisation: deferred to a figure pass
+  Na:
+    observations: []
+    context:
+      - observation_id: witthohn_2000_figure2_na_partial_pressure
+        type: figure
+        locator: {page: 16, pdf_page_index: 15, figure: '2'}
+        units: Pa; temperature in °C
+        values:
+          quantity: figure_record
+          method_class: figure_only
+          admission_status: figure_only
+          typed_quantity_as_printed: p_partial
+          identity:
+            species: Na(g)
+            formula: Na
+            phase: gas
+            temperature: variable from 200 to 1800 °C on the x-axis
+            sample_composition: coal-ash samples A, B, C, and D; chemistry is listed in Table 1 on physical page 15
+          axes_as_printed: 'x: Temperature [°C]; y: Partial pressure [Pa], logarithmic scale'
+          caption: 'Alkali release from laboratory ashes of different boiler lignites (A, B, C) and refinement lignite (D).'
+          panel: left
+          series:
+            - {name: sample A, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample B, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample C, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample D, marker_count: unresolved_due_to_overlapping_symbols}
+          marker_count_note: >-
+            Measurement points are marked in the printed figure, but the
+            closely spaced connected symbols cannot be counted confidently
+            from the raster without digitising the figure.
+          points: []
+          attribution: authors' KEMS measurements
+          digitisation: deferred to a figure pass
+      - observation_id: witthohn_2000_figure3_na_partial_pressure
+        type: figure
+        locator: {page: 17, pdf_page_index: 16, figure: '3'}
+        units: Pa; temperature in °C
+        values:
+          quantity: figure_record
+          method_class: figure_only
+          admission_status: figure_only
+          typed_quantity_as_printed: p_partial
+          identity:
+            species: Na(g)
+            formula: Na
+            phase: gas
+            temperature: variable from 200 to 1800 °C on the x-axis
+            sample_composition: hard-coal laboratory ash E and plant slags F and G; chemistry is listed in Table 1 on physical page 15
+          axes_as_printed: 'x: Temperature [°C]; y: Partial pressure [Pa], logarithmic scale'
+          caption: 'Alkali release from a hard coal laboratory ash (E) and accompanying plant slags (F, G).'
+          panel: left
+          series:
+            - {name: sample E, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample F, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample G, marker_count: unresolved_due_to_overlapping_symbols}
+          marker_count_note: >-
+            Measurement points are marked in the printed figure, but the
+            closely spaced connected symbols cannot be counted confidently
+            from the raster without digitising the figure.
+          points: []
+          attribution: authors' KEMS measurements
+          digitisation: deferred to a figure pass
+  NaCl:
+    observations: []
+    context:
+      - observation_id: witthohn_2000_figure2_nacl_partial_pressure
+        type: figure
+        locator: {page: 16, pdf_page_index: 15, figure: '2'}
+        units: Pa; temperature in °C
+        values:
+          quantity: figure_record
+          method_class: figure_only
+          admission_status: figure_only
+          typed_quantity_as_printed: p_partial
+          identity:
+            species: NaCl(g)
+            formula: NaCl
+            phase: gas
+            temperature: variable from 200 to 1800 °C on the x-axis
+            sample_composition: coal-ash samples A, B, C, and D; chemistry is listed in Table 1 on physical page 15
+          axes_as_printed: 'x: Temperature [°C]; y: Partial pressure [Pa], logarithmic scale'
+          caption: 'Alkali release from laboratory ashes of different boiler lignites (A, B, C) and refinement lignite (D).'
+          panel: left
+          series:
+            - {name: sample A, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample B, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample C, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample D, marker_count: unresolved_due_to_overlapping_symbols}
+          marker_count_note: >-
+            Measurement points are marked in the printed figure, but the
+            closely spaced connected symbols cannot be counted confidently
+            from the raster without digitising the figure.
+          points: []
+          attribution: authors' KEMS measurements
+          digitisation: deferred to a figure pass
+  K:
+    observations: []
+    context:
+      - observation_id: witthohn_2000_figure2_k_partial_pressure
+        type: figure
+        locator: {page: 16, pdf_page_index: 15, figure: '2'}
+        units: Pa; temperature in °C
+        values:
+          quantity: figure_record
+          method_class: figure_only
+          admission_status: figure_only
+          typed_quantity_as_printed: p_partial
+          identity:
+            species: K(g)
+            formula: K
+            phase: gas
+            temperature: variable from 200 to 1800 °C on the x-axis
+            sample_composition: coal-ash samples A, B, C, and D; chemistry is listed in Table 1 on physical page 15
+          axes_as_printed: 'x: Temperature [°C]; y: Partial pressure [Pa], logarithmic scale'
+          caption: 'Alkali release from laboratory ashes of different boiler lignites (A, B, C) and refinement lignite (D).'
+          panel: right
+          series:
+            - {name: sample A, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample B, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample C, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample D, marker_count: unresolved_due_to_overlapping_symbols}
+          marker_count_note: >-
+            Measurement points are marked in the printed figure, but the
+            closely spaced connected symbols cannot be counted confidently
+            from the raster without digitising the figure.
+          points: []
+          attribution: authors' KEMS measurements
+          digitisation: deferred to a figure pass
+      - observation_id: witthohn_2000_figure3_k_partial_pressure
+        type: figure
+        locator: {page: 17, pdf_page_index: 16, figure: '3'}
+        units: Pa; temperature in °C
+        values:
+          quantity: figure_record
+          method_class: figure_only
+          admission_status: figure_only
+          typed_quantity_as_printed: p_partial
+          identity:
+            species: K(g)
+            formula: K
+            phase: gas
+            temperature: variable from 200 to 1800 °C on the x-axis
+            sample_composition: hard-coal laboratory ash E and plant slags F and G; chemistry is listed in Table 1 on physical page 15
+          axes_as_printed: 'x: Temperature [°C]; y: Partial pressure [Pa], logarithmic scale'
+          caption: 'Alkali release from a hard coal laboratory ash (E) and accompanying plant slags (F, G).'
+          panel: right
+          series:
+            - {name: sample E, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample F, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample G, marker_count: unresolved_due_to_overlapping_symbols}
+          marker_count_note: >-
+            Measurement points are marked in the printed figure, but the
+            closely spaced connected symbols cannot be counted confidently
+            from the raster without digitising the figure.
+          points: []
+          attribution: authors' KEMS measurements
+          digitisation: deferred to a figure pass
+  KCl:
+    observations: []
+    context:
+      - observation_id: witthohn_2000_figure2_kcl_partial_pressure
+        type: figure
+        locator: {page: 16, pdf_page_index: 15, figure: '2'}
+        units: Pa; temperature in °C
+        values:
+          quantity: figure_record
+          method_class: figure_only
+          admission_status: figure_only
+          typed_quantity_as_printed: p_partial
+          identity:
+            species: KCl(g)
+            formula: KCl
+            phase: gas
+            temperature: variable from 200 to 1800 °C on the x-axis
+            sample_composition: coal-ash samples A, B, C, and D; chemistry is listed in Table 1 on physical page 15
+          axes_as_printed: 'x: Temperature [°C]; y: Partial pressure [Pa], logarithmic scale'
+          caption: 'Alkali release from laboratory ashes of different boiler lignites (A, B, C) and refinement lignite (D).'
+          panel: right
+          series:
+            - {name: sample A, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample B, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample C, marker_count: unresolved_due_to_overlapping_symbols}
+            - {name: sample D, marker_count: unresolved_due_to_overlapping_symbols}
+          marker_count_note: >-
+            Measurement points are marked in the printed figure, but the
+            closely spaced connected symbols cannot be counted confidently
+            from the raster without digitising the figure.
+          points: []
+          attribution: authors' KEMS measurements
+          digitisation: deferred to a figure pass
+  K2O:
+    observations: []
+    context:
+      - observation_id: witthohn_2000_figure6_k2o_activity
+        type: figure
+        locator: {page: 18, pdf_page_index: 17, figure: '6'}
+        units: dimensionless activity; T in K
+        values:
+          quantity: figure_record
+          method_class: model_derived
+          admission_status: figure_only
+          typed_quantity_as_printed: activity
+          identity:
+            species: K2O
+            formula: K2O
+            phase: phase assemblage in the calculated equilibrium system, not separated by curve in Figure 6
+            temperature: 1273–2073 K, per series below
+          standard_state_locator: {page: 9, pdf_page_index: 8, section: Procedure}
+          axes_as_printed: 'x: SiO2 mole fraction; y: K2O activity (log scale)'
+          caption: 'K2O activity in the system K2O*SiO2*Al2O3 for K2O mole fractions of 0.02 (thin) and 0.10 (thick lines)'
+          panel: single
+          standard_state_as_printed: &witthohn_figure6_reference >-
+            The paper defines a_i = p_i / p_i^0, with p_i^0 the vapour
+            pressure of the pure component; the phase of the pure-oxide
+            reference is not specified.
+          series:
+            - name: K2O mole fraction 0.02, 1273 K
+              marker_count: 0
+              standard_state_as_printed: *witthohn_figure6_reference
+            - name: K2O mole fraction 0.02, 1373 K
+              marker_count: 0
+              standard_state_as_printed: *witthohn_figure6_reference
+            - name: K2O mole fraction 0.02, 1573 K
+              marker_count: 0
+              standard_state_as_printed: *witthohn_figure6_reference
+            - name: K2O mole fraction 0.02, 1873 K
+              marker_count: 0
+              standard_state_as_printed: *witthohn_figure6_reference
+            - name: K2O mole fraction 0.02, 2073 K
+              marker_count: 0
+              standard_state_as_printed: *witthohn_figure6_reference
+            - name: K2O mole fraction 0.10, 1273 K
+              marker_count: 0
+              standard_state_as_printed: *witthohn_figure6_reference
+            - name: K2O mole fraction 0.10, 1373 K
+              marker_count: 0
+              standard_state_as_printed: *witthohn_figure6_reference
+            - name: K2O mole fraction 0.10, 1573 K
+              marker_count: 0
+              standard_state_as_printed: *witthohn_figure6_reference
+            - name: K2O mole fraction 0.10, 1873 K
+              marker_count: 0
+              standard_state_as_printed: *witthohn_figure6_reference
+            - name: K2O mole fraction 0.10, 2073 K
+              marker_count: 0
+              standard_state_as_printed: *witthohn_figure6_reference
+          attribution: FACT 2.1 calculation in this work using the modified quasi-chemical model and ChemSage ΔG-minimiser.
+          points: []
+          digitisation: deferred to a figure pass
