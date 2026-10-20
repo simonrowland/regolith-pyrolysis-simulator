@@ -143,6 +143,15 @@ def test_fo2_grid_refuses_floor_substitution():
     assert validate_fo2_grid([-7.0, -9.0, -8.0]) == (-9.0, -8.0, -7.0)
 
 
+def test_fo2_grid_admitted_numeric_pin():
+    # Pre-consolidation pin: the shared owner must preserve admitted coordinates
+    # bit-for-bit, including the inclusive historical transport-floor boundary.
+    grid = validate_fo2_grid([-6.431798275933005, -9.0])
+    assert tuple(value.hex() for value in grid) == (
+        '-0x1.2000000000000p+3', '-0x1.9ba2953c667e0p+2',
+    )
+
+
 def test_runner_hard_requires_vr5_warm_pool():
     with pytest.raises(Exception, match="warm pool"):
         run_engine_crosscheck(
