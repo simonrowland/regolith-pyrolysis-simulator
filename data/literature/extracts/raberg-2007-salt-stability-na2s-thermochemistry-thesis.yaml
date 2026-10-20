@@ -1,0 +1,260 @@
+schema_version: literature_extract.v1
+source_id: raberg-2007-salt-stability-na2s-thermochemistry-thesis
+source:
+  citation: 'Råberg, M. (2007). Black liquor gasification: Experimental stability studies of smelt components and refractory lining. Umeå University, ETPC Report 07-06.'
+  year: 2007
+  corpus_asset: raw/raberg-2007-salt-stability-na2s-thermochemistry-thesis/raberg-2007-salt-stability-na2s-thermochemistry-thesis.pdf
+extraction:
+  method: Born-digital pdftotext-layout; experimental transition statements checked against the cited physical PDF pages.
+  date: '2026-10-20'
+  worker: fam30-1020
+  source_note: >-
+    This 48-page thesis summary contains several results papers. The Na2S EMF thermochemistry and Na2CO3-Na2S phase-diagram
+    results are also published papers and are retained as context to avoid duplicate scoring. No corresponding published-paper
+    extracts or observation ids exist in this seat, so the source links are recorded by DOI for controller resolution. Thesis-only
+    Na2SO3 stability findings are typed. No phase-diagram or EMF figure points are digitized.
+review_status: draft
+fidelity_samples:
+  - path: species.Na2SO3.observations[raberg2007_na2so3_solid_solid_transition].values.T_C
+    value: 675
+    locator: {page: 3, pdf_page_index: 2, section: Abstract}
+species:
+  MgO:
+    observations: []
+    context:
+      - observation_id: raberg2007_monofrax_typical_chemistry_table1
+        type: textual_fact
+        locator: {page: 19, pdf_page_index: 18, published_page: 9, table: '1'}
+        units: wt% as printed
+        values:
+          quantity_as_published: typical Monofrax L refractory composition
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          sample: Monofrax L, a multiphase MgAl2O4 + MgO refractory
+          printed_composition_wt_percent: {MgO: 44.9, Al2O3: 53.6, SiO2: 0.44, Na2O: 0.23, CaO: 0.35}
+          reason: Bulk refractory chemistry is not a phase composition or a salt-thermochemistry measurement, so it is context only.
+  Na2SO3:
+    observations:
+      - observation_id: raberg2007_na2so3_solid_solid_transition
+        type: transition_point
+        locator: {page: 3, pdf_page_index: 2, section: Abstract}
+        phase: solid Na2SO3
+        units: °C
+        values:
+          quantity: transition_temperature
+          method_class: measured_direct
+          evidence_class: measured_direct
+          property_kind: solid_solid_transition
+          phase_from: solid Na2SO3
+          phase_to: solid Na2SO3 high-temperature form
+          T_C: 675
+          uncertainty_C: 10
+          experimental_method: HTM, HT-XRD, XRD, and DTA study summarized in the thesis
+        uncertainty: {reported_status: printed, value: 10, units: °C}
+      - observation_id: raberg2007_na2so3_melting_transition
+        type: transition_point
+        locator: {page: 33, pdf_page_index: 32, published_page: 23, section: '3.3 Thermal stability of Na2SO3'}
+        phase: solid Na2SO3
+        units: °C
+        values:
+          quantity: transition_temperature
+          method_class: measured_direct
+          evidence_class: measured_direct
+          property_kind: melting_point
+          phase_from: solid Na2SO3
+          phase_to: liquid Na2SO3
+          T_C: 750
+          experimental_heating_regime: rapidly heated
+          note: Text states that metastable Na2SO3 is stable up to 750 °C and immediately melts at that temperature.
+    context:
+      - observation_id: raberg2007_na2so3_decomposition_htxrd
+        type: textual_fact
+        locator: {page: 32, pdf_page_index: 31, published_page: 22, section: '3.3 Thermal stability of Na2SO3'}
+        units: °C and hours
+        values:
+          quantity_as_published: Na2SO3 thermal decomposition
+          method_class: measured_direct
+          evidence_class: measured_direct
+          experimental_method: HT-XRD
+          reaction_as_published: '4Na2SO3(s) ⇌ 3Na2SO4(s,l) + Na2S(s,l)'
+          temperature_as_published: '700 °C'
+          duration_as_published: '16 hours'
+          text_result: Na2SO3 gradually decomposes at around 700 °C over a few hours; Fig. 14 shows the 700 °C, 16-hour HT-XRD run.
+          reason: No quantity token represents time-dependent decomposition extent in the text; the XRD figure is deferred without numeric points.
+      - observation_id: raberg2007_na2so3_phase_diagram_figures_deferred
+        type: figure_record
+        locator: {page: 33, pdf_page_index: 32, published_page: 23, figure: '14'}
+        units: X-ray diffraction axes as printed
+        values:
+          quantity: HT-XRD decomposition pattern
+          method_class: measured_direct
+          evidence_class: measured_direct
+          species: Na2SO3, Na2SO4, Na2S
+          phase: solid decomposition products
+          temperature: 700 °C
+          duration: 16 hours
+          atmosphere: as used in the Na2SO4-Na2S phase study; not specified in this caption
+          axes_as_published: {x: '2-Theta scale', y: 'intensity'}
+          caption: The decomposition of Na2SO3 at 700 °C during 16 hours duration.
+          panel: all
+          series:
+            - {name: HT-XRD pattern, marker_count: 0}
+          digitisation: deferred to a figure pass
+  Na2S:
+    observations: []
+    context:
+      - observation_id: raberg2007_na2s_emf_thermochemistry_published_repeat
+        type: published_result_context
+        locator: {page: 37, pdf_page_index: 36, published_page: 27, section: '3.4 Determination of thermodynamic properties of Na2S'}
+        units: kJ/mol, J/(mol K), voltage, and printed equation variables
+        values:
+          quantity_as_published: measured EMF fit and evaluated Na2S thermochemical properties
+          method_class: model_derived
+          evidence_class: model_derived
+          reason: These results repeat the published Na2S solid-state EMF paper; retain context pending a published observation id rather than scoring the same result twice.
+          published_paper:
+            citation: 'Lindberg, G., Larsson, A., Råberg, M., Boström, D., Backman, R. & Nordin, A. (2007). Determination of thermodynamic properties of Na2S using solid-state EMF measurements. Journal of Chemical Thermodynamics, 39(1), 44–48.'
+            doi: 10.1016/j.jct.2006.06.003
+          measured_emf_temperature_interval: '870–1000 K'
+          equilibration_time_per_temperature: '2–10 h'
+          fitted_emf_equation_as_published: 'Efit/V (±0.00047) = 0.63650 − 0.00584732(T/K) + 0.00073190(T/K) ln(T/K)'
+          equilibrium_constant_equation_as_published: 'log Kf(Na2S(s)) (±0.05) = 216.28 − 4750(T/K)−1 − 28.28878 ln(T/K)'
+          Gibbs_energy_equation_as_published: 'ΔfG°(Na2S(s))/(kJ mol−1) (±1.0) = 90.9 − 4.1407(T/K) + 0.5415849(T/K) ln(T/K)'
+          standard_enthalpy_of_formation_as_published: 'ΔfH°(Na2S(s), 298.15 K) = −369.0 ± 1.0 kJ/mol'
+          standard_entropy_as_published: 'S°(Na2S(s), 298.15 K) = 97.0 ± 2.0 J/(mol K), evaluated by third-law analysis'
+          publication_link_state: no matching published extract or observation id found in the current seat
+      - observation_id: raberg2007_thermochemical_uncertainties_table2_context
+        type: textual_fact
+        locator: {page: 28, pdf_page_index: 27, published_page: 18, table: '2'}
+        units: J/mol at 1000 °C
+        values:
+          quantity_as_published: compilation of uncertainties in Gibbs energy of formation
+          method_class: model_derived
+          evidence_class: model_derived
+          uncertainty_by_species_as_published: 'Na2S(s,l): ±15000; K2S(s,l): ±24900; Na2CO3(s,l): ±1100; K2CO3(s,l): ±2600; Na2SO4(s,l): ±1200; K2SO4(s,l): ±1400; NaOH(s,l): ±2400; NaOH(g): ±20000; (NaOH)2(g): ±27300; KOH(s,l): ±2000; KOH(g): ±12700; (KOH)2(g): ±16600; NaCl(s,l): ±600; NaCl(g): ±2100; (NaCl)2(g): ±8400; KCl(s,l): ±400; KCl(g): ±400; (KCl)2(g): ±4200'
+          reason: Literature uncertainty compilation calculated mostly from JANAF enthalpy and entropy uncertainties; values are assessment context, not observations from this thesis.
+      - observation_id: raberg2007_na2s_emf_figure18_deferred
+        type: figure_record
+        locator: {page: 37, pdf_page_index: 36, published_page: 27, figure: '18'}
+        units: V versus K
+        values:
+          quantity: solid-state EMF measurement
+          method_class: measured_direct
+          evidence_class: measured_direct
+          species: Na2S(s)/Na2SO4(s) cell
+          phase: solid electrolyte cell
+          temperature: 870–1000 K
+          axes_as_published: {x: temperature (K), y: voltage (V)}
+          caption: Experimental values with the fitted function. Cell A and Cell B.
+          panel: all
+          series:
+            - {name: Cell A, marker_count: not countable (overplotted)}
+            - {name: Cell B, marker_count: not countable (overplotted)}
+          digitisation: deferred to a figure pass
+      - observation_id: raberg2007_naco3_na2s_published_phase_diagram_context
+        type: published_result_context
+        locator: {page: 30, pdf_page_index: 29, published_page: 20, section: '3.2 Improvement of the binary phase diagram Na2CO3-Na2S'}
+        units: °C
+        values:
+          quantity_as_published: Na2CO3-Na2S liquidus and solidus measurements
+          method_class: measured_direct
+          evidence_class: measured_direct
+          reason: Thesis Paper II is also the published phase-diagram study; its figure points are deferred and its printed atmosphere comparison is preserved without duplicating scored points.
+          published_paper:
+            citation: 'Råberg, M., Boström, D., Nordin, A., Rosén, E. & Warnqvist, B. (2003). Improvement of the binary phase diagram Na2CO3-Na2S. Energy & Fuels, 17(6), 1591–1594.'
+            doi: 10.1021/ef0340256
+          printed_result: CO2-atmosphere melting points were about 8 °C higher than corresponding points under an inert atmosphere.
+          publication_link_state: no matching published extract or observation id found in the current seat
+      - observation_id: raberg2007_figure12_phase_diagram_deferred
+        type: figure_record
+        locator: {page: 31, pdf_page_index: 30, published_page: 21, figure: '12'}
+        units: temperature °C versus Na2S mole fraction
+        values:
+          quantity: binary liquidus and solidus phase diagram
+          method_class: measured_direct
+          evidence_class: measured_direct
+          species: Na2CO3-Na2S
+          phase: liquidus, solidus, and Na2CO3 solid solution
+          temperature: 25–1200 °C
+          atmosphere: Ar and CO2 datasets
+          axes_as_published: {x: 'molar composition XNa2S', y: 'temperature (°C)'}
+          caption: The binary phase diagram Na2CO3-Na2S. The magnification shows the Na2CO3(ss) boundary and melting-point difference for XNa2S = 0, 0.1, 0.15, and 0.2 in Ar and CO2 atmospheres.
+          panel: all
+          series:
+            - {name: Tegman and Warnqvist literature data, marker_count: not countable (overplotted)}
+            - {name: HTM in Ar, marker_count: not countable (overplotted)}
+            - {name: HTM in CO2, marker_count: not countable (overplotted)}
+            - {name: HT-XRD, marker_count: not countable (overplotted)}
+          digitisation: deferred to a figure pass
+      - observation_id: raberg2007_figure13_literature_diagram_deferred
+        type: figure_record
+        locator: {page: 32, pdf_page_index: 31, published_page: 22, figure: '13'}
+        units: temperature °C versus Na2S mole fraction
+        values:
+          quantity: compiled binary phase diagram
+          method_class: model_derived
+          evidence_class: model_derived
+          species: Na2SO4-Na2S
+          phase: literature solidus and liquidus points
+          axes_as_published: {x: 'molar composition XNa2S', y: 'temperature (°C)'}
+          caption: Compilation of the literature data on the binary phase diagram Na2SO4-Na2S.
+          panel: all
+          series:
+            - {name: 'Tamman and Oelsen [18]', marker_count: not countable (overplotted)}
+            - {name: 'Ley [19]', marker_count: not countable (overplotted)}
+            - {name: 'Courtois [20]', marker_count: not countable (overplotted)}
+            - {name: 'Kohlmeyer and Lohorke [21]', marker_count: not countable (overplotted)}
+            - {name: 'Tran and Barham [22]', marker_count: not countable (overplotted)}
+            - {name: 'Andersson [23]', marker_count: not countable (overplotted)}
+          digitisation: deferred to a figure pass
+      - observation_id: raberg2007_figure15_metastable_diagram_deferred
+        type: figure_record
+        locator: {page: 34, pdf_page_index: 33, published_page: 24, figure: '15'}
+        units: temperature °C versus Na2S mole fraction
+        values:
+          quantity: metastable binary phase diagram
+          method_class: measured_direct
+          evidence_class: measured_direct
+          species: Na2SO4-Na2S with Na2SO3
+          phase: metastable phase relations
+          axes_as_published: {x: 'molar composition XNa2S', y: 'temperature (°C)'}
+          caption: Metastable phase diagram Na2SO4-Na2S, constructed from HTM measurements.
+          panel: all
+          series: [{name: HTM metastable phase boundaries, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: raberg2007_figure16_equilibrium_diagram_deferred
+        type: figure_record
+        locator: {page: 35, pdf_page_index: 34, published_page: 25, figure: '16'}
+        units: temperature °C versus Na2S mole fraction
+        values:
+          quantity: equilibrium binary phase diagram
+          method_class: measured_direct
+          evidence_class: measured_direct
+          species: Na2SO4-Na2S
+          phase: equilibrium phase relations
+          axes_as_published: {x: 'molar composition XNa2S', y: 'temperature (°C)'}
+          caption: Equilibrium phase diagram Na2SO4-Na2S, constructed from HTM measurements.
+          panel: all
+          series: [{name: HTM equilibrium phase boundaries, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: raberg2007_figure17_literature_log_kf_deferred
+        type: figure_record
+        locator: {page: 36, pdf_page_index: 35, published_page: 26, figure: '17'}
+        units: log10 equilibrium constant versus 1000/T
+        values:
+          quantity: log equilibrium constant of formation of Na2S(s)
+          method_class: model_derived
+          evidence_class: model_derived
+          species: Na2S(s)
+          axes_as_published: {x: '1000/(T/K)', y: 'log Kf(Na2S(s))'}
+          caption: Different values for log Kf(Na2S(s)) found in literature.
+          panel: all
+          series:
+            - {name: 'Backman [17]', marker_count: not countable (overplotted)}
+            - {name: 'Lindberg et al. [24]', marker_count: not countable (overplotted)}
+            - {name: 'Köszegi and Rosén [25]', marker_count: not countable (overplotted)}
+            - {name: 'Fredriksson and Rosén [16]', marker_count: not countable (overplotted)}
+            - {name: 'JANAF [13] and FACT [11]', marker_count: not countable (overplotted)}
+            - {name: 'Itoh et al. [26]', marker_count: not countable (overplotted)}
+            - {name: 'SGTE [10]', marker_count: not countable (overplotted)}
+          digitisation: deferred to a figure pass
