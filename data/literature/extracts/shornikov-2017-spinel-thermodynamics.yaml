@@ -20,8 +20,10 @@ extraction:
     Tick marks were calibrated in linear space. Each stored centre was
     re-read on that render. A marker was stored only when it is an open
     right-pointing triangle with no bar and its centre is visible.
-    Figure 2 series 16 was read the same way from PDF page 3. Only open
-    right-pointing triangles with a free white interior were stored.
+    Figure 2 series 16 was read the same way from PDF page 3. The 2210 K
+    point was read again on a 1200 dpi render of the same page. A marker
+    was stored when its open right-pointing outline and its centre could
+    be located. A crossing outline alone was not a reason to refuse.
   date: '2026-10-20'
   worker: t1372-w1-w3-t1
 review_status: draft
@@ -157,6 +159,32 @@ fidelity_samples:
       pdf_page_index: 2
       figure: '2'
       note: Figure 2 series 16 at the 2302 K read. 600 dpi render.
+  - path: species.MgAl2O4.observations[shornikov_2017_spinel_thermodynamics_fig2_series16_2004k].values.value
+    value: '-22.32'
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      note: Figure 2 series 16 at the 2004 K read. 600 dpi render.
+  - path: species.MgAl2O4.observations[shornikov_2017_spinel_thermodynamics_fig2_series16_2210k].values.value
+    value: '-23.47'
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      note: >-
+        Figure 2 series 16 at the 2210 K read. 600 dpi centre, confirmed
+        on the 1200 dpi render.
+  - path: species.MgAl2O4.observations[shornikov_2017_spinel_thermodynamics_fig2_series16_2252k].values.value
+    value: '-23.39'
+    locator:
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      figure: '2'
+      note: Figure 2 series 16 at the 2252 K read. 600 dpi render.
 experiments:
   - experiment_id: shornikov_2017_spinel_thermodynamics_kems
     method: knudsen_effusion
@@ -767,6 +795,157 @@ species:
           fO2_Pa:
             state: {tag: unknown, reason: not_published}
             locator: *fig2_locator
+      - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_2004k
+        type: gibbs_table
+        regime: tabulation
+        locator:
+          page: 3
+          published_page: 289
+          pdf_page_index: 2
+          figure: '2'
+          equation: '18'
+          note: >-
+            Series 16. Same tick calibration as the 2050 K point. Crop
+            centre (1638.4, 1013.8). Unrounded read 2003.94 K and
+            −22.318 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+            Neighbouring outlines touch the corners. The centre is in
+            the open interior.
+        units: kJ/mol
+        phase: cr
+        per: mol_species
+        standard_state: *fig2_standard_state
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        values:
+          quantity: delta_fG
+          method_class: figure_only
+          value: '-22.32'
+          T_K: '2004'
+          value_as_printed: not printed; read from Figure 2 series 16
+        uncertainty:
+          value: '0.30'
+          unit: kJ/mol
+          basis: visual read uncertainty
+          confidence_level: not_stated
+          note: ±0.30 kJ/mol and ±10 K.
+        point_conditions:
+          composition: *spinel_composition
+          temperature_K:
+            state:
+              tag: value
+              value: {kind: point, point: '2004'}
+            locator:
+              page: 3
+              published_page: 289
+              pdf_page_index: 2
+              figure: '2'
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *fig2_locator
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *fig2_locator
+      - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_2210k
+        type: gibbs_table
+        regime: tabulation
+        locator:
+          page: 3
+          published_page: 289
+          pdf_page_index: 2
+          figure: '2'
+          equation: '18'
+          note: >-
+            Series 16. Same tick calibration as the 2050 K point. 600 dpi
+            crop centre (1873.1, 1068.5), page pixel (3214, 1504).
+            Unrounded read 2209.62 K and −23.469 kJ/mol. The 1200 dpi
+            render of PDF page 3 puts the white centroid at page pixel
+            (6428, 3007), which is crop (1873.0, 1068.2) in the 600 dpi
+            frame, 2209.49 K and −23.464 kJ/mol. The two reads agree
+            inside the ±10 K and ±0.30 kJ/mol uncertainty. The next
+            outline meets the tip. The centre stays in the open interior.
+        units: kJ/mol
+        phase: cr
+        per: mol_species
+        standard_state: *fig2_standard_state
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        values:
+          quantity: delta_fG
+          method_class: figure_only
+          value: '-23.47'
+          T_K: '2210'
+          value_as_printed: not printed; read from Figure 2 series 16
+        uncertainty:
+          value: '0.30'
+          unit: kJ/mol
+          basis: visual read uncertainty
+          confidence_level: not_stated
+          note: ±0.30 kJ/mol and ±10 K. Both the 600 dpi and 1200 dpi crops were read.
+        point_conditions:
+          composition: *spinel_composition
+          temperature_K:
+            state:
+              tag: value
+              value: {kind: point, point: '2210'}
+            locator:
+              page: 3
+              published_page: 289
+              pdf_page_index: 2
+              figure: '2'
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *fig2_locator
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *fig2_locator
+      - observation_id: shornikov_2017_spinel_thermodynamics_fig2_series16_2252k
+        type: gibbs_table
+        regime: tabulation
+        locator:
+          page: 3
+          published_page: 289
+          pdf_page_index: 2
+          figure: '2'
+          equation: '18'
+          note: >-
+            Series 16. Same tick calibration as the 2050 K point. 600 dpi
+            crop centre (1921.5, 1064.6), page pixel (3263, 1500).
+            Unrounded read 2252.04 K and −23.387 kJ/mol. The 1200 dpi
+            white centroid is page pixel (6521, 2999), crop (1919.6, 1064.5)
+            in the 600 dpi frame, 2250.32 K and −23.385 kJ/mol. The next
+            outline meets the tip. The centre is in the open interior.
+        units: kJ/mol
+        phase: cr
+        per: mol_species
+        standard_state: *fig2_standard_state
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        values:
+          quantity: delta_fG
+          method_class: figure_only
+          value: '-23.39'
+          T_K: '2252'
+          value_as_printed: not printed; read from Figure 2 series 16
+        uncertainty:
+          value: '0.30'
+          unit: kJ/mol
+          basis: visual read uncertainty
+          confidence_level: not_stated
+          note: ±0.30 kJ/mol and ±10 K.
+        point_conditions:
+          composition: *spinel_composition
+          temperature_K:
+            state:
+              tag: value
+              value: {kind: point, point: '2252'}
+            locator:
+              page: 3
+              published_page: 289
+              pdf_page_index: 2
+              figure: '2'
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *fig2_locator
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *fig2_locator
     context:
       - observation_id: shornikov_2017_spinel_thermodynamics_table1_literature
         type: literature_compilation_not_extracted
@@ -827,17 +1006,22 @@ species:
         values:
           status: context_only
           reason: >-
-            Series 16 is the open right-pointing triangle. Four centres with
-            a free white interior are stored as delta_fG observations.
-            Refused: the chain left of crop x about 1660, below about 2020 K,
-            where open outlines cross and white regions are shared or are
-            gaps, including the marker near crop (1477, 959). The interior
-            near crop (1874, 1068), about 2210 K, is cut by the next outline
-            (white width 36 px). The position near crop (1926, 1065) lies
-            between two triangles. Filled up-triangles, squares, circles, and
-            left-pointing triangles are other series. Error-bar ends were not
-            read. The least-squares constants of this series are Table 1.
-            MinerU's chart table was ignored.
+            Series 16 is the open right-pointing triangle. Seven centres
+            are stored. The 2210 K and 2252 K markers were re-read on the
+            1200 dpi render; both outlines and both centres are visible,
+            and the next outline meeting the tip does not hide the centre.
+            Refused, each by temperature. About 1420 K, crop x 900–1050
+            and y 940–1060: the symbols are open squares and rectangles,
+            not series 16. About 1640 K, crop x 1180–1280: up-triangles,
+            and the crossing outlines hide any centre. About 1780–1840 K,
+            crop x 1320–1450: up-triangles, open and filled, not series 16.
+            About 1863 K, crop (1477, 959): a fit line splits the interior
+            and a second outline crosses the lower vertex, so the centre
+            is hidden. About 1950 K, crop (1576, 1002): more than one
+            outline shares the white interior, so the symbol cannot be
+            assigned. Legend symbols near crop x 2078 are not data.
+            Error-bar ends were not read. The least-squares constants of
+            this series are Table 1. MinerU's chart table was ignored.
       - observation_id: shornikov_2017_spinel_thermodynamics_fig3_pressures
         type: figure_context_not_digitised
         locator:

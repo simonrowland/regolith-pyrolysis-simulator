@@ -30,7 +30,7 @@ pdftotext `-bbox` on this file uses a top-left origin. Page renders are 600 dpi 
 | 4 | 290 | Table 2 MgAl2O4 block. The last row before Al2O3 is 2420 ± 25, 55.81 ± 4.62, 23.06 ± 1.73, This work | the whole Table 2 body |
 | 6 | 292 | Prose: ΔH_T = 43.79 ± 4.84 kJ/mol and ΔS_T = 28.09 ± 1.64 J/(mol K), liquid state, equation (19) | the paragraph that prints those constants |
 | 5 | 291 | Figure 4 series 8. Open right-pointing triangles, no bar, both panels, including the 1917 K marker on each panel | the figure crop, then each stored centre again |
-| 3 | 289 | Figure 2 series 16. Four open right-pointing triangles with a free white interior | the high-T chain at 2× and 3×, then the marked centres |
+| 3 | 289 | Figure 2 series 16. Seven open right-pointing triangles. The 2210 K point was read on both the 600 dpi and the 1200 dpi render | the high-T chain at 2×, the marked centres, and a 1200 dpi crop of the same chain |
 
 Neighbour rows on pages 2 and 4 match pdftotext, so the this-work row is not a shifted literature row.
 
@@ -51,9 +51,13 @@ Ten Figure 4 activities, `figure_only`, stoichiometric spinel. Quantity `activit
 - Panel (a) a(MgO): 0.276 at 1917 K, 0.368 at 2161 K, 0.388 at 2218 K, 0.406 at 2257 K, 0.425 at 2304 K. Read uncertainty ±0.010 and ±5.4 K.
 - Panel (b) a(Al2O3): 0.236 at 1917 K, 0.211 at 2162 K, 0.202 at 2220 K, 0.203 at 2259 K, 0.200 at 2306 K. Read uncertainty ±0.005 and ±5.4 K.
 
-Four Figure 2 Gibbs energies, `figure_only`, quantity `delta_fG`, crystalline spinel. Read uncertainty ±0.30 kJ/mol and ±10 K.
+Seven Figure 2 Gibbs energies, `figure_only`, quantity `delta_fG`, crystalline spinel. Read uncertainty ±0.30 kJ/mol and ±10 K.
 
-- −22.41 kJ/mol at 2050 K, −22.70 at 2102 K, −22.92 at 2160 K, −23.61 at 2302 K.
+- −22.32 kJ/mol at 2004 K, −22.41 at 2050 K, −22.70 at 2102 K, −22.92 at 2160 K, −23.47 at 2210 K, −23.39 at 2252 K, −23.61 at 2302 K.
+
+The 2210 K point was the disagreement between the two confirm reviews. Sol called it readable. The other review called the cut interior a fair refusal. Both crops locate the same centre. At 600 dpi the midpoint is crop (1873.1, 1068.5), page pixel (3214, 1504), 2209.62 K and −23.469 kJ/mol. At 1200 dpi the white centroid is page pixel (6428, 3007), which falls at crop (1873.0, 1068.2) in the 600 dpi frame, 2209.49 K and −23.464 kJ/mol. The outline is a complete open right triangle. The next outline meets the tip and does not hide the centre. The point is stored.
+
+The 2252 K point is the marker the earlier note called a gap near crop (1926, 1065). The 600 dpi midpoint is crop (1921.5, 1064.6), page pixel (3263, 1500), 2252.04 K and −23.387 kJ/mol. The 1200 dpi white centroid is page pixel (6521, 2999), crop (1919.6, 1064.5) in the 600 dpi frame. The two reads differ by about 2 px.
 
 ## What was refused
 
@@ -67,7 +71,7 @@ Two formation entropies are stored and marked `typed_refusal`. The schema has no
 - Table 1: 30 literature rows (calorimetry, EMF, thermochemical calculations, earlier KEMS). Not this paper’s measurements.
 - Table 2: 15 literature melting rows (4 MgO, 8 other MgAl2O4, 3 Al2O3). Not this paper’s measurements.
 - Figure 1: literature heat capacity. Not read.
-- Figure 2: pointwise ΔG. Series 16 is the open right-pointing triangle. Four centres with a free white interior were stored. The overlapped chain below about 2020 K, the cut interior near 2210 K, and the gap near 2256 K were not stored. Other symbols are other series. The least-squares constants remain Table 1. MinerU’s chart table was ignored.
+- Figure 2: pointwise ΔG. Series 16 is the open right-pointing triangle. Seven centres were stored, including 2004 K, 2210 K, and 2252 K. Refused markers are named one by one in the figure-2 context row: squares near 1420 K, up-triangles near 1640 K and 1780–1840 K, a fit line that hides the centre near 1863 K, and a shared interior near 1950 K. Error-bar ends were not read. The least-squares constants remain Table 1. MinerU’s chart table was ignored.
 - Figure 3: pressures over spinel cited as reference [1], the evaporation paper already extracted. Not re-read.
 - Figure 4: activities. Linear axes, calibrated from the tick marks on the 600 dpi render of PDF page 5. Series 8 is the open right-pointing triangle with no bar. Ten centres were stored, five on each panel. The new ones are the open triangles at 1917 K. Read uncertainty is ±10 px (±5.4 K, and ±0.010 or ±0.005 in activity). Each refused marker is named with its approximate temperature in the figure-4 context row: a vertical bar (series 5 or 6), a filled triangle (series 7), an up-triangle (series 1–4), a legend key, or a centre hidden in a shared mass. MinerU’s scatter table was ignored.
 - Figure 5: MgAl2O4–SiO2 phase diagram cited to [55]. Not this paper’s measurements. MinerU’s contour table was ignored.
