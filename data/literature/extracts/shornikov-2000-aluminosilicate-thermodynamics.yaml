@@ -8,8 +8,10 @@ source:
   corpus_asset: raw/shornikov-2000-aluminosilicate-thermodynamics/shornikov-2000-aluminosilicate-thermodynamics.pdf
 extraction:
   method: 'No content_list table exists (MinerU types are text, equation, chart, and image). Figure 2
-    markers were read twice on a 600 dpi render of PDF page 3. Figure 1 and Figure 3 are context: Figure
-    1 is an ion-current ratio, and Figure 3 marker cores were not separable from the connecting strokes.'
+    markers were read twice on a 600 dpi render of PDF page 3. Figure 1 is an ion-current ratio and stays context. The high-alumina tail of the
+    2300 K squares and the 2400 K triangles was read on the same Figure 2 scale. Figure 3
+    centres on curves 1-3 were read twice and kept as a typed refusal: the integral melt
+    Gibbs energy has no solution-composition carrier.'
   date: '2026-10-20'
   worker: t1372-w1-w2-t1
   provenance_path: text/shornikov-2000-aluminosilicate-thermodynamics/pdftotext-layout.txt
@@ -426,7 +428,7 @@ species:
           dark-annulus centroid (open square). The nominal value is the mean, rounded to 0.01 mol% and
           0.001 activity. read_uncertainty is at least half a marker (12 px circles, 8.5 px triangles,
           10 px squares) and is wide enough to contain both reads. It is a digitising width, not a printed
-          interval. read_uncertainty_dex is stored only for activity >= 0.05, as da/(a ln 10).'
+          interval.  Fix round: the high-alumina tail was read on the same scale. One further open square (84.99 mol%) and four further filled triangles (78.04 to 96.06 mol%) are stored. Markers that merge with a stored point, the 90% tick, the right-hand frame, or curves 4-10 were refused one by one and are listed in the audit. read_uncertainty_dex is stored only for activity >= 0.05, as da/(a ln 10).'
       T_range_K:
       - 2300.0
       - 2300.0
@@ -994,6 +996,35 @@ species:
                 figure: '2'
                 panel: a
                 note: Read 1 (1966.00, 1730.00); read 2 (1965.95, 1727.64); shift 2.36 px; audit shornikov_2000_f2_sio2_2300k-18.
+        - Al2O3_mole_percent_as_read: '84.99'
+          T_K: '2300'
+          T_K_as_printed: '2300'
+          composition_mol:
+            Al2O3: '0.8499'
+            SiO2: '0.1501'
+          activity: '0.017'
+          read_uncertainty: '0.010'
+          read_uncertainty_mol_percent: '0.59'
+          audit_read_id: shornikov_2000_f2_sio2_2300k-19
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.8499'
+                  - - SiO2
+                    - '0.1501'
+              locator:
+                published_page: 686
+                pdf_page_index: 2
+                page: 3
+                figure: '2'
+                panel: a
+                note: Read mean (2041.9, 1751.15). The axis-excluded read sits about 3 px higher because the bottom edge is the axis; that shift is inside the 12 px y uncertainty. audit shornikov_2000_f2_sio2_2300k-19.
     - observation_id: shornikov_2000_f2_sio2_2400k
       type: activity_coefficient
       locator:
@@ -1010,7 +1041,7 @@ species:
           centroid (filled) or the dark-annulus centroid (open square). The nominal value is the mean,
           rounded to 0.01 mol% and 0.001 activity. read_uncertainty is at least half a marker (12 px circles,
           8.5 px triangles, 10 px squares) and is wide enough to contain both reads. It is a digitising
-          width, not a printed interval. read_uncertainty_dex is stored only for activity >= 0.05, as
+          width, not a printed interval.   Fix round: the high-alumina tail was read on the same scale. One further open square (84.99 mol%) and four further filled triangles (78.04 to 96.06 mol%) are stored. Markers that merge with a stored point, the 90% tick, the right-hand frame, or curves 4-10 were refused one by one and are listed in the audit. read_uncertainty_dex is stored only for activity >= 0.05, as
           da/(a ln 10).'
       T_range_K:
       - 2400.0
@@ -1490,6 +1521,123 @@ species:
                 panel: a
                 note: Read 1 (1780.60, 1624.20); read 2 (1781.00, 1623.03); shift 1.24 px; audit shornikov_2000_f2_sio2_2400k-15.
           read_uncertainty_dex: '0.0278'
+        - Al2O3_mole_percent_as_read: '78.04'
+          T_K: '2400'
+          T_K_as_printed: '2400'
+          composition_mol:
+            Al2O3: '0.7804'
+            SiO2: '0.2196'
+          activity: '0.060'
+          read_uncertainty: '0.008'
+          read_uncertainty_mol_percent: '0.50'
+          audit_read_id: shornikov_2000_f2_sio2_2400k-16
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.7804'
+                  - - SiO2
+                    - '0.2196'
+              locator:
+                published_page: 686
+                pdf_page_index: 2
+                page: 3
+                figure: '2'
+                panel: a
+                note: Two reads, shift 0.47 px, mean (1923.51, 1700.89). audit shornikov_2000_f2_sio2_2400k-16.
+          read_uncertainty_dex: '0.0579'
+        - Al2O3_mole_percent_as_read: '87.54'
+          T_K: '2400'
+          T_K_as_printed: '2400'
+          composition_mol:
+            Al2O3: '0.8754'
+            SiO2: '0.1246'
+          activity: '0.015'
+          read_uncertainty: '0.010'
+          read_uncertainty_mol_percent: '0.50'
+          audit_read_id: shornikov_2000_f2_sio2_2400k-17
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.8754'
+                  - - SiO2
+                    - '0.1246'
+              locator:
+                published_page: 686
+                pdf_page_index: 2
+                page: 3
+                figure: '2'
+                panel: a
+                note: Two reads, shift 0.16 px, mean (2085.40, 1753.60). The base meets the axis, so the y uncertainty is widened to 12 px. audit shornikov_2000_f2_sio2_2400k-17.
+        - Al2O3_mole_percent_as_read: '93.51'
+          T_K: '2400'
+          T_K_as_printed: '2400'
+          composition_mol:
+            Al2O3: '0.9351'
+            SiO2: '0.0649'
+          activity: '0.021'
+          read_uncertainty: '0.010'
+          read_uncertainty_mol_percent: '0.50'
+          audit_read_id: shornikov_2000_f2_sio2_2400k-18
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.9351'
+                  - - SiO2
+                    - '0.0649'
+              locator:
+                published_page: 686
+                pdf_page_index: 2
+                page: 3
+                figure: '2'
+                panel: a
+                note: Two reads, shift 0.53 px, mean (2187.17, 1746.65). The base meets the axis, so the y uncertainty is widened to 12 px. audit shornikov_2000_f2_sio2_2400k-18.
+        - Al2O3_mole_percent_as_read: '96.06'
+          T_K: '2400'
+          T_K_as_printed: '2400'
+          composition_mol:
+            Al2O3: '0.9606'
+            SiO2: '0.0394'
+          activity: '0.012'
+          read_uncertainty: '0.010'
+          read_uncertainty_mol_percent: '0.50'
+          audit_read_id: shornikov_2000_f2_sio2_2400k-19
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.9606'
+                  - - SiO2
+                    - '0.0394'
+              locator:
+                published_page: 686
+                pdf_page_index: 2
+                page: 3
+                figure: '2'
+                panel: a
+                note: Two reads, shift 2.01 px, mean (2230.54, 1757.59). The base meets the axis, so the y uncertainty is widened to 12 px. audit shornikov_2000_f2_sio2_2400k-19.
     context:
     - observation_id: shornikov_2000_fig1_ion_ratio_context
       type: figure_ion_current_ratio
@@ -1556,20 +1704,657 @@ species:
         published_page: 687
         pdf_page_index: 3
         figure: '3'
-        note: Markers 1–3 are this work at 2200, 2300, and 2400 K. Lines 7–9 are equation (18). Curves
-          4–6 are literature. Y is linear −ΔfGT in kJ/mol (ticks 0, 10, 20, 30; 0 at y≈596, 10 at y=986.5,
-          20 at y=1377.5, 30 at y=1768). X ticks every 10 mol% match 17.03 px per mol%, the same scale
-          as Figure 2. Marker cores were not separable from the heavy connecting strokes (eroded cores
-          are 30–40 px wide stroke segments). No numeric Gibbs values are stored.
+        note: 'Markers 1-3 are this work at 2200, 2300, and 2400 K (filled circles, open squares,
+          filled triangles). Lines 4-9 are literature or equation (18) and were not sampled. 600 dpi
+          PDF page 4. Linear axes. mol% Al2O3 = (x_px - 2710.9) / 17.03. neg_delta_fG_kJ_mol =
+          (y_px - 596) / 39.067, from ticks y=596 at 0, y=986.5 at 10, y=1377.5 at 20, y=1768 at 30.
+          Read 1 is the 7x7 eroded core (filled) or the bright-hole centre (open square). Read 2 is
+          the radius-14 dark centroid (filled) or the dark-ring centroid (open square). The nominal
+          value is the mean. Shifts are under 2 px. read_uncertainty is half a marker: 12 px circles
+          (0.31 kJ/mol, 0.70 mol%), 10 px squares (0.26 kJ/mol, 0.59 mol%), 8.5 px triangles
+          (0.22 kJ/mol, 0.50 mol%). The legend glyphs near x=3427 (a circle at y=768 and a triangle
+          at y=964) were excluded. Curves 4-9 and the white gaps past about 85 mol%, where those
+          curves converge, were not given a centre.'
       units: kJ/mol
       values:
-        quantity_as_printed: −ΔfG_T of the melt, equation (17)
-        equation: ΔfG_T = RT Σ x(i) ln a(i)
+        quantity_as_printed: integral melt -delta_fG_T, equation (17)
+        equation: delta_fG_T = RT sum x(i) ln a(i)
         method_class: figure_only
-        reason: Integral formation Gibbs energy of the melt. It is not a partial quantity of SiO2 or Al2O3,
-          and the schema has no solution-composition carrier for it. Markers were also not separable from
-          the strokes, so no values are invented. Partial Gibbs energies are already carried by RT ln
-          a on the Figure 2 activity rows.
+        status: typed_refusal
+        reason: Integral formation Gibbs energy of the melt. It is not a partial quantity of SiO2 or
+          Al2O3, and the schema has no solution-composition carrier, so these centres are recorded
+          and not scored. Partial Gibbs energies remain RT ln a on the Figure 2 activity rows.
+        points:
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '3.96'
+          neg_delta_fG_kJ_mol: '3.60'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [2778.5, 736.6]
+          read_2_px: [2778.1, 736.9]
+          read_shift_px: '0.50'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '7.24'
+          neg_delta_fG_kJ_mol: '5.25'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [2834.5, 801.0]
+          read_2_px: [2834.0, 801.0]
+          read_shift_px: '0.50'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '10.29'
+          neg_delta_fG_kJ_mol: '6.71'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [2886.4, 858.5]
+          read_2_px: [2886.0, 858.0]
+          read_shift_px: '0.64'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '15.93'
+          neg_delta_fG_kJ_mol: '9.35'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [2982.3, 961.3]
+          read_2_px: [2982.0, 961.0]
+          read_shift_px: '0.42'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '21.14'
+          neg_delta_fG_kJ_mol: '11.41'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3070.7, 1041.5]
+          read_2_px: [3071.0, 1042.0]
+          read_shift_px: '0.58'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '26.21'
+          neg_delta_fG_kJ_mol: '13.49'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3157.4, 1122.8]
+          read_2_px: [3157.0, 1123.0]
+          read_shift_px: '0.45'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '30.79'
+          neg_delta_fG_kJ_mol: '15.11'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3235.4, 1186.4]
+          read_2_px: [3235.0, 1186.0]
+          read_shift_px: '0.57'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '35.11'
+          neg_delta_fG_kJ_mol: '16.46'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3308.7, 1239.1]
+          read_2_px: [3309.0, 1239.0]
+          read_shift_px: '0.32'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '40.70'
+          neg_delta_fG_kJ_mol: '17.94'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3404.0, 1296.7]
+          read_2_px: [3404.0, 1297.0]
+          read_shift_px: '0.30'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '45.85'
+          neg_delta_fG_kJ_mol: '18.87'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3491.5, 1333.2]
+          read_2_px: [3492.0, 1333.0]
+          read_shift_px: '0.54'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '51.55'
+          neg_delta_fG_kJ_mol: '19.46'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3588.6, 1356.2]
+          read_2_px: [3589.0, 1356.0]
+          read_shift_px: '0.45'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '54.62'
+          neg_delta_fG_kJ_mol: '19.48'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3641.3, 1357.1]
+          read_2_px: [3641.0, 1357.0]
+          read_shift_px: '0.32'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '61.19'
+          neg_delta_fG_kJ_mol: '18.81'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3753.1, 1330.9]
+          read_2_px: [3753.0, 1331.0]
+          read_shift_px: '0.14'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '66.35'
+          neg_delta_fG_kJ_mol: '17.46'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3840.6, 1277.9]
+          read_2_px: [3841.0, 1278.0]
+          read_shift_px: '0.41'
+        - series: 1
+          symbol: filled_circle
+          T_K: '2200'
+          Al2O3_mole_percent_as_read: '71.88'
+          neg_delta_fG_kJ_mol: '14.95'
+          read_uncertainty_kJ_mol: '0.31'
+          read_uncertainty_mol_percent: '0.70'
+          read_1_px: [3935.1, 1180.4]
+          read_2_px: [3935.0, 1180.0]
+          read_shift_px: '0.41'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '4.87'
+          neg_delta_fG_kJ_mol: '4.34'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [2794.0, 766.0]
+          read_2_px: [2793.8, 764.8]
+          read_shift_px: '1.22'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '7.16'
+          neg_delta_fG_kJ_mol: '7.08'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [2832.0, 872.0]
+          read_2_px: [2833.7, 873.4]
+          read_shift_px: '2.20'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '9.65'
+          neg_delta_fG_kJ_mol: '7.08'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [2874.0, 874.0]
+          read_2_px: [2876.4, 871.4]
+          read_shift_px: '3.54'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '15.38'
+          neg_delta_fG_kJ_mol: '10.70'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [2972.0, 1014.0]
+          read_2_px: [2973.6, 1013.9]
+          read_shift_px: '1.60'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '19.33'
+          neg_delta_fG_kJ_mol: '12.65'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3040.0, 1090.0]
+          read_2_px: [3040.3, 1090.3]
+          read_shift_px: '0.42'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '21.65'
+          neg_delta_fG_kJ_mol: '13.37'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3080.0, 1118.0]
+          read_2_px: [3079.1, 1119.0]
+          read_shift_px: '1.35'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '23.93'
+          neg_delta_fG_kJ_mol: '14.85'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3118.0, 1176.0]
+          read_2_px: [3118.8, 1176.0]
+          read_shift_px: '0.80'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '28.49'
+          neg_delta_fG_kJ_mol: '16.79'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3196.0, 1252.0]
+          read_2_px: [3196.3, 1252.0]
+          read_shift_px: '0.30'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '32.74'
+          neg_delta_fG_kJ_mol: '18.38'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3268.0, 1314.0]
+          read_2_px: [3268.8, 1314.1]
+          read_shift_px: '0.81'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '36.71'
+          neg_delta_fG_kJ_mol: '19.60'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3336.0, 1362.0]
+          read_2_px: [3336.3, 1361.5]
+          read_shift_px: '0.58'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '40.71'
+          neg_delta_fG_kJ_mol: '20.73'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3404.0, 1406.0]
+          read_2_px: [3404.5, 1406.1]
+          read_shift_px: '0.51'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '44.47'
+          neg_delta_fG_kJ_mol: '21.49'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3468.0, 1436.0]
+          read_2_px: [3468.6, 1435.4]
+          read_shift_px: '0.85'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '47.97'
+          neg_delta_fG_kJ_mol: '22.01'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3528.0, 1456.0]
+          read_2_px: [3527.6, 1455.9]
+          read_shift_px: '0.41'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '51.27'
+          neg_delta_fG_kJ_mol: '22.47'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3584.0, 1474.0]
+          read_2_px: [3583.9, 1473.9]
+          read_shift_px: '0.14'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '54.55'
+          neg_delta_fG_kJ_mol: '22.63'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3640.0, 1480.0]
+          read_2_px: [3639.9, 1480.4]
+          read_shift_px: '0.41'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '57.49'
+          neg_delta_fG_kJ_mol: '22.73'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3690.0, 1484.0]
+          read_2_px: [3689.9, 1484.3]
+          read_shift_px: '0.32'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '60.19'
+          neg_delta_fG_kJ_mol: '22.63'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3736.0, 1480.0]
+          read_2_px: [3735.8, 1480.0]
+          read_shift_px: '0.20'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '65.23'
+          neg_delta_fG_kJ_mol: '22.16'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3822.0, 1462.0]
+          read_2_px: [3821.7, 1461.5]
+          read_shift_px: '0.58'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '69.57'
+          neg_delta_fG_kJ_mol: '21.40'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3896.0, 1432.0]
+          read_2_px: [3895.5, 1432.4]
+          read_shift_px: '0.64'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '73.53'
+          neg_delta_fG_kJ_mol: '21.58'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3964.0, 1438.0]
+          read_2_px: [3962.2, 1440.0]
+          read_shift_px: '2.69'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '74.63'
+          neg_delta_fG_kJ_mol: '19.86'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [3982.0, 1372.0]
+          read_2_px: [3981.8, 1372.1]
+          read_shift_px: '0.22'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '80.64'
+          neg_delta_fG_kJ_mol: '17.04'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [4084.0, 1262.0]
+          read_2_px: [4084.3, 1261.3]
+          read_shift_px: '0.76'
+        - series: 2
+          symbol: open_square
+          T_K: '2300'
+          Al2O3_mole_percent_as_read: '84.98'
+          neg_delta_fG_kJ_mol: '13.98'
+          read_uncertainty_kJ_mol: '0.26'
+          read_uncertainty_mol_percent: '0.59'
+          read_1_px: [4158.0, 1142.0]
+          read_2_px: [4158.1, 1142.1]
+          read_shift_px: '0.14'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '8.80'
+          neg_delta_fG_kJ_mol: '8.04'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [2860.7, 909.9]
+          read_2_px: [2860.8, 910.1]
+          read_shift_px: '0.22'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '14.06'
+          neg_delta_fG_kJ_mol: '11.90'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [2950.4, 1060.8]
+          read_2_px: [2950.3, 1060.9]
+          read_shift_px: '0.14'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '19.09'
+          neg_delta_fG_kJ_mol: '15.39'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3036.1, 1197.3]
+          read_2_px: [3035.9, 1197.0]
+          read_shift_px: '0.36'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '24.10'
+          neg_delta_fG_kJ_mol: '18.43'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3121.4, 1316.1]
+          read_2_px: [3121.2, 1315.7]
+          read_shift_px: '0.45'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '29.06'
+          neg_delta_fG_kJ_mol: '20.94'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3205.9, 1414.2]
+          read_2_px: [3205.8, 1413.9]
+          read_shift_px: '0.32'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '33.71'
+          neg_delta_fG_kJ_mol: '23.04'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3285.2, 1496.5]
+          read_2_px: [3284.8, 1495.9]
+          read_shift_px: '0.72'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '38.23'
+          neg_delta_fG_kJ_mol: '24.81'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3362.1, 1565.4]
+          read_2_px: [3361.8, 1564.9]
+          read_shift_px: '0.58'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '42.58'
+          neg_delta_fG_kJ_mol: '26.20'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3436.2, 1619.9]
+          read_2_px: [3436.0, 1619.6]
+          read_shift_px: '0.36'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '46.51'
+          neg_delta_fG_kJ_mol: '27.23'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3503.2, 1660.3]
+          read_2_px: [3502.8, 1659.6]
+          read_shift_px: '0.81'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '50.51'
+          neg_delta_fG_kJ_mol: '27.95'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3571.2, 1688.4]
+          read_2_px: [3571.1, 1687.7]
+          read_shift_px: '0.71'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '54.18'
+          neg_delta_fG_kJ_mol: '28.42'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3633.5, 1706.7]
+          read_2_px: [3633.8, 1706.2]
+          read_shift_px: '0.58'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '57.77'
+          neg_delta_fG_kJ_mol: '28.78'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3694.8, 1720.6]
+          read_2_px: [3694.6, 1720.1]
+          read_shift_px: '0.54'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '61.13'
+          neg_delta_fG_kJ_mol: '28.78'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3752.0, 1720.7]
+          read_2_px: [3752.0, 1720.1]
+          read_shift_px: '0.60'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '64.16'
+          neg_delta_fG_kJ_mol: '28.57'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3803.5, 1712.4]
+          read_2_px: [3803.7, 1711.7]
+          read_shift_px: '0.73'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '67.09'
+          neg_delta_fG_kJ_mol: '28.34'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3853.4, 1703.6]
+          read_2_px: [3853.5, 1703.0]
+          read_shift_px: '0.61'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '69.89'
+          neg_delta_fG_kJ_mol: '27.76'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3901.1, 1680.7]
+          read_2_px: [3901.3, 1680.3]
+          read_shift_px: '0.45'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '72.41'
+          neg_delta_fG_kJ_mol: '27.22'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3943.8, 1659.5]
+          read_2_px: [3944.2, 1659.1]
+          read_shift_px: '0.57'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '74.49'
+          neg_delta_fG_kJ_mol: '26.64'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [3979.3, 1637.1]
+          read_2_px: [3979.5, 1636.5]
+          read_shift_px: '0.63'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '80.34'
+          neg_delta_fG_kJ_mol: '24.39'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [4079.0, 1549.2]
+          read_2_px: [4079.3, 1548.6]
+          read_shift_px: '0.67'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '84.74'
+          neg_delta_fG_kJ_mol: '21.96'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [4154.0, 1454.0]
+          read_2_px: [4154.1, 1453.8]
+          read_shift_px: '0.22'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '89.95'
+          neg_delta_fG_kJ_mol: '17.86'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [4242.8, 1293.7]
+          read_2_px: [4242.7, 1294.0]
+          read_shift_px: '0.32'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '93.88'
+          neg_delta_fG_kJ_mol: '13.64'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [4309.7, 1128.9]
+          read_2_px: [4309.8, 1129.1]
+          read_shift_px: '0.22'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '96.43'
+          neg_delta_fG_kJ_mol: '10.07'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [4353.1, 989.4]
+          read_2_px: [4353.0, 989.7]
+          read_shift_px: '0.32'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '97.16'
+          neg_delta_fG_kJ_mol: '8.78'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [4365.5, 938.9]
+          read_2_px: [4365.5, 939.3]
+          read_shift_px: '0.40'
+        - series: 3
+          symbol: filled_triangle
+          T_K: '2400'
+          Al2O3_mole_percent_as_read: '99.79'
+          neg_delta_fG_kJ_mol: '0.18'
+          read_uncertainty_kJ_mol: '0.22'
+          read_uncertainty_mol_percent: '0.50'
+          read_1_px: [4410.3, 602.6]
+          read_2_px: [4410.2, 603.2]
+          read_shift_px: '0.61'
   Al2O3:
     observations:
     - observation_id: shornikov_2000_f2_al2o3_2200k
@@ -1994,7 +2779,7 @@ species:
           dark-annulus centroid (open square). The nominal value is the mean, rounded to 0.01 mol% and
           0.001 activity. read_uncertainty is at least half a marker (12 px circles, 8.5 px triangles,
           10 px squares) and is wide enough to contain both reads. It is a digitising width, not a printed
-          interval. read_uncertainty_dex is stored only for activity >= 0.05, as da/(a ln 10).'
+          interval.read_uncertainty_dex is stored only for activity >= 0.05, as da/(a ln 10).'
       T_range_K:
       - 2300.0
       - 2300.0

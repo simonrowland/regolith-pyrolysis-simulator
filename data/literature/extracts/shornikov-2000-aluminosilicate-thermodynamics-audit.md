@@ -23,8 +23,8 @@ Read 1 is the eroded-core seed (filled markers) or the open-square ring center. 
 Admitted, this work only, symbols 1–3:
 
 - SiO2, 2200 K, filled circles: 10 points. The gap from 45.82 to 61.02 mol% Al2O3 is the “10” label; those circles were not separable and were not invented.
-- SiO2, 2300 K, open squares: 18 points. Squares past about 81 mol% sit on the axis and were left unread.
-- SiO2, 2400 K, filled triangles: 15 points. Triangles past about 70 mol% merge with the axis.
+- SiO2, 2300 K, open squares: 19 points. The fix round added one square at 84.99 mol% Al2O3, activity 0.017. Its bottom edge is the axis, so the y uncertainty is 12 px.
+- SiO2, 2400 K, filled triangles: 19 points. The fix round added four triangles, at 78.04, 87.54, 93.51, and 96.06 mol% Al2O3 (activities 0.060, 0.015, 0.021, 0.012). The last three meet the axis, so their y uncertainty is 12 px. The rise from 0.015 to 0.021 is inside that uncertainty.
 - Al2O3, 2200 K, filled circles: 12 points. The last is 71.95 mol% Al2O3, activity 0.997, on the top frame. The printed corundum-liquidus limit from [1] is 28.56 mol% SiO2, which is 71.44 mol% Al2O3. The read was not forced onto that limit.
 - Al2O3, 2300 K, open squares: 20 points, ending at 85.11 mol%, activity 0.836. The printed limit is 90.10 mol% Al2O3. Squares between there and a = 1 were not separable from the stroke.
 - Al2O3, 2400 K, filled triangles: 25 points, ending at 99.98 mol%, activity 0.994. The corner core is a filled marker (about 490 dark pixels inside a 14 px ball), not the frame line. The printed limit at 2400 K is x*(SiO2) = 0.
@@ -41,7 +41,11 @@ Al2O3. Published p. 685 sets the lower limit of equation (1) on the corundum cry
 
 Figure 1 (published p. 685) is log I(SiO)+/I(Al)+. Context only.
 
-Figure 3 (published p. 687) is the integral melt −ΔfG. Y ticks 0, 10, 20, 30 fit G = −15.253 + 0.025595 y (39.07 px per kJ/mol) with residuals under 0.01 kJ/mol on those four ticks. X ticks every 10 mol% match 17.03 px per mol%. Eroded cores on the curves are 30–40 px stroke segments, not separable markers. No Gibbs numbers are stored. The quantity is also the integral of the melt, which a one-formula species key cannot carry. Partial Gibbs energies remain RT ln a on the Figure 2 rows.
+Figure 3 (published p. 687) is the integral melt −ΔfG. Y ticks 0, 10, 20, 30 fit −ΔfG = (y − 596) / 39.067 kJ/mol. X is mol% = (x − 2710.9) / 17.03. The fix round read the this-work markers twice. Read 1 is the 7×7 eroded core (filled) or the bright-hole centre (open square). Read 2 is a radius-14 dark centroid or the dark-ring centroid. Shifts are under 2 px. Stored, as a typed refusal because the schema has no solution-composition carrier: 15 filled circles at 2200 K, 23 open squares at 2300 K, and 25 filled triangles at 2400 K. The legend glyphs near x = 3427 were excluded. Half-marker uncertainty is 0.31 kJ/mol for circles, 0.26 for squares, and 0.22 for triangles.
+
+Refused on Figure 3, each one: open-square candidates at (2960, 988), (3144, 1138), (3908, 1220), (3956, 1468), (3962, 1186), and (4062, 1120), because they sit on the circle curve or break the square series; and the clump (4176, 1022), (4208, 984), (4224, 964), (4228, 992), (4248, 964), past about 85 mol%, where curves 7–9 converge and the white gaps are not one square each. Curves 4–9 were not sampled.
+
+Refused on the Figure 2(a) tail, each one: the dark mass near x = 1830–1872 (the stored 2300 K square, the curve, and any triangle are one mass); x ≈ 1895, curve thickness; x ≈ 1984–1990, a triangle tip merged with the stored square at (1966, 1730); x ≈ 2128, the 90% tick through the glyph; x ≈ 2275, the axis plus a bump; x ≈ 2296–2300, the right-hand frame. The dashed upper strokes are curves 4–10, not markers. Partial Gibbs energies remain RT ln a on the Figure 2 rows. The new activity points reuse the parent observation's standard state. The reference phase is not stated, and the pure-oxide rule is not applied.
 
 ## Prose kept as context
 
