@@ -704,7 +704,7 @@ def test_coating_diagnostic_output_does_not_depend_on_local_magemin_config(
         status="ok",
     )
 
-    def run_with_config(config_path):
+    def run_with_config(config_path, discovered_binary=None):
         with (
             patch.object(
                 engine_local_config,
@@ -714,7 +714,7 @@ def test_coating_diagnostic_output_does_not_depend_on_local_magemin_config(
             patch.object(
                 MAGEMinBackend,
                 "_locate_binary",
-                return_value=None,
+                return_value=discovered_binary,
             ),
             patch(
                 "engines.magemin.provider._SHADOW_BACKEND_CONFIG",
@@ -734,7 +734,9 @@ def test_coating_diagnostic_output_does_not_depend_on_local_magemin_config(
             actual_bytes, _engagement = produce_default_coating_diagnostic()
         return actual_bytes
 
-    assert run_with_config(host_config) == run_with_config(absent_config)
+    without_magemin = run_with_config(absent_config)
+    assert run_with_config(host_config) == without_magemin
+    assert run_with_config(absent_config, configured_binary) == without_magemin
 
 
 def test_positive_production_diagnostic_and_resumed_session_are_local() -> None:
