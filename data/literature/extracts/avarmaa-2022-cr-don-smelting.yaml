@@ -1,0 +1,268 @@
+schema_version: literature_extract.v1
+source_id: avarmaa-2022-cr-don-smelting
+source:
+  citation: Avarmaa K, O'Brien H, Johto H, Taskinen P (2022). Solubility of Chromium in DON Smelting. Mineral Processing and Extractive Metallurgy Review 43(2):201-208.
+  doi: 10.1080/08827508.2020.1854251
+  year: 2022
+extraction:
+  method: Born-digital pdftotext-layout; Table 1 condition rows and Figures 1-6 checked against 600 dpi page renders.
+  date: '2026-10-20'
+  worker: fam26-1020
+review_status: draft
+fidelity_samples:
+- path: species.Cr.observations[avarmaa_2022_average_slag_chromium_at_1400C].values.value
+  value: '0.66'
+  locator: {page: 8, published_page: 206, pdf_page_index: 7, figure: '1'}
+species:
+  Cr:
+    observations:
+    - observation_id: avarmaa_2022_average_slag_chromium_at_1400C
+      type: equilibrium_phase_composition
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 206
+        figure: '1'
+        section: Discussion and conclusions
+      units: wt% Cr
+      phase: l
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: silica + chromite spinel saturation
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 206
+            figure: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: The printed 0.66 wt% is the mean across experimental points with varying matte Fe and slag MgO.
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 206
+            figure: '1'
+        log_fO2:
+          state:
+            tag: unknown
+            reason: Figure 1 averages experimental points with different oxygen partial pressures; no single pressure applies to the mean.
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 206
+            figure: '1'
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_C: '1400'
+        value: '0.66'
+        value_as_published: '0.66'
+        component_as_published: Cr
+        basis_as_published: average of all experimental points in Figure 1
+        quench_provenance: Equilibrated for four hours and rapidly quenched in ice water; the original molten slag is reported as glassy after quench.
+        quench_preservation: not_stated
+    context:
+    - observation_id: avarmaa_2022_matte_chromium_range
+      type: context_record
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 201
+        section: Abstract
+      units: ppm Cr in matte
+      candidate_quantities: [equilibrium_phase_composition]
+      reason: The store quantity fits concentration, but its migration accepts scalar composition values, not intervals; retain the measured aggregate range here instead of misrepresenting it as a point.
+      values:
+        method_class: measured_direct
+        range_as_published: 30-100
+        phase_as_published: nickel matte
+    - observation_id: avarmaa_2022_table_1_experimental_conditions
+      type: context_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 202
+        table: '1'
+      units: table conditions as printed
+      candidate_quantities:
+      - equilibrium_phase_composition
+      reason: Table 1 is an experimental gas-flow and target-matte-grade conditions table, not measured equilibrium compositions. The printed flow units have no store token; keep the exact row conditions here without treating gas flow as a thermodynamic observation.
+      values:
+        method_class: measured_direct
+        rows:
+        - temperature_C: '1350'
+          target_Fe_in_matte_wt_percent: '5.0'
+          slag_MgO_wt_percent: '0, 5 and 10'
+          log_pO2_atm_as_printed: '-7.25'
+          log_pS2_atm_as_printed: '-3.17'
+          gas_flow_mL_min: {CO: '8', CO2: '55', SO2: '40', Ar: '300'}
+        - temperature_C: '1400'
+          target_Fe_in_matte_wt_percent: '2.5'
+          slag_MgO_wt_percent: '0, 5 and 10'
+          log_pO2_atm_as_printed: '-6.74'
+          log_pS2_atm_as_printed: '-3.41'
+          gas_flow_mL_min: {CO: '8', CO2: '55', SO2: '40', Ar: '300'}
+        - temperature_C: '1400'
+          target_Fe_in_matte_wt_percent: '5.0'
+          slag_MgO_wt_percent: '0, 5 and 10'
+          log_pO2_atm_as_printed: '-6.91'
+          log_pS2_atm_as_printed: '-3.15'
+          gas_flow_mL_min: {CO: '9.9', CO2: '55', SO2: '40', Ar: '300'}
+        - temperature_C: '1400'
+          target_Fe_in_matte_wt_percent: '10.0'
+          slag_MgO_wt_percent: '0, 5 and 10'
+          log_pO2_atm_as_printed: '-7.18'
+          log_pS2_atm_as_printed: '-2.67'
+          gas_flow_mL_min: {CO: '16', CO2: '55', SO2: '40', Ar: '300'}
+        - temperature_C: '1450'
+          target_Fe_in_matte_wt_percent: '5.0'
+          slag_MgO_wt_percent: '0, 5 and 10'
+          log_pO2_atm_as_printed: '-6.67'
+          log_pS2_atm_as_printed: '-3.03'
+          gas_flow_mL_min: {CO: '13.3', CO2: '55', SO2: '40', Ar: '300'}
+        SO2_partial_pressure_atm_as_printed: 0.1 ± 0.01
+    - observation_id: avarmaa_2022_matte_slag_distribution_coefficient_no_store_token
+      type: context_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 205
+        figure: '5'
+      units: dimensionless ratio as printed
+      candidate_quantities:
+      - equilibrium_phase_composition
+      reason: Figure 5 reports a matte-to-slag chromium distribution coefficient. No existing quantity token represents this ratio; equilibrium_phase_composition is a concentration and does not fit.
+      values:
+        method_class: measured_reduced
+        typed_quantity_as_published: matte-to-slag distribution coefficient
+    - observation_id: avarmaa_2022_spinel_slag_distribution_coefficient_no_store_token
+      type: context_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 203
+        figure: '3'
+      units: dimensionless ratio as printed
+      candidate_quantities:
+      - equilibrium_phase_composition
+      reason: Figure 3 reports the spinel-to-slag chromium distribution coefficient; no existing quantity token represents this ratio.
+      values:
+        method_class: measured_reduced
+        typed_quantity_as_published: spinel-to-slag distribution coefficient
+    - observation_id: avarmaa_2022_figure_1
+      type: figure_record
+      locator: {page: 5, pdf_page_index: 4, published_page: 203, figure: '1'}
+      units: wt% Cr
+      phase_as_printed: molten iron-silicate slag at silica-spinel saturation; glassy after quench
+      temperature_as_printed: 1400 °C
+      axes_as_printed: 'x: Fe in matte (wt%); y: chromium concentration in slag (wt%)'
+      caption: Obtained solubilities of chromium in molten iron-silicate slags at silica-spinel saturation as a function of iron concentration of nickel matte at 1400 °C; red horizontal line is the average of all experimental points, 0.66 wt% Cr.
+      panel: single
+      series:
+      - {name: MgO=0, marker: open diamond, marker_count: 8, method_class: measured_reduced}
+      - {name: MgO=5, marker: open square, marker_count: 8, method_class: measured_reduced}
+      - {name: MgO=9, marker: open triangle, marker_count: 6, method_class: measured_reduced}
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values: {typed_quantity: equilibrium_phase_composition, method_class: measured_reduced}
+    - observation_id: avarmaa_2022_figure_2
+      type: figure_record
+      locator: {page: 6, pdf_page_index: 5, published_page: 204, figure: '2'}
+      units: wt% Cr
+      phase_as_printed: molten iron-silicate slag at silica-spinel saturation
+      temperature_as_printed: 1350–1450 °C
+      axes_as_printed: 'x: temperature (°C); y: chromium concentration in slag (wt%)'
+      caption: Impact of temperature on chromium solubility at silica-spinel saturation and 5 wt% Fe in DON matte; trend line fitted to points with 5 wt% MgO.
+      panel: single
+      series:
+      - {name: MgO=0, marker: open diamond, marker_count: 3, method_class: measured_reduced}
+      - {name: MgO=5, marker: open square, marker_count: 3, method_class: measured_reduced}
+      - {name: MgO=9, marker: open triangle, marker_count: 6, method_class: measured_reduced}
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values: {typed_quantity: equilibrium_phase_composition, method_class: measured_reduced}
+    - observation_id: avarmaa_2022_figure_3a
+      type: figure_record
+      locator: {page: 6, pdf_page_index: 5, published_page: 204, figure: '3'}
+      units: dimensionless
+      phase_as_printed: chromite spinel / molten iron-silicate slag
+      temperature_as_printed: 1400 °C
+      axes_as_printed: 'x: Fe in matte (wt%); y: spinel/slag chromium distribution coefficient'
+      caption: Chromium distribution coefficient between spinel and molten slag at 1400 °C as a function of matte iron content.
+      panel: a
+      series:
+      - {name: MgO=0, marker: open diamond, marker_count: 6, method_class: measured_reduced}
+      - {name: MgO=5, marker: open square, marker_count: 6, method_class: measured_reduced}
+      - {name: MgO=9, marker: open triangle, marker_count: 6, method_class: measured_reduced}
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values: {typed_quantity: spinel/slag distribution coefficient, method_class: measured_reduced}
+    - observation_id: avarmaa_2022_figure_3b
+      type: figure_record
+      locator: {page: 6, pdf_page_index: 5, published_page: 204, figure: '3'}
+      units: dimensionless
+      phase_as_printed: chromite spinel / molten iron-silicate slag
+      temperature_as_printed: 1350–1450 °C
+      axes_as_printed: 'x: Fe in matte (wt%); y: spinel/slag chromium distribution coefficient'
+      caption: Chromium distribution coefficient at about 5 wt% MgO as a function of matte iron content and temperature.
+      panel: b
+      series:
+      - {name: 1350 °C, marker: open diamond, marker_count: 3, method_class: measured_reduced}
+      - {name: 1400 °C, marker: open square, marker_count: 8, method_class: measured_reduced}
+      - {name: 1450 °C, marker: open triangle, marker_count: 6, method_class: measured_reduced}
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values: {typed_quantity: spinel/slag distribution coefficient, method_class: measured_reduced}
+    - observation_id: avarmaa_2022_figure_4
+      type: figure_record
+      locator: {page: 7, pdf_page_index: 6, published_page: 205, figure: '4'}
+      units: ppm Cr
+      phase_as_printed: nickel matte
+      temperature_as_printed: 1350–1450 °C
+      axes_as_printed: 'x: Fe in matte (wt%); y: chromium concentration in matte (ppm)'
+      caption: Measured chromium solubilities in nickel matte as a function of iron concentration in DON matte; symbols distinguish slag MgO and temperature.
+      panel: single
+      series:
+      - {name: 'MgO=0, 1400 °C', marker: open square, marker_count: 3, method_class: measured_direct}
+      - {name: 'MgO=5, 1400 °C', marker: open circle, marker_count: 4, method_class: measured_direct}
+      - {name: 'MgO=10, 1450 °C', marker: filled square, marker_count: 2, method_class: measured_direct}
+      - {name: 'MgO=10, 1400 °C', marker: filled circle, marker_count: 3, method_class: measured_direct}
+      - {name: 'MgO=10, 1350 °C', marker: open diamond, marker_count: 1, method_class: measured_direct}
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values: {typed_quantity: equilibrium_phase_composition, method_class: measured_direct}
+    - observation_id: avarmaa_2022_figure_5
+      type: figure_record
+      locator: {page: 7, pdf_page_index: 6, published_page: 205, figure: '5'}
+      units: dimensionless
+      phase_as_printed: nickel matte / molten iron-silicate slag
+      temperature_as_printed: 1350–1450 °C
+      axes_as_printed: 'x: Fe in matte (wt%); y: matte/slag chromium distribution coefficient'
+      caption: Chromium distribution coefficient between nickel matte and iron-silicate slag at 1350–1450 °C; MgO series cannot be distinguished due to scatter.
+      panel: single
+      series:
+      - {name: all MgO conditions, marker: open diamond, marker_count: 12, method_class: measured_reduced}
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values: {typed_quantity: matte/slag distribution coefficient, method_class: measured_reduced}
+    - observation_id: avarmaa_2022_figure_6
+      type: figure_record
+      locator: {page: 8, pdf_page_index: 7, published_page: 206, figure: '6'}
+      units: site fraction
+      phase_as_printed: spinel solid solution
+      temperature_as_printed: 1400 °C
+      axes_as_printed: 'x: magnesia concentration in slag (wt%); y: site fraction of species in spinel'
+      caption: Estimated cation distributions in spinel sublattices as a function of magnesia concentration in the bulk slag at silica-spinel saturation at 1400 °C.
+      panel: single
+      series:
+      - {name: 'y(Fe,Me)', marker: open diamond, marker_count: 3, method_class: model_derived}
+      - {name: 'y(Mg,Me)', marker: open square, marker_count: 3, method_class: model_derived}
+      - {name: 'y(Ni,Me)', marker: open triangle, marker_count: 3, method_class: model_derived}
+      - {name: 'y(Fe,M)', marker: open circle, marker_count: 3, method_class: model_derived}
+      - {name: 'y(Cr,M)', marker: filled diamond, marker_count: 3, method_class: model_derived}
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values: {typed_quantity: spinel cation site fraction, method_class: model_derived}
