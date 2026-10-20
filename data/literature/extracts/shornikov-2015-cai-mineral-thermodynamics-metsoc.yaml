@@ -1,0 +1,53 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2015-cai-mineral-thermodynamics-metsoc
+source:
+  citation: >-
+    Shornikov, S. I. (2015). Thermodynamics of Ca–Al-Inclusion’s High-Temperature
+    Minerals. 78th Annual Meeting of the Meteoritical Society, abstract 5017.
+  year: 2015
+  doi: null
+  corpus_asset: raw/shornikov-2015-cai-mineral-thermodynamics-metsoc/shornikov-2015-cai-mineral-thermodynamics-metsoc.pdf
+  corpus_sha256: 61593c040c6ac2f989e3553487e8fc0646d513e28e9baf974e393b0aed58f4e2
+extraction:
+  method: >-
+    Manual review of the one-page Meteoritical Society abstract 5017 by S. I.
+    Shornikov alone. The abstract reports a calculation using the ideal
+    associated solutions model and cites prior KEMS inputs; it prints no measured
+    table or numerical target-species results. No values were copied from those
+    cited KEMS papers.
+  date: '2026-10-20'
+  worker: fam20-1019
+review_status: draft
+species:
+  Al2O3:
+    observations: []
+    context:
+      - observation_id: shornikov_2015_metsoc_5017_calculated_model_summary
+        type: model_derived_context
+        locator:
+          page: 1
+          pdf_page_index: 0
+          abstract: '5017'
+          section: Abstract
+        units: not applicable; qualitative summary only
+        values:
+          method_class: model_derived
+          system_as_printed: CaO–Al2O3
+          model_as_printed: ideal associated solutions
+          input_data_as_printed: experimental results obtained by the Knudsen effusion mass spectrometric method [4, 5]
+          temperature_range_as_printed: 1600–2500 K
+          minerals_as_printed:
+            - corundum
+            - hibonite
+            - grossite
+            - dmitryivanovite
+          results_as_printed: >-
+            The abstract says total vapor pressures over the four refractory
+            minerals are close within an order of magnitude, while vapor
+            composition differs with changes in oxide activities across the
+            crystalline-to-liquid transition.
+          measured_table: none printed
+          numeric_target_species_results: none printed
+          reason: >-
+            Results are calculated and described qualitatively; numerical
+            pressure and activity values are not printed in this abstract.
