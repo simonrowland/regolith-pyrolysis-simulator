@@ -30,6 +30,7 @@ pdftotext `-bbox` on this file uses a top-left origin. Page renders are 600 dpi 
 | 4 | 290 | Table 2 MgAl2O4 block. The last row before Al2O3 is 2420 ± 25, 55.81 ± 4.62, 23.06 ± 1.73, This work | the whole Table 2 body |
 | 6 | 292 | Prose: ΔH_T = 43.79 ± 4.84 kJ/mol and ΔS_T = 28.09 ± 1.64 J/(mol K), liquid state, equation (19) | the paragraph that prints those constants |
 | 5 | 291 | Figure 4 series 8. Open right-pointing triangles, no bar, both panels, above about 2160 K | the figure crop, then each stored centre again |
+| 3 | 289 | Figure 2 series 16. Four open right-pointing triangles with a free white interior | the high-T chain at 2× and 3×, then the marked centres |
 
 Neighbour rows on pages 2 and 4 match pdftotext, so the this-work row is not a shifted literature row.
 
@@ -50,6 +51,10 @@ Eight Figure 4 activities, `figure_only`, stoichiometric spinel. Quantity `activ
 - Panel (a) a(MgO): 0.368 at 2161 K, 0.388 at 2218 K, 0.406 at 2257 K, 0.425 at 2304 K. Read uncertainty ±0.010 and ±5.4 K.
 - Panel (b) a(Al2O3): 0.211 at 2162 K, 0.202 at 2220 K, 0.203 at 2259 K, 0.200 at 2306 K. Read uncertainty ±0.005 and ±5.4 K.
 
+Four Figure 2 Gibbs energies, `figure_only`, quantity `delta_fG`, crystalline spinel. Read uncertainty ±0.30 kJ/mol and ±10 K.
+
+- −22.41 kJ/mol at 2050 K, −22.70 at 2102 K, −22.92 at 2160 K, −23.61 at 2302 K.
+
 ## What was refused
 
 Two formation entropies are stored and marked `typed_refusal`. The schema has no `delta_fS` token. They are not stored as absolute entropy `S`.
@@ -62,7 +67,7 @@ Two formation entropies are stored and marked `typed_refusal`. The schema has no
 - Table 1: 30 literature rows (calorimetry, EMF, thermochemical calculations, earlier KEMS). Not this paper’s measurements.
 - Table 2: 15 literature melting rows (4 MgO, 8 other MgAl2O4, 3 Al2O3). Not this paper’s measurements.
 - Figure 1: literature heat capacity. Not read.
-- Figure 2: pointwise ΔG. Series 16 (this study) sits on the same trend as series 13 and 15. The least-squares result is already Table 1. No point was read. MinerU’s chart table was ignored.
+- Figure 2: pointwise ΔG. Series 16 is the open right-pointing triangle. Four centres with a free white interior were stored. The overlapped chain below about 2020 K, the cut interior near 2210 K, and the gap near 2256 K were not stored. Other symbols are other series. The least-squares constants remain Table 1. MinerU’s chart table was ignored.
 - Figure 3: pressures over spinel cited as reference [1], the evaporation paper already extracted. Not re-read.
 - Figure 4: activities. Linear axes, calibrated from the tick marks on the 600 dpi render of PDF page 5. Series 8 is the open right-pointing triangle with no bar. Eight centres were stored, four on each panel, all above about 2160 K. Read uncertainty is ±10 px (±5.4 K, and ±0.010 or ±0.005 in activity). Markers below that, barred triangles, filled triangles, legend keys, and any outline that shares a centre were not stored. The refused set is named in the figure-4 context row. MinerU’s scatter table was ignored.
 - Figure 5: MgAl2O4–SiO2 phase diagram cited to [55]. Not this paper’s measurements. MinerU’s contour table was ignored.
