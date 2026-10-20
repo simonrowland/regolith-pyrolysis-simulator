@@ -12,7 +12,6 @@ def test_wall_lifespan_uses_net_signed_substrate_deposition():
 
 import copy
 import hashlib
-import json
 
 import pytest
 
@@ -609,32 +608,12 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
     assert all(record["authority_level"] == "extrapolated" for record in records.values())
 
 
-def test_coating_diagnostic_default_output_is_byte_identical_to_golden(
-    monkeypatch, tmp_path
-) -> None:
-    from simulator import engine_local_config
-
-    # This golden covers the runner default without machine-local engine paths.
-    monkeypatch.setattr(
-        engine_local_config,
-        "config_path",
-        lambda: tmp_path / "engines.local.toml",
+def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None:
+    from tests.coating_diagnostic_output import (
+        produce_default_coating_diagnostic,
     )
 
-    run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=24,
-        additives_kg={},
-        allow_fallback_vapor=True,
-        allow_unmeasured_alpha_fallback=True,
-        run_metadata_overrides={
-            "started_at_utc": "2026-05-15T00:00:00Z",
-            "kernel_commit_sha": "goal-18-fixture",
-        },
-    )
-
-    payload = run.run()
+    actual_bytes, engagement = produce_default_coating_diagnostic()
     # b-238 (2026-08-26): melt_redox_gate_floor_fallback_engagement counts
     # _melt_redox_liquidus_floor_fallback engagements, and that count depends
     # on whether _freeze_gate_curve() hits its cross-run cache — measured
@@ -642,22 +621,12 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden(
     # processes. A byte-identity pin over a cache-sensitive counter flaps red
     # and green with zero code change, so the block is asserted by SHAPE here
     # and excluded from the hash; the hash keeps pinning everything else.
-    engagement = payload.pop("melt_redox_gate_floor_fallback_engagement")
     assert set(engagement) == {"engaged", "total_count", "by_hour"}
     assert isinstance(engagement["engaged"], bool)
     assert isinstance(engagement["total_count"], int)
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
-    actual_bytes = (
-        json.dumps(
-            payload,
-            indent=2,
-            sort_keys=False,
-            allow_nan=False,
-        )
-        + "\n"
-    ).encode("utf-8")
     # Rebaselined 2026-08-18 (t-686) with the cause named, not to make a red
     # test pass. The prior digest 6e75e35e... was produced by the pre-t-470
     # rail; TWO intentional rail commits moved this whole-run hash, both

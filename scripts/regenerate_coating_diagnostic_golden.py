@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Regenerate the coating-diagnostic default-output SHA pin from the executable.
 
-Machine-sensitive: run under the STUDIO CI engine config (see scripts/studio-regen.sh).
-Laptop regens of this pin have red-on-gate history (train11 class).
+The producer uses the same engine-config-free default as the test, independent
+of the host's engines.local.toml. Run through scripts/studio-regen.sh on a
+studio for the supported golden update route.
 
 Producer matches tests/test_coating_rate.py::
 test_coating_diagnostic_default_output_is_byte_identical_to_golden.
@@ -11,7 +12,6 @@ test_coating_diagnostic_default_output_is_byte_identical_to_golden.
 from __future__ import annotations
 
 import hashlib
-import json
 import re
 import sys
 from pathlib import Path
@@ -19,8 +19,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-
-from simulator.runner import PyrolysisRun  # noqa: E402
 
 TEST_PATH = ROOT / "tests" / "test_coating_rate.py"
 PIN_RE = re.compile(
@@ -33,27 +31,12 @@ PIN_RE = re.compile(
 
 
 def produce_bytes() -> bytes:
-    run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=24,
-        additives_kg={},
-        allow_fallback_vapor=True,
-        allow_unmeasured_alpha_fallback=True,
-        run_metadata_overrides={
-            "started_at_utc": "2026-05-15T00:00:00Z",
-            "kernel_commit_sha": "goal-18-fixture",
-        },
+    from tests.coating_diagnostic_output import (
+        produce_default_coating_diagnostic,
     )
-    return (
-        json.dumps(
-            run.run(),
-            indent=2,
-            sort_keys=False,
-            allow_nan=False,
-        )
-        + "\n"
-    ).encode("utf-8")
+
+    actual_bytes, _engagement = produce_default_coating_diagnostic()
+    return actual_bytes
 
 
 def main() -> int:
