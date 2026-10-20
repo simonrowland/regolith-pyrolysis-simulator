@@ -59,6 +59,7 @@ Fig. 2 caption: SiO2 (1) and P4O10 (2) activities and mixing energies (3, 4) at 
 | Fig. 5A red curve 1 | refused | Continuous. Caption assigns it, with the filled red circles, to Shornikov et al. (1996), ZnO–P4O10 at 1300 K. |
 | Fig. 5A red curve 4 | refused | Continuous. Same citation. The open red circles are the rows below. |
 | Fig. 5A red filled circle, curve 1 | refused | (824, 1319), r=24.8, 600 dpi, PDF page 6. Shornikov et al. (1996). Not read. |
+| Fig. 5A red filled circle, curve 1 | refused | (856, 1342), r≈24. Between (824, 1319) and (885, 1369), separations 39.4 and 39.6 px. Blue curve 6 crosses the disk, and the red curve joins it to both neighbours, so a distance transform has no separate core. After those two cores are removed, a radius-23 template on the remaining red pixels peaks here. Not read. |
 | Fig. 5A red filled circle, curve 1 | refused | (885, 1369), r=24.4. Same series. Not read. |
 | Fig. 5A red filled circle, curve 1 | refused | (942, 1413), r=24.2. Same series. Not read. |
 | Fig. 5A red filled circle, curve 1 | refused | (998, 1457), r=24.1. Same series. Not read. |
@@ -82,6 +83,7 @@ Fig. 2 caption: SiO2 (1) and P4O10 (2) activities and mixing energies (3, 4) at 
 | Fig. 5A black filled circle, curve 2 | refused | (947, 1183), r=23.4. Triple with (972, 1188) and (998, 1188). Adjacent separations 25.5 and 26.0 px, inside one diameter (~46 px). Overlap; not read. |
 | Fig. 5A black filled circle, curve 2 | refused | (972, 1188), r=23.4. Same triple. Separation 26.0 px from (998, 1188). |
 | Fig. 5A black filled circle, curve 2 | refused | (998, 1188), r=23.1. Same triple. |
+| Fig. 5A black filled circle, curve 2 | refused | (1058, 1238), r≈26, 600 dpi, PDF page 6. Blue curve 6 crosses the lower part of the disk. The intact cap starts at y=1213 and the right edge is about x=1084. A distance transform of the black pixels peaks at r=12.4, under the 15 px cutoff. A radius-22 template that counts the black pixels plus that blue stroke peaks at (1060, 1233). Separation 78 px from (998, 1188). Stolyarova et al. (1990). Not read. |
 | Fig. 5A black filled circle, curve 2 | refused | (1755, 1489), r=23.1. Right-hand circle on curve 2. Not read. |
 | Fig. 5A black open circle, curve 5 | refused | (605, 1478), r=20. Lower left circle on curve 5. Not read. |
 | Fig. 5A black open circle, curve 5 | refused | (667, 1257), r=20. Same series. Not read. |
@@ -114,6 +116,35 @@ Fig. 2 caption: SiO2 (1) and P4O10 (2) activities and mixing energies (3, 4) at 
 | Fig. 5B endpoint disk | refused | (4002, 1020), r≈24. Filled disk at the right frame of panel B, crown at y=995, midline x=4002. Red, black and blue curves meet here. Not assigned to one series. Not read. |
 | Fig. 5A panel letter | legend glyph | (1972, 2031), the ring around the panel letter A. Not a data marker. |
 | Fig. 5B panel letter | legend glyph | (3857, 2032), the ring around the panel letter B, between counters (3857, 2013) and (3859, 2051). Not a data marker. |
+| Fig. 5 filled-core scan | scan | Both panels, 600 dpi, PDF page 6, window x 500–4080 and y 980–2220. Masks: red is R≥150, G≤80, B≤90; black is R, G and B ≤60; blue is B≥120 and B exceeds R and G. A distance transform keeps a local core only at radius ≥15 px. Open-circle rings are thinner than that, so they are not cores; their rows above are the census. Blue produced no core, so curves 3, 6 and 9 have no filled marker. |
+| Fig. 5 scan core | red r=29.7 | (2773, 2052). Matched row (2773, 2052). Paired row (2758, 2039) is 19.8 px away inside this core. |
+| Fig. 5 scan core | red r=29.0 | (2825, 2083). Matched row (2825, 2083). |
+| Fig. 5 scan core | red r=24.7 | (2934, 2085). Matched row (2941, 2090), 8.6 px away. |
+| Fig. 5 scan core | red r=24.0 | (824, 1319). Matched row (824, 1319). |
+| Fig. 5 scan core | red r=23.9 | (941, 1412). Matched row (942, 1413). |
+| Fig. 5 scan core | red r=23.8 | (2887, 2074). Matched row (2888, 2074). |
+| Fig. 5 scan core | red r=23.6 | (885, 1369). Matched row (885, 1369). |
+| Fig. 5 scan core | red r=23.4 | (998, 1457). Matched row (998, 1457). |
+| Fig. 5 scan core | red r=23.3 | (1065, 1519). Matched row (1065, 1519). |
+| Fig. 5 scan core | red r=23.2 | (1138, 1612). Matched row (1138, 1612). |
+| Fig. 5 scan core | red r=23.1 | (2702, 2011). Matched row (2701, 2011). |
+| Fig. 5 scan core | red r=23.1 | (3021, 2119). Matched row (3021, 2119). |
+| Fig. 5 scan core | red r=15.6 | (3832, 2031). Panel B letter stroke, not a data marker. Nearest glyph (3857, 2032). |
+| Fig. 5 scan core | black r=23.3 | (2793, 1287). Matched row (2793, 1287). |
+| Fig. 5 scan core | black r=23.3 | (2948, 1394). Matched row (2941.5, 1400.5), 9.2 px away. |
+| Fig. 5 scan core | black r=23.1 | (2854, 1356). Matched row (2855, 1356). |
+| Fig. 5 scan core | black r=23.0 | (947, 1183). Matched row (947, 1183). |
+| Fig. 5 scan core | black r=23.0 | (2551, 1181). Matched row (2550, 1181). |
+| Fig. 5 scan core | black r=23.0 | (3638, 1270). Matched row (3638, 1270). |
+| Fig. 5 scan core | black r=23.0 | (2881, 1354). Matched row (2880, 1354). |
+| Fig. 5 scan core | black r=23.0 | (1755, 1489). Matched row (1755, 1489). |
+| Fig. 5 scan core | black r=22.8 | (2830, 1351). Matched row (2831, 1352). |
+| Fig. 5 scan core | black r=22.8 | (667, 1079). Matched row (667, 1079). |
+| Fig. 5 scan core | black r=22.8 | (971, 1188). Matched row (972, 1188). |
+| Fig. 5 scan core | black r=22.8 | (997, 1188). Matched row (998, 1188). |
+| Fig. 5 scan core | black r=21.2 | (908, 1131). Matched row (908, 1132). |
+| Fig. 5 scan core | black r=15.7 | (1997, 2050). Panel A letter stroke, not a data marker. Nearest glyph (1972, 2031). |
+| Fig. 5 scan core | split disk | Raw radius falls under 15 where a stroke crosses a filled disk. A radius-22 template that counts that colour plus the crossing stroke recovers (605, 1022), (2488, 1063), the three endpoint disks, and the new black row (1058, 1238). The new red row (856, 1342) is the bead between (824, 1319) and (885, 1369). Other template peaks land on a listed open circle, a panel letter, a blue-curve junction, or the neck between two listed filled circles. |
 | Fig. 1 | refused | Phase diagram of Rahman et al. (2013) and Jantzen et al. (2019). |
 
 No point was given a value. Read uncertainty is not stated because nothing was read.
