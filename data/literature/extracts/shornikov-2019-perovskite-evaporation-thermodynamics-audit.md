@@ -63,12 +63,13 @@ A marker is a centre, or an assignable exposed arc or tip, inside a stated uncer
 - Fig. 2b red at x=3475: stored at (3474.5, 3105.0) from the exposed lower arc. The clean circle at (3556, 3121) fixes the 9 px offset from the arc bottom.
 - Fig. 2b navy at x=3386: stored at (3386.0, 2686.0) from the tip at (3386, 2702). The clean triangle at (3324, 2691) fixes the 16 px offset.
 - Fig. 2b Ti at x=4023: stored at (4024.0, 3096.0). The apex is y=3080-3084. Sibling triangles place the centre 16 px below the first apex row. The purple diamond crosses the body. The blue glyph near (4070, 3056) is the series label 3. The old centre (4050.0, 3085.6) is blank page.
-- Fig. 2b series 6. The clean triangle at (2646, 2475) has its one-pixel tip 8 px below the stored centre, so a new centre is tip y minus 8. Stored tips: (3266, 2521), (3323, 2519), (3386, 2516), (3474, 2512), (3557, 2510), (3640, 2507), (4125, 2502). x=2709 stays refused: two offset clumps, and the pixel at (2707, 2490) is not on the body axis. x=2780, x=2839 and x=3174 are deferred below. Series 4 is not used as the comparison.
+- Fig. 2b series 6. The clean triangle at (2646, 2475) has its one-pixel tip 8 px below the stored centre, so a new centre is tip y minus 8. Stored tips: (3266, 2521), (3323, 2519), (3386, 2516), (3474, 2512), (3557, 2510), (3640, 2507), (4125, 2502). x=2709 stays refused: two offset clumps, and the pixel at (2707, 2490) is not on the body axis. x=2780, x=2839 and x=3174 are refused below: the purple at those stations is the series stroke, not a tip. Series 4 is not used as the comparison.
 - Fig. 2b Ti at x=4124.5: stored at (4124.5, 3094.0). Saturated-blue apex y=3078-3079, x midpoint 4124.5. Centre y = 3078 + 16. The bar at y=3090-3096 crosses the body. lg p = -9.071. The glyph near (4070, 3056) remains the series label.
 - Fig. 2b O2 at x=4124: stored at (4124.0, 2657.0). One-pixel navy tip at (4124, 2673). Centre y = 2673 - 16. lg p = -6.562. The diagonal trail at x=4062-4092 is not the tip.
-- Fig. 2a magenta TiO near x=907, crop x=860-980, y=3020-3095. The left edge runs off the crop. A leftmost-magenta fit gives radius 122 px, rms 2.05. Deferred.
-- Fig. 2b TiO near x=4125, crop x=4040-4180, y=2380-2520. The narrow tip at y=2463 widens into the frame bar by y=2473. The longest vertical colour chord is that bar, so the filled-diamond centre is not assigned. Deferred.
-- Fig. 3a near x=1119, y=4632. Black pixels below the blue disk form a curve plus a vertical stroke. Circle fits of that ink move between radius 20 and 68 px, with rms 1.0 to 6.4. Deferred. The blue disk at (1119.5, 4597.9) stays stored.
+- Fig. 2a magenta TiO near x=907, crop x=860-1020, y=3000-3140. Refused. Magenta pixels in that window are the diagonal series stroke: their centroid is (935.8, 3051.4), and a mask of the window shows the stroke plus a hook, not a closed disk. A circle forced through the magenta edge, radius constrained to 14-24 px, lands at (906.09, 3062.26), radius 20.04 px, rms 0.751 px, on a 182 degree arc. That circle sits 9 px from the stored series-6 disk at (903.9, 3053.5). It is not a second marker. The old leftmost-magenta fit, radius 122 px, rms 2.05, is the same stroke and is not stored.
+- Fig. 2b TiO near x=4125, crop x=4040-4180, y=2380-2520. Refused. The horizontal magenta bar is y=2474-2480 (74 to 93 px wide). At x=4124 and x=4125 the only vertical magenta run is y=2462-2476, 15 px, and it joins that bar. There is no lower tip. The longest vertical colour chord is the bar, so no filled-diamond centre is assigned.
+- Fig. 2b series 6 at x=2780, x=2839 and x=3174. Refused. Purple ink at x=2780 is the horizontal stroke y=2491-2507, then a gap, then a speck at y=2512-2514 (5, 4 and 2 px). That speck is not a triangle tip. At x=2839 the purple is one band y=2498-2513 with no pixel below it. At x=3174 the purple is one band y=2502-2515 with no pixel below it. The clean triangle at (3266, 2521) has a continuous tip; these three stations do not.
+- Fig. 3a near x=1119, y=4632. Refused. Black pixels in x=1070-1170, y=4550-4665 are a stroke, not a disk: a circle through them has radius 184 px and rms 7.65 px, and the centre (1292, 4563) is not at the station. The blue disk at (1119.5, 4597.9) stays stored.
 - Fig. 3a series 3 and 5 are Banon et al. 1981. Fig. 3b series 2–4 are other papers. Fig. 1 is Gong et al. 2018.
 
 ## This-work markers
@@ -359,9 +360,9 @@ A marker is a centre, or an assignable exposed arc or tip, inside a stated uncer
 | b/6 purple ink | O | 2709 | 2490 | — | refused: two offset clumps, no one tip on an axis |
 | b/3 open triangle | Ti | 4124.5 | 3094.0 | log10_p=-9.071 | read |
 | b/7 open triangle | O2 | 4124.0 | 2657.0 | log10_p=-6.562 | read |
-| a/4 magenta ink | TiO | 907 | 3066 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=860-980, y=3020-3095; left edge leaves the crop, fitted radius 122 px |
-| b/4 filled diamond | TiO | 4125 | 2470 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=4040-4180, y=2380-2520; the tip widens into the frame and the longest vertical chord is the bar |
-| b/6 purple ink | O | 2780 | 2513 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=2765-2805, y=2488-2525; one disconnected pixel at (2779, 2513) |
-| b/6 purple ink | O | 2839 | 2505 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=2799-2885, y=2460-2540; lowest ink is x=2849-2885, off the station |
-| b/6 purple ink | O | 3174 | 2514 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=3125-3210, y=2460-2540; lowest ink is x=3158-3164 |
-| a/4 black patch | CaTiO3 | 1119 | 4632 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=1070-1170, y=4550-4665; black-ink fits move, rms 1.0 to 6.4 |
+| a/4 magenta ink | TiO | 907 | 3066 | — | refused: the magenta ink is the series stroke, centroid (935.8, 3051.4); a forced circle at (906.09, 3062.26), r=20.04, rms 0.75, sits 9 px from the stored series-6 disk |
+| b/4 filled diamond | TiO | 4125 | 2470 | — | refused: at x=4124-4125 the only vertical magenta run is y=2462-2476 and it joins the bar at y=2474-2480; no separate tip |
+| b/6 purple ink | O | 2780 | 2513 | — | refused: the purple is the stroke at y=2491-2507; y=2512-2514 is a 5 px speck after a gap, not a tip |
+| b/6 purple ink | O | 2839 | 2505 | — | refused: one purple band y=2498-2513, no pixel below the band |
+| b/6 purple ink | O | 3174 | 2514 | — | refused: one purple band y=2502-2515, no pixel below the band |
+| a/4 black patch | CaTiO3 | 1119 | 4632 | — | refused: black ink fits radius 184 px, rms 7.65, centre (1292, 4563), off the station; the blue disk at (1119.5, 4597.9) stays stored |
