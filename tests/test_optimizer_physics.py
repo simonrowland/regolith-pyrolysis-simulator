@@ -455,10 +455,14 @@ def test_runner_fouling_report_non_authoritative_is_unconstrained_and_surfaced()
     assert "resinter threshold is not grounded" in coating.detail
 
 
-@pytest.mark.parametrize("nominal_load", [0.0, 0.1])
+@pytest.mark.parametrize(
+    "nominal_load",
+    [0.0, 0.1, None],
+    ids=["measured-zero", "positive-rate", "unavailable-rate"],
+)
 @pytest.mark.parametrize("output_status", ["status_bearing", "non-authoritative-threshold"])
 def test_null_threshold_unavailable_wall_channel_is_not_an_authoritative_pass(
-    nominal_load: float, output_status: str,
+    nominal_load: float | None, output_status: str,
 ) -> None:
     from simulator.optimize.results_store import (
         _deserialize_grounding_margins, _serialize_margins,
@@ -492,6 +496,7 @@ def test_null_threshold_unavailable_wall_channel_is_not_an_authoritative_pass(
     assert coating.status == "unavailable"
     assert coating.authoritative is False
     assert coating.observed is None
+    assert coating.status_payload["wall_deposit_kg_per_campaign"] == nominal_load
     assert coating.status_payload["coating_constraint_authoritative"] is False
     assert coating.status_reason == report["status_reason"]
     assert _margin_view(coating)[9] is None

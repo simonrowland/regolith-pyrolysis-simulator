@@ -767,6 +767,23 @@ def test_runner_fouling_authority_receives_unfiltered_zero_projection() -> None:
     )
 
 
+def test_runner_wall_pressure_refusal_without_recorded_deposit_has_no_totals():
+    report = _wall_fouling_report(
+        {},
+        alpha_notice=_wall_pressure_refusal_notice(),
+    )
+
+    assert report["sticking_alpha_authority"]["code"] == (
+        "wall_deposit_saturation_pressure_refused"
+    )
+    assert report["authoritative_for_resinter"] is False
+    assert report["dominant_species_wall_deposit_kg"] is None
+    assert report["wall_deposit_kg_per_campaign"] is None
+    assert report["campaigns_to_resinter"] is None
+    assert report["aggregate_campaigns_to_resinter"] is None
+    assert report["nominal_verdict"] is None
+
+
 def test_positive_wall_deposit_still_reaches_the_species_bearing_branch():
     """The b-296 split must not swallow the case it was never about.
 
