@@ -11,7 +11,7 @@ import yaml
 
 from simulator.battery.enums import Quantity
 from simulator.battery.migrate import Migrator
-from tests.literature_extract_test_helpers import iter_locators
+from tests.literature_extract_test_helpers import iter_locators, source_page_text
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -77,6 +77,10 @@ def _source_page(page: int) -> str:
         text=True,
     )
     return result.stdout
+
+
+def test_shared_source_page_reader_matches_existing_reader() -> None:
+    assert source_page_text(SOURCE_ID, 3) == _source_page(3)
 
 
 def test_render_transcription_binds_both_printed_tables_and_mutations() -> None:
