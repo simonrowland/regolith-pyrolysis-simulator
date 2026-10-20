@@ -6,7 +6,6 @@ wrong row label, column, sample block, or condition cannot pass as a valid row.
 """
 from __future__ import annotations
 
-import os
 import re
 import subprocess
 from decimal import Decimal
@@ -17,10 +16,11 @@ import yaml
 
 from simulator.battery.enums import Phase, ValueKind
 from simulator.battery.migrate import Migrator
+from tests.literature_extract_test_helpers import corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/inoue-1991-n-s-partition-cao-al2o3.yaml"
-CORPUS_ROOT = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS_ROOT = corpus_root()
 PDF = CORPUS_ROOT / "raw/inoue-1991-n-s-partition-cao-al2o3/inoue-1991-n-s-partition-cao-al2o3.pdf"
 
 # (sample, equilibration time in min, printed n, {table column number: cell})
@@ -713,6 +713,45 @@ def test_every_rendered_cell_is_bound_to_its_sample_and_conditions():
     _assert_render_grid(_load_extract())
 
 
+def test_table3_oxygen_control_locators_point_to_section_34():
+    doc = _load_extract()
+    controls = [
+        row["point_conditions"]["fO2_control"]["locator"]
+        for block in doc["species"].values()
+        for row in block.get("observations", [])
+        if row.get("locator", {}).get("table") == "3"
+    ]
+    assert len(controls) == 70
+    assert all(
+        (locator["page"], locator["pdf_page_index"], locator["published_page"], locator["section"])
+        == (6, 5, 1394, "3.4")
+        for locator in controls
+    )
+
+
+def test_quoted_alumina_activity_values_are_independently_pinned():
+    expected = {
+        "inoue_1991_quoted_al2o3_activity_al2o3_1823": ("0.25", "1823", "Al2O3 crucible"),
+        "inoue_1991_quoted_al2o3_activity_al2o3_1873": ("0.33", "1873", "Al2O3 crucible"),
+        "inoue_1991_quoted_al2o3_activity_al2o3_1923": ("0.42", "1923", "Al2O3 crucible"),
+        "inoue_1991_quoted_al2o3_activity_cao_1823": ("0.0063", "1823", "CaO crucible"),
+        "inoue_1991_quoted_al2o3_activity_cao_1873": ("0.0048", "1873", "CaO crucible"),
+        "inoue_1991_quoted_al2o3_activity_cao_1923": ("0.0042", "1923", "CaO crucible"),
+    }
+    rows = {
+        row["observation_id"]: row
+        for row in _load_extract()["species"]["Al2O3"]["observations"]
+    }
+    assert set(rows) == set(expected)
+    for observation_id, (activity, temperature, crucible) in expected.items():
+        row = rows[observation_id]
+        assert row["values"]["activity"] == activity
+        assert row["values"]["formula"] == "Al2O3"
+        assert row["locator"]["section"] == "3.2"
+        assert row["T_range_K"] == [int(temperature), int(temperature)]
+        assert row["sample_block_as_printed"] == crucible
+
+
 def test_isolated_migration_preserves_species_temperature_conditions_and_bounds():
     doc = _load_extract()
     migrator = Migrator(root=ROOT, index={}, aliases={})
@@ -783,3 +822,8 @@ def test_physical_pdf_pages_support_table_and_figure_locators():
         assert "Fig." in text
         label = r"Fig\.\s*[l1I]\b" if figure == 1 else rf"Fig\.\s*{figure}\b"
         assert re.search(label, text)
+    p4 = _pdf_page_text(4)
+    assert all(value in p4 for value in ("0.25", "0.33", "0.42", "0.0063", "0.0048", "0.0042"))
+    p6 = _pdf_page_text(6)
+    assert re.search(r"3\.4\.\s+Relationship between Sulfur Distribution", p6)
+    assert "controlled by the Al/" in p6 and "equilibrium" in p6
