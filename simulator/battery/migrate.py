@@ -17421,7 +17421,11 @@ class Migrator:
                 and located_composition.state.is_value
             ):
                 raw_composition = located_composition.state.value
-                if isinstance(raw_composition, Composition):
+                if isinstance(raw_composition, Composition) and q_token_point in {
+                    Quantity.VALENCE_RATIO,
+                    Quantity.ACTIVITY,
+                    Quantity.ACTIVITY_COEFFICIENT,
+                }:
                     identity = replace(
                         identity, composition=State.of(raw_composition)
                     )

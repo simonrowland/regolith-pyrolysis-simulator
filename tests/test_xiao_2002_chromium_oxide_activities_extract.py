@@ -11,7 +11,6 @@ import pytest
 import yaml
 
 from simulator.battery.enums import AmountBasis, AssetRole, ValueKind
-from simulator.battery.identity import profile_for
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -179,6 +178,22 @@ def test_isolated_migration_resolves_assets_and_preserves_every_identity_axis():
     ]
     assert len(derived_rows) == 192
     assert all(observation.derived_from == (ASSET_ID,) for observation in derived_rows)
+    activity_rows = [
+        row
+        for container in document["species"].values()
+        for row in container.get("observations", ())
+        if row.get("values", {}).get("quantity") == "activity"
+    ]
+    assert len(activity_rows) == 96
+    assert all(row["values"]["method_class"] == "measured_reduced" for row in activity_rows)
+    assert all(row["derived_from"] == [ASSET_ID] for row in activity_rows)
+    assert all(
+        all(
+            term in row["derivation"]["relation"]
+            for term in ("EMF E_m", "temperature T", "Eq. [1]", "physical PDF p. 3")
+        )
+        for row in activity_rows
+    )
 
     required_conditions = {
         "temperature_K",
@@ -212,32 +227,29 @@ def test_isolated_migration_resolves_assets_and_preserves_every_identity_axis():
         assert observation.evidence.class_.is_value
         assert observation.evidence.class_.value.value == "measured_reduced"
 
-    for formula, table, sample, quantity in (
-        ("Cr", "I", "CSC1", "valence_ratio"),
-        ("Cr", "II", "A1", "valence_ratio"),
-        ("CrO", "I", "CSC1", "activity"),
-    ):
-        observation = next(
-            observation
-            for observation in result.observations.values()
-            if observation.identity.species.formula == formula
-            and observation.identity.quantity.value.value == quantity
-            and observation.locator.table == table
-            and f"sample {sample};" in (observation.locator.note or "")
-        )
-        identity = observation.identity
-        print(
-            observation.observation_id,
-            "required=", sorted(profile_for(identity).required),
-            "temperature_K=", identity.temperature_K,
-            "composition=", identity.composition,
-            "fO2_Pa=", identity.fO2_Pa,
-            "total_pressure_Pa=", identity.total_pressure_Pa,
-        )
 
 
 def test_context_and_figure_records_keep_only_unscored_content():
     document = _document()
+    valence_rows = [
+        row
+        for container in document["species"].values()
+        for row in container.get("observations", ())
+        if row.get("values", {}).get("quantity") == "valence_ratio"
+    ]
+    caveat = (
+        "For the slag with high concentration of chromium oxide, it is not appropriate to conclude and extend "
+        "the results to the molten slag because of the precipitation of quenched crystals and the presence of "
+        "metal droplets in the slag."
+    )
+    assert valence_rows
+    for row in valence_rows:
+        assert caveat in row["quench_note"]
+        assert "physical PDF page 5, pdf_page_index 4, published page 599" in row["quench_note"]
+        assert all(
+            point["quench_statement"]["preservation"] == "not_stated"
+            for point in row["values"]["points"]
+        )
     contexts = [
         record
         for container in document["species"].values()
