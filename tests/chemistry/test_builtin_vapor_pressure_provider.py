@@ -2330,7 +2330,9 @@ def test_sio_oxide_vapor_extrapolation_predicts_with_certified_band(
     assert _is_noncertifying_vapor_extrapolation("SiO", source)
 
 
-def test_sio_extrapolation_notice_reaches_public_numeric_answer(vapor_pressure_data):
+def test_silica_extrapolation_notices_reach_public_numeric_answers(
+    vapor_pressure_data,
+):
     import json
     from simulator.vapour_rail.batch import (
         FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
@@ -2340,44 +2342,58 @@ def test_sio_extrapolation_notice_reaches_public_numeric_answer(vapor_pressure_d
     from simulator.vapour_rail.instrumentation import serialize_vapour_answer
     from simulator.vapour_rail.request import VapourResolveState
 
+    temperature_K = 3273.15
+    species = ("Si", "Si2", "Si3", "SiO", "SiO2_gas")
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
-    result = provider.dispatch(_si_only_vapor_request_at_T_K(2473.15))
+    result = provider.dispatch(_si_only_vapor_request_at_T_K(temperature_K))
     diagnostic = result.diagnostic
     catalog = provider._vapour_rail_catalog
     state = VapourResolveState(
-        temperature_K=2473.15,
+        temperature_K=temperature_K,
         process_phase="pyrolysis",
         total_pressure_Pa=0.1,
         fO2_bar=diagnostic["pO2_bar"],
         source_reaction_activities=diagnostic["activities"],
         source_reaction_activity_provider=diagnostic["activities_provider"],
-        source_reaction_activity_evidence_refs={"SiO": "t838-provider-replay"},
+        source_reaction_activity_evidence_refs={
+            species_id: "b818-provider-replay" for species_id in species
+        },
         source_reaction_activity_standard_states={
-            "SiO": catalog.species["SiO"].source_reaction_activity.standard_state,
+            species_id: catalog.species[
+                species_id
+            ].source_reaction_activity.standard_state
+            for species_id in species
         },
         source_reaction_activity_provenance=diagnostic[
             "vapor_pressure_numerator_provenance"
         ],
     )
-    answer = catalog.resolve_batch(
+    report = catalog.resolve_batch(
         {"process.cleaned_melt": {"SiO2": 1.0}},
         state,
         flux_activation_context=FluxActivationContext(
             epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST
         ),
-    ).channel("SiO")
-    assert isinstance(answer.pressure, PressureValue)
-    assert answer.pressure.pa > 0.0
-    assert answer.is_flux_active
-    assert answer.certification_ceiling == "never"
-    assert answer.verdict_status == "status_bearing_non_authoritative"
-    public = json.loads(json.dumps(serialize_vapour_answer(answer), allow_nan=False))
-    assert public["extra"]["extrapolation_notice"] == {
-        "temperature_K": 2473.15,
-        "valid_range_K": [1400.0, 2273.15],
-        "authority_level": "extrapolated",
-        "reason": "oxide_vapor_pressure_out_of_validated_range",
-    }
+    )
+    for species_id in species:
+        answer = report.channel(species_id)
+        assert isinstance(answer.pressure, PressureValue)
+        assert answer.pressure.pa > 0.0
+        public = json.loads(
+            json.dumps(serialize_vapour_answer(answer), allow_nan=False)
+        )
+        notice = public["extra"]["extrapolation_notice"]
+        assert notice["temperature_K"] == temperature_K
+        assert notice["valid_range_K"] == [1400.0, 2273.15]
+        assert notice["authority_level"] == "extrapolated"
+        assert notice["reason"]
+        if species_id == "SiO":
+            assert answer.is_flux_active
+            assert answer.certification_ceiling == "never"
+            assert answer.verdict_status == "status_bearing_non_authoritative"
+            assert notice["reason"] == (
+                "oxide_vapor_pressure_out_of_validated_range"
+            )
 
 
 @pytest.mark.parametrize("temperature_K", [1900.0, 2473.15])
