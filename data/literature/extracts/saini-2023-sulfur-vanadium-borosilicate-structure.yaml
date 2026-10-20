@@ -1,0 +1,270 @@
+schema_version: literature_extract.v1
+source_id: saini-2023-sulfur-vanadium-borosilicate-structure
+source:
+  citation: 'Saini R, Neuville DR, Youngman RE, Goel A (2023). Deciphering the structural origins of high sulfur solubility in vanadium-containing borosilicate glasses. Journal of Non-Crystalline Solids 619, 122554.'
+  doi: 10.1016/j.jnoncrysol.2023.122554
+  year: 2023
+  corpus_asset: raw/saini-2023-sulfur-vanadium-borosilicate-structure/saini-2023-sulfur-vanadium-borosilicate-structure.pdf
+extraction:
+  method: >-
+    Born-digital journal article; pdftotext-layout is primary and MinerU table draft found no table blocks. Tables 1, 2, and 3 on PDF pages 3, 7, and 8 were rendered at 600 dpi and transcribed from the render. The ten figures were reviewed at 600 dpi and are deferred without numeric points. The paper reports qualitative V redox inferences and XPS binding-energy shifts, but no numeric V valence fractions or ratios. Glass-composition vectors, room-temperature structural descriptors, and binding energies are retained in context because no matching quantity token describes them.
+  table_dispositions:
+    table_1: context-only; measured whole-glass composition vectors and SO3 solubility have no matching battery quantity token
+    table_2: context-only; room-temperature Al coordination and NMR parameters have no matching quantity token
+    table_3: context-only; room-temperature B coordination and NMR parameters have no matching quantity token
+    redox: no numeric measured V valence fraction or ratio is printed; XPS binding-energy values and qualitative interpretation are context
+    figures: ten figure records are deferred without numeric points
+  date: '2026-10-20'
+  worker: fam31-1020
+review_status: draft
+species:
+  V:
+    observations: []
+    context:
+    - observation_id: saini_2023_table_1_glass_compositions
+      type: measured_table_context
+      locator: {page: 3, pdf_page_index: 2, table: '1'}
+      attribution: present work
+      units: wt.% oxides as printed; xV-yS labels give batched mol.% V2O5 and SO3
+      candidate_tokens: [equilibrium_phase_composition, liquidus_composition, sulfur_solubility_and_sulfate_capacity_series]
+      reason: Table 1 reports multicomponent bulk-glass composition vectors and SO3 solubility limits; no store token fits a glass composition vector or sulfur concentration.
+      values:
+        formulation_as_printed: '[30 Na2O – 5 Al2O3 – 15 B2O3 – 50 SiO2](100-x) – xV2O5 mol.%; sulfur-containing batches replace x mol.% Na2O by x mol.% Na2SO4 to keep total Na2O constant.'
+        method_as_printed: ICP-OES; reported compositions are within ±0.2 wt.%
+        processing_as_printed: melt at 1200 °C for 1 h, then quench on a copper plate at room temperature; sulfur-containing batch is remelted at the same temperature for another hour and quenched.
+        atmosphere_as_printed: not stated for the synthesis procedure
+        columns: [glass_id, batch_Na2O_wt_pct, measured_Na2O_wt_pct, batch_B2O3_wt_pct, measured_B2O3_wt_pct, batch_SiO2_wt_pct, measured_SiO2_wt_pct, batch_Al2O3_wt_pct, measured_Al2O3_wt_pct, batch_V2O5_wt_pct, measured_V2O5_wt_pct, batch_SO3_wt_pct, measured_SO3_wt_pct]
+        sulfur_free_rows:
+        - {glass_id: 0V, batch: {Na2O: 28.97, B2O3: 16.27, SiO2: 46.81, Al2O3: 7.94, V2O5: 0, SO3: 0}, measured: {Na2O: 28.95, B2O3: 16.26, SiO2: 46.82, Al2O3: 7.94}}
+        - {glass_id: 1V, batch: {Na2O: 28.16, B2O3: 15.82, SiO2: 45.51, Al2O3: 7.72, V2O5: 2.78, SO3: 0}, measured: {Na2O: 28.14, B2O3: 15.83, SiO2: 45.52, Al2O3: 7.73, V2O5: 2.77}}
+        - {glass_id: 2.5V, batch: {Na2O: 27.00, B2O3: 15.17, SiO2: 43.62, Al2O3: 7.40, V2O5: 6.77, SO3: 0}, measured: {Na2O: 27.01, B2O3: 15.16, SiO2: 43.61, Al2O3: 7.40, V2O5: 6.76}}
+        - {glass_id: 5V, batch: {Na2O: 25.21, B2O3: 14.16, SiO2: 40.74, Al2O3: 6.91, V2O5: 12.98, SO3: 0}, measured: {Na2O: 25.20, B2O3: 14.16, SiO2: 40.73, Al2O3: 6.92, V2O5: 12.98}}
+        - {glass_id: 7.5V, batch: {Na2O: 23.56, B2O3: 13.23, SiO2: 38.07, Al2O3: 6.46, V2O5: 18.68, SO3: 0}, measured: {Na2O: 23.57, B2O3: 13.24, SiO2: 38.06, Al2O3: 6.46, V2O5: 18.67}}
+        - {glass_id: 9V, batch: {Na2O: 22.63, B2O3: 12.71, SiO2: 36.56, Al2O3: 6.20, V2O5: 21.89, SO3: 0}, measured: {Na2O: 22.64, B2O3: 12.71, SiO2: 36.56, Al2O3: 6.20, V2O5: 21.88}}
+        sulfur_containing_rows:
+        - {glass_id: 1V-1.25S, batch: {Na2O: 26.89, B2O3: 15.76, SiO2: 45.35, Al2O3: 7.70, V2O5: 2.77, SO3: 1.53}, measured: {Na2O: 26.87, B2O3: 15.77, SiO2: 45.36, Al2O3: 7.71, V2O5: 2.78, SO3: 1.51}}
+        - {glass_id: 2.5V-1.75S, batch: {Na2O: 25.27, B2O3: 15.10, SiO2: 43.44, Al2O3: 7.37, V2O5: 6.74, SO3: 2.08}, measured: {Na2O: 25.25, B2O3: 15.11, SiO2: 43.45, Al2O3: 7.38, V2O5: 6.75, SO3: 2.06}}
+        - {glass_id: 5V-3S, batch: {Na2O: 22.38, B2O3: 14.05, SiO2: 40.42, Al2O3: 6.86, V2O5: 12.88, SO3: 3.40}, measured: {Na2O: 22.37, B2O3: 14.06, SiO2: 40.42, Al2O3: 6.86, V2O5: 12.89, SO3: 3.39}}
+        - {glass_id: 7.5V-6S, batch: {Na2O: 18.19, B2O3: 13.04, SiO2: 37.51, Al2O3: 6.36, V2O5: 18.41, SO3: 6.48}, measured: {Na2O: 18.17, B2O3: 13.05, SiO2: 37.52, Al2O3: 6.37, V2O5: 18.41, SO3: 6.47}}
+        - {glass_id: 9V-6.5S, batch: {Na2O: 16.97, B2O3: 12.51, SiO2: 36.00, Al2O3: 6.11, V2O5: 21.55, SO3: 6.81}, measured: {Na2O: 16.95, B2O3: 12.51, SiO2: 36.01, Al2O3: 6.12, V2O5: 21.53, SO3: 6.83}}
+        note: SO3 for sulfur-containing samples is the dissolved concentration at the glass's solubility limit; sulfur-free table cells with no parenthesized measured entry are not inferred as measured zero.
+    - observation_id: saini_2023_table_2_aluminum_structure
+      type: measured_table_context
+      locator: {page: 7, pdf_page_index: 6, table: '2'}
+      attribution: present work
+      units: abundance %, δCS ppm, CQ MHz
+      candidate_tokens: [equilibrium_phase_composition, oxidation_state]
+      reason: Room-temperature 27Al MAS-NMR coordination abundances and spectral parameters are structural descriptors without a matching quantity token.
+      values:
+        phase_as_printed: melt-quenched borosilicate glass, measured as room-temperature powdered samples
+        temperature_as_printed: synthesis melt at 1200 °C for 1 h; NMR measurement at room temperature
+        uncertainty_as_printed: abundance ±1%; chemical shift ±1 ppm; quadrupolar coupling constant ±0.2 MHz
+        rows:
+        - {glass_id: 0V, AlIV_abundance_percent: 97, AlIV_delta_CS_ppm: 63.8, AlIV_CQ_MHz: 4.39, AlV_abundance_percent: 3, AlV_delta_CS_ppm: 32.7, AlV_CQ_MHz: 3.24}
+        - {glass_id: 1V, AlIV_abundance_percent: 98, AlIV_delta_CS_ppm: 63.7, AlIV_CQ_MHz: 4.31, AlV_abundance_percent: 2, AlV_delta_CS_ppm: 32.6, AlV_CQ_MHz: 2.18}
+        - {glass_id: 2.5V, AlIV_abundance_percent: 98, AlIV_delta_CS_ppm: 63.0, AlIV_CQ_MHz: 4.35, AlV_abundance_percent: 2, AlV_delta_CS_ppm: 32.9, AlV_CQ_MHz: 2.21}
+        - {glass_id: 5V, AlIV_abundance_percent: 98, AlIV_delta_CS_ppm: 62.4, AlIV_CQ_MHz: 4.36, AlV_abundance_percent: 2, AlV_delta_CS_ppm: 33.0, AlV_CQ_MHz: 2.16}
+        - {glass_id: 7.5V, AlIV_abundance_percent: 98, AlIV_delta_CS_ppm: 62.1, AlIV_CQ_MHz: 4.38, AlV_abundance_percent: 2, AlV_delta_CS_ppm: 33.1, AlV_CQ_MHz: 2.14}
+        - {glass_id: 9V, AlIV_abundance_percent: 98, AlIV_delta_CS_ppm: 61.9, AlIV_CQ_MHz: 4.44, AlV_abundance_percent: 2, AlV_delta_CS_ppm: 33.0, AlV_CQ_MHz: 1.84}
+    - observation_id: saini_2023_table_3_boron_vanadium_structure
+      type: measured_table_context
+      locator: {page: 8, pdf_page_index: 7, table: '3'}
+      attribution: present work
+      units: boron abundance %; 51V δCS ppm; CQ MHz
+      candidate_tokens: [equilibrium_phase_composition, oxidation_state, valence_ratio]
+      reason: Room-temperature 11B coordination and 51V NMR spectral parameters describe glass structure; Table 3 does not report a V valence fraction or ratio.
+      values:
+        phase_as_printed: melt-quenched borosilicate glass, measured as room-temperature powdered samples
+        temperature_as_printed: synthesis melt at 1200 °C for 1 h; NMR measurement at room temperature
+        uncertainty_as_printed: abundance ±1%; chemical shift ±2 ppm; quadrupolar coupling constant ±0.5 MHz
+        rows:
+        - {glass_id: 0V, BIII_abundance_percent: 40.7, BIV_abundance_percent: 59.3, V51_delta_CS_ppm: null, V51_CQ_MHz: null, blank_cells: 'Table prints em dashes; values are unreported, not zero.'}
+        - {glass_id: 1V, BIII_abundance_percent: 41.8, BIV_abundance_percent: 58.2, V51_delta_CS_ppm: -565, V51_CQ_MHz: 4.6}
+        - {glass_id: 2.5V, BIII_abundance_percent: 36.8, BIV_abundance_percent: 63.2, V51_delta_CS_ppm: -565, V51_CQ_MHz: 5.6}
+        - {glass_id: 5V, BIII_abundance_percent: 35.4, BIV_abundance_percent: 64.6, V51_delta_CS_ppm: -564, V51_CQ_MHz: 6.5}
+        - {glass_id: 7.5V, BIII_abundance_percent: 34.2, BIV_abundance_percent: 65.8, V51_delta_CS_ppm: -556, V51_CQ_MHz: 6.5}
+        - {glass_id: 9V, BIII_abundance_percent: 38.1, BIV_abundance_percent: 61.9, V51_delta_CS_ppm: -560, V51_CQ_MHz: 6.5}
+        note: BIII+BIV=100% and is a coordination fraction, not vanadium oxidation-state abundance.
+    - observation_id: saini_2023_vanadium_redox_xps_context
+      type: measured_text_context
+      locator: {page: 4, pdf_page_index: 3, section: '3.1 Redox chemistry of vanadium'}
+      attribution: present work
+      units: XPS binding energy eV
+      candidate_tokens: [valence_ratio, oxidation_state]
+      reason: The paper uses binding-energy shifts and glass color qualitatively to infer V oxidation states; it prints no numeric V3+/V4+/V5+ fraction or ratio, and binding energy has no matching quantity token.
+      values:
+        XPS_as_printed: V 2p3/2 peak maximum near 517.3 eV for V2O5 below 7.5 mol.%; expected V5+ energy 517.91 eV; peak shifts lower at V2O5 at or above 7.5 mol.%, with expected V4+ peak 516.35 eV.
+        qualitative_interpretation_as_printed: Vanadium is primarily +5; V4+ is minimal at V2O5 up to 5 mol.% and a notable fraction above 5 mol.%. Blue color at 10 mol.% V2O5 indicates V4+ presence; the paper gives no measured valence fraction.
+        experimental_conditions_as_printed: glasses melted at 1200 °C for 1 h; synthesis atmosphere is not stated; XPS on freshly fractured monolithic samples.
+    - observation_id: saini_2023_glass_transition_density_context
+      type: measured_text_context
+      locator: {page: 8, pdf_page_index: 7, section: '3.2.3 Density, molar volume, and glass transition temperature'}
+      attribution: present work
+      units: Tg °C; density g cm-3; molar volume cm3 mol-1
+      candidate_tokens: [transition_temperature, density]
+      reason: These bulk glass properties are outside the sulfur-solubility and vanadium-redox data requested for this paper; the density values are shown as a figure trend and are deferred with the figures.
+      values:
+        Tg_text_values_as_printed: '0 V: 485 °C; 2.5 mol.% V2O5: approximately 486 °C; 5 mol.%: 462 °C; 7.5 and 9 mol.%: 454 °C.'
+        density_range_as_printed: 2.45 to 2.49 g cm-3
+        molar_volume_range_as_printed: 24.58 to 28.19 cm3 mol-1
+        DSC_conditions_as_printed: heat from 100 to 1000 °C at 10 °C/min in air; values averaged from at least three scans.
+    - observation_id: saini_2023_figure_1_glass_photographs
+      type: figure_record
+      locator: {page: 4, pdf_page_index: 3, figure: '1'}
+      panel: whole_figure
+      attribution: present work
+      units: none; sample photographs
+      values:
+        quantity_as_printed: photographs of sulfur-free xV glasses, sulfur-loaded glasses at solubility limit, and supersaturated samples with salt layer
+        species: [V2O5, SO3]
+        phase: glass and separated salt layer
+        temperature_as_printed: glasses were melted at 1200 °C for 1 h and quenched; photograph at room temperature
+        axes_as_printed: none; photographs
+        caption: 'Images of V2O5-containing sulfur-free glasses (xV); glasses xV-yS where sulfur solubility limit has been reached; and glasses xV-yS supersaturated with sulfur showing the formation of salt layer on their surface.'
+        series: [{name: labeled glass specimens, marker: photograph, marker_count: 17}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: saini_2023_figure_2_xrd_microscopy
+      type: figure_record
+      locator: {page: 5, pdf_page_index: 4, figure: '2'}
+      panel: '(a), (b)'
+      attribution: present work
+      units: XRD intensity arbitrary units; optical micrograph scale bar 5 μm
+      values:
+        quantity_as_printed: XRD patterns of xV glasses and optical micrograph of 10 V glass
+        species: [V2O5]
+        phase: glass
+        temperature_as_printed: not shown
+        axes_as_printed: '(a) intensity (a.u.) versus 2θ (degree); (b) optical micrograph'
+        caption: 'X-ray diffractograms of (a) xV glasses and (b) optical microscope image of 10 V glass.'
+        series: [{name: xV XRD patterns, marker: continuous trace, marker_count: 0}, {name: 10 V optical micrograph, marker: image, marker_count: 1}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: saini_2023_figure_3_xps
+      type: figure_record
+      locator: {page: 6, pdf_page_index: 5, figure: '3'}
+      panel: '(a), (b)'
+      attribution: present work
+      units: binding energy eV; intensity arbitrary units
+      values:
+        quantity_as_printed: XPS spectra of O 1s and V 2p, and V 2p3/2 maximum binding energy versus V2O5 concentration
+        species: [V]
+        phase: freshly fractured glass
+        temperature_as_printed: synthesis melt at 1200 °C for 1 h; XPS measurement temperature not stated
+        axes_as_printed: '(a) intensity (a.u.) versus binding energy (eV); (b) V 2p3/2 binding energy (eV) versus V2O5 (mol.%)'
+        caption: 'Fig. 3. (a) XPS spectra of the O 1s and V 2p core levels of the xV glasses. The untreated spectra are shown using dots for each data point, whereas the solid lines are the same spectra after applying a 10-point (1.0 eV) smoothing spline. (b) Variation in the binding energy of V-2p3/2 (at the maximum height of the smoothed data shown by circles in Fig. 3a) as a function of V2O5 concentration in the glasses.'
+        series: [{name: panel a xV spectra, marker: spectrum, marker_count: 5}, {name: panel b V 2p3/2 binding energy, marker: square, marker_count: 5}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: saini_2023_figure_4_raman_xv
+      type: figure_record
+      locator: {page: 6, pdf_page_index: 5, figure: '4'}
+      panel: whole_figure
+      attribution: present work
+      units: intensity arbitrary units; Raman shift cm-1
+      values:
+        quantity_as_printed: Raman spectra of xV glasses and 0 V glass
+        species: [V2O5]
+        phase: glass
+        temperature_as_printed: spectra collected at room temperature
+        axes_as_printed: intensity (a.u.) versus wavenumber (cm-1)
+        caption: Raman spectra of xV glasses along with 0 V glass.
+        series: [{name: 'glass compositions 0V, 1V, 2.5V, 5V, 7.5V, 9V', marker: continuous trace, marker_count: 0}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: saini_2023_figure_5_nmr
+      type: figure_record
+      locator: {page: 7, pdf_page_index: 6, figure: '5'}
+      panel: '(a), (b), (c), (d)'
+      attribution: present work
+      units: NMR chemical shift ppm; intensity arbitrary units; CQ MHz
+      values:
+        quantity_as_printed: 27Al and 11B MAS NMR spectra, BIV peak position, and 51V MAS NMR spectra of xV glasses
+        species: [Al, B, V]
+        phase: powdered glass
+        temperature_as_printed: spectra collected at room temperature
+        axes_as_printed: panels (a), (b), and (d) NMR shift (ppm) versus intensity; panel (c) 11B NMR shift (ppm)
+        caption: 'Fig. 5. (a) 27Al, (b) 11B, (c) shifting of BIV peak position with V2O5 concentration, and (d) 51V MAS NMR spectra of xV glasses.'
+        series: [{name: panel a Al spectra, marker: trace, marker_count: 0}, {name: panel b B spectra, marker: trace, marker_count: 0}, {name: panel c six V2O5 compositions, marker: line, marker_count: 6}, {name: panel d V spectra, marker: trace, marker_count: 0}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: saini_2023_figure_6_glass_transition
+      type: figure_record
+      locator: {page: 8, pdf_page_index: 7, figure: '6'}
+      panel: whole_figure
+      attribution: present work
+      units: Tg °C; V2O5 mol.%
+      values:
+        quantity_as_printed: glass transition temperature of xV glasses versus V2O5 concentration
+        species: [V2O5]
+        phase: glass
+        temperature_as_printed: glass samples heated from 100 to 1000 °C for DSC; xV glass synthesized at 1200 °C for 1 h
+        axes_as_printed: Tg (°C) versus V2O5 (mol.%)
+        caption: Variation of glass transition temperature (Tg) of xV glass as a function of V2O5 concentration.
+        series: [{name: xV glasses, marker: square, marker_count: 5}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: saini_2023_figure_7_density_molar_volume
+      type: figure_record
+      locator: {page: 8, pdf_page_index: 7, figure: '7'}
+      panel: whole_figure
+      attribution: present work
+      units: density g cm-3; molar volume cm3 mol-1; V2O5 mol.%
+      values:
+        quantity_as_printed: density and molar volume of xV glasses versus V2O5 concentration
+        species: [V2O5]
+        phase: glass
+        temperature_as_printed: not stated for density plot
+        axes_as_printed: density (g/cc) and Vm (cc/mol) versus V2O5 (mol.%)
+        caption: Variation of density (ρ) and molar volume (Vm) of xV glass as a function of V2O5 concentration.
+        series: [{name: density, marker: square, marker_count: 5}, {name: molar volume, marker: square, marker_count: 5}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: saini_2023_figure_8_sulfur_glass_xrd
+      type: figure_record
+      locator: {page: 9, pdf_page_index: 8, figure: '8'}
+      panel: '(a), (b)'
+      attribution: present work
+      units: XRD intensity arbitrary units; 2θ degree
+      values:
+        quantity_as_printed: XRD patterns of sulfur-containing glass and separated salt phases
+        species: [SO3, Na2SO4, NaVO3]
+        phase: glass and salt layer
+        temperature_as_printed: not shown
+        axes_as_printed: intensity (a.u.) versus 2θ (degree)
+        caption: 'Sulfur-containing glasses (within solubility limit) and Na2SO4 in 1 V, 2.5 V, and 5 V glasses; Na2SO4, minor thenardite, and NaVO3 crystalline phases in salt layers over phase-separated 7.5 V and 9 V glasses.'
+        series: [{name: panel a sulfur-bearing glass patterns, marker: trace, marker_count: 5}, {name: panel b salt and glass-surface phase patterns, marker: trace and phase marks, marker_count: 5}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: saini_2023_figure_9_sulfur_solubility
+      type: figure_record
+      locator: {page: 9, pdf_page_index: 8, figure: '9'}
+      panel: whole_figure
+      attribution: present work
+      units: SO3 mol.%; V2O5 mol.%
+      values:
+        quantity_as_printed: SO3 solubility in glasses as V2O5 content increases to 5 mol.%
+        species: [SO3]
+        phase: glass melt, quenched glass used for analysis
+        temperature_as_printed: glass melt at 1200 °C for 1 h; measurement plot reports solubility limit
+        axes_as_printed: SO3 (mol.%) versus V2O5 (mol.%)
+        caption: A linear increase in SO3 solubility in glasses with increasing V2O5 content up to 5 mol.%.
+        series: [{name: measured solubility, marker: square, marker_count: 4}, {name: linear fit, marker: line, marker_count: 0}]
+        points: []
+      digitisation: deferred to a figure pass
+    - observation_id: saini_2023_figure_10_raman_tg
+      type: figure_record
+      locator: {page: 10, pdf_page_index: 9, figure: '10'}
+      panel: '(a), (b)'
+      attribution: present work
+      units: Raman intensity arbitrary units; shift cm-1; Tg °C; V2O5 mol.%
+      values:
+        quantity_as_printed: comparison of Raman spectra and glass transition temperatures of sulfur-free and sulfur-containing 1 V glasses
+        species: [SO3, V2O5]
+        phase: glass
+        temperature_as_printed: Raman at room temperature; DSC measurements in air from 100 to 1000 °C at 10 °C/min
+        axes_as_printed: panel (a) intensity versus Raman shift; panel (b) Tg (°C) versus V2O5 (mol.%)
+        caption: 'Comparison of Raman spectra of 1 V and 1V-1.25S glasses, and comparison of Tg of xV and xV-1.25S glasses.'
+        series: [{name: panel a glass spectra, marker: trace, marker_count: 2}, {name: panel b xV glasses, marker: circle, marker_count: 4}, {name: panel b xV-1.25S glasses, marker: square, marker_count: 4}]
+        points: []
+      digitisation: deferred to a figure pass
