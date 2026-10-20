@@ -236,18 +236,14 @@ Run on green commit `a4608882dcdad6ab67ca0381284d4c65055c1160` with the built-in
 
 ### What this run does NOT yet show
 
-Ca, Al and Ti leave the melt almost entirely in this run (100.0% each under the ideal-condenser basis),
-but that loss comes from the melt-redox runaway described above, not from their vapour pressures.
-It is not evidence against the refractory rump the project expects to keep. The 38.0% of feedstock O
-reported in the redox-buffer reservoir is also a bookkeeping artifact: oxygen released by metal
-evaporation is parked there and never drained, so stored O₂ is understated. These are tracked as
-open issues.
+This run does not show Fe capture, Mg-crown extraction, alkali capture, or O₂ recovery; see the open
+issues above. The refractory rump remains. `redox_buffer_retained` is 0 for every element, including
+oxygen.
 
-The report status is `partial / pending_decision`: VapoRock was importable on the run machine but was
-not the active engine; the active vapor-pressure source was `builtin-vapor-pressure` with VapoRock as
-a shadow. The analytical report marks 20 of 21 pressure summaries as extrapolated and the remaining
-one as a pO2-floor inversion. Treat the silica qualification and wall-lifespan number as diagnostic,
-not hardware certification.
+Report fields: `status` is `ok`, `reason` is `''`, `error_message` is `''`, and
+`run_metadata.backend` is `internal-analytical`. The `vapor_pressure_source_report` has 32 species
+summaries; 30 of 32 are extrapolated beyond their fitted temperature range. No VapoRock shadow is
+recorded. The high-temperature yields are extrapolations, not certified values.
 
 From a source checkout, run the dependency installer:
 
