@@ -96,3 +96,22 @@ def test_all_builtin_mars_feedstocks_define_co2_environment():
 
         assert sim.melt.ambient_pressure_mbar > 0.0
         assert sim.melt.ambient_atmosphere == "96% CO2"
+
+
+@pytest.mark.parametrize('finite_headspace', [False, True])
+def test_controlled_background_pressure_pin_before_owner_reuse(finite_headspace):
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+
+    melt = MeltState()
+    melt.atmosphere = Atmosphere.CONTROLLED_O2
+    melt.p_total_mbar = 1000.0
+    melt.pO2_mbar = 900.0
+    melt.background_gas_species = 'CO2'
+    melt.background_gas_mole_fraction = 1.0
+    model = OverheadGasModel({'enabled': finite_headspace, 'volume_m3': 1.0})
+    gas = model.update(EvaporationFlux(), melt, CondensationTrain.create_default())
+    # Independent Dalton-law anchor: the commanded oxygen occupies 900 of
+    # 1000 mbar. Pin before reusing the two existing background projections.
+    assert gas.composition['CO2'].hex() == (100.0).hex()
+    assert gas.composition['O2'].hex() == (900.0).hex()
