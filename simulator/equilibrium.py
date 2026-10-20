@@ -467,6 +467,7 @@ class EquilibriumMixin:
             antoine: object,
             *,
             temperature_K: float,
+            species_id: str,
         ) -> tuple[float, float, float] | None:
             if not isinstance(antoine, Mapping):
                 return None
@@ -497,6 +498,16 @@ class EquilibriumMixin:
             except (ArithmeticError, TypeError, ValueError):
                 return None
             if not math.isfinite(log_pressure):
+                return None
+            try:
+                pressure = _pow10_pressure_or_raise(
+                    log_pressure,
+                    species=species_id,
+                    field='antoine_coefficients',
+                )
+            except (ArithmeticError, TypeError, ValueError):
+                return None
+            if not math.isfinite(pressure) or pressure <= 0.0:
                 return None
             return coefficients
 
@@ -762,6 +773,7 @@ class EquilibriumMixin:
                 coefficients = _usable_antoine_coefficients(
                     antoine,
                     temperature_K=T_K,
+                    species_id=species,
                 )
                 if P_reference_Pa is None and coefficients is None:
                     if not _active_metal_source_oxide(species, parent_oxide):
@@ -927,6 +939,7 @@ class EquilibriumMixin:
                 liquid_coefficients = _usable_antoine_coefficients(
                     antoine_liq,
                     temperature_K=T_K,
+                    species_id=species,
                 )
                 if liquid_coefficients is None:
                     if not _active_metal_source_oxide(species, parent_oxide):
@@ -1021,6 +1034,7 @@ class EquilibriumMixin:
                 gas_coefficients = _usable_antoine_coefficients(
                     antoine_gas,
                     temperature_K=T_K,
+                    species_id=species,
                 )
                 if gas_coefficients is None:
                     if not _active_metal_source_oxide(species, parent_oxide):
@@ -1383,6 +1397,9 @@ class EquilibriumMixin:
                 )
                 if oxide_activity is None:
                     continue
+                if oxide_activity.activity <= 1e-10:
+                    _sz_activity_skip(name, oxide_activity)
+                    continue
 
             reference_model = data.get('reference_pressure_model')
             compiled_evaluator = None
@@ -1415,19 +1432,6 @@ class EquilibriumMixin:
                     )
                     continue
 
-            retain_analytical_channel = (
-                compiled_evaluator is not None
-                or bool(data.get('retain_analytical_pressure_channel'))
-            )
-            if oxide_activity is not None and (
-                oxide_activity.activity <= 0.0
-                or (
-                    not retain_analytical_channel
-                    and oxide_activity.activity <= 1e-10
-                )
-            ):
-                _sz_activity_skip(name, oxide_activity)
-                continue
             if oxide_activity is not None:
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
@@ -1478,6 +1482,7 @@ class EquilibriumMixin:
                 coefficients = _usable_antoine_coefficients(
                     antoine,
                     temperature_K=T_K,
+                    species_id=name,
                 )
                 if coefficients is None:
                     _sz_refuse_missing_coefficient(name)
@@ -1585,9 +1590,7 @@ class EquilibriumMixin:
                     field="P_sat_suppressed",
                 )
 
-            if P_sat > 0.0 and (
-                retain_analytical_channel or P_sat > 1e-15
-            ):
+            if P_sat > 1e-15:
                 vapor_pressures[name] = P_sat
                 source_label = vapor_pressure_source_label(
                     'builtin_authoritative',
