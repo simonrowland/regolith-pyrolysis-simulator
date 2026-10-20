@@ -1,0 +1,281 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2017-cai-mgo-sio-fugacity
+source:
+  citation: >-
+    Shornikov, S. I., Yakovlev, O. I., and Ivanova, M. A. (2017). A thermodynamic
+    study of inversion of MgO and SiO2 relative fugacity at CAI evaporation.
+    Lunar and Planetary Science XLVIII, abstract 1134.
+  year: 2017
+  doi: null
+  corpus_asset: raw/shornikov-2017-cai-mgo-sio-fugacity/shornikov-2017-cai-mgo-sio-fugacity.pdf
+  corpus_sha256: 458713037a89a71afad57c4037b5ad08be780c092709869a62f89bf28b69278b
+extraction:
+  method: >-
+    No MinerU table. The four activities are the numbers printed in the abstract
+    text on PDF page 1, checked against the 600 dpi page. Figs. 1–3 are
+    calculated curves and were not digitized. Mole fractions other than the
+    printed 50 mol% are the arithmetic of the printed MgO/SiO2 ratio.
+  date: '2026-10-20'
+  worker: t1372-w5
+review_status: draft
+fidelity_samples:
+  - species: SiO2
+    observable: activity_coefficient
+    observation_id: shornikov_2017_cms_50cao_sio2_activity
+    field: activity
+    value: '0.0032'
+    locator:
+      page: 1
+      pdf_page_index: 0
+      abstract: '1134'
+  - species: MgO
+    observable: activity_coefficient
+    observation_id: shornikov_2017_cms_50cao_mgo_activity
+    field: activity
+    value: '0.61'
+    locator:
+      page: 1
+      pdf_page_index: 0
+      abstract: '1134'
+  - species: SiO2
+    observable: activity_coefficient
+    observation_id: shornikov_2017_mas_50al2o3_sio2_activity
+    field: activity
+    value: '0.11'
+    locator:
+      page: 1
+      pdf_page_index: 0
+      abstract: '1134'
+  - species: MgO
+    observable: activity_coefficient
+    observation_id: shornikov_2017_mas_50al2o3_mgo_activity
+    field: activity
+    value: '0.066'
+    locator:
+      page: 1
+      pdf_page_index: 0
+      abstract: '1134'
+species:
+  SiO2:
+    observations:
+      - observation_id: shornikov_2017_cms_50cao_sio2_activity
+        type: activity_coefficient
+        locator:
+          page: 1
+          pdf_page_index: 0
+          abstract: '1134'
+          paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+          note: >-
+            Printed a(SiO2) = 0.0032 for the CaO–MgO–SiO2 melt with 50 mol% CaO
+            and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a). Read from the text on the
+            600 dpi page, not from the curve.
+        T_range_K:
+          - 2300
+          - 2300
+        phase: l
+        standard_state: >-
+          The paper does not state the activity reference phase (reference phase
+          not stated). It prints calculated oxide activities in the named melts
+          at 2300 K. It does not name a pure-oxide standard, a cell reference
+          measurement, or the temperature of a reference measurement.
+        units: dimensionless
+        uncertainty:
+          note: No uncertainty is printed on a(SiO2) = 0.0032.
+        values:
+          quantity: activity
+          activity: '0.0032'
+          method_class: quoted_attributed
+          attribution: >-
+            Calculated in this abstract with the ideal associated solutions model.
+            The per-row inputs are not printed, so the value is quoted_attributed
+            rather than model_derived.
+          system_as_printed: CaO–MgO–SiO2
+          composition_as_printed: 50 mol% CaO and MgO/SiO2 = 2/3
+          composition_mol:
+            basis: arithmetic from the printed 50 mol% CaO and MgO/SiO2 = 2/3
+            CaO: '0.50'
+            MgO: '0.20'
+            SiO2: '0.30'
+          composition_conversion: >-
+            x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = (2/3) * 0.30 = 0.20.
+            x(CaO) is the printed 0.50.
+          temperature_K_as_printed: '2300'
+          phase_note: >-
+            phase l is the melt the paper calculates. It is not an activity
+            reference phase.
+      - observation_id: shornikov_2017_mas_50al2o3_sio2_activity
+        type: activity_coefficient
+        locator:
+          page: 1
+          pdf_page_index: 0
+          abstract: '1134'
+          paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
+          note: >-
+            Printed a(SiO2) = 0.11 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3
+            and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b). Read from the text on the
+            600 dpi page, not from the curve.
+        T_range_K:
+          - 2300
+          - 2300
+        phase: l
+        standard_state: >-
+          The paper does not state the activity reference phase (reference phase
+          not stated). It prints calculated oxide activities in the named melts
+          at 2300 K. It does not name a pure-oxide standard, a cell reference
+          measurement, or the temperature of a reference measurement.
+        units: dimensionless
+        uncertainty:
+          note: No uncertainty is printed on a(SiO2) = 0.11.
+        values:
+          quantity: activity
+          activity: '0.11'
+          method_class: quoted_attributed
+          attribution: >-
+            Calculated in this abstract with the ideal associated solutions model.
+            The per-row inputs are not printed, so the value is quoted_attributed
+            rather than model_derived.
+          system_as_printed: MgO–Al2O3–SiO2
+          composition_as_printed: 50 mol% Al2O3 and MgO/SiO2 = 2/3
+          composition_mol:
+            basis: arithmetic from the printed 50 mol% Al2O3 and MgO/SiO2 = 2/3
+            Al2O3: '0.50'
+            MgO: '0.20'
+            SiO2: '0.30'
+          composition_conversion: >-
+            x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = (2/3) * 0.30 = 0.20.
+            x(Al2O3) is the printed 0.50.
+          temperature_K_as_printed: '2300'
+          phase_note: >-
+            phase l is the melt the paper calculates. It is not an activity
+            reference phase.
+    context:
+      - observation_id: shornikov_2017_figures_123_not_digitized
+        type: figure_context
+        locator:
+          page: 1
+          pdf_page_index: 0
+          abstract: '1134'
+          figure: '1–3'
+          note: >-
+            Fig. 1 is on PDF page 1. Figs. 2 and 3 are on PDF page 2. Captions
+            say the curves are calculated. Some panels use a log composition or
+            activity axis. The markers are series labels on model curves, not
+            experimental points. No curve point was read.
+        units: not applicable
+        values:
+          method_class: quoted_unattributed
+          reason: >-
+            Model curves. The only composition-anchored activities the paper
+            prints as numbers are the four text values at 50 mol% and 2300 K.
+          figure_1: calculated CaO/Al2O3 and MgO/SiO2 ratios in residual melts at 2300 K
+          figure_2: calculated CAI melt compositions and oxide activities at 2300 K
+          figure_3: >-
+            calculated a(SiO2) and a(MgO) versus CaO or Al2O3 content at 2300 K
+            and MgO/SiO2 = 2/3
+      - observation_id: shornikov_2017_no_numeric_fugacity
+        type: fugacity_discussion
+        locator:
+          page: 1
+          pdf_page_index: 0
+          abstract: '1134'
+          section: Title and text
+          note: The title says relative fugacity. The printed numbers are activities.
+        units: not applicable
+        values:
+          method_class: quoted_unattributed
+          numeric_fugacity: none printed
+          reason: >-
+            The abstract equates activity with volatility in prose and does not
+            print a fugacity value.
+  MgO:
+    observations:
+      - observation_id: shornikov_2017_cms_50cao_mgo_activity
+        type: activity_coefficient
+        locator:
+          page: 1
+          pdf_page_index: 0
+          abstract: '1134'
+          paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+          note: >-
+            Printed a(MgO) = 0.61 for the CaO–MgO–SiO2 melt with 50 mol% CaO
+            and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a). Read from the text on the
+            600 dpi page, not from the curve.
+        T_range_K:
+          - 2300
+          - 2300
+        phase: l
+        standard_state: >-
+          The paper does not state the activity reference phase (reference phase
+          not stated). It prints calculated oxide activities in the named melts
+          at 2300 K. It does not name a pure-oxide standard, a cell reference
+          measurement, or the temperature of a reference measurement.
+        units: dimensionless
+        uncertainty:
+          note: No uncertainty is printed on a(MgO) = 0.61.
+        values:
+          quantity: activity
+          activity: '0.61'
+          method_class: quoted_attributed
+          attribution: >-
+            Calculated in this abstract with the ideal associated solutions model.
+            The per-row inputs are not printed, so the value is quoted_attributed
+            rather than model_derived.
+          system_as_printed: CaO–MgO–SiO2
+          composition_as_printed: 50 mol% CaO and MgO/SiO2 = 2/3
+          composition_mol:
+            basis: arithmetic from the printed 50 mol% CaO and MgO/SiO2 = 2/3
+            CaO: '0.50'
+            MgO: '0.20'
+            SiO2: '0.30'
+          composition_conversion: >-
+            x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = (2/3) * 0.30 = 0.20.
+            x(CaO) is the printed 0.50.
+          temperature_K_as_printed: '2300'
+          phase_note: >-
+            phase l is the melt the paper calculates. It is not an activity
+            reference phase.
+      - observation_id: shornikov_2017_mas_50al2o3_mgo_activity
+        type: activity_coefficient
+        locator:
+          page: 1
+          pdf_page_index: 0
+          abstract: '1134'
+          paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
+          note: >-
+            Printed a(MgO) = 0.066 for the MgO–Al2O3–SiO2 melt with 50 mol%
+            Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b). Read from the text on
+            the 600 dpi page, not from the curve.
+        T_range_K:
+          - 2300
+          - 2300
+        phase: l
+        standard_state: >-
+          The paper does not state the activity reference phase (reference phase
+          not stated). It prints calculated oxide activities in the named melts
+          at 2300 K. It does not name a pure-oxide standard, a cell reference
+          measurement, or the temperature of a reference measurement.
+        units: dimensionless
+        uncertainty:
+          note: No uncertainty is printed on a(MgO) = 0.066.
+        values:
+          quantity: activity
+          activity: '0.066'
+          method_class: quoted_attributed
+          attribution: >-
+            Calculated in this abstract with the ideal associated solutions model.
+            The per-row inputs are not printed, so the value is quoted_attributed
+            rather than model_derived.
+          system_as_printed: MgO–Al2O3–SiO2
+          composition_as_printed: 50 mol% Al2O3 and MgO/SiO2 = 2/3
+          composition_mol:
+            basis: arithmetic from the printed 50 mol% Al2O3 and MgO/SiO2 = 2/3
+            Al2O3: '0.50'
+            MgO: '0.20'
+            SiO2: '0.30'
+          composition_conversion: >-
+            x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = (2/3) * 0.30 = 0.20.
+            x(Al2O3) is the printed 0.50.
+          temperature_K_as_printed: '2300'
+          phase_note: >-
+            phase l is the melt the paper calculates. It is not an activity
+            reference phase.
