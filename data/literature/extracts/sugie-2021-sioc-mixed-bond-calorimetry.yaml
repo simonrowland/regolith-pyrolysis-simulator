@@ -10,15 +10,91 @@ extraction:
     renders
   date: '2026-10-20'
   worker: fam30-1020
-  source_note: The measured drop-solution and resulting formation quantities are whole-sample SiOC(H) ceramic thermochemistry.
-    No existing quantity token describes drop-solution enthalpy, oxidation enthalpy, or formation from the printed
-    crystalline components. Formation from elements is calculated using drop-solution values that have no store
-    token; it is preserved with the printed reaction basis pending the required corpus table asset. Structural composition
-    and spectroscopy tables and figures are context only.
+  source_note: Four Table 6 formation-from-elements values are typed with their printed reaction basis and gram-atom units. Drop-solution and oxidation enthalpies, and formation from the printed crystalline components, remain context because no matching token represents those quantities. Structural composition and spectroscopy tables and figures are context only.
 review_status: draft
 species:
   SiOCH:
-    observations: []
+    observations:
+    - observation_id: sugie2021_table6_hq4sg800c_delta_fH_elem
+      type: gibbs_table
+      locator: {page: 19, pdf_page_index: 18, table: '6', row: 'HQ4_SG 800 C'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'HQ4_SG 800 C'
+        sample_processing_temperature_C: 800
+        delta_f_H: -257.2
+        note: Formation from elements at 25 °C (Si + O2 + C + H2 -> the SiOC(H) sample); the printed unit is kJ/g-at; Table 6 defines one sample mole as one gram-atom (one mole of atoms).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 19, pdf_page_index: 18, table: '6'}
+      uncertainty: {reported_status: printed, value: 0.6, units: kJ/g-at}
+    - observation_id: sugie2021_table6_hq4sg1100c_delta_fH_elem
+      type: gibbs_table
+      locator: {page: 19, pdf_page_index: 18, table: '6', row: 'HQ4_SG 1100 C'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'HQ4_SG 1100 C'
+        sample_processing_temperature_C: 1100
+        delta_f_H: -265.8
+        note: Formation from elements at 25 °C (Si + O2 + C + H2 -> the SiOC(H) sample); the printed unit is kJ/g-at; Table 6 defines one sample mole as one gram-atom (one mole of atoms).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 19, pdf_page_index: 18, table: '6'}
+      uncertainty: {reported_status: printed, value: 0.6, units: kJ/g-at}
+    - observation_id: sugie2021_table6_phsio15sg800c_delta_fH_elem
+      type: gibbs_table
+      locator: {page: 19, pdf_page_index: 18, table: '6', row: 'PhSiO1.5_SG 800 C'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'PhSiO1.5_SG 800 C'
+        sample_processing_temperature_C: 800
+        delta_f_H: -93.2
+        note: Formation from elements at 25 °C (Si + O2 + C + H2 -> the SiOC(H) sample); the printed unit is kJ/g-at; Table 6 defines one sample mole as one gram-atom (one mole of atoms).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 19, pdf_page_index: 18, table: '6'}
+      uncertainty: {reported_status: printed, value: 3.3, units: kJ/g-at}
+    - observation_id: sugie2021_table6_phsio15sg1100c_delta_fH_elem
+      type: gibbs_table
+      locator: {page: 19, pdf_page_index: 18, table: '6', row: 'PhSiO1.5_SG 1100 C'}
+      phase: glass
+      per: mol_atom
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        formula: unknown
+        sample_id: 'PhSiO1.5_SG 1100 C'
+        sample_processing_temperature_C: 1100
+        delta_f_H: -116.4
+        note: Formation from elements at 25 °C (Si + O2 + C + H2 -> the SiOC(H) sample); the printed unit is kJ/g-at; Table 6 defines one sample mole as one gram-atom (one mole of atoms).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 298.15}
+          locator: {page: 19, pdf_page_index: 18, table: '6'}
+      uncertainty: {reported_status: printed, value: 3.9, units: kJ/g-at}
     context:
     - observation_id: sugie2021_table1_context
       type: printed_table_context
@@ -182,12 +258,11 @@ species:
         quantity: printed_table_values_no_matching_token
         table_number: 6
         table_title: Measured drop solution, oxidation, and formation enthalpies for SiOC(H) samples
-        reason: 'Candidate tokens checked: delta_fH, H_minus_H298, heat_of_formation. Delta Hds and Delta Hox have
-          no matching tokens. Delta Hf,elem is formation from elements but is calculated using the untyped drop-solution
-          measurement, so it is pending a corpus table asset (controller, t-1382); all input values are transcribed
-          above. Delta Hf,comp is formation from SiC, cristobalite, graphite and liquid water and is not delta_fH.
-          No value is promoted to a wrong token. Reaction basis: from elements, Si + O2 + C + H2 -> SiaOb-d/2Cc
-          + d/2 H2O; from components, reaction printed in Table 5.'
+        reason: 'Candidate tokens checked: delta_fH, H_minus_H298, heat_of_formation. The four Delta Hf,elem values are
+          typed as formation from elements above. Delta Hds and Delta Hox remain context because no matching quantity token
+          represents these drop-solution and oxidation enthalpies. Delta Hf,comp is formation from SiC, cristobalite, graphite
+          and liquid water and is not delta_fH. Reaction basis: from elements, Si + O2 + C + H2 -> SiaOb-d/2Cc + d/2 H2O;
+          from components, reaction printed in Table 5.'
         printed_rows:
         - - HQ4_SG 800 C
           - a=0.286 b=0.619 c=0.047 d=0.048
@@ -213,11 +288,9 @@ species:
           - Delta Hox=-244.7 +/- 3.9 kJ/g-at
           - Delta Hf,elem=-116.4 +/- 3.9 kJ/g-at
           - Delta Hf,comp=-13.9 +/- 3.9 kJ/g-at
-        schema_gap: Delta Hds and Delta Hox have no matching tokens. Delta Hf,elem is formation from elements but
-          is calculated using the untyped drop-solution measurement, so it is pending a corpus table asset (controller,
-          t-1382); the measured table cells and composition inputs are in .agent-scratch/oxide-thermochemistry-tables/sugie-2021-sioc-mixed-bond-calorimetry/table-6-input.csv.
-          Delta Hf,comp is formation from SiC, cristobalite, graphite and liquid water and is not delta_fH. No value
-          is promoted to a wrong token.
+        schema_gap: Delta Hds and Delta Hox have no matching tokens and remain context. Delta Hf,comp is formation from SiC,
+          cristobalite, graphite and liquid water and is not delta_fH. Table 6 inputs and composition values remain in
+          .agent-scratch/oxide-thermochemistry-tables/sugie-2021-sioc-mixed-bond-calorimetry/table-6-input.csv.
     - observation_id: sugie2021_figure1_deferred
       type: figure_record
       locator:
@@ -477,3 +550,7 @@ species:
           marker_count: not applicable (micrographs)
         digitisation: deferred to a figure pass
         printed_quantity_as_published: high-resolution transmission electron microscopy images
+fidelity_samples:
+- path: species.SiOCH.observations[sugie2021_table6_hq4sg800c_delta_fH_elem].values.delta_f_H
+  value: -257.2
+  locator: {page: 19, pdf_page_index: 18, table: '6', row: 'HQ4_SG 800 C'}
