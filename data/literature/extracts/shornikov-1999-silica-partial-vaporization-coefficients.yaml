@@ -1,0 +1,1621 @@
+schema_version: literature_extract.v1
+source_id: shornikov-1999-silica-partial-vaporization-coefficients
+source:
+  citation: Shornikov, S. I., Archakov, I. Yu., and Shul'ts, M. M. (1999). Mass Spectrometric Study of
+    Vaporization and Thermodynamic Properties of Silicon Dioxide. II. Determination of Partial Vaporization
+    Coefficients of Silicon Dioxide. Russian Journal of General Chemistry, 69(2), 187–196.
+extraction:
+  method: mineru_table_draft emit of Table 4 this-work rows only, then a move of the verbatim ± cell onto
+    values.alpha after dividing by 100 because the header is α_i × 10^2. MinerU had tagged those data
+    rows as header. The scratch CSV set rows 7–9 to body after the 600 dpi render agreed with MinerU on
+    every this-work cell. No digit was changed. Temperature ranges were not passed through the temperature
+    column. Tables 1–3 this-work A/B and a/b coefficients are context rows, because a two-coefficient
+    law is not a point pressure. Literature rows and Figs. 1–5 were not emitted.
+  date: '2026-10-20'
+  worker: t1372-w2-w9-t1
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables:
+  - page: 8
+    table_index: 4
+    count: 0
+species:
+  SiO:
+    observations:
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c03
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (SiO) 1700–1950
+        column_header: (10)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (10). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0201'
+        alpha_as_printed: 2.01±0.45
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (10)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1700
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0045 on values.alpha.
+        printed: ±0.45
+        on_alpha: ±0.0045
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c04
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (SiO) 1700–1950
+        column_header: (15)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (15). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0239'
+        alpha_as_printed: 2.39±0.35
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (15)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1700
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0035 on values.alpha.
+        printed: ±0.35
+        on_alpha: ±0.0035
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c05
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (SiO) 1700–1950
+        column_header: (17)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (17). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0225'
+        alpha_as_printed: 2.25±0.25
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (17)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1700
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0025 on values.alpha.
+        printed: ±0.25
+        on_alpha: ±0.0025
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c06
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (SiO) 1700–1950
+        column_header: (19)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (19). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0220'
+        alpha_as_printed: 2.20±0.24
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (19)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1700
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0024 on values.alpha.
+        printed: ±0.24
+        on_alpha: ±0.0024
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c07
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (SiO) 1700–1950
+        column_header: recommended value
+        published_page: 194
+        note: '600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul''ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. The recommended
+          cell is not the arithmetic mean of columns (10), (15), (17), and (19): SiO mean 2.2125 against
+          printed 2.23; SiO2 mean 1.78 against printed 1.80; Si2O2 mean 1.58 against printed 1.62. Those
+          columns are not linked as parents. Published p. 194 also states this silicon monoxide coefficient
+          as (2.23±0.30)×10^{-2} and constant at 1610–1980 K. The table cell''s temperature range is the
+          one stored.'
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0223'
+        alpha_as_printed: 2.23±0.30
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: recommended value
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1700
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0030 on values.alpha.
+        printed: ±0.30
+        on_alpha: ±0.0030
+    context:
+    - observation_id: sh99_sio_t1_r04
+      type: experiment_series
+      locator:
+        published_page: 189
+        pdf_page_index: 2
+        table: '1'
+        note: This-work row of Table 1. 600 dpi render of published p. 189 agrees with MinerU on A, B,
+          n, and the temperature limits. The f exponent is 10^{-3} on the first three this-work rows and
+          10^{-1} on the open-cell row (MinerU 3.75×10^{-1}); tesseract drops the minus sign. No digit
+          was changed. A and B are fit coefficients of equation (18), not a point pressure. The reference
+          cell is This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 31
+        f_as_printed: 1.12 × 10^-3
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(SiO) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 27880 \pm 612
+          A_K: '27880'
+          sigma_A_K: '612'
+          B_as_printed: 10.84 \pm 0.15
+          B: '10.84'
+          sigma_B: '0.15'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1623
+        - 1930
+    - observation_id: sh99_sio_t1_r05
+      type: experiment_series
+      locator:
+        published_page: 189
+        pdf_page_index: 2
+        table: '1'
+        note: This-work row of Table 1. 600 dpi render of published p. 189 agrees with MinerU on A, B,
+          n, and the temperature limits. The f exponent is 10^{-3} on the first three this-work rows and
+          10^{-1} on the open-cell row (MinerU 3.75×10^{-1}); tesseract drops the minus sign. No digit
+          was changed. A and B are fit coefficients of equation (18), not a point pressure. The reference
+          cell is a ditto of This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 24
+        f_as_printed: 2.39 × 10^-3
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(SiO) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 27240 \pm 420
+          A_K: '27240'
+          sigma_A_K: '420'
+          B_as_printed: 10.45 \pm 0.24
+          B: '10.45'
+          sigma_B: '0.24'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1616
+        - 1947
+    - observation_id: sh99_sio_t1_r06
+      type: experiment_series
+      locator:
+        published_page: 189
+        pdf_page_index: 2
+        table: '1'
+        note: This-work row of Table 1. 600 dpi render of published p. 189 agrees with MinerU on A, B,
+          n, and the temperature limits. The f exponent is 10^{-3} on the first three this-work rows and
+          10^{-1} on the open-cell row (MinerU 3.75×10^{-1}); tesseract drops the minus sign. No digit
+          was changed. A and B are fit coefficients of equation (18), not a point pressure. The reference
+          cell is a ditto of This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 31
+        f_as_printed: 3.35 × 10^-3
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(SiO) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 26932 \pm 820
+          A_K: '26932'
+          sigma_A_K: '820'
+          B_as_printed: 10.27 \pm 0.27
+          B: '10.27'
+          sigma_B: '0.27'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1650
+        - 1970
+    - observation_id: sh99_sio_t1_r17
+      type: experiment_series
+      locator:
+        published_page: 189
+        pdf_page_index: 2
+        table: '1'
+        note: This-work row of Table 1. 600 dpi render of published p. 189 agrees with MinerU on A, B,
+          n, and the temperature limits. The f exponent is 10^{-3} on the first three this-work rows and
+          10^{-1} on the open-cell row (MinerU 3.75×10^{-1}); tesseract drops the minus sign. No digit
+          was changed. A and B are fit coefficients of equation (18), not a point pressure. The reference
+          cell is This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 32
+        f_as_printed: 3.75 × 10^-1
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(SiO) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 26452 \pm 860
+          A_K: '26452'
+          sigma_A_K: '860'
+          B_as_printed: 8.00 \pm 0.48
+          B: '8.00'
+          sigma_B: '0.48'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1690
+        - 1947
+    - observation_id: sh99_sio_t3_r03
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 8±3
+          minus_a: '8'
+          sigma_minus_a: '3'
+          minus_b_as_printed: 5.552±0.004
+          minus_b: '5.552'
+          sigma_minus_b: '0.004'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1700
+    - observation_id: sh99_sio_t3_r05
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 15±2
+          minus_a: '15'
+          sigma_minus_a: '2'
+          minus_b_as_printed: 5.076±0.006
+          minus_b: '5.076'
+          sigma_minus_b: '0.006'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1750
+    - observation_id: sh99_sio_t3_r08
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 22±3
+          minus_a: '22'
+          sigma_minus_a: '3'
+          minus_b_as_printed: 4.626±0.008
+          minus_b: '4.626'
+          sigma_minus_b: '0.008'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1800
+    - observation_id: sh99_sio_t3_r11
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 28±4
+          minus_a: '28'
+          sigma_minus_a: '4'
+          minus_b_as_printed: 4.201±0.010
+          minus_b: '4.201'
+          sigma_minus_b: '0.010'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1850
+    - observation_id: sh99_sio_t3_r14
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 34±5
+          minus_a: '34'
+          sigma_minus_a: '5'
+          minus_b_as_printed: 3.798±0.012
+          minus_b: '3.798'
+          sigma_minus_b: '0.012'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1900
+    - observation_id: sh99_sio_t3_r17
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 40±6
+          minus_a: '40'
+          sigma_minus_a: '6'
+          minus_b_as_printed: 3.415±0.013
+          minus_b: '3.415'
+          sigma_minus_b: '0.013'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1950
+    - observation_id: sh99_fig1
+      type: experiment_series
+      locator:
+        published_page: 190
+        pdf_page_index: 3
+        figure: '1'
+        note: Fig. 1 is six straight lines of log p(SiO) against 1000/T. There are no discrete markers.
+          Series 6 is this work's effusion line; its coefficients are the Table 1 this-work rows. Series
+          1–5 are the cited experiments named in the caption. No line was digitized.
+      units: figure-only
+      values:
+        quantity: figure not digitized
+        method_class: figure_only
+        digitized: false
+    - observation_id: sh99_fig2a
+      type: experiment_series
+      locator:
+        published_page: 191
+        pdf_page_index: 4
+        figure: '2'
+        note: 'Fig. 2a plots this work''s effective p(SiO) against 1000/T for four values of f, with markers
+          on the fit lines. The lines are Table 1. The markers were not read: no labelled-tick calibration
+          was stored, and a marker count was not invented. No point pressure is stored.'
+      units: figure-only
+      values:
+        quantity: figure not digitized
+        method_class: figure_only
+        digitized: false
+    - observation_id: sh99_fig4a
+      type: experiment_series
+      locator:
+        published_page: 192
+        pdf_page_index: 5
+        figure: '4'
+        note: Fig. 4a plots p_ef/p_eq for (SiO) against f. Series 1–10 are the effusion results of references
+          [15] and [16]. Series 11–16 are this work and are the input to the Table 3 least-squares constants.
+          Markers were not read. No ratio is stored.
+      units: figure-only
+      values:
+        quantity: figure not digitized
+        method_class: figure_only
+        digitized: false
+    - observation_id: sh99_fig5_nagai
+      type: experiment_series
+      locator:
+        published_page: 194
+        pdf_page_index: 7
+        figure: '5'
+        note: Fig. 5 is the partial vaporization coefficient of (SiO) calculated by equation (8) from
+          Nagai et al. [16], not from this work. Series 1–5 were not read.
+      units: figure-only
+      values:
+        quantity: figure not digitized
+        method_class: figure_only
+        digitized: false
+  SiO2:
+    observations:
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c03
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (SiO2) 1850–1950
+        column_header: (10)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (10). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0156'
+        alpha_as_printed: 1.56±0.52
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (10)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1850
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0052 on values.alpha.
+        printed: ±0.52
+        on_alpha: ±0.0052
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c04
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (SiO2) 1850–1950
+        column_header: (15)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (15). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0190'
+        alpha_as_printed: 1.90±0.43
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (15)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1850
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0043 on values.alpha.
+        printed: ±0.43
+        on_alpha: ±0.0043
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c05
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (SiO2) 1850–1950
+        column_header: (17)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (17). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0164'
+        alpha_as_printed: 1.64±0.35
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (17)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1850
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0035 on values.alpha.
+        printed: ±0.35
+        on_alpha: ±0.0035
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c06
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (SiO2) 1850–1950
+        column_header: (19)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (19). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0202'
+        alpha_as_printed: 2.02±0.38
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (19)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1850
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0038 on values.alpha.
+        printed: ±0.38
+        on_alpha: ±0.0038
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c07
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (SiO2) 1850–1950
+        column_header: recommended value
+        published_page: 194
+        note: '600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul''ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. The recommended
+          cell is not the arithmetic mean of columns (10), (15), (17), and (19): SiO mean 2.2125 against
+          printed 2.23; SiO2 mean 1.78 against printed 1.80; Si2O2 mean 1.58 against printed 1.62. Those
+          columns are not linked as parents.'
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0180'
+        alpha_as_printed: 1.80±0.41
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: recommended value
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1850
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0041 on values.alpha.
+        printed: ±0.41
+        on_alpha: ±0.0041
+    context:
+    - observation_id: sh99_sio2_t2_r03
+      type: experiment_series
+      locator:
+        published_page: 190
+        pdf_page_index: 3
+        table: '2'
+        note: This-work row of Table 2. The caption says the pressures were determined in this work from
+          a molybdenum effusion cell. 600 dpi render of published p. 190 agrees with MinerU on A, B, n,
+          f, and the temperature limits. Tesseract garbles the species glyphs; the stored species is the
+          MinerU formula, which matches the MinerU caption (SiO2) and (Si2O2). The open-cell f cell is
+          3.75×10^{-1}. No digit was changed. A and B are fit coefficients of equation (18), not a point
+          pressure.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO2(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 28
+        f_as_printed: 1.12 × 10^-3
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 29153 \pm 338
+          A_K: '29153'
+          sigma_A_K: '338'
+          B_as_printed: 8.76 \pm 0.19
+          B: '8.76'
+          sigma_B: '0.19'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1704
+        - 1907
+    - observation_id: sh99_sio2_t2_r04
+      type: experiment_series
+      locator:
+        published_page: 190
+        pdf_page_index: 3
+        table: '2'
+        note: This-work row of Table 2. The caption says the pressures were determined in this work from
+          a molybdenum effusion cell. 600 dpi render of published p. 190 agrees with MinerU on A, B, n,
+          f, and the temperature limits. Tesseract garbles the species glyphs; the stored species is the
+          MinerU formula, which matches the MinerU caption (SiO2) and (Si2O2). The open-cell f cell is
+          3.75×10^{-1}. No digit was changed. A and B are fit coefficients of equation (18), not a point
+          pressure.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO2(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 7
+        f_as_printed: 2.39 × 10^-3
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 29587 \pm 971
+          A_K: '29587'
+          sigma_A_K: '971'
+          B_as_printed: 8.63 \pm 0.38
+          B: '8.63'
+          sigma_B: '0.38'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1764
+        - 1983
+    - observation_id: sh99_sio2_t2_r05
+      type: experiment_series
+      locator:
+        published_page: 190
+        pdf_page_index: 3
+        table: '2'
+        note: This-work row of Table 2. The caption says the pressures were determined in this work from
+          a molybdenum effusion cell. 600 dpi render of published p. 190 agrees with MinerU on A, B, n,
+          f, and the temperature limits. Tesseract garbles the species glyphs; the stored species is the
+          MinerU formula, which matches the MinerU caption (SiO2) and (Si2O2). The open-cell f cell is
+          3.75×10^{-1}. No digit was changed. A and B are fit coefficients of equation (18), not a point
+          pressure.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO2(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 8
+        f_as_printed: 3.35 × 10^-3
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 29203 \pm 1066
+          A_K: '29203'
+          sigma_A_K: '1066'
+          B_as_printed: 8.30 \pm 0.58
+          B: '8.30'
+          sigma_B: '0.58'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1795
+        - 1970
+    - observation_id: sh99_sio2_t2_r06
+      type: experiment_series
+      locator:
+        published_page: 190
+        pdf_page_index: 3
+        table: '2'
+        note: This-work row of Table 2. The caption says the pressures were determined in this work from
+          a molybdenum effusion cell. 600 dpi render of published p. 190 agrees with MinerU on A, B, n,
+          f, and the temperature limits. Tesseract garbles the species glyphs; the stored species is the
+          MinerU formula, which matches the MinerU caption (SiO2) and (Si2O2). The open-cell f cell is
+          3.75×10^{-1}. No digit was changed. A and B are fit coefficients of equation (18), not a point
+          pressure.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO2(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 9
+        f_as_printed: 3.75 × 10^-1
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 28864 \pm 1695
+          A_K: '28864'
+          sigma_A_K: '1695'
+          B_as_printed: 7.03 \pm 0.79
+          B: '7.03'
+          sigma_B: '0.79'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1847
+        - 1947
+    - observation_id: sh99_sio2_t3_r18
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is a ditto
+          of This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO2(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 22±6
+          minus_a: '22'
+          sigma_minus_a: '6'
+          minus_b_as_printed: 6.794±0.148
+          minus_b: '6.794'
+          sigma_minus_b: '0.148'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1850
+    - observation_id: sh99_sio2_t3_r19
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is a ditto
+          of This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO2(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 22±6
+          minus_a: '22'
+          sigma_minus_a: '6'
+          minus_b_as_printed: 6.378±0.141
+          minus_b: '6.378'
+          sigma_minus_b: '0.141'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1900
+    - observation_id: sh99_sio2_t3_r20
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is a ditto
+          of This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: SiO2(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 22±6
+          minus_a: '22'
+          sigma_minus_a: '6'
+          minus_b_as_printed: 5.983±0.134
+          minus_b: '5.983'
+          sigma_minus_b: '0.134'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1950
+    - observation_id: sh99_condensed_phase_convention
+      type: laboratory_conditions
+      locator:
+        published_page: 187
+        pdf_page_index: 0
+        paragraph: Notation
+        note: 'Published p. 187: the condensed and gas phases are denoted by brackets and parentheses.
+          Part I prints Tm([SiO2]) = 1996±5 K. This paper does not name the phase or a polymorph.'
+      units: verbatim source statement
+      values:
+        statement_as_printed: Here and hereinafter the condensed and gas phases are denoted by brackets
+          and parentheses, respectively.
+        part_i_melting_point_as_printed: 1996±5 K
+        part_i_source_id: shornikov-1998-silica-vaporization
+        polymorph_stored: false
+    - observation_id: sh99_cell_geometry
+      type: laboratory_conditions
+      locator:
+        published_page: 190
+        pdf_page_index: 3
+        section: Experimental
+        note: Printed cell geometry. Equation (11) defines f = s_or C_or / S_c. The open cell has s_or
+          = S_c and the printed Clausing coefficient 0.375, which is the Table 1–2 f cell 3.75×10^{-1}.
+      units: mm as printed
+      values:
+        instrument_as_printed: MI-1201 mass spectrometer, modified
+        temperature_range_K_as_printed: 1610–1980 K
+        cell_material_as_printed: molybdenum
+        cell_diameter_mm: 8.00±0.05
+        cell_height_mm: 15.0±0.05
+        orifice_diameter_mm:
+        - 0.308±0.007
+        - 0.434±0.007
+        - 0.507±0.007
+        orifice_channel_length_mm: 0.10±0.01
+        clausing_orifice_as_printed:
+        - '0.755'
+        - '0.813'
+        - '0.835'
+        clausing_cell_as_printed: '0.375'
+        ionizing_energy_eV: 20
+        open_cell_as_printed: s_or = S_c
+    - observation_id: sh99_fig2b
+      type: experiment_series
+      locator:
+        published_page: 191
+        pdf_page_index: 4
+        figure: '2'
+        note: Fig. 2b is the same kind of plot for (SiO2). The lines are the Table 2 (SiO2) rows. Markers
+          were not read and no point pressure is stored.
+      units: figure-only
+      values:
+        quantity: figure not digitized
+        method_class: figure_only
+        digitized: false
+    - observation_id: sh99_fig3_silver
+      type: experiment_series
+      locator:
+        published_page: 191
+        pdf_page_index: 4
+        figure: '3'
+        note: 'Fig. 3 is the silver calibration: effective and equilibrium p(Ag) from molybdenum cells,
+          compared with Paule and Mandel. It is not an oxide measurement. No silver pressure was read.'
+      units: figure-only
+      values:
+        quantity: figure not digitized
+        method_class: figure_only
+        digitized: false
+    - observation_id: sh99_fig4b
+      type: experiment_series
+      locator:
+        published_page: 192
+        pdf_page_index: 5
+        figure: '4'
+        note: Fig. 4b is the same ratio for (SiO2), series 14–16, this work. Markers were not read. The
+          fit is the Table 3 (SiO2) rows.
+      units: figure-only
+      values:
+        quantity: figure not digitized
+        method_class: figure_only
+        digitized: false
+  Si2O2:
+    observations:
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c03
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (Si2O2) 1850–1950
+        column_header: (10)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (10). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0131'
+        alpha_as_printed: 1.31±0.56
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (10)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1850
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0056 on values.alpha.
+        printed: ±0.56
+        on_alpha: ±0.0056
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c04
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (Si2O2) 1850–1950
+        column_header: (15)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (15). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0160'
+        alpha_as_printed: 1.60±0.49
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (15)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1850
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0049 on values.alpha.
+        printed: ±0.49
+        on_alpha: ±0.0049
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c05
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (Si2O2) 1850–1950
+        column_header: (17)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (17). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0153'
+        alpha_as_printed: 1.53±0.41
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (17)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1850
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0041 on values.alpha.
+        printed: ±0.41
+        on_alpha: ±0.0041
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c06
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (Si2O2) 1850–1950
+        column_header: (19)
+        published_page: 194
+        note: 600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul'ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. This cell is
+          the printed result of equation (19). It is not recomputed, and it is not linked to Table 3.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0188'
+        alpha_as_printed: 1.88±0.45
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: (19)
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1850
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0045 on values.alpha.
+        printed: ±0.45
+        on_alpha: ±0.0045
+    - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c07
+      type: alpha
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '4'
+        row_label: (Si2O2) 1850–1950
+        column_header: recommended value
+        published_page: 194
+        note: '600 dpi render of published p. 194 (PDF p. 8) agrees with this MinerU cell. No digit was
+          changed. MinerU had tagged the data row as a header; the scratch CSV retagged rows 7–9 to body
+          before emit. The column header is α_i × 10^2, so values.alpha is the printed cell divided by
+          100. The temperature cell is a range, so it was not passed through the temperature column. Condensed
+          phase is printed as [SiO2]. Published p. 187 says brackets denote the condensed phase and parentheses
+          the gas phase. This paper does not name solid, liquid, or a polymorph, so no phase token is
+          stored. Part I (Shornikov, Archakov, and Shul''ts, Russian Journal of General Chemistry, 68(8),
+          1171–1177, 1998) prints the melting point of [SiO2] as 1996±5 K. This interval ends at 1950
+          K, outside the melting band 1991–2001 K and within 100 K of that melting point. The recommended
+          cell is not the arithmetic mean of columns (10), (15), (17), and (19): SiO mean 2.2125 against
+          printed 2.23; SiO2 mean 1.78 against printed 1.80; Si2O2 mean 1.58 against printed 1.62. Those
+          columns are not linked as parents.'
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: measured_reduced
+        alpha: '0.0162'
+        alpha_as_printed: 1.62±0.47
+        header_scale_as_printed: α_i × 10^2
+        equation_column_as_printed: recommended value
+        condensed_as_printed: '[SiO2]'
+      T_range_K:
+      - 1850
+      - 1950
+      uncertainty:
+        note: Printed plus-minus is on the α_i × 10^2 cell. Divided by 100 it is ±0.0047 on values.alpha.
+        printed: ±0.47
+        on_alpha: ±0.0047
+    context:
+    - observation_id: sh99_si2o2_t2_r07
+      type: experiment_series
+      locator:
+        published_page: 190
+        pdf_page_index: 3
+        table: '2'
+        note: This-work row of Table 2. The caption says the pressures were determined in this work from
+          a molybdenum effusion cell. 600 dpi render of published p. 190 agrees with MinerU on A, B, n,
+          f, and the temperature limits. Tesseract garbles the species glyphs; the stored species is the
+          MinerU formula, which matches the MinerU caption (SiO2) and (Si2O2). The open-cell f cell is
+          3.75×10^{-1}. No digit was changed. A and B are fit coefficients of equation (18), not a point
+          pressure.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: Si2O2(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 21
+        f_as_printed: 1.12 × 10^-3
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 31699 \pm 825
+          A_K: '31699'
+          sigma_A_K: '825'
+          B_as_printed: 10.91 \pm 0.37
+          B: '10.91'
+          sigma_B: '0.37'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1610
+        - 1907
+    - observation_id: sh99_si2o2_t2_r08
+      type: experiment_series
+      locator:
+        published_page: 190
+        pdf_page_index: 3
+        table: '2'
+        note: This-work row of Table 2. The caption says the pressures were determined in this work from
+          a molybdenum effusion cell. 600 dpi render of published p. 190 agrees with MinerU on A, B, n,
+          f, and the temperature limits. Tesseract garbles the species glyphs; the stored species is the
+          MinerU formula, which matches the MinerU caption (SiO2) and (Si2O2). The open-cell f cell is
+          3.75×10^{-1}. No digit was changed. A and B are fit coefficients of equation (18), not a point
+          pressure.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: Si2O2(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 14
+        f_as_printed: 2.39 × 10^-3
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 32095 \pm 865
+          A_K: '32095'
+          sigma_A_K: '865'
+          B_as_printed: 10.63 \pm 0.44
+          B: '10.63'
+          sigma_B: '0.44'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1749
+        - 1871
+    - observation_id: sh99_si2o2_t2_r09
+      type: experiment_series
+      locator:
+        published_page: 190
+        pdf_page_index: 3
+        table: '2'
+        note: This-work row of Table 2. The caption says the pressures were determined in this work from
+          a molybdenum effusion cell. 600 dpi render of published p. 190 agrees with MinerU on A, B, n,
+          f, and the temperature limits. Tesseract garbles the species glyphs; the stored species is the
+          MinerU formula, which matches the MinerU caption (SiO2) and (Si2O2). The open-cell f cell is
+          3.75×10^{-1}. No digit was changed. A and B are fit coefficients of equation (18), not a point
+          pressure.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: Si2O2(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 6
+        f_as_printed: 3.35 × 10^-3
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 32247 \pm 965
+          A_K: '32247'
+          sigma_A_K: '965'
+          B_as_printed: 10.57 \pm 0.54
+          B: '10.57'
+          sigma_B: '0.54'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1795
+        - 1970
+    - observation_id: sh99_si2o2_t2_r10
+      type: experiment_series
+      locator:
+        published_page: 190
+        pdf_page_index: 3
+        table: '2'
+        note: This-work row of Table 2. The caption says the pressures were determined in this work from
+          a molybdenum effusion cell. 600 dpi render of published p. 190 agrees with MinerU on A, B, n,
+          f, and the temperature limits. Tesseract garbles the species glyphs; the stored species is the
+          MinerU formula, which matches the MinerU caption (SiO2) and (Si2O2). The open-cell f cell is
+          3.75×10^{-1}. No digit was changed. A and B are fit coefficients of equation (18), not a point
+          pressure.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: Si2O2(g)
+        condensed_as_printed: '[SiO2]'
+        n_measurements: 7
+        f_as_printed: 3.75 × 10^-1
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = −A/T + B, atm
+          equation: (18)
+          pressure_unit_as_printed: atm
+          A_as_printed: 32481 \pm 1555
+          A_K: '32481'
+          sigma_A_K: '1555'
+          B_as_printed: 9.10 \pm 0.82
+          B: '9.10'
+          sigma_B: '0.82'
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_range_K:
+        - 1847
+        - 1947
+    - observation_id: sh99_si2o2_t3_r21
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is a ditto
+          of This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: Si2O2(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 29±9
+          minus_a: '29'
+          sigma_minus_a: '9'
+          minus_b_as_printed: 5.962±0.216
+          minus_b: '5.962'
+          sigma_minus_b: '0.216'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1850
+    - observation_id: sh99_si2o2_t3_r22
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is a ditto
+          of This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: Si2O2(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 28±9
+          minus_a: '28'
+          sigma_minus_a: '9'
+          minus_b_as_printed: 5.515±0.214
+          minus_b: '5.515'
+          sigma_minus_b: '0.214'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1900
+    - observation_id: sh99_si2o2_t3_r23
+      type: experiment_series
+      locator:
+        published_page: 193
+        pdf_page_index: 6
+        table: '3'
+        note: This-work row of Table 3. Equation (14) is log p_ef(i) = a(i) f + b(i). The printed columns
+          are already −a(i) and −b(i). Those printed magnitudes are stored. a(i) and b(i) are not rewritten
+          as a second pair of numbers, and 10^{b(i)} is not evaluated. 600 dpi tesseract agrees with MinerU
+          except where it fuses ± into the neighbouring digits (SiO at 1800 K prints as 2243 and 4,626;
+          SiO at 1850 K prints as 28244). The MinerU markdown and the CSV already split those cells as
+          22±3, 4.626±0.008 and 28±4, 4.201±0.010. No digit was changed. The reference cell is a ditto
+          of This work.
+      units: log p_ef coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        gas_species: Si2O2(g)
+        condensed_as_printed: '[SiO2]'
+        pressure_temperature_or_f_relation:
+          relation_as_printed: log p_ef(i) = a(i) f + b(i)
+          equation: (14)
+          printed_columns: −a(i) and −b(i)
+          minus_a_as_printed: 28±9
+          minus_a: '28'
+          sigma_minus_a: '9'
+          minus_b_as_printed: 5.090±0.212
+          minus_b: '5.090'
+          sigma_minus_b: '0.212'
+          prose: The paper says 10^{b(i)} equals the equilibrium partial pressure at f = 0. That pressure
+            is not computed in this extract.
+        composition_basis_as_reported: Pure silicon dioxide. The paper prints the condensed phase as [SiO2]
+          and does not name solid, liquid, or a polymorph.
+        cell_material_as_printed: Mo
+        temperature_K: 1950
+    - observation_id: sh99_fig2c
+      type: experiment_series
+      locator:
+        published_page: 191
+        pdf_page_index: 4
+        figure: '2'
+        note: Fig. 2c is the same kind of plot for (Si2O2). The lines are the Table 2 (Si2O2) rows. Markers
+          were not read and no point pressure is stored.
+      units: figure-only
+      values:
+        quantity: figure not digitized
+        method_class: figure_only
+        digitized: false
+    - observation_id: sh99_fig4c
+      type: experiment_series
+      locator:
+        published_page: 192
+        pdf_page_index: 5
+        figure: '4'
+        note: Fig. 4c is the same ratio for (Si2O2), series 14–16, this work. Markers were not read. The
+          fit is the Table 3 (Si2O2) rows.
+      units: figure-only
+      values:
+        quantity: figure not digitized
+        method_class: figure_only
+        digitized: false
+fidelity_samples:
+- species: SiO
+  observable: alpha
+  observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r07_c07
+  field: alpha
+  value: '0.0223'
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 194
+    table: '4'
+    note: Fidelity pin of values.alpha. The printed recommended cell is 2.23±0.30 under the header α_i
+      × 10^2. 600 dpi OCR agrees with that MinerU cell.
+- species: SiO2
+  observable: alpha
+  observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r08_c07
+  field: alpha
+  value: '0.0180'
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 194
+    table: '4'
+    note: Fidelity pin of values.alpha. The printed recommended cell is 1.80±0.41 under the header α_i
+      × 10^2. 600 dpi OCR agrees with that MinerU cell.
+- species: Si2O2
+  observable: alpha
+  observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c07
+  field: alpha
+  value: '0.0162'
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 194
+    table: '4'
+    note: Fidelity pin of values.alpha. The printed recommended cell is 1.62±0.47 under the header α_i
+      × 10^2. 600 dpi OCR agrees with that MinerU cell.
