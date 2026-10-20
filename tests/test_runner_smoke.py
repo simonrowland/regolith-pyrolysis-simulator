@@ -24,6 +24,7 @@ from __future__ import annotations
 import hashlib
 from collections import defaultdict
 import json
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -138,6 +139,20 @@ def test_completed_run_wires_product_classification_and_markdown() -> None:
     assert "Silica glass" in report["markdown"]
     assert "Industrial mixed glass" in report["markdown"]
     assert "Refractory ceramic rump" in report["markdown"]
+
+
+def test_default_lunar_c0_product_story_is_numeric_with_si_channel():
+    payload = _run_scenario(SCENARIOS[0])
+
+    assert payload["status"] == "ok"
+    classification = payload["product_classification"]["classification"]
+    metals_and_oxygen = classification["metals_plus_O2"]
+    assert "Na" in metals_and_oxygen["metals_kg"]
+    assert "Si" in metals_and_oxygen["metals_kg"]
+    class_total = metals_and_oxygen["class_total_kg"]
+    assert isinstance(class_total, (int, float))
+    assert math.isfinite(class_total)
+    assert class_total > 0.0
 
 
 def test_product_classifier_fixed_composition_anchor() -> None:

@@ -51,6 +51,7 @@ def two_hour_run(request, vapor_pressure_data, feedstocks_data, setpoints_data):
     refusal = result.diagnostic["missing_transport_parameters"]["Si"]
     assert refusal["status"] == "unavailable"
     assert refusal["refusal_type"] == "EvaporationFluxConfigurationError"
+    assert refusal["parent_oxide"] == "SiO2"
 
     def dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX and not sim.record.snapshots:
