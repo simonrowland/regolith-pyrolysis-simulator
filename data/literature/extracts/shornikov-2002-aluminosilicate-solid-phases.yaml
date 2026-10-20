@@ -8,8 +8,10 @@ source:
   corpus_asset: raw/shornikov-2002-aluminosilicate-solid-phases/shornikov-2002-aluminosilicate-solid-phases.pdf
 extraction:
   method: Prose values checked against pdftotext-layout and the 600 dpi page renders. No content_list
-    table exists. Figure 2 symbols overlap too heavily to assign a composition, and Figure 3 is a broken-axis
-    schematic on S/M/A labels. Neither figure was digitized.
+    table exists. Figure 2 was inspected at 1200 dpi. Marker cores that survive a 2 px opening are dashes of
+    the dotted fit lines or symbols still crossed by those dashes, so no composition was assigned.
+    Figure 3 is a broken-axis schematic on S/M/A labels and was not digitized. The mullite
+    formation enthalpy keeps the printed least-squares lineage; the Gibbs-energy grid is not printed.
   date: '2026-10-20'
   worker: t1372-w1-w2-t1
   provenance_path: text/shornikov-2002-aluminosilicate-solid-phases/pdftotext-layout.txt
@@ -56,6 +58,19 @@ species:
         adjacent to mullite, not ion currents over a pure oxide in the cell.'
       per: mol_species
       experiment: shornikov-2002-doklady-solid-kems
+      derivation:
+        relation: Least squares of the Gibbs energies of formation from equations (4) and (5)
+          over 1676-2180 K. The Gibbs-energy grid is not printed.
+        output_unit: kJ/mol
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 84
+            pdf_page_index: 2
+            equation: '6'
+            note: Equations (4) and (5) supply the Gibbs energies. The grid is not printed.
+              Equation (6) is the least-squares result on published page 84.
       values:
         quantity: delta_fH
         method_class: measured_reduced
@@ -104,10 +119,10 @@ species:
     - observation_id: shornikov_2002_transition_enthalpies
       type: quoted_phase_transition_estimate
       locator:
-        page: 2
+        page: 3
         published_page: 84
-        pdf_page_index: 1
-        note: Author estimates. Partial pressures below 10^−9 atm. Not fusion enthalpies of a pure endmember.
+        pdf_page_index: 2
+        note: Author estimates. The sentences are on published page 84, which is PDF page 3. Partial pressures below 10^−9 atm. Not fusion enthalpies of a pure endmember.
       units: kJ/mol
       values:
         M_plus_S_to_M_plus_liquid_and_S_plus_liquid_maximum_kJ_mol: '5'
@@ -139,8 +154,17 @@ species:
       units: atm
       values:
         method_class: figure_only
-        reason: A composition and a (T, log p) pair cannot be assigned to an individual symbol within
-          a stated uncertainty.
+        reason: '1200 dpi PDF page 2. Panel frames, page pixels: (a) y-axis x=5430, y=1155-3541,
+          x-axis y=3541, x=5430-8913, T ticks 1700/1800/1900/2000/2100 at x=5692/6502/7232/7886/8478,
+          log10(p) ticks -3/-4/-5/-6 at y=1659/2277/2885/3442; (b) y-axis x=5522, y=3971-6238,
+          x-axis y=6238; (c) y-axis x=5430, y=6719-9130, x-axis y=9130. The low-T crop of panel (a),
+          x=5460-7000 and y=2300-3520, is the region of the claimed isolated VIII near 1740 K.
+          The diamond at the top of that crop is the legend entry, not a datum. A 2 px opening
+          leaves 24x24 dash cores of the dotted lines (area about 417) and a few larger cores
+          still crossed by dashes. No core is one legend symbol clear of the line and of its
+          neighbour, so no roman numeral was assigned and no pressure was stored. Replica filled
+          symbols are changed composition, and the new mole percent is not printed. The same
+          overlap holds on panels (b) and (c).'
         sample_mol_percent_Al2O3: 1.19, 3.31, 12.84, 28.20, 60.00, 67.63, 70.21, 84.14
         temperature_span_as_printed_K: 1676–2327
     - observation_id: shornikov_2002_fig3_schematic

@@ -8,7 +8,7 @@ Not a duplicate of an extract on this base. `shornikov-2002-mullite-thermodynami
 
 ## Admitted
 
-ΔfH of mullite from oxides, 12.9 ± 0.8 kJ/mol, least squares of ΔfG over 1676–2180 K, equation (6), published page 84. Species Al6Si2O13, phase cr, quantity delta_fH. No single temperature is printed, so none is invented. The ±0.8 is the printed uncertainty; the confidence level is not stated.
+ΔfH of mullite from oxides, 12.9 ± 0.8 kJ/mol, least squares of ΔfG over 1676–2180 K, equation (6), published page 84. Species Al6Si2O13, phase cr, quantity delta_fH. No single temperature is printed, so none is invented. The ±0.8 is the printed uncertainty; the confidence level is not stated. The fix round adds the printed lineage: derivation.relation is the least squares of equations (4) and (5), and raw_inputs is not_printed with a locator on equation (6). No parent observation is invented, and derived_from is absent.
 
 Standard state: “formation of mullite from oxides.” The paper does not state solid versus liquid oxides. The prose contains “not stated” and does not name one pure endmember, so migration of an activity mapper would stay unknown. This row is a formation enthalpy, not an activity. The 2026-10-20 pure-oxide rule was not applied: equations (4) and (5) compare partial pressures between the two heterogeneous regions, not a pure oxide measured in the cell.
 
@@ -26,7 +26,7 @@ Evaporation coefficients: the paper says direct data are unavailable and assumes
 
 No content_list table. Figure 1 is a phase-diagram comparison. Context only.
 
-Figure 2 (published p. 83): log p(SiO), log p(Al), log p(O) versus T for eight compositions (1.19, 3.31, 12.84, 28.20, 60.00, 67.63, 70.21, 84.14 mol% Al2O3), open in silica–mullite and filled in mullite–alumina. Symbols overlap. A composition cannot be assigned within a stated uncertainty. Lines are literature or interval summaries. Not digitized.
+Figure 2 (published p. 83) was re-read at 1200 dpi (`p2002-p-2.png`, PDF page 2). Panel frames, page pixels: (a) y-axis x=5430, y=1155–3541, x-axis y=3541, x=5430–8913, with T ticks 1700, 1800, 1900, 2000, 2100 at x=5692, 6502, 7232, 7886, 8478 and log10(p) ticks −3, −4, −5, −6 at y=1659, 2277, 2885, 3442; (b) y-axis x=5522, y=3971–6238, x-axis y=6238; (c) y-axis x=5430, y=6719–9130, x-axis y=9130. The disputed low-T crop of panel (a) is x=5460–7000, y=2300–3520. The diamond at the top of that crop is the legend entry VIII, not a datum. A 2 px opening of the ink leaves 24×24 dash cores of the dotted fit lines (area about 417) and a few larger cores still crossed by dashes. Centres checked and refused, page pixels: (5512, 3410), (5596, 3367), (5859, 3272), (5889, 3123), (6068, 3028), (6873, 2506), (6928, 2458), (7137, 2489), (7200, 2276), (7269, 2230), (7390, 2162), (7521, 2130), (8363, 1574), (8853, 1261). None is one legend symbol clear of the line and of its neighbour, so no roman numeral and no pressure were stored. Replica filled symbols are changed composition, and the new mole percent is not printed. Panels (b) and (c) have the same overlap. The transition sentences are on published page 84, which is PDF page 3.
 
 Figure 3 (published p. 84): log p at 1850 K. The y axis is broken between −4.0 and −8.5. The x axis is S, M, A only. Schematic. Not digitized.
 
