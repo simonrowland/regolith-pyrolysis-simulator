@@ -1,0 +1,350 @@
+schema_version: literature_extract.v1
+source_id: sumita-1982-optical-basicity-fe-redox
+source:
+  citation: Sumita, S., Matsumoto, Y., Morinaga, K. & Yanagase, T. (1982), "The Optical Basicity and Fe2+–Fe3+ Redox
+    in Oxyacid Salt Systems", Transactions of the Japan Institute of Metals 23(7), 360–367.
+  year: 1982
+extraction:
+  method: Born-digital pdftotext-layout review; MinerU table draft reports no tables. Figures retained without numeric
+    points per wave rules.
+  date: '2026-10-20'
+  worker: fam25-1020
+review_status: draft
+species:
+  Fe:
+    observations: []
+    context:
+    - observation_id: sumita_1982_figure9_fe_redox_deferred
+      type: figure_only
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 364
+        figure: '9'
+      phase: quenched glass
+      units: log10(Fe2+/Fe3+), dimensionless; composition in mol%
+      values:
+        method_class: figure_only
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 2
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: log10_ratio
+        species: Fe
+        phase_as_printed: Na2O–SiO2, Na2O–P2O5, and CaO–P2O5 glasses
+        temperature: 1573 K
+        axes_as_printed:
+          x: Na2O or CaO content in mol%
+          y: log(Fe2+/Fe3+)
+        caption: Relation between Fe2+/Fe3+ ratio and composition.
+        panel:
+        - a
+        - b
+        - c
+        series:
+        - label: CaO–P2O5
+          marker_count: 6
+        - label: Na2O–P2O5
+          marker_count: 5
+        - label: Na2O–SiO2
+          marker_count: 8
+        attribution: Sumita et al. (1982), measured redox ratios in glasses quenched from the melts.
+        digitisation: deferred to a figure pass
+    - observation_id: sumita_1982_figure10_fe_redox_deferred
+      type: figure_only
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 365
+        figure: '10'
+      phase: quenched glass
+      units: log10(Fe2+/Fe3+) and optical basicity Λ, dimensionless
+      values:
+        method_class: figure_only
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 2
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: log10_ratio
+        species: Fe
+        phase_as_printed: Na2O–SiO2, Na2O–P2O5, and CaO–P2O5 glasses
+        temperature: 1573 K, inherited from Fig. 9
+        axes_as_printed:
+          x: optical basicity Λ
+          y: log(Fe2+/Fe3+)
+        caption: Relation between Fe2+/Fe3+ ratio and optical basicity.
+        panel: none
+        series:
+        - label: Na2O–SiO2
+          marker_count: 8
+        - label: Na2O–P2O5
+          marker_count: 5
+        - label: CaO–P2O5
+          marker_count: 6
+        attribution: Sumita et al. (1982), measured ratios reproduced from Fig. 9; optical basicity is author-determined
+          context.
+        digitisation: deferred to a figure pass
+    - observation_id: sumita_1982_figure11_fe3_mossbauer_shift_deferred
+      type: figure_only
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 365
+        figure: '11'
+      phase: glass
+      units: Mössbauer isomer shift δ, mm/s; optical basicity dimensionless
+      values:
+        method_class: figure_only
+        quantity_as_printed: Fe3+ Mössbauer isomer shift versus optical basicity
+        species: Fe
+        phase_as_printed: Fe3+-bearing oxide glasses, 10 mol% Fe2O3
+        axes_as_printed:
+          x: optical basicity Λ
+          y: Mössbauer isomer shift δ in mm/s
+        caption: Relation between optical basicity and isomer shift of Fe3+ in the Mössbauer effect.
+        panel: none
+        series:
+        - label: values from cited report (20)
+          marker_count: 11
+        attribution: Quoted from the report cited as reference 20 in Sumita et al. (1982).
+        digitisation: deferred to a figure pass
+  Pb:
+    observations: []
+    context:
+    - observation_id: sumita_1982_figure1_deferred
+      type: figure_only
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 360
+        figure: '1'
+      phase: probe ion schematic
+      units: schematic; no numeric series
+      values:
+        method_class: figure_only
+        quantity_as_printed: Pb2+ probe ion electronic schematic
+        species: Pb
+        phase_as_printed: free Pb2+ and Pb2+ in oxide glass
+        axes_as_printed: no data axes
+        caption: Schematic diagram of the free Pb2+ ion and the Pb2+ ion after receiving negative charge.
+        panel:
+        - a
+        - b
+        series: []
+        attribution: Sumita et al. (1982)
+        digitisation: deferred to a figure pass
+    - observation_id: sumita_1982_figure2_deferred
+      type: figure_only
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 361
+        figure: '2'
+      phase: glass
+      units: optical absorption spectrum; wavenumber and wavelength as printed
+      values:
+        method_class: figure_only
+        quantity_as_printed: Pb-probe absorption spectra
+        species: Pb
+        phase_as_printed: Na2O–SiO2 glass, 40 mol% Na2O
+        axes_as_printed:
+          x: wavelength and wavenumber
+          y: absorption
+        caption: Effect of PbO content on Pb-probe spectra shift.
+        panel: none
+        series:
+        - label: PbO content 4×10−4 kg per 1 kg sample
+          marker_count: 0
+        - label: PbO content 2×10−4 kg per 1 kg sample
+          marker_count: 0
+        - label: PbO content 1×10−4 kg per 1 kg sample
+          marker_count: 0
+        - label: PbO content 5×10−5 kg per 1 kg sample
+          marker_count: 0
+        attribution: Sumita et al. (1982)
+        digitisation: deferred to a figure pass
+    - observation_id: sumita_1982_figure3_deferred
+      type: figure_only
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 361
+        figure: '3'
+      phase: glass
+      units: optical absorption spectrum; wavelength and wavenumber as printed
+      values:
+        method_class: figure_only
+        quantity_as_printed: Pb-probe absorption spectra
+        species: Pb
+        phase_as_printed: oxide glasses with varying composition
+        axes_as_printed:
+          x: wavelength and wavenumber
+          y: absorption
+        caption: Effect of composition on Pb-probe spectra shift.
+        panel: none
+        series:
+        - label: compositions as shown in figure
+          marker_count: 0
+        attribution: Sumita et al. (1982)
+        digitisation: deferred to a figure pass
+    - observation_id: sumita_1982_figure4_deferred
+      type: figure_only
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 362
+        figure: '4'
+      phase: quenched glass
+      units: optical basicity, dimensionless; composition in mol%
+      values:
+        method_class: figure_only
+        quantity_as_printed: optical basicity versus composition
+        species: Fe
+        phase_as_printed: Li2O–SiO2 and Na2O–SiO2 glasses
+        axes_as_printed:
+          x: alkali oxide composition in mol%
+          y: optical basicity Λ
+        caption: Relation between composition and optical basicity in silicate systems.
+        panel: none
+        series:
+        - label: Li2O–SiO2
+          marker_count: 0
+        - label: Na2O–SiO2
+          marker_count: 0
+        attribution: Optical basicity determined by Sumita et al. from Pb2+ probe spectra.
+        digitisation: deferred to a figure pass
+    - observation_id: sumita_1982_figure5_deferred
+      type: figure_only
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 362
+        figure: '5'
+      phase: quenched glass
+      units: optical basicity, dimensionless; composition in mol%
+      values:
+        method_class: figure_only
+        quantity_as_printed: optical basicity versus composition
+        species: Fe
+        phase_as_printed: Na2O–P2O5 and CaO–P2O5 glasses
+        axes_as_printed:
+          x: oxide composition
+          y: optical basicity Λ
+        caption: Relation between composition and optical basicity in phosphate systems.
+        panel: none
+        series:
+        - label: Na2O–P2O5
+          marker_count: 0
+        - label: CaO–P2O5
+          marker_count: 0
+        attribution: Optical basicity determined by Sumita et al. from Pb2+ probe spectra.
+        digitisation: deferred to a figure pass
+    - observation_id: sumita_1982_figure6_deferred
+      type: figure_only
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 362
+        figure: '6'
+      phase: quenched glass
+      units: optical basicity, dimensionless; composition in mol%
+      values:
+        method_class: figure_only
+        quantity_as_printed: optical basicity versus composition
+        species: Fe
+        phase_as_printed: alkaline-earth oxide–borate glasses
+        axes_as_printed:
+          x: alkaline-earth oxide composition
+          y: optical basicity Λ
+        caption: Relation between composition and optical basicity in borate systems.
+        panel: none
+        series:
+        - label: alkaline-earth borate systems
+          marker_count: 0
+        attribution: Optical basicity determined by Sumita et al. from Pb2+ probe spectra.
+        digitisation: deferred to a figure pass
+    - observation_id: sumita_1982_figure7_deferred
+      type: figure_only
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 363
+        figure: '7'
+      phase: quenched glass
+      units: optical basicity, dimensionless; relative oxygen ion activity as attributed
+      values:
+        method_class: figure_only
+        quantity_as_printed: optical basicity and relative oxygen ion activity
+        species: Fe
+        phase_as_printed: alkali oxide–borate melts/glasses
+        axes_as_printed:
+          x: alkali oxide composition
+          y: optical basicity and relative oxygen ion activity
+        caption: Relation between optical basicity and relative oxygen ion activities in borate systems.
+        panel: none
+        series:
+        - label: experimental optical basicity
+          marker_count: 0
+        - label: relative oxygen ion activity cited from other authors
+          marker_count: 0
+        attribution: The oxygen ion activity values are from other authors as cited by Sumita et al.
+        digitisation: deferred to a figure pass
+    - observation_id: sumita_1982_figure8_deferred
+      type: figure_only
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 364
+        figure: '8'
+      phase: quenched glass
+      units: optical basicity, dimensionless
+      values:
+        method_class: figure_only
+        quantity_as_printed: observed and theoretical optical-basicity ranges
+        species: Fe
+        phase_as_printed: silicate, borate, phosphate, and germanate systems
+        axes_as_printed:
+          x: optical basicity Λ
+          y: systems
+        caption: Observed range of optical basicities in silicate, borate, phosphate and germanate systems.
+        panel: none
+        series:
+        - label: experimental silicate
+          marker_count: 1
+        - label: experimental borate
+          marker_count: 1
+        - label: experimental phosphate
+          marker_count: 1
+        - label: experimental germanate
+          marker_count: 1
+        - label: theoretical ranges
+          marker_count: 4
+        attribution: Theoretical ranges are calculated using the Duffy et al. equation; optical basicity has no
+          matching store quantity.
+        digitisation: deferred to a figure pass
+    - observation_id: sumita_1982_optical_basicity_context
+      type: author_derived_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 363
+        section: Results
+      units: dimensionless
+      values:
+        quantity_as_printed: optical basicity Λ
+        computation: Optical basicity values are obtained by Sumita et al. from measured Pb2+ probe spectral shifts
+          and are context because the store has no optical-basicity quantity token.
+        schema_gap: Optical basicity has no existing Quantity enum; it is not thermodynamic activity.
+audit:
+  table_dispositions:
+  - table: none
+    disposition: no_tables
+    candidate_tokens:
+    - valence_ratio
+    - activity
+    notes: The measured Fe2+/Fe3+ ratios are plotted only in Figures 9–10; figures are deferred and contain no numeric
+      observations. Optical basicity is author-determined context and is not activity.
