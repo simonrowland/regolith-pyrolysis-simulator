@@ -195,12 +195,16 @@ def _group_names(item) -> list[str]:
 
 
 def pytest_collection_finish(session) -> None:
-    """Write full-collection metadata for the unfiltered guard subprocess."""
+    """Write collection metadata for the guard's collection subprocess."""
     report_path = os.environ.get(FULL_COLLECTION_REPORT_ENV)
     if report_path is None:
         return
     collected = [
-        {"nodeid": item.nodeid, "timeout_s": _timeout_s(item)}
+        {
+            "nodeid": item.nodeid,
+            "timeout_s": _timeout_s(item),
+            "xdist_groups": _group_names(item),
+        }
         for item in session.items
     ]
     Path(report_path).write_text(
@@ -208,7 +212,9 @@ def pytest_collection_finish(session) -> None:
     )
 
 
-def _collect_full_suite_items() -> list[dict[str, object]]:
+def _collect_full_suite_items(
+    markexpr: str | None = None,
+) -> list[dict[str, object]]:
     repo_root = Path(__file__).resolve().parents[1]
     env = os.environ.copy()
     # CI may pass a marker expression through PYTEST_ADDOPTS or pyproject.
@@ -220,18 +226,21 @@ def _collect_full_suite_items() -> list[dict[str, object]]:
         if env.get("PYTHONPATH"):
             pythonpath.append(env["PYTHONPATH"])
         env["PYTHONPATH"] = os.pathsep.join(pythonpath)
+        command = [
+            sys.executable,
+            "-m",
+            "pytest",
+            "--collect-only",
+            "-q",
+            "-o",
+            "addopts=",
+            "-p",
+            "test_suite_shape_guard",
+        ]
+        if markexpr:
+            command.extend(["-m", markexpr])
         result = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "pytest",
-                "--collect-only",
-                "-q",
-                "-o",
-                "addopts=",
-                "-p",
-                "test_suite_shape_guard",
-            ],
+            command,
             cwd=repo_root,
             env=env,
             capture_output=True,
@@ -241,7 +250,7 @@ def _collect_full_suite_items() -> list[dict[str, object]]:
         if result.returncode != 0 or not report_path.is_file():
             detail = (result.stdout + result.stderr).strip()[-4000:]
             raise AssertionError(
-                "full pytest collect-only listing failed without mark filters "
+                "pytest collect-only listing failed "
                 f"(exit {result.returncode})\n{detail}"
             )
         return json.loads(report_path.read_text(encoding="utf-8"))
@@ -308,10 +317,20 @@ def _run_duration_hint_guard(
     tmp_path: Path,
     full_collection: list[dict[str, object]],
     duration_hints: dict[str, float],
+    marker_filtered_collection: list[dict[str, object]] | None = None,
 ) -> None:
     monkeypatch.setitem(globals(), "HEAVY_ROSTER", frozenset())
+
+    def collect_items(markexpr=None):
+        if markexpr is None or marker_filtered_collection is None:
+            return full_collection
+        assert markexpr == "not nightly"
+        return marker_filtered_collection
+
     monkeypatch.setitem(
-        globals(), "_collect_full_suite_items", lambda: full_collection
+        globals(),
+        "_collect_full_suite_items",
+        collect_items,
     )
     monkeypatch.setitem(globals(), "_nightly_yield_violations", lambda: [])
     hint_path = tmp_path / "duration-hints.json"
@@ -351,6 +370,7 @@ def test_duration_hint_group_deselected_by_not_nightly_is_not_stale(
             }
         ],
         {"magemin_fullrun_a": 12.0},
+        marker_filtered_collection=[],
     )
 
 
@@ -369,6 +389,34 @@ def test_duration_hint_with_no_collected_group_is_still_stale(
                 }
             ],
             {"magemin_fullrun_z": 12.0},
+        )
+
+
+def test_duration_hint_omitted_by_nonmarker_filter_is_still_stale(
+    monkeypatch, tmp_path: Path
+) -> None:
+    # The group survives -m; the active session omits it through another filter.
+    with pytest.raises(
+        AssertionError, match="stale=\\['magemin_fullrun_a'\\]"
+    ):
+        _run_duration_hint_guard(
+            monkeypatch,
+            tmp_path,
+            [
+                {
+                    "nodeid": "tests/test_selected.py::test_heavy",
+                    "timeout_s": None,
+                    "xdist_groups": ["magemin_fullrun_a"],
+                }
+            ],
+            {"magemin_fullrun_a": 12.0},
+            marker_filtered_collection=[
+                {
+                    "nodeid": "tests/test_selected.py::test_heavy",
+                    "timeout_s": None,
+                    "xdist_groups": ["magemin_fullrun_a"],
+                }
+            ],
         )
 
 
@@ -405,10 +453,9 @@ def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
     violations.extend(_nightly_yield_violations())
     # Roster membership must see tests excluded by ``-m``, ``-k`` or a
     # targeted invocation, so compare against a fresh full collection.
+    full_collection = _collect_full_suite_items()
     violations.extend(
-        _full_collection_roster_violations(
-            _collect_full_suite_items(), HEAVY_ROSTER
-        )
+        _full_collection_roster_violations(full_collection, HEAVY_ROSTER)
     )
     if len(request.session.items) > 1000:
         collected_groups = {
@@ -416,13 +463,32 @@ def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
             for item in request.session.items
             for group in _group_names(item)
         }
+        full_collection_groups = {
+            group
+            for item in full_collection
+            for group in item["xdist_groups"]
+        }
+        markexpr = request.config.option.markexpr
+        marker_collection_groups = full_collection_groups
+        if markexpr:
+            marker_collection = _collect_full_suite_items(markexpr)
+            marker_collection_groups = {
+                group
+                for item in marker_collection
+                for group in item["xdist_groups"]
+            }
+        marker_deselected_groups = (
+            full_collection_groups - marker_collection_groups
+        )
         hint_groups = set(
             json.loads(DURATION_HINTS_PATH.read_text(encoding="utf-8"))[
                 "durations_seconds"
             ]
         )
         missing_hints = sorted(collected_groups - hint_groups)
-        stale_hints = sorted(hint_groups - collected_groups)
+        stale_hints = sorted(
+            hint_groups - collected_groups - marker_deselected_groups
+        )
         if missing_hints or stale_hints:
             violations.append(
                 "xdist duration-hint keys must match collected groups: "
