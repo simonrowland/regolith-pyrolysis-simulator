@@ -1034,7 +1034,10 @@ def test_product_story_requires_designated_stage_provenance():
         },
     )
     classification = {
-        "ingots_metals": {"species_kg": {}, "class_total_kg": 0.0},
+        "ingots_metals": {
+            "species_kg": {"Ca": 6.0, "Fe": 3.0},
+            "class_total_kg": 9.0,
+        },
         "glass": {"species_kg": {}, "class_total_kg": 0.0},
         "oxygen": {"class_total_kg": 0.0},
         "captured_volatiles": {"kg_by_species": {}, "class_total_kg": 0.0},
