@@ -576,6 +576,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             for keyword, control in (
                 ('vapor_transport_pO2_bar', 'pO2_bar'),
                 ('vapor_transport_floor_bar', 'vacuum_floor_bar'),
+                ('vapor_transport_pO2_admission', 'pO2_admission'),
             )
             if keyword in parameters
             and request.control_inputs.get(control) is not None

@@ -10180,6 +10180,122 @@ def test_live_transport_control_can_cross_simulator_boundary(backend_cls, monkey
 
 
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+def test_melts_transport_admission_rejects_unknown_mode(backend_cls, monkeypatch):
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, {})
+    with pytest.raises(ValueError, match='unsupported vapor_transport_pO2_admission'):
+        backend.equilibrate(temperature_C=1600.0, vapor_transport_pO2_admission='unknown')
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+@pytest.mark.parametrize('gas_bar', [1.3e-12, 3.7e-7])
+def test_battery_melts_observation_reaches_gas_projection_and_resets(
+    backend_cls, gas_bar, monkeypatch,
+):
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BinaryPot, EngineHandle, Po2Request, equilibrate_cell,
+    )
+
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(
+        backend, monkeypatch, {'vapor_transport_pO2_bar': 1e-6},
+    )
+    helper = _vaporock_helper_returning({'SiO': 0.4})
+    backend._vaporock_helper = helper
+    requests = []
+    builtin_dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def capture(provider, request):
+        result = builtin_dispatch(provider, request)
+        requests.append((request, result))
+        return result
+
+    monkeypatch.setattr(BuiltinVaporPressureProvider, 'dispatch', capture)
+    native_inputs = []
+
+    def native_solve(**kwargs):
+        native_inputs.append(kwargs['fO2_log'])
+        result = EquilibriumResult(
+            status='ok', liquid_fraction=1.0,
+            temperature_C=kwargs['temperature_C'], pressure_bar=kwargs['pressure_bar'],
+            fO2_log=kwargs['fO2_log'], requested_fO2_log=kwargs['fO2_log'],
+            liquid_composition_wt_pct=kwargs['comp_wt'],
+        )
+        if backend._mode == 'subprocess':
+            backend._builtin_vapor_projection_for_subprocess(result)
+        else:
+            backend._vapor_pressures_via_vaporock_or_antoine(
+                T_C=kwargs['temperature_C'], solved_melt_wt_pct=kwargs['comp_wt'],
+                liquid_fraction=1.0, fO2_log=kwargs['fO2_log'],
+                pressure_bar=kwargs['pressure_bar'], activities={},
+            )
+        return result
+
+    monkeypatch.setattr(backend, '_equilibrate_prepared', native_solve)
+    cell = equilibrate_cell(
+        EngineHandle(backend.backend_name, backend, True, None, True, False),
+        BinaryPot('observation', None, 'transport receipt', _melts_domain_composition()),
+        temperature_K=1873.15, po2=Po2Request('commanded', gas_bar), isolated=False,
+    )
+    assert cell.status == 'ok', cell.engine_reason
+    assert native_inputs == [math.log10(gas_bar)]
+    assert backend._vapor_transport_pO2_bar == gas_bar
+    assert backend._vapor_transport_pO2_admission == 'observation'
+    assert backend._vapor_transport_floor_bar == 1e-9
+    if requests:
+        request, result = requests[-1]
+        assert request.control_inputs['pO2_admission'] == 'observation'
+        assert result.diagnostic['pO2_bar'] == gas_bar
+    else:
+        assert helper.calls[-1]['fO2_log'] == pytest.approx(math.log10(gas_bar))
+
+    backend.equilibrate(
+        temperature_C=1600.0, composition_kg=_melts_domain_composition(),
+        fO2_log=-12.0, pressure_bar=1.0,
+    )
+    assert native_inputs[-1] == -12.0
+    assert backend._vapor_transport_pO2_bar == 1e-6
+    assert backend._vapor_transport_pO2_admission == 'environment'
+    if requests:
+        request, result = requests[-1]
+        assert request.control_inputs['pO2_admission'] == 'environment'
+        assert result.diagnostic['pO2_bar'] == 1e-6
+    else:
+        assert helper.calls[-1]['fO2_log'] == pytest.approx(-6.0)
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+@pytest.mark.parametrize('gas_bar', [0.0, -1.0, float('nan'), float('inf')])
+def test_battery_melts_invalid_observation_refuses_before_native(
+    backend_cls, gas_bar, monkeypatch,
+):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BinaryPot, EngineHandle, Po2Request, equilibrate_cell,
+    )
+
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, {})
+
+    def unexpected_native(**_kwargs):
+        pytest.fail('invalid observation reached native MELTS')
+
+    monkeypatch.setattr(backend, '_equilibrate_prepared', unexpected_native)
+    args = (
+        EngineHandle(backend.backend_name, backend, True, None, True, False),
+        BinaryPot('invalid', None, 'invalid oxygen', _melts_domain_composition()),
+    )
+    kwargs = dict(temperature_K=1873.15, po2=Po2Request('commanded', gas_bar), isolated=False)
+    if gas_bar <= 0:
+        with pytest.raises(ValueError):
+            equilibrate_cell(*args, **kwargs)
+    else:
+        cell = equilibrate_cell(*args, **kwargs)
+        assert cell.status == 'refusal'
+        assert cell.engine_status == 'ValueError'
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 @pytest.mark.parametrize('route', ['direct', 'kernel'])
 def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeypatch):
     from simulator.environment import vacuum_floor_bar_for_environment
@@ -10212,6 +10328,7 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
 
     def native_solve(**kwargs):
         assert kwargs['fO2_log'] == -12.0
+        assert backend._vapor_transport_pO2_admission == 'environment'
         backend._vapor_pressures_via_vaporock_or_antoine(
             T_C=kwargs['temperature_C'],
             solved_melt_wt_pct=kwargs['comp_wt'],
@@ -10302,7 +10419,7 @@ def test_core_direct_alphamelts_dispatch_keeps_isothermal(monkeypatch):
         return equilibrate(self, *args, **kwargs)
 
     monkeypatch.setattr(AlphaMELTSBackend, 'equilibrate', record_call)
-    test_live_lunar_transport_input_reaches_vaporock(AlphaMELTSBackend, monkeypatch)
+    test_live_lunar_transport_input_reaches_vaporock(AlphaMELTSBackend, 'direct', monkeypatch)
     assert calls == ['isothermal', None]
 
 

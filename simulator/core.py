@@ -9616,6 +9616,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     control_inputs={
                         'pO2_bar': self._vapor_pressure_dispatch_pO2_bar(),
                         'vacuum_floor_bar': self._vacuum_floor_bar(),
+                        'pO2_admission': 'environment',
                     },
                     fO2_log=intrinsic_fO2_log,
                     fe_redox_policy='intrinsic',
@@ -9659,6 +9660,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     backend_kwargs['vapor_transport_floor_bar'] = (
                         self._vacuum_floor_bar()
                     )
+                if self._backend_accepts_kwarg('vapor_transport_pO2_admission'):
+                    backend_kwargs['vapor_transport_pO2_admission'] = 'environment'
                 if self._backend_accepts_kwarg('composition_mol_by_account'):
                     backend_kwargs['composition_mol_by_account'] = (
                         backend_composition_by_account)
