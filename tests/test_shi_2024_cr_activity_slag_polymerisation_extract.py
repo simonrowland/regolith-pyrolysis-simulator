@@ -78,6 +78,7 @@ def test_shi_tables_migrate_printed_values_species_and_run_conditions():
                     assert record.identity.fO2_Pa.value == Decimal("0.0000026040525")
                     assert record.identity.composition is not None
                     assert record.identity.composition.is_value
+                    assert record.point_conditions["composition"].state.value.proxy_flag == "initial_charge_only"
                     assert item["standard_state"] in {
                         "pure liquid CrO(l), explicit in Eq. (8)",
                         "pure solid CrO1.5(s), explicit in Eq. (11)",
@@ -90,6 +91,9 @@ def test_shi_tables_migrate_printed_values_species_and_run_conditions():
                     assert reference.value.endmember.phase.value.value == ("l" if formula == "CrO" else "cr")
                 assert record.locator.page == item["locator"]["page"]
                 assert record.point_conditions["composition"].locator.page == 3
+                if item["values"]["quantity"] == "equilibrium_phase_composition":
+                    assert record.identity.composition is not None
+                    assert not record.identity.composition.is_value
                 assert point["sample"] == item["experiment"].rsplit("_", 1)[1]
                 assert point["species_as_printed"] == formula
                 assert item["phase"] == "l"

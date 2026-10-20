@@ -16901,21 +16901,6 @@ class Migrator:
             else:
                 printed = point_printed_composition
                 residual = point_composition_located
-            role, role_refusal = _declared_composition_role(raw_item, parent_values)
-            if role_refusal is not None:
-                self.result.add_queue(
-                    work.work_id,
-                    point_locator,
-                    ["composition"],
-                    role_refusal,
-                    source=source_key,
-                    observation_id=point_id,
-                )
-            if residual is not None and role is not None:
-                residual = replace(
-                    residual,
-                    state=State.of(replace(residual.state.value, proxy_flag=role)),
-                )
             extra_pc: dict[str, Located[Any]] = {}
             if printed is not None:
                 extra_pc["printed_composition"] = printed
@@ -17221,6 +17206,32 @@ class Migrator:
                             locator=point_locator,
                         ),
                     }
+        role, role_refusal = _declared_composition_role(raw_item, parent_values)
+        if role_refusal is not None:
+            self.result.add_queue(
+                work.work_id,
+                point_locator,
+                ["composition"],
+                role_refusal,
+                source=source_key,
+                observation_id=point_id,
+            )
+        composition = (point_conditions or {}).get("composition")
+        if (
+            role is not None
+            and isinstance(composition, Located)
+            and composition.state.is_value
+            and isinstance(composition.state.value, Composition)
+        ):
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": replace(
+                    composition,
+                    state=State.of(
+                        replace(composition.state.value, proxy_flag=role)
+                    ),
+                ),
+            }
         partial_total_condition = _partial_pressure_point_condition(
             ident_kwargs, point_locator
         )
