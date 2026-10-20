@@ -3165,6 +3165,7 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
     assert 1 <= cache_rebuild_count <= 5
     assert gate_calls == cache_rebuild_count
     assert len(set(cache_ids)) <= cache_rebuild_count
+    assert factors == [factors[0]] * len(factors)
     assert factors == [1.0] * 10
     assert max(balance_errors) <= 5e-12
 
