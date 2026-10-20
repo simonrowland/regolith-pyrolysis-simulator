@@ -1051,7 +1051,6 @@ def test_product_story_requires_designated_stage_provenance():
     account_kg = web_events._product_story_account_kg(sim)
     story = web_events._product_story_payload(
         sim,
-        terminal_rump_by_species={},
         classification=classification,
         account_kg=account_kg,
         extracted_projection=web_events._product_story_extracted_projection(
