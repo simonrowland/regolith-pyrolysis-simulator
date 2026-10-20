@@ -50,6 +50,7 @@ from simulator.vapour_rail.channels import (
     ReactionTermRole,
     ReactionThermoInputs,
     channel_log10_contribution,
+    clamp_physical_pO2_bar,
     compile_o2_channel_term,
     o2_potential_from_pO2_bar,
 )
@@ -1280,10 +1281,7 @@ class CompiledPressureEvaluator:
                     }
                 )
             oxygen_raw = _finite_positive(pO2_bar, "pO2_bar")
-            oxygen = min(
-                max(oxygen_raw, MELT_DISSOCIATION_PO2_MIN_BAR),
-                MELT_DISSOCIATION_PO2_MAX_BAR,
-            )
+            oxygen = clamp_physical_pO2_bar(oxygen_raw)
             oxygen_term_ln = self.pO2_exponent * math.log(
                 oxygen / self.pO2_reference_bar
             )
@@ -4167,10 +4165,7 @@ def _evaluation_pO2_bar_used(
         return None
     if not math.isfinite(raw) or raw <= 0.0:
         return None
-    return min(
-        max(raw, MELT_DISSOCIATION_PO2_MIN_BAR),
-        MELT_DISSOCIATION_PO2_MAX_BAR,
-    )
+    return clamp_physical_pO2_bar(raw)
 
 
 def _evaluation_pO2_was_clamped(
