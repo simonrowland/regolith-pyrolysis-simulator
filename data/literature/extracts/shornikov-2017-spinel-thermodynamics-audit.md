@@ -2,7 +2,7 @@
 
 Source: Shornikov, S. I. (2017), “Thermodynamic Properties of Spinel MgAl2O4: A Mass Spectrometric Study,” *Russian Journal of Physical Chemistry A* 91(2), 287–294. DOI 10.1134/S0036024417020303. Extract: [shornikov-2017-spinel-thermodynamics.yaml](shornikov-2017-spinel-thermodynamics.yaml).
 
-This is not the evaporation paper already extracted as `shornikov-2017-spinel-evaporation` (91(1), 10–16, DOI 10.1134/S0036024417010241). The title, volume number, and DOI differ. PDF page 8 prints reference [1] as “S. I. Shornikov, Zh. Fiz. Khim. 90 (2016, in press).” The identity with the evaporation paper is an inference from the 1851–2089 K span, not the citation this paper prints.
+This is not the evaporation paper already extracted as `shornikov-2017-spinel-evaporation` (91(1), 10–16, DOI 10.1134/S0036024417010241). The title, volume number, and DOI differ. PDF page 7, published page 293, prints reference [1] as “S. I. Shornikov, Zh. Fiz. Khim. 90 (2016, in press).” The identity with the evaporation paper is an inference from the 1851–2089 K span, not the citation this paper prints.
 
 ## Tables
 
