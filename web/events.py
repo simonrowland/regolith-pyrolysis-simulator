@@ -2262,6 +2262,8 @@ def _product_story_soundness(product_story: object) -> str:
         if 'class_total_kg' not in bucket:
             return 'incomplete'
         raw_total = bucket['class_total_kg']
+        if raw_total is None:
+            return 'unavailable'
         if isinstance(raw_total, bool):
             return 'invalid'
         try:
@@ -2512,7 +2514,7 @@ def _product_story_bucket(species_kg, **details):
 
 
 def _product_story_payload(sim, *, terminal_rump_by_species):
-    classify_products(sim)
+    classification = classify_products(sim)
     account_kg = _product_story_account_kg(sim)
     extracted_projection = _product_story_extracted_projection(
         sim,
@@ -2605,6 +2607,7 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
     )
 
     refractory_ceramic_bucket = _product_story_bucket(refractory_ceramic)
+    metal_ingots_bucket = _product_story_bucket(metal_ingots)
     try:
         refractory_ceramic_bucket['ree_enrichment_extent'] = (
             AccountingQueries(sim).terminal_ree_enrichment_extent()
@@ -2613,13 +2616,13 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
         _safe_log(f'REE enrichment projection unavailable: {exc}')
         refractory_ceramic_bucket['ree_enrichment_extent'] = {}
 
-    return {
+    story = {
         'input': {
             'feedstock': sim.record.feedstock_key,
             'feedstock_label': sim.record.feedstock_label,
             'batch_mass_kg': round(float(sim.record.batch_mass_kg), 2),
         },
-        'metal_ingots': _product_story_bucket(metal_ingots),
+        'metal_ingots': metal_ingots_bucket,
         'glass': _product_story_bucket(glass),
         'oxygen': oxygen,
         'captured_volatiles': _product_story_bucket(captured_volatiles),
@@ -2634,6 +2637,41 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
         'off_spec_condensate': _product_story_bucket(off_spec_condensate),
         'unclassified': _product_story_bucket(unclassified),
     }
+    for name, source_name, species_key in (
+        ('metal_ingots', 'ingots_metals', 'species_kg'),
+        ('glass', 'glass', 'species_kg'),
+        ('oxygen', 'oxygen', None),
+        ('captured_volatiles', 'captured_volatiles', 'kg_by_species'),
+        ('refractory_ceramic', 'refractory_ceramic_rump', 'rump_kg_by_species'),
+    ):
+        source = classification[source_name]
+        if source.get('class_total_kg') is None:
+            bucket = story[name]
+            bucket['class_total_kg'] = None
+            bucket['flag'] = (
+                source.get('flag')
+                or classification['pure_silica_glass'].get('flag')
+            )
+            known_species = source.get(species_key, {}) if species_key else {}
+            bucket['species_kg'] = {
+                species: mass
+                for species, mass in bucket['species_kg'].items()
+                if species in known_species
+            }
+    if story['oxygen']['class_total_kg'] is None:
+        story['oxygen']['partition_kg'] = dict.fromkeys(
+            story['oxygen']['partition_kg']
+        )
+    rump = classification['refractory_ceramic_rump']
+    for field, source_field in (
+        ('silicate_residual_kg', 'rump_silicate_residual_kg'),
+        ('unextracted_metals_kg', 'rump_unextracted_metals_kg'),
+    ):
+        if rump[source_field] is None:
+            story['terminal_residue'][field] = None
+            story['terminal_residue']['class_total_kg'] = None
+            story['terminal_residue']['flag'] = rump['flag']
+    return story
 
 
 def _terminal_rump_classes_from_species(species_kg):

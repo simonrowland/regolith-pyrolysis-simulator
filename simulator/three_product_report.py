@@ -38,6 +38,7 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.accounting.completeness import evaporation_quantity_unavailability
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.queries import (
     AccountingQueries,
@@ -215,7 +216,6 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     train_stages = list(
         getattr(getattr(sim, 'train', None), 'stages', []) or []
     )
-
     # ----- Class 1: metals + O2 -----
     initial_inventory = getattr(getattr(sim, 'record', None), 'initial_inventory', None)
     native_metals = getattr(initial_inventory, 'metal_alloy_kg', {}) or {}
@@ -415,7 +415,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     if silica_is_product and silica_certification_flag is not None:
         silica_bucket['flag'] = silica_certification_flag
 
-    return {
+    result = {
         'metals_plus_O2': {
             'metals_kg': metals_kg,
             'metals_total_kg': metals_total_kg,
@@ -476,6 +476,56 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'total_kg': unclassified_total,
         },
     }
+    affected_buckets = (
+        ('metals_plus_O2', (*METAL_PRODUCT_SPECIES, 'O2'),
+         ('class_total_kg', 'metals_total_kg', 'O2_kg'), ('metals_kg',)),
+        ('ingots_metals', METAL_PRODUCT_SPECIES, ('class_total_kg',), ('species_kg',)),
+        ('oxygen', ('O2',), ('class_total_kg', 'O2_kg'), ()),
+        ('pure_silica_glass', PURE_SILICA_GLASS_SPECIES,
+         ('class_total_kg', 'stage_3_capture_kg'), ('stage_3_kg_by_species',)),
+        ('glass', PURE_SILICA_GLASS_SPECIES,
+         ('class_total_kg', 'pure_silica_glass_kg'), ('species_kg',)),
+        ('refractory_ceramic_rump', METAL_PRODUCT_SPECIES,
+         ('rump_total_kg',), ('rump_kg_by_species',)),
+        ('refractory_ceramic_rump', tuple(TERMINAL_RUMP_REFRACTORY_OXIDES),
+         ('class_total_kg', 'rump_refractory_oxides_kg'), ()),
+        ('refractory_ceramic_rump', tuple(TERMINAL_RUMP_SILICATE_RESIDUAL),
+         ('rump_silicate_residual_kg',), ()),
+        ('refractory_ceramic_rump', tuple(TERMINAL_RUMP_UNEXTRACTED_METALS),
+         ('rump_unextracted_metals_kg',), ()),
+        ('captured_volatiles', METAL_PRODUCT_SPECIES,
+         ('class_total_kg',), ('kg_by_species',)),
+    )
+    for name, targets, quantities, species_maps in affected_buckets:
+        flag = evaporation_quantity_unavailability(sim, targets)
+        if flag:
+            bucket = result[name]
+            bucket['flag'] = flag
+            for key in quantities:
+                bucket[key] = None
+            for key in species_maps:
+                bucket[key] = {
+                    species: kg
+                    for species, kg in bucket[key].items()
+                    if evaporation_quantity_unavailability(sim, species) is None
+                }
+    if result['oxygen']['class_total_kg'] is None:
+        for name, key in (
+            ('oxygen', 'partition_kg'),
+            ('metals_plus_O2', 'O2_partition_kg'),
+        ):
+            result[name][key] = dict.fromkeys(oxygen_partition)
+    if early_tap_mode:
+        flag = evaporation_quantity_unavailability(sim, METAL_PRODUCT_SPECIES)
+        if flag:
+            for name, fields in (
+                ('industrial_mixed_glass', ('class_total_kg', 'mixed_melt_residual_kg')),
+                ('glass', ('class_total_kg', 'industrial_mixed_glass_kg')),
+            ):
+                result[name]['flag'] = flag
+                for key in fields:
+                    result[name][key] = None
+    return result
 
 
 def _terminal_ree_enrichment_extent(sim: Any) -> dict[str, Any]:

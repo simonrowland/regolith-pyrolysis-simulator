@@ -1244,6 +1244,41 @@ class EvaporationMixin:
 
             merge_notes_into_mapping(diagnostic, _partial_sz_notes)
         self._last_evaporation_flux_diagnostic = diagnostic
+        missing_transport = diagnostic.get('missing_transport_parameters', {})
+        if isinstance(missing_transport, Mapping):
+            for species, refusal in missing_transport.items():
+                if not isinstance(refusal, Mapping):
+                    continue
+                refusal_type = refusal.get('refusal_type')
+                if not refusal_type or refusal.get('status') != 'unavailable':
+                    continue
+                channel = dict(
+                    flux.carrier_authority_by_species.get(str(species), {}) or {}
+                )
+                existing_extra = channel.get('extra')
+                extra = (
+                    dict(existing_extra)
+                    if isinstance(existing_extra, Mapping)
+                    else {}
+                )
+                extra.update(refusal)
+                reason = str(refusal.get('reason') or 'transport input unavailable')
+                channel.update({
+                    'species_id': str(species),
+                    'flux': {
+                        'kind': 'refusal',
+                        'code': str(refusal_type),
+                        'detail': reason,
+                    },
+                    'refusal_code': str(refusal_type),
+                    'is_refused': True,
+                    'reason': reason,
+                    'authority_level': str(
+                        refusal.get('authority_level') or 'unavailable'
+                    ),
+                    'extra': extra,
+                })
+                flux.carrier_authority_by_species[str(species)] = channel
         continuum_notice = diagnostic.get('continuum_extrapolation_notice')
         condensation_model = getattr(self, 'condensation_model', None)
         if continuum_notice and condensation_model is not None:
@@ -1285,12 +1320,26 @@ class EvaporationMixin:
                 'unmeasured_alpha_evaporation_fallback',
                 count=len(unmeasured_alpha_species),
             )
-        # Promote EVERY non-OK EVAPORATION_FLUX result to a typed refusal.
-        # Previously only missing_alpha / missing_transport_parameters raised;
-        # other refusals (e.g. uncertified_melt_resistance_model,
-        # viscous_p_bulk_transport_out_of_domain) fell through to empty
-        # flux_kg_hr={} — silent zero evaporation, not a load-bearing refuse.
-        if str(kernel_result.status) != 'ok':
+        # A typed missing-transport channel remains local to that species; keep
+        # the rest of the run available even when every requested channel is
+        # excluded. Other non-OK flux outcomes still fail as a run-level refusal.
+        transport_only_unavailable = (
+            str(kernel_result.status) == 'unavailable'
+            and isinstance(missing_transport, Mapping)
+            and bool(missing_transport)
+            and not any(
+                key in diagnostic
+                for key in ('missing_alpha', 'missing_molar_mass', 'reason')
+            )
+            and all(
+                isinstance(refusal, Mapping)
+                and refusal.get('policy') == 'fail_loud_missing_transport_parameters'
+                and refusal.get('status') == 'unavailable'
+                and bool(refusal.get('refusal_type'))
+                for refusal in missing_transport.values()
+            )
+        )
+        if str(kernel_result.status) != 'ok' and not transport_only_unavailable:
             reason = str(diagnostic.get('reason') or '').strip()
             # A primary refusal wins; secondary records remain diagnostic context.
             if 'missing_alpha' in diagnostic and not reason:

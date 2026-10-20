@@ -1493,7 +1493,7 @@ class PyrolysisRun:
             per_hour=execution.per_hour,
             products_kg=sim.product_ledger(),
             pumping_context=pumping_context_from_sim(sim, execution.snapshots),
-            snapshots=execution.snapshots,
+            snapshots=tuple(sim.record.snapshots),
         )
         cost_rollup_diagnostic["price_basis"] = (
             "legacy_placeholder_awaiting_owner_ratification"
