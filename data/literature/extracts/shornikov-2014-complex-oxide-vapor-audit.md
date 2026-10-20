@@ -20,11 +20,93 @@ These are labels and a citation. They are not new measured points. The 1% bound 
 
 ## Figures
 
-120 dpi renders of both pages. No tick calibration.
+Fig. 1 was re-rendered at 600 dpi: `pdftoppm -r 600 -f 1 -l 1 -x 2100 -y 600 -W 2100 -H 1800`. Pixels below are crop pixels. Page pixel = crop pixel + (2100, 600). A circle is a local maximum of the distance transform on a pure-color mask (one channel above 200 and the other two under 40; black is all channels under 45). Maxima within 22 px are one circle. The joining stroke has radius about 6 px and is not a circle. No log p was read. The curves are calculated at 2200 K from [2, 3], so the circles stay context.
 
-Fig. 1. Five continuous curves. Line 1 ends in a filled square and line 4 ends in a filled circle at the right border. Refused. The caption says the curves are calculated at 2200 K from [2, 3]. The endpoint marks were not read.
+There is no square. The earlier sentence that line 1 ends in a filled square was wrong. Every core on curves 1–4 is a filled circle. Curve 5, the purple total-pressure line, has no circle core.
 
-Fig. 2. Four lines of filled circles. Refused. The caption assigns them to the Knudsen effusion data of [4].
+Stroke peaks kept out of the table, radius under the circle cut: green 11, red 13, blue 10, black 8. The black numeral 4 above the curve is at cx 1647, cy 1430, dt 6.4, and is refused as the series glyph.
+
+| id | series | species | cx | cy | dt px | decision |
+| --- | --- | --- | --- | --- | --- | --- |
+| fig1-s1-01 | 1 | SiO | 971 | 751 | 21.0 | context, not read (calculated) |
+| fig1-s1-02 | 1 | SiO | 1050 | 733 | 19.1 | context, not read (calculated) |
+| fig1-s1-03 | 1 | SiO | 1116 | 709 | 19.3 | context, not read (calculated) |
+| fig1-s1-04 | 1 | SiO | 1205 | 683 | 19.0 | context, not read (calculated) |
+| fig1-s1-05 | 1 | SiO | 1282 | 664 | 15.7 | context, not read (calculated) |
+| fig1-s1-06 | 1 | SiO | 1345 | 658 | 18.8 | context, not read (calculated) |
+| fig1-s1-07 | 1 | SiO | 1422 | 646 | 16.1 | context, not read (calculated) |
+| fig1-s1-08 | 1 | SiO | 1461 | 640 | 15.8 | context, not read (calculated) |
+| fig1-s1-09 | 1 | SiO | 1504 | 642 | 20.1 | context, not read (calculated) |
+| fig1-s1-10 | 1 | SiO | 1552 | 636 | 19.3 | context, not read (calculated) |
+| fig1-s1-11 | 1 | SiO | 1602 | 631 | 18.2 | context, not read (calculated) |
+| fig1-s1-12 | 1 | SiO | 1651 | 626 | 17.0 | context, not read (calculated) |
+| fig1-s1-13 | 1 | SiO | 1707 | 622 | 16.0 | context, not read (calculated) |
+| fig1-s1-14 | 1 | SiO | 1766 | 618 | 15.0 | context, not read (calculated) |
+| fig1-s1-15 | 1 | SiO | 1829 | 614 | 15.0 | context, not read (calculated) |
+| fig1-s1-16 | 1 | SiO | 1894 | 617 | 20.0 | context, not read (calculated) |
+| fig1-s1-17 | 1 | SiO | 1961 | 614 | 19.4 | context, not read (calculated) |
+| fig1-s1-18 | 1 | SiO | 2029 | 611 | 19.0 | context, not read (calculated) |
+| fig1-s2-01 | 2 | Al | 834 | 990 | 11.0 | context, not read (calculated) |
+| fig1-s2-02 | 2 | Al | 970 | 989 | 21.0 | context, not read (calculated) |
+| fig1-s2-03 | 2 | Al | 1049 | 1012 | 21.2 | context, not read (calculated) |
+| fig1-s2-04 | 2 | Al | 1114 | 1053 | 21.0 | context, not read (calculated) |
+| fig1-s2-05 | 2 | Al | 1205 | 1077 | 20.9 | context, not read (calculated) |
+| fig1-s2-06 | 2 | Al | 1282 | 1082 | 20.9 | context, not read (calculated) |
+| fig1-s2-07 | 2 | Al | 1345 | 1105 | 21.0 | context, not read (calculated) |
+| fig1-s2-08 | 2 | Al | 1419 | 1109 | 21.4 | context, not read (calculated) |
+| fig1-s2-09 | 2 | Al | 1460 | 1111 | 21.1 | context, not read (calculated) |
+| fig1-s2-10 | 2 | Al | 1504 | 1132 | 21.0 | context, not read (calculated) |
+| fig1-s2-11 | 2 | Al | 1551 | 1135 | 20.9 | context, not read (calculated) |
+| fig1-s2-12 | 2 | Al | 1601 | 1138 | 21.2 | context, not read (calculated) |
+| fig1-s2-13 | 2 | Al | 1653 | 1142 | 21.0 | context, not read (calculated) |
+| fig1-s2-14 | 2 | Al | 1710 | 1145 | 21.0 | context, not read (calculated) |
+| fig1-s2-15 | 2 | Al | 1769 | 1150 | 21.0 | context, not read (calculated) |
+| fig1-s2-16 | 2 | Al | 1830 | 1154 | 20.9 | context, not read (calculated) |
+| fig1-s2-17 | 2 | Al | 1894 | 1178 | 20.9 | context, not read (calculated) |
+| fig1-s2-18 | 2 | Al | 1961 | 1183 | 21.1 | context, not read (calculated) |
+| fig1-s2-19 | 2 | Al | 2029 | 1189 | 21.0 | context, not read (calculated) |
+| fig1-s3-01 | 3 | O2 | 970 | 815 | 21.0 | context, not read (calculated) |
+| fig1-s3-02 | 3 | O2 | 1049 | 789 | 21.0 | context, not read (calculated) |
+| fig1-s3-03 | 3 | O2 | 1114 | 747 | 14.8 | context, not read (calculated) |
+| fig1-s3-04 | 3 | O2 | 1202 | 720 | 15.0 | context, not read (calculated) |
+| fig1-s3-05 | 3 | O2 | 1282 | 714 | 21.0 | context, not read (calculated) |
+| fig1-s3-06 | 3 | O2 | 1345 | 695 | 16.0 | context, not read (calculated) |
+| fig1-s3-07 | 3 | O2 | 1419 | 689 | 21.2 | context, not read (calculated) |
+| fig1-s3-08 | 3 | O2 | 1460 | 689 | 21.2 | context, not read (calculated) |
+| fig1-s3-09 | 3 | O2 | 1498 | 674 | 10.0 | context, not read (calculated) |
+| fig1-s3-10 | 3 | O2 | 1549 | 672 | 13.0 | context, not read (calculated) |
+| fig1-s3-11 | 3 | O2 | 1601 | 669 | 16.6 | context, not read (calculated) |
+| fig1-s3-12 | 3 | O2 | 1653 | 666 | 19.3 | context, not read (calculated) |
+| fig1-s3-13 | 3 | O2 | 1710 | 664 | 21.2 | context, not read (calculated) |
+| fig1-s3-14 | 3 | O2 | 1768 | 664 | 21.2 | context, not read (calculated) |
+| fig1-s3-15 | 3 | O2 | 1830 | 664 | 21.2 | context, not read (calculated) |
+| fig1-s3-16 | 3 | O2 | 1897 | 650 | 10.2 | context, not read (calculated) |
+| fig1-s3-17 | 3 | O2 | 1956 | 648 | 12.0 | context, not read (calculated) |
+| fig1-s3-18 | 3 | O2 | 2029 | 647 | 13.6 | context, not read (calculated) |
+| fig1-s4-01 | 4 | AlSiO | 971 | 1475 | 21.0 | context, not read (calculated) |
+| fig1-s4-02 | 4 | AlSiO | 1049 | 1477 | 21.2 | context, not read (calculated) |
+| fig1-s4-03 | 4 | AlSiO | 1114 | 1495 | 21.0 | context, not read (calculated) |
+| fig1-s4-04 | 4 | AlSiO | 1206 | 1492 | 21.2 | context, not read (calculated) |
+| fig1-s4-05 | 4 | AlSiO | 1282 | 1475 | 21.1 | context, not read (calculated) |
+| fig1-s4-06 | 4 | AlSiO | 1345 | 1494 | 21.1 | context, not read (calculated) |
+| fig1-s4-07 | 4 | AlSiO | 1419 | 1484 | 21.0 | context, not read (calculated) |
+| fig1-s4-08 | 4 | AlSiO | 1460 | 1480 | 21.4 | context, not read (calculated) |
+| fig1-s4-09 | 4 | AlSiO | 1504 | 1507 | 21.4 | context, not read (calculated) |
+| fig1-s4-10 | 4 | AlSiO | 1551 | 1504 | 21.5 | context, not read (calculated) |
+| fig1-s4-11 | 4 | AlSiO | 1601 | 1501 | 21.9 | context, not read (calculated) |
+| fig1-s4-12 | 4 | AlSiO | 1653 | 1499 | 21.0 | context, not read (calculated) |
+| fig1-s4-13 | 4 | AlSiO | 1710 | 1497 | 21.4 | context, not read (calculated) |
+| fig1-s4-14 | 4 | AlSiO | 1769 | 1496 | 21.4 | context, not read (calculated) |
+| fig1-s4-15 | 4 | AlSiO | 1830 | 1495 | 21.2 | context, not read (calculated) |
+| fig1-s4-16 | 4 | AlSiO | 1894 | 1528 | 21.4 | context, not read (calculated) |
+| fig1-s4-17 | 4 | AlSiO | 1961 | 1529 | 21.4 | context, not read (calculated) |
+| fig1-s4-18 | 4 | AlSiO | 2029 | 1532 | 21.0 | context, not read (calculated) |
+
+The first red circle, fig1-s2-01, is clipped by the y-axis.
+
+
+Fig. 2. Four lines of filled circles versus 1/T. Refused as a series. The caption assigns them to the Knudsen effusion data of [4], Shornikov 2003. They were not given per-marker rows.
+
 
 Fig. 3. Five continuous curves, no markers. Refused. Calculated at 2200 K from [2, 3].
 
