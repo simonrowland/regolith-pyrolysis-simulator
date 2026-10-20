@@ -686,7 +686,13 @@ def test_multisegment_lifespan_and_economics_normalize_cumulative_campaign_load(
         cost_parameters=cost_parameters,
     )
     assert depreciation["campaigns_to_resinter"] == pytest.approx(10.0 / 2.2)
+    assert depreciation["campaigns_to_resinter"].hex() == (
+        "0x1.22e8ba2e8ba2ep+2"
+    )
     assert depreciation["depreciation_expense_per_run_usd"] == pytest.approx(22.0)
+    assert depreciation["depreciation_expense_per_run_usd"].hex() == (
+        "0x1.6000000000000p+4"
+    )
 
 
 def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() -> None:
