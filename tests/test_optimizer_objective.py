@@ -909,18 +909,17 @@ def test_furnace_amortization_cost_trades_continuously_against_yield() -> None:
     ) == 0.0
     assert objective_module._has_positive_wall_deposit({("wall", "SiO"): 1e-30})
     assert not objective_module._has_positive_wall_deposit({("wall", "SiO"): 0.0})
-    lifetime, positive = objective_module._selection_coating_lifetime(
-        SimpleNamespace(
+    lifetime = objective_module._coating_lifetime_projection(
+        {},
+        coating_margin=SimpleNamespace(
             status_payload={
                 "campaigns_to_resinter_worst_segment": 1e30,
                 "wall_deposit_kg_per_campaign": 1e-30,
             }
         ),
-        fallback_campaigns="infinite",
-        fallback_positive=False,
     )
-    assert lifetime == pytest.approx(1e30)
-    assert positive is True
+    assert lifetime["campaigns_to_resinter_worst_segment"] == pytest.approx(1e30)
+    assert lifetime["has_positive_qualified_fouling"] is True
 
     params = CostParameters(
         electricity_cost_per_kWh=1.0,
@@ -1055,7 +1054,7 @@ def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> 
     assert summary["has_positive_qualified_fouling"] is None
     assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
     assert "furnace_amortization_cost_per_run_usd" not in summary
-    assert "furnace_amortization_batch_cost_equivalents" not in summary
+    assert summary["furnace_amortization_batch_cost_equivalents"] is None
     with pytest.raises(ObjectiveComputationError, match="batch_cost_unavailable"):
         cost_adjusted_objective_scores(
             {"oxygen_kg": 10.0, "energy_kWh": 1.0},
