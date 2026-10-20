@@ -80,6 +80,11 @@ def test_context_only_migration_has_no_unavailable_or_hard_rows() -> None:
     )
     assert len(raw_emf["values"]["tables_as_printed"]) == 2
     assert all(len(row["cells"]) == 6 for table in raw_emf["values"]["tables_as_printed"] for row in table["rows_as_printed"])
+    equations = {item["observation_id"]: item for item in document["species"]["Na2O"]["context"]}
+    assert equations["itoh_yokokawa_1984_equation_2_formation_from_oxides"]["values"]["reaction_delta_G_kJ_per_mol"] == -244.5
+    assert equations["itoh_yokokawa_1984_equation_3_partial_molar_gibbs_relation"]["values"]["right_hand_side_kJ_per_mol"] == -81.5
+    assert equations["itoh_yokokawa_1984_equation_4_log_activity_silica"]["values"]["reference"] == "pure solid SiO2, tridymite"
+    assert equations["itoh_yokokawa_1984_equation_5_log_activity_sodium_oxide"]["values"]["reference"] == "pure solid Na2O"
 
     migrator = Migrator(root=ROOT)
     migrator._migrate_extract(EXTRACT)

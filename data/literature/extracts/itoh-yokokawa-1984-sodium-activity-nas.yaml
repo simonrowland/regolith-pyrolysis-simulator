@@ -31,6 +31,8 @@ species:
       units: kJ/mol as printed; entropy column is printed with kJ/mol units
       values:
         quantity: relative partial molar Gibbs energy and entropy of Na2O
+        table_2_header_as_printed: 'ΔG*(Na2O), kJ/mol; ΔH*(Na2O), kJ/mol; ΔS*(Na2O), kJ/mol'
+        entropy_unit_note: The printed ΔS header says kJ/mol, but the row closure ΔG=ΔH−TΔS at 1400 K works only if ΔS is interpreted as J/(mol·K); for row 3, 38.4 + 1400×12.8/1000 = 56.32 kJ/mol, near the printed 56.27 kJ/mol. Values and printed unit are retained without correction.
         method_class: measured_reduced
         reference_melt_as_printed: 40Na2O·60SiO2 melt
         temperature_K: 1400
@@ -181,6 +183,65 @@ species:
           delta_G_relative_kJ_per_mol: -8.54±0.13
           delta_H_relative_kJ_per_mol: 2.6±1.6
           delta_S_relative_as_printed_kJ_per_mol: 7.9±1.1
+    - observation_id: itoh_yokokawa_1984_equation_2_formation_from_oxides
+      type: context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 881
+      units: kJ/mol
+      values:
+        quantity: reaction Gibbs energy for formation of sodium disilicate from oxides
+        reaction_as_printed: Na2O(s) + 2SiO2(s) = Na2O·2SiO2(l)
+        reaction_delta_G_kJ_per_mol: -244.5
+        temperature_K: 1300
+        composition_as_printed: Na2O·2SiO2
+        reference: formation from the mother oxides, as stated in the paper
+        note: Reaction Gibbs energy from oxides is not delta_fG (formation from elements).
+    - observation_id: itoh_yokokawa_1984_equation_3_partial_molar_gibbs_relation
+      type: context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 881
+      units: kJ/mol
+      values:
+        quantity: weighted relation between partial molar Gibbs energies
+        relation_as_printed: 0.33ΔG*(Na2O) + 0.67ΔG*(SiO2) = -81.5 kJ/mol
+        right_hand_side_kJ_per_mol: -81.5
+        temperature_K: 1300
+        composition_as_printed: X_Na2O=0.33 in the Na2O-SiO2 binary melt
+        reference: pure Na2O and pure SiO2; the SiO2 reference is tridymite
+    - observation_id: itoh_yokokawa_1984_equation_4_log_activity_silica
+      type: context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 881
+      units: log10(activity)
+      values:
+        quantity: log activity of SiO2
+        printed_value: -0.43
+        printed_form: log10
+        temperature_K: 1300
+        composition_as_printed: X_Na2O=0.33 in Na2O-SiO2 binary melt
+        reference: pure solid SiO2, tridymite
+        schema_gap: No existing scalar printed_form field supports this logged activity in a context record that can migrate as the required unavailable value; retained in context and not converted to activity.
+    - observation_id: itoh_yokokawa_1984_equation_5_log_activity_sodium_oxide
+      type: context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 882
+      units: log10(activity)
+      values:
+        quantity: log activity of Na2O
+        printed_value: -9.0
+        printed_form: log10
+        temperature_K: 1300
+        composition_as_printed: X_Na2O=0.33 in Na2O-SiO2 binary melt
+        reference: pure solid Na2O
+        schema_gap: No existing scalar printed_form field supports this logged activity in a context record that can migrate as the required unavailable value; retained in context and not converted to activity.
     - observation_id: itoh_yokokawa_1984_table1_emf_candidate
       type: context
       locator:
