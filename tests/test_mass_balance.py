@@ -409,8 +409,17 @@ def _assert_staged_route_extent(sim, post_mg_c2a_hold_limit: dict) -> None:
     assert 0 < campaign_hours[CampaignPhase.C2A] <= post_mg_c2a_hold_limit[
         CampaignPhase.C2A
     ]
-    assert 0 < campaign_hours[CampaignPhase.C6] <= campaign_mgr._max_hold_hr(
+    c6_reaction_hours = sum(
+        snapshot.campaign == CampaignPhase.C6 and snapshot.c6_at_hold_target
+        for snapshot in snapshots
+    )
+    assert 0 < c6_reaction_hours <= campaign_mgr._max_hold_hr(
         CampaignPhase.C6
+    )
+    c6_acquisition_limit_hr, _ = campaign_mgr._c6_target_acquisition_limit()
+    assert (
+        campaign_hours[CampaignPhase.C6] - c6_reaction_hours
+        <= c6_acquisition_limit_hr
     )
 
 

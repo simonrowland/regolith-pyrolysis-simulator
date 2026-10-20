@@ -42,10 +42,12 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # C3 leaves C0.temp_range_C and the C2A early-ramp path in the full
     # allowlist but disables both for search; this changes conditional subspace
     # dimensions and derived digests.
+    # d-203: regenerated with generate_optimizer_recipe_vocabulary.py; C6
+    # O2 controls were removed and its total-pressure bounds now use [5, 15].
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "1a1cb3658e83c6ac45b5ca8ff0feae4a653349fee76c76dbf767d679d1534751"
+        "90a29be7000b344fd6d9a1b3a21d872595e0c8a016e6ae932c6341fa5802819b"
     )
-    assert digest == "0ab21330293ea06c2da8ed3e618c5410f69a39b8fa6abc87898daba5f3a85bcd"
+    assert digest == "84fa6d2cfd33c986b79c23a528989111402ed58a74ace491c26fe80a75713f1a"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (

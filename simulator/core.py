@@ -1356,6 +1356,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Back-reduction cascade (if Si present):
         #   4Al(l) + 3SiO₂(melt) → 2Al₂O₃ + 3Si(l)
         self.thermite_Mg_inventory_kg = 0.0     # Mg available from additives
+        self._c6_entry_purge_pending = False
         self._activated_additive_reagents = set()
         self._thermite_Al2O3_reduced_this_hr = 0.0
         self._thermite_Al_produced_this_hr = 0.0
@@ -1681,6 +1682,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.shuttle_cycle_K = 0
         # Reset thermite state
         self.thermite_Mg_inventory_kg = 0.0
+        self._c6_entry_purge_pending = False
         self.shuttle_cycle_Na = 0
         self._shuttle_injected_this_hr = 0.0
         self._shuttle_reduced_this_hr = 0.0
@@ -12879,6 +12881,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if campaign == CampaignPhase.C6:
             self._last_c6_refusal_diagnostic = {}
             self._c6_campaign_refused = False
+            self._c6_entry_purge_pending = (
+                self._overhead_holdup_mol().get(OXYGEN_SPECIES, 0.0) > 0.0)
             self._init_thermite_inventory()
 
         if campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
@@ -13634,6 +13638,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.train,
                 self.record,
                 transport_state={
+                    'c6_entry_purge_pending': bool(
+                        self.melt.campaign == CampaignPhase.C6
+                        and self._c6_entry_purge_pending),
                     'binding_cause': str(getattr(
                         self.overhead,
                         'transport_binding_cause',
@@ -13972,6 +13979,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._update_temperature()
         self._apply_c2a_knudsen_pressure_adjustment()
         self._establish_melt_redox_gate_authority_for_current_hour()
+        c6_entry_purge = bool(
+            self.melt.campaign == CampaignPhase.C6
+            and self._c6_entry_purge_pending)
         self._apply_oxygen_reservoir_exchange()
         self._apply_o2_bubbler()
         # t-325: un-lanced solid char reduces melt FeO at T >= 700 C
@@ -14020,6 +14030,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 c6_target_T,
                 self.melt.temperature_C,
             )
+        if c6_entry_purge:
+            c6_hold_reached = False
         self._c6_at_hold_target_this_hr = c6_hold_reached
         if c6_hold_reached:
             self._step_thermite()
@@ -14409,6 +14421,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.paused_for_decision = True
         elif next_campaign is not None:
             self.start_campaign(next_campaign)
+
+        # Entry purge uses the normal finite bleed, hourly telemetry and cost
+        # owners. Keep Mg isolated for the entire last purge tick as well;
+        # the next tick may contact Mg only after the ledger has no carried O2.
+        if c6_entry_purge:
+            self._c6_entry_purge_pending = (
+                self._overhead_holdup_mol().get(OXYGEN_SPECIES, 0.0) > 0.0)
 
         if self.is_complete():
             self._finalize_record()
