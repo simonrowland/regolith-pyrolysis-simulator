@@ -24,6 +24,48 @@ def _flux(species_kg_hr: dict[str, float]) -> EvaporationFlux:
     return flux
 
 
+@pytest.mark.parametrize(
+    ("available_kg", "rate_kg_hr", "production_hex", "battery_hex"),
+    (
+        (2.0, 2.0, "0x1.f3e58f03a254ep-1", "0x1.f3e58f03a254fp-1"),
+        (2e-12, 2e-12, "0x0.0p+0", "0x1.12d235385dd86p-40"),
+        (2.0, 1e6, "0x1.34c1e7d008214p+0", "0x1.34c1e7d008216p+0"),
+    ),
+)
+def test_finite_parent_numeric_pin(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+    available_kg, rate_kg_hr, production_hex, battery_hex,
+):
+    """SC333-16 pre-move output pin; changes require an explicit value report."""
+    from simulator.accounting.formulas import parse_formula
+    from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
+
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    production = sim._analytic_evaporation_depletion_rates(
+        {"Mg": rate_kg_hr}, dt_hr=1.0, phase_scalar=1.0,
+        cleaned_melt_kg={"MgO": available_kg}, available_o2_kg=0.0,
+    )
+    monkeypatch.setattr(
+        "simulator.battery.residue._finite_step_fluxes",
+        lambda *args, **kwargs: {"Mg": rate_kg_hr / 3600.0},
+    )
+    battery = integrate_residue_inventory(
+        {"MgO": available_kg / parse_formula("MgO").molar_mass_kg_per_mol()},
+        (ResidueChannel("Mg", "Mg", "MgO", 1.0, "numeric pin"),),
+        lambda inventory, logp: {"Mg": 1.0},
+        temperature_K=2000.0, duration_s=3600.0,
+        area_evolution_m2=(1.0,), buffered_fO2_log=-6.0,
+    )
+    battery_kg = (
+        battery.evaporated_mol["Mg"]
+        * parse_formula("Mg").molar_mass_kg_per_mol()
+    )
+    assert production.get("Mg", 0.0).hex() == production_hex
+    assert battery_kg.hex() == battery_hex
+
+
 def test_parent_grouped_analytic_depletion_is_shared_and_deterministic(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
