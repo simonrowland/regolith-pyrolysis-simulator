@@ -8828,7 +8828,7 @@ species:
           CaO: '11.84'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.596336'
           TiO2: '0'
           Al2O3: '0.0689843'
@@ -8838,7 +8838,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.452298'
@@ -8846,7 +8846,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row1locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 155
         atmosphere_as_published: air
@@ -8925,30 +8925,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.596336'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0689843'
-              - - FeO
-                - '0.0428978'
-              - - MgO
-                - '0.166179'
-              - - CaO
-                - '0.125603'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row1locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '1'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -9002,7 +8987,7 @@ species:
         sample_as_published: HRF10-22
         row_as_printed: '2'
         T_C: '1301'
-        T_cell_as_published: “
+        T_cell_as_published: '1301'
         duration_h_as_published: “
         duration_h_effective_as_published: '46.5'
         composition_wt_pct_as_published:
@@ -9013,7 +8998,7 @@ species:
           CaO: '11.34'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.576527'
           TiO2: '0'
           Al2O3: '0.067113'
@@ -9023,7 +9008,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.45364'
@@ -9031,7 +9016,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row2locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 156
         atmosphere_as_published: air
@@ -9062,7 +9047,6 @@ species:
             table: '1'
             row: '2'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -9112,30 +9096,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.576527'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.067113'
-              - - FeO
-                - '0.0745709'
-              - - MgO
-                - '0.16006'
-              - - CaO
-                - '0.121729'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row2locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '2'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -9189,7 +9158,7 @@ species:
         sample_as_published: HRF20-22
         row_as_printed: '3'
         T_C: '1301'
-        T_cell_as_published: “
+        T_cell_as_published: '1301'
         duration_h_as_published: “
         duration_h_effective_as_published: '46.5'
         composition_wt_pct_as_published:
@@ -9200,7 +9169,7 @@ species:
           CaO: '9.98'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.52559'
           TiO2: '0'
           Al2O3: '0.0611446'
@@ -9210,7 +9179,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.473487'
@@ -9218,7 +9187,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row3locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 157
         atmosphere_as_published: air
@@ -9249,7 +9218,6 @@ species:
             table: '1'
             row: '3'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -9299,30 +9267,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.52559'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0611446'
-              - - FeO
-                - '0.157275'
-              - - MgO
-                - '0.145776'
-              - - CaO
-                - '0.110215'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row3locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '3'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -9387,7 +9340,7 @@ species:
           CaO: '11.80'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.595606'
           TiO2: '0'
           Al2O3: '0.0700728'
@@ -9397,7 +9350,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.361615'
@@ -9405,7 +9358,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row4locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 158
         atmosphere_as_published: air
@@ -9484,30 +9437,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.595606'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0700728'
-              - - FeO
-                - '0.0429689'
-              - - MgO
-                - '0.165907'
-              - - CaO
-                - '0.125445'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row4locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '4'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -9561,7 +9499,7 @@ species:
         sample_as_published: HRF10-21
         row_as_printed: '5'
         T_C: '1349'
-        T_cell_as_published: “
+        T_cell_as_published: '1349'
         duration_h_as_published: “
         duration_h_effective_as_published: '22.0'
         composition_wt_pct_as_published:
@@ -9572,7 +9510,7 @@ species:
           CaO: '11.33'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.573027'
           TiO2: '0'
           Al2O3: '0.0682223'
@@ -9582,7 +9520,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.371611'
@@ -9590,7 +9528,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row5locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 159
         atmosphere_as_published: air
@@ -9621,7 +9559,6 @@ species:
             table: '1'
             row: '5'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -9671,30 +9608,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.573027'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0682223'
-              - - FeO
-                - '0.0760242'
-              - - MgO
-                - '0.160985'
-              - - CaO
-                - '0.121742'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row5locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '5'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -9748,7 +9670,7 @@ species:
         sample_as_published: HRF20-21
         row_as_printed: '6'
         T_C: '1349'
-        T_cell_as_published: “
+        T_cell_as_published: '1349'
         duration_h_as_published: “
         duration_h_effective_as_published: '22.0'
         composition_wt_pct_as_published:
@@ -9759,7 +9681,7 @@ species:
           CaO: '9.94'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.528708'
           TiO2: '0'
           Al2O3: '0.0611618'
@@ -9769,7 +9691,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.40817'
@@ -9777,7 +9699,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row6locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 160
         atmosphere_as_published: air
@@ -9808,7 +9730,6 @@ species:
             table: '1'
             row: '6'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -9858,30 +9779,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.528708'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0611618'
-              - - FeO
-                - '0.153965'
-              - - MgO
-                - '0.146385'
-              - - CaO
-                - '0.10978'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row6locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '6'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -9946,7 +9852,7 @@ species:
           CaO: '11.81'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.597812'
           TiO2: '0'
           Al2O3: '0.0701177'
@@ -9956,7 +9862,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.291531'
@@ -9964,7 +9870,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row7locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 161
         atmosphere_as_published: air
@@ -10043,30 +9949,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.597812'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0701177'
-              - - FeO
-                - '0.0406973'
-              - - MgO
-                - '0.165796'
-              - - CaO
-                - '0.125577'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row7locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '7'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -10120,7 +10011,7 @@ species:
         sample_as_published: HRF10-30
         row_as_printed: '8'
         T_C: '1399'
-        T_cell_as_published: “
+        T_cell_as_published: '1399'
         duration_h_as_published: “
         duration_h_effective_as_published: '15.0'
         composition_wt_pct_as_published:
@@ -10131,7 +10022,7 @@ species:
           CaO: '11.22'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.578299'
           TiO2: '0'
           Al2O3: '0.067197'
@@ -10141,7 +10032,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.306798'
@@ -10149,7 +10040,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row8locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 162
         atmosphere_as_published: air
@@ -10180,7 +10071,6 @@ species:
             table: '1'
             row: '8'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -10230,30 +10120,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.578299'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.067197'
-              - - FeO
-                - '0.0738376'
-              - - MgO
-                - '0.160312'
-              - - CaO
-                - '0.120354'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row8locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '8'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -10307,7 +10182,7 @@ species:
         sample_as_published: HRF20-30
         row_as_printed: '9'
         T_C: '1399'
-        T_cell_as_published: “
+        T_cell_as_published: '1399'
         duration_h_as_published: “
         duration_h_effective_as_published: '15.0'
         composition_wt_pct_as_published:
@@ -10318,7 +10193,7 @@ species:
           CaO: '9.94'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.527074'
           TiO2: '0'
           Al2O3: '0.0612789'
@@ -10328,7 +10203,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.335792'
@@ -10336,7 +10211,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row9locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 163
         atmosphere_as_published: air
@@ -10367,7 +10242,6 @@ species:
             table: '1'
             row: '9'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -10417,30 +10291,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.527074'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0612789'
-              - - FeO
-                - '0.156738'
-              - - MgO
-                - '0.145261'
-              - - CaO
-                - '0.109648'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row9locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '9'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -10505,7 +10364,7 @@ species:
           CaO: '11.86'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.595477'
           TiO2: '0'
           Al2O3: '0.0703243'
@@ -10515,7 +10374,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.193232'
@@ -10523,7 +10382,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row10locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 164
         atmosphere_as_published: air
@@ -10602,30 +10461,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.595477'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0703243'
-              - - FeO
-                - '0.0409774'
-              - - MgO
-                - '0.167148'
-              - - CaO
-                - '0.126073'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row10locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '10'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -10679,7 +10523,7 @@ species:
         sample_as_published: HRF10-29
         row_as_printed: '11'
         T_C: '1451'
-        T_cell_as_published: “
+        T_cell_as_published: '1451'
         duration_h_as_published: “
         duration_h_effective_as_published: '8.0'
         composition_wt_pct_as_published:
@@ -10690,7 +10534,7 @@ species:
           CaO: '11.30'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.577818'
           TiO2: '0'
           Al2O3: '0.0677046'
@@ -10700,7 +10544,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.221466'
@@ -10708,7 +10552,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row11locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 165
         atmosphere_as_published: air
@@ -10739,7 +10583,6 @@ species:
             table: '1'
             row: '11'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -10789,30 +10632,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.577818'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0677046'
-              - - FeO
-                - '0.07246'
-              - - MgO
-                - '0.160335'
-              - - CaO
-                - '0.121683'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row11locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '11'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -10866,7 +10694,7 @@ species:
         sample_as_published: HRF20-29
         row_as_printed: '12'
         T_C: '1451'
-        T_cell_as_published: “
+        T_cell_as_published: '1451'
         duration_h_as_published: “
         duration_h_effective_as_published: '8.0'
         composition_wt_pct_as_published:
@@ -10877,7 +10705,7 @@ species:
           CaO: '10.07'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.531312'
           TiO2: '0'
           Al2O3: '0.0616909'
@@ -10887,7 +10715,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.255273'
@@ -10895,7 +10723,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row12locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 166
         atmosphere_as_published: air
@@ -10926,7 +10754,6 @@ species:
             table: '1'
             row: '12'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -10976,30 +10803,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.531312'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0616909'
-              - - FeO
-                - '0.148954'
-              - - MgO
-                - '0.146834'
-              - - CaO
-                - '0.11121'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row12locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '12'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -11064,7 +10876,7 @@ species:
           CaO: '15.39'
           Na2O: '5.90'
           K2O: '4.47'
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.508304'
           TiO2: '0'
           Al2O3: '0.0615138'
@@ -11074,7 +10886,7 @@ species:
           Na2O: '0.0594173'
           K2O: '0.0295971'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.565643'
@@ -11082,7 +10894,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row24locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 178
         atmosphere_as_published: air
@@ -11161,30 +10973,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.508304'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0615138'
-              - - FeO
-                - '0.067235'
-              - - MgO
-                - '0.102657'
-              - - CaO
-                - '0.171276'
-              - - Na2O
-                - '0.0594173'
-              - - K2O
-                - '0.0295971'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row24locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5, so the measured composition is incomplete. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '24'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -11238,7 +11035,7 @@ species:
         sample_as_published: DAFSN15/DAFSK25-33
         row_as_printed: '25'
         T_C: '1450'
-        T_cell_as_published: “
+        T_cell_as_published: '1450'
         duration_h_as_published: “
         duration_h_effective_as_published: '8.0'
         composition_wt_pct_as_published:
@@ -11249,7 +11046,7 @@ species:
           CaO: '10.02'
           Na2O: '7.11'
           K2O: '6.44'
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.597008'
           TiO2: '0'
           Al2O3: '0.0404847'
@@ -11259,7 +11056,7 @@ species:
           Na2O: '0.0722875'
           K2O: '0.0430693'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.5783'
@@ -11267,7 +11064,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row25locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 179
         atmosphere_as_published: air
@@ -11298,7 +11095,6 @@ species:
             table: '1'
             row: '25'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -11348,30 +11144,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.597008'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0404847'
-              - - FeO
-                - '0.0675621'
-              - - MgO
-                - '0.0670071'
-              - - CaO
-                - '0.112581'
-              - - Na2O
-                - '0.0722875'
-              - - K2O
-                - '0.0430693'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row25locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5, so the measured composition is incomplete. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '25'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -11425,7 +11206,7 @@ species:
         sample_as_published: DAFAN16/HAFSK26-33
         row_as_printed: '26'
         T_C: '1450'
-        T_cell_as_published: “
+        T_cell_as_published: '1450'
         duration_h_as_published: “
         duration_h_effective_as_published: '8.0'
         composition_wt_pct_as_published:
@@ -11436,7 +11217,7 @@ species:
           CaO: '9.36'
           Na2O: '6.42'
           K2O: '4.65'
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.469591'
           TiO2: '0'
           Al2O3: '0.108828'
@@ -11446,7 +11227,7 @@ species:
           Na2O: '0.066155'
           K2O: '0.0315623'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.552372'
@@ -11454,7 +11235,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row26locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 180
         atmosphere_as_published: air
@@ -11485,7 +11266,6 @@ species:
             table: '1'
             row: '26'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -11535,30 +11315,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.469591'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.108828'
-              - - FeO
-                - '0.0689453'
-              - - MgO
-                - '0.148248'
-              - - CaO
-                - '0.10667'
-              - - Na2O
-                - '0.066155'
-              - - K2O
-                - '0.0315623'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row26locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5, so the measured composition is incomplete. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '26'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -11612,7 +11377,7 @@ species:
         sample_as_published: DAFN8/HAFSK13-33
         row_as_printed: '27'
         T_C: '1450'
-        T_cell_as_published: “
+        T_cell_as_published: '1450'
         duration_h_as_published: “
         duration_h_effective_as_published: '8.0'
         composition_wt_pct_as_published:
@@ -11623,7 +11388,7 @@ species:
           CaO: '10.30'
           Na2O: '4.16'
           K2O: '5.38'
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.505761'
           TiO2: '0'
           Al2O3: '0.0736541'
@@ -11633,7 +11398,7 @@ species:
           Na2O: '0.0418817'
           K2O: '0.0356622'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.494715'
@@ -11641,7 +11406,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row27locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 181
         atmosphere_as_published: air
@@ -11672,7 +11437,6 @@ species:
             table: '1'
             row: '27'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -11722,30 +11486,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.505761'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0736541'
-              - - FeO
-                - '0.0669601'
-              - - MgO
-                - '0.161447'
-              - - CaO
-                - '0.114634'
-              - - Na2O
-                - '0.0418817'
-              - - K2O
-                - '0.0356622'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row27locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5, so the measured composition is incomplete. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '27'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -11810,7 +11559,7 @@ species:
           CaO: '9.09'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.706947'
           TiO2: '0'
           Al2O3: '0.106372'
@@ -11820,7 +11569,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '-0.0278291'
@@ -11828,7 +11577,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row19locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 173
         atmosphere_as_published: air
@@ -11907,30 +11656,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.706947'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.106372'
-              - - FeO
-                - '0.0801754'
-              - - MgO
-                - '0'
-              - - CaO
-                - '0.106505'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row19locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '19'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -11984,7 +11718,7 @@ species:
         sample_as_published: SAFM5-42
         row_as_printed: '20'
         T_C: '1499'
-        T_cell_as_published: “
+        T_cell_as_published: '1499'
         duration_h_as_published: “
         duration_h_effective_as_published: '3.0'
         composition_wt_pct_as_published:
@@ -11995,7 +11729,7 @@ species:
           CaO: '8.49'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.653732'
           TiO2: '0'
           Al2O3: '0.0984272'
@@ -12005,7 +11739,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.0377886'
@@ -12013,7 +11747,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row20locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 174
         atmosphere_as_published: air
@@ -12044,7 +11778,6 @@ species:
             table: '1'
             row: '20'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -12094,30 +11827,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.653732'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0984272'
-              - - FeO
-                - '0.0752748'
-              - - MgO
-                - '0.0765356'
-              - - CaO
-                - '0.0960304'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row20locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '20'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -12171,7 +11889,7 @@ species:
         sample_as_published: SAFM10-42
         row_as_printed: '21'
         T_C: '1499'
-        T_cell_as_published: “
+        T_cell_as_published: '1499'
         duration_h_as_published: “
         duration_h_effective_as_published: '3.0'
         composition_wt_pct_as_published:
@@ -12182,7 +11900,7 @@ species:
           CaO: '8.08'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.59894'
           TiO2: '0'
           Al2O3: '0.0912302'
@@ -12192,7 +11910,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.0680416'
@@ -12200,7 +11918,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row21locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 175
         atmosphere_as_published: air
@@ -12231,7 +11949,6 @@ species:
             table: '1'
             row: '21'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -12281,30 +11998,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.59894'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0912302'
-              - - FeO
-                - '0.073313'
-              - - MgO
-                - '0.147794'
-              - - CaO
-                - '0.088723'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row21locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '21'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -12358,7 +12060,7 @@ species:
         sample_as_published: SAFM15-42
         row_as_printed: '22'
         T_C: '1499'
-        T_cell_as_published: “
+        T_cell_as_published: '1499'
         duration_h_as_published: “
         duration_h_effective_as_published: '3.0'
         composition_wt_pct_as_published:
@@ -12369,7 +12071,7 @@ species:
           CaO: '7.62'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.54393'
           TiO2: '0'
           Al2O3: '0.0825196'
@@ -12379,7 +12081,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.105755'
@@ -12387,7 +12089,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row22locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 176
         atmosphere_as_published: air
@@ -12418,7 +12120,6 @@ species:
             table: '1'
             row: '22'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -12468,30 +12169,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.54393'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0825196'
-              - - FeO
-                - '0.0714552'
-              - - MgO
-                - '0.221349'
-              - - CaO
-                - '0.0807458'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row22locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '22'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -12556,7 +12242,7 @@ species:
           CaO: '9.03'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.706902'
           TiO2: '0'
           Al2O3: '0.10867'
@@ -12566,7 +12252,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.123278'
@@ -12574,7 +12260,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row13locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 167
         atmosphere_as_published: air
@@ -12653,30 +12339,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.706902'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.10867'
-              - - FeO
-                - '0.0794571'
-              - - MgO
-                - '0'
-              - - CaO
-                - '0.104971'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row13locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '13'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -12730,7 +12401,7 @@ species:
         sample_as_published: SAFM5-43
         row_as_printed: '14'
         T_C: '1398'
-        T_cell_as_published: “
+        T_cell_as_published: '1398'
         duration_h_as_published: “
         duration_h_effective_as_published: '16.0'
         composition_wt_pct_as_published:
@@ -12741,7 +12412,7 @@ species:
           CaO: '8.54'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.652111'
           TiO2: '0'
           Al2O3: '0.0996097'
@@ -12751,7 +12422,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.195926'
@@ -12759,7 +12430,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row14locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 168
         atmosphere_as_published: air
@@ -12790,7 +12461,6 @@ species:
             table: '1'
             row: '14'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -12840,30 +12510,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.652111'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0996097'
-              - - FeO
-                - '0.0747554'
-              - - MgO
-                - '0.0770812'
-              - - CaO
-                - '0.0964424'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row14locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '14'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -12928,7 +12583,7 @@ species:
           CaO: '9.09'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.706214'
           TiO2: '0'
           Al2O3: '0.108303'
@@ -12938,7 +12593,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.0434657'
@@ -12946,7 +12601,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row15locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 169
         atmosphere_as_published: air
@@ -13025,30 +12680,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.706214'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.108303'
-              - - FeO
-                - '0.0794096'
-              - - MgO
-                - '0'
-              - - CaO
-                - '0.106073'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row15locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '15'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -13102,7 +12742,7 @@ species:
         sample_as_published: SAFM5-44
         row_as_printed: '16'
         T_C: '1448'
-        T_cell_as_published: “
+        T_cell_as_published: '1448'
         duration_h_as_published: “
         duration_h_effective_as_published: unknown
         composition_wt_pct_as_published:
@@ -13113,7 +12753,7 @@ species:
           CaO: '8.55'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.651638'
           TiO2: '0'
           Al2O3: '0.0996829'
@@ -13123,7 +12763,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.115904'
@@ -13131,7 +12771,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row16locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 170
         atmosphere_as_published: air
@@ -13162,7 +12802,6 @@ species:
             table: '1'
             row: '16'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: unknown
@@ -13212,30 +12851,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.651638'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0996829'
-              - - FeO
-                - '0.0759743'
-              - - MgO
-                - '0.0758475'
-              - - CaO
-                - '0.0968573'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row16locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '16'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -13289,7 +12913,7 @@ species:
         sample_as_published: SAFM10-44
         row_as_printed: '17'
         T_C: '1448'
-        T_cell_as_published: “
+        T_cell_as_published: '1448'
         duration_h_as_published: “
         duration_h_effective_as_published: unknown
         composition_wt_pct_as_published:
@@ -13300,7 +12924,7 @@ species:
           CaO: '8.10'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.599771'
           TiO2: '0'
           Al2O3: '0.0909459'
@@ -13310,7 +12934,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.15007'
@@ -13318,7 +12942,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row17locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 171
         atmosphere_as_published: air
@@ -13349,7 +12973,6 @@ species:
             table: '1'
             row: '17'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: unknown
@@ -13399,30 +13022,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.599771'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0909459'
-              - - FeO
-                - '0.0727563'
-              - - MgO
-                - '0.147744'
-              - - CaO
-                - '0.0887827'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row17locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '17'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -13476,7 +13084,7 @@ species:
         sample_as_published: SAFM15-44
         row_as_printed: '18'
         T_C: '1448'
-        T_cell_as_published: “
+        T_cell_as_published: '1448'
         duration_h_as_published: “
         duration_h_effective_as_published: unknown
         composition_wt_pct_as_published:
@@ -13487,7 +13095,7 @@ species:
           CaO: '7.64'
           Na2O: –
           K2O: –
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.543759'
           TiO2: '0'
           Al2O3: '0.0835355'
@@ -13497,7 +13105,7 @@ species:
           Na2O: '0'
           K2O: '0'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.188501'
@@ -13505,7 +13113,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row18locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 172
         atmosphere_as_published: air
@@ -13536,7 +13144,6 @@ species:
             table: '1'
             row: '18'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: unknown
@@ -13586,30 +13193,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.543759'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0835355'
-              - - FeO
-                - '0.0720769'
-              - - MgO
-                - '0.219866'
-              - - CaO
-                - '0.0807633'
-              - - Na2O
-                - '0'
-              - - K2O
-                - '0'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row18locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5; Na2O and K2O are printed as dashes for this row. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '18'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -13674,7 +13266,7 @@ species:
           CaO: '10.23'
           Na2O: '1.87'
           K2O: '7.88'
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.539272'
           TiO2: '0'
           Al2O3: '0.0632111'
@@ -13684,7 +13276,7 @@ species:
           Na2O: '0.0186909'
           K2O: '0.0519313'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.614936'
@@ -13692,7 +13284,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row23locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 177
         atmosphere_as_published: air
@@ -13771,30 +13363,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.539272'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0632111'
-              - - FeO
-                - '0.0668855'
-              - - MgO
-                - '0.146742'
-              - - CaO
-                - '0.113268'
-              - - Na2O
-                - '0.0186909'
-              - - K2O
-                - '0.0519313'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row23locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5, so the measured composition is incomplete. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '23'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -13859,7 +13436,7 @@ species:
           CaO: '10.47'
           Na2O: '3.49'
           K2O: '4.31'
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.517685'
           TiO2: '0'
           Al2O3: '0.0756925'
@@ -13869,7 +13446,7 @@ species:
           Na2O: '0.0345135'
           K2O: '0.0280765'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.417728'
@@ -13877,7 +13454,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row28locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 182
         atmosphere_as_published: air
@@ -13956,30 +13533,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.517685'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0756925'
-              - - FeO
-                - '0.0678558'
-              - - MgO
-                - '0.161662'
-              - - CaO
-                - '0.114514'
-              - - Na2O
-                - '0.0345135'
-              - - K2O
-                - '0.0280765'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row28locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5, so the measured composition is incomplete. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '28'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -14033,7 +13595,7 @@ species:
         sample_as_published: DAFAN8/DAFSK12-46
         row_as_printed: '29'
         T_C: '1499'
-        T_cell_as_published: “
+        T_cell_as_published: '1499'
         duration_h_as_published: “
         duration_h_effective_as_published: '2.0'
         composition_wt_pct_as_published:
@@ -14044,7 +13606,7 @@ species:
           CaO: '13.63'
           Na2O: '3.64'
           K2O: '4.00'
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.518559'
           TiO2: '0'
           Al2O3: '0.0974807'
@@ -14054,7 +13616,7 @@ species:
           Na2O: '0.0373743'
           K2O: '0.0270161'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.413257'
@@ -14062,7 +13624,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row29locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 183
         atmosphere_as_published: air
@@ -14093,7 +13655,6 @@ species:
             table: '1'
             row: '29'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -14143,30 +13704,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.518559'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0974807'
-              - - FeO
-                - '0.0715541'
-              - - MgO
-                - '0.093492'
-              - - CaO
-                - '0.154524'
-              - - Na2O
-                - '0.0373743'
-              - - K2O
-                - '0.0270161'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row29locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5, so the measured composition is incomplete. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '29'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -14231,7 +13777,7 @@ species:
           CaO: '14.80'
           Na2O: '6.60'
           K2O: '5.91'
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.504326'
           TiO2: '0'
           Al2O3: '0.0610564'
@@ -14241,7 +13787,7 @@ species:
           Na2O: '0.0663796'
           K2O: '0.0391323'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.547501'
@@ -14249,7 +13795,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row30locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 184
         atmosphere_as_published: air
@@ -14328,30 +13874,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.504326'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0610564'
-              - - FeO
-                - '0.0649724'
-              - - MgO
-                - '0.0995993'
-              - - CaO
-                - '0.164534'
-              - - Na2O
-                - '0.0663796'
-              - - K2O
-                - '0.0391323'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row30locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5, so the measured composition is incomplete. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '30'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
@@ -14405,7 +13936,7 @@ species:
         sample_as_published: DAFSN15/DAFSK25-36
         row_as_printed: '31'
         T_C: '1500'
-        T_cell_as_published: “
+        T_cell_as_published: '1500'
         duration_h_as_published: “
         duration_h_effective_as_published: '2.0'
         composition_wt_pct_as_published:
@@ -14416,7 +13947,7 @@ species:
           CaO: '9.39'
           Na2O: '7.95'
           K2O: '7.95'
-        composition_mol:
+        supplementary_composition_mol_as_compiled:
           SiO2: '0.591828'
           TiO2: '0'
           Al2O3: '0.0401624'
@@ -14426,7 +13957,7 @@ species:
           Na2O: '0.0807152'
           K2O: '0.053151'
           P2O5: '0'
-        composition_mol_basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
+        supplementary_composition_mol_basis_as_printed: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
         log_fO2: '-0.68'
         log_fO2_as_published: '-0.68'
         supplementary_log10_Fe3_over_Fe2_as_published: '0.56971'
@@ -14434,7 +13965,7 @@ species:
         supplementary_ratio_derivation: x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1.
         supplementary_source_block_label_as_printed: Present Ms. / air
         supplementary_source_block_spreadsheet_rows: 155-185
-        second_locator: &borisov2018row31locator
+        second_locator:
           table: Supplementary Table 2
           record: spreadsheet row 185
         atmosphere_as_published: air
@@ -14465,7 +13996,6 @@ species:
             table: '1'
             row: '31'
             column: T °C
-            note: The printed ditto mark inherits temperature from the preceding sample row.
         duration_h:
           state:
             tag: value
@@ -14515,30 +14045,15 @@ species:
             note: One atmosphere total pressure, expressed as 101325 Pa.
         composition:
           state:
-            tag: value
-            value:
-              amount_basis: mole_fraction
-              basis: 'total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled'
-              components:
-              - - SiO2
-                - '0.591828'
-              - - TiO2
-                - '0'
-              - - Al2O3
-                - '0.0401624'
-              - - FeO
-                - '0.0636916'
-              - - MgO
-                - '0.0650767'
-              - - CaO
-                - '0.105375'
-              - - Na2O
-                - '0.0807152'
-              - - K2O
-                - '0.053151'
-              - - P2O5
-                - '0'
-          locator: *borisov2018row31locator
+            tag: unknown
+            reason: 'Table 1 omits TiO2 and P2O5, so the measured composition is incomplete. Supplementary recalculated mole fractions remain secondary.'
+          locator:
+            page: 3
+            published_page: 98
+            pdf_page_index: 2
+            table: '1'
+            row: '31'
+            column: measured oxide wt%
         quench_state:
           state:
             tag: value
