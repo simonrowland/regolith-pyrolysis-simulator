@@ -4,17 +4,38 @@ from copy import deepcopy
 
 import pytest
 
-from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
 from simulator.environment import feedstock_body, feedstock_surface_pressure_mbar
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.pumping_cost import process_pressure_state
-from simulator.state import CampaignPhase
+from simulator.state import CampaignPhase, MeltState
 
 
 HARDWARE = dict(inlet_temperature_K=300.0, max_pump_speed_m3_s=50.0,
                 validated_line_conductance_m3_s=50.0)
+
+
+@pytest.mark.parametrize('campaign', [
+    CampaignPhase.C2A, CampaignPhase.C2A_STAGED,
+    CampaignPhase.C3_NA, CampaignPhase.C3_K, CampaignPhase.C4,
+])
+@pytest.mark.parametrize('body,configured,override,expected', [
+    ('mars', 'pN2', None, 'Ar'),
+    ('mars', 'pCO2', None, 'CO2'), ('mars', 'pN2', 'pCO2', 'CO2'),
+    ('mars', 'pN2', 'pN2', 'N2'),
+])
+def test_mars_carrier_default_and_operator_choice(campaign, body, configured, override, expected):
+    setpoints = deepcopy(load_config_bundle().setpoints)
+    key = CampaignManager(setpoints)._campaign_config_key(campaign)
+    setpoints['campaigns'][key]['carrier_gas'] = configured
+    manager = CampaignManager(setpoints)
+    if override is not None:
+        manager.overrides[campaign.name] = {'carrier_gas': override}
+    melt = MeltState(body=body)
+    manager.configure_campaign(melt, campaign)
+    assert melt.background_gas_species == expected
 
 
 def mars_sim(*, pressure_mbar=6.0, pumping=None):

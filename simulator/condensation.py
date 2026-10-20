@@ -3528,6 +3528,21 @@ class CondensationModel:
             sticking_notice['alpha_s_extrapolation_warnings'] = (
                 alpha_extrapolation_warnings
             )
+        reactive_deposits = sorted({
+            species
+            for deposits in [wall_deposit_by_species, *condensed_by_stage_species.values()]
+            for species, amount in deposits.items()
+            if species in {'Na', 'Na2', 'K', 'K2', 'Mg'} and amount > 0.0
+        })
+        if self.carrier_gas == 'CO2' and reactive_deposits:
+            sticking_notice = dict(sticking_notice)
+            sticking_notice['reactive_sink_notice'] = {
+                'severity': 'warning',
+                'status': 'missing_physics',
+                'reason': 'missing reactive sink: alkali/Mg + CO2 (carbonate/oxide + C)',
+                'ticket': 't-1386',
+                'species': reactive_deposits,
+            }
         self.last_sticking_alpha_provenance_notice = copy.deepcopy(
             sticking_notice
         )

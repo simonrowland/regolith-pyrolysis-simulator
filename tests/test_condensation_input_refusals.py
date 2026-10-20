@@ -25,6 +25,32 @@ def _configured_model() -> condensation.CondensationModel:
     return model
 
 
+@pytest.mark.parametrize('carrier,species,expected', [
+    ('CO2', 'Na', True), ('CO2', 'K', True), ('CO2', 'Mg', True),
+    ('CO2', 'Fe', False), ('Ar', 'Mg', False),
+])
+def test_co2_reactive_deposit_notice(carrier, species, expected, monkeypatch):
+    model = _configured_model()
+    model.configure_operating_conditions(
+        carrier_gas=carrier, species_partial_pressures_mbar={species: 1.0},
+    )
+    monkeypatch.setattr(model, '_condensation_efficiency', lambda **kwargs: 1.0)
+    result = model.route(
+        EvaporationFlux(species_kg_hr={species: 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    )
+    notice = model.last_sticking_alpha_provenance_notice.get('reactive_sink_notice')
+    if expected:
+        assert notice['reason'] == 'missing reactive sink: alkali/Mg + CO2 (carbonate/oxide + C)'
+        assert notice['ticket'] == 't-1386'
+        assert notice['species'] == [species]
+        assert result.condensed_for_species(species) + result.wall_deposit_by_species.get(species, 0.0) > 0.0
+    else:
+        assert notice is None
+    model.route(EvaporationFlux(), MeltState(temperature_C=1700.0))
+    assert 'reactive_sink_notice' not in model.last_sticking_alpha_provenance_notice
+
+
 @pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf])
 def test_minimum_knudsen_pressure_refuses_nonfinite_temperature(value):
     with pytest.raises(

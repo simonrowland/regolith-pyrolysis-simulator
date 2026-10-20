@@ -350,6 +350,7 @@ class CampaignManager:
         'runtime_override',
     })
     _COMMON_OVERRIDE_FIELDS = frozenset({
+        'carrier_gas',
         'condenser_geometry',
         'duration_h',
         'freeze_gate',
@@ -1279,12 +1280,18 @@ class CampaignManager:
             diagnostic['max_hold_adjustment'] = dict(adjustment)
         return atmosphere, diagnostic
 
-    def _campaign_carrier(self, campaign: CampaignPhase) -> str:
+    def _campaign_carrier(self, campaign: CampaignPhase, melt: MeltState) -> str:
         cfg = self._campaign_config(campaign)
-        return _canonical_carrier_gas_key(
+        override = self._campaign_overrides(campaign)
+        if 'carrier_gas' in override:
+            return _canonical_carrier_gas_key(str(override['carrier_gas']))
+        carrier = _canonical_carrier_gas_key(
             str(cfg.get('carrier_gas', 'pN2') or 'pN2')
             if isinstance(cfg, Mapping) else 'pN2'
         )
+        # The shipped pN2 declaration is the cross-body legacy default.
+        # Mars uses Ar; an explicit CO2 config or operator carrier wins.
+        return 'Ar' if melt.body == 'mars' and carrier == 'N2' else carrier
 
     def apply_c2a_staged_gas_controls(
             self,
@@ -1312,7 +1319,7 @@ class CampaignManager:
         melt.p_total_mbar = float(diagnostic['p_total_mbar'])
         pN2_mbar = float(diagnostic['pN2_mbar'])
         if pN2_mbar > 0.0:
-            melt.background_gas_species = self._campaign_carrier(active_campaign)
+            melt.background_gas_species = self._campaign_carrier(active_campaign, melt)
             melt.background_gas_mole_fraction = 1.0
         else:
             melt.background_gas_species = ''
@@ -1493,7 +1500,7 @@ class CampaignManager:
         elif campaign in (CampaignPhase.C2A, CampaignPhase.C2A_STAGED):
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.PN2_SWEEP
-            melt.background_gas_species = self._campaign_carrier(campaign)
+            melt.background_gas_species = self._campaign_carrier(campaign, melt)
             melt.pO2_mbar = self._pressure_config_float(
                 cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
             melt.p_total_mbar = self._pressure_config_float(
@@ -1557,6 +1564,13 @@ class CampaignManager:
 
         # Apply runtime overrides (pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
+        if 'carrier_gas' in ovr or (
+            melt.body == 'mars' and campaign not in {
+                CampaignPhase.C0, CampaignPhase.C0B,
+                CampaignPhase.C5, CampaignPhase.MRE_BASELINE,
+            }
+        ):
+            melt.background_gas_species = self._campaign_carrier(campaign, melt)
         if 'pO2_mbar' in ovr:
             # 0.5.4 W5 milestone-review P1 (codex /challenge
             # 2026-05-28): mirror the active-path atmosphere switch
