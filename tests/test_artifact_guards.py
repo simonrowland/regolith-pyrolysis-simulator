@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from simulator.accounting import load_species_formulas
+from simulator.accounting import load_species_formulas, resolve_species_formula
 
 
 FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS = [
@@ -93,22 +93,51 @@ def test_composition_projection_has_no_literal_oxide_molar_mass_tables():
             relative = path.relative_to(repo).as_posix()
             tree = ast.parse(path.read_text(), filename=relative)
             for node in ast.walk(tree):
-                if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+                if not isinstance(node, ast.Dict) or not _is_oxide_molar_mass_table(node):
                     continue
-                value = node.value
-                if not isinstance(value, ast.Dict):
-                    continue
-                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-                names = [
-                    target.id.lower()
-                    for target in targets
-                    if isinstance(target, ast.Name)
-                ]
-                if not any("molar_mass" in name and "oxide" in name for name in names):
+                if relative == "simulator/accounting/formulas.py":
                     continue
                 violations.append(f"{relative}:{node.lineno}")
 
     assert not violations, "literal oxide molar-mass tables: " + ", ".join(violations)
+
+
+def _is_oxide_molar_mass_table(node: ast.Dict) -> bool:
+    if not node.keys or any(not isinstance(key, ast.Constant) or not isinstance(key.value, str)
+                            for key in node.keys):
+        return False
+    entries = list(zip(node.keys, node.values, strict=True))
+    for key_node, value_node in entries:
+        species = key_node.value
+        try:
+            formula = resolve_species_formula(species)
+            expected_mass = formula.molar_mass_g_per_mol()
+        except (TypeError, ValueError):
+            return False
+        if "O" not in formula.elements or len(formula.elements) < 2:
+            return False
+        if not isinstance(value_node, ast.Constant) or not isinstance(value_node.value, (int, float)):
+            return False
+        value = float(value_node.value)
+        if abs(value - expected_mass) > max(0.01, expected_mass * 0.001):
+            return False
+    return True
+
+
+@pytest.mark.parametrize(
+    ("literal", "is_mass_table"),
+    [
+        ('molar_mass = {"SiO2": 60.0843, "MnO": 70.9375}', True),
+        ('ordinary = {"SiO2": 50.0, "MnO": 0.2}', False),
+    ],
+)
+def test_oxide_molar_mass_table_guard_uses_contents_not_names(
+    literal: str, is_mass_table: bool
+) -> None:
+    assignment = ast.parse(literal).body[0]
+    assert isinstance(assignment, ast.Assign)
+    assert isinstance(assignment.value, ast.Dict)
+    assert _is_oxide_molar_mass_table(assignment.value) is is_mass_table
 
 
 def _forbidden_internal_kg_mutation_hits(root: Path) -> list[str]:
