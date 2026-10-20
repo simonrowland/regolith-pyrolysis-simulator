@@ -493,6 +493,7 @@ from simulator.vapour_rail.batch import FluxActivationContext
 from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import (
     _EVAPORATION_ALPHA_GROUPS,
+    _vapor_species_molar_mass_g_mol,
     EvaporationFluxRefusal,
     EvaporationMixin,
 )
@@ -1543,8 +1544,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     except AccountingError:
                         if (
                             isinstance(row, Mapping)
-                            and row.get('molar_mass_g_mol') is None
-                            and MOLAR_MASS.get(str(species)) is None
+                            and _vapor_species_molar_mass_g_mol(
+                                str(species), row
+                            ) is None
                         ):
                             # Evaporation's accounting path owns this missing-
                             # mass error; preserve its specific AccountingError.

@@ -364,6 +364,18 @@ def refuse_viscous_p_bulk_out_of_domain(
 # (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
 # duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
 _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
+
+
+def _vapor_species_molar_mass_g_mol(
+    species: str, species_data: Mapping[str, Any],
+) -> Any:
+    """Return catalogue molar mass with the legacy table fallback."""
+    molar_mass_g_mol = species_data.get('molar_mass_g_mol')
+    if molar_mass_g_mol is None:
+        molar_mass_g_mol = MOLAR_MASS.get(species)
+    return molar_mass_g_mol
+
+
 def _diagnostic_names_composition_projected(
     diagnostic: Mapping[str, Any] | None,
 ) -> bool:
@@ -3232,9 +3244,7 @@ class EvaporationMixin:
             if not sp_data:
                 sp_data = oxide_vapors_data.get(species, {})
 
-            M_g_mol = sp_data.get('molar_mass_g_mol')
-            if M_g_mol is None:
-                M_g_mol = MOLAR_MASS.get(species)
+            M_g_mol = _vapor_species_molar_mass_g_mol(species, sp_data)
             if M_g_mol is None:
                 raise AccountingError(
                     f"vapor species {species!r} requires "
