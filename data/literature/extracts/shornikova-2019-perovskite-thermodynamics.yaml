@@ -1473,6 +1473,19 @@ species:
         verbatim: 2241 ± 10
         basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
           is the printed ± on T_melt.
+      derived_from:
+        - shornikova_2019_perovskite_thermodynamics_p004_t02_r13_c03
+        - shornikova_2019_perovskite_thermodynamics_p004_t02_r13_c04
+      derivation:
+        relation: >-
+          Equation (15), published page 1432: T_melt = ΔH_melt / ΔS_melt.
+          The parents are the Table 2 this-work melting enthalpy and
+          melting entropy. Formation entropies are not stored, so the
+          form (ΔH_liq − ΔH_sol) / (ΔS_liq − ΔS_sol) is not the lineage.
+        output_unit: K
+        inputs:
+          - shornikova_2019_perovskite_thermodynamics_p004_t02_r13_c03
+          - shornikova_2019_perovskite_thermodynamics_p004_t02_r13_c04
       phase: cr
       point_conditions:
         total_pressure_Pa:
@@ -1735,6 +1748,20 @@ species:
         verbatim: 47.61 ± 1.84
         basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
           is the printed ± on this cell.
+      derived_from:
+        - shornikova_2019_perovskite_thermodynamics_p002_t01_r26_c03
+        - shornikova_2019_perovskite_thermodynamics_p002_t01_r25_c03
+      derivation:
+        relation: >-
+          Equation (13), published page 1432: ΔH_melt = ΔH_liq − ΔH_sol.
+          The parents are the Table 1 liquid enthalpy 7.73 kJ/mol and the
+          crystalline enthalpy −39.98 kJ/mol. Those printed values subtract
+          to 47.71 kJ/mol. Table 2 prints 47.61 kJ/mol. Both printed values
+          are kept.
+        output_unit: kJ/mol
+        inputs:
+          - shornikova_2019_perovskite_thermodynamics_p002_t01_r26_c03
+          - shornikova_2019_perovskite_thermodynamics_p002_t01_r25_c03
       phase: cr
       point_conditions:
         temperature_K:
@@ -4997,15 +5024,6 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1705.36, 2667.78). Read activity = 0.2289 ± 0.001; T = 2181.7 ± 4 K. Exposed left arc. Dark pixel means channel max < 90. Leftmost dark x on each row in x=1660-1745, y=2630-2710. Radius 41.62 px, rms 0.43 px, identical at thresholds 70-130. The stored circle at (1739.00, 2663.00) is 34 px away."
       T_range_K: [2181.7, 2181.7]
       phase: cr
-      condensed_form:
-        polymorph:
-          tag: unknown
-          reason: >-
-            The activity species is TiO2 in the crystalline perovskite
-            sample. Rutile on standard_state.endmember is the pure-oxide
-            reference, inferred below the Table 2 TiO2 melting point
-            2185 ± 10 K on published page 1431. That reference is not a
-            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -5014,14 +5032,15 @@ species:
             endmember:
               formula: TiO2
               phase:
-                tag: value
-                value: cr
-              polymorph:
-                tag: value
-                value: rutile
+                tag: unknown
+                reason: >-
+                  2181.7 K, read ±4 K, lies inside the Table 2 TiO2
+                  melting band 2185 ± 10 K on published page 1431.
+                  That overlap does not establish a crystalline
+                  pure-oxide reference.
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2181.7 K is 3 K below 2185 K and inside the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. The point is 3 K from 2185 K. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 59 K below 2241 K, so the sample phase stored here is crystalline perovskite. The point is within 100 K of that melting temperature. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2181.7 K, read ±4 K, is 3 K below 2185 K and inside the stated ±10 K band. That overlap does not establish a crystalline pure-oxide reference, so the reference phase and polymorph stay unresolved. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 59 K below 2241 K, so the sample phase stored here is crystalline perovskite. The point is within 100 K of that melting temperature."
         locator:
           page: 4
           pdf_page_index: 3

@@ -297,13 +297,14 @@ species:
           raw_inputs:
             state: {tag: value, value: not_printed}
             locator:
-              page: 2
-              published_page: 288
-              pdf_page_index: 1
-              table: '1'
+              page: 6
+              published_page: 292
+              pdf_page_index: 5
               equation: '19'
               note: >-
-                Equation (19) is ΔG_T = ΔH_T − TΔS_T. The least-squares
+                Table 1 on published page 288 prints this enthalpy.
+                Equation (19), ΔG_T = ΔH_T − TΔS_T, is the reduction
+                and is printed on published page 292. The least-squares
                 inputs are this paper's ΔG_T values. They are not printed
                 as a numeric table. Figure 2 series 16 is a partial marker
                 read, not that input list.
@@ -391,13 +392,14 @@ species:
           raw_inputs:
             state: {tag: value, value: not_printed}
             locator:
-              page: 2
-              published_page: 288
-              pdf_page_index: 1
-              table: '1'
+              page: 6
+              published_page: 292
+              pdf_page_index: 5
               equation: '19'
               note: >-
-                Equation (19) is ΔG_T = ΔH_T − TΔS_T. The least-squares
+                Table 1 on published page 288 prints this entropy.
+                Equation (19), ΔG_T = ΔH_T − TΔS_T, is the reduction
+                and is printed on published page 292. The least-squares
                 inputs are this paper's ΔG_T values. They are not printed
                 as a numeric table.
         values:
@@ -464,7 +466,8 @@ species:
           - shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
         derivation:
           relation: >-
-            Table 2 this-work melting enthalpy. Equations (20) and (22):
+            Table 2 on published page 290 prints this melting enthalpy.
+            Equations (20) and (22) are on published page 292:
             liquid-state formation enthalpy minus crystalline formation
             enthalpy.
           output_unit: kJ/mol
@@ -478,7 +481,8 @@ species:
           value_as_printed: '55.81 ± 4.62'
           T_K: '2420'
           attribution: >-
-            Table 2 this-work melting enthalpy. Equations (20) and (22):
+            Table 2 on published page 290 prints this melting enthalpy.
+            Equations (20) and (22) are on published page 292:
             liquid-state formation enthalpy minus crystalline formation
             enthalpy. The same row prints T_melt 2420 ± 25 K; that ± is on
             the transition_point row, not on this enthalpy.
@@ -524,7 +528,8 @@ species:
           - shornikov_2017_spinel_thermodynamics_p002_t01_r29_c04
         derivation:
           relation: >-
-            Table 2 this-work melting entropy. Equation (21): liquid-state
+            Table 2 on published page 290 prints this melting entropy.
+            Equation (21) is on published page 292: liquid-state
             formation entropy minus crystalline formation entropy.
           output_unit: J/mol K
           inputs:
@@ -538,7 +543,8 @@ species:
           units_as_printed: J/(mol K)
           T_K: '2420'
           attribution: >-
-            Table 2 this-work melting entropy. Equation (21): liquid-state
+            Table 2 on published page 290 prints this melting entropy.
+            Equation (21) is on published page 292: liquid-state
             formation entropy minus crystalline formation entropy.
         uncertainty:
           value: '1.73'
@@ -581,9 +587,10 @@ species:
           - shornikov_2017_spinel_thermodynamics_p004_t02_r14_c04
         derivation:
           relation: >-
-            Table 2 this-work melting temperature. Equation (22):
-            ΔH_melt / ΔS_melt. The paper calculates it from the liquid and
-            crystalline formation constants; it is not a separate pyrometry run.
+            Table 2 on published page 290 prints this melting temperature.
+            Equation (22) is on published page 292: ΔH_melt / ΔS_melt.
+            The paper calculates it from the liquid and crystalline
+            formation constants; it is not a separate pyrometry run.
           output_unit: K
           inputs:
             - shornikov_2017_spinel_thermodynamics_p004_t02_r14_c03
@@ -596,9 +603,10 @@ species:
           T_m_K: '2420'
           value_as_printed: '2420 ± 25'
           attribution: >-
-            Table 2 this-work melting temperature. Equation (22):
-            ΔH_melt / ΔS_melt. The paper calculates it from the liquid and
-            crystalline formation constants; it is not a separate pyrometry run.
+            Table 2 on published page 290 prints this melting temperature.
+            Equation (22) is on published page 292: ΔH_melt / ΔS_melt.
+            The paper calculates it from the liquid and crystalline
+            formation constants; it is not a separate pyrometry run.
         uncertainty:
           value: '25'
           unit: K
