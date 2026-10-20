@@ -1,0 +1,288 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2023-mgo-phosphate-melts
+source:
+  citation: >-
+    Shornikov, S. I., and Golyapa, E. S. (2023). Thermodynamic properties of the
+    MgO–P4O10 melts. Experiment in Geosciences, 29(1), 60–62.
+  year: 2023
+  corpus_asset: raw/shornikov-2023-mgo-phosphate-melts/shornikov-2023-mgo-phosphate-melts.pdf
+  corpus_sha256: 30f8d7addc009d6e290c92b4a761ea9d58d18532e22f04dea51d215be780d431
+extraction:
+  method: >-
+    The PDF is a journal excerpt. This extract is only the MgO–P4O10 article on
+    published pages 60–62 (PDF pages 3–5). The SiO2–P4O10 ending on published page 60
+    and the Slobodov article starting on published page 63 are excluded. No numeric
+    table is printed. Figures were inspected at 120 dpi. Calculated curves have no
+    discrete markers of this study, so no coordinates were read. Cited experimental
+    symbols were not read.
+  date: '2026-10-20'
+  worker: t1372-w2-w6-t1
+review_status: draft
+fidelity_samples:
+  - species: MgO
+    observable: activity_coefficient
+    observation_id: shornikov_2023_mgo_fig2_curve_1
+    field: method_class
+    value: figure_only
+    locator:
+      page: 5
+      published_page: 62
+      pdf_page_index: 4
+      figure: '2'
+      note: Curve 1 is the calculated MgO activity. No point was digitized.
+  - species: MgO
+    observable: thermodynamic_example
+    observation_id: shornikov_2023_mgo_mixing_energy_minimum
+    field: mixing_energy_kJ_mol
+    value: '-175'
+    locator:
+      page: 4
+      published_page: 61
+      pdf_page_index: 3
+      note: Prose minimum at 1673 K near MgP2O6.
+experiments:
+  - experiment_id: shornikov-2023-mgo-model
+    kind: thermodynamic_model
+    locator: {page: 3, pdf_page_index: 2, published_page: 60, section: Abstract}
+    method: >-
+      Semi-empirical model, 600–1800 K, described in Shornikov (2019). Oxide
+      activities, mixing energies and partial pressures are calculated. Parents
+      are the cited ΔG° compilations, not printed per point.
+  - experiment_id: shornikov-2023-mgo-cited-points
+    kind: literature
+    locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '2'}
+    method: >-
+      Symbols on Figs. 2 and 3 are Ding et al. (2015), Oetting and McDonald (1963),
+      Lopatin et al. (1986) and Lopatin and Semenov (1989). They are not measurements
+      of this article.
+species:
+  MgO:
+    observations:
+    - observation_id: shornikov_2023_mgo_fig2_curve_1
+      type: activity_coefficient
+      experiment: shornikov-2023-mgo-model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 62
+        figure: '2'
+        panel: A
+        note: Curve 1. Calculated lg a(MgO) at 1673 K.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Published page 61: the initial data are the Gibbs energies of formation of
+        the simple oxides MgO and P4O10 in the crystalline and liquid phases.
+        The activity reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '2'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no single mole percent is printed for this line.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '2'}
+      values:
+        quantity: activity
+        T_K: '1673'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+        component: MgO
+        curve_number: '1'
+        attribution: the present study
+    - observation_id: shornikov_2023_mgo_fig2_symbol_2
+      type: activity_coefficient
+      experiment: shornikov-2023-mgo-cited-points
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 62
+        figure: '2'
+        panel: A
+        note: Symbol 2 on the MgO activity panel.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Figure caption, published page 62: symbol 2 is the MgO activity from Ding et al. (2015).
+        The activity reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '2'}
+        composition:
+          state: {tag: unknown, reason: 'Cited comparison spans composition.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '2'}
+      values:
+        quantity: activity
+        T_K: '1673'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Caption assigns symbol 2 to Ding et al. (2015), not a measurement of this article.
+          Coordinates were not read.
+        component: MgO
+        curve_number: '2'
+        attribution: Ding et al. (2015)
+    context:
+    - observation_id: shornikov_2023_mgo_mixing_energy_minimum
+      type: thermodynamic_example
+      units: kJ/mol
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 61
+        section: Results
+        figure: '2'
+      values:
+        quantity: minimum mixing energy
+        method_class: quoted_attributed
+        temperature_K: 1673
+        composition: MgP2O6
+        mixing_energy_kJ_mol: '-175'
+        sentence_as_published: >-
+          The minimum value of mixing energy in the MgO–P4O10 melts at 1673 K is in
+          the composition region close to MgP2O6 and is equal to –175 kJ/mol.
+        reference_phase: >-
+          Mixing energy in the melt. The article gives ΔG° of MgO and P4O10 in both
+          the crystalline and liquid phases as model inputs. The reference phase is not stated.
+    - observation_id: shornikov_2023_mgo_fig2_mixing_curves
+      type: thermodynamic_example
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 62
+        figure: '2'
+        panel: B
+      values:
+        admission_status: refused
+        reason: >-
+          Panel B curves 9–11 are mixing energies. Curve 9 is calculated in this study
+          and has no discrete markers. Curves 10 and 11 are Ding et al. (2015) and
+          Lopatin and Semenov (1989). The prose minimum is the stored number. Coordinates
+          were not read.
+    - observation_id: shornikov_2023_mgo_fig1_phase_diagram
+      type: thermodynamic_example
+      units: not an activity
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 61
+        figure: '1'
+      values:
+        admission_status: refused
+        reason: >-
+          Fig. 1 is the phase diagram according to Ding et al. (2015). Congruent melting
+          temperatures 1630, 1658, 1438 and 1183 K and the 1328 K Mg3P2O8 transition are
+          cited from Berak (1958), not measured here.
+    - observation_id: shornikov_2023_mgo_vapor_species
+      type: thermodynamic_example
+      units: not printed as a pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 61
+        section: Results
+      values:
+        species_as_printed: >-
+          Mg, Mg2, MgO, P, P2, P3, P4, PO, PO2, P2O3, P2O4, P2O5, P3O6, P4O6, P4O7,
+          P4O8, P4O9, P4O10, MgPO2, MgPO3, O, O2, O3, O4
+        reason: >-
+          The list is the vapor set used in the equilibrium calculation. No numerical
+          partial pressure is printed in the text.
+  P4O10:
+    observations:
+    - observation_id: shornikov_2023_mgo_fig2_p4o10_curve_3
+      type: activity_coefficient
+      experiment: shornikov-2023-mgo-model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 62
+        figure: '2'
+        panel: A
+        note: Curve 3. Calculated lg a(P4O10) at 1673 K.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Published page 61: the initial data are the Gibbs energies of formation of
+        the simple oxides MgO and P4O10 in the crystalline and liquid phases.
+        The activity reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '2'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no single mole percent is printed for this line.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '2'}
+      values:
+        quantity: activity
+        T_K: '1673'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+        component: P4O10
+        curve_number: '3'
+        attribution: the present study
+    - observation_id: shornikov_2023_mgo_fig2_p4o10_symbols_4_to_8
+      type: activity_coefficient
+      experiment: shornikov-2023-mgo-cited-points
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 62
+        figure: '2'
+        panel: A
+        note: Symbols 4–8 on the P4O10 activity panel.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Figure caption, published page 62: symbols 4 and 10 are Ding et al. (2015);
+        symbol 5 is Oetting and McDonald (1963); symbols 6 and 7 are Lopatin et al. (1986);
+        symbols 8 and 11 are Lopatin and Semenov (1989). The activity reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: 'The caption assigns these symbols to 1400, 1600, 1673 and 1800 K.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '2'}
+        composition:
+          state: {tag: unknown, reason: 'Cited comparison spans composition.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '2'}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Caption assigns symbols 4–8 to other papers. Coordinates were not read.
+          Iwase et al. (1987) is cited in the text for EMF activities at 1673 K over
+          8–14 mol% P4O10 and is not a symbol of this figure.
+        component: P4O10
+        attribution: Ding et al. (2015); Oetting and McDonald (1963); Lopatin et al. (1986); Lopatin and Semenov (1989)
+    - observation_id: shornikov_2023_mgo_fig3_partial_pressures
+      type: partial_pressure
+      experiment: shornikov-2023-mgo-model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 62
+        figure: '3'
+        note: >-
+          Lines 1–4 are calculated partial pressures of O2, Mg, PO and PO2 over
+          Mg3P2O8 and Mg2P2O7. Symbols 5–7 are Knudsen measurements from Lopatin.
+      phase: g
+      units: atm, as printed on the figure
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: 'Fig. 3A spans about 1700–1900 K and Fig. 3B about 1400–1600 K.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '3'}
+        composition:
+          state: {tag: unknown, reason: 'The panels are the compounds Mg3P2O8 and Mg2P2O7, not a composition series.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 62, figure: '3'}
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Lines 1–4 are continuous calculated curves with no discrete markers.
+          Symbols 5–7 are Lopatin and Semenov (1989) and Lopatin et al. (1986),
+          not measurements of this article. No pressure was read.
+        attribution: the present study for lines 1–4; Lopatin for symbols 5–7
