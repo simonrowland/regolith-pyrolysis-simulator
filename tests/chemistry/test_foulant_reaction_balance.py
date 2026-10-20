@@ -10,9 +10,9 @@ from typing import Mapping
 import pytest
 import yaml
 
+import simulator.core as core
 from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
 from simulator.core import (
-    STAGE0_CARBONATE_METAL_OXIDE_STOICH,
     STAGE0_CATION_SULFATE_OXIDE_PRODUCTS,
     STAGE0_CATION_SULFATE_OXIDE_STOICH,
     STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS,
@@ -139,9 +139,13 @@ def test_stage0_cation_sulfate_code_tables_are_atom_balanced() -> None:
 
 
 def test_stage0_carbonate_code_table_is_atom_balanced() -> None:
+    _assert_stage0_carbonate_code_table_is_atom_balanced()
+
+
+def _assert_stage0_carbonate_code_table_is_atom_balanced() -> None:
     registry = _species_registry()
 
-    for metal, oxide, atoms_per_oxide in STAGE0_CARBONATE_METAL_OXIDE_STOICH:
+    for metal, oxide, atoms_per_oxide in core.STAGE0_CARBONATE_METAL_OXIDE_STOICH:
         carbonate = f"{metal}CO3" if atoms_per_oxide == 1.0 else f"{metal}2CO3"
         reaction = _format_reaction(
             ((1.0, carbonate),),
@@ -152,6 +156,17 @@ def test_stage0_carbonate_code_table_is_atom_balanced() -> None:
             reaction,
             registry,
         )
+
+
+def test_stage0_carbonate_guard_rejects_runtime_divisor_mutation(monkeypatch) -> None:
+    mutated_stoich = tuple(
+        (metal, oxide, 3.0 if metal == "Na" else atoms_per_oxide)
+        for metal, oxide, atoms_per_oxide in core.STAGE0_CARBONATE_METAL_OXIDE_STOICH
+    )
+    monkeypatch.setattr(core, "STAGE0_CARBONATE_METAL_OXIDE_STOICH", mutated_stoich)
+
+    with pytest.raises(AssertionError, match="Na"):
+        _assert_stage0_carbonate_code_table_is_atom_balanced()
 
 
 def test_foulant_reaction_balance_guard_rejects_unbalanced_oxygen_row() -> None:
