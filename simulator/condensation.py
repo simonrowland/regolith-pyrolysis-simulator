@@ -115,6 +115,7 @@ from simulator.physical_constants import (
     BOLTZMANN,
     CELSIUS_TO_KELVIN_OFFSET,
 )
+from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
@@ -6198,9 +6199,16 @@ def _flowing_species_partial_pressures_pa(
             # An unresolved positive carrier must refuse instead of silently
             # dropping out of the mole-flow denominator and renormalizing the
             # remaining species as if that carrier were absent.
-            molar_mass_kg_mol = resolve_species_formula(
-                str(species), species_formula_registry
-            ).molar_mass_kg_per_mol()
+            try:
+                molar_mass_kg_mol = resolve_species_formula(
+                    str(species), species_formula_registry
+                ).molar_mass_kg_per_mol()
+            except UnknownSpeciesError as exc:
+                raise DepositionInputRefusal(
+                    "species_molar_mass",
+                    species,
+                    f"formula could not be resolved: {exc}",
+                ) from exc
             molar_flow_by_species[str(species)] = (
                 rate_kg_hr / molar_mass_kg_mol
             )
