@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import ValueKind
@@ -18,18 +20,20 @@ RENDER_PINS = {
     "sineva23_tii_exp1_metal_cu2o": ("Cu2O", Decimal("96.0"), 7, Decimal("-7.1")),
     "sineva23_tii_exp1_slag_feo": ("FeO", Decimal("61.9"), 7, Decimal("-7.1")),
     "sineva23_tiii_exp56_slag_cao": ("CaO", Decimal("14.4"), 10, Decimal("-8.34")),
+    "sineva23_tii_exp5_wüstite_feo": ("FeO", Decimal("97.0"), 7, Decimal("-9.0")),
 }
 
 
-def test_sineva_tables_match_render_and_all_rows_migrate_with_conditions() -> None:
-    document = yaml.safe_load(EXTRACT.read_text())
-    observations = {
+def _observations(document: dict) -> dict[str, dict]:
+    return {
         observation["observation_id"]: observation
         for species in document["species"].values()
         for observation in species["observations"]
     }
-    assert len(observations) == 648
 
+
+def _assert_render_pins(document: dict) -> None:
+    observations = _observations(document)
     for observation_id, (formula, number, page, oxygen) in RENDER_PINS.items():
         row = observations[observation_id]
         assert row["values"]["component_as_published"] == formula
@@ -39,11 +43,37 @@ def test_sineva_tables_match_render_and_all_rows_migrate_with_conditions() -> No
         assert row["locator"]["pdf_page_index"] == page - 1
         assert row["values"]["log_fO2"]["units"] == "log10(atm)"
 
+
+def test_sineva_tables_match_render_and_all_rows_migrate_with_conditions() -> None:
+    document = yaml.safe_load(EXTRACT.read_text())
+    observations = _observations(document)
+    assert len(observations) == 696
+    _assert_render_pins(document)
+    wustite_rows = [row for row in observations.values() if row["phase_as_published"] == "Wüstite"]
+    assert len(wustite_rows) == 48
+    assert {row["point_conditions"]["sample_id"]["state"]["value"] for row in wustite_rows} == {
+        "5", "6", "11", "12", "24", "25", "26", "31", "48", "49", "50", "62"
+    }
+
+    figures = [row for row in document["species"]["SiO2"]["context"] if row["type"] == "figure_record"]
+    assert len(figures) == 7
+    assert {row["locator"]["figure"] for row in figures} == {str(i) for i in range(1, 8)}
+    assert all(row["values"]["caption"] and row["values"]["digitisation"] for row in figures)
+    assert all("marker_count" in series for row in figures for series in row["values"]["series"])
+    figure5 = next(row for row in figures if row["locator"]["figure"] == "5")
+    assert figure5["values"]["printed_bound_as_published"] == "The difference is < 0.3 in log10L values."
+
+    changed = deepcopy(document)
+    changed_row = _observations(changed)["sineva23_tii_exp5_wüstite_feo"]
+    changed_row["values"]["value"] = 97.1
+    with pytest.raises(AssertionError):
+        _assert_render_pins(changed)
+
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     migrated = list(migrator.result.observations.values())
-    assert len(migrated) == 648
+    assert len(migrated) == 696
     assert not migrator.result.validation.hard_issues
     assert all(row.value.kind is ValueKind.POINT for row in migrated)
 
@@ -66,3 +96,9 @@ def test_sineva_tables_match_render_and_all_rows_migrate_with_conditions() -> No
         assert row.point_conditions["temperature_K"].locator is not None
         assert row.point_conditions["fO2_log"].locator is not None
         assert not any("source_value_outside_physical_range" in notice for notice in row.notices)
+
+    wustite = by_id["sineva23_tii_exp5_wüstite_feo"]
+    assert wustite.value.point == Decimal("97.0")
+    assert wustite.identity.species.formula == "FeO"
+    assert wustite.identity.species.phase.value.value == "cr"
+    assert wustite.point_conditions["fO2_log"].state.value == Decimal("-9.0")
