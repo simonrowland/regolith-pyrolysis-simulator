@@ -106,6 +106,10 @@ def numeric_cells(value, path="record"):
             yield from numeric_cells(child, f"{path}[{index}]")
 
 
+@pytest.mark.skipif(
+    not PDF.is_file(),
+    reason="regolith-corpus checkout with the B1544 source PDF is absent",
+)
 def test_parser_parity_is_secondary_to_image_fixtures(corpus):
     _, records = corpus
     parsed = parse_source(PDF, verbose=False, include_ocr_suspect=True)
@@ -179,6 +183,10 @@ def test_image_verified_printed_phase_reversal_allowlist(corpus):
     assert set(_nonsuspect_cp_reversals(mutated)) != set(PRINTED_CP_REVERSALS)
 
 
+@pytest.mark.skipif(
+    not PDF.is_file(),
+    reason="regolith-corpus checkout with the B1544 source PDF is absent",
+)
 @pytest.mark.parametrize(
     ("record_id", "row_index", "field"),
     [
@@ -335,6 +343,10 @@ def test_ocr_suspect_keeps_raw_token():
     assert hht["value"] == "0.000"
 
 
+@pytest.mark.skipif(
+    not PDF.is_file(),
+    reason="regolith-corpus checkout with the B1544 source PDF is absent",
+)
 def test_public_row_loaders_require_explicit_suspect_opt_in():
     with pytest.raises(OcrSuspectTableValueError):
         load_records()
