@@ -6724,14 +6724,20 @@ def test_named_mass_loss_bounds_migrate_as_typed_values(
     extract["species"]["Na"]["observations"][0]["observation_id"] = (
         "na_mass_loss_bound"
     )
-    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    source_root = _write_min_tree(tmp_path, extract)
+    result = migrate(source_root, write=False)
     observation = next(iter(result.observations.values()))
 
     assert observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
     assert observation.value.kind is ValueKind.BOUND
     assert observation.value.bound_operator == operator
     assert observation.value.bound_value == expected
-    assert extract["species"]["Na"]["observations"][0]["values"][
+    source_extract = yaml.safe_load(
+        (source_root / "data/literature/extracts/fixture-source.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert source_extract["species"]["Na"]["observations"][0]["values"][
         "mass_loss_pct"
     ] == printed
 
@@ -6775,6 +6781,67 @@ def test_named_mass_loss_two_sided_range_keeps_interval_handling(
     assert observation.value.kind is ValueKind.INTERVAL
     assert observation.value.interval_low == Decimal("5")
     assert observation.value.interval_high == Decimal("10")
+
+
+def test_named_mass_loss_bound_in_row_migrates_as_typed_value(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="wt_pct",
+        obs_type="mass_loss_series",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [{"T_C": 1300, "mass_loss_pct": ">77"}],
+        },
+    )
+    source_root = _write_min_tree(tmp_path, extract)
+    result = migrate(source_root, write=False)
+    bounded = [
+        obs for obs in result.observations.values() if obs.value.kind is ValueKind.BOUND
+    ]
+    assert len(bounded) == 1, [
+        (observation_id, observation.value.kind.value)
+        for observation_id, observation in result.observations.items()
+    ]
+    observation = bounded[0]
+
+    assert observation.value.kind is ValueKind.BOUND
+    assert observation.value.bound_operator == ">"
+    assert observation.value.bound_value == Decimal("0.77")
+    source_extract = yaml.safe_load(
+        (source_root / "data/literature/extracts/fixture-source.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert source_extract["species"]["Na"]["observations"][0]["values"]["points"][
+        0
+    ]["mass_loss_pct"] == ">77"
+
+
+def test_malformed_named_mass_loss_bound_has_typed_unavailable_reason(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="%",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "mass_loss_pct": ">77 +/- 5",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.UNAVAILABLE
+    assert "mass_loss_pct is not a clean one-sided bound" in (
+        observation.value.unavailable_reason or ""
+    )
 
 
 def test_located_printed_and_initial_pins_numeric_composition() -> None:

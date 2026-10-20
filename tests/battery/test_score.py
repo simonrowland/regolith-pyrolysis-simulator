@@ -2011,6 +2011,38 @@ def test_zero_never_priced_as_value() -> None:
     }
 
 
+def test_one_sided_bound_is_not_scored_as_point() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "o2-bounded-value",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    ref = replace(
+        ref,
+        value=Value(
+            kind=ValueKind.BOUND,
+            bound_operator=">",
+            bound_value=Decimal("0.77"),
+        ),
+    )
+
+    residual, _ = _compile(ref, exp, _predict(Decimal("0.8"), ident))
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert residual.refusal.detail == {
+        "reason": "value_unknown",
+        "value_kind": "bound",
+    }
+
+
 def test_species_formula_unparsed_never_string_matched() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()

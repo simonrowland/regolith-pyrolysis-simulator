@@ -5322,9 +5322,98 @@ def _percent_named_fraction_field(key: str, units: str | None) -> bool:
     return unit in _PERCENT_FRACTION_UNITS
 
 
+_NAMED_FRACTION_BOUND_PREFIX_RE = re.compile(
+    r"^\s*(?:>=|<=|>|<|≥|≤|greater\s+than\b|less\s+than\b|"
+    r"at\s+least\b|at\s+most\b|upper\s+bound\b|lower\s+bound\b)",
+    re.IGNORECASE,
+)
+_NAMED_FRACTION_BOUND_RE = re.compile(
+    rf"^\s*(?P<operator>>=|<=|>|<|≥|≤|greater\s+than|less\s+than|"
+    r"at\s+least|at\s+most|upper\s+bound(?:\s+of)?|lower\s+bound(?:\s+of)?)"
+    rf"\s*(?P<number>[+-]?{_PRINTED_NUM})"
+    r"\s*(?P<percent>%|percent|pct)?\s*$",
+    re.IGNORECASE,
+)
+
+
+def _named_fraction_bound_selection(
+    payload: Mapping[str, Any],
+    key: str,
+    units: str | None,
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection | None:
+    """Read one clean printed bound from a declared fraction field."""
+
+    raw = payload.get(key)
+    field_units = _printed_unit_for_field(payload, key) or units
+    if isinstance(raw, Mapping):
+        raw = raw.get("value")
+    if not isinstance(raw, str) or not _NAMED_FRACTION_BOUND_PREFIX_RE.match(raw):
+        return None
+
+    match = _NAMED_FRACTION_BOUND_RE.fullmatch(raw)
+    if match is None:
+        return _unavailable_selection(
+            f"{key} is not a clean one-sided bound: {raw!r}",
+            condition_ranges=condition_ranges,
+            unused_ancillary=_unused_ancillary(payload, key),
+            field_name=key,
+        )
+
+    operator_text = " ".join(match.group("operator").lower().split())
+    operator_text = operator_text.removesuffix(" of")
+    operator = {
+        ">": ">",
+        "<": "<",
+        ">=": ">=",
+        "<=": "<=",
+        "≥": ">=",
+        "≤": "<=",
+        "greater than": ">",
+        "less than": "<",
+        "at least": ">=",
+        "lower bound": ">=",
+        "at most": "<=",
+        "upper bound": "<=",
+    }[operator_text]
+    number_text = match.group("number").strip()
+    unsigned_number = number_text.lstrip("+-").strip()
+    if unsigned_number.startswith("~"):
+        return _unavailable_selection(
+            f"{key} has an approximate one-sided bound, not a clean bound: {raw!r}",
+            condition_ranges=condition_ranges,
+            unused_ancillary=_unused_ancillary(payload, key),
+            field_name=key,
+        )
+    sign = Decimal("-1") if number_text.startswith("-") else Decimal("1")
+    bound = sign * _sci_to_decimal(unsigned_number)
+    percent = match.group("percent") is not None or _percent_named_fraction_field(
+        key, field_units
+    )
+    trail = "identity"
+    if percent:
+        bound /= Decimal("100")
+        trail = "percent_to_fraction"
+    return SourceSelection(
+        value=Value(
+            ValueKind.BOUND,
+            bound_operator=operator,
+            bound_value=bound,
+        ),
+        field_name=key,
+        unit_trail=trail,
+        unused_ancillary=_unused_ancillary(payload, key),
+        condition_ranges=condition_ranges,
+    )
+
+
 def _item_mass_loss_field(item: Mapping[str, Any]) -> str | None:
     for key in _MASS_LOSS_YIELD_FIELDS:
-        if key in item and _numeric_field(item, key) is not None:
+        if key not in item:
+            continue
+        if _named_fraction_bound_selection(item, key, None, ()) is not None:
+            return key
+        if _numeric_field(item, key) is not None:
             return key
     return None
 
@@ -8919,6 +9008,17 @@ def _selection_from_named_field(
                     amount, key, trail or "identity:K", payload, condition_ranges
                 )
             continue
+        if q_token in {
+            Quantity.MASS_LOSS_FRACTION,
+            Quantity.MASS_LOSS_FRACTION_VS_T,
+            Quantity.YIELD_FRACTION,
+            Quantity.O2_YIELD,
+        }:
+            bound = _named_fraction_bound_selection(
+                payload, key, units, condition_ranges
+            )
+            if bound is not None:
+                return bound
         amount = _numeric_field(payload, key)
         if amount is None:
             continue
