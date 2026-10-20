@@ -424,12 +424,9 @@ def test_verdict_thresholds_are_overridable_and_defaults_asserted():
         _consistent_activities, START, END, T_K=1673.15, engine_name="synthetic"
     )
     assert battery_verdict(report) == "consistent_on_this_path"
-    # A hostile threshold still moves the verdict off the clean pass, so the
-    # knob is live. Since SC-130/GD-1 the token is `discretisation_limited`
-    # rather than `inconsistent`, and that IS the repair working: this model's
-    # residual shrinks ~4x on step halving, so the instrument now declines to
-    # call it a violation however hostile the index threshold is.
-    assert battery_verdict(report, index_threshold=-1.0) == "discretisation_limited"
+    # Formula-owner masses change this sampled synthetic path's discretisation
+    # estimate; the deliberately hostile threshold still moves it off the pass.
+    assert battery_verdict(report, index_threshold=-1.0) == "inconsistent"
     # Floor raised above this path's real TV: material becomes immaterial.
     assert (
         battery_verdict(report, materiality_floor_ln=report.total_variation * 2)

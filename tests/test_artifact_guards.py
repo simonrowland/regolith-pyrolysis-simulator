@@ -21,6 +21,18 @@ FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS = [
     r"terminal\.oxygen_vented_to_vacuum",
 ]
 
+OXIDE_MASS_TABLE_ALLOWLIST = {
+    # Keep the independent REF-001 Kress91 input-conversion reference separate
+    # from the runtime formula owner so the anchor can catch mass drift.
+    ("tests/test_sulfsat_gate.py", frozenset(
+        {"SiO2", "TiO2", "Al2O3", "MnO", "MgO", "CaO", "Na2O", "K2O", "P2O5"}
+    )): "published Kress91 input-conversion reference",
+    # These precise values construct a package-envelope boundary fixture.
+    ("tests/test_openimcc_battery_engine.py", frozenset({"K2O", "Na2O", "SiO2"})): (
+        "OpenIMCC packaged-envelope boundary input"
+    ),
+}
+
 
 def test_internal_analytical_implementation_has_no_legacy_stub_symbols():
     repo = Path(__file__).parent.parent
@@ -97,14 +109,21 @@ def test_composition_projection_has_no_literal_oxide_molar_mass_tables():
                     continue
                 if relative == "simulator/accounting/formulas.py":
                     continue
+                table_keys = frozenset(
+                    key.value for key in node.keys if isinstance(key, ast.Constant)
+                )
+                if (relative, table_keys) in OXIDE_MASS_TABLE_ALLOWLIST:
+                    continue
                 violations.append(f"{relative}:{node.lineno}")
 
     assert not violations, "literal oxide molar-mass tables: " + ", ".join(violations)
 
 
 def _is_oxide_molar_mass_table(node: ast.Dict) -> bool:
-    if not node.keys or any(not isinstance(key, ast.Constant) or not isinstance(key.value, str)
-                            for key in node.keys):
+    if not node.keys or any(
+        not isinstance(key, ast.Constant) or not isinstance(key.value, str)
+        for key in node.keys
+    ):
         return False
     entries = list(zip(node.keys, node.values, strict=True))
     for key_node, value_node in entries:
@@ -116,7 +135,9 @@ def _is_oxide_molar_mass_table(node: ast.Dict) -> bool:
             return False
         if "O" not in formula.elements or len(formula.elements) < 2:
             return False
-        if not isinstance(value_node, ast.Constant) or not isinstance(value_node.value, (int, float)):
+        if not isinstance(value_node, ast.Constant) or not isinstance(
+            value_node.value, (int, float)
+        ):
             return False
         value = float(value_node.value)
         if abs(value - expected_mass) > max(0.01, expected_mass * 0.001):
