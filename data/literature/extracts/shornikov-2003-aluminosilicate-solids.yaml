@@ -9,7 +9,7 @@ source:
 extraction:
   method: Prose values checked against pdftotext-layout and the 600 dpi renders. No content_list table
     exists. Figure 3 partial pressures that sit on a distinct x, off the piles and off the legend, were
-    read on the 600 dpi page and recalibrated from the labelled tick marks (9.0 stub centre y=1369, 9.5 baseline centre y=1613.5, 489 px per log unit). The isolated Al triangle at (3193.8, 1448.1) was added. Figure 2 panel (b) open squares of caption symbol 1 were scored at six measured hole centres. Filled triangles on the same panel were scored as caption symbol 2 (one upright triangle) and caption symbol 4 (two inverted triangles). The second symbol-4 centre, (5890.2, 2687.5), is the centroid after a radius-3 opening, because the raw component includes the fit line. Every other filled component on Figure 2, including markers the 90 px census missed because they join the fit line, is one audit row and was not given a pressure. This article does not print the 12.9 ± 0.8 kJ/mol or 11.6 ± 0.4 J/(mol K) mullite values;
+    read on the 600 dpi page and recalibrated from the labelled tick marks (9.0 stub centre y=1369, 9.5 baseline centre y=1613.5, 489 px per log unit). The isolated Al triangle at (3193.8, 1448.1) was added. Figure 2 panel (b) open squares of caption symbol 1 were scored at six measured hole centres. Filled triangles on the same panel were scored as caption symbol 2 (one upright triangle) and caption symbol 4 (three inverted triangles). The second symbol-4 centre, (5890.2, 2687.5), is the centroid after a radius-3 opening, because the raw component includes the fit line. The third symbol-4 centre, (7829.7, 1390.2), is the same opening centroid, between the labelled 7 and 8 stubs and between the labelled 2000 and 2200 stubs. Panel (h) adds one filled square, caption symbol 10, at (6234.0, 9858.7). The other Sol centres named in the t1380 audit are refused there. Every other filled component on Figure 2, including markers the 90 px census missed because they join the fit line, is one audit row and was not given a pressure. This article does not print the 12.9 ± 0.8 kJ/mol or 11.6 ± 0.4 J/(mol K) mullite values;
     those are in the 2002 Doklady paper.
   date: '2026-10-20'
   worker: grok-resume-11242-1792500084
@@ -130,9 +130,10 @@ species:
           The contact sheet mixes open squares, open diamonds, triangles, and pairs of different
           symbols inside one marker width, most of them crossed by the fit line. Six open squares whose closed holes match caption symbol 1 are stored on
           shornikov_2003_fig2b_al_symbol1. The filled upright triangle at (6618.8, 2259.4) is
-          caption symbol 2 and the filled inverted triangles at (6746.1, 2302.4) and
-          (5890.2, 2687.5) are caption symbol 4; all three are stored. The second symbol-4
-          centre is a radius-3 opening centroid, because that marker joins the fit line.
+          caption symbol 2 and the filled inverted triangles at (6746.1, 2302.4),
+          (5890.2, 2687.5), and (7829.7, 1390.2) are caption symbol 4; all four are stored.
+          The second and third symbol-4 centres are radius-3 opening centroids. Panel (h)
+          stores one filled square, caption symbol 10, at (6234.0, 9858.7).
           A gray<90 census of the eight panels (bbox 14-90 px, area 350-2800, enclosed hole
           at most 60 px) found 105 filled components. Markers joined to a line were outside
           that bbox cut. A radius-3 opening separated those bodies, and each new body has an
@@ -777,10 +778,10 @@ species:
         published_page: 1040
         pdf_page_index: 3
         figure: '2'
-        note: "Figure 2 panel (b), 1200 dpi, PDF page 4, published page 1040. Quantity as printed is -log p*(Al) with p in atm. Two points are filled inverted triangles, caption symbol 4, 12.84 mol% Al2O3. The panel-(b) legend shows that glyph next to numeral 4. The composition is the printed caption assignment, not an axis read. Log ticks 8 at y=1844.5 and 10 at y=2852.0 give 503.75 px per log unit, -log = 8 + (y-1844.5)/503.75. Example: centroid y=2302.4 reads 8 + (2302.4-1844.5)/503.75 = 8.909. T ticks 1800 at x=5543.5 and 2000 at x=7133.5, so T = 1800 + (x-5543.5)/7.950. Centroid x=6746.1 reads 1951.3 K. That centre is the dark centroid, threshold 90. The dark bbox is 61x52 px. Half the height is 26 px, which is 0.052 dex. Half the width is 30.5 px, which is 3.8 K. The controller crop at (6746.2, 2302.4) is this marker. The second centroid y=2687.5 reads 8 + (2687.5-1844.5)/503.75 = 9.673. Centroid x=5890.2 reads 1843.6 K. The raw component of that marker includes the fit line, so the centre is the centroid after a radius-3 opening, which removes the thin stroke. The opened bbox is 56x52 px. Half the height is 26 px, which is 0.052 dex. Half the width is 28 px, which is 3.5 K. The controller crop at (5890, 2686) is this marker, 1.5 px from the centre. Partial pressure is not an activity, so the pure-oxide rule is not applied."
+        note: "Figure 2 panel (b), 1200 dpi, PDF page 4, published page 1040. Quantity as printed is -log p*(Al) with p in atm. Three points are filled inverted triangles, caption symbol 4, 12.84 mol% Al2O3. The panel-(b) legend shows that glyph next to numeral 4. The composition is the printed caption assignment, not an axis read. Log ticks 8 at y=1844.5 and 10 at y=2852.0 give 503.75 px per log unit, -log = 8 + (y-1844.5)/503.75. Example: centroid y=2302.4 reads 8 + (2302.4-1844.5)/503.75 = 8.909. T ticks 1800 at x=5543.5 and 2000 at x=7133.5, so T = 1800 + (x-5543.5)/7.950. Centroid x=6746.1 reads 1951.3 K. That centre is the dark centroid, threshold 90. The dark bbox is 61x52 px. Half the height is 26 px, which is 0.052 dex. Half the width is 30.5 px, which is 3.8 K. The controller crop at (6746.2, 2302.4) is this marker. The second centroid y=2687.5 reads 8 + (2687.5-1844.5)/503.75 = 9.673. Centroid x=5890.2 reads 1843.6 K. The raw component of that marker includes the fit line, so the centre is the centroid after a radius-3 opening, which removes the thin stroke. The opened bbox is 56x52 px. Half the height is 26 px, which is 0.052 dex. Half the width is 28 px, which is 3.5 K. The controller crop at (5890, 2686) is this marker, 1.5 px from the centre. Partial pressure is not an activity, so the pure-oxide rule is not applied. A third filled inverted triangle, centroid (7829.7, 1390.2) after a radius-3 opening at threshold 90, bbox 61x52, n=1860, lies on the data trend. The panel-(b) legend inverted triangle is at (7966.3, 2303.5), so this centre is not a legend glyph. It is between the labelled 7 stub at y=1341.0 (rows 1337-1345; the tick line, not the glyph) and the 8 stub at y=1844.5, so -log = 7 + (y-1341.0)/503.5. y=1390.2 reads 7.098. Four labelled stubs, 7, 8, 9, and 10 at y=1341.0, 1844.5, 2354.0, and 2852.0, give -log = 4.3397 + 0.00198311*y with residuals -0.0010, -0.0025, +0.0079, -0.0045 dex (rms 0.0047). That line reads 7.097 here. The 8-to-10 line used for the two earlier points reads 7.098. The difference is inside the half-marker width, and those two values were not moved. Half the height is 26 px, which is 0.052 dex on the 7-to-8 segment. T is between the labelled 2000 stub at x=7133.5 and the labelled 2200 stub at x=8401.0. The 2200 glyph sits on that stub. The unlabelled stubs at x=6358.0 and x=7801.0 were not anchors. T = 2000 + (x-7133.5)/1267.5*200. x=7829.7 reads 2109.9 K. A straight line through the labelled stubs 1800, 2000, and 2200 at x=5543.5, 7133.5, and 8401.0 has residuals -6.65, +14.98, and -8.34 K (rms 10.6 K), so the bracketing pair is the scale. Half the width is 30.5 px, which is 4.8 K on this segment (6.3375 px/K)."
       T_range_K:
       - 1843.6
-      - 1951.3
+      - 2109.9
       phase: gas
       experiment: shornikov-2003-rjpc-solid-kems
       regime: kems_effusion
@@ -850,6 +851,34 @@ species:
                 page: 4
                 figure: '2'
                 note: Mean (6746.1, 2302.4); filled inverted triangle; caption symbol 4, 12.84 mol% Al2O3, not an axis read; audit shornikov_2003_f2b_al_08.
+        - temperature_K: 2109.9
+          neg_log10_p_as_read: '7.098'
+          pressure_atm: 7.985167e-08
+          read_uncertainty_dex: '0.052'
+          read_uncertainty_K: '4.8'
+          Al2O3_mole_percent_as_read: '12.84'
+          composition_mol:
+            Al2O3: '0.1284'
+            SiO2: '0.8716'
+          audit_read_id: shornikov_2003_f2b_al_10
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.1284'
+                  - - SiO2
+                    - '0.8716'
+              locator:
+                published_page: 1040
+                pdf_page_index: 3
+                page: 4
+                figure: '2'
+                note: Mean (7829.7, 1390.2); filled inverted triangle; caption symbol 4, 12.84 mol% Al2O3, not an axis read; centre is the radius-3 opening centroid; between labelled ticks 7 and 8 and labelled ticks 2000 and 2200; audit shornikov_2003_f2b_al_10.
     - observation_id: shornikov_2003_fig3_al_1900k
       type: partial_pressure
       locator:
@@ -1380,6 +1409,58 @@ species:
                 note: Mean (4057.7, 1167.7); read 1 (4057.7, 1167.5); read 2 (4057.7, 1167.9); audit shornikov_2003_f3_alo_06.
   O:
     observations:
+    - observation_id: shornikov_2003_fig2h_o_symbol10
+      type: partial_pressure
+      locator:
+        page: 4
+        published_page: 1040
+        pdf_page_index: 3
+        figure: '2'
+        note: "Figure 2 panel (h), 1200 dpi, PDF page 4, published page 1040. Quantity as printed is -log p**(O) with p in atm. One point is a filled square, caption symbol 10, 84.14 mol% Al2O3. The panel-(h) legend shows that glyph next to numeral 10. The composition is the printed caption assignment, not an axis read. The square touches an open circle on its left and the trend line on its upper right. The centre is the centroid of the solid square, threshold 90, x=6210-6258 and y=9838-9880, n=2059, bbox 49x43. That centroid is (6234.0, 9858.7). The inscribed-circle plateau of the same body is (6233.5, 9858.5), 0.7 px away. Log stubs, the tick line not the glyph: 5 at y=8782.5, 6 at y=9161.5, 7 at y=9574.5, 8 at y=9959.5, 9 at y=10349.5. The point is between 7 and 8, so -log = 7 + (y-9574.5)/385. y=9858.7 reads 7.738. The five labelled stubs give -log = -17.3239 + 0.00254288*y with residuals +0.0089, -0.0273, +0.0229, +0.0019, -0.0064 dex (rms 0.0167). That line reads 7.745 here, 0.007 dex from the segment, inside the half-marker width. Half the height is 21.5 px, which is 0.056 dex. T stubs: labelled 1900 at x=5690.5 and labelled 2100 at x=6594.0. The stub at x=6158.5 has no glyph and was not an anchor. T = 1900 + (x-5690.5)/903.5*200. x=6234.0 reads 2020.3 K. Half the width is 24.5 px, which is 5.4 K on this segment (4.5175 px/K). Partial pressure is not an activity, so the pure-oxide rule is not applied."
+      T_range_K:
+      - 2020.3
+      - 2020.3
+      phase: gas
+      experiment: shornikov-2003-rjpc-solid-kems
+      regime: kems_effusion
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        gas_species: O(g)
+        formula: O
+        curve_as_printed: '10'
+        points:
+        - temperature_K: 2020.3
+          neg_log10_p_as_read: '7.738'
+          pressure_atm: 1.827335e-08
+          read_uncertainty_dex: '0.056'
+          read_uncertainty_K: '5.4'
+          Al2O3_mole_percent_as_read: '84.14'
+          composition_mol:
+            Al2O3: '0.8414'
+            SiO2: '0.1586'
+          audit_read_id: shornikov_2003_f2h_o_01
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.8414'
+                  - - SiO2
+                    - '0.1586'
+              locator:
+                published_page: 1040
+                pdf_page_index: 3
+                page: 4
+                figure: '2'
+                note: Mean (6234.0, 9858.7); filled square; caption symbol 10, 84.14 mol% Al2O3, not an axis read; centroid of the solid square after the adjoining open circle was left out; audit shornikov_2003_f2h_o_01.
     - observation_id: shornikov_2003_fig3_o_1900k
       type: partial_pressure
       locator:
