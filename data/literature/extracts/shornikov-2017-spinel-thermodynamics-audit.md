@@ -29,8 +29,8 @@ pdftotext `-bbox` on this file uses a top-left origin. Page renders are 600 dpi 
 | 2 | 288 | Table 1 this-work row: Knudsen mass spectrometry, 1851–2298, −12.02 ± 1.14, 5.03 ± 0.56, This work | top-origin band covering that row and its neighbours |
 | 4 | 290 | Table 2 MgAl2O4 block. The last row before Al2O3 is 2420 ± 25, 55.81 ± 4.62, 23.06 ± 1.73, This work | the whole Table 2 body |
 | 6 | 292 | Prose: ΔH_T = 43.79 ± 4.84 kJ/mol and ΔS_T = 28.09 ± 1.64 J/(mol K), liquid state, equation (19) | the paragraph that prints those constants |
-| 5 | 291 | Figure 4 series 8. Open right-pointing triangles, no bar, both panels, including the 1917 K marker on each panel | the figure crop, then each stored centre again |
-| 3 | 289 | Figure 2 series 16. Seven open right-pointing triangles. The 2210 K point was read on both the 600 dpi and the 1200 dpi render | the high-T chain at 2×, the marked centres, and a 1200 dpi crop of the same chain |
+| 5 | 291 | Figure 4 series 8. Open right-pointing triangles, no bar, both panels. Panel (b) adds 1954 K and 2009 K. The 2103 K glyph keeps its own bar | the figure crop, then each stored centre again, and the 2103 K glyph beside the 1861 K barred marker |
+| 3 | 289 | Figure 2 series 16. Nine open right-pointing triangles, including 1863 K and 1950 K. The 2210 K point was read on both the 600 dpi and the 1200 dpi render | the high-T chain at 2×, the marked centres, the 1863 K and 1950 K crops, and a 1200 dpi crop of the high-T chain |
 
 Neighbour rows on pages 2 and 4 match pdftotext, so the this-work row is not a shifted literature row.
 
@@ -46,14 +46,18 @@ Five scored rows, all `measured_reduced`, stoichiometric MgAl2O4 (MgO 0.5, Al2O3
 - Table 2 T_melt = 2420 ± 25 K. Quantity `transition_temperature`, `property_kind: melting_point`.
 - Prose liquid-state ΔH_T = 43.79 ± 4.84 kJ/mol. Quantity `delta_fH`, phase `l`. The sentence does not print a temperature, so the point temperature stays unknown.
 
-Ten Figure 4 activities, `figure_only`, stoichiometric spinel. Quantity `activity` on type `activity_coefficient`. Uncertainty is the read, not a printed ±.
+Twelve Figure 4 activities, `figure_only`, stoichiometric spinel. Quantity `activity` on type `activity_coefficient`. Uncertainty is the read, not a printed ±.
 
 - Panel (a) a(MgO): 0.276 at 1917 K, 0.368 at 2161 K, 0.388 at 2218 K, 0.406 at 2257 K, 0.425 at 2304 K. Read uncertainty ±0.010 and ±5.4 K.
-- Panel (b) a(Al2O3): 0.236 at 1917 K, 0.211 at 2162 K, 0.202 at 2220 K, 0.203 at 2259 K, 0.200 at 2306 K. Read uncertainty ±0.005 and ±5.4 K.
+- Panel (b) a(Al2O3): 0.232 at 1954 K, 0.236 at 1917 K, 0.223 at 2009 K, 0.211 at 2162 K, 0.202 at 2220 K, 0.203 at 2259 K, 0.200 at 2306 K. Read uncertainty ±0.005 and ±5.4 K.
 
-Seven Figure 2 Gibbs energies, `figure_only`, quantity `delta_fG`, crystalline spinel. Read uncertainty ±0.30 kJ/mol and ±10 K.
+The 1954 K centre is crop (1260.5, 2297.5), page pixel (3820, 2732), unrounded 1953.76 K and 0.2325. A neighbouring outline meets the upper and lower corners across a 16 px gap. That contact is two rows, not the five-row cap of a barred glyph. The 2009 K centre is crop (1362.5, 2317.0), page pixel (3922, 2752), unrounded 2009.12 K and 0.2229. No bar bridges that gap. The 2103 K glyph was not stored. Its two strokes are 11 px apart and join for about five rows at the top and at the bottom, the same closure as the barred marker at 1861 K on panel (a).
 
-- −22.32 kJ/mol at 2004 K, −22.41 at 2050 K, −22.70 at 2102 K, −22.92 at 2160 K, −23.47 at 2210 K, −23.39 at 2252 K, −23.61 at 2302 K.
+Nine Figure 2 Gibbs energies, `figure_only`, quantity `delta_fG`, crystalline spinel. Read uncertainty ±0.30 kJ/mol and ±10 K.
+
+- −21.15 kJ/mol at 1863 K, −22.07 at 1950 K, −22.32 at 2004 K, −22.41 at 2050 K, −22.70 at 2102 K, −22.92 at 2160 K, −23.47 at 2210 K, −23.39 at 2252 K, −23.61 at 2302 K.
+
+The 1863 K centre is crop (1477.4, 958.6), page pixel (2818, 1394), unrounded 1862.89 K and −21.154 kJ/mol. The fit line passes below the centre. The 1950 K centre is crop (1576.4, 1002.1), page pixel (2917, 1437), unrounded 1949.65 K and −22.071 kJ/mol. The centre is in the open interior.
 
 The 2210 K point was the disagreement between the two confirm reviews. Sol called it readable. The other review called the cut interior a fair refusal. Both crops locate the same centre. At 600 dpi the midpoint is crop (1873.1, 1068.5), page pixel (3214, 1504), 2209.62 K and −23.469 kJ/mol. At 1200 dpi the white centroid is page pixel (6428, 3007), which falls at crop (1873.0, 1068.2) in the 600 dpi frame, 2209.49 K and −23.464 kJ/mol. The outline is a complete open right triangle. The next outline meets the tip and does not hide the centre. The point is stored.
 
@@ -71,16 +75,16 @@ Two formation entropies are stored and marked `typed_refusal`. The schema has no
 - Table 1: 30 literature rows (calorimetry, EMF, thermochemical calculations, earlier KEMS). Not this paper’s measurements.
 - Table 2: 15 literature melting rows (4 MgO, 8 other MgAl2O4, 3 Al2O3). Not this paper’s measurements.
 - Figure 1: literature heat capacity. Not read.
-- Figure 2: pointwise ΔG. Series 16 is the open right-pointing triangle. Seven centres were stored, including 2004 K, 2210 K, and 2252 K. Refused markers are named one by one in the figure-2 context row: squares near 1420 K, up-triangles near 1640 K and 1780–1840 K, a fit line that hides the centre near 1863 K, and a shared interior near 1950 K. Error-bar ends were not read. The least-squares constants remain Table 1. MinerU’s chart table was ignored.
+- Figure 2: pointwise ΔG. Series 16 is the open right-pointing triangle. Nine centres were stored, including 1863 K, 1950 K, 2004 K, 2210 K, and 2252 K. Refused markers are named one by one in the figure-2 context row: squares near 1420 K, and up-triangles near 1640 K and 1780–1840 K. Error-bar ends were not read. The least-squares constants remain Table 1. MinerU’s chart table was ignored.
 - Figure 3: pressures over spinel cited as reference [1], the evaporation paper already extracted. Not re-read.
-- Figure 4: activities. Linear axes, calibrated from the tick marks on the 600 dpi render of PDF page 5. Series 8 is the open right-pointing triangle with no bar. Ten centres were stored, five on each panel. The new ones are the open triangles at 1917 K. Read uncertainty is ±10 px (±5.4 K, and ±0.010 or ±0.005 in activity). Each refused marker is named with its approximate temperature in the figure-4 context row: a vertical bar (series 5 or 6), a filled triangle (series 7), an up-triangle (series 1–4), a legend key, or a centre hidden in a shared mass. MinerU’s scatter table was ignored.
+- Figure 4: activities. Linear axes, calibrated from the tick marks on the 600 dpi render of PDF page 5. Series 8 is the open right-pointing triangle with no bar. Twelve centres were stored, five on panel (a) and seven on panel (b). The new panel-(b) centres are 1954 K at crop (1260.5, 2297.5) and 2009 K at crop (1362.5, 2317.0). The 2103 K glyph at crop (1535.5, 2329.5) was refused: its own vertical bar joins at the top and the bottom. Read uncertainty is ±10 px (±5.4 K, and ±0.010 or ±0.005 in activity). Each refused marker is named with its approximate temperature and its crop in the figure-4 context row. MinerU’s scatter table was ignored.
 - Figure 5: MgAl2O4–SiO2 phase diagram cited to [55]. Not this paper’s measurements. MinerU’s contour table was ignored.
 
 ## Standard state
 
 Two activity rows were read from Figure 4, series 8. Both carry the equation (12)–(13) sentence.
 
-Equations (12)–(13), PDF page 5, published page 291: “where p_i and p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.” The prose says the phase of that pure-component oxide is not stated, and the temperature of the reference measurement is not stated. `reference_state_from_extract` returns unknown on “not stated” before it looks for a Raoultian endmember. The prose does not say “Raoultian” and it does not name pure solid or pure liquid MgO, so `_standard_state_from_extract_text` does not replace that unknown. The points from 2161 K upward lie inside the crystal-state interval 2048–2298 K that the paper takes from reference [54] by equations (16) and (17). The 1917 K point on each panel is below that interval. The paper does not say the pure oxide was measured in the cell at the experiment temperature, at either temperature. The 2026-10-20 pure-oxide-at-T ruling was not applied. No melting point was used. “Crystal state” names the spinel. `phase: cr` is that spinel phase.
+Equations (12)–(13), PDF page 5, published page 291: “where p_i and p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.” The prose says the phase of that pure-component oxide is not stated, and the temperature of the reference measurement is not stated. `reference_state_from_extract` returns unknown on “not stated” before it looks for a Raoultian endmember. The prose does not say “Raoultian” and it does not name pure solid or pure liquid MgO, so `_standard_state_from_extract_text` does not replace that unknown. The points from 2161 K upward lie inside the crystal-state interval 2048–2298 K that the paper takes from reference [54] by equations (16) and (17). The 1917 K point on each panel, and the panel-(b) point at 1954 K, are below that interval. The panel-(b) point at 2009 K lies inside it. The paper does not say the pure oxide was measured in the cell at the experiment temperature. The 2026-10-20 pure-oxide-at-T ruling was not applied. No melting point was used. “Crystal state” names the spinel. `phase: cr` is that spinel phase.
 
 “Crystalline” and “liquid” in equations (20)–(22) and in the liquid-state paragraph are the spinel phase, not the oxide reference. The formation rows say the paper does not state the oxide phase. That prose is not on an activity row, so the activity mapper does not read it.
 
