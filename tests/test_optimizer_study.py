@@ -5582,6 +5582,49 @@ def test_stale_profile_refusal_flows_through_study_as_named_failure(tmp_path) ->
     assert not (tmp_path / "winner.recipe.yaml").exists()
 
 
+def test_cli_stale_profile_file_runs_as_ranked_unavailable_candidate(tmp_path) -> None:
+    profile_path = tmp_path / "stale-melt-profile.yaml"
+    profile_path.write_text(
+        yaml.safe_dump(_stale_melt_target_profile()),
+        encoding="utf-8",
+    )
+    out_dir = tmp_path / "stale-profile-cli"
+
+    exit_code = optimizer_cli.main(
+        [
+            "--feedstock",
+            FEEDSTOCK,
+            "--profile",
+            str(profile_path),
+            "--strategy",
+            "random",
+            "--fidelity",
+            "internal-analytical",
+            "--budget",
+            "1",
+            "--out",
+            str(out_dir),
+            "--seed",
+            "7",
+        ]
+    )
+
+    assert exit_code == 0
+    status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
+    pareto = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
+    leaderboard = list(csv.DictReader((out_dir / "leaderboard.csv").open()))
+    provenance = _read_provenance(out_dir)
+
+    assert status["status"] == "completed-no-feasible-winner"
+    assert status["success"] is True
+    assert pareto["failure_counts"] == {"stale_profile": 1}
+    assert len(leaderboard) == 1
+    assert leaderboard[0]["rank"] == "1"
+    assert leaderboard[0]["composition_target:stale-profile-target"] == ""
+    assert provenance[0]["failure_category"] == "stale_profile"
+    assert "FORCE_PROFILES=1" in provenance[0]["notes"][0]
+
+
 def test_all_out_of_domain_completes_no_feasible_and_logs_count(tmp_path) -> None:
     result = study.run(
         PROFILE,
