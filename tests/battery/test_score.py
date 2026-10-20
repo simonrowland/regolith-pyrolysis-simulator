@@ -5791,6 +5791,146 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
 
 
+_SAMPLE_PHASE_NOT_MELT_OBSERVABLE = "sample_phase_not_melt_activity_observable"
+
+
+def _oxide_activity_at_sample_phase(
+    phase: Phase | State,
+    *,
+    quantity: Quantity = Quantity.ACTIVITY,
+    observation_id: str = "sample-phase-activity",
+) -> tuple[object, Observation]:
+    """Al2O3 activity in a CaO–Al2O3 melt, with the sample phase replaced.
+
+    The reference endmember stays liquid, so a phase gate is the only thing
+    that can keep a crystalline sample off the melt engines.
+    """
+
+    experiment = F.tabulation_experiment()
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("CaO", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(
+        formula="Al2O3",
+        component_basis="Al2O3",
+        composition=composition,
+    )
+    polymorph = (
+        State.unknown("source does not state polymorph")
+        if phase is Phase.CR
+        else State.not_applicable("not crystal")
+    )
+    identity = replace(
+        identity,
+        quantity=quantity,
+        species=Species("Al2O3", phase, polymorph=polymorph),
+    )
+    reference = F.observation(
+        observation_id,
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="sample-phase-activity",
+    )
+    return experiment, reference
+
+
+def _score_sample_phase_activity(reference, experiment):
+    calls: list[str] = []
+
+    def predict(engine, obs, **_kwargs):
+        calls.append(obs.observation_id)
+        return _predict(Decimal("0.4"), obs.identity)
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference),
+        comparison_ids={reference.observation_id},
+        predict=predict,
+    )
+    return residual, calls
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT),
+)
+def test_crystalline_sample_activity_is_refused_not_a_melt_miss(
+    quantity: Quantity,
+) -> None:
+    """A crystalline solid solution is not an observable of a melt engine."""
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        Phase.CR,
+        quantity=quantity,
+        observation_id=f"spinel-ss-{quantity.value}",
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == []
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail["reason"] == _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+    assert residual.refusal.detail["sample_phase"] == Phase.CR.value
+    assert residual.refusal.detail["quantity"] == quantity.value
+    assert _residual_engine_observable(residual_to_plain(residual)) is False
+
+    if quantity is Quantity.ACTIVITY:
+        direct = predict_with_engine(Engine.INTERNAL_ANALYTICAL, reference)
+        assert direct.value is None
+        assert direct.refusal_reason is RefusalReason.UNSUPPORTED
+        assert direct.refusal_detail["reason"] == _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+        assert direct.execution.state is ExecutionState.NOT_PROBED
+        assert direct.execution.call_evidence is None
+
+
+@pytest.mark.parametrize(
+    "phase",
+    (Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L),
+)
+def test_melt_like_sample_activity_stays_on_the_melt_activity_rail(
+    phase: Phase,
+) -> None:
+    """Liquid, glass, and supercooled liquid stay comparable melt activities."""
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        phase,
+        observation_id=f"melt-like-{phase.value}",
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+
+
+def test_unknown_sample_phase_activity_stays_on_the_melt_activity_rail() -> None:
+    """An untyped phase is not a crystalline-sample statement."""
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        State.unknown("source does not state phase"),
+        observation_id="unknown-sample-phase-activity",
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.refusal is None or (
+        residual.refusal.detail.get("reason") != _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+    )
+
+
 def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None:
     from simulator.battery.score import (
         ENGINE_CHANNELS,
