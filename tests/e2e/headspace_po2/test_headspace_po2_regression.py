@@ -57,15 +57,8 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     # entry, so it consumes the residual that the old lot materialization lost.
     # b-894/t-1236 merged-tree measurement: the matching mol-basis credit
     # retains that parcel in terminal.offgas, leaving overhead empty.
-    expected_overhead: dict[str, float] = {}
-    assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
-        expected_overhead,
-        rel=1.0e-12,
-        abs=0.0,
-    )
-    assert sim.atom_ledger.project_account_kg(
-        "process.overhead_gas"
-    ) == pytest.approx(expected_overhead, rel=1.0e-12, abs=0.0)
+    assert set(sim.atom_ledger.kg_by_account("process.overhead_gas")) == set()
+    assert set(sim.atom_ledger.project_account_kg("process.overhead_gas")) == set()
     assert sim.atom_ledger.kg_by_account("terminal.offgas")["SiO2_gas"] == pytest.approx(
         9.409239449650439e-14, rel=1.0e-12, abs=0.0,
     )
