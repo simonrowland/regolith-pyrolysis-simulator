@@ -1050,6 +1050,22 @@ class _MELTSBackendSupport(MeltBackend):
         self._vapor_transport_pO2_bar = DEFAULT_VACUUM_FLOOR_BAR
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
 
+    def _set_vapor_transport_pO2_bar(self, value: object) -> None:
+        self._vapor_transport_pO2_bar = float(value)
+        if (
+            not math.isfinite(self._vapor_transport_pO2_bar)
+            or self._vapor_transport_pO2_bar < DEFAULT_VACUUM_FLOOR_BAR
+        ):
+            raise ValueError(
+                'vapor_transport_pO2_bar must be finite and at least the '
+                f'transport model floor {DEFAULT_VACUUM_FLOOR_BAR:g} bar'
+            )
+
+    def _initialize_vapor_transport(self, config: Mapping[str, object]) -> None:
+        self._set_vapor_transport_pO2_bar(config.get(
+            'vapor_transport_pO2_bar', DEFAULT_VACUUM_FLOOR_BAR,
+        ))
+
     def initialize(self, config: dict) -> bool:
         """
         Detect available alphaMELTS interfaces.
@@ -1092,20 +1108,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._timeout_s = _validated_timeout_s(
             config.get('timeout_s', ALPHAMELTS_DEFAULT_TIMEOUT_S)
         )
-        self._vapor_transport_pO2_bar = float(
-            config.get(
-                'vapor_transport_pO2_bar',
-                DEFAULT_VACUUM_FLOOR_BAR,
-            )
-        )
-        if (
-            not math.isfinite(self._vapor_transport_pO2_bar)
-            or self._vapor_transport_pO2_bar < DEFAULT_VACUUM_FLOOR_BAR
-        ):
-            raise ValueError(
-                'vapor_transport_pO2_bar must be finite and at least the '
-                f'transport model floor {DEFAULT_VACUUM_FLOOR_BAR:g} bar'
-            )
+        self._initialize_vapor_transport(config)
         require_petthermotools = bool(
             config.get('require_petthermotools')
             or requested_mode == 'python_api'
