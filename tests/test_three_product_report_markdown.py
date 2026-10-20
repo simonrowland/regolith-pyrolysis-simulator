@@ -200,6 +200,25 @@ def test_refused_metal_total_renders_flag_instead_of_numeric_partial_total():
     assert 'EvaporationFluxConfigurationError: Si transport missing' in report
 
 
+def test_refused_oxygen_partition_renders_unavailable_without_numeric_cast():
+    classification = _empty_classification()
+    classification['metals_plus_O2'].update({
+        'metals_total_kg': None,
+        'O2_kg': None,
+        'O2_partition_kg': {'stored': None, 'total': None},
+        'class_total_kg': None,
+        'flag': {
+            'status': 'unavailable',
+            'authority': 'unavailable',
+            'reason': 'Si: EvaporationFluxConfigurationError',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert 'Source-side O₂ potential subtotal (emitted; not recovered/captured): unavailable kg' in report
+
+
 def test_rump_class_shows_per_species_breakdown():
     classification = _empty_classification()
     classification['refractory_ceramic_rump'] = {
