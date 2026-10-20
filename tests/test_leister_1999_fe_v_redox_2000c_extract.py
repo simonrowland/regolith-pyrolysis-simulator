@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -136,6 +137,17 @@ def test_isolated_migration_preserves_species_temperature_conditions_and_scored_
     assert not migrator.result.validation.hard_issues
     assert all(row.value.kind is ValueKind.POINT for row in rows)
     assert all(row.identity.quantity.value is Quantity.VALENCE_RATIO for row in rows)
+
+    first_fe_fraction = next(
+        row
+        for row in rows
+        if row.observation_id.split("::", maxsplit=2)[1]
+        == "leister_1999_table2_fe3_valence_fraction"
+        and row.identity.temperature_K.is_value
+        and row.identity.temperature_K.value == Decimal("1873.15")
+    )
+    assert first_fe_fraction.value.point == Decimal("0.97")
+    assert first_fe_fraction.identity.temperature_K.value == Decimal("1873.15")
 
     expected_formulae = {
         observation["observation_id"]: species
