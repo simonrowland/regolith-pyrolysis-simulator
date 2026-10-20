@@ -1,0 +1,163 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2019-perovskite-evaporation-thermodynamics
+source:
+  citation: >-
+    Shornikov, S. I. (2019). Thermodynamics of evaporation of perovskite—the
+    mineral of white inclusions of chondrites. Experiment in Geosciences,
+    25(1), 38–40.
+  year: 2019
+extraction:
+  method: >-
+    No MinerU table. Prose transcribed from pdftotext. Figures inspected on a
+    120 dpi preview of PDF pages 2–3 and not digitized.
+  date: '2026-10-20'
+  worker: t1372-w1-w4-t1
+review_status: draft
+species:
+  CaTiO3:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_eg_not_the_lyul_abstract
+        type: page_scope
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 38
+          note: >-
+            PDF page 1 opens with the end of a different Lyul/enstatite
+            abstract. That text is not this paper and is not extracted.
+        units: as printed
+        values:
+          this_paper_starts: "Shornikov S. I. Thermodynamics of evaporation of perovskite"
+      - observation_id: shornikov_2019_eg_apparatus
+        type: apparatus
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 38
+        units: as printed
+        values:
+          method: Knudsen effusion mass spectrometry
+          container: molybdenum
+          perovskite_T_as_printed: 1791–2182 K
+          abstract_T_as_printed: 1700–2200 K
+          melts_T_as_printed: 2241–2441 K
+          note: The body prints 1791–2182 K. The abstract prints 1700–2200 K. Both are kept.
+      - observation_id: shornikov_2019_eg_vapour_reactions
+        type: vapour_species
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 38
+          equation: "1-7"
+        units: as printed
+        values:
+          reactions_as_printed:
+            - "[CaO] = (CaO)"
+            - "(CaO) = (Ca) + (O)"
+            - "[TiO2] = (TiO2)"
+            - "(TiO2) = (TiO) + (O)"
+            - "(TiO) = (Ti) + (O)"
+            - "2(O) = (O2)"
+            - "[CaTiO3] = (CaTiO3)"
+          partial_pressures: plotted in Fig. 2, not tabulated
+      - observation_id: shornikov_2019_eg_headline_numbers_not_rescored
+        type: overlap_with_other_extracts
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 40
+          note: >-
+            The same sentence prints formation enthalpy −39.88±0.54 kJ/mol,
+            formation entropy 3.15±0.28 J/(mol K), and melting enthalpy
+            47.61±1.84 kJ/mol at 2241±10 K. Shornikova 2019 Table 1 prints
+            −39.98±0.54, not −39.88, for the 1791–2241 K row, and the same
+            3.15±0.28. Table 2 prints the same melting figures. Those table
+            cells are scored on shornikova-2019-perovskite-thermodynamics.
+            This note does not score them again. metsoc-2019-6005 also prints
+            −39.88±0.54; that abstract is a different document.
+        units: kJ/mol and J/(mol K)
+        values:
+          delta_H_as_printed: "−39.88±0.54 kJ/mol"
+          delta_S_as_printed: "3.15±0.28 J/(mol×K)"
+          delta_H_melt_as_printed: "47.61±1.84 kJ/mol at 2241±10 K"
+          not_scored_because: already printed, with the 0.10 kJ/mol table difference, in the RJPC thermodynamics paper
+      - observation_id: shornikov_2019_eg_fig1_gong
+        type: figure_context
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 38
+          figure: "1"
+        units: as printed
+        values:
+          reason_not_extracted: Fig. 1 is the CaO–TiO2 phase diagram of Gong et al. (2018), not this study.
+      - observation_id: shornikov_2019_eg_fig2_pressures_not_digitized
+        type: figure_context
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 39
+          figure: "2"
+        units: atm
+        values:
+          reason_not_extracted: >-
+            Eight vapour species on two small log-pressure panels. Series
+            cross. A marker could not be assigned to one species within a
+            stated read uncertainty. Partial pressures are not tabulated.
+          panel_a: partial pressures over perovskite versus T
+          panel_b: partial pressures over CaO–TiO2 melts at 2300 K
+      - observation_id: shornikov_2019_eg_fig3_not_digitized
+        type: figure_context
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 39
+          figure: "3"
+        units: dimensionless activity and kJ/mol
+        values:
+          reason_not_extracted: >-
+            Fig. 3a curves for this study (CaO, TiO2, CaTiO3 at 2250 K) cross
+            the Banon et al. (1981) curves at 2150 K. Fig. 3b mixes this study
+            with three other Shornikov papers. Markers were not separated
+            within a stated read uncertainty.
+          this_study: "Fig. 3a series 1, 2, and 4 at 2250 K; Fig. 3b series 1 at 2300 K"
+          not_this_study: "Fig. 3a series 3 and 5 are Banon et al. (1981) at 2150 K. Fig. 3b series 2–4 are other papers."
+          standard_state: >-
+            Equations (8) and (9): a_CaO = p_CaO / p°_CaO and a_TiO2 = p_TiO2 /
+            p°_TiO2, the Lewis ratio to the pure simple oxide. The paper does
+            not state whether that pure oxide is solid or liquid. The melt
+            panel is at 2250 K. No activity point was stored, so the
+            pure-oxide-at-T phase was not attached to a scored row.
+  CaO:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_eg_cao_reference
+        type: activity_reference
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 39
+          equation: "8"
+        units: dimensionless
+        values:
+          standard_state: >-
+            Equation (8): a_CaO = p_CaO / p°_CaO. p° is the partial pressure
+            over the pure simple oxide. The paper does not state solid or
+            liquid. Fig. 3a is at 2250 K. No activity point was stored.
+  TiO2:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_eg_tio2_reference
+        type: activity_reference
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 39
+          equation: "9"
+        units: dimensionless
+        values:
+          standard_state: >-
+            Equation (9): a_TiO2 = p_TiO2 / p°_TiO2. p° is the partial pressure
+            over the pure simple oxide. The paper does not state solid or
+            liquid. Fig. 3a is at 2250 K. No activity point was stored.
