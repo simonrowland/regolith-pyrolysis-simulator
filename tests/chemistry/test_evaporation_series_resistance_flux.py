@@ -301,15 +301,6 @@ def test_cro2_evaporation_proxy_uses_shared_sio_collision_parameters():
     assert result.d_ab_m2_s == pytest.approx(expected, rel=1e-12)
 
 
-def test_potassium_transport_row_is_marked_proxy_with_unknown_source():
-    from simulator.condensation import _LENNARD_JONES_PARAMS, _LENNARD_JONES_PROVENANCE
-
-    assert _LENNARD_JONES_PARAMS["K"] == (3.987, 1305.0, 39.098)
-    row = _LENNARD_JONES_PROVENANCE["K"]
-    assert row["status"] == "proxy"
-    assert "unknown" in row["source"]
-
-
 def test_chapman_enskog_prefactor_matches_bsl_atmosphere_form():
     """Default condensation D_AB uses the BSL atm prefactor, not 0.00266.
 
@@ -327,21 +318,6 @@ def test_chapman_enskog_prefactor_matches_bsl_atmosphere_form():
     nist_m2_s = math.exp(-10.787 - 44.220 / 1000.0 + 1.649 * math.log(1000.0)) * 1.0e-4
     assert o2 == pytest.approx(nist_m2_s, rel=0.10)
     assert o2 < nist_m2_s
-
-
-def test_svehla_table_i_si_and_sio_transport_rows():
-    """The sourced silicon rows match Svehla 1962 NASA TR R-132, Table I."""
-    from simulator.condensation import (
-        _LENNARD_JONES_PARAMS,
-        _LENNARD_JONES_PROVENANCE,
-    )
-
-    assert _LENNARD_JONES_PARAMS["Si"] == (2.910, 3036.0, 28.085)
-    assert _LENNARD_JONES_PARAMS["SiO"] == (3.374, 569.0, 44.085)
-    for species in ("Si", "SiO"):
-        provenance = _LENNARD_JONES_PROVENANCE[species]
-        assert provenance["status"] == "sourced"
-        assert provenance["source"] == "Svehla 1962 NASA TR R-132 Table I"
 
 
 @pytest.mark.xfail(

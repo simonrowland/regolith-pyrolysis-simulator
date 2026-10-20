@@ -6,6 +6,7 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.condensation import _LENNARD_JONES_PARAMS
 from simulator.cost_energy import is_unavailable_quantity
 from simulator.cost_ledger import build_cost_rollup_diagnostic
+from simulator.optimize.objective import ObjectiveComputationError, _metric_value
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
@@ -33,7 +34,7 @@ def two_hour_run(request, vapor_pressure_data, feedstocks_data, setpoints_data):
     original_dispatch = sim._dispatch_only
     monkeypatch.setattr(sim, "_freeze_gate_enabled", lambda: False)
     with monkeypatch.context() as missing:
-        missing.delitem(_LENNARD_JONES_PARAMS, "Si")
+        missing.delitem(_LENNARD_JONES_PARAMS, "Si", raising=False)
         result = _w3_result_with_controls(
             1.0,
             overhead_pressure_pa=1000.0,
@@ -46,7 +47,10 @@ def two_hour_run(request, vapor_pressure_data, feedstocks_data, setpoints_data):
             available_oxide_kg={"Na": 10.0, "Si": 10.0},
             alpha={"Na": 0.5, "Si": 0.5},
         )
-    assert result.status == "unavailable"
+    assert result.status == "ok"
+    refusal = result.diagnostic["missing_transport_parameters"]["Si"]
+    assert refusal["status"] == "unavailable"
+    assert refusal["refusal_type"] == "EvaporationFluxConfigurationError"
 
     def dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX and not sim.record.snapshots:
@@ -120,3 +124,19 @@ def test_cost_allocation_refuses_partial_product_denominator(two_hour_run):
     for entry in diagnostic["product_costs"].values():
         assert is_unavailable_quantity(entry["owner_ratify_money_projection"])
         assert is_unavailable_quantity(entry["accumulated_cost"])
+
+
+@pytest.mark.parametrize("metric", ("oxygen_stored_kg", "oxygen_vented_kg"))
+def test_oxygen_objectives_refuse_unavailable_partitions(
+    two_hour_run, monkeypatch, metric
+):
+    monkeypatch.setattr(
+        two_hour_run,
+        "_oxygen_terminal_partition_kg",
+        lambda: {"stored": 1.0, "vented": 1.0, "total": 2.0},
+    )
+    with pytest.raises(
+        ObjectiveComputationError,
+        match="EvaporationFluxConfigurationError",
+    ):
+        _metric_value(metric, two_hour_run, {}, classify_products(two_hour_run))

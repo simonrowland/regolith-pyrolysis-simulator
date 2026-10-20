@@ -1668,7 +1668,7 @@ def test_provider_transitional_hkl_upper_bound_ignores_viscous_p_bulk():
 def test_provider_refuses_missing_species_transport_parameters(monkeypatch):
     from simulator.condensation import _LENNARD_JONES_PARAMS
 
-    # Keep this test on the generic refusal path after Si's sourced row lands.
+    # Keep this generic missing-input test independent of the Si data row.
     monkeypatch.delitem(_LENNARD_JONES_PARAMS, "Si", raising=False)
     result = _w3_result_with_controls(
         1.0,
@@ -1764,6 +1764,10 @@ def test_missing_transport_channel_is_unavailable_downstream(
     flux = sim._calculate_evaporation(equilibrium)
     assert "Si" not in flux.species_kg_hr
     assert flux.species_kg_hr["Na"] > 0.0
+    si_refusal = flux.carrier_authority_by_species["Si"]
+    assert si_refusal["is_refused"] is True
+    assert si_refusal["authority_level"] == "unavailable"
+    assert si_refusal["refusal_code"] == "EvaporationFluxConfigurationError"
 
     single_channel_result = _w3_result_with_controls(
         1.0,

@@ -4430,17 +4430,69 @@ def test_completion_payload_marks_missing_metal_product_story_unavailable(
     monkeypatch,
 ):
     sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    flag = {
+        "status": "unavailable",
+        "authority": "unavailable",
+        "reason": "EvaporationFluxConfigurationError: Si transport missing",
+    }
     monkeypatch.setattr(
         web_events,
         "classify_products",
         lambda _sim: {
-            "ingots_metals": {
+            "metals_plus_O2": {
+                "metals_kg": {},
+                "metals_total_kg": None,
+                "O2_kg": None,
+                "O2_partition_kg": {"stored": None, "vented": None},
                 "class_total_kg": None,
-                "flag": {
-                    "status": "unavailable",
-                    "authority": "unavailable",
-                    "reason": "EvaporationFluxConfigurationError: Si transport missing",
-                },
+                "flag": flag,
+            },
+            "ingots_metals": {
+                "species_kg": {},
+                "class_total_kg": None,
+                "flag": flag,
+            },
+            "oxygen": {
+                "O2_kg": None,
+                "partition_kg": {"stored": None, "vented": None},
+                "class_total_kg": None,
+                "flag": flag,
+            },
+            "pure_silica_glass": {
+                "stage_3_capture_kg": 0.0,
+                "stage_3_kg_by_species": {},
+                "class_total_kg": 0.0,
+            },
+            "glass": {
+                "species_kg": {},
+                "class_total_kg": 0.0,
+                "pure_silica_glass_kg": 0.0,
+                "industrial_mixed_glass_kg": 0.0,
+            },
+            "industrial_mixed_glass": {
+                "mixed_melt_residual_kg": 0.0,
+                "class_total_kg": 0.0,
+            },
+            "captured_volatiles": {
+                "kg_by_species": {},
+                "class_total_kg": 0.0,
+            },
+            "process_inventory_spent_reductant": {
+                "kg_by_species": {},
+                "class_total_kg": 0.0,
+            },
+            "refractory_ceramic_rump": {
+                "rump_kg_by_species": {},
+                "rump_total_kg": 0.0,
+                "rump_refractory_oxides_kg": 0.0,
+                "rump_silicate_residual_kg": 0.0,
+                "rump_unextracted_metals_kg": 0.0,
+                "rump_other_kg": 0.0,
+                "class_total_kg": 0.0,
+            },
+            "unclassified": {
+                "kg_by_species": {},
+                "total_kg": 0.0,
             }
         },
     )
@@ -4448,6 +4500,7 @@ def test_completion_payload_marks_missing_metal_product_story_unavailable(
     payload = _completion_payload(sim)
 
     assert payload["product_story"]["metal_ingots"]["class_total_kg"] is None
+    assert payload["product_story"]["metal_ingots"]["flag"] == flag
     assert payload["product_story_status"] == "unavailable"
 
 
