@@ -4,18 +4,12 @@ Stateless helper for the C-CO-CO2 buffer shared by future residual-carbon
 melt-effect and oxygen-sink callers. Never mutates ledgers, builds transition
 proposals, or imports melt/provider/inventory layers.
 
-The certified point expression is the graphite-CO-CO2 (CCO) buffer of
-Jakobsson & Oskarsson (1994, GCA), carried in the LEPR / ThermoEngine buffer
-table; Stagno & Frost (2010, EPSL 300:72-84) use it as the CCO reference line in
-their graphite-saturation work (they do not originate these point coefficients):
-
-    log10(fO2 / bar) = -21803 / T_K + 4.325 + 0.171 * (P_bar - 1) / T_K
-
-The expression is for graphite saturation; excess graphite does not add another
-state variable. It is only a CCO reference line, not an EMOG/EMOD fit. Requests
-that name the wider EMOG/EMOD graphite-saturation field return an interval so
-callers cannot accidentally promote an uncurated coefficient choice to a
-certified point.
+The certified CCO point coefficients are owned by
+``simulator.chemistry.graphite_c_co``. The expression is for graphite
+saturation; excess graphite does not add another state variable. It is only a
+CCO reference line, not an EMOG/EMOD fit. Requests that name the wider
+EMOG/EMOD graphite-saturation field return an interval so callers cannot
+accidentally promote an uncurated coefficient choice to a certified point.
 """
 
 from __future__ import annotations
@@ -23,8 +17,11 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from simulator.chemistry.graphite_c_co import (
+    _require_finite_positive,
+    cco_log10_fO2_bar,
+)
 from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
-from simulator.scalar_boundary import is_declared_real_scalar
 
 CCO_FORMULATION = "JakobssonOskarsson1994_CCO_via_LEPR_graphite_CO_CO2"
 CCO_SOURCE = (
@@ -33,11 +30,6 @@ CCO_SOURCE = (
 )
 CCO_TEMPERATURE_RANGE_K = (1_273.15, 1_873.15)
 QFM_REFERENCE_SOURCE = "O'Neill 1987 QFM fit used by MAGEMin adapter"
-
-_CCO_A = -21_803.0
-_CCO_B = 4.325
-_CCO_C = 0.171
-
 
 @dataclass(frozen=True)
 class RedoxBufferPoint:
@@ -63,15 +55,6 @@ class RedoxBufferInterval:
     source: str
 
 
-def _require_finite_positive(value: float, label: str) -> float:
-    if not is_declared_real_scalar(value, allow_numeric_str=True):
-        raise TypeError(f"{label} must be numeric")
-    parsed = float(value)
-    if not math.isfinite(parsed) or parsed <= 0.0:
-        raise ValueError(f"{label} must be finite and positive")
-    return parsed
-
-
 def _validity_for_temperature(temperature_K: float) -> str:
     lo, hi = CCO_TEMPERATURE_RANGE_K
     if lo <= temperature_K <= hi:
@@ -83,13 +66,6 @@ def qfm_log10_fO2_bar(temperature_K: float) -> float:
     """Return O'Neill-style QFM log10(fO2/bar) used for buffer offsets."""
     temperature = _require_finite_positive(temperature_K, "temperature_K")
     return oneill_qfm_log10_fO2_bar(temperature)
-
-
-def cco_log10_fO2_bar(temperature_K: float, pressure_bar: float = 1.0) -> float:
-    """Return certified CCO graphite-CO-CO2 log10(fO2/bar)."""
-    temperature = _require_finite_positive(temperature_K, "temperature_K")
-    pressure = _require_finite_positive(pressure_bar, "pressure_bar")
-    return _CCO_A / temperature + _CCO_B + _CCO_C * (pressure - 1.0) / temperature
 
 
 def cco_buffered_fO2(

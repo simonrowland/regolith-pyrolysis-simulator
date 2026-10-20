@@ -18,7 +18,10 @@ from engines.builtin.cco_redox_buffer import (
     qfm_log10_fO2_bar,
     stagno_frost_emog_emod_log10_fO2_interval,
 )
-from simulator.chemistry.graphite_c_co import log10_fo2_c_co_bar
+from simulator.chemistry.graphite_c_co import (
+    cco_log10_fO2_bar as chemistry_cco_log10_fO2_bar,
+    log10_fo2_c_co_bar,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MODULE_PATH = REPO_ROOT / "engines" / "builtin" / "cco_redox_buffer.py"
@@ -143,6 +146,10 @@ def test_cco_and_graphite_outputs_are_bit_pinned_on_temperature_grid() -> None:
         expected_one_atm,
         expected_tenth_atm,
     ) in output_grid:
+        assert (
+            chemistry_cco_log10_fO2_bar(temperature_K, 1.0).hex()
+            == expected_one_bar
+        )
         assert cco_log10_fO2_bar(temperature_K, 1.0).hex() == expected_one_bar
         assert (
             log10_fo2_c_co_bar(temperature_K, 1.01325).hex()
@@ -177,6 +184,9 @@ def test_purity_no_ledger_provider_or_melt_imports() -> None:
         "dataclasses",
         "dataclasses.dataclass",
         "math",
+        "simulator.chemistry.graphite_c_co",
+        "simulator.chemistry.graphite_c_co._require_finite_positive",
+        "simulator.chemistry.graphite_c_co.cco_log10_fO2_bar",
         "simulator.chemistry.qfm_oneill",
         "simulator.chemistry.qfm_oneill.oneill_qfm_log10_fO2_bar",
         "simulator.scalar_boundary",
