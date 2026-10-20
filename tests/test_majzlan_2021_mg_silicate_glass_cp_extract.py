@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import UncertaintyKind
 from simulator.battery.migrate import Migrator
 from tests.literature_extract_test_helpers import iter_locators
 
@@ -76,7 +77,7 @@ def _table2_grid(document: dict) -> list[tuple[str, str, float, float, float]]:
                 row["cp"] = values["cp_298_15_k"]
             if "entropy" in values:
                 row["entropy"] = values["entropy"]
-                row["entropy_uncertainty"] = values["uncertainty"]
+                row["entropy_uncertainty"] = observation["uncertainty"]["value"]
             assert row["formula"] == values.get("formula", table1_formulas.get(sample))
             assert row["page"] == 4 and row["pdf_page_index"] == 3
 
@@ -278,3 +279,56 @@ def test_isolated_migration_preserves_species_and_temperature_conditions() -> No
             if "table2" in migrated.observation_id:
                 assert migrated.identity.temperature_K.is_value
                 assert migrated.identity.temperature_K.value == Decimal("298.15")
+
+    source_rows = {
+        observation["observation_id"]: observation
+        for body in document["species"].values()
+        for observation in body.get("observations", [])
+    }
+    migrated_rows = {
+        observation_id.split("::", maxsplit=1)[1]: observation
+        for observation_id, observation in rows.items()
+    }
+
+    glass_transition_ids = (
+        "majzlan_2021_enstatitic_glass_transition_temperature",
+        "majzlan_2021_forsteritic_glass_transition_temperature_richet_1993",
+        "majzlan_2021_mg67_assumed_glass_transition_temperature_tangeman_2001",
+    )
+    for observation_id in glass_transition_ids:
+        assert source_rows[observation_id]["values"]["property_kind"] == "glass_transition"
+        assert migrated_rows[observation_id].identity.subtype.is_value
+        assert migrated_rows[observation_id].identity.subtype.value == "glass_transition"
+
+    fusion_temperatures = {
+        "majzlan_2021_enstatite_entropy_of_fusion_text": Decimal("1834"),
+        "majzlan_2021_forsterite_entropy_of_fusion_navrotsky_1989": Decimal("2163"),
+        "majzlan_2021_forsterite_entropy_of_fusion_richet_1993": Decimal("2174"),
+    }
+    for observation_id, expected_temperature in fusion_temperatures.items():
+        migrated = migrated_rows[observation_id]
+        assert migrated.identity.temperature_K.is_value
+        assert migrated.identity.temperature_K.value == expected_temperature
+
+    table2_entropies = {
+        observation_id: Decimal(str(source["uncertainty"]["value"]))
+        for observation_id, source in source_rows.items()
+        if source["locator"].get("table") == "2"
+        and source["values"].get("quantity") == "S"
+    }
+    assert list(table2_entropies.values()) == [
+        Decimal("0.9"),
+        Decimal("0.9"),
+        Decimal("1.0"),
+        Decimal("1.1"),
+        Decimal("1.2"),
+        Decimal("0.1"),
+        Decimal("0.1"),
+    ]
+    for observation_id, expected_uncertainty in table2_entropies.items():
+        uncertainty = migrated_rows[observation_id].uncertainty
+        assert uncertainty.kind is UncertaintyKind.PRINTED
+        assert Decimal(str(uncertainty.verbatim["value"])) == expected_uncertainty
+
+    enstatite_entropy = migrated_rows["majzlan_2021_enstatite_entropy_of_fusion_text"]
+    assert enstatite_entropy.uncertainty.kind is UncertaintyKind.NONE

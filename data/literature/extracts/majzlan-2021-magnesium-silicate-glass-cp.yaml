@@ -139,11 +139,13 @@ species:
         formula: Mg0.996SiO2.996
         T_K: 298.15
         entropy: 72.9
-        uncertainty: 0.9
-        uncertainty_as_printed: ± 0.9
-        confidence_level: not_stated
         basis_as_printed: per mole of formula Mg_xSiO_(2+x)
         derivation_note: The entropy is calculated from this study’s measured low-temperature heat-capacity data.
+      uncertainty:
+        reported_status: printed
+        value: 0.9
+        units: J/mol K
+        confidence_level: not_stated
     - observation_id: majzlan_2021_mg54_table2_cp_29815
       type: heat_capacity_and_heat_content_series
       locator:
@@ -220,11 +222,13 @@ species:
         formula: Mg1.174SiO3.174
         T_K: 298.15
         entropy: 78.5
-        uncertainty: 0.9
-        uncertainty_as_printed: ± 0.9
-        confidence_level: not_stated
         basis_as_printed: per mole of formula Mg_xSiO_(2+x)
         derivation_note: The entropy is calculated from this study’s measured low-temperature heat-capacity data.
+      uncertainty:
+        reported_status: printed
+        value: 0.9
+        units: J/mol K
+        confidence_level: not_stated
     - observation_id: majzlan_2021_mg58_table2_cp_29815
       type: heat_capacity_and_heat_content_series
       locator:
@@ -301,11 +305,13 @@ species:
         formula: Mg1.364SiO3.364
         T_K: 298.15
         entropy: 85.1
-        uncertainty: 1.0
-        uncertainty_as_printed: ± 1.0
-        confidence_level: not_stated
         basis_as_printed: per mole of formula Mg_xSiO_(2+x)
         derivation_note: The entropy is calculated from this study’s measured low-temperature heat-capacity data.
+      uncertainty:
+        reported_status: printed
+        value: 1.0
+        units: J/mol K
+        confidence_level: not_stated
     - observation_id: majzlan_2021_mg62_table2_cp_29815
       type: heat_capacity_and_heat_content_series
       locator:
@@ -382,11 +388,13 @@ species:
         formula: Mg1.611SiO3.611
         T_K: 298.15
         entropy: 91.4
-        uncertainty: 1.1
-        uncertainty_as_printed: ± 1.1
-        confidence_level: not_stated
         basis_as_printed: per mole of formula Mg_xSiO_(2+x)
         derivation_note: The entropy is calculated from this study’s measured low-temperature heat-capacity data.
+      uncertainty:
+        reported_status: printed
+        value: 1.1
+        units: J/mol K
+        confidence_level: not_stated
     - observation_id: majzlan_2021_mg67_table2_cp_29815
       type: heat_capacity_and_heat_content_series
       locator:
@@ -463,11 +471,13 @@ species:
         formula: Mg1.907SiO3.907
         T_K: 298.15
         entropy: 102.8
-        uncertainty: 1.2
-        uncertainty_as_printed: ± 1.2
-        confidence_level: not_stated
         basis_as_printed: per mole of formula Mg_xSiO_(2+x)
         derivation_note: The entropy is calculated from this study’s measured low-temperature heat-capacity data.
+      uncertainty:
+        reported_status: printed
+        value: 1.2
+        units: J/mol K
+        confidence_level: not_stated
     - observation_id: majzlan_2021_enstatite_table2_cp_29815
       type: heat_capacity_and_heat_content_series
       locator:
@@ -522,10 +532,12 @@ species:
         formula: MgSiO3
         T_K: 298.15
         entropy: 66.3
-        uncertainty: 0.1
-        uncertainty_as_printed: ± 0.1
-        confidence_level: not_stated
         attribution: Krupka et al. (1985b)
+      uncertainty:
+        reported_status: printed
+        value: 0.1
+        units: J/mol K
+        confidence_level: not_stated
     - observation_id: majzlan_2021_enstatite_heat_of_fusion_text
       type: heat_capacity_and_heat_content_series
       locator:
@@ -584,6 +596,13 @@ species:
         formula: MgSiO3
         delta_S_fus_J_mol-1_K-1: 41.1
         attribution: calculated in this work from the cited fusion enthalpy
+        T_fus_K:
+          value: 1834
+          units: K
+          locator:
+            page: 9
+            pdf_page_index: 8
+            section: Configurational entropy of enstatitic glass
       derived_from: &id009
       - majzlan_2021_enstatite_heat_of_fusion_text
       derivation:
@@ -603,6 +622,7 @@ species:
         method_class: quoted_attributed
         formula: Mg0.996SiO2.996
         T_K: 1063
+        property_kind: glass_transition
         transition_as_printed: glass-transition temperature
         attribution: Briggs (1975)
         qualification: The paper identifies the value for enstatite glass; MG50 is the near-enstatite composition in this study.
@@ -1423,10 +1443,12 @@ species:
         formula: Mg2SiO4
         T_K: 298.15
         entropy: 94.1
-        uncertainty: 0.1
-        uncertainty_as_printed: ± 0.1
-        confidence_level: not_stated
         attribution: Robie et al. (1982)
+      uncertainty:
+        reported_status: printed
+        value: 0.1
+        units: J/mol K
+        confidence_level: not_stated
     - observation_id: majzlan_2021_forsterite_heat_of_fusion_navrotsky_1989
       type: heat_capacity_and_heat_content_series
       locator:
@@ -1485,6 +1507,13 @@ species:
         formula: Mg2SiO4
         delta_S_fus_J_mol-1_K-1: 52.7
         attribution: calculated in this work from Navrotsky et al. (1989)
+        T_fus_K:
+          value: 2163
+          units: K
+          locator:
+            page: 7
+            pdf_page_index: 6
+            section: Configurational entropy of forsteritic glass
       derived_from: &id012
       - majzlan_2021_forsterite_heat_of_fusion_navrotsky_1989
       derivation:
@@ -1554,6 +1583,13 @@ species:
         formula: Mg2SiO4
         delta_S_fus_J_mol-1_K-1: 65.3
         attribution: calculated in this work from Richet et al. (1993)
+        T_fus_K:
+          value: 2174
+          units: K
+          locator:
+            page: 7
+            pdf_page_index: 6
+            section: Configurational entropy of forsteritic glass
       derived_from: &id013
       - majzlan_2021_forsterite_heat_of_fusion_richet_1993
       derivation:
@@ -1578,6 +1614,7 @@ species:
         method_class: quoted_attributed
         formula: Mg2SiO4
         T_K: 990
+        property_kind: glass_transition
         transition_as_printed: glass-transition temperature
         attribution: Richet et al. (1993)
         qualification: The authors state this is the temperature where configurational entropy would vanish.
@@ -1599,6 +1636,7 @@ species:
         method_class: quoted_attributed
         formula: Mg1.907SiO3.907
         T_K: 1040
+        property_kind: glass_transition
         transition_as_printed: glass-transition temperature
         attribution: Tangeman et al. (2001)
         qualification: Tangeman et al. assumed crystallization begins just before glass transition; this is an estimate, not a direct measurement in the present work.
