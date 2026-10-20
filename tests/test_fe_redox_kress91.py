@@ -38,6 +38,57 @@ KRESS91_MOL_FRACTIONS = {
 }
 
 
+def test_kress91_split_ratio_t_p_composition_float_hex_grid() -> None:
+    compositions_wt_pct = (
+        {
+            'SiO2': 45.0, 'TiO2': 1.0, 'Al2O3': 15.0, 'FeO': 10.0,
+            'Fe2O3': 3.0, 'MnO': 0.2, 'MgO': 8.0, 'CaO': 10.0,
+            'Na2O': 4.0, 'K2O': 1.0, 'P2O5': 0.3,
+        },
+        {
+            'SiO2': 68.0, 'TiO2': 0.4, 'Al2O3': 15.0, 'FeO': 3.0,
+            'Fe2O3': 1.0, 'MnO': 0.1, 'MgO': 1.0, 'CaO': 3.0,
+            'Na2O': 4.5, 'K2O': 3.5, 'P2O5': 0.2,
+        },
+        {
+            'SiO2': 42.0, 'TiO2': 2.0, 'Al2O3': 8.0, 'FeO': 16.0,
+            'Fe2O3': 5.0, 'MnO': 0.3, 'MgO': 15.0, 'CaO': 9.0,
+            'Na2O': 1.5, 'K2O': 0.4, 'P2O5': 0.3,
+        },
+    )
+    mol_fraction_compositions = tuple(
+        melt_mol_fractions_for_kress91(composition)
+        for composition in compositions_wt_pct
+    )
+    temperatures_K = (1473.15, 1873.15, 2473.15)
+    pressures_bar = (1.0e-9, 0.01, 10.0)
+    expected_ratio_hex = (
+        '0x1.164344640210ap-3', '0x1.1d8fe389c182cp-3', '0x1.b4112c021daa7p-4',
+        '0x1.16433c180b2a9p-3', '0x1.1d8fdb0613867p-3', '0x1.b4111f01a3c50p-4',
+        '0x1.1622de03c804bp-3', '0x1.1d6ea39631faap-3', '0x1.b3de65d8d5fcbp-4',
+        '0x1.a1911e54a0d60p-6', '0x1.ac8535fce2144p-6', '0x1.472f869f65b77p-6',
+        '0x1.a19113a39983ap-6', '0x1.ac852b040ec0ap-6', '0x1.472f7e3eca8abp-6',
+        '0x1.a1675d759be94p-6', '0x1.ac5a5cbabe5b7p-6', '0x1.470ecf542a9b9p-6',
+        '0x1.cf16a0a0d8013p-8', '0x1.db3c694046a12p-8', '0x1.6adaaa0f7cb7dp-8',
+        '0x1.cf16968391ea4p-8', '0x1.db3c5edf14c13p-8', '0x1.6adaa222a79b2p-8',
+        '0x1.ceef206e8f39bp-8', '0x1.db13dfcb6c482p-8', '0x1.6abbb69f2675dp-8',
+    )
+
+    actual_ratio_hex = tuple(
+        kress91_split(
+            fO2_log=-7.5,
+            mol_fractions=mol_fractions,
+            T_K=temperature_K,
+            pressure_bar=pressure_bar,
+        )['ratio'].hex()
+        for temperature_K in temperatures_K
+        for pressure_bar in pressures_bar
+        for mol_fractions in mol_fraction_compositions
+    )
+
+    assert actual_ratio_hex == expected_ratio_hex
+
+
 def test_initial_feot_split_conserves_iron_and_normalizes_without_oxygen_import():
     from simulator.fe_redox import split_feot_composition, RedoxState, FE_FEO_BUFFER_STANDARD
     from simulator.state import MOLAR_MASS
