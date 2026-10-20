@@ -247,31 +247,40 @@ def test_ellingham_authority_flag_is_consumed_by_metallothermic_diagnostic():
 
 
 def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
-    liquid_na2o_segment = next(
-        segment
-        for segment in ellingham_fit_segments("Na")
-        if "Na2O(l)" in segment.phase_basis
-    )
-
-    # 1100 C uses the alpha-Na2O segment today, while the activity coefficient
-    # is referenced to liquid NaO0.5. The 1150 C recipe point is above the
-    # 1405.2 K Na2O melt transition and already selects the liquid segment.
-    for temperature_C in (1100.0, 1150.0):
+    # NIST-JANAF Na-013, liquid Na2O formation Gibbs energies, doubled from
+    # kJ/mol Na2O to the 4 Na + O2 -> 2 Na2O basis (kJ/mol O2).
+    for temperature_K, expected_standard_delta_g in (
+        (1300.0, -433.616),
+        (1400.0, -384.082),
+    ):
         _priority, diagnostic = (
             BuiltinMetallothermicStepProvider._na_thermo_priority(
                 ("FeO",),
-                temperature_C,
+                temperature_K - CELSIUS_TO_KELVIN_OFFSET,
                 {"Na2O": 1.0, "FeO": 1.0},
             )
         )
-        temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
-        expected_standard_delta_g = liquid_na2o_segment.delta_g_kJ_per_mol_O2(
-            temperature_K
-        )
-
         assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
             expected_standard_delta_g
         )
+
+    # The fusion correction reaches the alpha standard Gibbs energy at the
+    # JANAF Na2O melting transition (1405.2 K).
+    alpha_na2o_segment = next(
+        segment
+        for segment in ellingham_fit_segments("Na")
+        if "Na2O(alpha)" in segment.phase_basis
+    )
+    melting_temperature_K = 1405.2
+    _priority, diagnostic = BuiltinMetallothermicStepProvider._na_thermo_priority(
+        ("FeO",),
+        melting_temperature_K - CELSIUS_TO_KELVIN_OFFSET,
+        {"Na2O": 1.0, "FeO": 1.0},
+    )
+    assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
+        alpha_na2o_segment.delta_g_kJ_per_mol_O2(melting_temperature_K),
+        abs=1e-3,
+    )
 
 
 def test_reconstructed_mn_authority_is_not_mislabeled_as_fit_extrapolation():
