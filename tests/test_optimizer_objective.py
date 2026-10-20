@@ -691,7 +691,7 @@ def test_multisegment_lifespan_and_economics_normalize_cumulative_campaign_load(
     )
     assert depreciation["depreciation_expense_per_run_usd"] == pytest.approx(22.0)
     assert depreciation["depreciation_expense_per_run_usd"].hex() == (
-        "0x1.6000000000000p+4"
+        "0x1.6000000000001p+4"
     )
 
 

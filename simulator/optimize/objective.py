@@ -4886,9 +4886,7 @@ def _depreciation_expense_per_run_summary(
                     "aggregate campaigns_to_resinter must be positive"
                 )
             # Unit check: USD/resinter / runs/resinter = USD/run.
-            depreciation = (
-                cost_parameters.furnace_resinter_cost_usd / threshold_kg
-            ) * wall_load
+            depreciation = cost_parameters.furnace_resinter_cost_usd / campaigns_to_resinter
             status = "campaigns_to_resinter"
     else:
         campaigns_to_resinter = None
