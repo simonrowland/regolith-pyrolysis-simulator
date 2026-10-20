@@ -98,7 +98,11 @@ from simulator.melt_backend.liquidus import (
     liquidus_sample_error_from_exception,
 )
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT,
+    PA_PER_BAR,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -154,7 +158,7 @@ _MELT_MODEL_ID = 'MELTS-v1.0'
 
 def _h2_melt_envelope_diagnostics(temperature_C: float) -> dict[str, Any]:
     return melt_extrapolation_diagnostic(
-        float(temperature_C) + 273.15,
+        float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
         _MELT_MODEL_ID,
     )
 
@@ -1825,7 +1829,9 @@ class _MELTSBackendSupport(MeltBackend):
             return LiquidusSolidusResult(
                 liquidus_T_C=liquidus_C,
                 liquidus_T_K=(
-                    liquidus_C + 273.15 if liquidus_C is not None else None
+                    liquidus_C + CELSIUS_TO_KELVIN_OFFSET
+                    if liquidus_C is not None
+                    else None
                 ),
                 liquid_fraction=result.liquid_fraction,
                 status=result.status,
@@ -5109,7 +5115,7 @@ class _MELTSBackendSupport(MeltBackend):
         )
         if not mu or not mu0:
             return {}
-        T_K = float(temperature_C) + 273.15
+        T_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         raw_activities: Dict[str, float] = {}
         for species, mu_i in mu.items():
             if species not in mu0:
@@ -5386,7 +5392,7 @@ class _MELTSBackendSupport(MeltBackend):
         try:
             commanded_pO2_bar = 10.0 ** float(gas_fO2_log)
             oxygen_atom_p_bar = _oxygen_atom_partial_pressure_bar(
-                eq.temperature_C + 273.15,
+                eq.temperature_C + CELSIUS_TO_KELVIN_OFFSET,
                 commanded_pO2_bar,
                 extract_path=(
                     Path(__file__).resolve().parents[2]
@@ -5404,8 +5410,8 @@ class _MELTSBackendSupport(MeltBackend):
         # With ideal gases fO2 = pO2. For O2 ⇌ 2O, CEA gives
         # ΔG° = 2G°(O) − G°(O2), Kp = exp(−ΔG°/RT), and
         # pO = P° sqrt(Kp * (pO2/P°)); both channels are returned in Pa.
-        pressures['O2'] = commanded_pO2_bar * 1.0e5
-        pressures['O'] = oxygen_atom_p_bar * 1.0e5
+        pressures['O2'] = commanded_pO2_bar * PA_PER_BAR
+        pressures['O'] = oxygen_atom_p_bar * PA_PER_BAR
         sources['O2'] = 'commanded_fO2_ideal_gas'
         sources['O'] = 'NASA_CEA_O2_dissociation_equilibrium'
         diagnostic['vapor_pressures_Pa'] = dict(pressures)
@@ -5788,7 +5794,7 @@ class _MELTSBackendSupport(MeltBackend):
         )
         from simulator.physical_constants import MELT_DISSOCIATION_PO2_MIN_BAR
 
-        T_K = float(T_C) + 273.15
+        T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
         pressures: Dict[str, float] = {}
         self._antoine_floor_inversion_notices = {}
         for species, spec in table.items():
