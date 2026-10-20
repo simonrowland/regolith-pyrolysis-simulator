@@ -1,0 +1,4554 @@
+schema_version: literature_extract.v1
+source_id: chen-2019-sioch-cp-entropy-gibbs
+source:
+  citation: Chen, J., Li, L., Li, J., Sun, J., Zhang, H. & Li, X. (2019), “Heat capacities, entropies, and Gibbs free energies
+    of formation of low-k amorphous Si(O)CH dielectric films and implications for stability during processing”, Journal of
+    Chemical Thermodynamics 128, 320–335.
+  doi: 10.1016/j.jct.2018.08.026
+  year: 2019
+extraction:
+  method: mineru_table_draft transcription from born-digital tables, checked against pdftotext layout and rendered table layouts
+  date: '2026-10-20'
+  worker: fam30-1020
+  source_note: Tables 5-12 are measured molar heat-capacity tables; every printed numeric Cp point is retained in its printed
+    unit and precision. Tables 1-4 and 13-25 dispositions are recorded under context; full numeric grids are in the accompanying
+    MinerU table drafts. Figures 1-4 are retained as deferred figure records without numeric points.
+review_status: draft
+notes:
+- text: Table 1 identifies eight whole-film samples. Each Cp observation binds values.sample_id to the table sample number;
+    these are sample labels, not chemical formulae. The samples are amorphous bulk films. Atom-percent composition is retained
+    as printed in table drafts and is not reconstructed into oxides.
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+- text: The measured PPMS pressure was 1.2 mPa (0.0012 Pa), with stated standard uncertainty 0.1 mPa; every table 5-12 CP
+    point is measured under this pressure. Temperature uncertainty is 4 mK; Cp standard uncertainty is 5% below 20 K and 2%
+    at/above 20 K.
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '5'
+    note: The table footnotes are repeated on Tables 5-12.
+species:
+  SiOCH:
+    observations:
+    - observation_id: chen2019_table5_sampleR337_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '5'
+        row: 'a-Si(O)CH #R337'
+        column: measured molar heat capacity
+      phase: glass
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: measured_direct
+        sample_id: R337
+        film_type_as_published: a-SiCH
+        series:
+        - T_K: '1.8308'
+          cp: '1.7349e-4'
+        - T_K: '1.9132'
+          cp: '1.9071e-4'
+        - T_K: '1.9982'
+          cp: '1.9211e-4'
+        - T_K: '2.0876'
+          cp: '2.0000e-4'
+        - T_K: '2.1803'
+          cp: '2.2415e-4'
+        - T_K: '2.2788'
+          cp: '2.3379e-4'
+        - T_K: '2.3827'
+          cp: '2.2497e-4'
+        - T_K: '2.4878'
+          cp: '2.5047e-4'
+        - T_K: '2.6001'
+          cp: '2.3456e-4'
+        - T_K: '2.7202'
+          cp: '2.8391e-4'
+        - T_K: '2.8599'
+          cp: '2.4371e-4'
+        - T_K: '2.9866'
+          cp: '3.0536e-4'
+        - T_K: '3.1185'
+          cp: '3.1000e-4'
+        - T_K: '3.2531'
+          cp: '3.3062e-4'
+        - T_K: '3.4017'
+          cp: '3.7350e-4'
+        - T_K: '3.5446'
+          cp: '4.1766e-4'
+        - T_K: '3.7035'
+          cp: '4.7246e-4'
+        - T_K: '3.8663'
+          cp: '5.0846e-4'
+        - T_K: '4.0365'
+          cp: '5.9610e-4'
+        - T_K: '4.2149'
+          cp: '5.1428e-4'
+        - T_K: '4.4016'
+          cp: '7.0476e-4'
+        - T_K: '4.5984'
+          cp: '5.8285e-4'
+        - T_K: '4.8016'
+          cp: '6.3068e-4'
+        - T_K: '5.0103'
+          cp: '9.2970e-4'
+        - T_K: '5.2343'
+          cp: '9.3441e-4'
+        - T_K: '5.4614'
+          cp: '1.0469e-3'
+        - T_K: '5.7042'
+          cp: '1.0111e-3'
+        - T_K: '5.9459'
+          cp: '9.5009e-4'
+        - T_K: '6.2076'
+          cp: '1.2253e-3'
+        - T_K: '6.4859'
+          cp: '1.5260e-3'
+        - T_K: '6.7703'
+          cp: '1.5641e-3'
+        - T_K: '7.0686'
+          cp: '1.8421e-3'
+        - T_K: '7.3747'
+          cp: '1.8876e-3'
+        - T_K: '7.7028'
+          cp: '2.4597e-3'
+        - T_K: '8.0373'
+          cp: '2.6511e-3'
+        - T_K: '8.3929'
+          cp: '2.7306e-3'
+        - T_K: '8.7558'
+          cp: '3.8425e-3'
+        - T_K: '9.1379'
+          cp: '4.3333e-3'
+        - T_K: '9.5389'
+          cp: '4.9327e-3'
+        - T_K: '9.9601'
+          cp: '5.1435e-3'
+        - T_K: '10.376'
+          cp: '5.7846e-3'
+        - T_K: '10.779'
+          cp: '6.3448e-3'
+        - T_K: '11.244'
+          cp: '7.0551e-3'
+        - T_K: '11.737'
+          cp: '7.7753e-3'
+        - T_K: '12.256'
+          cp: '9.2256e-3'
+        - T_K: '12.803'
+          cp: '0.010979'
+        - T_K: '13.370'
+          cp: '0.012608'
+        - T_K: '13.954'
+          cp: '0.014639'
+        - T_K: '14.584'
+          cp: '0.016899'
+        - T_K: '15.224'
+          cp: '0.019356'
+        - T_K: '15.717'
+          cp: '0.021044'
+        - T_K: '17.205'
+          cp: '0.028280'
+        - T_K: '18.768'
+          cp: '0.037249'
+        - T_K: '20.491'
+          cp: '0.047964'
+        - T_K: '22.451'
+          cp: '0.059305'
+        - T_K: '24.491'
+          cp: '0.081155'
+        - T_K: '26.751'
+          cp: '0.10821'
+        - T_K: '29.234'
+          cp: '0.13856'
+        - T_K: '31.925'
+          cp: '0.18607'
+        - T_K: '34.881'
+          cp: '0.24419'
+        - T_K: '38.103'
+          cp: '0.31583'
+        - T_K: '41.628'
+          cp: '0.40272'
+        - T_K: '45.479'
+          cp: '0.51890'
+        - T_K: '49.692'
+          cp: '0.63725'
+        - T_K: '54.292'
+          cp: '0.79903'
+        - T_K: '59.314'
+          cp: '0.99136'
+        - T_K: '64.811'
+          cp: '1.2085'
+        - T_K: '70.818'
+          cp: '1.4657'
+        - T_K: '77.385'
+          cp: '1.7752'
+        - T_K: '84.561'
+          cp: '2.1381'
+        - T_K: '92.411'
+          cp: '2.5332'
+        - T_K: '100.97'
+          cp: '2.9453'
+        - T_K: '111.07'
+          cp: '3.4458'
+        - T_K: '121.14'
+          cp: '3.9665'
+        - T_K: '131.23'
+          cp: '4.4667'
+        - T_K: '141.31'
+          cp: '4.9721'
+        - T_K: '151.35'
+          cp: '5.4986'
+        - T_K: '161.47'
+          cp: '5.9963'
+        - T_K: '171.51'
+          cp: '6.4966'
+        - T_K: '181.59'
+          cp: '7.0244'
+        - T_K: '191.65'
+          cp: '7.5043'
+        - T_K: '201.78'
+          cp: '7.9767'
+        - T_K: '211.85'
+          cp: '8.4347'
+        - T_K: '221.86'
+          cp: '8.8696'
+        - T_K: '231.92'
+          cp: '9.3039'
+        - T_K: '241.98'
+          cp: '9.7016'
+        - T_K: '252.13'
+          cp: '10.140'
+        - T_K: '262.19'
+          cp: '10.533'
+        - T_K: '272.25'
+          cp: '10.910'
+        - T_K: '282.21'
+          cp: '11.323'
+        - T_K: '292.35'
+          cp: '11.674'
+        - T_K: '302.44'
+          cp: '12.098'
+        method: Physical Properties Measurement System (PPMS) heat-capacity measurement
+        formula: unknown
+        uncertainty_as_published: 'Standard Cp uncertainty: 5% below 20 K and 2% at/above 20 K; temperature uncertainty 4
+          mK.'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '5'
+            note: The table footnote states 1.2 mPa during measurements.
+    - observation_id: chen2019_table7_sample300_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '6'
+        row: 'a-Si(O)CH #300'
+        column: measured molar heat capacity
+      phase: glass
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: measured_direct
+        sample_id: '300'
+        film_type_as_published: a-SiCH
+        series:
+        - T_K: '1.8416'
+          cp: '4.7419e-4'
+        - T_K: '1.9154'
+          cp: '5.3450e-4'
+        - T_K: '2.0070'
+          cp: '5.8799e-4'
+        - T_K: '2.1011'
+          cp: '6.5137e-4'
+        - T_K: '2.2018'
+          cp: '7.8927e-4'
+        - T_K: '2.3050'
+          cp: '8.6129e-4'
+        - T_K: '2.4140'
+          cp: '9.5470e-4'
+        - T_K: '2.5214'
+          cp: '1.0526e-3'
+        - T_K: '2.6199'
+          cp: '1.2288e-3'
+        - T_K: '2.7420'
+          cp: '1.4243e-3'
+        - T_K: '2.8646'
+          cp: '1.5894e-3'
+        - T_K: '2.9894'
+          cp: '1.6106e-3'
+        - T_K: '3.1153'
+          cp: '1.9665e-3'
+        - T_K: '3.2555'
+          cp: '2.3321e-3'
+        - T_K: '3.3998'
+          cp: '2.6236e-3'
+        - T_K: '3.5474'
+          cp: '2.8797e-3'
+        - T_K: '3.6998'
+          cp: '3.1956e-3'
+        - T_K: '3.8600'
+          cp: '4.0013e-3'
+        - T_K: '4.0321'
+          cp: '4.4922e-3'
+        - T_K: '4.2142'
+          cp: '5.1437e-3'
+        - T_K: '4.3989'
+          cp: '5.7148e-3'
+        - T_K: '4.5865'
+          cp: '6.4268e-3'
+        - T_K: '4.7929'
+          cp: '7.0432e-3'
+        - T_K: '5.0086'
+          cp: '8.4990e-3'
+        - T_K: '5.2244'
+          cp: '9.4155e-3'
+        - T_K: '5.4571'
+          cp: '0.010195'
+        - T_K: '5.7003'
+          cp: '0.012513'
+        - T_K: '5.9503'
+          cp: '0.013978'
+        - T_K: '6.2134'
+          cp: '0.016043'
+        - T_K: '6.4715'
+          cp: '0.017246'
+        - T_K: '6.7585'
+          cp: '0.020222'
+        - T_K: '7.0620'
+          cp: '0.023097'
+        - T_K: '7.3734'
+          cp: '0.025542'
+        - T_K: '7.6985'
+          cp: '0.029666'
+        - T_K: '8.0299'
+          cp: '0.032616'
+        - T_K: '8.3856'
+          cp: '0.036509'
+        - T_K: '8.7509'
+          cp: '0.040621'
+        - T_K: '9.1334'
+          cp: '0.045904'
+        - T_K: '9.5289'
+          cp: '0.051450'
+        - T_K: '9.9459'
+          cp: '0.056420'
+        - T_K: '10.371'
+          cp: '0.063676'
+        - T_K: '10.782'
+          cp: '0.070231'
+        - T_K: '11.249'
+          cp: '0.077908'
+        - T_K: '11.745'
+          cp: '0.086338'
+        - T_K: '12.265'
+          cp: '0.096651'
+        - T_K: '12.808'
+          cp: '0.10732'
+        - T_K: '13.379'
+          cp: '0.11913'
+        - T_K: '13.969'
+          cp: '0.13207'
+        - T_K: '14.581'
+          cp: '0.14576'
+        - T_K: '15.221'
+          cp: '0.16089'
+        - T_K: '15.739'
+          cp: '0.17296'
+        - T_K: '17.178'
+          cp: '0.21075'
+        - T_K: '18.795'
+          cp: '0.25464'
+        - T_K: '20.504'
+          cp: '0.30442'
+        - T_K: '22.439'
+          cp: '0.36493'
+        - T_K: '24.499'
+          cp: '0.43246'
+        - T_K: '26.771'
+          cp: '0.50931'
+        - T_K: '29.256'
+          cp: '0.60110'
+        - T_K: '31.963'
+          cp: '0.70628'
+        - T_K: '34.909'
+          cp: '0.83771'
+        - T_K: '38.134'
+          cp: '0.97586'
+        - T_K: '41.660'
+          cp: '1.1360'
+        - T_K: '45.519'
+          cp: '1.3179'
+        - T_K: '49.731'
+          cp: '1.5154'
+        - T_K: '54.331'
+          cp: '1.7222'
+        - T_K: '59.357'
+          cp: '1.9686'
+        - T_K: '64.858'
+          cp: '2.2369'
+        - T_K: '70.870'
+          cp: '2.5415'
+        - T_K: '77.437'
+          cp: '2.8830'
+        - T_K: '84.619'
+          cp: '3.2602'
+        - T_K: '92.471'
+          cp: '3.6062'
+        - T_K: '101.04'
+          cp: '3.9875'
+        - T_K: '111.16'
+          cp: '4.4404'
+        - T_K: '121.22'
+          cp: '4.9162'
+        - T_K: '131.28'
+          cp: '5.3205'
+        - T_K: '141.41'
+          cp: '5.7291'
+        - T_K: '151.46'
+          cp: '6.1891'
+        - T_K: '161.59'
+          cp: '6.5941'
+        - T_K: '171.64'
+          cp: '6.9846'
+        - T_K: '181.73'
+          cp: '7.4077'
+        - T_K: '191.81'
+          cp: '7.8154'
+        - T_K: '201.95'
+          cp: '8.2632'
+        - T_K: '212.03'
+          cp: '8.6329'
+        - T_K: '222.05'
+          cp: '9.0099'
+        - T_K: '232.13'
+          cp: '9.3807'
+        - T_K: '242.19'
+          cp: '9.7436'
+        - T_K: '252.35'
+          cp: '10.142'
+        - T_K: '262.41'
+          cp: '10.466'
+        - T_K: '272.47'
+          cp: '10.843'
+        - T_K: '282.43'
+          cp: '11.178'
+        - T_K: '292.55'
+          cp: '11.393'
+        - T_K: '302.62'
+          cp: '11.618'
+        method: Physical Properties Measurement System (PPMS) heat-capacity measurement
+        formula: unknown
+        uncertainty_as_published: 'Standard Cp uncertainty: 5% below 20 K and 2% at/above 20 K; temperature uncertainty 4
+          mK.'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            table: '6'
+            note: The table footnote states 1.2 mPa during measurements.
+    - observation_id: chen2019_table8_sample844_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '7'
+        row: 'a-Si(O)CH #844'
+        column: measured molar heat capacity
+      phase: glass
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: measured_direct
+        sample_id: '844'
+        film_type_as_published: a-SiOCH
+        series:
+        - T_K: '1.8276'
+          cp: '1.7110e-4'
+        - T_K: '1.9155'
+          cp: '2.0113e-4'
+        - T_K: '2.0031'
+          cp: '2.1548e-4'
+        - T_K: '2.1007'
+          cp: '2.3176e-4'
+        - T_K: '2.2002'
+          cp: '2.6004e-4'
+        - T_K: '2.3043'
+          cp: '2.7815e-4'
+        - T_K: '2.4019'
+          cp: '3.1439e-4'
+        - T_K: '2.5040'
+          cp: '3.2651e-4'
+        - T_K: '2.6161'
+          cp: '3.5737e-4'
+        - T_K: '2.7314'
+          cp: '3.8040e-4'
+        - T_K: '2.8534'
+          cp: '4.9900e-4'
+        - T_K: '2.9786'
+          cp: '4.9855e-4'
+        - T_K: '3.1081'
+          cp: '5.7585e-4'
+        - T_K: '3.2468'
+          cp: '5.6040e-4'
+        - T_K: '3.3927'
+          cp: '7.7609e-4'
+        - T_K: '3.5431'
+          cp: '7.6496e-4'
+        - T_K: '3.7011'
+          cp: '9.6929e-4'
+        - T_K: '3.8622'
+          cp: '1.0971e-3'
+        - T_K: '4.0319'
+          cp: '1.1434e-3'
+        - T_K: '4.2145'
+          cp: '1.2777e-3'
+        - T_K: '4.4004'
+          cp: '1.5082e-3'
+        - T_K: '4.5939'
+          cp: '1.6807e-3'
+        - T_K: '4.7952'
+          cp: '1.8407e-3'
+        - T_K: '5.0114'
+          cp: '2.5072e-3'
+        - T_K: '5.2314'
+          cp: '2.8835e-3'
+        - T_K: '5.4611'
+          cp: '3.4152e-3'
+        - T_K: '5.6970'
+          cp: '3.5860e-3'
+        - T_K: '5.9424'
+          cp: '4.5304e-3'
+        - T_K: '6.2082'
+          cp: '5.0088e-3'
+        - T_K: '6.4816'
+          cp: '6.1706e-3'
+        - T_K: '6.7671'
+          cp: '6.6057e-3'
+        - T_K: '7.0639'
+          cp: '7.7344e-3'
+        - T_K: '7.3758'
+          cp: '9.4189e-3'
+        - T_K: '7.7002'
+          cp: '0.010256'
+        - T_K: '8.0332'
+          cp: '0.012922'
+        - T_K: '8.3872'
+          cp: '0.014958'
+        - T_K: '8.7527'
+          cp: '0.016326'
+        - T_K: '9.1374'
+          cp: '0.021308'
+        - T_K: '9.5345'
+          cp: '0.024440'
+        - T_K: '9.9530'
+          cp: '0.027240'
+        - T_K: '10.373'
+          cp: '0.032775'
+        - T_K: '10.776'
+          cp: '0.037505'
+        - T_K: '11.241'
+          cp: '0.043062'
+        - T_K: '11.733'
+          cp: '0.049615'
+        - T_K: '12.252'
+          cp: '0.058126'
+        - T_K: '12.799'
+          cp: '0.068037'
+        - T_K: '13.363'
+          cp: '0.078516'
+        - T_K: '13.953'
+          cp: '0.090633'
+        - T_K: '14.568'
+          cp: '0.10389'
+        - T_K: '15.209'
+          cp: '0.11918'
+        - T_K: '15.721'
+          cp: '0.13138'
+        - T_K: '17.170'
+          cp: '0.17112'
+        - T_K: '18.780'
+          cp: '0.21976'
+        - T_K: '20.486'
+          cp: '0.27725'
+        - T_K: '22.446'
+          cp: '0.34133'
+        - T_K: '24.484'
+          cp: '0.42678'
+        - T_K: '26.741'
+          cp: '0.52792'
+        - T_K: '29.222'
+          cp: '0.63755'
+        - T_K: '31.911'
+          cp: '0.77492'
+        - T_K: '34.866'
+          cp: '0.92795'
+        - T_K: '38.089'
+          cp: '1.0994'
+        - T_K: '41.613'
+          cp: '1.2935'
+        - T_K: '45.466'
+          cp: '1.5214'
+        - T_K: '49.681'
+          cp: '1.7378'
+        - T_K: '54.279'
+          cp: '2.0146'
+        - T_K: '59.298'
+          cp: '2.3122'
+        - T_K: '64.795'
+          cp: '2.6370'
+        - T_K: '70.797'
+          cp: '3.0019'
+        - T_K: '77.365'
+          cp: '3.4186'
+        - T_K: '84.541'
+          cp: '3.9063'
+        - T_K: '92.386'
+          cp: '4.4117'
+        - T_K: '100.95'
+          cp: '4.9142'
+        - T_K: '111.05'
+          cp: '5.5117'
+        - T_K: '121.13'
+          cp: '6.1386'
+        - T_K: '131.18'
+          cp: '6.6760'
+        - T_K: '141.30'
+          cp: '7.2462'
+        - T_K: '151.34'
+          cp: '7.8078'
+        - T_K: '161.47'
+          cp: '8.3198'
+        - T_K: '171.51'
+          cp: '8.8496'
+        - T_K: '181.59'
+          cp: '9.3837'
+        - T_K: '191.65'
+          cp: '9.9026'
+        - T_K: '201.79'
+          cp: '10.372'
+        - T_K: '211.86'
+          cp: '10.830'
+        - T_K: '221.88'
+          cp: '11.300'
+        - T_K: '231.95'
+          cp: '11.726'
+        - T_K: '242.01'
+          cp: '12.107'
+        - T_K: '252.17'
+          cp: '12.530'
+        - T_K: '262.23'
+          cp: '12.929'
+        - T_K: '272.29'
+          cp: '13.303'
+        - T_K: '282.26'
+          cp: '13.774'
+        - T_K: '292.39'
+          cp: '14.122'
+        - T_K: '302.48'
+          cp: '14.602'
+        method: Physical Properties Measurement System (PPMS) heat-capacity measurement
+        formula: unknown
+        uncertainty_as_published: 'Standard Cp uncertainty: 5% below 20 K and 2% at/above 20 K; temperature uncertainty 4
+          mK.'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            table: '7'
+            note: The table footnote states 1.2 mPa during measurements.
+    - observation_id: chen2019_table9_sample539_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '8'
+        row: 'a-Si(O)CH #539'
+        column: measured molar heat capacity
+      phase: glass
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: measured_direct
+        sample_id: '539'
+        film_type_as_published: a-SiOCH
+        series:
+        - T_K: '1.8686'
+          cp: '5.0650e-4'
+        - T_K: '1.9081'
+          cp: '5.2908e-4'
+        - T_K: '1.9681'
+          cp: '5.6280e-4'
+        - T_K: '2.0442'
+          cp: '6.0505e-4'
+        - T_K: '2.1263'
+          cp: '6.4999e-4'
+        - T_K: '2.2137'
+          cp: '7.0212e-4'
+        - T_K: '2.3050'
+          cp: '7.4837e-4'
+        - T_K: '2.3994'
+          cp: '7.8883e-4'
+        - T_K: '2.4975'
+          cp: '8.3250e-4'
+        - T_K: '2.5994'
+          cp: '8.6856e-4'
+        - T_K: '2.7079'
+          cp: '8.9490e-4'
+        - T_K: '2.8195'
+          cp: '9.1873e-4'
+        - T_K: '2.9343'
+          cp: '9.4137e-4'
+        - T_K: '3.0243'
+          cp: '9.6978e-4'
+        - T_K: '3.1359'
+          cp: '1.0145e-3'
+        - T_K: '3.2799'
+          cp: '1.0933e-3'
+        - T_K: '3.4657'
+          cp: '1.2358e-3'
+        - T_K: '3.6181'
+          cp: '1.3353e-3'
+        - T_K: '3.7774'
+          cp: '1.4959e-3'
+        - T_K: '3.9469'
+          cp: '1.5876e-3'
+        - T_K: '4.1246'
+          cp: '1.7525e-3'
+        - T_K: '4.3086'
+          cp: '1.9458e-3'
+        - T_K: '4.4996'
+          cp: '2.1625e-3'
+        - T_K: '4.7121'
+          cp: '2.3713e-3'
+        - T_K: '4.9240'
+          cp: '2.7043e-3'
+        - T_K: '5.1497'
+          cp: '2.9705e-3'
+        - T_K: '5.3832'
+          cp: '3.4577e-3'
+        - T_K: '5.6256'
+          cp: '3.8579e-3'
+        - T_K: '5.8784'
+          cp: '4.5842e-3'
+        - T_K: '6.1434'
+          cp: '5.1700e-3'
+        - T_K: '6.4496'
+          cp: '6.0299e-3'
+        - T_K: '6.7334'
+          cp: '7.1846e-3'
+        - T_K: '7.0315'
+          cp: '8.0723e-3'
+        - T_K: '7.3449'
+          cp: '9.4145e-3'
+        - T_K: '7.6746'
+          cp: '0.011006'
+        - T_K: '8.0228'
+          cp: '0.012848'
+        - T_K: '8.3849'
+          cp: '0.015081'
+        - T_K: '8.7632'
+          cp: '0.017625'
+        - T_K: '9.1595'
+          cp: '0.020608'
+        - T_K: '9.5732'
+          cp: '0.024060'
+        - T_K: '10.024'
+          cp: '0.028495'
+        - T_K: '10.553'
+          cp: '0.033670'
+        - T_K: '11.065'
+          cp: '0.039336'
+        - T_K: '11.573'
+          cp: '0.045589'
+        - T_K: '12.093'
+          cp: '0.052411'
+        - T_K: '12.632'
+          cp: '0.060241'
+        - T_K: '13.192'
+          cp: '0.069121'
+        - T_K: '13.772'
+          cp: '0.079607'
+        - T_K: '14.390'
+          cp: '0.090735'
+        - T_K: '15.015'
+          cp: '0.10368'
+        - T_K: '15.524'
+          cp: '0.11431'
+        - T_K: '16.977'
+          cp: '0.14800'
+        - T_K: '18.569'
+          cp: '0.18881'
+        - T_K: '20.220'
+          cp: '0.23464'
+        - T_K: '22.200'
+          cp: '0.29639'
+        - T_K: '24.257'
+          cp: '0.36569'
+        - T_K: '26.523'
+          cp: '0.45062'
+        - T_K: '28.936'
+          cp: '0.54092'
+        - T_K: '31.666'
+          cp: '0.65065'
+        - T_K: '34.648'
+          cp: '0.78810'
+        - T_K: '37.876'
+          cp: '0.93619'
+        - T_K: '41.387'
+          cp: '1.0969'
+        - T_K: '45.263'
+          cp: '1.3084'
+        - T_K: '49.485'
+          cp: '1.5048'
+        - T_K: '54.088'
+          cp: '1.7285'
+        - T_K: '59.127'
+          cp: '1.9856'
+        - T_K: '64.634'
+          cp: '2.2780'
+        - T_K: '70.636'
+          cp: '2.6017'
+        - T_K: '77.213'
+          cp: '2.9862'
+        - T_K: '84.356'
+          cp: '3.4424'
+        - T_K: '92.222'
+          cp: '3.8405'
+        - T_K: '100.79'
+          cp: '4.2153'
+        - T_K: '110.91'
+          cp: '4.7653'
+        - T_K: '120.94'
+          cp: '5.2999'
+        - T_K: '131.06'
+          cp: '5.7648'
+        - T_K: '141.13'
+          cp: '6.2487'
+        - T_K: '151.19'
+          cp: '6.7210'
+        - T_K: '161.32'
+          cp: '7.1613'
+        - T_K: '171.43'
+          cp: '7.6002'
+        - T_K: '181.49'
+          cp: '8.0480'
+        - T_K: '191.57'
+          cp: '8.4743'
+        - T_K: '201.68'
+          cp: '8.8606'
+        - T_K: '211.78'
+          cp: '9.2359'
+        - T_K: '221.86'
+          cp: '9.5879'
+        - T_K: '231.95'
+          cp: '9.8882'
+        - T_K: '242.03'
+          cp: '10.230'
+        - T_K: '252.12'
+          cp: '10.614'
+        - T_K: '262.22'
+          cp: '10.892'
+        - T_K: '272.33'
+          cp: '11.313'
+        - T_K: '282.42'
+          cp: '11.632'
+        - T_K: '292.51'
+          cp: '11.864'
+        - T_K: '302.62'
+          cp: '12.523'
+        method: Physical Properties Measurement System (PPMS) heat-capacity measurement
+        formula: unknown
+        uncertainty_as_published: 'Standard Cp uncertainty: 5% below 20 K and 2% at/above 20 K; temperature uncertainty 4
+          mK.'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '8'
+            note: The table footnote states 1.2 mPa during measurements.
+    - observation_id: chen2019_table10_sample338_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '9'
+        row: 'a-Si(O)CH #338'
+        column: measured molar heat capacity
+      phase: glass
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: measured_direct
+        sample_id: '338'
+        film_type_as_published: a-SiOCH
+        series:
+        - T_K: '1.8169'
+          cp: '1.1247e-3'
+        - T_K: '1.8728'
+          cp: '1.2306e-3'
+        - T_K: '1.9248'
+          cp: '1.3423e-3'
+        - T_K: '1.9905'
+          cp: '1.4873e-3'
+        - T_K: '2.0548'
+          cp: '1.6482e-3'
+        - T_K: '2.1250'
+          cp: '1.8389e-3'
+        - T_K: '2.1994'
+          cp: '2.0736e-3'
+        - T_K: '2.2776'
+          cp: '2.3070e-3'
+        - T_K: '2.4311'
+          cp: '2.8562e-3'
+        - T_K: '2.5311'
+          cp: '3.2333e-3'
+        - T_K: '2.6391'
+          cp: '3.6969e-3'
+        - T_K: '2.7515'
+          cp: '4.1781e-3'
+        - T_K: '2.8715'
+          cp: '4.7613e-3'
+        - T_K: '3.0012'
+          cp: '5.4740e-3'
+        - T_K: '3.1356'
+          cp: '6.2763e-3'
+        - T_K: '3.2788'
+          cp: '7.2169e-3'
+        - T_K: '3.4267'
+          cp: '8.3573e-3'
+        - T_K: '3.5955'
+          cp: '9.7512e-3'
+        - T_K: '3.7659'
+          cp: '0.011288'
+        - T_K: '3.9355'
+          cp: '0.012995'
+        - T_K: '4.1122'
+          cp: '0.014928'
+        - T_K: '4.2962'
+          cp: '0.017101'
+        - T_K: '4.5003'
+          cp: '0.019683'
+        - T_K: '4.6988'
+          cp: '0.022362'
+        - T_K: '4.9098'
+          cp: '0.025405'
+        - T_K: '5.1291'
+          cp: '0.028866'
+        - T_K: '5.3617'
+          cp: '0.032829'
+        - T_K: '5.6033'
+          cp: '0.037235'
+        - T_K: '5.8566'
+          cp: '0.042240'
+        - T_K: '6.1212'
+          cp: '0.047741'
+        - T_K: '6.4261'
+          cp: '0.054417'
+        - T_K: '6.7084'
+          cp: '0.061137'
+        - T_K: '7.0050'
+          cp: '0.068436'
+        - T_K: '7.3198'
+          cp: '0.076844'
+        - T_K: '7.6516'
+          cp: '0.085943'
+        - T_K: '7.9981'
+          cp: '0.096137'
+        - T_K: '8.3609'
+          cp: '0.10722'
+        - T_K: '8.7411'
+          cp: '0.11938'
+        - T_K: '9.1377'
+          cp: '0.13269'
+        - T_K: '9.5519'
+          cp: '0.14724'
+        - T_K: '10.122'
+          cp: '0.16865'
+        - T_K: '10.602'
+          cp: '0.18659'
+        - T_K: '11.075'
+          cp: '0.20508'
+        - T_K: '11.554'
+          cp: '0.22508'
+        - T_K: '12.076'
+          cp: '0.24634'
+        - T_K: '12.610'
+          cp: '0.26969'
+        - T_K: '13.172'
+          cp: '0.29511'
+        - T_K: '13.757'
+          cp: '0.32260'
+        - T_K: '14.365'
+          cp: '0.35242'
+        - T_K: '15.006'
+          cp: '0.38418'
+        - T_K: '15.510'
+          cp: '0.40986'
+        - T_K: '16.960'
+          cp: '0.48663'
+        - T_K: '18.540'
+          cp: '0.57459'
+        - T_K: '20.229'
+          cp: '0.67109'
+        - T_K: '22.174'
+          cp: '0.79327'
+        - T_K: '24.239'
+          cp: '0.92961'
+        - T_K: '26.455'
+          cp: '1.0898'
+        - T_K: '28.938'
+          cp: '1.2683'
+        - T_K: '31.651'
+          cp: '1.4780'
+        - T_K: '34.610'
+          cp: '1.7261'
+        - T_K: '37.844'
+          cp: '2.0035'
+        - T_K: '41.380'
+          cp: '2.3106'
+        - T_K: '45.242'
+          cp: '2.6763'
+        - T_K: '49.453'
+          cp: '3.0578'
+        - T_K: '54.057'
+          cp: '3.4707'
+        - T_K: '59.100'
+          cp: '3.9230'
+        - T_K: '64.608'
+          cp: '4.4121'
+        - T_K: '70.613'
+          cp: '4.9330'
+        - T_K: '77.185'
+          cp: '5.4990'
+        - T_K: '84.324'
+          cp: '6.1014'
+        - T_K: '92.172'
+          cp: '6.6734'
+        - T_K: '100.76'
+          cp: '7.2186'
+        - T_K: '110.89'
+          cp: '7.8894'
+        - T_K: '120.92'
+          cp: '8.5145'
+        - T_K: '131.01'
+          cp: '9.0615'
+        - T_K: '141.10'
+          cp: '9.5886'
+        - T_K: '151.17'
+          cp: '10.093'
+        - T_K: '161.32'
+          cp: '10.549'
+        - T_K: '171.38'
+          cp: '11.010'
+        - T_K: '181.45'
+          cp: '11.453'
+        - T_K: '191.52'
+          cp: '11.891'
+        - T_K: '201.61'
+          cp: '12.271'
+        - T_K: '211.69'
+          cp: '12.641'
+        - T_K: '221.77'
+          cp: '13.005'
+        - T_K: '231.84'
+          cp: '13.341'
+        - T_K: '241.92'
+          cp: '13.689'
+        - T_K: '251.99'
+          cp: '14.019'
+        - T_K: '262.07'
+          cp: '14.312'
+        - T_K: '272.17'
+          cp: '14.655'
+        - T_K: '282.26'
+          cp: '14.917'
+        - T_K: '292.32'
+          cp: '15.229'
+        - T_K: '302.42'
+          cp: '15.539'
+        method: Physical Properties Measurement System (PPMS) heat-capacity measurement
+        formula: unknown
+        uncertainty_as_published: 'Standard Cp uncertainty: 5% below 20 K and 2% at/above 20 K; temperature uncertainty 4
+          mK.'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '9'
+            note: The table footnote states 1.2 mPa during measurements.
+    - observation_id: chen2019_table11_sample248_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 7
+        pdf_page_index: 6
+        table: '10'
+        row: 'a-Si(O)CH #248'
+        column: measured molar heat capacity
+      phase: glass
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: measured_direct
+        sample_id: '248'
+        film_type_as_published: a-SiOCH
+        series:
+        - T_K: '1.8329'
+          cp: '1.5039e-4'
+        - T_K: '1.9134'
+          cp: '1.8233e-4'
+        - T_K: '1.9976'
+          cp: '1.8886e-4'
+        - T_K: '2.0865'
+          cp: '1.9484e-4'
+        - T_K: '2.1794'
+          cp: '2.3238e-4'
+        - T_K: '2.3016'
+          cp: '2.5154e-4'
+        - T_K: '2.4037'
+          cp: '2.8485e-4'
+        - T_K: '2.5007'
+          cp: '2.8668e-4'
+        - T_K: '2.6266'
+          cp: '2.6794e-4'
+        - T_K: '2.7306'
+          cp: '3.3291e-4'
+        - T_K: '2.8566'
+          cp: '3.4918e-4'
+        - T_K: '2.9802'
+          cp: '4.1734e-4'
+        - T_K: '3.1127'
+          cp: '5.0510e-4'
+        - T_K: '3.2461'
+          cp: '5.2876e-4'
+        - T_K: '3.3931'
+          cp: '5.5606e-4'
+        - T_K: '3.5416'
+          cp: '5.8019e-4'
+        - T_K: '3.6947'
+          cp: '7.6103e-4'
+        - T_K: '3.8580'
+          cp: '6.9904e-4'
+        - T_K: '4.0295'
+          cp: '9.1448e-4'
+        - T_K: '4.2079'
+          cp: '9.9649e-4'
+        - T_K: '4.3956'
+          cp: '1.0464e-3'
+        - T_K: '4.5858'
+          cp: '1.4825e-3'
+        - T_K: '4.7900'
+          cp: '1.5643e-3'
+        - T_K: '5.0021'
+          cp: '1.5103e-3'
+        - T_K: '5.2237'
+          cp: '1.7840e-3'
+        - T_K: '5.4517'
+          cp: '2.5770e-3'
+        - T_K: '5.6944'
+          cp: '2.7079e-3'
+        - T_K: '5.9414'
+          cp: '3.0364e-3'
+        - T_K: '6.1966'
+          cp: '3.0600e-3'
+        - T_K: '6.4752'
+          cp: '3.6777e-3'
+        - T_K: '6.7588'
+          cp: '4.6440e-3'
+        - T_K: '7.0556'
+          cp: '5.6665e-3'
+        - T_K: '7.3650'
+          cp: '5.6073e-3'
+        - T_K: '7.6877'
+          cp: '7.2841e-3'
+        - T_K: '8.0298'
+          cp: '7.3698e-3'
+        - T_K: '8.3797'
+          cp: '8.8359e-3'
+        - T_K: '8.7436'
+          cp: '0.010184'
+        - T_K: '9.1310'
+          cp: '0.012592'
+        - T_K: '9.5322'
+          cp: '0.013615'
+        - T_K: '9.9457'
+          cp: '0.016642'
+        - T_K: '10.367'
+          cp: '0.018824'
+        - T_K: '10.773'
+          cp: '0.021431'
+        - T_K: '11.240'
+          cp: '0.024478'
+        - T_K: '11.734'
+          cp: '0.027973'
+        - T_K: '12.254'
+          cp: '0.032530'
+        - T_K: '12.797'
+          cp: '0.037891'
+        - T_K: '13.366'
+          cp: '0.043686'
+        - T_K: '13.953'
+          cp: '0.050276'
+        - T_K: '14.568'
+          cp: '0.057871'
+        - T_K: '15.219'
+          cp: '0.066318'
+        - T_K: '15.725'
+          cp: '0.072699'
+        - T_K: '17.170'
+          cp: '0.094841'
+        - T_K: '18.780'
+          cp: '0.12234'
+        - T_K: '20.489'
+          cp: '0.15599'
+        - T_K: '22.427'
+          cp: '0.19805'
+        - T_K: '24.490'
+          cp: '0.24365'
+        - T_K: '26.748'
+          cp: '0.31178'
+        - T_K: '29.235'
+          cp: '0.37526'
+        - T_K: '31.919'
+          cp: '0.46690'
+        - T_K: '34.874'
+          cp: '0.57195'
+        - T_K: '38.097'
+          cp: '0.69158'
+        - T_K: '41.622'
+          cp: '0.82903'
+        - T_K: '45.476'
+          cp: '0.99326'
+        - T_K: '49.689'
+          cp: '1.1545'
+        - T_K: '54.290'
+          cp: '1.3622'
+        - T_K: '59.308'
+          cp: '1.5859'
+        - T_K: '64.807'
+          cp: '1.8376'
+        - T_K: '70.811'
+          cp: '2.1195'
+        - T_K: '77.378'
+          cp: '2.4399'
+        - T_K: '84.559'
+          cp: '2.8088'
+        - T_K: '92.406'
+          cp: '3.2001'
+        - T_K: '100.97'
+          cp: '3.5811'
+        - T_K: '111.07'
+          cp: '4.0420'
+        - T_K: '121.06'
+          cp: '4.5127'
+        - T_K: '131.23'
+          cp: '4.9514'
+        - T_K: '141.27'
+          cp: '5.3726'
+        - T_K: '151.39'
+          cp: '5.8402'
+        - T_K: '161.47'
+          cp: '6.2465'
+        - T_K: '171.51'
+          cp: '6.6729'
+        - T_K: '181.63'
+          cp: '7.1090'
+        - T_K: '191.69'
+          cp: '7.5234'
+        - T_K: '201.77'
+          cp: '7.9155'
+        - T_K: '211.84'
+          cp: '8.3097'
+        - T_K: '221.91'
+          cp: '8.6846'
+        - T_K: '231.97'
+          cp: '9.0453'
+        - T_K: '242.03'
+          cp: '9.3908'
+        - T_K: '252.03'
+          cp: '9.7470'
+        - T_K: '262.09'
+          cp: '10.090'
+        - T_K: '272.21'
+          cp: '10.413'
+        - T_K: '282.26'
+          cp: '10.793'
+        - T_K: '292.22'
+          cp: '11.110'
+        - T_K: '302.38'
+          cp: '11.441'
+        method: Physical Properties Measurement System (PPMS) heat-capacity measurement
+        formula: unknown
+        uncertainty_as_published: 'Standard Cp uncertainty: 5% below 20 K and 2% at/above 20 K; temperature uncertainty 4
+          mK.'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            table: '10'
+            note: The table footnote states 1.2 mPa during measurements.
+    - observation_id: chen2019_table12_sample149_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 7
+        pdf_page_index: 6
+        table: '11'
+        row: 'a-Si(O)CH #149'
+        column: measured molar heat capacity
+      phase: glass
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: measured_direct
+        sample_id: '149'
+        film_type_as_published: a-SiOCH
+        series:
+        - T_K: '1.8307'
+          cp: '2.4771e-3'
+        - T_K: '1.9043'
+          cp: '2.7607e-3'
+        - T_K: '1.9783'
+          cp: '3.2028e-3'
+        - T_K: '2.0596'
+          cp: '3.6728e-3'
+        - T_K: '2.1452'
+          cp: '4.1688e-3'
+        - T_K: '2.2321'
+          cp: '4.8327e-3'
+        - T_K: '2.3269'
+          cp: '5.5812e-3'
+        - T_K: '2.4214'
+          cp: '6.4132e-3'
+        - T_K: '2.5224'
+          cp: '7.3609e-3'
+        - T_K: '2.6281'
+          cp: '8.5760e-3'
+        - T_K: '2.7385'
+          cp: '9.3981e-3'
+        - T_K: '2.8571'
+          cp: '0.010747'
+        - T_K: '2.9939'
+          cp: '0.012292'
+        - T_K: '3.1346'
+          cp: '0.014090'
+        - T_K: '3.2748'
+          cp: '0.016101'
+        - T_K: '3.4190'
+          cp: '0.018446'
+        - T_K: '3.5707'
+          cp: '0.020881'
+        - T_K: '3.7279'
+          cp: '0.023807'
+        - T_K: '3.8933'
+          cp: '0.026909'
+        - T_K: '4.0676'
+          cp: '0.030543'
+        - T_K: '4.2497'
+          cp: '0.034626'
+        - T_K: '4.4458'
+          cp: '0.039072'
+        - T_K: '4.6389'
+          cp: '0.043630'
+        - T_K: '4.8490'
+          cp: '0.048930'
+        - T_K: '5.0629'
+          cp: '0.054877'
+        - T_K: '5.2882'
+          cp: '0.061012'
+        - T_K: '5.5281'
+          cp: '0.068252'
+        - T_K: '5.7665'
+          cp: '0.076027'
+        - T_K: '6.0227'
+          cp: '0.084405'
+        - T_K: '6.2906'
+          cp: '0.093899'
+        - T_K: '6.5700'
+          cp: '0.10365'
+        - T_K: '6.8617'
+          cp: '0.11438'
+        - T_K: '7.1643'
+          cp: '0.12625'
+        - T_K: '7.4836'
+          cp: '0.14505'
+        - T_K: '7.8230'
+          cp: '0.15247'
+        - T_K: '8.1625'
+          cp: '0.16839'
+        - T_K: '8.5243'
+          cp: '0.18438'
+        - T_K: '8.9025'
+          cp: '0.20185'
+        - T_K: '9.2982'
+          cp: '0.22032'
+        - T_K: '9.7111'
+          cp: '0.24066'
+        - T_K: '10.214'
+          cp: '0.26679'
+        - T_K: '10.680'
+          cp: '0.29032'
+        - T_K: '11.151'
+          cp: '0.31504'
+        - T_K: '11.644'
+          cp: '0.34096'
+        - T_K: '12.158'
+          cp: '0.36869'
+        - T_K: '12.694'
+          cp: '0.39811'
+        - T_K: '13.255'
+          cp: '0.42969'
+        - T_K: '13.841'
+          cp: '0.46424'
+        - T_K: '14.453'
+          cp: '0.50035'
+        - T_K: '15.092'
+          cp: '0.53791'
+        - T_K: '15.594'
+          cp: '0.56635'
+        - T_K: '17.043'
+          cp: '0.65289'
+        - T_K: '18.629'
+          cp: '0.74900'
+        - T_K: '20.327'
+          cp: '0.86145'
+        - T_K: '22.265'
+          cp: '0.96951'
+        - T_K: '24.333'
+          cp: '1.0965'
+        - T_K: '26.570'
+          cp: '1.2374'
+        - T_K: '29.045'
+          cp: '1.3856'
+        - T_K: '31.751'
+          cp: '1.5517'
+        - T_K: '34.710'
+          cp: '1.7422'
+        - T_K: '37.944'
+          cp: '1.9490'
+        - T_K: '41.476'
+          cp: '2.1719'
+        - T_K: '45.337'
+          cp: '2.4210'
+        - T_K: '49.558'
+          cp: '2.6774'
+        - T_K: '54.164'
+          cp: '2.9718'
+        - T_K: '59.198'
+          cp: '3.3020'
+        - T_K: '64.692'
+          cp: '3.6245'
+        - T_K: '70.710'
+          cp: '3.9750'
+        - T_K: '77.289'
+          cp: '4.3754'
+        - T_K: '84.441'
+          cp: '4.8194'
+        - T_K: '92.311'
+          cp: '5.2604'
+        - T_K: '100.88'
+          cp: '5.6646'
+        - T_K: '110.96'
+          cp: '6.1575'
+        - T_K: '121.03'
+          cp: '6.6554'
+        - T_K: '131.16'
+          cp: '7.0866'
+        - T_K: '141.24'
+          cp: '7.5030'
+        - T_K: '151.30'
+          cp: '7.9184'
+        - T_K: '161.43'
+          cp: '8.2836'
+        - T_K: '171.56'
+          cp: '8.6661'
+        - T_K: '181.64'
+          cp: '9.0545'
+        - T_K: '191.73'
+          cp: '9.4051'
+        - T_K: '201.83'
+          cp: '9.7414'
+        - T_K: '211.92'
+          cp: '10.052'
+        - T_K: '222.01'
+          cp: '10.353'
+        - T_K: '232.10'
+          cp: '10.645'
+        - T_K: '242.18'
+          cp: '10.951'
+        - T_K: '252.28'
+          cp: '11.248'
+        - T_K: '262.39'
+          cp: '11.511'
+        - T_K: '272.49'
+          cp: '11.727'
+        - T_K: '282.61'
+          cp: '12.022'
+        - T_K: '292.73'
+          cp: '12.294'
+        - T_K: '302.88'
+          cp: '12.577'
+        method: Physical Properties Measurement System (PPMS) heat-capacity measurement
+        formula: unknown
+        uncertainty_as_published: 'Standard Cp uncertainty: 5% below 20 K and 2% at/above 20 K; temperature uncertainty 4
+          mK.'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            table: '11'
+            note: The table footnote states 1.2 mPa during measurements.
+    - observation_id: chen2019_table13_sample659_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 8
+        pdf_page_index: 7
+        table: '12'
+        row: 'a-Si(O)CH #659'
+        column: measured molar heat capacity
+      phase: glass
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: measured_direct
+        sample_id: '659'
+        film_type_as_published: a-SiOCH
+        series:
+        - T_K: '1.8304'
+          cp: '2.2792e-3'
+        - T_K: '1.9109'
+          cp: '2.5954e-3'
+        - T_K: '1.9978'
+          cp: '3.0047e-3'
+        - T_K: '2.0879'
+          cp: '3.6034e-3'
+        - T_K: '2.1834'
+          cp: '4.1910e-3'
+        - T_K: '2.2807'
+          cp: '4.3040e-3'
+        - T_K: '2.3835'
+          cp: '5.2567e-3'
+        - T_K: '2.4887'
+          cp: '5.9560e-3'
+        - T_K: '2.5958'
+          cp: '7.0307e-3'
+        - T_K: '2.7185'
+          cp: '7.9172e-3'
+        - T_K: '2.8322'
+          cp: '8.9634e-3'
+        - T_K: '2.9601'
+          cp: '0.010916'
+        - T_K: '3.0884'
+          cp: '0.011247'
+        - T_K: '3.2249'
+          cp: '0.013075'
+        - T_K: '3.3674'
+          cp: '0.015183'
+        - T_K: '3.5149'
+          cp: '0.016987'
+        - T_K: '3.6672'
+          cp: '0.018947'
+        - T_K: '3.8304'
+          cp: '0.021928'
+        - T_K: '3.9996'
+          cp: '0.024659'
+        - T_K: '4.1749'
+          cp: '0.027657'
+        - T_K: '4.3626'
+          cp: '0.031567'
+        - T_K: '4.5541'
+          cp: '0.033991'
+        - T_K: '4.7534'
+          cp: '0.038873'
+        - T_K: '4.9654'
+          cp: '0.044027'
+        - T_K: '5.1840'
+          cp: '0.048493'
+        - T_K: '5.4157'
+          cp: '0.054034'
+        - T_K: '5.6523'
+          cp: '0.060352'
+        - T_K: '5.9035'
+          cp: '0.063842'
+        - T_K: '6.1554'
+          cp: '0.073242'
+        - T_K: '6.4292'
+          cp: '0.077766'
+        - T_K: '6.7145'
+          cp: '0.088555'
+        - T_K: '7.0101'
+          cp: '0.093210'
+        - T_K: '7.3193'
+          cp: '0.10688'
+        - T_K: '7.6420'
+          cp: '0.11785'
+        - T_K: '7.9815'
+          cp: '0.12460'
+        - T_K: '8.3309'
+          cp: '0.13583'
+        - T_K: '8.6979'
+          cp: '0.15119'
+        - T_K: '9.0794'
+          cp: '0.16363'
+        - T_K: '9.4765'
+          cp: '0.17260'
+        - T_K: '9.8935'
+          cp: '0.19352'
+        - T_K: '10.327'
+          cp: '0.20747'
+        - T_K: '10.756'
+          cp: '0.22393'
+        - T_K: '11.228'
+          cp: '0.24123'
+        - T_K: '11.724'
+          cp: '0.26025'
+        - T_K: '12.243'
+          cp: '0.28104'
+        - T_K: '12.783'
+          cp: '0.30353'
+        - T_K: '13.351'
+          cp: '0.32721'
+        - T_K: '13.938'
+          cp: '0.35277'
+        - T_K: '14.552'
+          cp: '0.37869'
+        - T_K: '15.193'
+          cp: '0.40693'
+        - T_K: '15.703'
+          cp: '0.42820'
+        - T_K: '17.150'
+          cp: '0.49278'
+        - T_K: '18.749'
+          cp: '0.56360'
+        - T_K: '20.475'
+          cp: '0.63957'
+        - T_K: '22.389'
+          cp: '0.73574'
+        - T_K: '24.454'
+          cp: '0.82532'
+        - T_K: '26.723'
+          cp: '0.94031'
+        - T_K: '29.207'
+          cp: '1.0309'
+        - T_K: '31.907'
+          cp: '1.1687'
+        - T_K: '34.861'
+          cp: '1.3282'
+        - T_K: '38.088'
+          cp: '1.4954'
+        - T_K: '41.619'
+          cp: '1.6816'
+        - T_K: '45.478'
+          cp: '1.8904'
+        - T_K: '49.691'
+          cp: '2.1002'
+        - T_K: '54.297'
+          cp: '2.3248'
+        - T_K: '59.337'
+          cp: '2.6111'
+        - T_K: '64.838'
+          cp: '2.9177'
+        - T_K: '70.848'
+          cp: '3.2170'
+        - T_K: '77.414'
+          cp: '3.5423'
+        - T_K: '84.597'
+          cp: '3.9197'
+        - T_K: '92.442'
+          cp: '4.2906'
+        - T_K: '101.02'
+          cp: '4.5678'
+        - T_K: '111.15'
+          cp: '5.0421'
+        - T_K: '121.22'
+          cp: '5.4532'
+        - T_K: '131.28'
+          cp: '5.7921'
+        - T_K: '141.41'
+          cp: '6.1180'
+        - T_K: '151.47'
+          cp: '6.4796'
+        - T_K: '161.60'
+          cp: '6.7827'
+        - T_K: '171.65'
+          cp: '7.2509'
+        - T_K: '181.74'
+          cp: '7.4788'
+        - T_K: '191.84'
+          cp: '7.7793'
+        - T_K: '202.01'
+          cp: '8.0751'
+        - T_K: '211.66'
+          cp: '8.3402'
+        - T_K: '222.12'
+          cp: '8.6574'
+        - T_K: '232.19'
+          cp: '8.9508'
+        - T_K: '242.26'
+          cp: '9.2176'
+        - T_K: '252.43'
+          cp: '9.6157'
+        - T_K: '262.50'
+          cp: '9.8062'
+        - T_K: '272.59'
+          cp: '10.023'
+        - T_K: '282.60'
+          cp: '10.428'
+        - T_K: '292.77'
+          cp: '10.690'
+        - T_K: '302.89'
+          cp: '10.960'
+        method: Physical Properties Measurement System (PPMS) heat-capacity measurement
+        formula: unknown
+        uncertainty_as_published: 'Standard Cp uncertainty: 5% below 20 K and 2% at/above 20 K; temperature uncertainty 4
+          mK.'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            table: '12'
+            note: The table footnote states 1.2 mPa during measurements.
+    - observation_id: chen2019_table5_sampleR337_cp_continued
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '5'
+        row: 'a-SiCH #R337 (continued)'
+        column: measured molar heat capacity
+      phase: glass
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: measured_direct
+        method: Physical Properties Measurement System (PPMS) heat-capacity measurement
+        sample_id: R337
+        film_type_as_published: a-SiCH
+        series:
+        - T_K: '7.0686'
+          cp: '1.8421e-3'
+        - T_K: '7.3747'
+          cp: '1.8876e-3'
+        - T_K: '7.7028'
+          cp: '2.4597e-3'
+        - T_K: '59.314'
+          cp: '0.99136'
+        - T_K: '64.811'
+          cp: '1.2085'
+        - T_K: '70.818'
+          cp: '1.4657'
+        formula: unknown
+        uncertainty_as_published: 'Standard Cp uncertainty: 5% below 20 K and 2% at/above 20 K; temperature uncertainty 4
+          mK.'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            table: '5'
+            note: The continued table footnote states 1.2 mPa during measurements.
+    context:
+    - observation_id: chen2019_table1_context
+      type: printed_table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+      units: as printed in table headers
+      values:
+        quantity: printed_table_values_no_token
+        table_number: 1
+        disposition: context_schema_gap
+        reason: 'Table 1 atom-percent elemental film composition, gram-atom molar mass, dielectric constant, and density.
+          Candidate tokens reviewed: residue_component_composition, density, electrical_conductivity. The atomic percentages
+          are not an oxide composition and dielectric constant has no token; whole-film density is outside the requested thermochemistry
+          extraction. Sample labels and all numeric cells are preserved below.'
+        printed_rows:
+        - - 'Sample #'
+          - Film Type
+          - $Si^b$
+          - $O^b$
+          - $C^b$
+          - $H^b$
+          - $Mass^c (g·mol^{-1})$
+          - Dielectric Constant (k)
+          - $Mass\ Density^d (g·cm^{-3})$
+        - - $R337^a$
+          - a-SiCH
+          - '37.1'
+          - '0.3'
+          - '36.3'
+          - '26.3'
+          - '15.093'
+          - '7.2'
+          - '2.5'
+        - - '300'
+          - a-SiCH
+          - '21.2'
+          - '0'
+          - '32.6'
+          - '46.3'
+          - '10.336'
+          - '5'
+          - '1.8'
+        - - $844^a$
+          - a-SiOCH
+          - '36.1'
+          - '45.2'
+          - '10'
+          - '8.6'
+          - '18.658'
+          - '4.2'
+          - '2.4'
+        - - '539'
+          - a-SiOCH
+          - '26.7'
+          - '39.55'
+          - '12.4'
+          - '21.34'
+          - '15.531'
+          - '3.8'
+          - '2.2'
+        - - '338'
+          - a-SiOCH
+          - '20.3'
+          - '34'
+          - '15.5'
+          - '30.2'
+          - '13.309'
+          - '3.2'
+          - '1.6'
+        - - $248^a$
+          - a-SiOCH
+          - '25.4'
+          - '19.6'
+          - '22.6'
+          - '32.5'
+          - '13.312'
+          - '4.8'
+          - '2'
+        - - '149'
+          - a-SiOCH
+          - '16.36'
+          - '26.1'
+          - '15.05'
+          - '42.49'
+          - '11.007'
+          - '3.3'
+          - '1.3'
+        - - '659'
+          - a-SiOCH
+          - '10.4'
+          - '10.2'
+          - '24.1'
+          - '55.3'
+          - '8.005'
+          - '2.6'
+          - '1.25'
+    - observation_id: chen2019_table2_context
+      type: printed_table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+      units: as printed in table headers
+      values:
+        quantity: printed_table_values_no_token
+        table_number: 2
+        disposition: context_schema_gap
+        reason: 'Table 2 sample masses, copper reference masses, molar masses and measurement pressure. Candidate tokens reviewed:
+          total_pressure_Pa (typed on every CP observation), density. Mass/reference mass are apparatus quantities with no
+          store quantity token; all numeric cells are preserved below.'
+        printed_rows:
+        - - ''
+          - '#R337'
+          - '#300'
+          - '#844'
+          - '#539'
+          - '#338'
+          - '#248'
+          - '#149'
+          - '#659'
+        - - p/mPa
+          - '1.2'
+          - '1.2'
+          - '1.2'
+          - '1.2'
+          - '1.2'
+          - '1.2'
+          - '1.2'
+          - '1.2'
+        - - $M_s/mg$
+          - '12.98'
+          - '7.16'
+          - '9.28'
+          - '4.02'
+          - '8.94'
+          - '11.02'
+          - '9.84'
+          - '2.36'
+        - - $M/g·mol^{-1}$
+          - '15.093'
+          - '10.336'
+          - '18.658'
+          - '15.531'
+          - '13.309'
+          - '13.312'
+          - '11.007'
+          - '8.005'
+        - - $M_{Cu}/mg$
+          - '28.76'
+          - '30.10'
+          - '25.36'
+          - '18.20'
+          - '22.60'
+          - '32.66'
+          - '28.96'
+          - '29.92'
+    - observation_id: chen2019_table3_context
+      type: printed_table_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+      units: as printed in table headers
+      values:
+        quantity: printed_table_values_no_token
+        table_number: 3
+        disposition: context_schema_gap
+        reason: 'Table 3 drop-solution enthalpy replicate measurements and means. Candidate tokens reviewed: delta_fH, H_minus_H298
+          and heat_of_fusion. Drop-solution enthalpy is not any of these quantities and no matching token exists; replicate
+          values and mean are preserved below.'
+        printed_rows:
+        - - 'Sample #'
+          - '300'
+          - '300'
+          - '539'
+          - '539'
+          - '338'
+          - '338'
+          - '149'
+          - '149'
+          - '659'
+          - '659'
+        - - Experiment number
+          - Pellet mass (mg)
+          - $\Delta {H}_{ds}$  (kJ/mol)
+          - Pellet mass (mg)
+          - $\Delta {H}_{ds}$  (kJ/mol)
+          - Pellet mass (mg)
+          - $\Delta {H}_{ds}$  (kJ/mol)
+          - Pellet mass (mg)
+          - $\Delta {H}_{ds}$  (kJ/mol)
+          - Pellet mass (mg)
+          - $\Delta {H}_{ds}$  (kJ/mol)
+        - - '1'
+          - '2.44'
+          - '-228.34'
+          - '1.301'
+          - '-130.18'
+          - '2.113'
+          - '-119.38'
+          - '1.129'
+          - '-164.65'
+          - '1.032'
+          - '-108.97'
+        - - '2'
+          - '2.49'
+          - '-232.29'
+          - '1.111'
+          - '-129.66'
+          - '2.680'
+          - '-118.13'
+          - '0.873'
+          - '-162.44'
+          - '0.941'
+          - '-108.38'
+        - - '3'
+          - '1.75'
+          - '-231.87'
+          - '1.126'
+          - '-129.71'
+          - '2.102'
+          - '-118.11'
+          - '1.127'
+          - '-164.05'
+          - '0.754'
+          - '-98.55'
+        - - '4'
+          - '1.86'
+          - '-233.95'
+          - '1.361'
+          - '-127.43'
+          - '2.726'
+          - '-119.42'
+          - '0.957'
+          - '-165.26'
+          - '0.959'
+          - '-107.88'
+        - - '5'
+          - '1.92'
+          - '-230.01'
+          - '1.168'
+          - '-126.72'
+          - '2.471'
+          - '-119.39'
+          - '0.658'
+          - '-163.28'
+          - '0.839'
+          - '-115.08'
+        - - '6'
+          - '1.87'
+          - --228.27
+          - '1.057'
+          - '-125.91'
+          - '2.783'
+          - '-117.54'
+          - '0.842'
+          - '-163.56'
+          - '0.696'
+          - '-110.53'
+        - - '7'
+          - '2.02'
+          - '-226.15'
+          - '0.928'
+          - '-126.83'
+          - '1.997'
+          - '-120.18'
+          - '0.975'
+          - '-163.37'
+          - '0.850'
+          - '-116.57'
+        - - '8'
+          - '1.79'
+          - '-227.21'
+          - '0.694'
+          - '-127.84'
+          - '2.640'
+          - '-118.22'
+          - '0.859'
+          - '-163.26'
+          - '0.786'
+          - '-123.60'
+        - - Average  $\Delta {H}_{ds}$  (kJ/mol)
+          - -229.76 ± 1.93(8)
+          - -229.76 ± 1.93(8)
+          - -128.03 ± 1.14(8)
+          - -128.03 ± 1.14(8)
+          - -118.79 ± 0.64(8)
+          - -118.79 ± 0.64(8)
+          - -163.73 ± 0.63(8)
+          - -163.73 ± 0.63(8)
+          - -111.19 ± 5.22(8)
+          - -111.19 ± 5.22(8)
+    - observation_id: chen2019_table4_context
+      type: printed_table_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '4'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 4
+        disposition: context_derived_values
+        reason: Table 4 reports formation enthalpy, standard entropy, entropy of formation and Gibbs energy. These have existing
+          thermochemistry quantity tokens, so the printed values are carried in the context payload here while the CP series
+          remain scored. Table 4 cells include source attribution and uncertainty annotations; no uncertainty is parsed as
+          a zero.
+        printed_rows:
+        - - 'Sample #'
+          - Film Type
+          - $\Delta {\mathrm{H}}_{\mathrm{{ds}}}$  (kJ/mol)
+          - $\Delta {\mathrm{H}}_{\mathrm{{ox}},{25}^{ \circ }\mathrm{C}}$  (kJ/mol)
+          - $\Delta {\mathrm{H}}_{\mathrm{f},\mathrm{{ele}}}$  (kJ/mol)
+          - ${\mathrm{S}}^{0}\left( {\mathrm{J} \cdot {\mathrm{K}}^{-1} \cdot {\mathrm{{mol}}}^{-1}}\right)$
+          - $\Delta {\mathrm{S}}_{\mathrm{f},\mathrm{{ele}}}^{\mathrm{o}}\left( {\mathrm{J} \cdot {\mathrm{K}}^{-1} \cdot
+            {\mathrm{{mol}}}^{-1}}\right)$
+          - $\Delta {\mathrm{G}}_{\mathrm{f},\mathrm{{ele}}}^{\mathrm{o}}\left( {\mathrm{K} \cdot {\mathrm{{mol}}}^{-1}}\right)$
+        - - ${\mathrm{R337}}^{\mathrm{a}}$
+          - a-SiCH $^{\mathrm{b}}$
+          - $- {458.32} \pm {5.80}{\left( 7\right) }^{\mathrm{c},\mathrm{d}}$
+          - $- {479.94} \pm {5.80}$
+          - $- {37.50} \pm {5.85}$
+          - ${8.80} \pm {0.18}$
+          - $- {17.76} \pm {0.18}$
+          - $- {32.21} \pm {5.85}$
+        - - '300'
+          - a-SiCH
+          - $- {229.76} \pm {1.93}\left( 8\right)$
+          - $- {252.96} \pm {1.93}$
+          - $- {133.15} \pm {1.98}$
+          - ${10.59} \pm {0.21}$
+          - $- {25.50} \pm {0.21}$
+          - $- {125.55} \pm {1.98}$
+        - - ${844}^{\mathrm{a}}$
+          - a-SiOCH
+          - $- {94.68} \pm {0.70}\left( 8\right)$
+          - $- {113.17} \pm {0.70}$
+          - $- {266.47} \pm {1.00}$
+          - ${13.02} \pm {0.26}$
+          - $- {46.34} \pm {0.26}$
+          - $- {252.66} \pm {1.00}$
+        - - '539'
+          - a-SiOCH
+          - $- {128.03} \pm {1.14}\left( 8\right)$
+          - $- {147.62} \pm {1.14}$
+          - $- {174.21} \pm {1.27}$
+          - ${11.18} \pm {0.22}$
+          - $- {49.07} \pm {0.22}$
+          - $- {159.58} \pm {1.27}$
+        - - '338'
+          - a-SiOCH
+          - $- {118.79} \pm {0.64}\left( 8\right)$
+          - $- {139.15} \pm {0.64}$
+          - $- {149.40} \pm {0.77}$
+          - ${17.46} \pm {0.35}$
+          - $- {41.86} \pm {0.35}$
+          - $- {136.92} \pm {0.78}$
+        - - ${248}^{\mathrm{a}}$
+          - a-SiOCH
+          - $- {211.04} \pm {2.79}\left( 8\right)$
+          - $- {232.41} \pm {2.79}$
+          - $- {133.71} \pm {2.84}$
+          - ${9.66} \pm {0.02}$
+          - $- {37.75} \pm {0.02}$
+          - $- {122.45} \pm {2.84}$
+        - - '149'
+          - a-SiOCH
+          - $- {163.73} \pm {0.63}\left( 8\right)$
+          - $- {185.77} \pm {0.63}$
+          - $- {82.78} \pm {0.72}$
+          - ${14.40} \pm {0.29}$
+          - $- {44.08} \pm {0.29}$
+          - $- {69.64} \pm {0.72}$
+        - - '659'
+          - a-SiOCH
+          - $- {111.19} \pm {5.22}\left( 8\right)$
+          - $- {134.72} \pm {5.22}$
+          - $- {133.61} \pm {5.23}$
+          - ${11.77} \pm {0.24}$
+          - $- {38.17} \pm {0.24}$
+          - $- {122.23} \pm {5.23}$
+        schema_gap: The formation functions use Table 3 drop-solution enthalpies, which have no matching store token. Derived
+          formation thermochemistry is pending a corpus table asset (controller, t-1382); source table cells are in .agent-scratch/oxide-thermochemistry-tables/chen-2019-sioch-cp-entropy-gibbs/table-4.csv.
+    - observation_id: chen2019_table14_context
+      type: printed_table_context
+      locator:
+        page: 10
+        pdf_page_index: 9
+        table: '14'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 14
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows:
+        - - ''
+          - Parameter
+          - '#R337'
+          - '#300'
+          - '#844'
+          - '#539'
+          - '#338'
+          - '#248'
+          - '#149'
+          - '#659'
+        - - Low T Fits
+          - $\gamma/J·K^{-2}·mol^{-1}$
+          - $8.32·10^{-5}$
+          - $2.43·10^{-5}$
+          - $6.27·10^{-5}$
+          - '0.000281'
+          - '0'
+          - $6.01·10^{-5}$
+          - '0'
+          - '0.000829'
+        - - Low T Fits
+          - $B_3/J·K^{-4}$
+          - $2.20·10^{-6}$
+          - $6.13·10^{-5}$
+          - $9.41·10^{-6}$
+          - $2.07·10^{-6}$
+          - '0.000187'
+          - $7.52·10^{-6}$
+          - '0.000342'
+          - $1.80·10^{-5}$
+        - - Low T Fits
+          - $B_5/J·K^{-6}$
+          - $2.72·10^{-8}$
+          - $-5.60·10^{-8}$
+          - $3.01·10^{-7}$
+          - $4.15·10^{-7}$
+          - $-9.70·10^{-7}$
+          - $1.53·10^{-7}$
+          - $-2.30·10^{-6}$
+          - $-1.20·10^{-8}$
+        - - Low T Fits
+          - $B_7/J·K^{-8}$
+          - $-6.80·10^{-11}$
+          - $-1.90·10^{-10}$
+          - $-1.40·10^{-9}$
+          - $-2.20·10^{-9}$
+          - $2.92·10^{-9}$
+          - $-8.50·10^{-10}$
+          - $7.43·10^{-09}$
+          - '0'
+        - - Low T Fits
+          - $B_9/J·K^{-10}$
+          - '0'
+          - '0'
+          - $2.46·10^{-12}$
+          - $4.22·10^{-12}$
+          - '0'
+          - $1.72·10^{-12}$
+          - '0'
+          - '0'
+        - - Low T Fits
+          - $B_{gap}/J·K^{-2}$
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0.01610'
+          - '0'
+          - '0.01498'
+          - '0.03828'
+        - - Low T Fits
+          - δ/K
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '12.8134'
+          - '0'
+          - '7.4378'
+          - '8.1167'
+        - - Low T Fits
+          - '%RMS'
+          - '8.6255'
+          - '3.2713'
+          - '4.6204'
+          - '3.0053'
+          - '0.5824'
+          - '6.7304'
+          - '1.3592'
+          - '2.4267'
+        - - Low T Fits
+          - Range/K
+          - 1.83–12.87
+          - 1.84–13.55
+          - 1.83–11.77
+          - 1.86–12.41
+          - 1.82–6.35
+          - 1.83–11.87
+          - 1.83–7.93
+          - 1.83–11.09
+        - - Mid T Fits
+          - $A_0/J·K^{-1}·mol^{-1}$
+          - '0.1663'
+          - '0.02501'
+          - '0.2345'
+          - '0.03406'
+          - '0.03606'
+          - '0.1251'
+          - '0.01413'
+          - '0.2859'
+        - - Mid T Fits
+          - $A_1/J·K^{-2}·mol^{-1}$
+          - '-0.04865'
+          - '-0.01181'
+          - '-0.06441'
+          - '-0.00281'
+          - '-0.02307'
+          - '-0.03406'
+          - '-0.01778'
+          - '-0.08571'
+        - - Mid T Fits
+          - $A_2/J·K^{-3}·mol^{-1}$
+          - '0.005542'
+          - '0.001857'
+          - '0.006302'
+          - '-0.00111'
+          - '0.005118'
+          - '0.003364'
+          - '0.006237'
+          - '0.01220'
+        - - Mid T Fits
+          - $A_3/J·K^{-4}·mol^{-1}$
+          - '-0.00031'
+          - $-4.08·10^{-5}$
+          - '-0.00025'
+          - '0.000213'
+          - '-0.0002'
+          - '-0.00014'
+          - '-0.00026'
+          - '-0.00058'
+        - - Mid T Fits
+          - $A_4/J·K^{-5}·mol^{-1}$
+          - $9.37·10^{-6}$
+          - $6.00·10^{-7}$
+          - $6.27·10^{-6}$
+          - $-1.00·10^{-5}$
+          - $5.18·10^{-6}$
+          - $3.71·10^{-6}$
+          - $5.69·10^{-6}$
+          - $1.48·10^{-5}$
+        - - Mid T Fits
+          - $A_5/J·K^{-6}·mol^{-1}$
+          - $-1.40·^{-7}$
+          - $-3.83·^{-9}$
+          - $-8.50·10^{-8}$
+          - $2.40·10^{-7}$
+          - $-6.90·10^{-8}$
+          - $-5.20·10^{-8}$
+          - $-6.50·10^{-8}$
+          - $-1.90·^{-7}$
+        - - Mid T Fits
+          - $A_6/J·K^{-7}·mol^{-1}$
+          - $7.95·10^{-10}$
+          - '0'
+          - $4.57·10^{-10}$
+          - $-2.90·10^{-9}$
+          - $3.56·10^{-10}$
+          - $2.81·10^{-10}$
+          - $2.99·10^{-10}$
+          - $9.49·10^{-10}$
+        - - Mid T Fits
+          - $A_7/J·K^{-8}·mol^{-1}$
+          - '0'
+          - '0'
+          - '0'
+          - $1.40·10^{-11}$
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - Mid T Fits
+          - '%RMS'
+          - '1.4790'
+          - '0.3966'
+          - '0.5027'
+          - '0.3299'
+          - '0.1643'
+          - '0.5971'
+          - '0.6785'
+          - '0.4515'
+        - - Mid T Fits
+          - Range/K
+          - 12.87–49.53
+          - 13.55–50.82
+          - 11.77–50.93
+          - 12.41–0.52
+          - 6.35–54.97
+          - 11.87–45.28
+          - 7.93–54.75
+          - 11.09–53.03
+        - - High T Fits
+          - $n/mol^{-1}$
+          - '0.3663'
+          - '0.1752'
+          - '0.1852'
+          - '0.2917'
+          - '0.2676'
+          - '0.2535'
+          - '0.06465'
+          - '0.18793'
+        - - High T Fits
+          - $\Theta_D/K$
+          - '977.5376'
+          - '993.4797'
+          - '888.4856'
+          - '629.9682'
+          - '286.6888'
+          - '1125.002'
+          - '223.5839'
+          - '229.6469'
+        - - High T Fits
+          - $m/mol^{-1}$
+          - '0.1172'
+          - '0.0877'
+          - '0.1222'
+          - '0.0991'
+          - '0.1220'
+          - '0.1206'
+          - '0.06579'
+          - '0.1389'
+        - - High T Fits
+          - $\Theta_E/K$
+          - '311.4114'
+          - '260.0957'
+          - '298.5742'
+          - '158.368'
+          - '565.1627'
+          - '301.8483'
+          - '352.7505'
+          - '524.479'
+        - - High T Fits
+          - $A_1/J·K^{-2}·mol^{-1}$
+          - '0.005502'
+          - '0.02315'
+          - '0.028454'
+          - '0'
+          - '0.02266'
+          - '0.01718'
+          - '0.04008'
+          - '0'
+        - - High T Fits
+          - $A_2/J·K^{-2}·mol^{-1}$
+          - $2.20·10^{-5}$
+          - '0'
+          - '0'
+          - $4.40·10^{-5}$
+          - '0'
+          - '0'
+          - $-2.90·10^{-5}$
+          - $4.04·10^{-5}$
+        - - High T Fits
+          - '%RMS'
+          - '0.4415'
+          - '0.5655'
+          - '0.347326'
+          - '0.9901'
+          - '0.3508'
+          - '0.5935'
+          - '0.2623'
+          - '0.6895'
+        - - High T Fits
+          - Range/K
+          - 49.53–302.44
+          - 50.82–302.62
+          - 50.93–302.48
+          - 50.52–302.62
+          - 54.97–302.42
+          - 45.28–302.38
+          - 54.75–302.88
+          - 53.03–302.89
+    - observation_id: chen2019_table15_context
+      type: printed_table_context
+      locator:
+        page: 10
+        pdf_page_index: 9
+        table: '15'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 15
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows:
+        - - T/K
+          - $C_{\text{p,m}}/\text{J}\cdot\text{K}^{-1}\cdot\text{mol}^{-1}$
+          - $\Delta^{\text{T}}S_{\text{m}}^{\text{o}}/\text{J}\cdot\text{K}^{-1}\cdot\text{mol}^{-1}$
+          - $\Delta^{\text{T}}H_{\text{m}}^{\text{o}}/\text{kJ}\cdot\text{mol}^{-1}$
+          - $\varphi_{\text{m}}^{\text{o}}/\text{J}\cdot\text{K}^{-1}\cdot\text{mol}^{-1,b}$
+        - - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - '1'
+          - $8.926\cdot10^{-5}$
+          - $8.830\cdot10^{-5}$
+          - $4.427\cdot10^{-8}$
+          - $4.403\cdot10^{-5}$
+        - - '2'
+          - $1.884\cdot10^{-4}$
+          - $1.797\cdot10^{-4}$
+          - $1.818\cdot10^{-7}$
+          - $8.881\cdot10^{-5}$
+        - - '3'
+          - $3.135\cdot10^{-4}$
+          - $2.785\cdot10^{-4}$
+          - $4.296\cdot10^{-7}$
+          - $1.353\cdot10^{-4}$
+        - - '4'
+          - $4.911\cdot10^{-4}$
+          - $3.913\cdot10^{-4}$
+          - $8.261\cdot10^{-7}$
+          - $1.848\cdot10^{-4}$
+        - - '5'
+          - $7.600\cdot10^{-4}$
+          - $5.277\cdot10^{-4}$
+          - $1.442\cdot10^{-6}$
+          - $2.393\cdot10^{-4}$
+        - - '6'
+          - $1.169\cdot10^{-3}$
+          - $6.999\cdot10^{-4}$
+          - $2.393\cdot10^{-6}$
+          - $3.011\cdot10^{-4}$
+        - - '7'
+          - $1.771\cdot10^{-3}$
+          - $9.225\cdot10^{-4}$
+          - $3.845\cdot10^{-6}$
+          - $3.733\cdot10^{-4}$
+        - - '8'
+          - $2.614\cdot10^{-3}$
+          - $1.211\cdot10^{-3}$
+          - $6.016\cdot10^{-6}$
+          - $4.592\cdot10^{-4}$
+        - - '9'
+          - $3.734\cdot10^{-3}$
+          - $1.581\cdot10^{-3}$
+          - $9.166\cdot10^{-6}$
+          - $5.625\cdot10^{-4}$
+        - - '10'
+          - $5.149\cdot10^{-3}$
+          - $2.045\cdot10^{-3}$
+          - $1.358\cdot10^{-5}$
+          - $6.867\cdot10^{-4}$
+        - - '15'
+          - '0.01849'
+          - $6.200\cdot10^{-3}$
+          - $6.701\cdot10^{-5}$
+          - $1.733\cdot10^{-3}$
+        - - '20'
+          - '0.04405'
+          - '0.01474'
+          - $2.185\cdot10^{-4}$
+          - $3.817\cdot10^{-3}$
+        - - '25'
+          - '0.08552'
+          - '0.02864'
+          - $5.338\cdot10^{-4}$
+          - $7.291\cdot10^{-3}$
+        - - '30'
+          - '0.15201'
+          - '0.04968'
+          - $1.116\cdot10^{-3}$
+          - '0.01249'
+        - - '35'
+          - '0.24679'
+          - '0.07989'
+          - $2.102\cdot10^{-3}$
+          - '0.01984'
+        - - '40'
+          - '0.36453'
+          - '0.12032'
+          - $3.622\cdot10^{-3}$
+          - '0.02977'
+        - - '45'
+          - '0.49752'
+          - '0.17080'
+          - $5.772\cdot10^{-3}$
+          - '0.04254'
+        - - '50'
+          - '0.64998'
+          - '0.23087'
+          - $8.629\cdot10^{-3}$
+          - '0.05829'
+        - - '60'
+          - '1.0175'
+          - '0.38067'
+          - '0.01690'
+          - '0.09899'
+        - - '70'
+          - '1.4466'
+          - '0.56916'
+          - '0.02918'
+          - '0.15225'
+        - - '80'
+          - '1.9101'
+          - '0.79231'
+          - '0.04595'
+          - '0.21798'
+        - - '90'
+          - '2.3930'
+          - '1.0450'
+          - '0.06745'
+          - '0.29558'
+        - - '100'
+          - '2.8877'
+          - '1.3227'
+          - '0.09385'
+          - '0.38422'
+        - - '110'
+          - '3.3905'
+          - '1.6214'
+          - '0.12523'
+          - '0.48296'
+        - - '120'
+          - '3.8988'
+          - '1.9382'
+          - '0.16167'
+          - '0.59092'
+        - - '130'
+          - '4.4102'
+          - '2.2705'
+          - '0.20322'
+          - '0.70724'
+        - - '140'
+          - '4.9219'
+          - '2.6160'
+          - '0.24988'
+          - '0.83117'
+        - - '150'
+          - '5.4313'
+          - '2.9730'
+          - '0.30165'
+          - '0.96200'
+        - - '160'
+          - '5.9360'
+          - '3.3397'
+          - '0.35849'
+          - '1.0991'
+        - - '170'
+          - '6.4338'
+          - '3.7145'
+          - '0.42034'
+          - '1.2419'
+        - - '180'
+          - '6.9229'
+          - '4.0961'
+          - '0.48714'
+          - '1.3898'
+        - - '190'
+          - '7.4021'
+          - '4.4833'
+          - '0.55877'
+          - '1.5424'
+        - - '200'
+          - '7.8705'
+          - '4.8750'
+          - '0.63514'
+          - '1.6992'
+        - - '210'
+          - '8.3276'
+          - '5.2701'
+          - '0.71614'
+          - '1.8599'
+        - - '220'
+          - '8.7732'
+          - '5.6678'
+          - '0.80165'
+          - '2.0239'
+        - - '230'
+          - '9.2076'
+          - '6.0674'
+          - '0.89157'
+          - '2.1910'
+        - - T/K
+          - $C_{p,m}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}S_{m}^{o}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}H_{m}^{o}/kJ·mol^{-1}$
+          - $\varphi_{m}^{o}/J·K^{-1}·mol^{-1,b}$
+        - - '240'
+          - '9.6308'
+          - '6.4683'
+          - '0.98577'
+          - '2.3609'
+        - - '250'
+          - '10.044'
+          - '6.8698'
+          - '1.0841'
+          - '2.5332'
+        - - '260'
+          - '10.446'
+          - '7.2716'
+          - '1.1866'
+          - '2.7077'
+        - - '270'
+          - '10.839'
+          - '7.6732'
+          - '1.2930'
+          - '2.8842'
+        - - '273.15'
+          - '10.961'
+          - '7.7997'
+          - '1.3274'
+          - '2.9402'
+        - - '280'
+          - '11.224'
+          - '8.0744'
+          - '1.4034'
+          - '3.0624'
+        - - '290'
+          - '11.600'
+          - '8.4749'
+          - '1.5175'
+          - '3.2421'
+        - - '298.15'
+          - '11.902'
+          - '8.8006'
+          - '1.6133'
+          - '3.3896'
+        - - '300'
+          - '11.970'
+          - '8.8744'
+          - '1.6353'
+          - '3.4232'
+    - observation_id: chen2019_table16_context
+      type: printed_table_context
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '16'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 16
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows: []
+    - observation_id: chen2019_table17_context
+      type: printed_table_context
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '17'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 17
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows:
+        - - T/K
+          - $C_{p,m}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}S_{m}^{o}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}H_{m}^{o}/kJ·mol^{-1}$
+          - $\varphi_{m}^{o}/J·K^{-1}·mol^{-1,b}$
+        - - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - '1'
+          - $9.011·10^{-5}$
+          - $4.624·10^{-5}$
+          - $2.860·10^{-8}$
+          - $1.763·10^{-5}$
+        - - '2'
+          - $5.737·10^{-4}$
+          - $2.239·10^{-4}$
+          - $3.115·10^{-7}$
+          - $6.815·10^{-5}$
+        - - '3'
+          - $1.837·10^{-3}$
+          - $6.629·10^{-4}$
+          - $1.436·10^{-6}$
+          - $1.842·10^{-4}$
+        - - '4'
+          - $4.253·10^{-3}$
+          - $1.491·10^{-3}$
+          - $4.370·10^{-6}$
+          - $3.979·10^{-4}$
+        - - '5'
+          - $8.166·10^{-3}$
+          - $2.829·10^{-3}$
+          - $1.044·10^{-5}$
+          - $7.408·10^{-4}$
+        - - '6'
+          - '0.01389'
+          - $4.794·10^{-3}$
+          - $2.130·10^{-5}$
+          - $1.243·10^{-3}$
+        - - '7'
+          - '0.02167'
+          - $7.491·10^{-3}$
+          - $3.890·10^{-5}$
+          - $1.934·10^{-3}$
+        - - '8'
+          - '0.03169'
+          - '0.01101'
+          - $6.539·10^{-5}$
+          - $2.839·10^{-3}$
+        - - '9'
+          - '0.04403'
+          - '0.01544'
+          - $1.031·10^{-4}$
+          - $3.985·10^{-3}$
+        - - '10'
+          - '0.05864'
+          - '0.02081'
+          - $1.542·10^{-4}$
+          - $5.391·10^{-3}$
+        - - '15'
+          - '0.15543'
+          - '0.06169'
+          - $6.744·10^{-4}$
+          - '0.01673'
+        - - '20'
+          - '0.28888'
+          - '0.12394'
+          - $1.772·10^{-3}$
+          - '0.03532'
+        - - '25'
+          - '0.44971'
+          - '0.20523'
+          - $3.609·10^{-3}$
+          - '0.06088'
+        - - '30'
+          - '0.63313'
+          - '0.30311'
+          - $6.307·10^{-3}$
+          - '0.09288'
+        - - '35'
+          - '0.83612'
+          - '0.41572'
+          - $9.973·10^{-3}$
+          - '0.13079'
+        - - '40'
+          - '1.0561'
+          - '0.54156'
+          - '0.01470'
+          - '0.17414'
+        - - '45'
+          - '1.2894'
+          - '0.67931'
+          - '0.02056'
+          - '0.22251'
+        - - '50'
+          - '1.5299'
+          - '0.82759'
+          - '0.02760'
+          - '0.27553'
+        - - '60'
+          - '2.0171'
+          - '1.1493'
+          - '0.04532'
+          - '0.39393'
+        - - '70'
+          - '2.5118'
+          - '1.4974'
+          - '0.06797'
+          - '0.52644'
+        - - '80'
+          - '2.9982'
+          - '1.8647'
+          - '0.09553'
+          - '0.67060'
+        - - '90'
+          - '3.4719'
+          - '2.2453'
+          - '0.12789'
+          - '0.82433'
+        - - '100'
+          - '3.9339'
+          - '2.6352'
+          - '0.16493'
+          - '0.98586'
+        - - '110'
+          - '4.3865'
+          - '3.0314'
+          - '0.20654'
+          - '1.1538'
+        - - '120'
+          - '4.8316'
+          - '3.4322'
+          - '0.25264'
+          - '1.3269'
+        - - '130'
+          - '5.2704'
+          - '3.8363'
+          - '0.30315'
+          - '1.5044'
+        - - '140'
+          - '5.7032'
+          - '4.2428'
+          - '0.35802'
+          - '1.6854'
+        - - '150'
+          - '6.1302'
+          - '4.6508'
+          - '0.41720'
+          - '1.8695'
+        - - '160'
+          - '6.5508'
+          - '5.0599'
+          - '0.48061'
+          - '2.0561'
+        - - '170'
+          - '6.9647'
+          - '5.4695'
+          - '0.54819'
+          - '2.2449'
+        - - '180'
+          - '7.3715'
+          - '5.8792'
+          - '0.61988'
+          - '2.4354'
+        - - '190'
+          - '7.7707'
+          - '6.2884'
+          - '0.69559'
+          - '2.6274'
+        - - '200'
+          - '8.1623'
+          - '6.6970'
+          - '0.77527'
+          - '2.8207'
+        - - '210'
+          - '8.5461'
+          - '7.1046'
+          - '0.85881'
+          - '3.0150'
+        - - '220'
+          - '8.9220'
+          - '7.5108'
+          - '0.94616'
+          - '3.2101'
+        - - '230'
+          - '9.2902'
+          - '7.9156'
+          - '1.0372'
+          - '3.4059'
+        - - '240'
+          - '9.6509'
+          - '8.3186'
+          - '1.1319'
+          - '3.6022'
+        - - '250'
+          - '10.004'
+          - '8.7198'
+          - '1.2302'
+          - '3.7989'
+        - - '260'
+          - '10.351'
+          - '9.1189'
+          - '1.3320'
+          - '3.9959'
+        - - '270'
+          - '10.690'
+          - '9.5160'
+          - '1.4372'
+          - '4.1930'
+        - - '273.15'
+          - '10.796'
+          - '9.6406'
+          - '1.4711'
+          - '4.2551'
+        - - '280'
+          - '11.024'
+          - '9.9108'
+          - '1.5458'
+          - '4.3901'
+        - - '290'
+          - '11.351'
+          - '10.303'
+          - '1.6577'
+          - '4.5873'
+        - - '298.15'
+          - '11.614'
+          - '10.622'
+          - '1.7513'
+          - '4.7479'
+        - - '300'
+          - '11.673'
+          - '10.694'
+          - '1.7728'
+          - '4.7843'
+    - observation_id: chen2019_table18_context
+      type: printed_table_context
+      locator:
+        page: 12
+        pdf_page_index: 11
+        table: '18'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 18
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows:
+        - - T/K
+          - $C_{p,m}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{TS_{m}^{o}}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{TH_{m}^{o}}/kJ·mol^{-1}$
+          - $\varphi_{m}^{o}/J·K^{-1}·mol^{-1,b}$
+        - - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - '1'
+          - $7.242·10^{-5}$
+          - $6.591·10^{-5}$
+          - $3.376·10^{-8}$
+          - $3.215·10^{-5}$
+        - - '2'
+          - $2.102·10^{-4}$
+          - $1.524·10^{-4}$
+          - $1.662·10^{-7}$
+          - $6.930·10^{-5}$
+        - - '3'
+          - $5.124·10^{-4}$
+          - $2.870·10^{-4}$
+          - $5.082·10^{-7}$
+          - $1.176·10^{-4}$
+        - - '4'
+          - $1.139·10^{-3}$
+          - $5.101·10^{-4}$
+          - $1.298·10^{-6}$
+          - $1.855·10^{-4}$
+        - - '5'
+          - $2.326·10^{-3}$
+          - $8.787·10^{-4}$
+          - $2.972·10^{-6}$
+          - $2.843·10^{-4}$
+        - - '6'
+          - $4.381·10^{-3}$
+          - $1.469·10^{-3}$
+          - $6.238·10^{-6}$
+          - $4.288·10^{-4}$
+        - - '7'
+          - $7.666·10^{-3}$
+          - $2.372·10^{-3}$
+          - $1.214·10^{-5}$
+          - $6.376·10^{-4}$
+        - - '8'
+          - '0.01256'
+          - $3.696·10^{-3}$
+          - $2.211·10^{-5}$
+          - $9.322·10^{-4}$
+        - - '9'
+          - '0.01941'
+          - $5.550·10^{-3}$
+          - $3.792·10^{-5}$
+          - $1.337·10^{-3}$
+        - - '10'
+          - '0.02850'
+          - $8.045·10^{-3}$
+          - $6.168·10^{-5}$
+          - $1.877·10^{-3}$
+        - - '15'
+          - '0.11400'
+          - '0.03342'
+          - $3.888·10^{-4}$
+          - $7.496·10^{-3}$
+        - - '20'
+          - '0.25911'
+          - '0.08489'
+          - $1.301·10^{-3}$
+          - '0.01985'
+        - - '25'
+          - '0.44884'
+          - '0.16234'
+          - $3.054·10^{-3}$
+          - '0.04019'
+        - - '30'
+          - '0.67595'
+          - '0.26373'
+          - $5.852·10^{-3}$
+          - '0.06868'
+        - - '35'
+          - '0.93298'
+          - '0.38691'
+          - $9.863·10^{-3}$
+          - '0.10510'
+        - - '40'
+          - '1.2086'
+          - '0.52935'
+          - '0.01521'
+          - '0.14904'
+        - - '45'
+          - '1.4892'
+          - '0.68792'
+          - '0.02196'
+          - '0.19997'
+        - - '50'
+          - '1.7656'
+          - '0.85917'
+          - '0.03010'
+          - '0.25724'
+        - - '60'
+          - '2.3461'
+          - '1.2314'
+          - '0.05060'
+          - '0.38806'
+        - - '70'
+          - '2.9684'
+          - '1.6395'
+          - '0.07716'
+          - '0.53729'
+        - - '80'
+          - '3.6026'
+          - '2.0773'
+          - '0.11001'
+          - '0.70216'
+        - - '90'
+          - '4.2331'
+          - '2.5381'
+          - '0.14919'
+          - '0.88036'
+        - - '100'
+          - '4.8528'
+          - '3.0163'
+          - '0.19463'
+          - '1.0699'
+        - - '110'
+          - '5.4593'
+          - '3.5073'
+          - '0.24621'
+          - '1.2691'
+        - - '120'
+          - '6.0515'
+          - '4.0079'
+          - '0.30377'
+          - '1.4764'
+        - - '130'
+          - '6.6292'
+          - '4.5151'
+          - '0.36719'
+          - '1.6906'
+        - - '140'
+          - '7.1921'
+          - '5.0271'
+          - '0.43631'
+          - '1.9106'
+        - - '150'
+          - '7.7401'
+          - '5.5421'
+          - '0.51098'
+          - '2.1356'
+        - - '160'
+          - '8.2733'
+          - '6.0587'
+          - '0.59106'
+          - '2.3646'
+        - - '170'
+          - '8.7917'
+          - '6.5759'
+          - '0.67640'
+          - '2.5971'
+        - - '180'
+          - '9.2958'
+          - '7.0928'
+          - '0.76685'
+          - '2.8325'
+        - - '190'
+          - '9.7858'
+          - '7.6086'
+          - '0.86227'
+          - '3.0703'
+        - - '200'
+          - '10.262'
+          - '8.1227'
+          - '0.96252'
+          - '3.3101'
+        - - '210'
+          - '10.726'
+          - '8.6347'
+          - '1.0675'
+          - '3.5515'
+        - - '220'
+          - '11.178'
+          - '9.1441'
+          - '1.1770'
+          - '3.7941'
+        - - '230'
+          - '11.618'
+          - '9.6507'
+          - '1.2910'
+          - '4.0377'
+        - - '240'
+          - '12.047'
+          - '10.154'
+          - '1.4093'
+          - '4.2821'
+        - - '250'
+          - '12.466'
+          - '10.655'
+          - '1.5319'
+          - '4.5270'
+        - - '260'
+          - '12.876'
+          - '11.152'
+          - '1.6586'
+          - '4.7723'
+        - - '270'
+          - '13.278'
+          - '11.645'
+          - '1.7894'
+          - '5.0177'
+        - - '273.15'
+          - '13.402'
+          - '11.800'
+          - '1.8314'
+          - '5.0950'
+        - - '280'
+          - '13.671'
+          - '12.135'
+          - '1.9241'
+          - '5.2631'
+        - - '290'
+          - '14.057'
+          - '12.622'
+          - '2.0628'
+          - '5.5085'
+        - - '298.15'
+          - '14.366'
+          - '13.015'
+          - '2.1786'
+          - '5.7083'
+        - - '300'
+          - '14.436'
+          - '13.104'
+          - '2.2052'
+          - '5.7537'
+    - observation_id: chen2019_table19_context
+      type: printed_table_context
+      locator:
+        page: 12
+        pdf_page_index: 11
+        table: '19'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 19
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows:
+        - - T/K
+          - $C_{p,m}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}S_{m}^{o}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}H_{m}^{o}/kJ·mol^{-1}$
+          - $\varphi_{m}^{o}/J·K^{-1}·mol^{-1,b}$
+        - - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - '1'
+          - $2.838·10^{-4}$
+          - $2.821·10^{-4}$
+          - $1.412·10^{-7}$
+          - $1.408·10^{-4}$
+        - - '2'
+          - $5.922·10^{-4}$
+          - $5.707·10^{-4}$
+          - $5.752·10^{-7}$
+          - $2.831·10^{-4}$
+        - - '3'
+          - $9.958·10^{-4}$
+          - $8.820·10^{-4}$
+          - $1.356·10^{-6}$
+          - $4.299·10^{-4}$
+        - - '4'
+          - $1.647·10^{-3}$
+          - $1.249·10^{-3}$
+          - $2.648·10^{-6}$
+          - $5.872·10^{-4}$
+        - - '5'
+          - $2.795·10^{-3}$
+          - $1.728·10^{-3}$
+          - $4.815·10^{-6}$
+          - $7.650·10^{-4}$
+        - - '6'
+          - $4.775·10^{-3}$
+          - $2.397·10^{-3}$
+          - $8.514·10^{-6}$
+          - $9.779·10^{-4}$
+        - - '7'
+          - $7.972·10^{-3}$
+          - $3.355·10^{-3}$
+          - $1.477·10^{-5}$
+          - $1.245·10^{-3}$
+        - - '8'
+          - '0.01276'
+          - $4.712·10^{-3}$
+          - $2.499·10^{-5}$
+          - $1.589·10^{-3}$
+        - - '9'
+          - '0.01942'
+          - $6.580·10^{-3}$
+          - $4.091·10^{-5}$
+          - $2.034·10^{-3}$
+        - - '10'
+          - '0.02811'
+          - $9.058·10^{-3}$
+          - $6.451·10^{-5}$
+          - $2.607·10^{-3}$
+        - - '15'
+          - '0.10308'
+          - '0.03275'
+          - $3.691·10^{-4}$
+          - $8.141·10^{-3}$
+        - - '20'
+          - '0.22907'
+          - '0.07861'
+          - $1.181·10^{-3}$
+          - '0.01955'
+        - - '25'
+          - '0.39236'
+          - '0.14668'
+          - $2.722·10^{-3}$
+          - '0.03781'
+        - - '30'
+          - '0.58411'
+          - '0.23477'
+          - $5.152·10^{-3}$
+          - '0.06304'
+        - - '35'
+          - '0.80052'
+          - '0.34076'
+          - $8.604·10^{-3}$
+          - '0.09494'
+        - - '40'
+          - '1.0376'
+          - '0.46294'
+          - '0.01319'
+          - '0.13314'
+        - - '45'
+          - '1.2861'
+          - '0.59944'
+          - '0.01900'
+          - '0.17725'
+        - - '50'
+          - '1.5328'
+          - '0.74778'
+          - '0.02605'
+          - '0.22680'
+        - - '60'
+          - '2.0640'
+          - '1.0741'
+          - '0.04403'
+          - '0.34030'
+        - - '70'
+          - '2.5942'
+          - '1.4321'
+          - '0.06732'
+          - '0.47038'
+        - - '80'
+          - '3.1283'
+          - '1.8133'
+          - '0.09593'
+          - '0.61420'
+        - - '90'
+          - '3.6661'
+          - '2.2128'
+          - '0.12990'
+          - '0.76948'
+        - - '100'
+          - '4.2028'
+          - '2.6268'
+          - '0.16924'
+          - '0.93440'
+        - - '110'
+          - '4.7321'
+          - '3.0523'
+          - '0.21393'
+          - '1.1075'
+        - - '120'
+          - '5.2483'
+          - '3.4863'
+          - '0.26384'
+          - '1.2876'
+        - - '130'
+          - '5.7478'
+          - '3.9262'
+          - '0.31884'
+          - '1.4736'
+        - - '140'
+          - '6.2286'
+          - '4.3699'
+          - '0.37874'
+          - '1.6647'
+        - - '150'
+          - '6.6901'
+          - '4.8155'
+          - '0.44335'
+          - '1.8599'
+        - - '160'
+          - '7.1328'
+          - '5.2615'
+          - '0.51248'
+          - '2.0585'
+        - - '170'
+          - '7.5580'
+          - '5.7068'
+          - '0.58594'
+          - '2.2600'
+        - - '180'
+          - '7.9672'
+          - '6.1504'
+          - '0.66358'
+          - '2.4639'
+        - - '190'
+          - '8.3624'
+          - '6.5918'
+          - '0.74524'
+          - '2.6695'
+        - - '200'
+          - '8.7454'
+          - '7.0306'
+          - '0.83079'
+          - '2.8766'
+        - - '210'
+          - '9.1181'
+          - '7.4663'
+          - '0.92011'
+          - '3.0848'
+        - - '220'
+          - '9.4823'
+          - '7.8989'
+          - '1.0131'
+          - '3.2938'
+        - - '230'
+          - '9.8398'
+          - '8.3283'
+          - '1.1097'
+          - '3.5034'
+        - - '240'
+          - '10.192'
+          - '8.7546'
+          - '1.2099'
+          - '3.7133'
+        - - '250'
+          - '10.540'
+          - '9.1777'
+          - '1.3136'
+          - '3.9234'
+        - - '260'
+          - '10.886'
+          - '9.5978'
+          - '1.4207'
+          - '4.1336'
+        - - '270'
+          - '11.230'
+          - '10.015'
+          - '1.5313'
+          - '4.3437'
+        - - '273.15'
+          - '11.339'
+          - '10.146'
+          - '1.5668'
+          - '4.4099'
+        - - '280'
+          - '11.574'
+          - '10.430'
+          - '1.6453'
+          - '4.5537'
+        - - '290'
+          - '11.919'
+          - '10.842'
+          - '1.7628'
+          - '4.7634'
+        - - '298.15'
+          - '12.200'
+          - '11.176'
+          - '1.8611'
+          - '4.9341'
+        - - '300'
+          - '12.264'
+          - '11.252'
+          - '1.8837'
+          - '4.9729'
+    - observation_id: chen2019_table20_context
+      type: printed_table_context
+      locator:
+        page: 13
+        pdf_page_index: 12
+        table: '20'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 20
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows: []
+    - observation_id: chen2019_table21_context
+      type: printed_table_context
+      locator:
+        page: 13
+        pdf_page_index: 12
+        table: '21'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 21
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows:
+        - - T/K
+          - $C_{p,m}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}S_{m}^{o}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}H_{m}^{o}/kJ·mol^{-1}$
+          - $\varphi_{m}^{o}/J·K^{-1}·mol^{-1,b}$
+        - - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - '1'
+          - $1.865·10^{-4}$
+          - $6.227·10^{-5}$
+          - $4.669·10^{-8}$
+          - $1.558·10^{-5}$
+        - - '2'
+          - $1.521·10^{-3}$
+          - $5.000·10^{-4}$
+          - $7.509·10^{-7}$
+          - $1.245·10^{-4}$
+        - - '3'
+          - $5.504·10^{-3}$
+          - $1.752·10^{-3}$
+          - $3.971·10^{-6}$
+          - $4.286·10^{-4}$
+        - - '4'
+          - '0.01366'
+          - $4.340·10^{-3}$
+          - $1.316·10^{-5}$
+          - $1.050·10^{-3}$
+        - - '5'
+          - '0.02681'
+          - $8.705·10^{-3}$
+          - $3.296·10^{-5}$
+          - $2.112·10^{-3}$
+        - - '6'
+          - '0.04514'
+          - '0.01514'
+          - $6.852·10^{-5}$
+          - $3.717·10^{-3}$
+        - - '7'
+          - '0.06843'
+          - '0.02378'
+          - $1.249·10^{-4}$
+          - $5.939·10^{-3}$
+        - - '8'
+          - '0.09622'
+          - '0.03469'
+          - $2.069·10^{-4}$
+          - $8.827·10^{-3}$
+        - - '9'
+          - '0.12802'
+          - '0.04782'
+          - $3.187·10^{-4}$
+          - '0.01241'
+        - - '10'
+          - '0.16340'
+          - '0.06311'
+          - $4.641·10^{-4}$
+          - '0.01670'
+        - - '15'
+          - '0.38360'
+          - '0.16880'
+          - $1.805·10^{-3}$
+          - '0.04850'
+        - - '20'
+          - '0.65971'
+          - '0.31580'
+          - $4.392·10^{-3}$
+          - '0.09618'
+        - - '25'
+          - '0.98253'
+          - '0.49685'
+          - $8.479·10^{-3}$
+          - '0.15768'
+        - - '30'
+          - '1.3495'
+          - '0.70777'
+          - '0.01429'
+          - '0.23139'
+        - - '35'
+          - '1.7566'
+          - '0.94589'
+          - '0.02204'
+          - '0.31615'
+        - - '40'
+          - '2.1948'
+          - '1.2088'
+          - '0.03191'
+          - '0.41105'
+        - - '45'
+          - '2.6497'
+          - '1.4935'
+          - '0.04402'
+          - '0.51532'
+        - - '50'
+          - '3.1059'
+          - '1.7963'
+          - '0.05841'
+          - '0.62814'
+        - - '60'
+          - '4.0238'
+          - '2.4430'
+          - '0.09402'
+          - '0.87604'
+        - - '70'
+          - '4.9123'
+          - '3.1309'
+          - '0.13875'
+          - '1.1487'
+        - - '80'
+          - '5.7306'
+          - '3.8410'
+          - '0.19203'
+          - '1.4407'
+        - - '90'
+          - '6.4846'
+          - '4.5601'
+          - '0.25315'
+          - '1.7473'
+        - - '100'
+          - '7.1826'
+          - '5.2799'
+          - '0.32153'
+          - '2.0646'
+        - - '110'
+          - '7.8322'
+          - '5.9953'
+          - '0.39664'
+          - '2.3894'
+        - - '120'
+          - '8.4389'
+          - '6.7031'
+          - '0.47803'
+          - '2.7195'
+        - - '130'
+          - '9.0073'
+          - '7.4012'
+          - '0.56529'
+          - '3.0528'
+        - - '140'
+          - '9.5414'
+          - '8.0885'
+          - '0.65806'
+          - '3.3880'
+        - - '150'
+          - '10.045'
+          - '8.7641'
+          - '0.75602'
+          - '3.7240'
+        - - '160'
+          - '10.520'
+          - '9.4277'
+          - '0.85886'
+          - '4.0598'
+        - - '170'
+          - '10.970'
+          - '10.079'
+          - '0.96633'
+          - '4.3948'
+        - - '180'
+          - '11.398'
+          - '10.718'
+          - '1.0782'
+          - '4.7284'
+        - - '190'
+          - '11.806'
+          - '11.346'
+          - '1.1942'
+          - '5.0602'
+        - - '200'
+          - '12.197'
+          - '11.961'
+          - '1.3143'
+          - '5.3899'
+        - - '210'
+          - '12.571'
+          - '12.565'
+          - '1.4381'
+          - '5.7173'
+        - - '220'
+          - '12.932'
+          - '13.159'
+          - '1.5656'
+          - '6.0421'
+    - observation_id: chen2019_table22_context
+      type: printed_table_context
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '22'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 22
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows:
+        - - T/K
+          - $C_{p,m}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{\text{T}}S_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{\text{T}}H_{\text{m}}^{\text{o}}/kJ·mol^{-1}$
+          - $\varphi_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1,b}$
+        - - '230'
+          - '13.280'
+          - '13.741'
+          - '1.6967'
+          - '6.3642'
+        - - '240'
+          - '13.617'
+          - '14.313'
+          - '1.8312'
+          - '6.6835'
+        - - '250'
+          - '13.943'
+          - '14.876'
+          - '1.9690'
+          - '7.0000'
+        - - '260'
+          - '14.261'
+          - '15.429'
+          - '2.1100'
+          - '7.3136'
+        - - '270'
+          - '14.572'
+          - '15.973'
+          - '2.2542'
+          - '7.6243'
+        - - '273.15'
+          - '14.668'
+          - '16.143'
+          - '2.3003'
+          - '7.7215'
+        - - '280'
+          - '14.875'
+          - '16.509'
+          - '2.4014'
+          - '7.9320'
+        - - '290'
+          - '15.171'
+          - '17.036'
+          - '2.5517'
+          - '8.2369'
+        - - '298.15'
+          - '15.409'
+          - '17.460'
+          - '2.6763'
+          - '8.4832'
+        - - '300'
+          - '15.462'
+          - '17.555'
+          - '2.7048'
+          - '8.5388'
+    - observation_id: chen2019_table23_context
+      type: printed_table_context
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '23'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 23
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows:
+        - - T/K
+          - $C_{p,m}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}S_{m}^{o}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{T}H_{m}^{o}/kJ·mol^{-1}$
+          - $\varphi_{m}^{o}/J·K^{-1}·mol^{-1,b}$
+        - - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - '1'
+          - $6.773·10^{-5}$
+          - $6.259·10^{-5}$
+          - $3.193·10^{-8}$
+          - $3.066·10^{-5}$
+        - - '2'
+          - $1.851·10^{-4}$
+          - $1.411·10^{-4}$
+          - $1.518·10^{-7}$
+          - $6.523·10^{-5}$
+        - - '3'
+          - $4.186·10^{-4}$
+          - $2.550·10^{-4}$
+          - $4.405·10^{-7}$
+          - $1.082·10^{-4}$
+        - - '4'
+          - $8.650·10^{-4}$
+          - $4.301·10^{-4}$
+          - $1.060·10^{-6}$
+          - $1.652·10^{-4}$
+        - - '5'
+          - $1.656·10^{-3}$
+          - $7.003·10^{-4}$
+          - $2.285·10^{-6}$
+          - $2.433·10^{-4}$
+        - - '6'
+          - $2.956·10^{-3}$
+          - $1.108·10^{-3}$
+          - $4.542·10^{-6}$
+          - $3.512·10^{-4}$
+        - - '7'
+          - $4.947·10^{-3}$
+          - $1.703·10^{-3}$
+          - $8.428·10^{-6}$
+          - $4.993·10^{-4}$
+        - - '8'
+          - $7.806·10^{-3}$
+          - $2.540·10^{-3}$
+          - $1.473·10^{-5}$
+          - $6.993·10^{-4}$
+        - - '9'
+          - '0.01169'
+          - $3.673·10^{-3}$
+          - $2.438·10^{-5}$
+          - $9.637·10^{-4}$
+        - - '10'
+          - '0.01669'
+          - $5.153·10^{-3}$
+          - $3.847·10^{-5}$
+          - $1.306·10^{-3}$
+        - - '15'
+          - '0.06320'
+          - '0.01938'
+          - $2.216·10^{-4}$
+          - $4.603·10^{-3}$
+        - - '20'
+          - '0.14574'
+          - '0.04809'
+          - $7.304·10^{-4}$
+          - '0.01156'
+        - - '25'
+          - '0.25963'
+          - '0.09227'
+          - $1.731·10^{-3}$
+          - '0.02303'
+        - - '30'
+          - '0.40357'
+          - '0.15189'
+          - $3.377·10^{-3}$
+          - '0.03933'
+        - - '35'
+          - '0.57462'
+          - '0.22663'
+          - $5.812·10^{-3}$
+          - '0.06057'
+        - - '40'
+          - '0.76619'
+          - '0.31569'
+          - $9.157·10^{-3}$
+          - '0.08675'
+        - - '45'
+          - '0.96900'
+          - '0.41757'
+          - '0.01349'
+          - '0.11774'
+        - - '50'
+          - '1.1652'
+          - '0.52969'
+          - '0.01882'
+          - '0.15325'
+        - - '60'
+          - '1.6093'
+          - '0.78051'
+          - '0.03265'
+          - '0.23640'
+        - - '70'
+          - '2.0912'
+          - '1.0645'
+          - '0.05113'
+          - '0.33406'
+        - - '80'
+          - '2.5818'
+          - '1.3758'
+          - '0.07450'
+          - '0.44457'
+        - - '90'
+          - '3.0665'
+          - '1.7080'
+          - '0.10275'
+          - '0.56633'
+        - - '100'
+          - '3.5402'
+          - '2.0557'
+          - '0.13579'
+          - '0.69776'
+        - - '110'
+          - '4.0028'
+          - '2.4149'
+          - '0.17351'
+          - '0.83746'
+        - - '120'
+          - '4.4558'
+          - '2.7826'
+          - '0.21581'
+          - '0.98418'
+        - - '130'
+          - '4.9008'
+          - '3.1569'
+          - '0.26260'
+          - '1.1369'
+        - - '140'
+          - '5.3391'
+          - '3.5362'
+          - '0.31381'
+          - '1.2947'
+        - - '150'
+          - '5.7712'
+          - '3.9193'
+          - '0.36936'
+          - '1.4569'
+        - - '160'
+          - '6.1972'
+          - '4.3054'
+          - '0.42921'
+          - '1.6228'
+        - - '170'
+          - '6.6168'
+          - '4.6937'
+          - '0.49329'
+          - '1.7920'
+        - - '180'
+          - '7.0296'
+          - '5.0837'
+          - '0.56153'
+          - '1.9641'
+        - - '190'
+          - '7.4351'
+          - '5.4746'
+          - '0.63386'
+          - '2.1385'
+        - - '200'
+          - '7.8327'
+          - '5.8661'
+          - '0.71020'
+          - '2.3151'
+        - - '210'
+          - '8.2221'
+          - '6.2578'
+          - '0.79048'
+          - '2.4936'
+        - - '220'
+          - '8.6030'
+          - '6.6491'
+          - '0.87462'
+          - '2.6736'
+        - - '230'
+          - '8.9753'
+          - '7.0397'
+          - '0.96251'
+          - '2.8549'
+        - - '240'
+          - '9.3387'
+          - '7.4294'
+          - '1.0541'
+          - '3.0374'
+        - - '250'
+          - '9.6934'
+          - '7.8179'
+          - '1.1493'
+          - '3.2208'
+        - - '260'
+          - '10.039'
+          - '8.2048'
+          - '1.2479'
+          - '3.4051'
+        - - '270'
+          - '10.377'
+          - '8.5901'
+          - '1.3500'
+          - '3.5900'
+        - - '273.15'
+          - '10.482'
+          - '8.7110'
+          - '1.3829'
+          - '3.6484'
+        - - '280'
+          - '10.706'
+          - '8.9734'
+          - '1.4554'
+          - '3.7754'
+        - - '290'
+          - '11.028'
+          - '9.3548'
+          - '1.5641'
+          - '3.9613'
+        - - '298.15'
+          - '11.284'
+          - '9.6640'
+          - '1.6550'
+          - '4.1129'
+        - - '300'
+          - '11.341'
+          - '9.7339'
+          - '1.6760'
+          - '4.1474'
+    - observation_id: chen2019_table24_context
+      type: printed_table_context
+      locator:
+        page: 15
+        pdf_page_index: 14
+        table: '24'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 24
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows:
+        - - T/K
+          - $C_{p,m}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{\text{T}}S_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{\text{T}}H_{\text{m}}^{\text{o}}/kJ·mol^{-1}$
+          - $\varphi_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1,b}$
+        - - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - '1'
+          - $3.482·10^{-4}$
+          - $1.144·10^{-4}$
+          - $8.590·10^{-8}$
+          - $2.848·10^{-5}$
+        - - '2'
+          - $3.387·10^{-3}$
+          - $1.030·10^{-3}$
+          - $1.572·10^{-6}$
+          - $2.444·10^{-4}$
+        - - '3'
+          - '0.01244'
+          - $3.878·10^{-3}$
+          - $8.896·10^{-6}$
+          - $9.125·10^{-4}$
+        - - '4'
+          - '0.02894'
+          - $9.535·10^{-3}$
+          - $2.895·10^{-5}$
+          - $2.296·10^{-3}$
+        - - '5'
+          - '0.05295'
+          - '0.01844'
+          - $6.929·10^{-5}$
+          - $4.578·10^{-3}$
+        - - '6'
+          - '0.08382'
+          - '0.03072'
+          - $1.371·10^{-4}$
+          - $7.865·10^{-3}$
+        - - '7'
+          - '0.12048'
+          - '0.04633'
+          - $2.389·10^{-4}$
+          - '0.01221'
+        - - '8'
+          - '0.16166'
+          - '0.06506'
+          - $3.796·10^{-4}$
+          - '0.01761'
+        - - '9'
+          - '0.20692'
+          - '0.08668'
+          - $5.636·10^{-4}$
+          - '0.02406'
+        - - '10'
+          - '0.25552'
+          - '0.11097'
+          - $7.945·10^{-4}$
+          - '0.03151'
+        - - '15'
+          - '0.53143'
+          - '0.26529'
+          - $2.744·10^{-3}$
+          - '0.08235'
+        - - '20'
+          - '0.83285'
+          - '0.45917'
+          - $6.150·10^{-3}$
+          - '0.15168'
+        - - '25'
+          - '1.1401'
+          - '0.67798'
+          - '0.01108'
+          - '0.23473'
+        - - '30'
+          - '1.4486'
+          - '0.91309'
+          - '0.01755'
+          - '0.32801'
+        - - '35'
+          - '1.7599'
+          - '1.1597'
+          - '0.02557'
+          - '0.42909'
+        - - '40'
+          - '2.0753'
+          - '1.4153'
+          - '0.03516'
+          - '0.53631'
+        - - '45'
+          - '2.3934'
+          - '1.6781'
+          - '0.04633'
+          - '0.64851'
+        - - '50'
+          - '2.7113'
+          - '1.9467'
+          - '0.05909'
+          - '0.76486'
+        - - '60'
+          - '3.3397'
+          - '2.4967'
+          - '0.08935'
+          - '1.0075'
+        - - '70'
+          - '3.9554'
+          - '3.0580'
+          - '0.12585'
+          - '1.2602'
+        - - '80'
+          - '4.5444'
+          - '3.6250'
+          - '0.16837'
+          - '1.5203'
+        - - '90'
+          - '5.1027'
+          - '4.1928'
+          - '0.21663'
+          - '1.7857'
+        - - '100'
+          - '5.6296'
+          - '4.7579'
+          - '0.27032'
+          - '2.0547'
+        - - '110'
+          - '6.1267'
+          - '5.3180'
+          - '0.32912'
+          - '2.3260'
+        - - '120'
+          - '6.5964'
+          - '5.8714'
+          - '0.39276'
+          - '2.5984'
+        - - '130'
+          - '7.0415'
+          - '6.4172'
+          - '0.46097'
+          - '2.8712'
+        - - '140'
+          - '7.4647'
+          - '6.9546'
+          - '0.53352'
+          - '3.1438'
+        - - '150'
+          - '7.8684'
+          - '7.4835'
+          - '0.61020'
+          - '3.4155'
+        - - '160'
+          - '8.2547'
+          - '8.0037'
+          - '0.69083'
+          - '3.6860'
+        - - '170'
+          - '8.6255'
+          - '8.5154'
+          - '0.77524'
+          - '3.9551'
+        - - '180'
+          - '8.9822'
+          - '9.0185'
+          - '0.86329'
+          - '4.2225'
+        - - '190'
+          - '9.3261'
+          - '9.5135'
+          - '0.95484'
+          - '4.4880'
+        - - '200'
+          - '9.6582'
+          - '10.000'
+          - '1.0498'
+          - '4.7514'
+        - - '210'
+          - '9.9795'
+          - '10.479'
+          - '1.1480'
+          - '5.0128'
+        - - '220'
+          - '10.291'
+          - '10.951'
+          - '1.2493'
+          - '5.2720'
+        - - '230'
+          - '10.592'
+          - '11.415'
+          - '1.3538'
+          - '5.5291'
+        - - '240'
+          - '10.885'
+          - '11.872'
+          - '1.4611'
+          - '5.7839'
+        - - '250'
+          - '11.169'
+          - '12.322'
+          - '1.5714'
+          - '6.0364'
+        - - '260'
+          - '11.445'
+          - '12.766'
+          - '1.6845'
+          - '6.2867'
+        - - '270'
+          - '11.713'
+          - '13.203'
+          - '1.8003'
+          - '6.5348'
+        - - '273.15'
+          - '11.796'
+          - '13.339'
+          - '1.8373'
+          - '6.6125'
+        - - '280'
+          - '11.974'
+          - '13.633'
+          - '1.9187'
+          - '6.7806'
+        - - '290'
+          - '12.227'
+          - '14.058'
+          - '2.0398'
+          - '7.0243'
+        - - '298.15'
+          - '12.428'
+          - '14.400'
+          - '2.1402'
+          - '7.2212'
+        - - '300'
+          - '12.473'
+          - '14.477'
+          - '2.1633'
+          - '7.2657'
+    - observation_id: chen2019_table25_context
+      type: printed_table_context
+      locator:
+        page: 15
+        pdf_page_index: 14
+        table: '25'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        table_number: 25
+        disposition: context_model
+        reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
+          are context. The full printed cells are preserved below.
+        printed_rows:
+        - - T/K
+          - $C_{p,m}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{\text{T}}S_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1}$
+          - $\Delta^{\text{T}}H_{\text{m}}^{\text{o}}/kJ·mol^{-1}$
+          - $\varphi_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1,b}$
+        - - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - '1'
+          - $8.584·10^{-4}$
+          - $8.361·10^{-4}$
+          - $4.200·10^{-7}$
+          - $4.161·10^{-4}$
+        - - '2'
+          - $3.125·10^{-3}$
+          - $1.934·10^{-3}$
+          - $2.125·10^{-6}$
+          - $8.719·10^{-4}$
+        - - '3'
+          - '0.01065'
+          - $4.407·10^{-3}$
+          - $8.472·10^{-6}$
+          - $1.583·10^{-3}$
+        - - '4'
+          - '0.02459'
+          - $9.232·10^{-3}$
+          - $2.558·10^{-5}$
+          - $2.837·10^{-3}$
+        - - '5'
+          - '0.04412'
+          - '0.01672'
+          - $5.951·10^{-5}$
+          - $4.821·10^{-3}$
+        - - '6'
+          - '0.06816'
+          - '0.02683'
+          - $1.153·10^{-4}$
+          - $7.611·10^{-3}$
+        - - '7'
+          - '0.09584'
+          - '0.03937'
+          - $1.970·10^{-4}$
+          - '0.01122'
+        - - '8'
+          - '0.12651'
+          - '0.05414'
+          - $3.080·10^{-4}$
+          - '0.01564'
+        - - '9'
+          - '0.15973'
+          - '0.07094'
+          - $4.509·10^{-4}$
+          - '0.02084'
+        - - '10'
+          - '0.19516'
+          - '0.08958'
+          - $6.282·10^{-4}$
+          - '0.02676'
+        - - '15'
+          - '0.39812'
+          - '0.20574'
+          - $2.095·10^{-3}$
+          - '0.06609'
+        - - '20'
+          - '0.62213'
+          - '0.35083'
+          - $4.643·10^{-3}$
+          - '0.11867'
+        - - '25'
+          - '0.84835'
+          - '0.51391'
+          - $8.318·10^{-3}$
+          - '0.18117'
+        - - '30'
+          - '1.0821'
+          - '0.68905'
+          - '0.01314'
+          - '0.25108'
+        - - '35'
+          - '1.3315'
+          - '0.87436'
+          - '0.01917'
+          - '0.32676'
+    - observation_id: chen2019_figure1_pxrd
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '1'
+      panel: whole_figure
+      units: PXRD intensity and 2theta as plotted
+      values:
+        quantity: unavailable
+        schema_gap: PXRD intensity has no simulator/battery quantity token.
+        species: a-Si(O)CH films; sample formulae unknown
+        phase: 'amorphous film with crystalline impurities in #300, #539, #338; reference patterns in panels (a)-(c)'
+        temperature_as_printed: not stated
+        axes_as_printed:
+          x: 2theta (degrees)
+          y: intensity (counts)
+        caption: PXRD patterns of Si(O)CH samples. Peaks arise from sample holder are marked with stars. The crystalline impurities
+          were compared with different reference patterns in (a)-(c).
+        series:
+        - name: sample patterns and reference patterns
+          marker_count: not countable (overplotted line traces)
+        digitisation: deferred to a figure pass
+    - observation_id: chen2019_figure2_cp
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: '2'
+      panel: a-b
+      phase: glass
+      units: Cp,m in J K−1 mol−1; T in K
+      values:
+        quantity: cp
+        species: a-Si(O)CH sample bulk glass; sample ids as listed
+        temperature_range_K:
+        - 0
+        - 300
+        axes_as_printed:
+          x: T (K)
+          y: Cp (J/mol K)
+        caption: Experimental heat capacity (dots in each figure) and fitted curves from (a) 0 to 300 K and (b) 0 to 10 K.
+        series:
+        - name: 'sample #R337'
+          marker_count: 98
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #300'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #844'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #539'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #338'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #248'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #149'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #659'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        digitisation: deferred to a figure pass
+    - observation_id: chen2019_figure3_cp_fit_deviation
+      type: figure_record
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: '3'
+      panel: whole_figure
+      phase: glass
+      units: percent deviation; T in K
+      values:
+        quantity: cp
+        species: a-Si(O)CH sample bulk glass; sample ids as listed
+        axes_as_printed:
+          x: T (K)
+          y: percent deviation
+        caption: Percent deviation for different samples.
+        series:
+        - name: 'sample #R337'
+          marker_count: 98
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #300'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #844'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #539'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #338'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #248'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #149'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        - name: 'sample #659'
+          marker_count: 92
+          note: Exact data-point count from the corresponding measured Table 5-12 grid.
+        digitisation: deferred to a figure pass
+    - observation_id: chen2019_figure4_entropy
+      type: figure_record
+      locator:
+        page: 16
+        pdf_page_index: 15
+        figure: '4'
+      panel: whole_figure
+      phase: glass
+      units: S in J K−1 mol−1; O/Si ratio dimensionless
+      values:
+        quantity: S
+        species: a-Si(O)CH sample bulk glass; sample ids as listed
+        temperature_as_printed: 298 K
+        axes_as_printed:
+          x: O/Si ratio
+          y: standard molar entropy at 298 K (J/mol K)
+        caption: Standard molar entropy at 298 K for all samples vs. O/Si ratio.
+        series:
+        - name: 'sample #R337'
+          marker_count: 1
+        - name: 'sample #300'
+          marker_count: 1
+        - name: 'sample #844'
+          marker_count: 1
+        - name: 'sample #539'
+          marker_count: 1
+        - name: 'sample #338'
+          marker_count: 1
+        - name: 'sample #248'
+          marker_count: 1
+        - name: 'sample #149'
+          marker_count: 1
+        - name: 'sample #659'
+          marker_count: 1
+        digitisation: deferred to a figure pass
+fidelity_samples:
+- path: species.SiOCH.observations[chen2019_table5_sampleR337_cp].values.series[0]
+  value:
+    T_K: '1.8308'
+    cp: '1.7349e-4'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '5'
+    row: 'a-SiCH #R337'
+    column: T/K and Cp,m/J K−1 mol−1
+- path: species.SiOCH.observations[chen2019_table7_sample300_cp].values.series[0]
+  value:
+    T_K: '1.8416'
+    cp: '4.7419e-4'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    table: '6'
+    row: 'a-SiCH #300'
+- path: species.SiOCH.observations[chen2019_table13_sample659_cp].values.series[0]
+  value:
+    T_K: '1.8304'
+    cp: '2.2792e-3'
+  locator:
+    page: 8
+    pdf_page_index: 7
+    table: '12'
+    row: 'a-SiOCH #659'
