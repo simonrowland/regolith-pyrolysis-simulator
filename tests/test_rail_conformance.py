@@ -460,14 +460,12 @@ def _mass_spec_expected_species(
     pins: dict[str, Any],
     live_species: set[str],
     residual_pins: tuple[dict[str, Any], ...] | list[dict[str, Any]],
-    covered_species: set[str],
 ) -> set[str]:
     """LIVE T3 mass_spec declarations backed by a mass-spec-type residual pin.
 
     An activity / boiling-point residual pin must not mint a species here.
-    ``covered_species`` is the live mass-spec-type record set: a declared pin
-    whose store record is gone (inadmissible figure, typed skip) does not stay
-    expected. Lost-record detection is ``_assert_mass_spec_pin_record_parity``.
+    Keep this set independent of observed coverage so the parity guard detects
+    a declared mass-spec pin whose store record is gone.
     """
 
     declared = {
@@ -481,7 +479,7 @@ def _mass_spec_expected_species(
         if pin.get("observation_type") in MASS_SPEC_OBSERVATION_TYPES
         and str(pin["species"]) in live_species
     }
-    return declared & typed_pin_species & covered_species
+    return declared & typed_pin_species
 
 
 def _assert_mass_spec_pin_record_parity(
@@ -1822,7 +1820,6 @@ def test_t3_guard_does_not_hide_mass_spec_pin_missing_its_record() -> None:
         pins=pins,
         live_species={"Fe", "K"},
         residual_pins=residual_pins,
-        covered_species=covered_species,
     )
 
     with pytest.raises(AssertionError, match=r"pins_without_records=\['Fe'\]"):
@@ -1857,7 +1854,6 @@ def test_t3_activity_residual_pin_does_not_mint_mass_spec_expected_species() -> 
         pins=pins,
         live_species={"Na", "Fe"},
         residual_pins=residual_pins,
-        covered_species={"Na", "Fe"},
     )
     assert "Na" not in expected, (
         "activity residual pin minted Na as a mass-spec expected species"
@@ -1894,7 +1890,6 @@ def test_t3_expected_species_come_from_mass_spec_type_pins_only(
         pins=PINS,
         live_species=set(LIVE_SPECIES),
         residual_pins=_residual_baseline_points(),
-        covered_species=covered,
     )
     assert "Na" not in expected, (
         "Na entered expected_species without a mass-spec-type store record; "
@@ -1911,7 +1906,6 @@ def test_t3_mass_spec_residual_pins_are_two_way(
         pins=PINS,
         live_species=set(LIVE_SPECIES),
         residual_pins=_residual_baseline_points(),
-        covered_species=covered,
     )
     _assert_mass_spec_pin_record_parity(expected_species, covered)
     for species_id in sorted(expected_species):
