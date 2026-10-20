@@ -10047,11 +10047,11 @@ def _vaporock_helper_returning(pressures, status='ok'):
         def is_available(self):
             return True
 
-        def equilibrate(self, *, temperature_C, composition_kg,
-                        fO2_log, pressure_bar):
+        def equilibrate(self, *, temperature_C, composition_kg=None,
+                        fO2_log, pressure_bar, **_kwargs):
             self.calls.append({
                 'temperature_C': temperature_C,
-                'composition_kg': dict(composition_kg),
+                'composition_kg': dict(composition_kg or {}),
                 'fO2_log': fO2_log,
                 'pressure_bar': pressure_bar,
             })
@@ -10066,11 +10066,46 @@ def _vaporock_helper_returning(pressures, status='ok'):
     return _Helper()
 
 
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+def test_vapor_bridge_uses_same_gas_oxygen_as_shadow(backend_cls):
+    from engines.vaporock import VapoRockProvider
+    from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+    backend = backend_cls()
+    backend._vapor_transport_pO2_bar = 1e-6
+    helper = _vaporock_helper_returning({'SiO': 0.4})
+    backend._vaporock_helper = helper
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': {'SiO2': 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        fO2_log=-12.0,
+        control_inputs={'pO2_bar': 1e-6},
+    )
+    shadow = VapoRockProvider(backend=helper, vapor_pressure_data={})
+    shadow.dispatch(request)
+    backend._vapor_pressures_via_vaporock_or_antoine(
+        T_C=1600.0,
+        solved_melt_wt_pct={'SiO2': 100.0},
+        liquid_fraction=1.0,
+        fO2_log=-12.0,
+        pressure_bar=1e-6,
+        activities={'SiO2': 1.0},
+    )
+    assert helper.calls[0]['fO2_log'] == pytest.approx(-6.0)
+    assert helper.calls[1]['fO2_log'] == helper.calls[0]['fO2_log']
+
+
 def test_vapor_bridge_happy_path_labels_source_vaporock_and_passes_solved_comp():
     backend = AlphaMELTSBackend()
     backend._vaporock_available = True
     helper = _vaporock_helper_returning({'Na': 11.5, 'SiO': 0.4, 'Fe': 1.57})
     backend._vaporock_helper = helper
+    backend._vapor_transport_pO2_bar = 1e-6
 
     solved = {'SiO2': 45.0, 'FeO': 18.0, 'Na2O': 0.4}
     pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
@@ -10087,8 +10122,8 @@ def test_vapor_bridge_happy_path_labels_source_vaporock_and_passes_solved_comp()
     assert pressures == {'Na': 11.5, 'SiO': 0.4, 'Fe': 1.57}
     # The SOLVED equilibrium liquid was fed to VapoRock, not the fallback.
     assert helper.calls[0]['composition_kg'] == solved
-    # Absolute fO2_log forwarded unchanged (no buffer/offset conversion).
-    assert helper.calls[0]['fO2_log'] == pytest.approx(-7.96)
+    # Gas oxygen follows transport pO2, independently of intrinsic melt redox.
+    assert helper.calls[0]['fO2_log'] == pytest.approx(-6.0)
 
 
 def test_vapor_bridge_no_liquid_phase_returns_physical_zero_without_helper():

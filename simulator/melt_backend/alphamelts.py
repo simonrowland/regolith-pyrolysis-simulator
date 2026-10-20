@@ -5436,13 +5436,9 @@ class _MELTSBackendSupport(MeltBackend):
         through any normalizer — a stray 1e5 here silently inflates the
         Hertz-Knudsen evaporation flux).
 
-        fO2 convention: the simulator's ``fO2_log`` is absolute
-        log10(fO2/bar) (``core.py::_compute_intrinsic_melt_fO2``), and
-        VapoRock's ``System.eval_gas_abundances(T_K, logfO2)`` consumes
-        the same absolute log10(fO2/bar).  No buffer/offset conversion is
-        applied — the alphaMELTS ``fO2_buffer``/``fO2_offset`` are a
-        SEPARATE config input to the MELTS silicate solve, not this
-        absolute quantity, and are deliberately NOT forwarded here.
+        VapoRock consumes absolute log10(fO2/bar) for the gas. Resolve it
+        through the shadow provider's existing transport-pO2 boundary;
+        ``fO2_log`` is the independent intrinsic melt-redox provenance.
 
         The melt fed to VapoRock is the composition alphaMELTS SOLVED
         (the equilibrium liquid), never the pre-equilibrium bulk. A zero
@@ -5500,6 +5496,25 @@ class _MELTSBackendSupport(MeltBackend):
                 'liquid_fraction > 0 but solved_melt_wt_pct is empty; '
                 'refusing bulk-composition vapor fallback'
             )
+
+        from engines.vaporock import VapoRockProvider
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+        # Both potentials are log10(bar), but they describe different reservoirs.
+        # For P_i ∝ (fO2/bar)^(-1/2), using melt -12 instead of gas -6
+        # gives P_wrong/P_gas = 10^((-12 - (-6)) * -1/2) = 1000.
+        # The ratio is dimensionless and tends to 1 when the potentials agree.
+        fO2_log = VapoRockProvider._resolve_fO2_log(IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={}, species_formula_registry={},
+            ),
+            temperature_C=T_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            control_inputs={'pO2_bar': self._vapor_transport_pO2_bar},
+        ))
 
         helper = self._vaporock_helper
         if helper is None or not helper.is_available():
