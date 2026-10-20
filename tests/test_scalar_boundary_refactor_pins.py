@@ -1,21 +1,25 @@
 from __future__ import annotations
 
-from engines.alphamelts.parser import _is_finite as alphamelts_parser_is_finite
-from engines.alphamelts.provider import _is_finite as alphamelts_provider_is_finite
+import ast
+from pathlib import Path
+
+from engines.alphamelts.parser import is_finite as alphamelts_parser_is_finite
+from engines.alphamelts.provider import is_finite as alphamelts_provider_is_finite
 from engines.builtin.melt_effect_adjustment import (
-    _finite_float as melt_effect_finite_float,
+    finite_float as melt_effect_finite_float,
 )
-from engines.magemin.domain import _is_finite as magemin_domain_is_finite
-from engines.magemin.provider import _is_finite as magemin_provider_is_finite
-from engines.vaporock.provider import _is_finite as vaporock_provider_is_finite
+from engines.magemin.domain import is_finite as magemin_domain_is_finite
+from engines.magemin.provider import is_finite as magemin_provider_is_finite
+from engines.vaporock.provider import is_finite as vaporock_provider_is_finite
 from scripts.classify_epoch2_liquid_fraction_failures import (
-    _finite_float as classify_epoch2_finite_float,
+    finite_float as classify_epoch2_finite_float,
 )
-from scripts.grid_pregrind_triage import _finite_float as grid_pregrind_finite_float
+from scripts.grid_pregrind_triage import finite_float as grid_pregrind_finite_float
 from simulator.diagnostic_helpers.binary_pot_battery import (
-    _finite_float as binary_pot_finite_float,
+    finite_float as binary_pot_finite_float,
 )
-from simulator.diagnostics import _finite_float as diagnostics_finite_float
+from simulator.diagnostics import finite_float as diagnostics_finite_float
+from simulator.scalar_boundary import finite_float, is_finite
 
 IS_FINITE_HELPERS = (
     ("engines/magemin/provider.py", magemin_provider_is_finite),
@@ -33,6 +37,35 @@ FINITE_FLOAT_HELPERS = (
     (
         "scripts/classify_epoch2_liquid_fraction_failures.py",
         classify_epoch2_finite_float,
+    ),
+)
+
+LOCAL_COPY_NAMES = (
+    ("engines/magemin/provider.py", ("_is_finite", "is_finite"), "is_finite"),
+    ("engines/vaporock/provider.py", ("_is_finite", "is_finite"), "is_finite"),
+    ("engines/alphamelts/provider.py", ("_is_finite", "is_finite"), "is_finite"),
+    ("engines/alphamelts/parser.py", ("_is_finite", "is_finite"), "is_finite"),
+    ("engines/magemin/domain.py", ("_is_finite", "is_finite"), "is_finite"),
+    ("simulator/diagnostics.py", ("_finite_float", "finite_float"), "finite_float"),
+    (
+        "simulator/diagnostic_helpers/binary_pot_battery.py",
+        ("_finite_float", "finite_float"),
+        "finite_float",
+    ),
+    (
+        "engines/builtin/melt_effect_adjustment.py",
+        ("_finite_float", "finite_float"),
+        "finite_float",
+    ),
+    (
+        "scripts/grid_pregrind_triage.py",
+        ("_finite_float", "finite_float"),
+        "finite_float",
+    ),
+    (
+        "scripts/classify_epoch2_liquid_fraction_failures.py",
+        ("_finite_float", "finite_float"),
+        "finite_float",
     ),
 )
 
@@ -91,3 +124,29 @@ def test_finite_float_pin_grid():
     for label, value, _, expected in OUTPUT_PIN_GRID:
         for source, helper in FINITE_FLOAT_HELPERS:
             assert _outcome(helper, value) == expected, f"{source} {label}"
+
+
+def test_target_modules_have_no_local_scalar_boundary_copies():
+    for source, helper in IS_FINITE_HELPERS:
+        assert helper is is_finite, f"{source} does not use the owner predicate"
+    for source, helper in FINITE_FLOAT_HELPERS:
+        assert helper is finite_float, f"{source} does not use the owner converter"
+
+    root = Path(__file__).resolve().parents[1]
+    for source, helper_names, owner_name in LOCAL_COPY_NAMES:
+        tree = ast.parse((root / source).read_text(), filename=source)
+        definitions = {
+            node.name
+            for node in ast.walk(tree)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        }
+        for helper_name in helper_names:
+            assert helper_name not in definitions, f"{source} defines {helper_name}"
+        owner_imports = {
+            alias.name
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom)
+            and node.module == "simulator.scalar_boundary"
+            for alias in node.names
+        }
+        assert owner_name in owner_imports, f"{source} does not import {owner_name}"
