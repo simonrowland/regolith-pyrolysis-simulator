@@ -465,20 +465,38 @@ class EquilibriumMixin:
 
         def _usable_antoine_coefficients(
             antoine: object,
+            *,
+            temperature_K: float,
         ) -> tuple[float, float, float] | None:
             if not isinstance(antoine, Mapping):
                 return None
             try:
-                coefficients = (
-                    float(antoine.get('A', 0) or 0),
-                    float(antoine.get('B', 0) or 0),
-                    float(antoine.get('C', 0) or 0),
-                )
-            except (TypeError, ValueError):
+                raw_coefficients = tuple(antoine[key] for key in ('A', 'B', 'C'))
+                if any(
+                    value is None
+                    or isinstance(value, bool)
+                    or (isinstance(value, str) and not value.strip())
+                    for value in raw_coefficients
+                ):
+                    return None
+                coefficients = tuple(float(value) for value in raw_coefficients)
+            except (KeyError, OverflowError, TypeError, ValueError):
                 return None
             if not all(math.isfinite(value) for value in coefficients):
                 return None
             if coefficients[0] <= 0.0:
+                return None
+            denominator = temperature_K + coefficients[2]
+            if not math.isfinite(denominator) or denominator == 0.0:
+                return None
+            try:
+                log_pressure = _antoine_log10_pressure(
+                    *coefficients,
+                    temperature_K,
+                )
+            except (ArithmeticError, TypeError, ValueError):
+                return None
+            if not math.isfinite(log_pressure):
                 return None
             return coefficients
 
@@ -741,7 +759,10 @@ class EquilibriumMixin:
                         sp_data,
                         coefficient_block,
                     )
-                coefficients = _usable_antoine_coefficients(antoine)
+                coefficients = _usable_antoine_coefficients(
+                    antoine,
+                    temperature_K=T_K,
+                )
                 if P_reference_Pa is None and coefficients is None:
                     if not _active_metal_source_oxide(species, parent_oxide):
                         continue
@@ -903,7 +924,10 @@ class EquilibriumMixin:
                 if T_K <= 300.0:
                     continue
                 antoine_liq = liquid_rxn.get("antoine", {}) or {}
-                liquid_coefficients = _usable_antoine_coefficients(antoine_liq)
+                liquid_coefficients = _usable_antoine_coefficients(
+                    antoine_liq,
+                    temperature_K=T_K,
+                )
                 if liquid_coefficients is None:
                     if not _active_metal_source_oxide(species, parent_oxide):
                         continue
@@ -994,7 +1018,10 @@ class EquilibriumMixin:
                 if T_K <= 300.0:
                     continue
                 antoine_gas = gas_rail_rxn.get("antoine", {}) or {}
-                gas_coefficients = _usable_antoine_coefficients(antoine_gas)
+                gas_coefficients = _usable_antoine_coefficients(
+                    antoine_gas,
+                    temperature_K=T_K,
+                )
                 if gas_coefficients is None:
                     if not _active_metal_source_oxide(species, parent_oxide):
                         continue
@@ -1448,7 +1475,10 @@ class EquilibriumMixin:
                 pO2_exponent = 0.0
             else:
                 coefficient_block = COEFF_BLOCK_ANTOINE
-                coefficients = _usable_antoine_coefficients(antoine)
+                coefficients = _usable_antoine_coefficients(
+                    antoine,
+                    temperature_K=T_K,
+                )
                 if coefficients is None:
                     _sz_refuse_missing_coefficient(name)
                     continue
