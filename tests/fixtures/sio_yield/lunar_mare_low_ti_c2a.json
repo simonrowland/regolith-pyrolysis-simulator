@@ -21,14 +21,14 @@
   "fouling_rate": {
     "liner_material": "hot_wall_refractory_liner",
     "dominant_species": "none",
-    "dominant_species_wall_deposit_kg": 0.0,
-    "wall_deposit_kg_per_campaign": 0.0,
+    "dominant_species_wall_deposit_kg": null,
+    "wall_deposit_kg_per_campaign": null,
     "wall_deposit_basis": "total_wall_load_by_species",
     "resinter_threshold_kg": null,
     "resinter_threshold_basis": "fail_closed_no_qualified_positive_deposition",
-    "campaigns_to_resinter": "infinite",
+    "campaigns_to_resinter": null,
     "campaigns_to_resinter_by_segment": {},
-    "aggregate_campaigns_to_resinter": "infinite",
+    "aggregate_campaigns_to_resinter": null,
     "fast_fouling_campaign_threshold": 10,
     "output_status": "status_bearing",
     "authoritative": false,
@@ -10115,7 +10115,7 @@
         }
       }
     },
-    "nominal_verdict": "slow-fouling",
+    "nominal_verdict": null,
     "verdict": "non-authoritative"
   },
   "sio_yield_pct_of_feedstock": 1.04099076417e-06,
