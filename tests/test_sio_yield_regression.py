@@ -433,6 +433,9 @@ def _assert_golden_close(actual, expected, path="root"):
             _assert_golden_close(
                 actual[index], expected_item, f"{path}[{index}]")
         return
+    if actual is None or expected is None:
+        assert actual is None and expected is None, path
+        return
     if isinstance(expected, (int, float)):
         tolerance = max(abs(float(expected)) * 0.01, 1.0e-12)
         assert abs(float(actual) - float(expected)) <= tolerance, path
@@ -474,6 +477,14 @@ def test_golden_comparison_tolerates_only_parametric_fouling_denominator():
             expected,
             "root.alpha_provenance",
         )
+
+
+def test_golden_comparison_matches_null_only_with_null():
+    _assert_golden_close(None, None)
+    with pytest.raises(AssertionError):
+        _assert_golden_close(None, 0.0)
+    with pytest.raises(AssertionError):
+        _assert_golden_close(0.0, None)
 
 
 @pytest.mark.parametrize(("feedstock", "golden_name"), GOLDENS)
