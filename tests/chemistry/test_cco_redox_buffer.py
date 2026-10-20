@@ -115,29 +115,42 @@ def test_cco_and_graphite_outputs_are_bit_pinned_on_temperature_grid() -> None:
             1273.15,
             "-0x1.999b920f450c2p+3",
             "-0x1.999b8e53d50b5p+3",
+            "-0x1.d99b8e53d50b5p+3",
         ),
         (
             1473.15,
             "-0x1.4f35502966942p+3",
             "-0x1.4f354cefad3dfp+3",
+            "-0x1.8f354cefad3dfp+3",
         ),
         (
             1723.15,
             "-0x1.0a7ee53a21cdep+3",
             "-0x1.0a7ee27834ea1p+3",
+            "-0x1.4a7ee27834ea1p+3",
         ),
         (
             1873.15,
             "-0x1.d424e24e5ce07p+2",
             "-0x1.d424dd3b925b5p+2",
+            "-0x1.2a126e9dc92dap+3",
         ),
     )
 
-    for temperature_K, expected_one_bar, expected_one_atm in output_grid:
+    for (
+        temperature_K,
+        expected_one_bar,
+        expected_one_atm,
+        expected_tenth_atm,
+    ) in output_grid:
         assert cco_log10_fO2_bar(temperature_K, 1.0).hex() == expected_one_bar
         assert (
             log10_fo2_c_co_bar(temperature_K, 1.01325).hex()
             == expected_one_atm
+        )
+        assert (
+            log10_fo2_c_co_bar(temperature_K, 0.101325).hex()
+            == expected_tenth_atm
         )
 
 
