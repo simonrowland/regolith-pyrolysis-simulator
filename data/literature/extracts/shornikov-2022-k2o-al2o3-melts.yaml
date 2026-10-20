@@ -1,0 +1,144 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2022-k2o-al2o3-melts
+source:
+  citation: Shornikov, S. I., and A. A. Slobodov (2022), “Thermodynamic properties of the K2O–Al2O3 melts,”
+    Experiment in Geosciences 28(1), 72–75.
+  year: 2022
+  corpus_asset: raw/shornikov-2022-k2o-al2o3-melts/shornikov-2022-k2o-al2o3-melts.pdf
+extraction:
+  method: No MinerU table. Printed scalars were taken from the text layer and checked against the 600
+    dpi renders of PDF pages 3 and 5 (published pages 72 and 74). Figures were inspected and not digitised.
+  date: '2026-10-20'
+  worker: t1372-w2-w8-t1
+review_status: draft
+fidelity_samples:
+- species: KAlO2
+  observable: transition_point
+  observation_id: k2o_2022_kalo2_tm_glushko
+  field: value
+  value: '1986'
+  locator: &id001
+    page: 3
+    pdf_page_index: 2
+    published_page: 72
+    section: Introduction
+    note: The sentence accepts Glushko et al. (1982), 1986±10 K, against Roth (1980) and Moya et al. (1982).
+experiments:
+- experiment_id: shornikov-2022-k2o-al2o3-model
+  kind: thermodynamic_model
+  locator: &id002
+    page: 5
+    pdf_page_index: 4
+    published_page: 74
+    section: Discussion
+  method: Semi-empirical model cited to Shornikov (2019). Activities and mixing energies are calculated,
+    not tabulated.
+species:
+  KAlO2:
+    observations:
+    - observation_id: k2o_2022_kalo2_tm_glushko
+      type: transition_point
+      locator: *id001
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        value: '1986'
+        value_as_printed: 1986±10 K
+        attribution: Glushko et al. (1982), the melting point the paper accepts.
+        property_kind: melting_point
+        T_K: '1986'
+        phase_basis: The sentence is the melting point of the compound KAlO2. The solid that melts is
+          crystalline. The cell does not print a phase token.
+      phase: cr
+      uncertainty:
+        kind: printed
+        value: '10'
+        verbatim: 1986±10 K
+        confidence_level: not_stated
+        basis: One printed ±. The paper does not state the confidence level.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1986'
+          locator: *id001
+    context:
+    - observation_id: k2o_2022_kalo2_tm_above_2500
+      type: cited_melting_bound
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 72
+        section: Introduction
+      units: K
+      values:
+        bound_as_printed: above 2500 K
+        attribution: Roth (1980) and Moya et al. (1982).
+        paper_judgement: The paper calls this an overestimated value compared with 1986±10 K.
+        reason_not_scored: A lower bound the paper does not accept as the melting point. Not stored as
+          a point temperature.
+  K2O:
+    observations: []
+    context:
+    - observation_id: k2o_2022_mixing_minimum_1450
+      type: mixing_energy_minimum
+      locator: *id002
+      units: kJ/mol
+      values:
+        value_as_printed: -95 kJ/mol
+        T_K: '1450'
+        composition_as_printed: close to the KAlO2 composition
+        method_class: model_derived
+        standard_state: 'Published page 74 (PDF page 5): the oxide activities and mixing energies were
+          calculated in the present study. The initial data are the standard Gibbs energies of formation
+          of the simple oxides (K2O and Al2O3) and the potassium aluminates in the crystalline and liquid
+          state. The paper does not state whether a(K2O) and a(Al2O3) are referred to the pure solid oxide
+          or the pure liquid oxide.'
+        reason_not_scored: No mixing-energy quantity. The composition is not a numeric mole fraction.
+          Parent Gibbs energies are cited, not printed.
+    - observation_id: k2o_2022_mixing_minimum_2300
+      type: mixing_energy_minimum
+      locator: *id002
+      units: kJ/mol
+      values:
+        value_as_printed: -65 kJ/mol
+        T_K: '2300'
+        composition_as_printed: in the KAlO2 melt
+        method_class: model_derived
+        standard_state: 'Published page 74 (PDF page 5): the oxide activities and mixing energies were
+          calculated in the present study. The initial data are the standard Gibbs energies of formation
+          of the simple oxides (K2O and Al2O3) and the potassium aluminates in the crystalline and liquid
+          state. The paper does not state whether a(K2O) and a(Al2O3) are referred to the pure solid oxide
+          or the pure liquid oxide.'
+        reason_not_scored: No mixing-energy quantity. The composition is not a numeric mole fraction.
+          Parent Gibbs energies are cited, not printed.
+    - observation_id: k2o_2022_activity_reference_unstated
+      type: activity_reference_unstated
+      locator: *id002
+      units: as reported
+      values:
+        standard_state: 'Published page 74 (PDF page 5): the oxide activities and mixing energies were
+          calculated in the present study. The initial data are the standard Gibbs energies of formation
+          of the simple oxides (K2O and Al2O3) and the potassium aluminates in the crystalline and liquid
+          state. The paper does not state whether a(K2O) and a(Al2O3) are referred to the pure solid oxide
+          or the pure liquid oxide.'
+        expected_migration_phase: unknown
+        reason_not_scored: Fig. 4 activities are continuous curves. No discrete present-study marker was
+          read.
+  KAlO:
+    observations: []
+    context:
+    - observation_id: k2o_2022_p_kalo_ceiling_2300
+      type: partial_pressure_ceiling
+      locator: *id002
+      units: atm
+      values:
+        ceiling_as_printed: 3.5×10^−9 atm
+        T_K: '2300'
+        composition_as_printed: over the K2O–Al2O3 melts
+        method_class: model_derived
+        reason_not_scored: The sentence is a ceiling, not a point pressure, and it does not name a melt
+          composition.
