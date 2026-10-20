@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import io
+import tokenize
+from pathlib import Path
+
 from simulator.chemistry.offgas_fo2 import (
     _load_cea_polynomials_from_text,
     imposed_fo2,
@@ -87,3 +91,31 @@ species:
         _load_cea_polynomials_from_text(("O",), source_text, "b-963 pin")
     )
     assert polynomials["O"].reference_pressure_Pa.hex() == "0x1.86a0000000000p+16"
+
+
+def test_melt_modules_do_not_reintroduce_bare_bar_or_kelvin_constants() -> None:
+    repo = Path(__file__).resolve().parents[1]
+    targets = (
+        (repo / "simulator/melt_backend/alphamelts.py", "alphamelts"),
+        (repo / "simulator/chemistry/offgas_fo2.py", "offgas_fo2"),
+    )
+    for path, module in targets:
+        source = path.read_text(encoding="utf-8")
+        code_lines = source.splitlines()
+        bare_literals = []
+        for token in tokenize.generate_tokens(io.StringIO(source).readline):
+            if token.type != tokenize.NUMBER:
+                continue
+            try:
+                value = float(token.string.replace("_", ""))
+            except ValueError:
+                continue
+            if value not in {273.15, 100_000.0}:
+                continue
+            line = code_lines[token.start[0] - 1].strip()
+            if module == "alphamelts" and line == (
+                "if pressure_bar == 0.0 and failed_temperature_C == -273.15:"
+            ):
+                continue
+            bare_literals.append((token.start[0], token.string))
+        assert bare_literals == [], f"{path.relative_to(repo)}: {bare_literals}"
