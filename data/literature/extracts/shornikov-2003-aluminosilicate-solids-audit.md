@@ -10,13 +10,13 @@ The 2002 Doklady paper is a sibling report of the same solid-phase campaign (sam
 
 ## Scored observations
 
-None. The partial-pressure figures cannot be read pointwise, and the prose results are a derived composition, author estimates, and pressure bounds.
+Figure 3 at 1900 K, partial pressures, figure_only. SiO 12 points, Al 10, AlO 6, O 9. Calibration is in the observation locator: 4.0 at y=685, 8.5 at y=1104, 9.0 at y=1364, 520 px per log unit, applied to the upper segment as well. Points with 890 < y < 1000 carry an extra 0.03 dex. Touched pairs use 22 px instead of 16 px. The pure-oxide rule does not apply: these rows are partial pressures, not activities.
 
 ## Context rows
 
-Mullite 60 ± 5 mol% Al2O3, equation (17), published page 1041. Same result as the Doklady paper.
+Mullite 60 ± 5 mol% Al2O3, equation (17), published page 1042 (PDF page 6). Same result as the Doklady paper.
 
-Phase-transition estimates, the same bounds as the Doklady paper: reactions (12) and (13) did not exceed 5 kJ/mol; reaction (14) is 13 ± 10 kJ/mol. Cited transition temperatures 1857 K and 2123 K are from [3], not measured here.
+Phase-transition estimates, the same bounds as the Doklady paper: reactions (12) and (13) did not exceed 5 kJ/mol, stated on published page 1039; reaction (14) is 13 ± 10 kJ/mol on published page 1041. Cited transition temperatures 1857 K and 2123 K are from [3], not measured here.
 
 ΔfusH(Al2O3) = 105 ± 25 kJ/mol, “found in this work,” published page 1041. It is the difference of reaction-(3) enthalpies below and above the melting point. The melting point 2327 K is cited from [49]. The paper says the estimate is less accurate than 111.4 ± 3.0 kJ/mol [54]. Kept as context: an author estimate whose temperature is cited, not opened as a scored heat_of_fusion identity. The 2026-10-20 pure-oxide rule does not apply. This is a fusion enthalpy, not an activity reference, and the paper does not present it as an ion current over pure alumina at the experiment temperature.
 
@@ -28,8 +28,10 @@ Evaporation coefficients were assumed equal to the simple oxides via Komlev. Not
 
 No content_list table. Figure 1 is vapourization paths on the phase diagram. Context only.
 
-Figure 2 (published pp. 1039–1040): eight panels of −log p versus T. Symbols from the eight samples overlap, and the lines are averages or literature (silica [51], mullite [6], alumina [50, 52]). Not digitized.
+Figure 2 (published p. 1040, PDF page 4) was re-read at 1200 dpi (`p2003-p-4.png`). Panel frames, page pixels: x-axes at y=3108 (left) and 3097 (right), then 5587, 8128, and 10617; left y-axis x=1481; right y-axis x=5255 (the third right-hand panel is x=5261). Panel (b) crop x=5255–6800, y=1600–3120: a bright-hole finder returned 26 interiors. The contact sheet mixes open squares, open diamonds, triangles, and pairs of different symbols inside one marker width, most of them crossed by the fit line. A hole is not a unique legend class, so no (T, −log p, composition) triple was stored. Literature symbols 11–18 stay context.
 
-Figure 3 (published p. 1041): −log p at 1900 K versus mol% Al2O3. Symbols are SiO (filled circles), Al (inverted triangles), AlO (filled triangles), and O (crossed squares). The y axis is broken between about 4.0 and 8.5 (upper segment y = 700–848 px, lower segment y = 872–1616 px, axis x ≈ 2800). The x axis is broken between the two two-phase clusters (axis y ≈ 1612, x = 2798–3569). SiO circles pile on the 4.0 tick, and the other symbols stack on the y axis. Individual points in those piles cannot be read within a stated uncertainty. Isolated symbols were not stored on their own, because the paper’s claim is that p(i) is constant inside each two-phase region. Not digitized.
+Figure 3 (published p. 1041, PDF page 5) was digitized where a symbol is alone at a distinct x. Y calibration is from the label centres, not the data guides: 4.0 at y=685, 8.5 at y=1104, 9.0 at y=1364, 9.5 at y=1606, 520 px per log unit. Left mol% = (x−2799)/21.60. Right mol% = 60+(x−3618.5)/18.20. Stored: SiO 12, Al 10, AlO 6, O 9. The L18 pair was split by hand at y=698 (a figure-8) and both centres kept, with the 22 px uncertainty. The right-hand pair near 68 mol% on the 4.0 line is one fused oval and was refused.
 
-Checked against the 600 dpi renders of PDF pages 2, 3, 4, and 5.
+Refused on Figure 3, each one: the SiO pile on the y axis (x=2799–2860, y=650–760); the lower-band pile on the y axis (y=1050–1600, x=2799–2840); the left SiO cloud at about 3–6 mol% on the 4.0 line (x=2860–2920, y=650–710); the left bowtie near 4–5 mol% (y=1280–1360); the hourglass on the guide near 18 mol% (y about 1380); the fused oval near 68 mol% (x=3740–3790, y=670–710); the legend stack near x=4139; tick stubs near y=1593; anything in the tilde break y=847–880.
+
+Checked against the 600 dpi renders of PDF pages 2, 3, 4, 5, and 6, and against the 1200 dpi render of PDF page 4. Hand corrections are the L18 split and the choice of label centres over the data guides; both are stated above.

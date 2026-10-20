@@ -8,13 +8,23 @@ source:
   corpus_asset: raw/shornikov-2003-aluminosilicate-solids/shornikov-2003-aluminosilicate-solids.pdf
 extraction:
   method: Prose values checked against pdftotext-layout and the 600 dpi renders. No content_list table
-    exists. Figure 2 panels overlap, and Figure 3 symbols pile on the broken axes, so neither figure was
-    digitized. This article does not print the 12.9 ± 0.8 kJ/mol or 11.6 ± 0.4 J/(mol K) mullite values;
+    exists. Figure 3 partial pressures that sit on a distinct x, off the piles and off the legend, were
+    read on the 600 dpi page. Figure 2 was inspected at 1200 dpi; symbol classes on one trend
+    are not separable within one marker width, so those panels were not scored. This article does not print the 12.9 ± 0.8 kJ/mol or 11.6 ± 0.4 J/(mol K) mullite values;
     those are in the 2002 Doklady paper.
   date: '2026-10-20'
   worker: t1372-w1-w2-t1
   provenance_path: text/shornikov-2003-aluminosilicate-solids/pdftotext-layout.txt
 review_status: draft
+fidelity_samples:
+- path: species.SiO.observations[shornikov_2003_fig3_sio_1900k].values.points[0].neg_log10_p_as_read
+  value: '4.093'
+  locator:
+    page: 5
+    published_page: 1041
+    pdf_page_index: 4
+    figure: '3'
+    note: shornikov_2003_f3_sio_01, SiO circle left of the x-axis break
 experiments:
 - experiment_id: shornikov-2003-rjpc-solid-kems
   kind: kems
@@ -52,9 +62,9 @@ species:
     - observation_id: shornikov_2003_mullite_composition
       type: quoted_derived_composition
       locator:
-        page: 5
-        published_page: 1041
-        pdf_page_index: 4
+        page: 6
+        published_page: 1042
+        pdf_page_index: 5
         equation: '17'
         note: Same 60 ± 5 mol% result as the 2002 Doklady paper, derived here again from equation (17).
           This article does not print 12.9 ± 0.8 or 11.6 ± 0.4.
@@ -65,12 +75,13 @@ species:
     - observation_id: shornikov_2003_transition_enthalpies
       type: quoted_phase_transition_estimate
       locator:
-        page: 4
-        published_page: 1040
-        pdf_page_index: 3
+        page: 3
+        published_page: 1039
+        pdf_page_index: 2
         equation: 12–14
-        note: 'Same campaign bounds as the 2002 Doklady paper. Transition temperatures are cited from
-          [3]: 1857 K for (12) and 2123 K for (14).'
+        note: 'Same campaign bounds as the 2002 Doklady paper. The sentences start on published page
+          1039. The 13 ± 10 kJ/mol figure is on published page 1041. Transition temperatures are
+          cited from [3]: 1857 K for (12) and 2123 K for (14).'
       units: kJ/mol
       values:
         reactions_12_and_13_maximum_kJ_mol: '5'
@@ -103,9 +114,9 @@ species:
     - observation_id: shornikov_2003_fig2_pressures_not_digitized
       type: figure_partial_pressure_overlap
       locator:
-        page: 3
-        published_page: 1039
-        pdf_page_index: 2
+        page: 4
+        published_page: 1040
+        pdf_page_index: 3
         figure: '2'
         note: 'Eight panels of −log p versus T for SiO, Al, AlO, and O in the silica–mullite and mullite–alumina
           intervals. Literature: pure silica [51], mullite [6], alumina [50, 52]. Lines are averages and
@@ -113,8 +124,14 @@ species:
       units: atm
       values:
         method_class: figure_only
-        reason: Symbols from eight compositions overlap in each panel. A composition and a (T, −log p)
-          pair cannot be assigned within a stated uncertainty. Y is −log p; the lines were not digitized.
+        reason: '1200 dpi PDF page 4, published page 1040. Panel frames, page pixels: row x-axes at
+          y=3108/3097, 5587, 8128, 10617; left y-axis x=1481; right y-axis x=5255 (row 3 right is
+          x=5261). Each panel is one -log p versus T trend carrying several symbol classes.
+          Panel (b) crop x=5255-6800, y=1600-3120: a bright-hole finder returned 26 interiors.
+          The contact sheet mixes open squares, open diamonds, triangles, and pairs of different
+          symbols inside one marker width, most of them crossed by the fit line. A hole is not a
+          unique legend class, so no (T, -log p, composition) triple was stored. Literature
+          symbols 11-18 stay context. The fit lines were not digitized.'
     - observation_id: shornikov_2003_fig3_isotherm_not_digitized
       type: figure_partial_pressure_isotherm
       locator:
@@ -130,7 +147,1156 @@ species:
       values:
         T_K: '1900'
         method_class: figure_only
-        reason: SiO circles pile on the −log p = 4.0 tick, and Al, AlO, and O symbols stack on the y axis
-          and on each other. Individual (composition, pressure) pairs in those piles cannot be read within
-          a stated uncertainty. Isolated symbols were not stored without the piles, because that would
-          misrepresent an isotherm the paper describes as constant inside each two-phase region.
+        reason: 'Refused, each with its place. Pile on the y axis, x=2799-2860, y=650-760: SiO circles
+          are one mass. Lower-band pile on the y axis, y=1050-1600, x=2799-2840: squares and triangles
+          stacked on the axis. Left SiO cloud at about 3-6 mol% on the 4.0 line, x=2860-2920, y=650-710:
+          overlapping circles. Left bowtie of two triangles near 4-5 mol%, y=1280-1360. Left hourglass
+          on the solid line near 18 mol%, y about 1380: upright and inverted triangles merged with the
+          guide. Right SiO pair near 68 mol% on the 4.0 line, x=3740-3790, y=670-710: one fused oval,
+          no waist. Legend stack at x about 4139: the numerals 1-4, not data. Tick stubs at y about 1593.
+          Anything inside the tilde break, y=847-880. Centres that are one symbol at a distinct x are
+          stored on the gas-species observations.'
+  SiO:
+    observations:
+    - observation_id: shornikov_2003_fig3_sio_1900k
+      type: partial_pressure
+      locator:
+        page: 5
+        published_page: 1041
+        pdf_page_index: 4
+        figure: '3'
+        note: "Figure 3, 600 dpi, PDF page 5, published page 1041. T = 1900 K. Quantity as printed is -log p_1900(i) with p in atm. Symbols: filled circles SiO, inverted triangles Al, filled triangles AlO, crossed squares O. Log axes, calibrated in log space from the label centres beside the y axis: 4.0 at y=685 (the dotted reference line; the 4.0 digit centre is y=699, 14 px lower), 8.5 at y=1104, 9.0 at y=1364, 9.5 at y=1606. Lower scale -log = 8.5 + (y-1104)/520, from the 8.5 and 9.0 labels (520 px per log unit). The 9.5 label lies 18 px (0.035 log) off that line; that residual is inside the stated read uncertainty. The upper segment has only the 4.0 line, so the same 520 px per log unit is applied: -log = 4.0 + (y-685)/520. The tilde break is y=847-880; nothing in that band was stored. Lower-segment points with 890 < y < 1000 sit above the 8.5 tick toward the break, and their dex uncertainty is widened by 0.03. The upper-segment SiO circles and the O squares near y=1053 do not get that extra term. Left of the x-axis break, mol% = (x-2799)/21.60 (0 at the y axis, 20 at the glyph midpoint x=3231). Right of the break, mol% = 60 + (x-3618.5)/18.20 (60 at x=3618.5, 80 at x=3985, 100 at x=4347). Read 1 is the connected-component centre. Read 2 is the radius-12 centroid at threshold 140. The stored coordinate is the mean. read_uncertainty is at least half a marker (16 px, 22 px where two markers touch) and contains both reads. It is a digitising width, not a printed interval. Partial pressure is not an activity, so the pure-oxide reference rule is not applied. Piles on the y axis, the fused oval near 68 mol% on the 4.0 line, the legend stack, and the guide-line blobs were refused one by one; the audit lists them."
+      T_range_K:
+      - 1900.0
+      - 1900.0
+      phase: gas
+      experiment: shornikov-2003-rjpc-solid-kems
+      regime: kems_effusion
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        gas_species: SiO(g)
+        formula: SiO
+        temperature_K: 1900
+        curve_as_printed: '1'
+        points:
+        - temperature_K: 1900
+          neg_log10_p_as_read: '4.093'
+          pressure_atm: 8.063776e-05
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '3.19'
+          composition_mol:
+            Al2O3: '0.0319'
+            SiO2: '0.9681'
+          audit_read_id: shornikov_2003_f3_sio_01
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.0319'
+                  - - SiO2
+                    - '0.9681'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (2868.0, 733.6); read 1 (2868.0, 733.6); read 2 (2868.0, 733.6); audit shornikov_2003_f3_sio_01.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '3.901'
+          pressure_atm: 1.256698e-04
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '8.22'
+          composition_mol:
+            Al2O3: '0.0822'
+            SiO2: '0.9178'
+          audit_read_id: shornikov_2003_f3_sio_02
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.0822'
+                  - - SiO2
+                    - '0.9178'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (2976.6, 633.4); read 1 (2976.6, 633.4); read 2 (2976.6, 633.4); audit shornikov_2003_f3_sio_02.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '3.987'
+          pressure_atm: 1.030112e-04
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '12.74'
+          composition_mol:
+            Al2O3: '0.1274'
+            SiO2: '0.8726'
+          audit_read_id: shornikov_2003_f3_sio_03
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.1274'
+                  - - SiO2
+                    - '0.8726'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3074.2, 678.3); read 1 (3074.2, 678.3); read 2 (3074.2, 678.3); audit shornikov_2003_f3_sio_03.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '4.052'
+          pressure_atm: 8.862137e-05
+          read_uncertainty_dex: '0.042'
+          read_uncertainty_mol_percent: '1.02'
+          Al2O3_mole_percent_as_read: '18.22'
+          composition_mol:
+            Al2O3: '0.1822'
+            SiO2: '0.8178'
+          audit_read_id: shornikov_2003_f3_sio_04
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.1822'
+                  - - SiO2
+                    - '0.8178'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3192.6, 712.3); read 1 (3192.6, 712.3); read 2 (3192.6, 712.3); audit shornikov_2003_f3_sio_04.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '3.996'
+          pressure_atm: 1.009879e-04
+          read_uncertainty_dex: '0.042'
+          read_uncertainty_mol_percent: '1.02'
+          Al2O3_mole_percent_as_read: '18.44'
+          composition_mol:
+            Al2O3: '0.1844'
+            SiO2: '0.8156'
+          audit_read_id: shornikov_2003_f3_sio_05
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.1844'
+                  - - SiO2
+                    - '0.8156'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3197.3, 682.8); read 1 (3197.3, 682.8); read 2 (3197.3, 682.8); audit shornikov_2003_f3_sio_05.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '4.054'
+          pressure_atm: 8.826108e-05
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '28.17'
+          composition_mol:
+            Al2O3: '0.2817'
+            SiO2: '0.7183'
+          audit_read_id: shornikov_2003_f3_sio_06
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.2817'
+                  - - SiO2
+                    - '0.7183'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3407.5, 713.2); read 1 (3407.7, 713.2); read 2 (3407.4, 713.2); audit shornikov_2003_f3_sio_06.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '3.954'
+          pressure_atm: 1.111633e-04
+          read_uncertainty_dex: '0.042'
+          read_uncertainty_mol_percent: '1.02'
+          Al2O3_mole_percent_as_read: '30.00'
+          composition_mol:
+            Al2O3: '0.3000'
+            SiO2: '0.7000'
+          audit_read_id: shornikov_2003_f3_sio_07
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.3000'
+                  - - SiO2
+                    - '0.7000'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3447.0, 661.1); read 1 (3447.1, 661.1); read 2 (3447.0, 661.1); audit shornikov_2003_f3_sio_07.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '4.021'
+          pressure_atm: 9.524587e-05
+          read_uncertainty_dex: '0.042'
+          read_uncertainty_mol_percent: '1.02'
+          Al2O3_mole_percent_as_read: '30.37'
+          composition_mol:
+            Al2O3: '0.3037'
+            SiO2: '0.6963'
+          audit_read_id: shornikov_2003_f3_sio_08
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.3037'
+                  - - SiO2
+                    - '0.6963'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3455.0, 696.0); read 1 (3455.0, 696.0); read 2 (3455.0, 696.0); audit shornikov_2003_f3_sio_08.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '4.086'
+          pressure_atm: 8.207876e-05
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '59.98'
+          composition_mol:
+            Al2O3: '0.5998'
+            SiO2: '0.4002'
+          audit_read_id: shornikov_2003_f3_sio_09
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.5998'
+                  - - SiO2
+                    - '0.4002'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3618.2, 729.6); read 1 (3618.2, 729.5); read 2 (3618.2, 729.7); audit shornikov_2003_f3_sio_09.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '4.055'
+          pressure_atm: 8.814391e-05
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '62.56'
+          composition_mol:
+            Al2O3: '0.6256'
+            SiO2: '0.3744'
+          audit_read_id: shornikov_2003_f3_sio_10
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.6256'
+                  - - SiO2
+                    - '0.3744'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3665.1, 713.5); read 1 (3665.0, 713.5); read 2 (3665.1, 713.5); audit shornikov_2003_f3_sio_10.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '4.162'
+          pressure_atm: 6.881646e-05
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '70.20'
+          composition_mol:
+            Al2O3: '0.7020'
+            SiO2: '0.2980'
+          audit_read_id: shornikov_2003_f3_sio_11
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.7020'
+                  - - SiO2
+                    - '0.2980'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3804.1, 769.4); read 1 (3804.0, 769.3); read 2 (3804.1, 769.4); audit shornikov_2003_f3_sio_11.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '4.097'
+          pressure_atm: 8.006847e-05
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '84.05'
+          composition_mol:
+            Al2O3: '0.8405'
+            SiO2: '0.1595'
+          audit_read_id: shornikov_2003_f3_sio_12
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.8405'
+                  - - SiO2
+                    - '0.1595'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (4056.2, 735.2); read 1 (4056.2, 735.2); read 2 (4056.3, 735.2); audit shornikov_2003_f3_sio_12.
+  Al:
+    observations:
+    - observation_id: shornikov_2003_fig3_al_1900k
+      type: partial_pressure
+      locator:
+        page: 5
+        published_page: 1041
+        pdf_page_index: 4
+        figure: '3'
+        note: "Figure 3, 600 dpi, PDF page 5, published page 1041. T = 1900 K. Quantity as printed is -log p_1900(i) with p in atm. Symbols: filled circles SiO, inverted triangles Al, filled triangles AlO, crossed squares O. Log axes, calibrated in log space from the label centres beside the y axis: 4.0 at y=685 (the dotted reference line; the 4.0 digit centre is y=699, 14 px lower), 8.5 at y=1104, 9.0 at y=1364, 9.5 at y=1606. Lower scale -log = 8.5 + (y-1104)/520, from the 8.5 and 9.0 labels (520 px per log unit). The 9.5 label lies 18 px (0.035 log) off that line; that residual is inside the stated read uncertainty. The upper segment has only the 4.0 line, so the same 520 px per log unit is applied: -log = 4.0 + (y-685)/520. The tilde break is y=847-880; nothing in that band was stored. Lower-segment points with 890 < y < 1000 sit above the 8.5 tick toward the break, and their dex uncertainty is widened by 0.03. The upper-segment SiO circles and the O squares near y=1053 do not get that extra term. Left of the x-axis break, mol% = (x-2799)/21.60 (0 at the y axis, 20 at the glyph midpoint x=3231). Right of the break, mol% = 60 + (x-3618.5)/18.20 (60 at x=3618.5, 80 at x=3985, 100 at x=4347). Read 1 is the connected-component centre. Read 2 is the radius-12 centroid at threshold 140. The stored coordinate is the mean. read_uncertainty is at least half a marker (16 px, 22 px where two markers touch) and contains both reads. It is a digitising width, not a printed interval. Partial pressure is not an activity, so the pure-oxide reference rule is not applied. Piles on the y axis, the fused oval near 68 mol% on the 4.0 line, the legend stack, and the guide-line blobs were refused one by one; the audit lists them."
+      T_range_K:
+      - 1900.0
+      - 1900.0
+      phase: gas
+      experiment: shornikov-2003-rjpc-solid-kems
+      regime: kems_effusion
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        gas_species: Al(g)
+        formula: Al
+        temperature_K: 1900
+        curve_as_printed: '2'
+        points:
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.814'
+          pressure_atm: 1.535841e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '3.30'
+          composition_mol:
+            Al2O3: '0.0330'
+            SiO2: '0.9670'
+          audit_read_id: shornikov_2003_f3_al_01
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.0330'
+                  - - SiO2
+                    - '0.9670'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (2870.3, 1267.1); read 1 (2870.3, 1267.0); read 2 (2870.3, 1267.2); audit shornikov_2003_f3_al_01.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '9.106'
+          pressure_atm: 7.834990e-10
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '4.27'
+          composition_mol:
+            Al2O3: '0.0427'
+            SiO2: '0.9573'
+          audit_read_id: shornikov_2003_f3_al_02
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.0427'
+                  - - SiO2
+                    - '0.9573'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (2891.3, 1419.1); read 1 (2891.3, 1419.1); read 2 (2891.3, 1419.1); audit shornikov_2003_f3_al_02.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.933'
+          pressure_atm: 1.168154e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '8.21'
+          composition_mol:
+            Al2O3: '0.0821'
+            SiO2: '0.9179'
+          audit_read_id: shornikov_2003_f3_al_03
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.0821'
+                  - - SiO2
+                    - '0.9179'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (2976.4, 1328.9); read 1 (2976.5, 1328.9); read 2 (2976.3, 1329.0); audit shornikov_2003_f3_al_03.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '9.169'
+          pressure_atm: 6.769817e-10
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '28.17'
+          composition_mol:
+            Al2O3: '0.2817'
+            SiO2: '0.7183'
+          audit_read_id: shornikov_2003_f3_al_04
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.2817'
+                  - - SiO2
+                    - '0.7183'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3407.4, 1452.1); read 1 (3407.5, 1452.0); read 2 (3407.2, 1452.2); audit shornikov_2003_f3_al_04.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.786'
+          pressure_atm: 1.636961e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '30.28'
+          composition_mol:
+            Al2O3: '0.3028'
+            SiO2: '0.6972'
+          audit_read_id: shornikov_2003_f3_al_05
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.3028'
+                  - - SiO2
+                    - '0.6972'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3453.0, 1252.7); read 1 (3453.1, 1252.6); read 2 (3453.0, 1252.7); audit shornikov_2003_f3_al_05.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.186'
+          pressure_atm: 6.511092e-09
+          read_uncertainty_dex: '0.061'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '60.10'
+          composition_mol:
+            Al2O3: '0.6010'
+            SiO2: '0.3990'
+          audit_read_id: shornikov_2003_f3_al_06
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.6010'
+                  - - SiO2
+                    - '0.3990'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3620.3, 940.9); read 1 (3620.2, 941.1); read 2 (3620.3, 940.8); audit shornikov_2003_f3_al_06.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.138'
+          pressure_atm: 7.279732e-09
+          read_uncertainty_dex: '0.072'
+          read_uncertainty_mol_percent: '1.21'
+          Al2O3_mole_percent_as_read: '67.90'
+          composition_mol:
+            Al2O3: '0.6790'
+            SiO2: '0.3210'
+          audit_read_id: shornikov_2003_f3_al_07
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.6790'
+                  - - SiO2
+                    - '0.3210'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3762.2, 915.7); read 1 (3762.2, 915.6); read 2 (3762.2, 915.7); audit shornikov_2003_f3_al_07.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.133'
+          pressure_atm: 7.354251e-09
+          read_uncertainty_dex: '0.072'
+          read_uncertainty_mol_percent: '1.21'
+          Al2O3_mole_percent_as_read: '70.28'
+          composition_mol:
+            Al2O3: '0.7028'
+            SiO2: '0.2972'
+          audit_read_id: shornikov_2003_f3_al_08
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.7028'
+                  - - SiO2
+                    - '0.2972'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3805.6, 913.4); read 1 (3805.5, 913.3); read 2 (3805.6, 913.5); audit shornikov_2003_f3_al_08.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.190'
+          pressure_atm: 6.462263e-09
+          read_uncertainty_dex: '0.061'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '84.14'
+          composition_mol:
+            Al2O3: '0.8414'
+            SiO2: '0.1586'
+          audit_read_id: shornikov_2003_f3_al_09
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.8414'
+                  - - SiO2
+                    - '0.1586'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (4057.9, 942.6); read 1 (4057.9, 942.8); read 2 (4057.9, 942.3); audit shornikov_2003_f3_al_09.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.169'
+          pressure_atm: 6.775815e-09
+          read_uncertainty_dex: '0.061'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '98.93'
+          composition_mol:
+            Al2O3: '0.9893'
+            SiO2: '0.0107'
+          audit_read_id: shornikov_2003_f3_al_10
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.9893'
+                  - - SiO2
+                    - '0.0107'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (4327.1, 931.9); read 1 (4327.1, 932.2); read 2 (4327.1, 931.7); audit shornikov_2003_f3_al_10.
+  AlO:
+    observations:
+    - observation_id: shornikov_2003_fig3_alo_1900k
+      type: partial_pressure
+      locator:
+        page: 5
+        published_page: 1041
+        pdf_page_index: 4
+        figure: '3'
+        note: "Figure 3, 600 dpi, PDF page 5, published page 1041. T = 1900 K. Quantity as printed is -log p_1900(i) with p in atm. Symbols: filled circles SiO, inverted triangles Al, filled triangles AlO, crossed squares O. Log axes, calibrated in log space from the label centres beside the y axis: 4.0 at y=685 (the dotted reference line; the 4.0 digit centre is y=699, 14 px lower), 8.5 at y=1104, 9.0 at y=1364, 9.5 at y=1606. Lower scale -log = 8.5 + (y-1104)/520, from the 8.5 and 9.0 labels (520 px per log unit). The 9.5 label lies 18 px (0.035 log) off that line; that residual is inside the stated read uncertainty. The upper segment has only the 4.0 line, so the same 520 px per log unit is applied: -log = 4.0 + (y-685)/520. The tilde break is y=847-880; nothing in that band was stored. Lower-segment points with 890 < y < 1000 sit above the 8.5 tick toward the break, and their dex uncertainty is widened by 0.03. The upper-segment SiO circles and the O squares near y=1053 do not get that extra term. Left of the x-axis break, mol% = (x-2799)/21.60 (0 at the y axis, 20 at the glyph midpoint x=3231). Right of the break, mol% = 60 + (x-3618.5)/18.20 (60 at x=3618.5, 80 at x=3985, 100 at x=4347). Read 1 is the connected-component centre. Read 2 is the radius-12 centroid at threshold 140. The stored coordinate is the mean. read_uncertainty is at least half a marker (16 px, 22 px where two markers touch) and contains both reads. It is a digitising width, not a printed interval. Partial pressure is not an activity, so the pure-oxide reference rule is not applied. Piles on the y axis, the fused oval near 68 mol% on the 4.0 line, the legend stack, and the guide-line blobs were refused one by one; the audit lists them."
+      T_range_K:
+      - 1900.0
+      - 1900.0
+      phase: gas
+      experiment: shornikov-2003-rjpc-solid-kems
+      regime: kems_effusion
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        gas_species: AlO(g)
+        formula: AlO
+        temperature_K: 1900
+        curve_as_printed: '3'
+        points:
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.761'
+          pressure_atm: 1.733958e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '4.36'
+          composition_mol:
+            Al2O3: '0.0436'
+            SiO2: '0.9564'
+          audit_read_id: shornikov_2003_f3_alo_01
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.0436'
+                  - - SiO2
+                    - '0.9564'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (2893.2, 1239.7); read 1 (2893.2, 1239.5); read 2 (2893.2, 1240.0); audit shornikov_2003_f3_alo_01.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '9.036'
+          pressure_atm: 9.197162e-10
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '28.31'
+          composition_mol:
+            Al2O3: '0.2831'
+            SiO2: '0.7169'
+          audit_read_id: shornikov_2003_f3_alo_02
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.2831'
+                  - - SiO2
+                    - '0.7169'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3410.4, 1382.9); read 1 (3410.4, 1383.0); read 2 (3410.4, 1382.9); audit shornikov_2003_f3_alo_02.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.640'
+          pressure_atm: 2.288840e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '60.09'
+          composition_mol:
+            Al2O3: '0.6009'
+            SiO2: '0.3991'
+          audit_read_id: shornikov_2003_f3_alo_03
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.6009'
+                  - - SiO2
+                    - '0.3991'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3620.2, 1177.0); read 1 (3620.2, 1176.9); read 2 (3620.2, 1177.1); audit shornikov_2003_f3_alo_03.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.761'
+          pressure_atm: 1.733190e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '67.64'
+          composition_mol:
+            Al2O3: '0.6764'
+            SiO2: '0.3236'
+          audit_read_id: shornikov_2003_f3_alo_04
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.6764'
+                  - - SiO2
+                    - '0.3236'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3757.5, 1239.8); read 1 (3757.5, 1239.6); read 2 (3757.5, 1240.0); audit shornikov_2003_f3_alo_04.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.662'
+          pressure_atm: 2.180025e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '70.25'
+          composition_mol:
+            Al2O3: '0.7025'
+            SiO2: '0.2975'
+          audit_read_id: shornikov_2003_f3_alo_05
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.7025'
+                  - - SiO2
+                    - '0.2975'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3805.1, 1188.0); read 1 (3805.2, 1187.8); read 2 (3805.1, 1188.1); audit shornikov_2003_f3_alo_05.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.623'
+          pressure_atm: 2.385064e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '84.13'
+          composition_mol:
+            Al2O3: '0.8413'
+            SiO2: '0.1587'
+          audit_read_id: shornikov_2003_f3_alo_06
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.8413'
+                  - - SiO2
+                    - '0.1587'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (4057.7, 1167.7); read 1 (4057.7, 1167.5); read 2 (4057.7, 1167.9); audit shornikov_2003_f3_alo_06.
+  O:
+    observations:
+    - observation_id: shornikov_2003_fig3_o_1900k
+      type: partial_pressure
+      locator:
+        page: 5
+        published_page: 1041
+        pdf_page_index: 4
+        figure: '3'
+        note: "Figure 3, 600 dpi, PDF page 5, published page 1041. T = 1900 K. Quantity as printed is -log p_1900(i) with p in atm. Symbols: filled circles SiO, inverted triangles Al, filled triangles AlO, crossed squares O. Log axes, calibrated in log space from the label centres beside the y axis: 4.0 at y=685 (the dotted reference line; the 4.0 digit centre is y=699, 14 px lower), 8.5 at y=1104, 9.0 at y=1364, 9.5 at y=1606. Lower scale -log = 8.5 + (y-1104)/520, from the 8.5 and 9.0 labels (520 px per log unit). The 9.5 label lies 18 px (0.035 log) off that line; that residual is inside the stated read uncertainty. The upper segment has only the 4.0 line, so the same 520 px per log unit is applied: -log = 4.0 + (y-685)/520. The tilde break is y=847-880; nothing in that band was stored. Lower-segment points with 890 < y < 1000 sit above the 8.5 tick toward the break, and their dex uncertainty is widened by 0.03. The upper-segment SiO circles and the O squares near y=1053 do not get that extra term. Left of the x-axis break, mol% = (x-2799)/21.60 (0 at the y axis, 20 at the glyph midpoint x=3231). Right of the break, mol% = 60 + (x-3618.5)/18.20 (60 at x=3618.5, 80 at x=3985, 100 at x=4347). Read 1 is the connected-component centre. Read 2 is the radius-12 centroid at threshold 140. The stored coordinate is the mean. read_uncertainty is at least half a marker (16 px, 22 px where two markers touch) and contains both reads. It is a digitising width, not a printed interval. Partial pressure is not an activity, so the pure-oxide reference rule is not applied. Piles on the y axis, the fused oval near 68 mol% on the 4.0 line, the legend stack, and the guide-line blobs were refused one by one; the audit lists them."
+      T_range_K:
+      - 1900.0
+      - 1900.0
+      phase: gas
+      experiment: shornikov-2003-rjpc-solid-kems
+      regime: kems_effusion
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        gas_species: O(g)
+        formula: O
+        temperature_K: 1900
+        curve_as_printed: '4'
+        points:
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.555'
+          pressure_atm: 2.788590e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '4.39'
+          composition_mol:
+            Al2O3: '0.0439'
+            SiO2: '0.9561'
+          audit_read_id: shornikov_2003_f3_o_01
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.0439'
+                  - - SiO2
+                    - '0.9561'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (2893.9, 1132.4); read 1 (2893.9, 1132.5); read 2 (2893.9, 1132.3); audit shornikov_2003_f3_o_01.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.401'
+          pressure_atm: 3.968751e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '12.73'
+          composition_mol:
+            Al2O3: '0.1273'
+            SiO2: '0.8727'
+          audit_read_id: shornikov_2003_f3_o_02
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.1273'
+                  - - SiO2
+                    - '0.8727'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3074.0, 1052.7); read 1 (3074.0, 1052.8); read 2 (3074.0, 1052.7); audit shornikov_2003_f3_o_02.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.427'
+          pressure_atm: 3.740112e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '18.11'
+          composition_mol:
+            Al2O3: '0.1811'
+            SiO2: '0.8189'
+          audit_read_id: shornikov_2003_f3_o_03
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.1811'
+                  - - SiO2
+                    - '0.8189'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3190.1, 1066.1); read 1 (3190.0, 1066.1); read 2 (3190.1, 1066.1); audit shornikov_2003_f3_o_03.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.419'
+          pressure_atm: 3.806948e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.74'
+          Al2O3_mole_percent_as_read: '28.15'
+          composition_mol:
+            Al2O3: '0.2815'
+            SiO2: '0.7185'
+          audit_read_id: shornikov_2003_f3_o_04
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.2815'
+                  - - SiO2
+                    - '0.7185'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3407.0, 1062.1); read 1 (3406.9, 1062.2); read 2 (3407.0, 1062.1); audit shornikov_2003_f3_o_04.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.477'
+          pressure_atm: 3.337809e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '60.05'
+          composition_mol:
+            Al2O3: '0.6005'
+            SiO2: '0.3995'
+          audit_read_id: shornikov_2003_f3_o_05
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.6005'
+                  - - SiO2
+                    - '0.3995'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3619.4, 1091.8); read 1 (3619.5, 1091.8); read 2 (3619.4, 1091.9); audit shornikov_2003_f3_o_05.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.565'
+          pressure_atm: 2.721496e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '68.04'
+          composition_mol:
+            Al2O3: '0.6804'
+            SiO2: '0.3196'
+          audit_read_id: shornikov_2003_f3_o_06
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.6804'
+                  - - SiO2
+                    - '0.3196'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3764.8, 1137.9); read 1 (3764.8, 1137.9); read 2 (3764.8, 1137.8); audit shornikov_2003_f3_o_06.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.453'
+          pressure_atm: 3.521525e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '70.19'
+          composition_mol:
+            Al2O3: '0.7019'
+            SiO2: '0.2981'
+          audit_read_id: shornikov_2003_f3_o_07
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.7019'
+                  - - SiO2
+                    - '0.2981'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (3804.0, 1079.7); read 1 (3804.1, 1079.8); read 2 (3803.9, 1079.6); audit shornikov_2003_f3_o_07.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.545'
+          pressure_atm: 2.851018e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '84.29'
+          composition_mol:
+            Al2O3: '0.8429'
+            SiO2: '0.1571'
+          audit_read_id: shornikov_2003_f3_o_08
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.8429'
+                  - - SiO2
+                    - '0.1571'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (4060.6, 1127.4); read 1 (4060.7, 1127.2); read 2 (4060.5, 1127.6); audit shornikov_2003_f3_o_08.
+        - temperature_K: 1900
+          neg_log10_p_as_read: '8.453'
+          pressure_atm: 3.519966e-09
+          read_uncertainty_dex: '0.031'
+          read_uncertainty_mol_percent: '0.88'
+          Al2O3_mole_percent_as_read: '98.87'
+          composition_mol:
+            Al2O3: '0.9887'
+            SiO2: '0.0113'
+          audit_read_id: shornikov_2003_f3_o_09
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_binary_mole_percent_Al2O3
+                  amount_basis: mole_fraction
+                  components:
+                  - - Al2O3
+                    - '0.9887'
+                  - - SiO2
+                    - '0.0113'
+              locator:
+                published_page: 1041
+                pdf_page_index: 4
+                page: 5
+                figure: '3'
+                note: Mean (4326.0, 1079.8); read 1 (4326.0, 1079.9); read 2 (4326.0, 1079.8); audit shornikov_2003_f3_o_09.
