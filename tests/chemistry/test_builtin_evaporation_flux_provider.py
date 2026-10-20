@@ -1765,6 +1765,34 @@ def test_missing_transport_channel_is_unavailable_downstream(
     assert "Si" not in flux.species_kg_hr
     assert flux.species_kg_hr["Na"] > 0.0
 
+    single_channel_result = _w3_result_with_controls(
+        1.0,
+        overhead_pressure_pa=1000.0,
+        vapour_batch_flux_pressures_Pa={"Si": 100.0},
+        molar_mass_kg_mol={"Si": 0.028085},
+        stoich_by_species={
+            "Si": {"parent_oxide": "SiO2", "oxide_per_product_kg": 2.139},
+        },
+        available_oxide_kg={"Si": 10.0},
+        alpha={"Si": 0.5},
+    )
+    single_sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    single_sim.melt.temperature_C = 1500.0
+    original_single_dispatch = single_sim._dispatch_only
+
+    def dispatch_single(intent, *args, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return single_channel_result
+        return original_single_dispatch(intent, *args, **kwargs)
+
+    monkeypatch.setattr(single_sim, "_dispatch_only", dispatch_single)
+    monkeypatch.setattr(single_sim, "_freeze_gate_enabled", lambda: False)
+    single_flux = single_sim._calculate_evaporation(equilibrium)
+    assert single_flux.species_kg_hr == {}
+    assert single_flux.carrier_authority_by_species["Si"]["is_refused"] is True
+
     report = target_species_yield_report(sim, target_species=("Na", "SiO"))
     assert report["targets"]["Na"]["yield_fraction"] is not None
     assert report["targets"]["SiO"]["yield_fraction"] is None
