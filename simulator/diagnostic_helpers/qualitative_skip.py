@@ -71,6 +71,9 @@ def qualitative_payload_skip_reason(obs: Any) -> str:
         # counterpart on the row. Keep as an unparsed ordering, not figure-only.
         return "unsupported_observable:ordering_claim_unparsed"
 
+    if "ordering" in quantity or quantity == "qualitative_volatility_order":
+        return "unsupported_observable:ordering_claim_unparsed"
+
     if (
         admission == "rejected_no_figure_reading"
         or "figure_only" in quantity
@@ -85,6 +88,9 @@ def qualitative_payload_skip_reason(obs: Any) -> str:
     if quantity == "pure_oxide_dominant_gas_species_index":
         return "unsupported_observable:pure_oxide_speciation_index"
 
+    if quantity == "major_gas_speciation_by_environment":
+        return "unsupported_observable:species_speciation_without_numeric_pressures"
+
     if quantity == "not_reported_among_detected_species":
         return "unsupported_observable:species_not_reported_among_detected"
 
@@ -97,4 +103,8 @@ def qualitative_payload_skip_reason(obs: Any) -> str:
     if method_class == "model_derived" or quantity in _MODEL_OUTPUT_QUANTITIES:
         return "model_output_not_measurement"
 
-    return "unsupported_observable:ordering_claim_unparsed"
+    if quantity == "activity_measurement_qualitative_arrest_search":
+        return "unsupported_observable:qualitative_activity_not_tabulated"
+
+    # There is no evidence here that the payload asserts an ordering relation.
+    return "unsupported_observable:qualitative_payload_unclassified"

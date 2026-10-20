@@ -367,6 +367,8 @@ def _run_web_session(monkeypatch) -> SurfaceResult:
                 "mass_kg": MASS_KG,
                 "speed": 1,
                 "track": TRACK,
+                # b-793: the server refuses a start without the current tick-payload version.
+                "payload_version": web_events.SIMULATION_TICK_PAYLOAD_VERSION,
             },
         )
         drain()
