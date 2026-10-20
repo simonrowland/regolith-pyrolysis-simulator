@@ -408,11 +408,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         if event == "per_hour_summary" and isinstance(payload, dict):
             sid = kwargs.get("room")
             state = _simulations.get(sid)
-            summary_count = sum(
-                1 for name, _hour, _size, _serialized in wire_samples
-                if name == "per_hour_summary"
-            )
-            if summary_count >= 12 and state is not None:
+            if state is not None:
                 state["running"] = False
         return original_emit(event, payload, *args, **kwargs)
 
@@ -437,11 +433,13 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
                 "track": "pyrolysis",
             },
         )
+        active_sids = set(_simulations) - before
+        assert len(active_sids) == 1
+        state = _simulations[next(iter(active_sids))]
         rounds = 0
-        while len(tick_samples) < 12 and rounds < 40:
+        while len(tick_samples) < 12 and rounds < 11:
             rounds += 1
-            if not captured_tasks:
-                break
+            assert captured_tasks, tick_samples
             target = captured_tasks.pop(0)
             target()
             for event in client.get_received():
@@ -451,6 +449,9 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
                         "make_decision",
                         {"choice": decision.get("recommendation")},
                     )
+            if len(tick_samples) < 12:
+                state["running"] = True
+                captured_tasks.append(target)
         assert len(tick_samples) >= 12, tick_samples
         for event, hour, size, _serialized in wire_samples:
             assert size < 120_000, (event, hour, size)
@@ -476,9 +477,6 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             for event, _hour, _size, serialized in wire_samples
             if event in {"simulation_tick", "per_hour_summary"}
         )
-        active_sids = set(_simulations) - before
-        assert len(active_sids) == 1
-        state = _simulations[active_sids.pop()]
         captured_summary = state["last_recipe_capture"]["per_hour_summary"]
         assert '"padding"' in json.dumps(captured_summary, default=str)
         history_response = http.get("/api/simulation-history")
