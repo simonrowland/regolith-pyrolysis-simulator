@@ -12,7 +12,7 @@ extraction:
     were read on the 600 dpi render. Fig. 2 and Fig. 3 markers were read on
     the 600 dpi render of PDF page 2. Axes were calibrated from the printed
     tick stubs. Each stored centre is the core of one filled marker, or the
-    white hole of one open marker, and was drawn back onto the page. The t1380 Fig. 2a TiO centre is the exposed magenta crescent, and the Fig. 2b TiO centre at the 100 mol% tick is the vertical magenta run.
+    white hole of one open marker, and was drawn back onto the page. The t1380 Fig. 2a TiO centre is the exposed magenta crescent, and the Fig. 2b TiO centre at the 100 mol% tick is the vertical magenta run. The t1380 Fig. 3a CaO centre is the exposed black rim, with the blue disk and the descending stroke excluded.
   date: '2026-10-20'
   worker: t1372-w4-fix1-t5
 review_status: draft
@@ -2738,6 +2738,57 @@ species:
 
         page_pixel_x: '4023.0'
         page_pixel_y: '3282.0'
+    - observation_id: shornikov_2019_eg_fig3a_CaO_x34_21
+      type: activity_coefficient
+      experiment: shornikov-2019-eg-fig3a-2250k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '3'
+        panel: a
+        series: '1'
+        marker_symbol: filled circle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 3a activity ticks, least-squares residual at most 0.0004: 1.0 at y=4119.0, 0.8 at y=4379.5, 0.6 at y=4639.5, 0.4 at y=4898.5, 0.2 at y=5159.0, and the x-axis at y=5419.0 is 0. a = 4.169532 - 0.00076944*y, 1300 px per activity unit. TiO2 mol% ticks, residual at most 0.07 mol%: 20 at x=830.5, 30 at x=1034.0, 40 at x=1238.0, 50 at x=1440.0, 60 at x=1644.5, 70 at x=1848.0, 80 at x=2052.0, 90 at x=2255.0, 100 at x=2461.0. mol% = -20.7515 + 0.049096*x, 20.37 px per mol%. The caption states 2250 K for series 1, 2 and 4. Series 1, filled circle, CaO. The blue disk at (1119.5, 4597.9) is the stored series-4 CaTiO3 and stays. The black disk under it was fit on the exposed rim only. Rays that enter the blue disk were excluded, and a crossing more than 1.5 px from the median radius was excluded as the descending stroke. At threshold 110 the centre is (1119.48, 4619.05), radius 19.63 px, rms 0.39 px, max residual 1.28 px, 142 edge samples. Thresholds 50, 80, 110, 140, and 170 give rms 0.38 to 0.43 px and centres within 0.12 px. Activity = 0.6155 ± 0.0005. TiO2 = 34.21 mol% ± 0.08."
+      T_range_K: [2250, 2250]
+      phase: l
+      standard_state: >-
+        Published page 39, above equations (8) and (9): "Values of oxide activities (a_i) in perovskite and in the CaO–TiO2 melts were calculated on the Lewis ratio:" Equation (8) is printed a_CaO = p_CaO / p°_CaO. Equation (9) is printed with a full stop after the numerator, a_TiO2 = p_TiO2. / p°_TiO2. The degree sign is on each denominator only. That sentence does not say that p° was measured, or tabulated, at the temperature of this point. The phase is not stated.
+      units: dimensionless activity
+      uncertainty:
+        value: '0.0005'
+        unit: activity
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: Read uncertainty is ±0.0005 in activity, the 0.39 px rim residual and the 0.0004 tick residual in quadrature. TiO2 is ±0.08 mol%. The paper prints no error bar on this marker.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2250'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '3'
+            panel: a
+            note: The Fig. 3 caption states 2250 K for series 1, 2 and 4.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2250'
+        temperature_K: 2250
+        activity: '0.6155'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '0.342105'
+          CaO: '0.657895'
+        x_TiO2_mol_pct: '34.21'
+        page_pixel_x: '1119.48'
+        page_pixel_y: '4619.05'
     - observation_id: shornikov_2019_eg_fig3a_CaO_x38_29
       type: activity_coefficient
       experiment: shornikov-2019-eg-fig3a-2250k
