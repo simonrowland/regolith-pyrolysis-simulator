@@ -112,7 +112,6 @@ MRE_CURRENT_PARTITION_SOURCE = (
     "heuristic:activity_exp_FdV_over_RT_SEL-1_not_literature_grounded"
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
-MRE_INVALID_CONTROL_REFUSAL = "invalid_electrolysis_control"
 MRE_INVALID_TARGET_REFUSAL = "invalid_allowed_oxides"
 MRE_INVALID_GAS_FUGACITY_REFUSAL = "invalid_gas_product_fugacity"
 
@@ -293,6 +292,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             FERRIC_TO_FERROUS_REFERENCE_V,
             FERRIC_TO_FERROUS_REFERENCE_STATUS,
             MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+            MRE_INVALID_CONTROL_REFUSAL,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
             MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,
@@ -305,6 +305,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             MRE_NORTH_STAR_POSTURE,
             MRE_OPTIONAL_BANNER,
             CURRENT_EFFICIENCY_MODEL_ID,
+            MREElectrolysisInvalidInput,
             _without_mre_quantities,
             coerce_gas_product_fugacity_bar,
             current_efficiency_diagnostic,
@@ -326,27 +327,30 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             return wrong_intent
 
         controls = unpack_controls(request)
-        validated, invalid_controls = self._validate_controls(request, controls)
-        invalid_domain_controls, control_notices = mre_control_domain_assessment(
-            {
-                name: value
-                for name, value in validated.items()
-                if name not in invalid_controls
-            }
-        )
-        if invalid_domain_controls:
-            return self._invalid_result(
-                request,
-                reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
-                invalid=invalid_domain_controls,
-                energy_kWh=0.0,
-            )
+        validated, invalid_controls = self._validate_request_controls(request)
         if invalid_controls:
             return self._invalid_result(
                 request,
                 reason=MRE_INVALID_CONTROL_REFUSAL,
                 invalid=invalid_controls,
             )
+        try:
+            validated_mre_controls, control_notices = (
+                mre_control_domain_assessment(controls)
+            )
+        except MREElectrolysisInvalidInput as exc:
+            invalid = exc.diagnostic.get("invalid_controls", {})
+            return self._invalid_result(
+                request,
+                reason=exc.reason,
+                invalid=invalid if isinstance(invalid, Mapping) else {},
+                energy_kWh=(
+                    0.0
+                    if exc.reason == MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+                    else None
+                ),
+            )
+        validated.update(validated_mre_controls)
         empty_transition = (
             LedgerTransitionProposal(
                 debits={},
@@ -767,17 +771,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic=diagnostic,
             )
 
-        # Faraday integration time. dt_hr -> seconds. Mirrors the
-        # legacy ``t_s = 3600.0`` exactly when dt_hr=1.0, scales for
-        # future tick changes.
+        # Faraday integration time. The shared MRE assessment has already
+        # checked this exact conversion for binary64 overflow.
         t_s = 3600.0 * dt_hr
-        if not math.isfinite(t_s):
-            return self._invalid_result(
-                request,
-                reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
-                invalid={"dt_hr": "Faraday integration time is not finite"},
-                energy_kWh=0.0,
-            )
 
         debits_mol: dict[str, dict[str, float]] = defaultdict(dict)
         credits_mol: dict[str, dict[str, float]] = defaultdict(dict)
@@ -1108,37 +1104,19 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         ) / (int(electrons) * faraday) * log_Q
 
     @staticmethod
-    def _validate_controls(
+    def _validate_request_controls(
         request: IntentRequest,
-        controls: Mapping[str, Any],
     ) -> tuple[dict[str, float], dict[str, str]]:
         raw_values = {
-            "voltage_V": (
-                0.0
-                if controls.get("voltage_V") is None
-                else controls.get("voltage_V")
-            ),
-            "current_A": (
-                0.0
-                if controls.get("current_A") is None
-                else controls.get("current_A")
-            ),
-            "dt_hr": controls.get("dt_hr", 1.0),
-            "pO2_bar": controls.get("pO2_bar", 1.0),
             "temperature_C": request.temperature_C,
             "pressure_bar": request.pressure_bar,
         }
         values: dict[str, float] = {}
         invalid: dict[str, str] = {}
         for name, raw in raw_values.items():
-            # Same admission predicate the DTO uses
-            # (`is_declared_real_scalar(..., allow_numeric_str=True)`),
-            # applied here BEFORE float(). The DTO defers these four
-            # electrolysis controls so a typed MRE_INVALID_CONTROL_REFUSAL
-            # can replace a bare TypeError (028791da / RC-05). Skipping that
-            # check without re-applying it admitted np.bool_ and size-1
-            # arrays, which float() coerces (True -> 1.0). None still passes
-            # (absence is not a type error); nan/inf/negative stay below.
+            # Same admission predicate the DTO uses, applied here before
+            # float(). Electrolysis controls are owned by the shared MRE
+            # assessment below; this validates only request environment.
             if raw is not None and not is_declared_real_scalar(
                 raw,
                 allow_numeric_str=True,
@@ -1159,14 +1137,10 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 continue
             values[name] = value
 
-        nonnegative = ("voltage_V", "current_A", "pressure_bar")
+        nonnegative = ("pressure_bar",)
         for name in nonnegative:
             if name in values and values[name] < 0.0:
                 invalid[name] = "must_be_nonnegative"
-        if "dt_hr" in values and values["dt_hr"] < 0.0:
-            invalid["dt_hr"] = "must_be_nonnegative"
-        if "pO2_bar" in values and values["pO2_bar"] <= 0.0:
-            invalid["pO2_bar"] = "must_be_positive"
         if (
             "temperature_C" in values
             and values["temperature_C"] <= -CELSIUS_TO_KELVIN_OFFSET
