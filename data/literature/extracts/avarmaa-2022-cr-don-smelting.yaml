@@ -12,7 +12,7 @@ review_status: draft
 fidelity_samples:
 - path: species.Cr.observations[avarmaa_2022_average_slag_chromium_at_1400C].values.value
   value: '0.66'
-  locator: {page: 8, published_page: 206, pdf_page_index: 7, figure: '1'}
+  locator: {page: 8, published_page: 206, pdf_page_index: 7, section: Discussion and conclusions}
 species:
   Cr:
     observations:
@@ -22,7 +22,6 @@ species:
         page: 8
         pdf_page_index: 7
         published_page: 206
-        figure: '1'
         section: Discussion and conclusions
       units: wt% Cr
       phase: l
@@ -35,7 +34,6 @@ species:
             page: 8
             pdf_page_index: 7
             published_page: 206
-            figure: '1'
         composition:
           state:
             tag: unknown
@@ -44,7 +42,6 @@ species:
             page: 8
             pdf_page_index: 7
             published_page: 206
-            figure: '1'
         log_fO2:
           state:
             tag: unknown
@@ -53,17 +50,23 @@ species:
             page: 8
             pdf_page_index: 7
             published_page: 206
-            figure: '1'
       values:
         quantity: equilibrium_phase_composition
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1400'
         value: '0.66'
         value_as_published: '0.66'
         component_as_published: Cr
         basis_as_published: average of all experimental points in Figure 1
-        quench_provenance: Equilibrated for four hours and rapidly quenched in ice water; the original molten slag is reported as glassy after quench.
-        quench_preservation: not_stated
+        quench_statement:
+          statement: Equilibrated for four hours and rapidly quenched in ice water; Figure 1 uses analyses of the glassy, originally molten part of the silicate slag.
+          preservation: asserted_preserved
+          locator: {page: 5, published_page: 203, pdf_page_index: 4, section: Experimental}
+      derived_from: [unknown:avarmaa-2022-cr-don-smelting]
+      derivation:
+        relation: Reported mean chromium concentration across the experimental points plotted in Figure 1.
+        inputs: [unknown:avarmaa-2022-cr-don-smelting]
+        output_unit: wt% Cr
     context:
     - observation_id: avarmaa_2022_matte_chromium_range
       type: context_record

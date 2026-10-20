@@ -60,6 +60,10 @@ def test_printed_slag_mean_and_matte_range_migrate_with_species_and_conditions()
     slag = rows["avarmaa_2022_average_slag_chromium_at_1400C"]
     assert slag.value.kind is ValueKind.POINT
     assert slag.value.point == Decimal("0.66")
+    assert document["species"]["Cr"]["observations"][0]["values"]["method_class"] == "measured_reduced"
+    assert document["species"]["Cr"]["observations"][0]["values"]["quench_statement"]["preservation"] == "asserted_preserved"
+    assert document["species"]["Cr"]["observations"][0]["locator"]["section"] == "Discussion and conclusions"
+    assert "figure" not in document["species"]["Cr"]["observations"][0]["locator"]
     assert slag.identity.species.formula == "Cr"
     assert slag.identity.temperature_K.value == Decimal("1673.15")
     assert slag.point_conditions["log_fO2"].state.tag.value == "unknown"
