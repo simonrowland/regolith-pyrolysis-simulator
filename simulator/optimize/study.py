@@ -85,7 +85,10 @@ from simulator.optimize.pool import (
 )
 from simulator.optimize.profiles import (
     ProfileValidationError,
+    _load_yaml_mapping as _load_profile_yaml_mapping,
+    _resolve_profile_path,
     canonicalize_profile_backend_names,
+    load_profile,
     physics_constraints_from_profile,
     validate_profile,
 )
@@ -2912,6 +2915,18 @@ def resolve_profile(
     )
     _requested_staged_topologies(validated, None)
     return validated
+
+
+def _load_profile_for_study(profile: str) -> str | Mapping[str, Any]:
+    if profile in DEFAULT_PROFILES:
+        return profile
+    try:
+        return load_profile(profile)
+    except ProfileValidationError as exc:
+        if not _is_stale_profile_refusal(exc):
+            raise
+        path = _resolve_profile_path(profile, data_dir=DEFAULT_DATA_DIR)
+        return _load_profile_yaml_mapping(path)
 
 
 def resolve_strategy(
