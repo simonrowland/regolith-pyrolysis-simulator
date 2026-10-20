@@ -297,6 +297,21 @@ def test_chapman_enskog_prefactor_matches_bsl_atmosphere_form():
     assert o2 < nist_m2_s
 
 
+def test_svehla_table_i_si_and_sio_transport_rows():
+    """The sourced silicon rows match Svehla 1962 NASA TR R-132, Table I."""
+    from simulator.condensation import (
+        _LENNARD_JONES_PARAMS,
+        _LENNARD_JONES_PROVENANCE,
+    )
+
+    assert _LENNARD_JONES_PARAMS["Si"] == (2.910, 3036.0, 28.085)
+    assert _LENNARD_JONES_PARAMS["SiO"] == (3.374, 569.0, 44.085)
+    for species in ("Si", "SiO"):
+        provenance = _LENNARD_JONES_PROVENANCE[species]
+        assert provenance["status"] == "sourced"
+        assert provenance["source"] == "Svehla 1962 NASA TR R-132 Table I"
+
+
 @pytest.mark.xfail(
     strict=True,
     reason=(
