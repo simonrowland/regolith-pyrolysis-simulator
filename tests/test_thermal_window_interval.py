@@ -39,6 +39,7 @@ def test_preheat_interval_hours_rejects_descending_ranges() -> None:
     [
         ([1600.0, 1800.0, 25.0], 600.0),
         ([1600.0, 1800.0, float("nan")], 600.0),
+        ([1800.0, 1600.0], 600.0),
         ([1600.0], 600.0),
         (["warm", 1800.0], 600.0),
         ([1600.0, 1800.0], "slow"),
@@ -101,12 +102,16 @@ def test_preheat_interval_hours_rejects_invalid_ramps() -> None:
 
 
 @pytest.mark.parametrize(
-    ("temperature_range", "expected_hours"),
-    [([1600.0, 1800.0], 3), ([1050.0, 1843.0], 2)],
+    ("temperature_range", "ramp_rate", "expected_hours"),
+    [
+        ([1500.0, 1600.0], 600.0, 3),
+        ([1050.0, 1843.0], None, 2),
+    ],
 )
 def test_three_preheat_readers_agree_on_valid_intervals(
     monkeypatch: pytest.MonkeyPatch,
     temperature_range: list[float],
+    ramp_rate: float | None,
     expected_hours: int,
 ) -> None:
     profile = {
@@ -115,7 +120,7 @@ def test_three_preheat_readers_agree_on_valid_intervals(
             "hours": 1,
             "duration_h": 1,
             "temp_range_C": temperature_range,
-            "preheat_ramp_C_per_hr": 600.0,
+            "preheat_ramp_C_per_hr": ramp_rate,
         }
     }
     monkeypatch.setattr(
@@ -151,7 +156,7 @@ def test_three_preheat_readers_agree_on_valid_intervals(
     monkeypatch.setattr(
         recipe_db_profile,
         "_setpoint_campaign_config",
-        lambda _campaign: {"preheat_ramp_C_per_hr": 600.0},
+        lambda _campaign: {"preheat_ramp_C_per_hr": ramp_rate},
     )
     script_hours = recipe_db_profile._thermal_window_preheat_hours(
         "C0", profile["run"]["temp_range_C"]
