@@ -161,7 +161,7 @@ class FoulingLifecycleHarness:
                 resinter_threshold_kg=self._resinter_threshold_kg,
                 campaign_index=campaign_index,
             )
-            authority = wall_deposit_sticking_authority_status(
+            cumulative_authority = wall_deposit_sticking_authority_status(
                 cumulative.wall_deposit_by_segment_species_kg,
                 cumulative.wall_deposit_sticking_authority,
             )
@@ -169,14 +169,18 @@ class FoulingLifecycleHarness:
                 cumulative.wall_deposit_sticking_authority
             )
             if refusal_events:
-                authority[WALL_SATURATION_PRESSURE_REFUSAL_EVENTS] = (
+                cumulative_authority[WALL_SATURATION_PRESSURE_REFUSAL_EVENTS] = (
                     refusal_events
                 )
+            snapshot_authority = wall_deposit_sticking_authority_status(
+                snapshot.wall_deposit_by_segment_species_kg,
+                snapshot.wall_deposit_sticking_authority,
+            )
             cumulative_availability = wall_deposit_figure_availability(
                 has_positive_deposit=bool(
-                    authority.get("deposited_species")
+                    cumulative_authority.get("deposited_species")
                 ),
-                authority=authority,
+                authority=cumulative_authority,
                 refusal=total.refusal,
             )
             if cumulative_availability.status == "refused":
@@ -187,9 +191,9 @@ class FoulingLifecycleHarness:
                     refusal=cumulative_availability.refusal,
                     measured_empty_deposit=False,
                 )
-            if not authority["authoritative_for_resinter"]:
+            if not snapshot_authority["authoritative_for_resinter"]:
                 snapshots_authoritative = False
-                snapshot_notices.append(authority)
+                snapshot_notices.append(snapshot_authority)
             total = replace(
                 total,
                 authoritative_for_resinter=(

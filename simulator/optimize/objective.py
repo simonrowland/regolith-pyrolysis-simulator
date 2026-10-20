@@ -3400,17 +3400,16 @@ def _scores_dominate(
 
 
 def _normalize_campaigns_to_resinter(campaigns_to_resinter: Any) -> float:
-    if campaigns_to_resinter is None:
-        raise ObjectiveComputationError(
-            "campaigns_to_resinter is unavailable and cannot be priced"
-        )
-    if isinstance(campaigns_to_resinter, str) and campaigns_to_resinter == "infinite":
+    if campaigns_to_resinter is None or (
+        isinstance(campaigns_to_resinter, str)
+        and campaigns_to_resinter == "infinite"
+    ):
         return math.inf
     try:
         campaigns = float(campaigns_to_resinter)
     except (TypeError, ValueError, OverflowError) as exc:
         raise ObjectiveComputationError(
-            "campaigns_to_resinter must be numeric or 'infinite'"
+            "campaigns_to_resinter must be numeric, None, or 'infinite'"
         ) from exc
     # Positive fouling with an unusable signed lifetime is physically no better
     # than an observed zero lifetime; keep that failure finite and rankable.
@@ -3695,7 +3694,7 @@ def _furnace_amortization_summary(
 ) -> Mapping[str, Any]:
     if has_positive_fouling is None:
         payload = {
-            "furnace_amortization_status": "wall_deposit_unavailable",
+            "furnace_amortization_status": "batch_cost_unavailable",
             "furnace_amortization_batch_cost_equivalents": None,
         }
         if refusal is not None:
@@ -4881,26 +4880,7 @@ def _depreciation_expense_per_run_summary(
             depreciation = 0.0
             status = "no_wall_deposit"
         else:
-            raw = _wall_deposit_metric_raw(run_execution, sim)
-            campaigns_elapsed = (
-                _campaigns_elapsed(run_execution)
-                if run_execution is not None
-                else 1.0
-            )
-            aggregate_campaigns = _aggregate_campaigns_to_resinter(
-                raw,
-                campaigns_elapsed=campaigns_elapsed,
-            )
-            if isinstance(aggregate_campaigns, bool) or not isinstance(
-                aggregate_campaigns, int | float
-            ):
-                raise ObjectiveComputationError(
-                    "aggregate campaigns_to_resinter is unavailable"
-                )
-            campaigns_to_resinter = _finite_float(
-                aggregate_campaigns,
-                "aggregate_campaigns_to_resinter",
-            )
+            campaigns_to_resinter = threshold_kg / wall_load
             if campaigns_to_resinter <= 0.0:
                 raise ObjectiveComputationError(
                     "aggregate campaigns_to_resinter must be positive"

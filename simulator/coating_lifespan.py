@@ -325,29 +325,8 @@ def _merged_wall_deposit_sticking_authority(
                         ):
                             current_by_segment[str(segment)] = record
 
-        raw_refusals = authority.get(
-            "wall_saturation_pressure_refusals_by_species"
-        )
-        if isinstance(raw_refusals, Mapping):
-            by_species = merged.setdefault(
-                "wall_saturation_pressure_refusals_by_species",
-                {},
-            )
-            if isinstance(by_species, dict):
-                for species, by_segment in raw_refusals.items():
-                    if not isinstance(by_segment, Mapping):
-                        continue
-                    current = by_species.setdefault(str(species), {})
-                    if not isinstance(current, dict):
-                        continue
-                    for segment, raw_record in by_segment.items():
-                        if isinstance(raw_record, Mapping):
-                            current.setdefault(
-                                str(segment),
-                                _plain_authority_mapping(raw_record),
-                            )
-
         for key in (
+            "wall_saturation_pressure_refusals_by_species",
             "wall_saturation_pressure_extrapolations_by_species",
             "evaporation_transport_notices_by_species",
         ):
