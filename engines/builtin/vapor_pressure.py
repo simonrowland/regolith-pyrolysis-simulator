@@ -2645,7 +2645,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
             REACTION_PLANE_TRANSPORT_HEADSPACE,
-            _log_oxygen_ratio,
             channel_linear_mass_action_factor,
             o2_potential_from_pO2_bar,
         )
@@ -3934,17 +3933,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
                     pO2_reference_bar=sio_reference_bar,
                 )
-                oxygen_ratio = (
-                    sio_o2_potential.legacy_pO2_reference_bar
-                    / sio_o2_potential.legacy_pO2_bar
-                )
-                mass_action = (
-                    math.sqrt(oxygen_ratio)
-                    if 0.0 < oxygen_ratio < math.inf
-                    else math.exp(0.5 * _log_oxygen_ratio(
-                        sio_o2_potential.legacy_pO2_reference_bar,
-                        sio_o2_potential.legacy_pO2_bar,
-                    ))
+                from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
+
+                mass_action = _sio_oxygen_pressure_factor(
+                    sio_o2_potential.legacy_pO2_bar,
+                    sio_o2_potential.legacy_pO2_reference_bar,
                 )
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa * mass_action,

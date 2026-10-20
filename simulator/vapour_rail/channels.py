@@ -839,6 +839,11 @@ def validate_physical_pO2_bar(pO2_bar: float) -> float:
     oxygen = float(pO2_bar)
     if not math.isfinite(oxygen) or oxygen <= 0.0:
         raise ValueError(f"pO2_bar must be finite and positive; got {pO2_bar!r}")
+    notice = _pO2_evaluation_notice(oxygen)
+    if notice is not None:
+        import warnings
+
+        warnings.warn(str(notice), UserWarning, stacklevel=2)
     return oxygen
 
 

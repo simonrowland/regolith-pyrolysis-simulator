@@ -589,19 +589,19 @@ def test_adapter_antoine_projection_flags_floor_without_refusing() -> None:
         control, base_source="thermoengine"
     )
 
-    assert below["Si"] == pytest.approx(at_floor["Si"])
+    assert below["Si"] / at_floor["Si"] == pytest.approx(1e10)
     assert below["Si"] > 0.0
     assert below["Si"] < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
     assert "Si" in floor_notices
     assert floor_notices["Si"]["reason"] == (
-        MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+        "pO2_outside_evaluator_band"
     )
     assert floor_notices["Si"]["certified_band"]["pO2_bar"] == (
-        MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
+        MELT_DISSOCIATION_PO2_MIN_BAR,
         MELT_DISSOCIATION_PO2_MAX_BAR,
     )
-    assert MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON in floor_sources["Si"]
+    assert "pO2_outside_evaluator_band" in floor_sources["Si"]
     assert control["Si"] > 0.0
-    assert control["Si"] / below["Si"] == pytest.approx(1e-21, rel=1e-6)
+    assert control["Si"] / below["Si"] == pytest.approx(1e-31, rel=1e-6)
     assert "Si" not in control_notices
     assert MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON not in control_sources["Si"]
