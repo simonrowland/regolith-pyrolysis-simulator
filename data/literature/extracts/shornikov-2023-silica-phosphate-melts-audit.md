@@ -76,6 +76,7 @@ Fig. 2 caption: SiO2 (1) and P4O10 (2) activities and mixing energies (3, 4) at 
 | Fig. 5A red open circle, curve 4 | refused | (817, 2126), r=20. Lowest circle on curve 4. Not read. |
 | Fig. 5A black curve 2 | refused | Continuous. Caption assigns it, with the filled black circles, to Stolyarova et al. (1990), GeO2–P4O10 at 1423 K. |
 | Fig. 5A black curve 5 | refused | Continuous. Same citation. The open black circles are the rows below. |
+| Fig. 5A black filled circle, curve 2 | refused | (605.0, 1022), r=24, 600 dpi, PDF page 6. Crown at y=999, horizontal midline x=605. The blue axis crosses the disk, so a distance transform of the black pixels misses it. Stolyarova et al. (1990). Not read. |
 | Fig. 5A black filled circle, curve 2 | refused | (667, 1079), r=23.3, 600 dpi, PDF page 6. Stolyarova et al. (1990). Not read. |
 | Fig. 5A black filled circle, curve 2 | refused | (908, 1132), r=21.8. Same series. Not read. |
 | Fig. 5A black filled circle, curve 2 | refused | (947, 1183), r=23.4. Triple with (972, 1188) and (998, 1188). Adjacent separations 25.5 and 26.0 px, inside one diameter (~46 px). Overlap; not read. |
@@ -88,6 +89,7 @@ Fig. 2 caption: SiO2 (1) and P4O10 (2) activities and mixing energies (3, 4) at 
 | Fig. 5A black open circle, curve 5 | refused | (954.8, 1127.8). The curve splits the hole into four fragments spanning (940–969, 1114–1141), area 676 px. Centre is that area centroid, about ±8 px. Separation 43.2 px from (998, 1126), about one diameter. Not read. |
 | Fig. 5A black open circle, curve 5 | refused | (998, 1126), r=20. Same chain. Not read. |
 | Fig. 5A black open circle, curve 5 | refused | (1066, 1097), r=20. Right circle of the chain. Not read. |
+| Fig. 5A black open circle, curve 5 | refused | (1755.0, 1029), outer r=26. The top axis crosses the lower half of the ring, so the hole is only the upper part. Crown at y=1004, midline x=1755. Not read. |
 | Fig. 5A black open circle, curve 5 | refused | (2119, 1021), r=20. Open circle on the top axis. The red curve also passes through the ring. Not read. |
 | Fig. 5B blue curve 9 | refused | Calculated SiO2–P4O10 mixing energy at 2000 K. Continuous. No markers on the blue line. |
 | Fig. 5B red curve 7 | refused | Continuous. Caption assigns it, with the filled red circles, to Shornikov et al. (1996), mixing energy at 1300 K. |
@@ -99,6 +101,7 @@ Fig. 2 caption: SiO2 (1) and P4O10 (2) activities and mixing energies (3, 4) at 
 | Fig. 5B red filled circle, curve 7 | refused | (2941, 2090), r=24.7. Two distance-transform maxima inside one disk were recorded as this one marker. Not read. |
 | Fig. 5B red filled circle, curve 7 | refused | (3021, 2119), r=23.8. Rightmost circle of the bottom cluster. Not read. |
 | Fig. 5B black curve 8 | refused | Continuous. Caption assigns it, with the filled black circles, to Stolyarova et al. (1990), mixing energy at 1423 K. |
+| Fig. 5B black filled circle, curve 8 | refused | (2488.0, 1063), r=23.5, 600 dpi, PDF page 6. The blue line crosses the disk and splits the black pixels into two caps. Crown at y=1040. Stolyarova et al. (1990). Not read. |
 | Fig. 5B black filled circle, curve 8 | refused | (2550, 1181), r=23.3, 600 dpi, PDF page 6. Stolyarova et al. (1990). Not read. |
 | Fig. 5B black filled circle, curve 8 | refused | (2793, 1287), r=23.7. Same series. Not read. |
 | Fig. 5B black filled circle, curve 8 | refused | (2831, 1352), r=23.1. Triple with (2855, 1356) and (2880, 1354). Adjacent separations 24.3 and 25.1 px, inside one diameter (~46 px). The outer pair is 49.0 px. Overlap; not read. |
@@ -106,6 +109,9 @@ Fig. 2 caption: SiO2 (1) and P4O10 (2) activities and mixing energies (3, 4) at 
 | Fig. 5B black filled circle, curve 8 | refused | (2880, 1354), r=23.0. Same triple. |
 | Fig. 5B black filled circle, curve 8 | refused | (2941.5, 1400.5), r=23.5. Two distance-transform maxima 18.4 px apart lie in one disk. Recorded as one marker. Not read. |
 | Fig. 5B black filled circle, curve 8 | refused | (3638, 1270), r=23.0. Right-hand circle on curve 8. Not read. |
+| Fig. 5A endpoint disk | refused | (539, 1021), r≈24. Filled disk at the left frame, crown at y=998, midline x=539. The red and blue curves leave it. Same radius as the data circles. The numeral 0 to its left is the tick label, not this disk. Not assigned to one series. Not read. |
+| Fig. 5B endpoint disk | refused | (2423, 1019), r≈24. Filled disk at the left frame of panel B, crown at y=995, midline x=2422.5. Red, black and blue curves meet here. The numeral 0 to its left is the tick label. Not assigned to one series. Not read. |
+| Fig. 5B endpoint disk | refused | (4002, 1020), r≈24. Filled disk at the right frame of panel B, crown at y=995, midline x=4002. Red, black and blue curves meet here. Not assigned to one series. Not read. |
 | Fig. 5A panel letter | legend glyph | (1972, 2031), the ring around the panel letter A. Not a data marker. |
 | Fig. 5B panel letter | legend glyph | (3857, 2032), the ring around the panel letter B, between counters (3857, 2013) and (3859, 2051). Not a data marker. |
 | Fig. 1 | refused | Phase diagram of Rahman et al. (2013) and Jantzen et al. (2019). |
