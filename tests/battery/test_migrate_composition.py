@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import re
+import subprocess
+import sys
+import types
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
@@ -3050,6 +3053,100 @@ def test_plante_1979_migrator_keeps_typed_k2si2o5_initial(
     assert dict(start.identity.composition.value.components) != dict(
         later.identity.composition.value.components
     )
+
+
+# Green 4153a7c4b typed these. This tip withholds them on purpose.
+# Bischof: 829ce3701 withholds conflicting owner-selected initials.
+# Nominal recipe (p.4: SiO2 50.34, Al2O3 15.40, MgO 10.80, CaO 23.46)
+# disagrees with Table 6 EPMA Start. Neither inventory is authoritative.
+# Robinot: bad7fd5eb / 6cac821ce do not promote an untyped oxide map.
+# The generated experiment is the unbound quote robinot_2026_eac1_composition_quoted_sesko.
+_GREEN_TYPED_INITIAL_EXCEPTIONS = frozenset(
+    {
+        "10.1016/j.gca.2023.08.027::experiment::an-di-1-low",
+        "10.1016/j.gca.2023.08.027::experiment::an-di-2-low",
+        "10.1016/j.gca.2023.08.027::experiment::an-di-3-high",
+        "10.1016/j.asr.2026.02.003::kems-044-robinot-2026",
+    }
+)
+
+# Printed starting charges typed on the extract. Mole fractions come from
+# the owner converter, not from a pasted inventory.
+_RESTORED_STARTING_WT = {
+    "10.1016/j.gca.2007.09.005::experiment::type-b-cai-like-lab-melt": {
+        "MgO": "11.48",
+        "SiO2": "46",
+        "Al2O3": "19.39",
+        "CaO": "23.12",
+    },
+    "10.6028/nbs.ir.81-2279::experiment::hastie-1981-measured-soda-lime-glass": {
+        "Na2O": "17",
+        "CaO": "12",
+        "SiO2": "71",
+    },
+    "9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series": {
+        "MgO": "12",
+        "SiO2": "46",
+        "Al2O3": "19",
+        "CaO": "23",
+    },
+}
+
+
+def _green_migrate_module():
+    name = "simulator.battery._green_4153a7c4b_migrate"
+    cached = sys.modules.get(name)
+    if cached is not None:
+        return cached
+    source = subprocess.check_output(
+        ["git", "show", "4153a7c4b:simulator/battery/migrate.py"],
+        cwd=REPO_ROOT,
+        text=True,
+    )
+    module = types.ModuleType(name)
+    module.__file__ = migrate_module.__file__
+    sys.modules[name] = module
+    exec(compile(source, name, "exec"), module.__dict__)
+    return module
+
+
+def _typed_initials_by_experiment(module) -> dict[str, object]:
+    migrator = module.Migrator(root=REPO_ROOT)
+    for path in migrate_module.discover_extracts(REPO_ROOT / "data" / "literature" / "extracts"):
+        migrator._migrate_extract(path)
+    for work_id in list(migrator.result.works):
+        migrator._promote_universal_observation_printed_compositions(work_id)
+    typed: dict[str, object] = {}
+    for experiment_id, experiment in migrator.result.experiments.items():
+        initial = experiment.sample.initial_composition
+        if initial is not None and initial.state.is_value:
+            typed[experiment_id] = initial
+    return typed
+
+
+def test_every_extract_keeps_green_typed_initials() -> None:
+    """A migrator change must not drop an initial green still types.
+
+    Runs the migrator on every extract. The required set is green
+    4153a7c4b's typed initials on those same extracts, minus the
+    exceptions documented above.
+    """
+
+    green_ids = set(_typed_initials_by_experiment(_green_migrate_module()))
+    current_typed = _typed_initials_by_experiment(migrate_module)
+    missing = green_ids - _GREEN_TYPED_INITIAL_EXCEPTIONS - set(current_typed)
+    assert missing == set()
+    assert _GREEN_TYPED_INITIAL_EXCEPTIONS <= green_ids
+    for experiment_id, weights in _RESTORED_STARTING_WT.items():
+        initial = current_typed[experiment_id]
+        assert initial.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+        assert initial.state.value.proxy_flag is None
+        assert initial.inference is not None
+        assert initial.inference.relation == "wt_pct_to_mole_fraction"
+        expected = wt_pct_to_mole_fraction(
+            {oxide: as_decimal(weight) for oxide, weight in weights.items()}
+        )
+        assert dict(initial.state.value.components) == dict(expected.components)
 
 
 def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:
