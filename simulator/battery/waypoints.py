@@ -29,6 +29,7 @@ from simulator.battery.records import (
 )
 from simulator.lab_schedule import LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
 from simulator.transport_constants import COLLISION_DIAMETERS_M, FREE_MOLECULAR_KNUDSEN_MIN
+from simulator.physical_constants import GAS_CONSTANT
 
 
 class WaypointAuthority(StrEnum):
@@ -181,7 +182,7 @@ _AUTHORITY_RANK = {
     WaypointAuthority.ASSUMED: 1,
 }
 _PI = Decimal("3.141592653589793238462643383279502884197")
-_R = Decimal("8.31446261815324")
+_R = Decimal(str(GAS_CONSTANT))
 RPS_PRESSURE_FLOOR_PA = as_decimal(LAB_SCHEDULE_PRESSURE_FLOOR_MBAR) * Decimal("100")
 ENGINE_POINT_CONSUMERS = (
     "internal-analytical",

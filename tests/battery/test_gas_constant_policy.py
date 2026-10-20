@@ -8,7 +8,9 @@ and docs/chemistry-methods.md §11.
 
 from __future__ import annotations
 
+import ast
 from decimal import Decimal
+from pathlib import Path
 
 from simulator.battery.generators import janaf as janaf_generator
 from simulator.battery.generators import usgs_b1259 as b1259_generator
@@ -25,6 +27,17 @@ from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader imp
 from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
     R_CAL as B1259_LOADER_R_CAL,
 )
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_SOURCE_RECEIPT_FILES = {
+    "simulator/battery/generators/janaf.py",
+    "simulator/reference_data/janaf.py",
+    "simulator/battery/generators/usgs_b1452.py",
+    "simulator/battery/generators/usgs_b1544.py",
+    "simulator/battery/generators/usgs_b1259.py",
+    "simulator/reference_data/hemingway_haas_robinson_1982_usgs_b1544_loader.py",
+    "simulator/melt_backend/sulfliq_matte.py",
+}
 
 
 def test_per_source_transcription_constants_are_the_printed_values() -> None:
@@ -119,3 +132,43 @@ def test_log10k_helper_default_is_identity_codata() -> None:
         gas_constant_J_per_mol_K=janaf_generator.JANAF_R_J_PER_MOL_K,
     )
     assert janaf != log10K_from_delta_fG_kJ_mol(delta_fg, t_k)
+
+
+def test_production_gas_constant_literals_have_one_owner() -> None:
+    roots = ("simulator", "engines", "tools", "scripts", "web")
+    violations = []
+    for root in roots:
+        for path in (_REPO_ROOT / root).rglob("*.py"):
+            relative = path.relative_to(_REPO_ROOT).as_posix()
+            if (
+                relative == "simulator/physical_constants.py"
+                or relative in _SOURCE_RECEIPT_FILES
+            ):
+                continue
+            tree = ast.parse(path.read_text(), filename=relative)
+            assignments = (
+                node
+                for node in ast.walk(tree)
+                if isinstance(node, (ast.Assign, ast.AnnAssign))
+            )
+            for assignment in assignments:
+                value = assignment.value
+                is_literal = (
+                    isinstance(value, ast.Constant)
+                    and str(value.value).startswith("8.314")
+                )
+                if (
+                    isinstance(value, ast.Call)
+                    and isinstance(value.func, ast.Name)
+                    and value.func.id == "Decimal"
+                    and value.args
+                    and isinstance(value.args[0], ast.Constant)
+                    and str(value.args[0].value).startswith("8.314")
+                ):
+                    is_literal = True
+                if is_literal:
+                    violations.append(f"{relative}:{assignment.lineno}")
+    assert not violations, (
+        "production R literals must use physical_constants.GAS_CONSTANT:\n"
+        + "\n".join(violations)
+    )

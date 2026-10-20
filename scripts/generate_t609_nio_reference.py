@@ -22,13 +22,14 @@ from scipy.optimize import minimize_scalar
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from simulator.physical_constants import GAS_CONSTANT  # noqa: E402
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 EXTRACT = ROOT / "data/literature/extracts/nasa-cea-thermo.yaml"
 OUTPUT = (
     ROOT
     / "validation-data/pin-evidence/nio_liquid_reference_fit_grid_2026-08-10.yaml"
 )
-R_J_MOL_K = 8.314462618
+R_J_MOL_K = GAS_CONSTANT
 LN10 = math.log(10.0)
 
 

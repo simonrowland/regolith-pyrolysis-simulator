@@ -20,6 +20,7 @@ from simulator.condensation_routing import target_species_for_stage_number
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe_errors import MalformedRecipeError
+from simulator.physical_constants import GAS_CONSTANT
 
 # ============================================================================
 # SECTION 1: CONSTANTS
@@ -111,14 +112,9 @@ for _oxide, (_metal, _n_met, _n_oxy) in OXIDE_TO_METAL.items():
     _kg_O2 = (_n_oxy * MOLAR_MASS['O'] ) / _M_oxide  # mass of O atoms
     STOICH_RATIOS[_oxide] = (_kg_metal, _kg_O2)
 
-# Physical constants. GAS_CONSTANT and FARADAY here are six-significant-
-# figure truncations of the CODATA / SI 2019 values in
-# simulator.physical_constants. Do not silently re-export the leaf: a
-# 3e-7 relative shift in R moves pinned evaporation-flux heads (see
-# tests/test_capacity_coupling.py::test_default_off_preserves_hot_fe_redox_split_head_result).
+# Physical constants retained here for compatibility with existing callers.
 BOLTZMANN = 1.380649e-23      # J/K
 FARADAY = 96485.3321          # C/mol (for electrolysis)
-GAS_CONSTANT = 8.31446        # J/(mol·K)
 STEFAN_BOLTZMANN = 5.670374e-8  # W/(m²·K⁴)
 
 # Operator-controlled induction-stirring ceiling. See ``MeltState.

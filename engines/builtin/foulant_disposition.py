@@ -17,8 +17,9 @@ import yaml
 
 from engines.antoine import _antoine_log10_pressure
 from engines.yaml_loader import YAML12SafeLoader
+from simulator.physical_constants import GAS_CONSTANT
 
-GAS_CONSTANT_J_PER_MOL_K = 8.314462618
+GAS_CONSTANT_J_PER_MOL_K = GAS_CONSTANT
 PA_PER_BAR = 100_000.0
 UNGROUNDABLE_PROCESS_EXTENT = "UNGROUNDABLE_PROCESS_EXTENT"
 NOT_SPECIFIED = "not_speciated"

@@ -132,9 +132,10 @@ from validate_literature_extracts import (  # noqa: E402
     discover_extracts,
     validate_extract_document,
 )
+from simulator.physical_constants import GAS_CONSTANT  # noqa: E402
 
 # Gas constant J/(mol·K) — matches simulator.condensation.GAS_CONSTANT_J_MOL_K.
-R_GAS = 8.314462618
+R_GAS = GAS_CONSTANT
 
 
 # ---------------------------------------------------------------------------

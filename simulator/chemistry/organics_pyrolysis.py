@@ -47,8 +47,9 @@ from simulator.silent_zero import (
     make_note,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.physical_constants import GAS_CONSTANT
 
-GAS_CONSTANT_J_PER_MOL_K = 8.31446
+GAS_CONSTANT_J_PER_MOL_K = GAS_CONSTANT
 CELSIUS_TO_KELVIN = 273.15
 _PARAMS_PATH = (
     Path(__file__).resolve().parents[2] / "data" / "organics_pyrolysis.yaml"

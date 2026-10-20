@@ -35,6 +35,7 @@ from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
+from simulator.physical_constants import GAS_CONSTANT
 from typing import Any, Callable, Mapping, Sequence
 
 from simulator.physical_constants import (
@@ -1538,7 +1539,7 @@ _CELL_OXIDE_BUFFER_TABLES: dict[str, tuple[tuple[str, str], ...]] = {
     "W": (("WO2", "O-047"), ("WO3", "O-065")),
     "Mo": (("MoO2", "Mo-009"),),
 }
-_CELL_GAS_CONSTANT_J_MOL_K = 8.31446261815324
+_CELL_GAS_CONSTANT_J_MOL_K = GAS_CONSTANT
 _CELL_ATOMIC_MASS_G_MOL = {"O": 15.999, "W": 183.84, "Mo": 95.95}
 
 

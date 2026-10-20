@@ -6,6 +6,7 @@ import math
 import sys
 
 import pytest
+from simulator.physical_constants import GAS_CONSTANT
 
 from simulator.melt_backend.melt_envelope import (
     MELT_ENVELOPE_CONSTANTS,
@@ -198,7 +199,7 @@ def test_typed_consumer_classifies_marker_only_envelope_as_partial():
 
 
 def test_r_constant_matches_ht_plan():
-    assert R_J_MOL_K == 8.314462618
+    assert R_J_MOL_K == GAS_CONSTANT
 
 
 def _assert_out_of_domain_zeros(envelope: MeltExtrapolationEnvelope) -> None:

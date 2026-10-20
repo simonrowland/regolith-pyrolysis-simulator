@@ -28,6 +28,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 import math
 from typing import Any
+from simulator.physical_constants import GAS_CONSTANT
 
 from simulator.cost_energy import json_safe_number, unavailable_quantity
 from simulator.environment import (
@@ -38,8 +39,7 @@ from simulator.environment import (
     normalize_body_name,
 )
 
-# Universal gas constant, J/(mol*K). CODATA 2018.
-_R_J_PER_MOL_K = 8.314462618
+_R_J_PER_MOL_K = GAS_CONSTANT
 _PA_PER_BAR = 100_000.0
 _PA_PER_MBAR = 100.0
 _SECONDS_PER_HOUR = 3600.0

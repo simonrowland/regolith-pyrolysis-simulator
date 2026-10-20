@@ -114,6 +114,7 @@ from simulator.physical_constants import (
     AVOGADRO,
     BOLTZMANN,
     CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT,
 )
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
@@ -219,7 +220,7 @@ DEFAULT_SHERWOOD_LAMINAR = 3.66
 # when pressure is absent/invalid or that computation fails, anchored to the
 # historical SiO/N2 operating point at 10 mbar and 1700 C.
 DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2
-GAS_CONSTANT_J_MOL_K = 8.314462618
+GAS_CONSTANT_J_MOL_K = GAS_CONSTANT
 
 
 def _finite_nonnegative_value(value: Any, *, label: str) -> float:

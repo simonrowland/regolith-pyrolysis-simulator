@@ -29,6 +29,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
+from simulator.physical_constants import GAS_CONSTANT
 
 from engines.antoine import _antoine_log10_pressure
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
@@ -1192,7 +1193,9 @@ def _literature_alpha_points(
                         alpha_form.get("gamma_o", alpha_form.get("c0"))
                     )
                     activation = float(alpha_form["E_J_per_mol"])
-                    gas_constant = float(alpha_form.get("R_J_per_mol_K") or 8.314462618)
+                    gas_constant = float(
+                        alpha_form.get("R_J_per_mol_K") or GAS_CONSTANT
+                    )
                     alpha = prefactor * math.exp(-activation / (gas_constant * T_K))
                     sigma_E = alpha_form.get("E_uncertainty_J_per_mol")
                     sigma = (
@@ -2453,7 +2456,7 @@ RAIL_NONMATCH_CONDENSED_FORMS = frozenset(
 CONDENSED_FORM_CORRECTIONS_PATH = (
     REPO_ROOT / "data" / "condensed_form_corrections.yaml"
 )
-_R_GAS_J_MOL_K = 8.314462618  # CODATA; used only in form-correction algebra
+_R_GAS_J_MOL_K = GAS_CONSTANT  # Used only in form-correction algebra.
 
 
 def observation_condensed_form(

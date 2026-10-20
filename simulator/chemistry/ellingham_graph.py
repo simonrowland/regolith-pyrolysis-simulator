@@ -31,9 +31,9 @@ from simulator.chemistry.gas_rail_authority import (
     _gas_rail_block_is_authoritative,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.physical_constants import GAS_CONSTANT
 
-# Match simulator.state.GAS_CONSTANT without importing simulator.state here.
-GAS_CONSTANT_J_PER_MOL_K = 8.31446
+GAS_CONSTANT_J_PER_MOL_K = GAS_CONSTANT
 CELSIUS_TO_KELVIN_OFFSET = 273.15
 ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
 

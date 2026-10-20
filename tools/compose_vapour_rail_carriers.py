@@ -26,6 +26,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from simulator.physical_constants import GAS_CONSTANT  # noqa: E402
 from simulator.vapour_rail.catalog import compile_vapour_rail_catalog  # noqa: E402
 from simulator.vapour_rail.channels import (  # noqa: E402
     ChannelCompositionRefusal,
@@ -40,7 +41,7 @@ STRICT = "COMPOSABLE-NOW-STRICT"
 CLIPPED = "COMPOSABLE-NOW-CLIPPED"
 OPERATING_LOW_K = 1300.0
 OPERATING_HIGH_K = 2300.0
-R_J_MOL_K = 8.31446261815324
+R_J_MOL_K = GAS_CONSTANT
 
 _FORMULA_TOKEN_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?|\.\d+)?")
 
@@ -804,7 +805,14 @@ def _catalog_self_row(
         if match is None:
             raise ValueError(f"{spec.carrier}: cannot parse {source_form!r}")
         enthalpy, entropy = (float(match.group(1)), float(match.group(2)))
-        gas_constant = 1.98720425864083 if "cal_mol" in source_form else 8.31446261815324
+        if "cal_mol" in source_form:
+            # Premise: source entropy is cal_th/(mol K), while the owner is J/(mol K).
+            # Algebra: R_cal = R_J / 4.184 J/cal_th.
+            # Unit check: J/(mol K) / (J/cal_th) = cal_th/(mol K).
+            # Sanity: multiplying this result by 4.184 returns the owner value.
+            gas_constant = GAS_CONSTANT / 4.184
+        else:
+            gas_constant = GAS_CONSTANT
         standard_pressure = str(correlation.get("standard_pressure") or "1 bar").lower()
         pressure_standard_pa = 101325.0 if "atm" in standard_pressure else 100000.0
         reference_coefficients = {

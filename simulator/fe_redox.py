@@ -12,6 +12,7 @@ from simulator.feedstock_composition import (
     iron_oxide_values,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.physical_constants import GAS_CONSTANT
 
 
 class Kress91InvalidControls(ValueError):
@@ -501,7 +502,7 @@ def holzheid_feo_liquid_delta_g_j_mol(T_K: float) -> float:
 
 def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
     activity = max(float(a_feo), 1.0e-300)
-    R = 8.31446261815324
+    R = GAS_CONSTANT
     ln_fO2 = 2.0 * (
         math.log(activity)
         + holzheid_feo_liquid_delta_g_j_mol(T_K) / (R * float(T_K))
@@ -788,7 +789,7 @@ def ban_ya_quadratic_gamma_feo(
                 alpha_fe_a + alpha_fe_b - alpha_ab
             ) * candidate[cation_a] * candidate[cation_b]
 
-    R = 8.31446261815324
+    R = GAS_CONSTANT
     ln_gamma = rt_ln_gamma / (R * float(T_K))
     gamma = math.exp(max(-745.0, min(709.0, ln_gamma)))
     return {

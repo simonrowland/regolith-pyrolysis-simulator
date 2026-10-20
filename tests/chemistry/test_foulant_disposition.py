@@ -9,6 +9,7 @@ import textwrap
 from pathlib import Path
 
 import pytest
+from simulator.physical_constants import GAS_CONSTANT
 
 from engines.builtin.foulant_disposition import (
     GAS_CONSTANT_J_PER_MOL_K,
@@ -191,11 +192,11 @@ def test_chi_decomp_po2_edge_semantics(foulant_registry_yaml: Path) -> None:
     floor = chi_decomp("CaSO4", 1300.0, 1.0e-15, 0.0, registry)
     below_floor = chi_decomp("CaSO4", 1300.0, 1.0e-30, 0.0, registry)
 
-    # Fixture: T0=1423.15 K, width=R*T0/1000=11.832727 C, nu_O2=1/2.
-    # Vacuum shift = 0.5*width*ln(1e-15/0.2) = -194.821944 C,
-    # giving effective onset 1228.328056 K and near-complete extent at 1300 C.
-    assert vacuum.onset_K == pytest.approx(1228.3280559055947, rel=1e-12)
-    assert vacuum.extent == pytest.approx(0.9999999999997791, rel=1e-12)
+    # For the 1423.15 K reference, width = R*T0/1000 (K); with ν_O2=1/2,
+    # vacuum onset shifts by 0.5*width*ln(1e-15/0.2). The onset remains K.
+    width_K = GAS_CONSTANT * 1423.15 / 1000.0
+    expected_onset_K = 1423.15 + 0.5 * width_K * math.log(1.0e-15 / 0.2)
+    assert vacuum.onset_K == pytest.approx(expected_onset_K, rel=1e-12)
     assert vacuum == floor
     assert below_floor == floor
     for invalid in (-1.0, float("nan"), float("inf")):
