@@ -18,7 +18,8 @@ extraction:
     pair on published page 292 is prose, added by hand from that render.
     Figure 4 series 8 was read from the 600 dpi render of PDF page 5.
     Tick marks were calibrated in linear space. Each stored centre was
-    re-read on that render. Overlapped markers were not stored.
+    re-read on that render. A marker was stored only when it is an open
+    right-pointing triangle with no bar and its centre is visible.
     Figure 2 series 16 was read the same way from PDF page 3. Only open
     right-pointing triangles with a free white interior were stored.
   date: '2026-10-20'
@@ -85,6 +86,16 @@ fidelity_samples:
       equation: '19'
       note: Liquid-state formation enthalpy in the prose on PDF page 6.
   - path: species.MgO.observations[shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8].values.points[0].activity
+    value: '0.276'
+    locator:
+      page: 5
+      published_page: 291
+      pdf_page_index: 4
+      figure: '4'
+      note: >-
+        Figure 4 panel (a), series 8 at 1917 K. 600 dpi render.
+        Local-stroke centre (1192.0, 1112.0) in the figure crop.
+  - path: species.MgO.observations[shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8].values.points[1].activity
     value: '0.368'
     locator:
       page: 5
@@ -92,9 +103,19 @@ fidelity_samples:
       pdf_page_index: 4
       figure: '4'
       note: >-
-        Figure 4 panel (a), first stored series-8 point. 600 dpi render.
+        Figure 4 panel (a), series 8 at 2161 K. 600 dpi render.
         Bounding-box centre (1641.5, 1018.5) in the figure crop.
   - path: species.Al2O3.observations[shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8].values.points[0].activity
+    value: '0.236'
+    locator:
+      page: 5
+      published_page: 291
+      pdf_page_index: 4
+      figure: '4'
+      note: >-
+        Figure 4 panel (b), series 8 at 1917 K. 600 dpi render.
+        Local-stroke centre (1193.5, 2290.0) in the figure crop.
+  - path: species.Al2O3.observations[shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8].values.points[1].activity
     value: '0.211'
     locator:
       page: 5
@@ -102,7 +123,7 @@ fidelity_samples:
       pdf_page_index: 4
       figure: '4'
       note: >-
-        Figure 4 panel (b), first stored series-8 point. 600 dpi render.
+        Figure 4 panel (b), series 8 at 2162 K. 600 dpi render.
         Bounding-box centre (1644.5, 2341.5) in the figure crop.
   - path: species.MgAl2O4.observations[shornikov_2017_spinel_thermodynamics_fig2_series16_2050k].values.value
     value: '-22.41'
@@ -862,17 +883,31 @@ species:
             ruling was not applied. No melting point was used.
           reason: >-
             Series 8 is the open right-pointing triangle with no bar.
-            Four separable markers on each panel, all above about 2160 K,
-            are the activity observations. Refused on panel (a): every
-            marker left of crop x about 1600 (below about 2140 K), where
-            open triangles carry a vertical bar (series 5 and 6), filled
-            right triangles (series 7), or two outlines share one centre.
-            The open triangle at crop (1633, 799) is the legend key.
-            Refused on panel (b): the legend key at crop (1650, 2114)
-            beside the printed 8; the filled right triangle near crop
-            x 1400 and y 2330; the open triangle near crop x 1500 and
-            y 2330, which a vertical bar crosses. Up-triangles are
-            series 1–4. MinerU's scatter table was ignored.
+            Five centres on each panel are the activity observations,
+            including the open triangle near 1917 K. Refused on panel (a),
+            each by the temperature of its centre. About 1861 K, crop
+            (1086, 1134): the symbol has a vertical bar, so it is series
+            5 or 6. About 1940–2000 K, crop x 1210–1330 and y 1070–1120:
+            barred outlines and a filled right triangle share one black
+            mass, so those centres are hidden. About 1980 K, crop
+            (1310, 1013): vertical bar. About 2051 K, crop (1440, 1060):
+            vertical bar. About 2080 K, crop (1460, 980): vertical bar.
+            About 2101 K, crop (1532, 1044): vertical bar. About
+            2170–2280 K, crop y 900–970, above the stored series: vertical
+            bar. The open triangle at crop (1633, 799) is the legend key.
+            Up-triangles from about 1640 K to about 1870 K, crop y
+            1240–1330, are series 1–4. Refused on panel (b). Up-triangles
+            from about 1420 K to about 1670 K, crop x 250–780: series 1–4.
+            About 1840 K, crop x 1050–1120: an up-triangle and a right
+            triangle share one centre, so the symbol cannot be assigned.
+            About 1954 K, crop (1260, 2297): vertical bar. About 1965 K,
+            crop y 2156: the marker is filled and its centre is hidden in
+            that mass. About 2009 K, crop (1362, 2319): vertical bar, with
+            a filled triangle beside it. About 2053 K, crop (1443, 2321):
+            filled right triangle, series 7. About 2103 K, crop
+            (1535, 2329): vertical bar. The open triangle at crop
+            (1650, 2114) is the legend key. MinerU's scatter table was
+            ignored.
       - observation_id: shornikov_2017_spinel_thermodynamics_fig5_phase_diagram
         type: figure_context_not_digitised
         locator:
@@ -909,9 +944,11 @@ species:
             578.5, 1.0 at 374.5, 1.2 at 174.5. Slope -0.000983 per px.
             Tick-fit residual under 0.002. The stored coordinate is the
             bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
-            and ±0.010 in activity. These points lie above 2160 K, in the
+            and ±0.010 in activity. The points from 2161 K upward lie in the
             crystal-state range 2048–2298 K that the paper takes from
-            reference [54] by equations (16) and (17).
+            reference [54] by equations (16) and (17). The 1917 K point is
+            below that range. The reference sentence is equations (12)
+            and (13) for every point.
         units: dimensionless
         phase: cr
         standard_state: >-
@@ -932,6 +969,20 @@ species:
           activity_name_as_reported: a_MgO
           series_as_printed: '8'
           points:
+            - T_K: '1917'
+              activity: '0.276'
+              crop_pixel_xy: [1192, 1112]
+              unrounded_T_K: '1916.58'
+              unrounded_activity: '0.2760'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: >-
+                  Panel (a) series 8. Crop centre (1192.0, 1112.0).
+                  The tip meets the next outline. The centre is in the
+                  open interior.
             - T_K: '2161'
               activity: '0.368'
               crop_pixel_xy: [1642, 1018]
@@ -1011,9 +1062,11 @@ species:
             Slope -0.000491 per px. Tick-fit residual under 0.0011. Crop
             origin is page pixel (2560, 435). The stored coordinate is the
             bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
-            and ±0.0049 in activity. These points are the high-temperature
-            tail, in the crystal-state range 2048–2298 K from reference [54]
-            by equations (16) and (17).
+            and ±0.0049 in activity. The points from 2162 K upward are the
+            high-temperature tail, in the crystal-state range 2048–2298 K
+            from reference [54] by equations (16) and (17). The 1917 K point
+            is below that range. The reference sentence is equations (12)
+            and (13) for every point.
         units: dimensionless
         phase: cr
         standard_state: >-
@@ -1034,6 +1087,20 @@ species:
           activity_name_as_reported: a_Al2O3
           series_as_printed: '8'
           points:
+            - T_K: '1917'
+              activity: '0.236'
+              crop_pixel_xy: [1194, 2290]
+              unrounded_T_K: '1917.39'
+              unrounded_activity: '0.2362'
+              locator:
+                page: 5
+                published_page: 291
+                pdf_page_index: 4
+                figure: '4'
+                note: >-
+                  Panel (b) series 8. Crop centre (1193.5, 2290.0).
+                  The tip meets the next outline. The centre is in the
+                  open interior.
             - T_K: '2162'
               activity: '0.211'
               crop_pixel_xy: [1644, 2342]
