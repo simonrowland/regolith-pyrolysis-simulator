@@ -219,8 +219,12 @@ def test_render_grid_and_both_cell_mutations_are_detected() -> None:
         assert _render_grid(changed_extract) == TABLE_RENDER
 
 
-def test_printed_loss_summaries_and_missing_supplement_are_context_only() -> None:
+def test_printed_loss_summaries_and_registered_supplement_context_are_preserved() -> None:
     document = _document()
+    assert "supporting_material" not in document["source"]
+    assert document["source"]["supporting_material_sha256"] == (
+        "0f745b41c8f76c6b5c77ba7c44275d59f5a910f4e1f236a93c10632c4358720e"
+    )
     contexts = {
         observation["observation_id"]: observation
         for block in document["species"].values()
@@ -271,9 +275,10 @@ def test_printed_loss_summaries_and_missing_supplement_are_context_only() -> Non
 
     supplement = contexts["neuman_2026_supplementary_table_s1_mass_loss_inputs"]
     assert supplement["type"] == "printed_data_context"
-    assert supplement["values"]["reason"].startswith(
-        "data in publisher supplement MMC2 Table S1, not in corpus; fetch queued 2026-10-20"
-    )
+    reason = supplement["values"]["reason"]
+    assert "49 rows are transcribed from the registered publisher MMC2 workbook" in reason
+    assert "no registered TABLE_CSV asset" in reason
+    assert "no mass-loss fraction is computed" in reason
     assert len(supplement["values"]["rows"]) == 49
 
 
@@ -282,6 +287,9 @@ def test_isolated_migration_preserves_species_and_run_conditions() -> None:
     source = _source_observations(document)
     rows = _migrate(document)
     assert len(rows) == 2258
+    assert not any(
+        row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION for row in rows
+    )
 
     actual_species_rows = Counter()
     without_sample = []

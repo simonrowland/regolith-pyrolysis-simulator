@@ -147,7 +147,7 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
 
     activities = [row for row in migrated if row.identity.quantity.value is Quantity.ACTIVITY]
     assert len(activities) == 2
-    expected_reference_phases = {"CaO": Phase.CR, "SiO2": Phase.L}
+    expected_reference_phases = {"CaO": Phase.CR}
     for row in activities:
         formula = row.identity.species.formula
         assert row.identity.species.phase.is_unknown
@@ -155,8 +155,12 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
         assert reference.is_value
         assert reference.value.convention.value == "raoultian_pure_endmember"
         assert reference.value.endmember.formula == formula
-        assert reference.value.endmember.phase.is_value
-        assert reference.value.endmember.phase.value is expected_reference_phases[formula]
+        if formula == "SiO2":
+            assert reference.value.endmember.phase.is_unknown
+            assert "cristobalite" in reference.value.endmember.phase.reason
+        else:
+            assert reference.value.endmember.phase.is_value
+            assert reference.value.endmember.phase.value is expected_reference_phases[formula]
         assert row.identity.temperature_K.is_unknown
         assert row.point_conditions is not None
         activity_temperature = row.point_conditions["temperature_K"].state.value
@@ -171,6 +175,23 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
         )
         assert source_standard_state["inferred"] is True
         assert source_standard_state["basis"]
+        if formula == "SiO2":
+            assert source_standard_state["state"]["value"]["endmember"]["phase"]["tag"] == "unknown"
+            assert "cristobalite" in source_standard_state["basis"].casefold()
+            assert "1999 K" in source_standard_state["basis"]
+            assert "crosses" in source_standard_state["basis"]
+
+    source_activities = [
+        observation
+        for block in document["species"].values()
+        for observation in block.get("observations", [])
+        if observation["values"].get("quantity") == "activity"
+    ]
+    assert len(source_activities) == 2
+    # The schema has no `activity` observation type; the `activity_coefficient` family type
+    # carries the scored `values.quantity: activity` records.
+    assert all(observation["type"] == "activity_coefficient" for observation in source_activities)
+    assert all(observation["values"]["quantity"] == "activity" for observation in source_activities)
 
 
 def test_every_deferred_figure_has_metadata_and_no_numeric_points() -> None:
@@ -196,6 +217,15 @@ def test_every_deferred_figure_has_metadata_and_no_numeric_points() -> None:
         assert values["digitisation"] == "deferred to a figure pass"
         assert "points" not in values
         assert all(isinstance(series["marker_count"], int) for series in values["series"])
+
+    sio2_activity_figure = next(
+        record for record in figures if record["observation_id"] == "shornikov_2026_fig3_SiO2_b"
+    )
+    figure_standard_state = sio2_activity_figure["values"]["standard_state"]
+    assert figure_standard_state["state"]["value"]["endmember"]["phase"]["tag"] == "unknown"
+    assert "cristobalite" in figure_standard_state["basis"].casefold()
+    assert "1999 K" in figure_standard_state["basis"]
+    assert "crosses" in figure_standard_state["basis"]
 
     for locator in iter_locators(document):
         if "pdf_page_index" in locator and "page" in locator:

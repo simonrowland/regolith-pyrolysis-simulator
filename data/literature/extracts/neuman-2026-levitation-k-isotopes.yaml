@@ -8,7 +8,6 @@ source:
   year: 2026
   corpus_asset: raw/neuman-2026-levitation-k-isotopes/neuman-2026-levitation-k-isotopes.pdf
   corpus_sha256: 02e602b38a470d2e8b1db0d357817dabeacfbe2a9a4a341b4c451d98715b4c75
-  supporting_material: /Users/simonrowland/Repos/regolith-sources/_incoming/neuman-2026-levitation-k-isotopes/supporting/neuman-2026-publisher-mmc2.xlsx
   supporting_material_sha256: 0f745b41c8f76c6b5c77ba7c44275d59f5a910f4e1f236a93c10632c4358720e
 extraction:
   method: Born-digital pdftotext-layout was primary; publisher MMC2 supplied table cells and printed precision;
@@ -136656,8 +136655,11 @@ species:
         - mass_loss_fraction
         - residue_component_composition
         - evaporation_rate
-        reason: data in publisher supplement MMC2 Table S1, not in corpus; fetch queued 2026-10-20. The listed
-          calculated K evaporation number, J and timescales are model-derived and remain context.
+        reason: The 49 rows are transcribed from the registered publisher MMC2 workbook (SHA-256
+          0f745b41c8f76c6b5c77ba7c44275d59f5a910f4e1f236a93c10632c4358720e). Starting and ending weights remain
+          context because no registered TABLE_CSV asset exposes those cells as derived_from parents; no mass-loss
+          fraction is computed. The listed calculated K evaporation number, J and timescales are model-derived and
+          remain context.
         rows:
         - sample: 1–1
           material: Basalt

@@ -6014,16 +6014,18 @@ species:
             endmember:
               formula: SiO2
               phase:
-                tag: value
-                value: l
+                tag: unknown
+                reason: The reported interval includes solid cristobalite below its melting point and liquid above it.
               polymorph:
                 tag: unknown
-                reason: The stable reference is liquid over the reported interval.
+                reason: The 1751–2087 K interval crosses cristobalite melting near 1999 K, so no single polymorph
+                  applies across it.
             component_basis: SiO2
         inferred: true
-        basis: JANAF O-037 identifies high quartz to liquid at 1695 ± 50 K; the 1751 K lower bound is about 56 K
-          above that transition.
-        transition_notice: The lower reported temperature is within about 100 K of the high-quartz to liquid transition.
+        basis: JANAF O-037's 1696 K high-quartz transition is not the stable pure-SiO2 reference at 1751 K.
+          Cristobalite is stable at 1751 K and melts near 1999 K; the reported 1751–2087 K interval crosses that
+          melting point, so no single reference phase can be selected.
+        transition_notice: The reported 1751–2087 K interval crosses cristobalite melting near 1999 K.
         locator:
           table_id: O-037
           url: https://janaf.nist.gov/tables/O-037.html
@@ -6178,16 +6180,18 @@ species:
               endmember:
                 formula: SiO2
                 phase:
-                  tag: value
-                  value: l
+                  tag: unknown
+                  reason: The reported interval includes solid cristobalite below its melting point and liquid above it.
                 polymorph:
                   tag: unknown
-                  reason: The stable reference is liquid over the reported interval.
+                  reason: The 1751–2087 K interval crosses cristobalite melting near 1999 K, so no single polymorph
+                    applies across it.
               component_basis: SiO2
           inferred: true
-          basis: JANAF O-037 identifies high quartz to liquid at 1695 ± 50 K; the 1751 K lower bound is about 56
-            K above that transition.
-          transition_notice: The lower reported temperature is within about 100 K of the high-quartz to liquid transition.
+          basis: JANAF O-037's 1696 K high-quartz transition is not the stable pure-SiO2 reference at 1751 K.
+            Cristobalite is stable at 1751 K and melts near 1999 K; the reported 1751–2087 K interval crosses
+            that melting point, so no single reference phase can be selected.
+          transition_notice: The reported 1751–2087 K interval crosses cristobalite melting near 1999 K.
           locator:
             table_id: O-037
             url: https://janaf.nist.gov/tables/O-037.html

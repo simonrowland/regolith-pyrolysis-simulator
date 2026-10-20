@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import subprocess
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
@@ -16,6 +18,11 @@ EXTRACT = (
     Path(__file__).resolve().parents[1]
     / "data/literature/extracts/kems-213-schneider-1980-nbsir-80-2139.yaml"
 )
+SOURCE_ID = "kems-213-schneider-1980-nbsir-80-2139"
+CORPUS_ROOT = Path(
+    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
+)
+PDF = CORPUS_ROOT / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
 
 # Independent transcription from the 600 dpi render of Table 1, physical PDF
 # page 8. Table 1 reports starting composition and listed mineral components.
@@ -217,8 +224,36 @@ def test_every_typed_component_keeps_its_species_and_conditions_in_migration() -
     temperature = liquid_onset.point_conditions["temperature_K"]
     assert temperature.state.is_value
     assert temperature.state.value == Decimal("1583.15")
-    assert temperature.locator is not None and temperature.locator.page == 7
+    assert temperature.locator is not None and temperature.locator.page == 6
     assert liquid_onset.point_conditions["composition"].state.is_unknown
+
+
+@pytest.mark.skipif(not PDF.is_file(), reason="regolith-corpus source PDF is absent")
+def test_liquid_onset_locator_cites_the_page_with_the_1310_c_sentence() -> None:
+    document = _document()
+    liquid_onset = next(
+        observation
+        for observation in document["species"]["SiO2"]["observations"]
+        if observation["observation_id"] == "schneider_1980_kcas_vp_1_liquid_phase_first_forms"
+    )
+    locator = liquid_onset["locator"]
+    assert (locator["page"], locator["pdf_page_index"], locator["published_page"]) == (
+        6,
+        5,
+        2,
+    )
+    page_text = {}
+    for page in (6, 7):
+        result = subprocess.run(
+            ["pdftotext", "-f", str(page), "-l", str(page), "-layout", str(PDF), "-"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        page_text[page] = result.stdout
+    assert "1310 °C" in page_text[6]
+    assert "1310 °C" not in page_text[7]
+
 
 def test_figure_records_are_deferred_and_locators_use_physical_pages() -> None:
     document = _document()

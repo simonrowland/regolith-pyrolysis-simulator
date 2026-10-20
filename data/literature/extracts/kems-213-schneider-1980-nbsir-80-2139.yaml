@@ -267,7 +267,7 @@ species:
     observations:
     - observation_id: schneider_1980_kcas_vp_1_liquid_phase_first_forms
       type: transition_point
-      locator: {page: 7, pdf_page_index: 6, published_page: 3, section: Vaporization Studies}
+      locator: {page: 6, pdf_page_index: 5, published_page: 2, section: Vaporization Studies}
       phase: l
       units: °C
       values:
@@ -283,7 +283,7 @@ species:
               state:
                 tag: unknown
                 reason: The KCAS-VP-1 run-state composition at liquid-phase appearance is not reported.
-              locator: {page: 7, pdf_page_index: 6, published_page: 3, section: Vaporization Studies}
+              locator: {page: 6, pdf_page_index: 5, published_page: 2, section: Vaporization Studies}
     - observation_id: schneider_1980_table3_pair1_component1
       type: equilibrium_phase_composition
       locator: &table3_pair1_locator {page: 10, pdf_page_index: 9, published_page: 6, table: '3', row: 'KAlSiO4/CaSiO3'}
