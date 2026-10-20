@@ -51,6 +51,7 @@ species:
         values:
           quantity: partial_pressure
           method_class: measured_direct
+          admission_status: admitted
           pressure_species: CO(g)
           partial_pressure_pa: '100'
           partial_pressure_pa_as_printed: 0.001 × 10^5 Pa
@@ -83,7 +84,7 @@ species:
               published_page: 254
               table: '3'
               row_label: average glass melt surface temperature
-              note: The paper says the glass-surface temperatures were calculated with a CFD model.
+              note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
           fO2_Pa:
             state: {tag: value, value: '3000'}
             locator:
@@ -151,6 +152,7 @@ species:
         values:
           quantity: partial_pressure
           method_class: measured_direct
+          admission_status: admitted
           pressure_species: CO(g)
           partial_pressure_pa: '6500'
           partial_pressure_pa_as_printed: 0.065 × 10^5 Pa
@@ -183,7 +185,7 @@ species:
               published_page: 254
               table: '3'
               row_label: average glass melt surface temperature
-              note: The paper says the glass-surface temperatures were calculated with a CFD model.
+              note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
           fO2_Pa:
             state: {tag: value, value: '0'}
             locator:
@@ -251,6 +253,7 @@ species:
         values:
           quantity: partial_pressure
           method_class: measured_direct
+          admission_status: admitted
           pressure_species: CO(g)
           partial_pressure_pa: '6500'
           partial_pressure_pa_as_printed: 0.065 × 10^5 Pa
@@ -283,7 +286,7 @@ species:
               published_page: 254
               table: '3'
               row_label: average glass melt surface temperature
-              note: The paper says the glass-surface temperatures were calculated with a CFD model.
+              note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
           fO2_Pa:
             state: {tag: value, value: '0'}
             locator:
@@ -351,6 +354,7 @@ species:
         values:
           quantity: partial_pressure
           method_class: measured_direct
+          admission_status: admitted
           pressure_species: CO(g)
           partial_pressure_pa: '1300'
           partial_pressure_pa_as_printed: 0.013 × 10^5 Pa
@@ -383,7 +387,7 @@ species:
               published_page: 254
               table: '3'
               row_label: average glass melt surface temperature
-              note: The paper says the glass-surface temperatures were calculated with a CFD model.
+              note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
           fO2_Pa:
             state: {tag: value, value: '0'}
             locator:
@@ -620,7 +624,7 @@ species:
           pdf_page_index: 11
           published_page: 256
           section: Conclusions and recommendations
-        units: percent; °C; Pa; g per tonne glass
+        units: percent; °C; Pa; g per ton glass
         values:
           quantity_as_printed: Model results and process-level emission estimates
           method_class: model_derived
@@ -629,7 +633,7 @@ species:
           oxygen_firing_reduction_as_printed: factor 2 to 4 reduction in evaporation rates and specific particulate emissions; factor 4 to 5 dust reduction for C-glass or other alkali borosilicate melts
           reducing_condition_as_printed: pO2 < 100 Pa may increase alkali and lead evaporation by 20 to 40%
           NaOH_pressure_comparison_as_printed: about 20 to 25% higher at 16 wt% Na2O than at 13 wt% Na2O
-          chloride_emission_as_printed: 300 g chloride (495 g NaCl) up to 450 g Cl per tonne glass leads to about 100 g extra dust per tonne glass
+          chloride_emission_as_printed: 300 g chloride (495 g NaCl) up to 450 g Cl per ton glass leads to about 100 g extra dust per ton glass
           candidate_tokens: [mass_loss_fraction, mass_loss_rate, partial_pressure]
           schema_gap: The printed values are process ratios, surface depletion, or particulate mass per glass production, not a typed species-level mass fraction, pressure point, or mass/time rate.
       - observation_id: beerkens_2001_figure9_hot_spot_fraction_context
@@ -812,12 +816,13 @@ species:
         values:
           quantity: mass_loss_fraction
           method_class: quoted_attributed
+          admission_status: admitted
           mass_loss_pct: 50
           approximate: true
           value_as_published: about 50% of the extra NaCl added to the batch evaporates
           attribution: Beek, A. R. M. ter and Thole, E. J. M. C. (1992), reference 37.
-          denominator_as_printed: extra NaCl added above the 0.200 g NaCl per tonne glass background
-          background_absorption_as_printed: The first 0.200 g NaCl per tonne glass is almost completely absorbed in the melt.
+          denominator_as_printed: extra NaCl added above the 0.200 g NaCl per ton glass background
+          background_absorption_as_printed: The first 0.200 g NaCl per ton glass is almost completely absorbed in the melt.
           products_as_printed: HCl and sodium sulfate dust
         point_conditions:
           temperature_C:

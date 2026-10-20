@@ -146,6 +146,7 @@ def test_species_conditions_fidelity_and_isolated_migration() -> None:
     rows = tuple(migrator.result.observations.values())
     assert len(rows) == 5
     assert {row.identity.species.formula for row in rows} == {"CO", "NaCl"}
+    assert all(row.admission.status.value == "admitted" for row in rows)
 
     co_rows = sorted(
         (row for row in rows if row.identity.species.formula == "CO"),
@@ -165,6 +166,9 @@ def test_species_conditions_fidelity_and_isolated_migration() -> None:
         assert row.identity.temperature_K is not None
         assert row.point_conditions is not None
         assert row.point_conditions["temperature_C"].state.value == Decimal(temp_c)
+        temperature_locator = row.point_conditions["temperature_C"].locator
+        assert temperature_locator is not None
+        assert "Model-derived condition (CFD)" in temperature_locator.note
         assert row.point_conditions["fO2_Pa"].state.value == Decimal(oxygen_pa)
         assert row.point_conditions["water_vapor_pressure_Pa"].state.value == Decimal("60000")
         assert row.point_conditions["gas_velocity_m_s"].state.value == Decimal(velocity)
