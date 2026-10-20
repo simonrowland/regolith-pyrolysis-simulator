@@ -18,6 +18,8 @@ let flueCompositionHours = [];
 let flueCompositionLastHour = null;
 
 socket.on('simulation_tick', (data) => {
+    if (typeof window.requireSimulationTickPayloadVersion === 'function'
+        && !window.requireSimulationTickPayloadVersion(data)) return;
     // Status bar
     const setEl = (id, text) => { const e = document.getElementById(id); if (e) e.textContent = text; };
     setEl('status-hour', 'Hour: ' + data.hour);

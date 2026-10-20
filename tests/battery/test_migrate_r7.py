@@ -305,6 +305,45 @@ def test_h3_pressure_evaluator_arguments_do_not_name_the_output(units):
     assert control.is_value and control.value is Quantity.P_SAT
 
 
+@pytest.mark.parametrize(
+    ("form", "expected"),
+    [
+        pytest.param("P[0]", False, id="pressure-subscript"),
+        pytest.param('p["Na"]', False, id="species-pressure-subscript"),
+        pytest.param("# pressure = P_bar", False, id="comment-only"),
+        pytest.param('"P"', False, id="string-only"),
+        pytest.param("Psat(T_K)", True, id="psat-call"),
+        pytest.param("p_sat(T_K)", True, id="p-sat-call"),
+        pytest.param(
+            "vapor_pressure(T_K) = A - B/T",
+            True,
+            id="vapor-pressure-call",
+        ),
+        pytest.param(
+            "alpha[Psat(T_K)] = A - B/T",
+            False,
+            id="psat-in-subscript-index",
+        ),
+        pytest.param(
+            "alpha[P_bar] = A - B/T",
+            False,
+            id="pressure-name-in-subscript-index",
+        ),
+        pytest.param("log10(P_bar) = A - B/T", True, id="log-pressure-positive"),
+        pytest.param(
+            "alpha(P_bar, T_K) = A * exp(-B/T)",
+            False,
+            id="pressure-only-in-arguments",
+        ),
+    ],
+)
+def test_h3_pressure_evaluator_uses_source_syntax(form, expected):
+    from simulator.battery.migrate import _pressure_evaluator
+
+    values = {"source_form": form, "coefficients": {"A": 1, "B": 2}}
+    assert _pressure_evaluator(values, "bar") is expected
+
+
 def test_g3_declared_psat_cannot_contradict_partial_pressure():
     state, reason = map_quantity("psat_series", {
         "quantity": "pure_Psat", "P_bar": 1,

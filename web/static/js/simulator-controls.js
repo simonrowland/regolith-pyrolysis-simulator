@@ -253,6 +253,8 @@ function handleRecipeDefiningControlEdit(e) {
 }
 
 socket.on('simulation_tick', (data) => {
+    if (typeof window.requireSimulationTickPayloadVersion === 'function'
+        && !window.requireSimulationTickPayloadVersion(data)) return;
     lastRecipeTick = data || null;
 });
 
@@ -796,6 +798,7 @@ document.getElementById('btn-start').addEventListener('click', () => {
     const furnaceMaterialId = selectedFurnaceMaterialId();
 
     const payload = {
+        payload_version: window.simulationTickPayloadVersion,
         feedstock: feedstock,
         mass_kg: mass_kg,
         backend: document.getElementById('engine-select').value,
@@ -879,7 +882,9 @@ document.getElementById('btn-pause').addEventListener('click', () => {
 });
 
 document.getElementById('btn-resume').addEventListener('click', () => {
-    socket.emit('resume_simulation');
+    socket.emit('resume_simulation', {
+        payload_version: window.simulationTickPayloadVersion,
+    });
     document.getElementById('btn-resume').disabled = true;
     document.getElementById('btn-pause').disabled = false;
     transitionSimulatorLifecycle({

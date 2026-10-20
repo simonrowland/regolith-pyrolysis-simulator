@@ -34,6 +34,31 @@ function renderWallRiskPanel(payload) {
     if (!content) return;
     const status = payload && payload.status ? payload.status : 'n/a';
     updateAdvisoryState('wall-risk-state', status);
+    if (status === 'n/a') {
+        content.className = 'advisory-empty';
+        advisoryClear(content);
+        content.textContent = 'n/a';
+        return;
+    }
+    if (payload && payload.tick_view === 'compact') {
+        content.className = 'advisory-result';
+        advisoryClear(content);
+        appendCeramicLine(
+            content,
+            'Active vapors',
+            String(payload.active_species_count || 0)
+        );
+        const operatingPoint = payload.operating_point || {};
+        appendCeramicLine(
+            content,
+            'Operating point',
+            'pO2 ' + (operatingPoint.pO2_mbar ?? 'n/a')
+                + ' mbar; buffer ' + (operatingPoint.p_buffer_mbar ?? 'n/a')
+                + ' mbar'
+        );
+        appendOnDemandAdvisoryDetail(content, 'wall_risk_panel', payload);
+        return;
+    }
     let metaText = 'Active vapors: ' + (
         payload && payload.active_species && payload.active_species.length
             ? payload.active_species.join(', ')
@@ -792,6 +817,15 @@ function renderVapourRailInstrumentationPanel(payload) {
             'Refused species',
             refusedNames.length ? refusedNames.join(', ') : 'none'
         );
+    } else if (payload.tick_view === 'compact') {
+        const count = Number(payload.n_refused_species);
+        appendCeramicLine(
+            content,
+            'Refused species',
+            Number.isFinite(count)
+                ? (count ? `${count} species; open full records for names` : 'none')
+                : 'available in full records'
+        );
     } else {
         appendCeramicLine(content, 'Refused species', 'absent');
     }
@@ -880,6 +914,14 @@ function renderCondensationRefusalsPanel(payload) {
         } else {
             appendCeramicLine(content, 'By species', 'none');
         }
+    } else if (payload.tick_view === 'compact') {
+        appendCeramicLine(
+            content,
+            'By species',
+            payload.has_refusals
+                ? 'available in full records'
+                : 'none'
+        );
     } else {
         appendCeramicLine(content, 'By species', 'absent');
     }
@@ -1024,6 +1066,8 @@ function refreshThermalTrainHeadline(isRetry) {
 }
 
 socket.on('simulation_tick', (data) => {
+    if (typeof window.requireSimulationTickPayloadVersion === 'function'
+        && !window.requireSimulationTickPayloadVersion(data)) return;
     renderWallRiskPanel(data.wall_risk_panel);
     renderVaporPressureAuthorityPanel(data.vapor_pressure_authority_panel);
     renderVapourRailInstrumentationPanel(data.vapour_rail_instrumentation_panel);
