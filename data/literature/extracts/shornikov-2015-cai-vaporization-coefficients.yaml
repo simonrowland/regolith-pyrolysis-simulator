@@ -1,0 +1,1501 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2015-cai-vaporization-coefficients
+source:
+  citation: Shornikov, S. I. (2015). Vaporization Coefficients of Oxides Contained in the Melts of Ca–Al–Inclusions in Chondrites. Geochemistry International, vol. 53, no. 12, pp. 1080–1089.
+  year: 2015
+  doi: 10.1134/S0016702915100055
+  corpus_asset: raw/shornikov-2015-cai-vaporization-coefficients/shornikov-2015-cai-vaporization-coefficients.pdf
+  corpus_sha256: 6c200e01f13ab9675d1407d4f90d65af90a58bd2a53b97e0b65bebd98903c390
+extraction:
+  method: mineru_table_draft emit of the αvap column only, then a field move onto values.alpha. MinerU tagged data rows as header, which drops ± and range cells, so the scratch CSV set those rows to body after the 600 dpi render confirmed every αvap cell. No digit was changed. Temperature ranges were not passed through the temperature column, because a range is not a point; T_range_K was attached from the temperature cell. A printed power of ten inside a cell was applied to that cell. Printed ranges have no stored midpoint. Prose coefficients that are not table cells were added from the same pages. Table 5 columns other than αvap (cr) were not emitted. Figs. 1 and 2 were not digitized.
+  date: '2026-10-20'
+  worker: t1372-w5
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables:
+  - page: 3
+    table_index: 1
+    count: 0
+  - page: 3
+    table_index: 2
+    count: 0
+  - page: 4
+    table_index: 3
+    count: 0
+  - page: 5
+    table_index: 4
+    count: 0
+  - page: 7
+    table_index: 5
+    count: 0
+species:
+  CaO:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r02_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 1283–1473
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient in this table was determined only for the crystalline phase. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Knyazeva and Vasil''ev, 1972. The calculation inputs are not stored in this extract, so the row is quoted_attributed rather than model_derived.'
+        alpha_as_printed: '0.79 ± 0.20*'
+        alpha: '0.79'
+        crucible_or_matrix_as_printed: 'Ni'
+        gas_phase_component_as_printed: 'Ca'
+        temperature_K_as_printed: '1283–1473'
+      phase: cr
+      T_range_K:
+      - 1283
+      - 1473
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.20'
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 1617–1728
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Claasen and Veenemans, 1933. The calculation inputs are not stored in this extract, so the row is quoted_attributed rather than model_derived.'
+        alpha_as_printed: '1.11 ± 0.30*'
+        alpha: '1.11'
+        crucible_or_matrix_as_printed: 'Pt'
+        temperature_K_as_printed: '1617–1728'
+      phase: cr
+      T_range_K:
+      - 1617
+      - 1728
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.30'
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r04_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 1773–2173
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Sata et al., 1982. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.80–0.52'
+        alpha_range_as_printed: '0.80–0.52'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '1773–2173'
+      phase: cr
+      T_range_K:
+      - 1773
+      - 2173
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r05_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 1873–2173
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Hashimoto et al., 1989. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '1.00'
+        alpha: '1.00'
+        crucible_or_matrix_as_printed: 'C'
+        temperature_K_as_printed: '1873–2173'
+      phase: cr
+      T_range_K:
+      - 1873
+      - 2173
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r07_c08
+      type: alpha
+      locator:
+        page: 7
+        pdf_page_index: 6
+        table: '5'
+        row_label: CaO
+        column_header: αvap (cr)
+        published_page: 1086
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        alpha_as_printed: '0.66 ± 0.15'
+        alpha: '0.66'
+      phase: cr
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.15'
+    - observation_id: shornikov_2015_cao_liq_hypothesis
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1084
+        note: 'Published p. 1084: the paper says the theory of vaporization gives sound grounds to believe that αvap of CaO, MgO, and TiO2 for the liquid phase equals one, and calls that a hypothesis. Conclusions on published p. 1087 say the liquid coefficients of all six oxides equal one. No temperature and no uncertainty are printed for these three. FeO, Al2O3, and SiO2 liquid values are separate rows with printed uncertainties.'
+        paragraph: Liquid-phase hypothesis
+      units: dimensionless
+      uncertainty:
+        note: No uncertainty is printed. The paper says the liquid coefficient is equal to one.
+      values:
+        quantity: alpha
+        method_class: author_estimate
+        attribution: Shornikov (2015) hypothesis for the liquid oxide. Conclusions restate it as equal to one.
+        alpha: '1'
+        alpha_as_printed: 'equal to one'
+        model: hypothesis that the liquid vaporization coefficient equals one
+      phase: l
+  MgO:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r02_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: 1621–2133
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the MgO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Sata, 1983. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.04–0.21'
+        alpha_range_as_printed: '0.04–0.21'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '1621–2133'
+      phase: cr
+      T_range_K:
+      - 1621
+      - 2133
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r03_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: 1673–2073
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the MgO coefficient in this table was determined only for the crystalline phase. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Sasamoto et al., 1974. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.10–0.34'
+        alpha_range_as_printed: '0.10–0.34'
+        crucible_or_matrix_as_printed: 'W'
+        gas_phase_component_as_printed: 'Mg'
+        temperature_K_as_printed: '1673–2073'
+      phase: cr
+      T_range_K:
+      - 1673
+      - 2073
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r04_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: 1685–2089
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the MgO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Sata and Lee, 1978. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.06–0.17'
+        alpha_range_as_printed: '0.06–0.17'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '1685–2089'
+      phase: cr
+      T_range_K:
+      - 1685
+      - 2089
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r05_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: 1800–1900
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the MgO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Peleg and Alcock, 1974. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.25–0.40'
+        alpha_range_as_printed: '0.25–0.40'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '1800–1900'
+      phase: cr
+      T_range_K:
+      - 1800
+      - 1900
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r06_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: 1820–1960
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the MgO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Alcock and Peleg, 1967. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.25'
+        alpha: '0.25'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '1820–1960'
+      phase: cr
+      T_range_K:
+      - 1820
+      - 1960
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r07_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: 1873–2173
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the MgO coefficient in this table was determined only for the crystalline phase. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Hashimoto, 1990. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.12–0.22'
+        alpha_range_as_printed: '0.12–0.22'
+        crucible_or_matrix_as_printed: 'C'
+        gas_phase_component_as_printed: 'Mg'
+        temperature_K_as_printed: '1873–2173'
+      phase: cr
+      T_range_K:
+      - 1873
+      - 2173
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r08_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: '2273'
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the MgO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Kronert and Boehm, 1972. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.09'
+        alpha: '0.09'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '2273'
+      phase: cr
+      T_range_K:
+      - 2273
+      - 2273
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r09_c04
+      type: alpha
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: 2273–2573
+        column_header: αvap
+        published_page: 1082
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the MgO coefficient in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Lukin and Poluboyarinov, 1964. The calculation inputs are not stored in this extract, so the row is quoted_attributed rather than model_derived.'
+        alpha_as_printed: '0.59 ± 0.20*'
+        alpha: '0.59'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '2273–2573'
+      phase: cr
+      T_range_K:
+      - 2273
+      - 2573
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.20'
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r06_c08
+      type: alpha
+      locator:
+        page: 7
+        pdf_page_index: 6
+        table: '5'
+        row_label: MgO
+        column_header: αvap (cr)
+        published_page: 1086
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        alpha_as_printed: '0.50 ± 0.20'
+        alpha: '0.50'
+      phase: cr
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.20'
+    - observation_id: shornikov_2015_mgo_liq_hypothesis
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1084
+        note: 'Published p. 1084: the paper says the theory of vaporization gives sound grounds to believe that αvap of CaO, MgO, and TiO2 for the liquid phase equals one, and calls that a hypothesis. Conclusions on published p. 1087 say the liquid coefficients of all six oxides equal one. No temperature and no uncertainty are printed for these three. FeO, Al2O3, and SiO2 liquid values are separate rows with printed uncertainties.'
+        paragraph: Liquid-phase hypothesis
+      units: dimensionless
+      uncertainty:
+        note: No uncertainty is printed. The paper says the liquid coefficient is equal to one.
+      values:
+        quantity: alpha
+        method_class: author_estimate
+        attribution: Shornikov (2015) hypothesis for the liquid oxide. Conclusions restate it as equal to one.
+        alpha: '1'
+        alpha_as_printed: 'equal to one'
+        model: hypothesis that the liquid vaporization coefficient equals one
+      phase: l
+  Al2O3:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r02_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 1873–2300
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Hashimoto et al., 1989. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.35'
+        alpha: '0.35'
+        crucible_or_matrix_as_printed: 'C'
+        temperature_K_as_printed: '1873–2300'
+      T_range_K:
+      - 1873
+      - 2300
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r03_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 1873–2063
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper calls this Takigawa estimate the vaporization coefficient of an Al2O3 crystal. The prose once spells the name Tokigawa; the table spelling is kept. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Takigawa et al., 2012. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.10–0.01'
+        alpha_range_as_printed: '0.10–0.01'
+        crucible_or_matrix_as_printed: 'Ir'
+        temperature_K_as_printed: '1873–2063'
+      T_range_K:
+      - 1873
+      - 2063
+      phase: cr
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r04_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 2077–2322
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Sata, 1983. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.11–1.00'
+        alpha_range_as_printed: '0.11–1.00'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '2077–2322'
+      T_range_K:
+      - 2077
+      - 2322
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r05_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 2128–2318
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Burns et al., 1964; Burns, 1966. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.28–0.30'
+        alpha_range_as_printed: '0.28–0.30'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        gas_phase_component_as_printed: 'Al'
+        temperature_K_as_printed: '2128–2318'
+      T_range_K:
+      - 2128
+      - 2318
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r06_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 2128–2318
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Burns et al., 1964; Burns, 1966. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.20–0.29'
+        alpha_range_as_printed: '0.20–0.29'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        gas_phase_component_as_printed: 'AlO'
+        temperature_K_as_printed: '2128–2318'
+      T_range_K:
+      - 2128
+      - 2318
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r07_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 2128–2318
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Burns et al., 1964; Burns, 1966. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.19–0.27'
+        alpha_range_as_printed: '0.19–0.27'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        gas_phase_component_as_printed: 'Al2O'
+        temperature_K_as_printed: '2128–2318'
+      T_range_K:
+      - 2128
+      - 2318
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r08_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 2128–2318
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Burns et al., 1964; Burns, 1966. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.26–0.28'
+        alpha_range_as_printed: '0.26–0.28'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        gas_phase_component_as_printed: 'O'
+        temperature_K_as_printed: '2128–2318'
+      T_range_K:
+      - 2128
+      - 2318
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r09_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 2000–2318
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Fu and Burns, 1976. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.33'
+        alpha: '0.33'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        gas_phase_component_as_printed: 'Al, AlO, Al2O, O'
+        temperature_K_as_printed: '2000–2318'
+      T_range_K:
+      - 2000
+      - 2318
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r10_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 1800–1900
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Peleg and Alcock, 1974. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.24–0.49'
+        alpha_range_as_printed: '0.24–0.49'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        temperature_K_as_printed: '1800–1900'
+      T_range_K:
+      - 1800
+      - 1900
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r11_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: '2000'
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Kronert and Boehm, 1972. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.14'
+        alpha: '0.14'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '2000'
+      T_range_K:
+      - 2000
+      - 2000
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r12_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 2000–2310
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      - non_numeric_in_numeric_column
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Wolff and Alcock, 1962. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.067–0.18'
+        alpha_range_as_printed: '0.067–0.18'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '2000–2310'
+      T_range_K:
+      - 2000
+      - 2310
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r13_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: '2290'
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Alcock and Peleg, 1967. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.18'
+        alpha: '0.18'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '2290'
+      T_range_K:
+      - 2290
+      - 2290
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r14_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: '2300'
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Srivastava and Farber, 1981. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.20'
+        alpha: '0.20'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        gas_phase_component_as_printed: 'Al, AlO, O'
+        temperature_K_as_printed: '2300'
+      T_range_K:
+      - 2300
+      - 2300
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r15_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: '2300'
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Srivastava and Farber, 1981. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.10'
+        alpha: '0.10'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        gas_phase_component_as_printed: 'Al2O'
+        temperature_K_as_printed: '2300'
+      T_range_K:
+      - 2300
+      - 2300
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r16_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: '2300'
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Srivastava and Farber, 1981. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.02'
+        alpha: '0.02'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        gas_phase_component_as_printed: 'Al2O2'
+        temperature_K_as_printed: '2300'
+      T_range_K:
+      - 2300
+      - 2300
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r17_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: '2300'
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Srivastava and Farber, 1981. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.01'
+        alpha: '0.01'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        gas_phase_component_as_printed: 'AlO2'
+        temperature_K_as_printed: '2300'
+      T_range_K:
+      - 2300
+      - 2300
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r18_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: '2318'
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper assigns αvap(Al2O3, liq) = 1.0 ± 0.2 to the melting-temperature jump and cites these Burns 2318 K and Drowart 2327–2594 K rows. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Burns et al., 1964; Burns, 1966. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '1.0 ± 0.2'
+        alpha: '1.0'
+        crucible_or_matrix_as_printed: 'Al2O3'
+        gas_phase_component_as_printed: 'Al, AlO, Al2O, O'
+        temperature_K_as_printed: '2318'
+      T_range_K:
+      - 2318
+      - 2318
+      phase: l
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.2'
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r19_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 2327–2594
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper assigns αvap(Al2O3, liq) = 1.0 ± 0.2 to the melting-temperature jump and cites these Burns 2318 K and Drowart 2327–2594 K rows. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Drowart et al., 1960. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '1.0 ± 0.2'
+        alpha: '1.0'
+        crucible_or_matrix_as_printed: 'W, Mo'
+        gas_phase_component_as_printed: 'Al, AlO, Al2O, O'
+        temperature_K_as_printed: '2327–2594'
+      T_range_K:
+      - 2327
+      - 2594
+      phase: l
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.2'
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r20_c04
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '3'
+        row_label: 2330–2500
+        column_header: αvap
+        published_page: 1083
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 3 mixes crystalline and liquid Al2O3 rows. This row is not individually labeled, so no phase is assigned. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Hashimoto et al., 1989. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '0.35'
+        alpha: '0.35'
+        crucible_or_matrix_as_printed: 'C'
+        temperature_K_as_printed: '2330–2500'
+      T_range_K:
+      - 2330
+      - 2500
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r05_c08
+      type: alpha
+      locator:
+        page: 7
+        pdf_page_index: 6
+        table: '5'
+        row_label: $Al_2O_3$
+        column_header: αvap (cr)
+        published_page: 1086
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. The abstract, the discussion on published p. 1083, and the conclusions print the recommended crystalline value as 0.33 ± 0.02. That prose value is a separate observation. This cell is kept as printed.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        alpha_as_printed: '0.32 ± 0.02'
+        alpha: '0.32'
+      phase: cr
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.02'
+    - observation_id: shornikov_2015_al2o3_cr_recommendation_prose
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1083
+        note: 600 dpi render of PDF p. 4. Abstract (PDF p. 1) and conclusions (published p. 1087) repeat 0.33 ± 0.02. Table 5 prints 0.32 ± 0.02. Both printed numbers are kept.
+        paragraph: Recommended crystalline Al2O3
+      units: dimensionless
+      uncertainty:
+        note: Printed ±0.02 on the recommended αvap(Al2O3, cr).
+        printed: '±0.02'
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Shornikov (2015) recommendation from the Table 3 compilation and the discussion of the melting jump. Per-row inputs are the table, already stored, but this sentence is the author's recommended value rather than one experimental cell.
+        alpha: '0.33'
+        alpha_as_printed: '0.33 ± 0.02'
+      phase: cr
+  SiO2:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r02_c04
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '4'
+        row_label: 1692–1739
+        column_header: αvap
+        published_page: 1084
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper recommends αvap(SiO2, cr) from these partial coefficients. The row's upper temperature is below the stated melting temperature 1996 ± 5 K. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Firsova and Nesmeyanov, 1960. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '$(2.2–3.6) \times 10^{-2}$'
+        alpha_range_as_printed: '0.022–0.036'
+        crucible_or_matrix_as_printed: 'Mo, W, Ir, Pt–Rh'
+        gas_phase_component_as_printed: 'SiO'
+        temperature_K_as_printed: '1692–1739'
+      T_range_K:
+      - 1692
+      - 1739
+      phase: cr
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r03_c04
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '4'
+        row_label: 1700–1950
+        column_header: αvap
+        published_page: 1084
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper recommends αvap(SiO2, cr) from these partial coefficients. The row's upper temperature is below the stated melting temperature 1996 ± 5 K. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Shornikov et al., 1998, 1999. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '$(2.23 \pm 0.30) \times 10^{-2}$'
+        alpha: '0.0223'
+        crucible_or_matrix_as_printed: 'Mo, W, Ir, Pt–Rh'
+        gas_phase_component_as_printed: 'SiO'
+        temperature_K_as_printed: '1700–1950'
+      T_range_K:
+      - 1700
+      - 1950
+      phase: cr
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.0030'
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r04_c04
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '4'
+        row_label: 1800–1950
+        column_header: αvap
+        published_page: 1084
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper recommends αvap(SiO2, cr) from these partial coefficients. The row's upper temperature is below the stated melting temperature 1996 ± 5 K. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Nagai et al., 1973. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '$(2.2 \pm 0.8) \times 10^{-2}$'
+        alpha: '0.022'
+        crucible_or_matrix_as_printed: 'Pt–Rh, ZrO2–CaO'
+        gas_phase_component_as_printed: 'SiO'
+        temperature_K_as_printed: '1800–1950'
+      T_range_K:
+      - 1800
+      - 1950
+      phase: cr
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.008'
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r05_c04
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '4'
+        row_label: 1833–1958
+        column_header: αvap
+        published_page: 1084
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper recommends αvap(SiO2, cr) from these partial coefficients. The row's upper temperature is below the stated melting temperature 1996 ± 5 K. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Hashimoto, 1990. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '$(1.1–1.5) \times 10^{-2}$'
+        alpha_range_as_printed: '0.011–0.015'
+        crucible_or_matrix_as_printed: 'C'
+        temperature_K_as_printed: '1833–1958'
+      T_range_K:
+      - 1833
+      - 1958
+      phase: cr
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r06_c04
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '4'
+        row_label: 1850–1950
+        column_header: αvap
+        published_page: 1084
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper recommends αvap(SiO2, cr) from these partial coefficients. The row's upper temperature is below the stated melting temperature 1996 ± 5 K. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Shornikov et al., 1998, 1999. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '$(1.80 \pm 0.41) \times 10^{-2}$'
+        alpha: '0.0180'
+        crucible_or_matrix_as_printed: 'Mo'
+        gas_phase_component_as_printed: 'SiO2'
+        temperature_K_as_printed: '1850–1950'
+      T_range_K:
+      - 1850
+      - 1950
+      phase: cr
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.0041'
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r07_c04
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '4'
+        row_label: 1850–1950
+        column_header: αvap
+        published_page: 1084
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper recommends αvap(SiO2, cr) from these partial coefficients. The row's upper temperature is below the stated melting temperature 1996 ± 5 K. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Shornikov et al., 1998, 1999. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '$(1.62 \pm 0.47) \times 10^{-2}$'
+        alpha: '0.0162'
+        crucible_or_matrix_as_printed: 'Mo'
+        gas_phase_component_as_printed: 'Si2O2'
+        temperature_K_as_printed: '1850–1950'
+      T_range_K:
+      - 1850
+      - 1950
+      phase: cr
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.0047'
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r08_c04
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '4'
+        row_label: 1873–1973
+        column_header: αvap
+        published_page: 1084
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper recommends αvap(SiO2, cr) from these partial coefficients. The row's upper temperature is below the stated melting temperature 1996 ± 5 K. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Nagahara, 1993. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '$2 \times 10^{-2}$'
+        alpha: '0.02'
+        crucible_or_matrix_as_printed: 'W'
+        temperature_K_as_printed: '1873–1973'
+      T_range_K:
+      - 1873
+      - 1973
+      phase: cr
+      uncertainty:
+        note: No uncertainty is printed on this αvap cell.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r09_c04
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '4'
+        row_label: 2000–2100
+        column_header: αvap
+        published_page: 1084
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the SiO2 vaporization rate jumps at the stated melting temperature 1996 ± 5 K to αvap(SiO2, liq) = 1.00 ± 0.02. This is that table cell. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. The prose states αvap(SiO2, liq) = 1.00 ± 0.02 at the melting jump. That sentence is this cell, not a second row. MinerU math wrappers in the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Shornikov et al., 1998, 1999. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '$1.00 \pm 0.02$'
+        alpha: '1.00'
+        crucible_or_matrix_as_printed: 'Mo, W, Ir, Pt–Rh'
+        gas_phase_component_as_printed: 'SiO, SiO2, Si2O2'
+        temperature_K_as_printed: '2000–2100'
+      T_range_K:
+      - 2000
+      - 2100
+      phase: l
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.02'
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r10_c04
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '4'
+        row_label: 2173–2373
+        column_header: αvap
+        published_page: 1084
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. This Hashimoto row is above the stated SiO2 melting temperature, and the paper says that work did not show the melting jump. Phase is not assigned. The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags:
+      - en_dash_minus
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Compiled from Hashimoto, 1990. That experiment is not stored in this extract, so the row is quoted_attributed.
+        alpha_as_printed: '$(3.8–4.8) \times 10^{-2}$'
+        alpha_range_as_printed: '0.038–0.048'
+        crucible_or_matrix_as_printed: 'C'
+        temperature_K_as_printed: '2173–2373'
+      T_range_K:
+      - 2173
+      - 2373
+      uncertainty:
+        note: The cell is a printed range, kept in printed order. No midpoint is stored.
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r03_c08
+      type: alpha
+      locator:
+        page: 7
+        pdf_page_index: 6
+        table: '5'
+        row_label: $SiO_2$
+        column_header: αvap (cr)
+        published_page: 1086
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. The abstract, the SiO2 discussion, and the conclusions print (2.2 ± 0.3) × 10^{−2}, which is this same 0.022 ± 0.003. It is not stored twice.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        alpha_as_printed: '0.022 ± 0.003'
+        alpha: '0.022'
+      phase: cr
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.003'
+    context:
+    - observation_id: shornikov_2015_fig1_curves_not_read
+      type: figure_context
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 1085
+        figure: '1'
+        note: Two panels, log p (atm) versus 10^4/T, with a top T axis. Panel (a) is SiO and panel (b) is SiO2. Lines 1–6 are continuous calculated or previously published curves. No discrete measurement markers. The lines overlap on a log axis, so no point was read.
+      units: not applicable
+      values:
+        method_class: quoted_unattributed
+        reason: context only; curve digitizing on this log plot is refused
+        caption_as_printed: (1) total vapor pressure over SiO2 estimated according to Langmuir (Hashimoto, 1990) from a graphite crucible; (2–5) partial pressures of SiO or SiO2 by Knudsen effusion mass spectrometry (Shornikov et al., 1998, 1999) from Pt, Ir, W, and Mo cells; (6) calculated in this publication from Glushko et al. (1978–1982) for chemically neutral conditions.
+    - observation_id: shornikov_2015_fig2_stars_not_read
+      type: figure_context
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 1086
+        figure: '2'
+        note: 'log αvap(i, cr) versus ΔSmelt. Labeled stars and one fitted curve. The CAI oxides repeat Table 5. BeO, BaO, Ga2O3, In2O3, and SnO2 have no table, and the stars were not read: the log axis is small and a stated uncertainty would be an invention.'
+      units: not applicable
+      values:
+        method_class: quoted_unattributed
+        reason: context only; star coordinates were not read
+    - observation_id: shornikov_2015_table5_thermo_columns_out_of_scope
+      type: out_of_scope_table
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 1086
+        table: '5'
+        note: Only the αvap (cr) column is in scope. The other numeric columns were not emitted.
+      units: as printed in the refused columns
+      values:
+        method_class: quoted_unattributed
+        refused_columns:
+        - condensed ΔHf,298
+        - condensed ΔSf,298
+        - Tmelt
+        - ΔHmelt
+        - ΔSmelt
+        - ΔHsubl
+        - gas ΔHf,0
+        - gas ΔSf,298
+        - ΔHat,0
+        reason: 'Outside the requested quantities: oxide activities, activity coefficients, partial pressures, vapour species, partial Gibbs energies, and evaporation coefficients.'
+  TiO2:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r04_c08
+      type: alpha
+      locator:
+        page: 7
+        pdf_page_index: 6
+        table: '5'
+        row_label: $TiO_2$
+        column_header: αvap (cr)
+        published_page: 1086
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        alpha_as_printed: '0.23 ± 0.02'
+        alpha: '0.23'
+      phase: cr
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.02'
+    - observation_id: shornikov_2015_tio2_semenov_1920k
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1083
+        note: 600 dpi render of PDF p. 4. Semenov (1969) value at 1920 K by the Komlev equation. The recommended 0.23 ± 0.02 is the separate Table 5 cell, not this row.
+        paragraph: Semenov TiO2
+      units: dimensionless
+      uncertainty:
+        note: Printed ±0.04 on αvap(TiO2, cr) at 1920 K.
+        printed: '±0.04'
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Semenov (1969), as quoted by Shornikov (2015). The Semenov paper is not stored in this extract.
+        alpha: '0.20'
+        alpha_as_printed: '0.20 ± 0.04'
+        temperature_K_as_printed: '1920'
+        gas_phase_component_as_printed: 'TiO'
+      phase: cr
+      T_range_K:
+      - 1920
+      - 1920
+    - observation_id: shornikov_2015_tio2_liq_hypothesis
+      type: alpha
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1084
+        note: 'Published p. 1084: the paper says the theory of vaporization gives sound grounds to believe that αvap of CaO, MgO, and TiO2 for the liquid phase equals one, and calls that a hypothesis. Conclusions on published p. 1087 say the liquid coefficients of all six oxides equal one. No temperature and no uncertainty are printed for these three. FeO, Al2O3, and SiO2 liquid values are separate rows with printed uncertainties.'
+        paragraph: Liquid-phase hypothesis
+      units: dimensionless
+      uncertainty:
+        note: No uncertainty is printed. The paper says the liquid coefficient is equal to one.
+      values:
+        quantity: alpha
+        method_class: author_estimate
+        attribution: Shornikov (2015) hypothesis for the liquid oxide. Conclusions restate it as equal to one.
+        alpha: '1'
+        alpha_as_printed: 'equal to one'
+        model: hypothesis that the liquid vaporization coefficient equals one
+      phase: l
+  FeO:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r08_c08
+      type: alpha
+      locator:
+        page: 7
+        pdf_page_index: 6
+        table: '5'
+        row_label: FeO
+        column_header: αvap (cr)
+        published_page: 1086
+        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells; the scratch copy retagged them to body so ± and range cells could be emitted. Table 5 column header is αvap (cr). Table 5 does not print a temperature for αvap. The melting temperature in another column is not used. The abstract, the discussion on published p. 1083, and the conclusions print 1.00 ± 0.20 for crystalline FeO. That prose value, with 1373–1623 K, is a separate observation. This cell is kept as printed.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated in the abstract and the conclusions where the printed values agree.
+        alpha_as_printed: '1.00 ± 0.30'
+        alpha: '1.00'
+      phase: cr
+      uncertainty:
+        note: Printed plus-minus on the αvap cell. The central value is values.alpha.
+        printed: '±0.30'
+    - observation_id: shornikov_2015_feo_cr_prose
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1083
+        note: The sentence starts at the bottom of published p. 1082 and the value is printed on published p. 1083. 600 dpi render of PDF p. 4. This is not the Table 5 cell, which prints 1.00 ± 0.30.
+        paragraph: Crystalline Fe oxide
+      units: dimensionless
+      uncertainty:
+        note: Printed ±0.20 on αvap(FeO, cr).
+        printed: '±0.20'
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: Evaluated in this study from Darken and Gurry (1946) and thermochemical data in Glushko et al. (1978–1982). The inputs are not stored here, so the row is quoted_attributed rather than model_derived.
+        alpha: '1.00'
+        alpha_as_printed: '1.00 ± 0.20'
+        temperature_K_as_printed: '1373–1623'
+      phase: cr
+      T_range_K:
+      - 1373
+      - 1623
+    - observation_id: shornikov_2015_feo_liq_prose
+      type: alpha
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1083
+        note: 600 dpi render of PDF p. 4. The paper does not print a temperature for this liquid coefficient.
+        paragraph: Liquid FeO
+      units: dimensionless
+      uncertainty:
+        note: Printed ±0.10 on αvap(FeO, liq).
+        printed: '±0.10'
+      values:
+        quantity: alpha
+        method_class: quoted_attributed
+        attribution: The paper says consistency of Knudsen partial pressures over liquid FeO (Drowart et al., 1968) with Darken and Gurry (1946) shows this value. Wang et al. (1994) is cited as closely similar. Those sources are not stored here.
+        alpha: '1.00'
+        alpha_as_printed: '1.00 ± 0.10'
+      phase: l
+fidelity_samples:
+- species: CaO
+  observable: alpha
+  observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r07_c08
+  field: alpha
+  value: '0.66'
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1086
+    note: Fidelity pin of values.alpha
+- species: MgO
+  observable: alpha
+  observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r06_c08
+  field: alpha
+  value: '0.50'
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1086
+    note: Fidelity pin of values.alpha
+- species: Al2O3
+  observable: alpha
+  observation_id: shornikov_2015_al2o3_cr_recommendation_prose
+  field: alpha
+  value: '0.33'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1083
+    note: Fidelity pin of values.alpha
+- species: SiO2
+  observable: alpha
+  observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r03_c08
+  field: alpha
+  value: '0.022'
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1086
+    note: Fidelity pin of values.alpha
+- species: TiO2
+  observable: alpha
+  observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r04_c08
+  field: alpha
+  value: '0.23'
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1086
+    note: Fidelity pin of values.alpha
+- species: FeO
+  observable: alpha
+  observation_id: shornikov_2015_feo_cr_prose
+  field: alpha
+  value: '1.00'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1083
+    note: Fidelity pin of values.alpha
