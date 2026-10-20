@@ -907,9 +907,10 @@ class CampaignManager:
           domain, so C3_NA evaporates more Mg into process.overhead_gas
           (measured CI path: ~19 kg → ~51 kg rate-hour sum; ~17 kg holdup
           remains at C4 entry).
-        - C4 controlled-O2 pipe capacity at p_total=0.2 mbar is ~0.35 kg/hr
-          with binding controlled_o2_no_equipment; demand≈holdup/dt saturates
-          transport at tens of × capacity and zeros ΔT/dt for ~50–75 h.
+        - On the former C4 default (p_total=0.2 mbar), controlled-O2 pipe
+          capacity was ~0.35 kg/hr with binding controlled_o2_no_equipment;
+          demand≈holdup/dt saturated transport at tens of × capacity and
+          zeroed ΔT/dt for ~50–75 h.
         - Wall-clock acquisition then refuses at 60 h while T is still the
           C3 carry-in (~1150 C), never giving the 42 h nominal preheat.
         - Opportunity hours exclude fully transport-throttled isothermal
@@ -1240,8 +1241,8 @@ class CampaignManager:
                         C2A_STAGED_PN2_SWEEP_MAX_MBAR,
                     ],
                 })
-            # SC-67 recompute-and-adjust (t-185): the viscous-flow band is a
-            # computable, non-empty feasible set, so an out-of-band configured
+            # SC-67 recompute-and-adjust (t-185): the configured N2 engineering
+            # band is a computable, non-empty feasible set, so an out-of-band
             # p_total adjusts to the nearest band edge like a physical
             # regulator hitting its limit stop — LOUDLY: requested vs applied
             # and the band action are recorded in the diagnostic
@@ -1524,13 +1525,23 @@ class CampaignManager:
             melt.p_total_mbar = self._pressure_config_float(
                 cfg, 'p_total_mbar', 'p_total_mbar_default', 1.0)
 
-        elif campaign == CampaignPhase.C4:
+        elif campaign in (CampaignPhase.C4, CampaignPhase.C6):
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
             melt.pO2_mbar = self._pressure_config_float(
                 cfg, 'pO2_mbar', 'pO2_mbar_default', 0.2)
             melt.p_total_mbar = self._pressure_config_float(
                 cfg, 'p_total_mbar', 'p_total_mbar_default', 0.2)
+            continuum_bounds = cfg.get('continuum_pressure_bounds')
+            if isinstance(continuum_bounds, Mapping):
+                carrier_gas = continuum_bounds.get('carrier_gas')
+                if carrier_gas and melt.p_total_mbar > melt.pO2_mbar:
+                    # Partial pressures add: p_total = pO2 + pN2. When the
+                    # non-O2 share is positive, stamp its configured carrier.
+                    melt.background_gas_species = _canonical_carrier_gas_key(
+                        str(carrier_gas)
+                    )
+                    melt.background_gas_mole_fraction = 1.0
 
         elif campaign == CampaignPhase.C5:
             cfg = self._campaign_config(campaign)
@@ -1539,14 +1550,6 @@ class CampaignManager:
                 cfg, 'pO2_mbar', 'pO2_mbar_default', 50.0)
             melt.p_total_mbar = self._pressure_config_float(
                 cfg, 'p_total_mbar', 'p_total_mbar_default', 50.0)
-
-        elif campaign == CampaignPhase.C6:
-            cfg = self._campaign_config(campaign)
-            melt.atmosphere = Atmosphere.CONTROLLED_O2
-            melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.2)
-            melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 0.2)
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             cfg = self._campaign_config(campaign)
@@ -2537,8 +2540,9 @@ class CampaignManager:
                 # acquisition_limit + process_limit (both setpoint-sourced;
                 # a flat wall-hours cap is WRONG — the honest CI Pref_GF path
                 # acquires near wall hour 120-135 and would trip it).
-                # Unit: hours. Sanity: CI path holds ~50-90 h (17 kg holdup
-                # at ~0.35 kg/hr) < 100 h budget, unaffected; a plant held
+                # Unit: hours. Sanity: the former 0.2 mbar-default CI path
+                # holds ~50-90 h (17 kg holdup at ~0.35 kg/hr) < 100 h
+                # budget, unaffected; a plant held
                 # 100+ hours with no ramp deserves the typed refusal (raise
                 # the setpoints if a feedstock legitimately needs longer).
                 if (

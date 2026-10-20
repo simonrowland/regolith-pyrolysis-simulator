@@ -317,9 +317,10 @@ def test_c4_unreachable_window_is_typed_acquisition_refusal() -> None:
 def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
     """Loop-3 full transport holds must not spend max_target_acquisition_hr.
 
-    b-147 Pref_GF leaves ~17 kg C3 overhead holdup into C4; controlled_o2
-    pipe capacity ~0.35 kg/hr zeros the ramp for tens of hours. The 60 h
-    acquisition budget is preheat opportunity, not holdup-drain wall clock.
+    b-147 Pref_GF leaves ~17 kg C3 overhead holdup into C4; at the former
+    0.2 mbar C4 default, controlled_o2 pipe capacity ~0.35 kg/hr zeroed the
+    ramp for tens of hours. The 60 h acquisition budget is preheat
+    opportunity, not holdup-drain wall clock.
     """
     setpoints = _setpoints()
     setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 3.0

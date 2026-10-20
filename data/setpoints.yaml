@@ -140,7 +140,7 @@ campaigns:
       peak_SiO_window_1400_1600C: [5, 10]
     atmosphere: "recirculating_inert_sweep"
     carrier_gas: "pN2"                   # optimal; pKr preferred fallback (condenses ~30 K above LOX -> clean cryo separation); pAr legacy (3 K from LOX, avoid)
-    p_total_mbar: [5, 15]               # optimal 8-12 mbar viscous-flow regime
+    p_total_mbar: [5, 15]               # N2 engineering margin for capacity and geometry variation
     pO2_mbar: null                       # <1e-5 mbar; maintained by Fe-granule sorbent
     pO2_mbar_default: 0.0
     p_total_mbar_default: 10.0
@@ -429,12 +429,14 @@ campaigns:
     atmosphere: "controlled_O2"
     pO2_mbar: [0.08, 0.35]
     pO2_mbar_default: 0.2
-    p_total_mbar_default: 0.2
-    # The N2 continuum floor derives from hard-sphere kinetic theory:
+    p_total_mbar_default: 10.2
+    # The N2 operating band is an engineering margin for capacity and
+    # geometry variation. Its midpoint is 10 mbar; adding 0.2 mbar pO2 gives
+    # p_total = pO2 + pN2 = 10.2 mbar. Separately, the transport reference
+    # floor derives from hard-sphere kinetic theory:
     # p_min = k_B*T/(sqrt(2)*pi*sigma_N2^2*Kn_max*D), with T=1670 C,
     # sigma_N2=3.798e-10 m, Kn_max=0.01, and hot-wall D=0.12 m. The
-    # formula returns Pa; divide by 100 for mbar. The operational 5-15 mbar
-    # pN2 band keeps Kn well below 0.01. Derive total pressure as pO2+pN2.
+    # formula returns Pa; divide by 100 for mbar.
     # The optimizer pressure-cap chunk consumes this data; it is not a clamp.
     continuum_pressure_bounds:
       pN2_mbar: [5.0, 15.0]
@@ -574,11 +576,13 @@ campaigns:
     atmosphere: "controlled_O2"          # bakeout atmosphere for Mg recovery
     pO2_mbar: [0.08, 0.35]              # bakeout pO2
     pO2_mbar_default: 0.2
-    p_total_mbar_default: 0.2
-    # Same N2 continuum derivation and operational band as C4, evaluated at
-    # the selected C6 static hold 1400 C: k_B*(1400+273.15) /
+    p_total_mbar_default: 10.2
+    # The N2 operating band is an engineering margin for capacity and
+    # geometry variation. Its midpoint is 10 mbar; adding 0.2 mbar pO2 gives
+    # p_total = pO2 + pN2 = 10.2 mbar. Separately, the transport reference
+    # floor is evaluated at the selected C6 static hold 1400 C:
+    # k_B*(1400+273.15) /
     # (sqrt(2)*pi*(3.798e-10 m)^2*0.12 m*0.01) = 30.037 Pa = 0.300374 mbar.
-    # The 5.0 mbar operating floor remains conservative at 16.65x that minimum.
     continuum_pressure_bounds:
       pN2_mbar: [5.0, 15.0]
       derived_pN2_floor_mbar: 0.300374

@@ -58,7 +58,7 @@ Under JANAF-4th multiphase Ellingham (2026-07-09 re-ground):
 
 `run_metadata.knudsen_regime_diagnostic` reports the transport-regime check per pipe segment:
 
-- `status: "ok"`, `regime: "viscous"` — Kn < 0.01, sweep gas drives directional transport. Default operating condition for the 5–15 mbar pN₂ band.
+- `status: "ok"`, `regime: "viscous"` — Kn < 0.01, sweep gas drives directional transport. The 5–15 mbar pN₂ band is an engineering margin for capacity and geometry variation; the regime is evaluated separately.
 - `status: "warning"`, `regime: "transitional"` — Kn between 0.01 and 10; F3 still computes attenuated HKL flux (`regime_factor = Kn / (Kn + 0.01)`) but you are losing transport-directed condensation and the simulator's stage-yield numbers should be read as a lower bound (see [`docs/model-limitations.md`](model-limitations.md) on viscous-regime mass transfer).
 - `status: "refused"`, `regime: "free_molecular"` — Kn ≥ 10 on at least one segment; `KnudsenRegimeRefusal` escalates the run to `status="refused"`. Recipe is unrunnable at this pN₂; increase sweep gas pressure.
 

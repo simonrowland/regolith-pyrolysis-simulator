@@ -76,13 +76,17 @@ def _n2_lab_schedule() -> dict:
         (CampaignPhase.C2B, 1.5, 1.5, Atmosphere.CONTROLLED_O2),
         (CampaignPhase.C3_K, 1.0, 1.0, Atmosphere.CONTROLLED_O2),
         (CampaignPhase.C3_NA, 1.0, 1.0, Atmosphere.CONTROLLED_O2),
-        (CampaignPhase.C4, 0.2, 0.2, Atmosphere.CONTROLLED_O2),
+        pytest.param(
+            CampaignPhase.C4, 0.2, 10.2, Atmosphere.CONTROLLED_O2, id="C4"
+        ),
         (CampaignPhase.C5, 50.0, 50.0, Atmosphere.O2_BACKPRESSURE),
-        (CampaignPhase.C6, 0.2, 0.2, Atmosphere.CONTROLLED_O2),
+        pytest.param(
+            CampaignPhase.C6, 0.2, 10.2, Atmosphere.CONTROLLED_O2, id="C6"
+        ),
         (CampaignPhase.MRE_BASELINE, 50.0, 50.0, Atmosphere.O2_BACKPRESSURE),
     ],
 )
-def test_configure_campaign_pressure_defaults_match_legacy_constants(
+def test_configure_campaign_pressure_defaults_match_yaml(
     campaign: CampaignPhase,
     pO2_mbar: float,
     p_total_mbar: float,
@@ -115,7 +119,10 @@ def test_campaign_default_applies_declared_n2_engineering_band(
     assert melt.atmosphere is Atmosphere.CONTROLLED_O2
     assert melt.pO2_mbar == pytest.approx(config["pO2_mbar_default"])
     assert melt.background_gas_species == bounds["carrier_gas"]
-    pN2_mbar = melt.p_total_mbar - melt.pO2_mbar
+    assert melt.background_gas_mole_fraction == pytest.approx(1.0)
+    pN2_mbar = (
+        melt.p_total_mbar - melt.pO2_mbar
+    ) * melt.background_gas_mole_fraction
     minimum_pN2_mbar, maximum_pN2_mbar = bounds["pN2_mbar"]
     assert minimum_pN2_mbar <= pN2_mbar <= maximum_pN2_mbar
 
@@ -204,46 +211,29 @@ def test_declared_continuum_floor_matches_its_own_derivation(campaign_name):
 
 
 def test_campaign_default_pressure_versus_its_own_continuum_floor():
-    """Pins WHICH campaigns run a default below their own declared floor.
-
-    ★ This pins a DEFECT, not an expectation. b-326: C4 and C6 both declare a
-    continuum floor and both set p_total_mbar_default BELOW it --
-
-        C4  floor 0.348846 mbar   default 0.2   -> 1.74x below, implied Kn 0.0174
-        C6  floor 0.300374 mbar   default 0.2   -> 1.50x below, implied Kn 0.0150
-
-    against a declared knudsen_max of 0.01. The consequence is real: the
-    viscous-flow refusal that makes C4 unreachable is CORRECT -- the recipe is
-    asking for a pressure its own derivation forbids.
-
-    Resolving it is a physics call (either the 0.2 defaults are wrong, or these
-    campaigns knowingly operate transitional and need a conductance model
-    rather than a continuum P_bulk), so it is owner-gated and NOT fixed here.
-
-    Pinned as the exact violating SET rather than left red or xfailed, because
-    the set is what carries information: fixing one campaign, or a third
-    campaign regressing, both change it and both fail this test. An xfail would
-    stay silent through either.
-    """
-    known_violations = {"C4", "C6"}
+    """Check resolved N2 partial pressures against the separate transport floor."""
+    setpoints = _setpoints()
+    manager = CampaignManager(setpoints)
 
     violations = {}
     for name, campaign in _campaigns_with_continuum_bounds().items():
-        default_mbar = campaign.get("p_total_mbar_default")
-        if default_mbar is None:
-            continue
         floor = _n2_continuum_floor_mbar(campaign["continuum_pressure_bounds"])
-        if float(default_mbar) < floor:
-            violations[name] = (float(default_mbar), floor)
+        melt = MeltState()
+        manager.configure_campaign(melt, CampaignPhase[name])
+        pN2_mbar = (
+            max(0.0, melt.p_total_mbar - melt.pO2_mbar)
+            * melt.background_gas_mole_fraction
+            if melt.background_gas_species == "N2"
+            else 0.0
+        )
+        if pN2_mbar < floor:
+            violations[name] = (pN2_mbar, floor)
 
-    assert set(violations) == known_violations, (
-        f"the set of campaigns running below their own continuum floor has "
-        f"CHANGED (b-326). Now {sorted(violations)}, previously "
-        f"{sorted(known_violations)}. If a campaign was fixed, drop it from "
-        f"known_violations; if a new one regressed, that is a live defect. "
-        f"Detail: "
+    assert not violations, (
+        f"campaigns whose resolved N2 pressure is below its "
+        f"transport floor changed: {sorted(violations)}. Detail: "
         + "; ".join(
-            f"{n}: default {d} mbar vs floor {f:.6f} mbar ({f / d:.2f}x below)"
+            f"{n}: default {d} mbar vs floor {f:.6f} mbar"
             for n, (d, f) in sorted(violations.items())
         )
     )

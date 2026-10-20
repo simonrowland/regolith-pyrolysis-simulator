@@ -49,14 +49,14 @@ PRESSURE_REGIMES = ("vacuum", "millibar_sweep")
 #   (data/setpoints.yaml C2B pO2_mbar [0.8, 2.3]; pO2_bakeout_mbar [0.5, 1.5]):
 #   the deposit/locally-O-buffered branch.
 # - Below that the overhead is the project-default low-pO2 reducing branch.
-# - Buffer gas at or above ~5 mbar selects the recipe's millibar-sweep wall
-#   branch (CLAUDE.md SS4: ~5-15 mbar pN2 keeps Kn << 0.01). Below that the
-#   advisor uses its conservative "vacuum" bucket; this threshold is not a
-#   Knudsen boundary because the default 0.12 m pipe at ~1 mbar is still
-#   viscous by Kn.
+# - Buffer gas at or above 5 mbar selects the advisor's millibar-sweep wall
+#   branch. The 5-15 mbar N2 operating band is an engineering margin for
+#   capacity and geometry variation; this branch classification is separate
+#   from the transport-regime calculation. Below 5 mbar the advisor uses its
+#   conservative "vacuum" bucket.
 DOSED_O2_PO2_MIN_MBAR = 3.0
 BUFFERED_PO2_MIN_MBAR = 0.5
-VISCOUS_SWEEP_MIN_MBAR = 5.0
+MILLIBAR_SWEEP_MIN_MBAR = 5.0
 
 
 @dataclass(frozen=True)
@@ -132,7 +132,7 @@ def resolve_wall_operating_point(
         po2_regime = "buffered"
     else:
         po2_regime = "reducing"
-    if buffer_pressure is not None and buffer_pressure >= VISCOUS_SWEEP_MIN_MBAR:
+    if buffer_pressure is not None and buffer_pressure >= MILLIBAR_SWEEP_MIN_MBAR:
         pressure_regime = "millibar_sweep"
     else:
         pressure_regime = "vacuum"

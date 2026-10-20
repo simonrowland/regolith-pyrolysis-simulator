@@ -880,7 +880,10 @@ def _c4_point_two_mbar_transitional_run() -> PyrolysisRun:
         hours=1,
         mass_kg=1000,
         backend_name="internal-analytical",
-        setpoints_patch={"furnace_max_T_C": 1200},
+        setpoints_patch={
+            "furnace_max_T_C": 1200,
+            "campaigns": {"C4": {"p_total_mbar_default": 0.2}},
+        },
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
         run_metadata_overrides={
