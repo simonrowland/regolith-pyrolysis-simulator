@@ -27,6 +27,7 @@ from simulator.state import (
     EvaporationFlux,
     MeltState,
     PipeSegment,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
 )
 from simulator.trace import wall_deposit_by_segment_species_kg
 
@@ -880,3 +881,16 @@ def test_lab_surface_deposit_accounts_conserve_and_roll_up_by_surface() -> None:
     assert trace_surface_kg[("window", "SiO")] == pytest.approx(0.0002)
     assert trace_surface_kg[("condenser", "SiO")] == pytest.approx(0.0007)
     assert trace_surface_kg[("filter", "Na")] == pytest.approx(0.00006)
+
+
+def test_wall_deposit_report_includes_formula_only_species() -> None:
+    account = f"{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}stage_4_to_stage_5"
+    ledger = AtomLedger(
+        initial_balances={account: {"In2O": 3.741952825179326e-11}}
+    )
+
+    report = _wall_deposit_report_kg(ledger.mol_by_account())
+
+    assert report["In2O"] == pytest.approx(
+        ledger.project_account_kg(account)["In2O"]
+    )
