@@ -223,6 +223,8 @@ species:
         a ratio, so the figures remain deferred records without numeric points.
       values:
         typed_quantity_as_printed: distribution ratio
+        antimony_slag_to_lead_alloy_ratio: '0.58'
+        antimony_ratio_conditions_as_printed: Na2O-SiO2-SbOn slag / Pb alloy; independent of slag composition
         data_figures:
         - '2'
         - '4'
@@ -340,6 +342,22 @@ species:
   Nb:
     observations: []
     context:
+    - observation_id: tsukihashi_1985_niobium_activity_coefficient_estimates
+      type: context_record
+      locator: {page: 7, published_page: 837, pdf_page_index: 6, section: '3.3'}
+      units: dimensionless
+      candidate_quantities: [activity_coefficient]
+      reason: These are authors' activity-coefficient estimates for Nb in carbon-saturated liquid iron; the earlier estimate is explicitly set aside and the later value is adopted. No pointwise activity data are provided for a typed observation.
+      values:
+        method_class: model_derived
+        phase_as_printed: carbon-saturated liquid iron
+        temperature_as_printed: 1200 °C
+        oxygen_partial_pressure_as_printed: not stated for this estimate
+        CO_pressure_as_printed: 1 atm
+        carbon_activity_as_printed: '1'
+        estimates:
+        - {value: 1.34×10^-4, status: earlier estimate set aside by the authors}
+        - {value: 5.56×10^-3, status: more accurate estimate adopted from NbC solubility}
     - observation_id: tsukihashi_1985_figure_2_nb
       type: figure_record
       locator:

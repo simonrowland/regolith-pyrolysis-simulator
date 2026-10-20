@@ -24,6 +24,19 @@ def test_printed_antimony_activity_coefficient_fit_is_preserved_as_context() -> 
     assert activity["values"]["temperature_as_printed"] == "1200 °C"
     assert activity["values"]["oxygen_partial_pressure_as_printed"] == "8.42×10^-18 atm"
 
+    nb_estimates = next(
+        row for row in document["species"]["Nb"]["context"]
+        if row["observation_id"] == "tsukihashi_1985_niobium_activity_coefficient_estimates"
+    )
+    assert [row["value"] for row in nb_estimates["values"]["estimates"]] == ["1.34×10^-4", "5.56×10^-3"]
+    assert nb_estimates["values"]["estimates"][0]["status"] == "earlier estimate set aside by the authors"
+    assert nb_estimates["values"]["estimates"][1]["status"] == "more accurate estimate adopted from NbC solubility"
+    sb_ratios = next(
+        row for row in document["species"]["Sb"]["context"]
+        if row["observation_id"] == "tsukihashi_1985_distribution_ratios_no_store_token"
+    )
+    assert sb_ratios["values"]["antimony_slag_to_lead_alloy_ratio"] == "0.58"
+
 
 def test_distribution_and_activity_figures_are_deferred_without_points() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
