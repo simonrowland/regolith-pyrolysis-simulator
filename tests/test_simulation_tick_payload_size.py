@@ -454,20 +454,20 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
                 "track": "pyrolysis",
             },
         )
-        rounds = 0
-        while len(tick_samples) < 12 and rounds < 40:
-            rounds += 1
-            if not captured_tasks:
-                break
+        active_sids = set(_simulations) - before
+        assert len(active_sids) == 1
+        state = _simulations[next(iter(active_sids))]
+        while len(tick_samples) < 12:
+            assert captured_tasks, tick_samples
             target = captured_tasks.pop(0)
             target()
-            for event in client.get_received():
-                if event["name"] == "decision_required":
-                    decision = event["args"][0]
-                    client.emit(
-                        "make_decision",
-                        {"choice": decision.get("recommendation")},
-                    )
+            client.get_received()
+            decision = state["session"].pending_decision()
+            if decision is not None:
+                choice = decision.recommendation or (
+                    decision.options[0] if decision.options else ""
+                )
+                client.emit("make_decision", {"choice": choice})
         assert len(tick_samples) >= 12, tick_samples
         for event, hour, size, _serialized in wire_samples:
             assert size < 120_000, (event, hour, size)
@@ -493,9 +493,6 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             for event, _hour, _size, serialized in wire_samples
             if event in {"simulation_tick", "per_hour_summary"}
         )
-        active_sids = set(_simulations) - before
-        assert len(active_sids) == 1
-        state = _simulations[active_sids.pop()]
         captured_summary = state["last_recipe_capture"]["per_hour_summary"]
         assert '"padding"' in json.dumps(captured_summary, default=str)
         history_response = http.get("/api/simulation-history")
