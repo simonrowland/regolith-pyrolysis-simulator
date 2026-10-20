@@ -166,120 +166,36 @@ def test_unknown_evidence_marker_never_scores(extract_comparator, key, nested):
     assert all(set(r["signed_residual"].values()) == {None} for r in rows)
 
 
-def _refusal_reason_definition_literals(tree):
+def test_every_evidence_marker_reader_has_closed_vocabulary():
     import ast
+    from pathlib import Path
+    from simulator.diagnostic_helpers import extract_reproduction as e
 
-    definitions = [
-        node for node in tree.body
-        if isinstance(node, ast.Assign)
-        and any(
-            isinstance(target, ast.Name)
-            and target.id == "_SYSTEM_CLASS_REFUSAL_REASONS"
-            for target in node.targets
-        )
-    ]
-    assert len(definitions) == 1
-    value = definitions[0].value
-    assert (
-        isinstance(value, ast.Call)
-        and isinstance(value.func, ast.Name)
-        and value.func.id == "frozenset"
-        and len(value.args) == 1
-        and isinstance(value.args[0], ast.Set)
-    )
-    elements = value.args[0].elts
-    assert elements and all(
-        isinstance(element, ast.Constant) and isinstance(element.value, str)
-        for element in elements
-    ), "refusal reason frozenset elements must be plain string constants"
-    return set(elements)
-
-
-def _evidence_marker_reader_sites(source, relative):
-    import ast
-
+    root = Path(__file__).resolve().parents[1]
+    # Sample/observable axes are physics, not evidence or admission markers.
     physical_keys = {"system_class", "property_kind", "alpha_kind", "provenance_class",
                      "standard_state_kind"}
     output_keys = {"measurement_kind", "reported_status", "observable_status",
                    "comparator_status", "provider_status", "antoine_provenance_class",
                    "observation_system_class", "claim_kind"}
-    tree = ast.parse(source)
-    refusal_owner = relative == "simulator/diagnostic_helpers/extract_reproduction.py"
-    refusal_definition_literals = (
-        _refusal_reason_definition_literals(tree) if refusal_owner else frozenset()
-    )
-
     readers = []
-    for node in ast.walk(tree):
-        # Scan definitions too: aliases, unpacking, helper calls and
-        # comprehensions must not escape the marker vocabulary guard.
-        if not isinstance(node, ast.Constant) or not isinstance(node.value, str):
-            continue
-        key = node.value
-        if not key.isidentifier():
-            continue
-        if key in physical_keys | output_keys:
-            continue
-        if (key in {"class", "class_tag", "status", "semantics"}
-                or key.startswith("evidence_")
-                or key.endswith(("_class", "_status", "_role", "_kind"))):
-            if node not in refusal_definition_literals:
-                readers.append((relative, node.lineno, key))
-    return readers
-
-
-def test_evidence_marker_scan_exempts_only_refusal_vocabulary_definition():
-    from simulator.diagnostic_helpers import extract_reproduction as e
-
-    refusal_reasons = e._SYSTEM_CLASS_REFUSAL_REASONS
-    reason = next(code for code in refusal_reasons if code.startswith("missing_"))
-    owner = "simulator/diagnostic_helpers/extract_reproduction.py"
-    definition = f"_SYSTEM_CLASS_REFUSAL_REASONS = frozenset({{{reason!r}}})"
-    assert _evidence_marker_reader_sites(
-        definition, owner
-    ) == []
-
-    for unsafe_definition in (
-        f"_SYSTEM_CLASS_REFUSAL_REASONS = frozenset({{(key := {reason!r})}})",
-        f"_SYSTEM_CLASS_REFUSAL_REASONS = frozenset({{payload.get({reason!r})}})",
-    ):
-        with pytest.raises(AssertionError, match="plain string constants"):
-            _evidence_marker_reader_sites(unsafe_definition, owner)
-
-    reassigned_key = f"{definition}\nkey = {reason!r}\npayload.get(key)\nkey = 'ordinary'"
-    assert _evidence_marker_reader_sites(reassigned_key, owner) == [
-        (owner, 2, reason)
-    ]
-    comprehension_key = f"{definition}\n[payload.get(key) for key in ({reason!r},)]"
-    assert _evidence_marker_reader_sites(comprehension_key, owner) == [
-        (owner, 2, reason)
-    ]
-
-    direct = _evidence_marker_reader_sites(
-        'token = values.get("x_class")', "fixture.py"
-    )
-    alias = _evidence_marker_reader_sites(
-        'evidence = payload\nevidence.get("x_class")', "fixture.py"
-    )
-    assert direct == [("fixture.py", 1, "x_class")]
-    assert alias == [("fixture.py", 2, "x_class")]
-    assert direct[0][2] not in e._EVIDENCE_VOCABULARY
-    assert alias[0][2] not in e._EVIDENCE_VOCABULARY
-
-
-def test_every_evidence_marker_reader_has_closed_vocabulary():
-    from pathlib import Path
-    from simulator.diagnostic_helpers import extract_reproduction as e
-
-    root = Path(__file__).resolve().parents[1]
-    readers = []
-    refusal_owner = "simulator/diagnostic_helpers/extract_reproduction.py"
-    for relative in (refusal_owner,
+    for relative in ("simulator/diagnostic_helpers/extract_reproduction.py",
                      "simulator/diagnostic_helpers/qualitative_skip.py",
                      "scripts/calibration_battery.py"):
-        readers.extend(_evidence_marker_reader_sites(
-            (root / relative).read_text(), relative
-        ))
+        tree = ast.parse((root / relative).read_text())
+        for node in ast.walk(tree):
+            # Scan definitions too: aliases and tuple-driven readers must not
+            # escape merely because get(key) has no literal argument.
+            if not isinstance(node, ast.Constant) or not isinstance(node.value, str):
+                continue
+            key = node.value
+            if not key.isidentifier():
+                continue
+            if key in physical_keys | output_keys:
+                continue
+            if (key in {"class", "class_tag", "status", "semantics"}
+                    or key.startswith("evidence_") or key.endswith(("_class", "_status", "_role", "_kind"))):
+                readers.append((relative, node.lineno, key))
     assert readers
     missing = [reader for reader in readers if reader[2] not in e._EVIDENCE_VOCABULARY]
     assert not missing, f"marker readers missing closed vocabulary: {missing}"

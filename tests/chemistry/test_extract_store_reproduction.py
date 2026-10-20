@@ -322,7 +322,7 @@ def test_untyped_system_class_is_not_alpha_pin_bearing() -> None:
     )
     pin_ok, pin_skip, axes = rail_alpha_comparability(obs)
     assert pin_ok is False
-    assert pin_skip == "missing_system_class"
+    assert pin_skip == "missing_system_classification"
     assert axes["rail_system_class_verdict"] == "undeterminable"
 
 

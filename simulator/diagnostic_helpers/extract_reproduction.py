@@ -1890,7 +1890,7 @@ def _transition_point_carrier_comparability(
     if system_class in RAIL_COMPARABLE_SYSTEM_CLASSES:
         # Silicate / pure-oxide melt specimen: not a pure-component NBP.
         skip = (
-            f"{_system_class_refusal_reason(system_class)}"
+            f"not_comparable_system_class:{system_class}"
             ":pure_component_nbp_not_silicate_rail"
         )
         return False, skip, runtime
@@ -2384,20 +2384,20 @@ def rail_system_class_comparability(
 
     system_class = observation_system_class(obs)
     if system_class is None:
-        return False, None, _system_class_refusal_reason()
+        return False, None, "missing_system_classification"
     if system_class in RAIL_COMPARABLE_SYSTEM_CLASSES:
         return True, system_class, None
     if system_class in RAIL_INCOMPARABLE_SYSTEM_CLASSES:
         return (
             False,
             system_class,
-            _system_class_refusal_reason(system_class),
+            f"not_comparable_system_class:{system_class}",
         )
     # Explicit but unlisted class — fail closed (do not invent comparability).
     return (
         False,
         system_class,
-        _system_class_refusal_reason(system_class),
+        f"not_comparable_system_class:{system_class}",
     )
 
 
@@ -5471,22 +5471,6 @@ def is_typed_skip(reason: str | None) -> bool:
         "ordering-fail",
         "ordering-pass",
     }
-
-
-_SYSTEM_CLASS_REFUSAL_REASONS = frozenset(
-    {"missing_system_class", "not_comparable_system_class"}
-)
-
-
-def _system_class_refusal_reason(system_class: str | None = None) -> str:
-    """Build a system-class refusal from its closed reason-code vocabulary."""
-
-    prefix = "not_comparable_" if system_class is not None else "missing_"
-    reason = next(
-        reason for reason in _SYSTEM_CLASS_REFUSAL_REASONS
-        if reason.startswith(prefix)
-    )
-    return reason if system_class is None else f"{reason}:{system_class}"
 
 
 __all__ = [
