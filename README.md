@@ -181,16 +181,6 @@ Model-bearing citations are tracked in [`docs/references/`](docs/references/): a
 
 ### Hero run: 1 kg lunar mare to 2200 °C
 
-> **Known defect: most of the extraction reported below is not a physical result.** From about
-> hour 157 (~1780 °C) the melt drifts oxidizing. Its log fO₂ passes the furnace's total pressure at
-> hour 160 (1805 °C), reaches +3.7 at hour 168 and +20 at hour 169, then collapses to about −13,950
-> from hour 170. At that fO₂ the Al, Mg and Ca vapour pressures reach 10⁸–10¹³ Pa, so almost all of the Ca, Al, Ti and Mg that leaves the melt does so in
-> hours 169–173, mostly at hour 171. For scale, at hour 156 (1775 °C), the
-> condensation train holds 0.029 kg of condensate plus 0.009 kg of stored O₂. After hour 176 no further
-> extraction occurs, so the 2200 °C hold adds none. The fix and a corrected re-run are open
-> work. Until then, read the figures below as a record of the defective run, not as the process's
-> predicted yield.
-
 This is the smallest end-to-end demonstration of the product story. The command uses the default
 `furnace_material: zirconia_ysz` hot-wall configuration (catalog ceiling 2200 °C), runs the
 continuous `C2A` campaign long enough to reach that ceiling, and writes the full report to
@@ -207,42 +197,42 @@ python3 -m simulator.runner \
   --output hero-run.json
 ```
 
-Recorded on the current green checkout with the built-in analytical backend:
+The 2026-09-26 figures previously shown here came from a run with a redox-runaway defect (fixed by b-894).
 
-| audited result | value |
+Run on green commit `a4608882dcdad6ab67ca0381284d4c65055c1160` with the built-in analytical backend:
+
+| element | condensed | retained in melt | vented | other (O₂, wall, overhead) |
+|---|---:|---:|---:|---:|
+| Al | 0.000 | 1.000 | 0.000 | 0.000 |
+| Ca | 0.001 | 0.999 | 0.000 | 0.000 |
+| Ti | 0.001 | 0.999 | 0.000 | 0.000 |
+| Si | 0.956 | 0.001 | 0.043 | 0.000 |
+| Fe | 0.078 | 0.000 | 0.921 | 0.001 |
+| Mg | 0.088 | 0.806 | 0.105 | 0.000 |
+| Na | 0.633 | 0.000 | 0.367 | 0.000 |
+| K | 0.499 | 0.115 | 0.386 | 0.000 |
+| Cr | 0.265 | 0.735 | 0.000 | 0.000 |
+| O | 0.280 | 0.319 | 0.014 | 0.387 |
+
+| result | value |
 |---|---:|
+| Melt rump | 0.349 kg |
+| Condensed | 0.342 kg |
+| O₂, source-side and not recovered | 0.165 kg |
+| Vented | 0.144 kg |
+| Wall | 0.000200 kg |
+| Cleanup-sequestered | 0.000700 kg |
+| Tapped | 0.000200 kg |
 | Furnace endpoint | 2200 °C at hour 213; held through hour 225 |
-| Left the melt (product, assuming an ideal condenser train) | 0.825164 kg (82.5164%); everything leaving the melt surface or drain tap is captured |
-| Fe ingot (ideal condenser train) | 0.123948 kg |
-| Stored O2 | 0.137477 kg |
-| Condensed SiO2 (origin-first ledger) | 0.218508 kg; pure-silica qualification is not established |
-| Volatile product (ideal condenser train) | 0.652563 kg (`product_condensed` + `offgas_vented`) |
-| Glass product qualification | Not established; the canonical runner does not classify mid-run melt as glass |
-| Retained melt / refractory rump | 0.013089 kg retained; 0.000221 kg refractory-oxide subdisposition |
-| Wall deposit | 0.000150951 kg Fe; lifespan rate 0.0000301902 kg/campaign, non-authoritative |
-| Mass closure | max per-hour error 4.44e-14%; audited disposition residual 2.70e-15 |
+| Mass-closure residual | below 1e-14 (max element residual ~1e-15; limit 5e-14) |
 
-For an ideal condenser train, the origin-first ledger's product fraction is
-`1 - melt_retained - redox_buffer_retained - wall_deposit`:
+### Open issues in this run
 
-| feedstock element | ideal-condenser product fraction |
-|---|---:|
-| Fe | 94.0858% |
-| Mg | 100.0000% |
-| Na | 100.0000% |
-| Si | 100.0000% |
-| Ca | 100.0000% |
-| Al | 100.0000% |
-| Ti | 100.0000% |
-| O | 61.0110% |
-
-The left-melt percentage and closure above come from the report's origin-first
-`yield_disposition` ledger, whose terminal mass partition is: 0.529685 kg condensed,
-0.034239 kg tapped, 0.137477 kg oxygen, 0.122878 kg vented,
-0.000734 kg cleanup-sequestered, and 0.000151 kg wall deposit; 0.013089 kg remains in the melt and
-0.161747 kg remains in the redox buffer.
-
-The simulated condenser train currently captures only part of this. For example, 63% of the Fe passes the Stage-1 condenser to the terminal. Designing a train that meets the ideal is open work.
+- 92% of Fe is vented past Stage 1 (b-591; capture-law fix pending an owner decision on collector areas).
+- About 80% of Mg stays in the melt; the hard-vacuum crown stage is not built.
+- 37% of alkalis are vented.
+- O₂ is counted at the source side, not captured.
+- This README table is hand-copied until the nightly hero golden exists.
 
 ### What this run does NOT yet show
 
