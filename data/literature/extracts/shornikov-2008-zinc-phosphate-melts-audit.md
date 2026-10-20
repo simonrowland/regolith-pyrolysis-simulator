@@ -8,7 +8,7 @@ Duplicate check: not a duplicate. No extract on this base cites this title, this
 
 MinerU `p001-t01` was emitted: 30 numeric cells, 30 empty cells skipped. `pdftotext-layout.txt` is empty, so it cannot confirm digits. The 600 dpi render of PDF page 1 was read. Every stored digit and sign matches that render, including gaseous O2 `0.000` as a printed zero. No cell was hand-corrected. No `needs_render_check` flag was set. Empty condensed-phase cells under the gas-only rows were not stored.
 
-The caption says the cells were calculated in the present study according to data [1, 6–9]. Those parents are not printed per row, so the evidence class is `quoted_attributed`. They are formation Gibbs energies from the elements at 1300 K, not oxide activities.
+The caption says the cells were calculated in the present study according to data [1, 6–9]. Those parents are not printed per row. The evidence class is `model_derived`. `derived_from` and `derivation` are absent, so migration queues the two conditional_field issues (b-767, d-053). They are formation Gibbs energies from the elements at 1300 K, not oxide activities.
 
 ## Figure (PDF p. 2, published p. 150)
 
