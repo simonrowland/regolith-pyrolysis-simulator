@@ -107,6 +107,10 @@ def test_all_foulant_dg_reactions_are_atom_balanced() -> None:
 
 
 def test_stage0_cation_sulfate_code_tables_are_atom_balanced() -> None:
+    _assert_stage0_cation_sulfate_code_tables_are_atom_balanced()
+
+
+def _assert_stage0_cation_sulfate_code_tables_are_atom_balanced() -> None:
     registry = _species_registry()
 
     for sulfate, oxide in STAGE0_CATION_SULFATE_OXIDE_PRODUCTS.items():
@@ -136,6 +140,34 @@ def test_stage0_cation_sulfate_code_tables_are_atom_balanced() -> None:
             reaction,
             registry,
         )
+
+
+def test_stage0_sulfate_guard_rejects_runtime_oxide_yield_mutation(
+    monkeypatch,
+) -> None:
+    runtime_method = (
+        core.PyrolysisSimulator._apply_stage0_cation_sulfate_carbon_reactions
+    )
+
+    def halve_runtime_oxide_yields(runtime, feedstock, carbon_mol_remaining, specs):
+        remaining = runtime_method(
+            runtime, feedstock, carbon_mol_remaining, specs
+        )
+        for spec in specs:
+            spec["oxide_products_kg"] = {
+                oxide: product_kg / 2.0
+                for oxide, product_kg in spec["oxide_products_kg"].items()
+            }
+        return remaining
+
+    monkeypatch.setattr(
+        core.PyrolysisSimulator,
+        "_apply_stage0_cation_sulfate_carbon_reactions",
+        halve_runtime_oxide_yields,
+    )
+
+    with pytest.raises(AssertionError, match="Ca"):
+        _assert_stage0_cation_sulfate_code_tables_are_atom_balanced()
 
 
 def test_stage0_carbonate_code_table_is_atom_balanced() -> None:
