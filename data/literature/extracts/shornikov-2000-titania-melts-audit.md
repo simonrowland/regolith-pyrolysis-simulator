@@ -32,10 +32,12 @@ Half-ticks are unlabelled and were not used in any fit. Log axes are fitted in t
 | fig2b | 0 | 1 | 0 |
 | fig2c | 92 | 0 | 0 |
 | fig2d | 23 | 0 | 0 |
-| fig2e | 44 | 0 | 0 |
+| fig2e | 42 | 0 | 2 |
 | fig2f | 14 | 0 | 0 |
 | fig3 | 30 | 0 | 2 |
 
+
+Legend check, fix round 1. The Fig. 2e circle at (2371.3, 4177.0) and the triangle at (2371.9, 4273.5) sit beside numerals 1 and 2 and are detached from both compound curves. They are refused, and the two activity points were removed. Fig. 1 and Fig. 2c, Fig. 2d, and Fig. 2f print the numerals on the data curves, and every marker on those panels lies on a curve. Fig. 2a and Fig. 2b have no discrete markers. The Fig. 3 legend circle and square were already refused.
 Fig. 2a and Fig. 2b are continuous phase boundaries (vector forms contain tick strokes and text, and no filled marker paths). No point was sampled from those curves.
 
 ## Standard state
@@ -237,39 +239,39 @@ The ordinate is ΔfG/RT, not ΔfG. There is no quantity token for ΔfG/RT. The r
 | fig2c/1 filled circle | SiO2 | 1806.4 | 3045.8 | log10_a=-3.193 a=0.0006 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 1807.8 | 2517.9 | log10_a=-1.043 a=0.0906 ± 0.0041 | read |
 | fig2c/2 filled square | CaO | 1883.2 | 2648.1 | log10_a=-1.573 a=0.0267 ± 0.0041 | read |
-| fig2c/1 filled circle | SiO2 | 1885.0 | 3104.0 | log10_a=-3.429 a=0.0004 ± 0.0041 | read |
+| fig2c/1 filled circle | SiO2 | 1885.0 | 3104.0 | log10_a=-3.429 a=0.0003724 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 1885.6 | 2456.7 | log10_a=-0.793 a=0.1609 ± 0.0041 | read |
 | fig2c/1 filled circle | SiO2 | 1937.5 | 3160.1 | log10_a=-3.658 a=0.0002 ± 0.0154 | read |
 | fig2c/2 filled square | CaO | 1940.0 | 2655.7 | log10_a=-1.604 a=0.0249 ± 0.0233 | read |
 | fig2c/3 filled up-triangle | TiO2 | 1940.5 | 2389.1 | log10_a=-0.518 a=0.3034 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 1940.5 | 2418.1 | log10_a=-0.636 a=0.2312 ± 0.0141 | read |
 | fig2c/3 filled up-triangle | TiO2 | 1940.5 | 2442.2 | log10_a=-0.734 a=0.1843 ± 0.0041 | read |
-| fig2c/1 filled circle | SiO2 | 1986.3 | 3152.6 | log10_a=-3.627 a=0.0002 ± 0.0041 | read |
+| fig2c/1 filled circle | SiO2 | 1986.3 | 3152.6 | log10_a=-3.627 a=0.000236 ± 0.0041 | read |
 | fig2c/2 filled square | CaO | 1988.3 | 2631.3 | log10_a=-1.504 a=0.0313 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 1989.4 | 2400.2 | log10_a=-0.563 a=0.2735 ± 0.0049 | read |
 | fig2c/2 filled square | CaO | 2003.3 | 2629.5 | log10_a=-1.497 a=0.0318 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2005.4 | 2399.3 | log10_a=-0.560 a=0.2756 ± 0.0041 | read |
-| fig2c/1 filled circle | SiO2 | 2038.7 | 3158.1 | log10_a=-3.650 a=0.0002 ± 0.0041 | read |
+| fig2c/1 filled circle | SiO2 | 2038.7 | 3158.1 | log10_a=-3.650 a=0.0002239 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2040.0 | 2400.5 | log10_a=-0.564 a=0.2727 ± 0.0041 | read |
-| fig2c/1 filled circle | SiO2 | 2050.1 | 3145.1 | log10_a=-3.597 a=0.0003 ± 0.0041 | read |
+| fig2c/1 filled circle | SiO2 | 2050.1 | 3145.1 | log10_a=-3.597 a=0.000253 ± 0.0041 | read |
 | fig2c/2 filled square | CaO | 2050.1 | 2640.6 | log10_a=-1.542 a=0.0287 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2052.5 | 2390.0 | log10_a=-0.522 a=0.3008 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2052.5 | 2411.6 | log10_a=-0.610 a=0.2457 ± 0.0041 | read |
-| fig2c/1 filled circle | SiO2 | 2057.5 | 3163.9 | log10_a=-3.673 a=0.0002 ± 0.0041 | read |
+| fig2c/1 filled circle | SiO2 | 2057.5 | 3163.9 | log10_a=-3.673 a=0.0002123 ± 0.0041 | read |
 | fig2c/2 filled square | CaO | 2057.5 | 2663.2 | log10_a=-1.634 a=0.0232 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2059.2 | 2399.9 | log10_a=-0.562 a=0.2742 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2059.2 | 2423.0 | log10_a=-0.656 a=0.2207 ± 0.0041 | read |
-| fig2c/1 filled circle | SiO2 | 2083.8 | 3186.4 | log10_a=-3.765 a=0.0002 ± 0.0041 | read |
+| fig2c/1 filled circle | SiO2 | 2083.8 | 3186.4 | log10_a=-3.765 a=0.0001718 ± 0.0041 | read |
 | fig2c/2 filled square | CaO | 2085.6 | 2650.0 | log10_a=-1.581 a=0.0263 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2087.4 | 2393.1 | log10_a=-0.534 a=0.2923 ± 0.0201 | read |
-| fig2c/1 filled circle | SiO2 | 2127.0 | 3148.9 | log10_a=-3.612 a=0.0002 ± 0.0041 | read |
+| fig2c/1 filled circle | SiO2 | 2127.0 | 3148.9 | log10_a=-3.612 a=0.0002443 ± 0.0041 | read |
 | fig2c/2 filled square | CaO | 2128.0 | 2649.1 | log10_a=-1.577 a=0.0265 ± 0.0121 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2129.5 | 2410.3 | log10_a=-0.604 a=0.2486 ± 0.0336 | read |
 | fig2c/2 filled square | CaO | 2165.4 | 2651.0 | log10_a=-1.585 a=0.0260 ± 0.0054 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2165.5 | 2416.4 | log10_a=-0.629 a=0.2348 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2166.8 | 2402.5 | log10_a=-0.572 a=0.2677 ± 0.0138 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2168.1 | 2431.7 | log10_a=-0.692 a=0.2034 ± 0.0041 | read |
-| fig2c/1 filled circle | SiO2 | 2192.6 | 3167.6 | log10_a=-3.689 a=0.0002 ± 0.0041 | read |
+| fig2c/1 filled circle | SiO2 | 2192.6 | 3167.6 | log10_a=-3.689 a=0.0002046 ± 0.0041 | read |
 | fig2c/2 filled square | CaO | 2192.6 | 2633.1 | log10_a=-1.512 a=0.0308 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2194.3 | 2399.3 | log10_a=-0.560 a=0.2756 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2194.3 | 2420.7 | log10_a=-0.647 a=0.2256 ± 0.0041 | read |
@@ -280,7 +282,7 @@ The ordinate is ΔfG/RT, not ΔfG. There is no quantity token for ΔfG/RT. The r
 | fig2c/3 filled up-triangle | TiO2 | 2258.8 | 2398.4 | log10_a=-0.556 a=0.2781 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2258.8 | 2443.1 | log10_a=-0.738 a=0.1828 ± 0.0041 | read |
 | fig2c/2 filled square | CaO | 2350.1 | 2657.6 | log10_a=-1.611 a=0.0245 ± 0.0041 | read |
-| fig2c/1 filled circle | SiO2 | 2350.1 | 3190.1 | log10_a=-3.780 a=0.0002 ± 0.0041 | read |
+| fig2c/1 filled circle | SiO2 | 2350.1 | 3190.1 | log10_a=-3.780 a=0.000166 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2351.9 | 2408.2 | log10_a=-0.596 a=0.2536 ± 0.0116 | read |
 | fig2c/2 filled square | CaO | 2451.3 | 2648.1 | log10_a=-1.573 a=0.0267 ± 0.0041 | read |
 | fig2c/3 filled up-triangle | TiO2 | 2453.7 | 2414.3 | log10_a=-0.621 a=0.2395 ± 0.0041 | read |
@@ -346,8 +348,8 @@ The ordinate is ΔfG/RT, not ΔfG. There is no quantity token for ΔfG/RT. The r
 | fig2e/2 filled up-triangle | CaTiO3 | 2176.8 | 3821.9 | log10_a=0.000 a=1.0006 ± 0.0124 | read |
 | fig2e/1 filled circle | CaSiO3 | 2239.9 | 4635.1 | log10_a=-2.333 a=0.0046 ± 0.0029 | read |
 | fig2e/2 filled up-triangle | CaTiO3 | 2242.2 | 3819.4 | log10_a=0.008 a=1.0178 ± 0.0029 | read |
-| fig2e/1 filled circle | CaSiO3 | 2371.3 | 4177.0 | log10_a=-1.019 a=0.0958 ± 0.0029 | read |
-| fig2e/2 filled up-triangle | CaTiO3 | 2371.9 | 4273.5 | log10_a=-1.296 a=0.0506 ± 0.0029 | read |
+| fig2e/1 filled circle | CaSiO3 | 2371.3 | 4177.0 | beside numeral 1, detached from both curves | refused — legend glyph |
+| fig2e/2 filled up-triangle | CaTiO3 | 2371.9 | 4273.5 | beside numeral 2, detached from both curves | refused — legend glyph |
 | fig2e/1 filled circle | CaSiO3 | 2397.5 | 4702.8 | log10_a=-2.528 a=0.0030 ± 0.0029 | read |
 | fig2e/2 filled up-triangle | CaTiO3 | 2399.8 | 3826.3 | log10_a=-0.012 a=0.9724 ± 0.0029 | read |
 | fig2e/2 filled up-triangle | CaTiO3 | 2501.6 | 3824.0 | log10_a=-0.006 a=0.9873 ± 0.0132 | read |
