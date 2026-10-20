@@ -1806,6 +1806,29 @@ def test_t3_guard_still_fires_when_mass_spec_pin_loses_its_record() -> None:
         _assert_mass_spec_pin_record_parity(expected_species, covered_species)
 
 
+def test_t3_guard_does_not_hide_mass_spec_pin_missing_its_record() -> None:
+    pins = {
+        "species": {
+            "Fe": {"validations": {"mass_spec": {}}},
+            "K": {"validations": {"mass_spec": {}}},
+        }
+    }
+    residual_pins = (
+        {"observation_type": "psat_series", "species": "Fe"},
+        {"observation_type": "alpha", "species": "K"},
+    )
+    covered_species = {"K"}
+    expected_species = _mass_spec_expected_species(
+        pins=pins,
+        live_species={"Fe", "K"},
+        residual_pins=residual_pins,
+        covered_species=covered_species,
+    )
+
+    with pytest.raises(AssertionError, match=r"pins_without_records=\['Fe'\]"):
+        _assert_mass_spec_pin_record_parity(expected_species, covered_species)
+
+
 def test_t3_activity_residual_pin_does_not_mint_mass_spec_expected_species() -> None:
     pins = {
         "species": {
