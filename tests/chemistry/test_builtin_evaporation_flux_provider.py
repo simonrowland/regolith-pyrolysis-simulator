@@ -1445,21 +1445,22 @@ def test_provider_extrapolates_finite_continuum_without_fabricating_zero_flux():
         "viscous_p_bulk_transport_out_of_domain" in w for w in result.warnings
     )
 
-    # Explicit hard-refuse helper uses the same typed refusal.
+    # The shared helper reports the same extrapolation authority.
     from simulator.evaporation import (
-        EvaporationFluxRefusal,
         refuse_viscous_p_bulk_out_of_domain,
     )
-    import pytest
 
-    with pytest.raises(EvaporationFluxRefusal) as ei:
-        refuse_viscous_p_bulk_out_of_domain(
-            knudsen_number=notice["knudsen_number"],
-            overhead_pressure_pa=3.632,
-            pipe_diameter_m=0.12,
-            gas_temperature_K=2023.15,
-        )
-    assert ei.value.reason == "viscous_p_bulk_transport_out_of_domain"
+    helper_notice = refuse_viscous_p_bulk_out_of_domain(
+        knudsen_number=notice["knudsen_number"],
+        overhead_pressure_pa=3.632,
+        pipe_diameter_m=0.12,
+        gas_temperature_K=2023.15,
+    )
+    assert helper_notice is not None
+    assert helper_notice["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert helper_notice["status"] == "extrapolated"
+    assert helper_notice["authority_level"] == "extrapolated"
+    assert helper_notice["ledger_yields_authorized"] is True
 
 
 @pytest.mark.xdist_group("serial")
