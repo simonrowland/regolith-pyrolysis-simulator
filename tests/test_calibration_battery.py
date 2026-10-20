@@ -166,58 +166,36 @@ def test_unknown_evidence_marker_never_scores(extract_comparator, key, nested):
     assert all(set(r["signed_residual"].values()) == {None} for r in rows)
 
 
-def _refusal_reason_payload_reads(tree, refusal_reasons):
+def _refusal_reason_definition_literals(tree):
     import ast
 
-    aliases = {}
-
-    def string_value(node):
-        if isinstance(node, ast.Constant) and isinstance(node.value, str):
-            return node.value
-        if isinstance(node, ast.Name):
-            return aliases.get(node.id)
-        return None
-
-    assignments = [node for node in ast.walk(tree)
-                    if isinstance(node, (ast.Assign, ast.AnnAssign))]
-    for _ in assignments:
-        for node in assignments:
-            value = string_value(node.value)
-            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-            for target in targets:
-                if isinstance(target, ast.Name):
-                    if value is None:
-                        aliases.pop(target.id, None)
-                    else:
-                        aliases[target.id] = value
-
-    reads = []
-
-    def record(key, site):
-        reason = string_value(key)
-        if reason in refusal_reasons:
-            reads.append((reason, site.lineno))
-
-    for node in ast.walk(tree):
-        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
-                and node.func.attr == "get"):
-            if node.args:
-                record(node.args[0], node)
-            for keyword in node.keywords:
-                if keyword.arg in (None, "key"):
-                    record(keyword.value, node)
-        elif isinstance(node, ast.Subscript):
-            record(node.slice, node)
-        elif isinstance(node, ast.Compare):
-            left = node.left
-            for operator, comparator in zip(node.ops, node.comparators):
-                if isinstance(operator, (ast.In, ast.NotIn)):
-                    record(left, node)
-                left = comparator
-    return sorted(reads)
+    definitions = [
+        node for node in tree.body
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name)
+            and target.id == "_SYSTEM_CLASS_REFUSAL_REASONS"
+            for target in node.targets
+        )
+    ]
+    assert len(definitions) == 1
+    value = definitions[0].value
+    assert (
+        isinstance(value, ast.Call)
+        and isinstance(value.func, ast.Name)
+        and value.func.id == "frozenset"
+        and len(value.args) == 1
+        and isinstance(value.args[0], ast.Set)
+    )
+    literals = {
+        node for node in ast.walk(value.args[0])
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }
+    assert literals
+    return literals
 
 
-def _evidence_marker_reader_sites(source, relative, refusal_reasons=frozenset()):
+def _evidence_marker_reader_sites(source, relative):
     import ast
 
     physical_keys = {"system_class", "property_kind", "alpha_kind", "provenance_class",
@@ -227,9 +205,9 @@ def _evidence_marker_reader_sites(source, relative, refusal_reasons=frozenset())
                    "observation_system_class", "claim_kind"}
     tree = ast.parse(source)
     refusal_owner = relative == "simulator/diagnostic_helpers/extract_reproduction.py"
-    if refusal_owner:
-        refusal_reads = _refusal_reason_payload_reads(tree, refusal_reasons)
-        assert not refusal_reads, f"refusal reason literals are payload reads: {refusal_reads}"
+    refusal_definition_literals = (
+        _refusal_reason_definition_literals(tree) if refusal_owner else frozenset()
+    )
 
     readers = []
     for node in ast.walk(tree):
@@ -245,29 +223,30 @@ def _evidence_marker_reader_sites(source, relative, refusal_reasons=frozenset())
         if (key in {"class", "class_tag", "status", "semantics"}
                 or key.startswith("evidence_")
                 or key.endswith(("_class", "_status", "_role", "_kind"))):
-            if not (refusal_owner and key in refusal_reasons):
+            if node not in refusal_definition_literals:
                 readers.append((relative, node.lineno, key))
     return readers
 
 
-def test_evidence_marker_reader_scan_exempts_only_declared_refusal_reasons():
+def test_evidence_marker_scan_exempts_only_refusal_vocabulary_definition():
     from simulator.diagnostic_helpers import extract_reproduction as e
 
     refusal_reasons = e._SYSTEM_CLASS_REFUSAL_REASONS
     reason = next(code for code in refusal_reasons if code.startswith("missing_"))
     owner = "simulator/diagnostic_helpers/extract_reproduction.py"
+    definition = f"_SYSTEM_CLASS_REFUSAL_REASONS = frozenset({{{reason!r}}})"
     assert _evidence_marker_reader_sites(
-        f"reason = {reason!r}", owner, refusal_reasons
+        definition, owner
     ) == []
 
-    for source in (
-        f"payload.get({reason!r})",
-        f"payload[{reason!r}]",
-        f"{reason!r} in payload",
-        f"key = {reason!r}\npayload.get(key)",
-    ):
-        with pytest.raises(AssertionError, match="refusal reason literals are payload reads"):
-            _evidence_marker_reader_sites(source, owner, refusal_reasons)
+    reassigned_key = f"{definition}\nkey = {reason!r}\npayload.get(key)\nkey = 'ordinary'"
+    assert _evidence_marker_reader_sites(reassigned_key, owner) == [
+        (owner, 2, reason)
+    ]
+    comprehension_key = f"{definition}\n[payload.get(key) for key in ({reason!r},)]"
+    assert _evidence_marker_reader_sites(comprehension_key, owner) == [
+        (owner, 2, reason)
+    ]
 
     direct = _evidence_marker_reader_sites(
         'token = values.get("x_class")', "fixture.py"
@@ -292,8 +271,7 @@ def test_every_evidence_marker_reader_has_closed_vocabulary():
                      "simulator/diagnostic_helpers/qualitative_skip.py",
                      "scripts/calibration_battery.py"):
         readers.extend(_evidence_marker_reader_sites(
-            (root / relative).read_text(), relative,
-            e._SYSTEM_CLASS_REFUSAL_REASONS if relative == refusal_owner else frozenset(),
+            (root / relative).read_text(), relative
         ))
     assert readers
     missing = [reader for reader in readers if reader[2] not in e._EVIDENCE_VOCABULARY]
