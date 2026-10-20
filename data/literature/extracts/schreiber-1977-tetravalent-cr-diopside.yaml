@@ -17,7 +17,7 @@ extraction:
 review_status: draft
 fidelity_samples:
   - path: species.Cr.observations[schreiber_1977_crvi_fraction_blue_diopside_melt].values.points[0].range
-    value: ['10', '20']
+    value: ['0.10', '0.20']
     locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}
 experiments:
   - experiment_id: schreiber_1977_redox_glasses_and_diopside
@@ -32,8 +32,9 @@ species:
         experiment: schreiber_1977_redox_glasses_and_diopside
         type: concentration_series
         locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}
-        phase: glass
-        units: percent of total Cr
+        phase: l
+        regime: melt_equilibration_quench
+        units: fraction of total Cr
         values:
           quantity: valence_ratio
           formula: Cr
@@ -41,7 +42,7 @@ species:
           method_class: measured_direct
           points:
             - value: null
-              range: ['10', '20']
+              range: ['0.10', '0.20']
               approximate: true
               value_as_published: about 10-20 percent
               atmosphere_as_published: 'air, for melts that crystallize blue diopside'
@@ -49,6 +50,52 @@ species:
                 temperature_K: {state: {tag: unknown, reason: The text says the fraction varies with temperature but gives no single temperature for this range.}, locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}}
                 fO2_log: {state: {tag: unknown, reason: The melt is described as the one from which blue diopside crystallizes in air; no numeric oxygen fugacity is printed for this range.}, locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}}
                 composition: {state: {tag: unknown, reason: The fraction is stated to depend on temperature and composition and is not assigned to one composition.}, locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}}
+      - observation_id: schreiber_1977_crii_fraction_blue_diopside_melt
+        type: concentration_series
+        locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion, note: 'Melt fraction stated before the separate distribution-coefficient citation.'}
+        phase: l
+        regime: melt_equilibration_quench
+        units: dimensionless fraction as printed
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          valence_basis: {numerator_oxidation_states: [2], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          method_class: measured_direct
+          points:
+            - value: '0.30'
+              value_as_published: 30 percent
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: The paper gives no temperature for this melt fraction.}, locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}}
+                oxygen_partial_pressure:
+                  value: 10^-8
+                  units: atm
+                  state: {tag: value, value: 10^-8}
+                  locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}
+                composition: {state: {tag: unknown, reason: The sentence does not assign the melt to one composition.}, locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}}
+      - observation_id: schreiber_1977_criii_fraction_blue_diopside_melt
+        type: concentration_series
+        locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion, note: 'Melt fraction stated before the separate distribution-coefficient citation.'}
+        phase: l
+        regime: melt_equilibration_quench
+        units: dimensionless fraction as printed
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          method_class: measured_direct
+          points:
+            - value: '0.70'
+              value_as_published: 70 percent
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: The paper gives no temperature for this melt fraction.}, locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}}
+                oxygen_partial_pressure:
+                  value: 10^-8
+                  units: atm
+                  state: {tag: value, value: 10^-8}
+                  locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}
+                composition: {state: {tag: unknown, reason: The sentence does not assign the melt to one composition.}, locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}}
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}}
     context:
       - observation_id: schreiber_1977_blue_diopside_criv_inference
@@ -65,22 +112,19 @@ species:
             Cr(IV) in the crystal is inferred from color, redox titration, EPR and
             optical spectra; its fraction is not directly measured and no exact
             Cr(IV) ratio is reported.
-      - observation_id: schreiber_1977_quoted_prior_crii_fraction
+      - observation_id: schreiber_1977_quoted_criii_crii_distribution_coefficient
         type: assessment
         locator: {page: 3, pdf_page_index: 2, published_page: 524, section: Results and discussion}
-        units: percent of total Cr
+        units: ratio of distribution coefficients as printed
         values:
-          quantity: Cr(II) and Cr(III) fractions in low-fO2 melt
+          quantity: Cr(III)/Cr(II) distribution coefficient ratio between diopside and melt
           method_class: quoted_attributed
           attribution: Schreiber and Haskin (1976)
-          published_observation_id: schreiber_1976_fig4_B_CrII_fraction
-          values_as_published: 30 percent Cr(II); 70 percent Cr(III) at pO2 = 10^-8 atm
+          value_as_published: about 3
           note: >-
-            The cited 1976 extract records 80% Cr(II) at 1500 °C and log pO2 =
-            -7.9 (atm) for its FAS sample; this article gives 30% at 10^-8 atm
-            without stating matching temperature or composition. Preserve both
-            source statements; do not score this repeated, differently conditioned
-            citation as a second measurement.
+            The citation follows the statement that the Cr(III) distribution
+            coefficient between diopside and melt is about three times that of
+            Cr(II); it does not attribute the preceding 30/70 melt fractions.
       - observation_id: schreiber_1977_figure1_prior_optical_spectra
         type: figure_record
         locator: {page: 2, pdf_page_index: 1, published_page: 523, figure: '1'}
