@@ -12,7 +12,7 @@ extraction:
     were read on the 600 dpi render. Fig. 2 and Fig. 3 markers were read on
     the 600 dpi render of PDF page 2. Axes were calibrated from the printed
     tick stubs. Each stored centre is the core of one filled marker, or the
-    white hole of one open marker, and was drawn back onto the page.
+    white hole of one open marker, and was drawn back onto the page. The t1380 Fig. 2a TiO centre is the exposed magenta crescent, and the Fig. 2b TiO centre at the 100 mol% tick is the vertical magenta run.
   date: '2026-10-20'
   worker: t1372-w4-fix1-t5
 review_status: draft
@@ -4811,6 +4811,55 @@ species:
         page_pixel_y: '3094.0'
   TiO:
     observations:
+    - observation_id: shornikov_2019_eg_fig2a_TiO_1790_2
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2a-perovskite
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: a
+        series: '4'
+        marker_symbol: filled circle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2a lg p labelled ticks only, least-squares residual at most 0.0028: -6 at y=2380.0, -7 at y=2555.0, -8 at y=2729.0, -9 at y=2902.5, -10 at y=3076.5, -11 at y=3251.5. lg p = 7.667841 - 0.00574193*y, 174.16 px per decade. The unlabelled ticks between those labels are half-decades (y=2467, 2642, 2816, 2990, 3164.5) and were not assigned integer values. T ticks are uneven: 1800 K at x=944.0, 1900 at x=1317.0, 2000 at x=1653.5, 2100 at x=1958.0, 2200 at x=2235.0. T is piecewise linear between those centres. 1 px is 0.00574 in lg p. Series 4, filled circle, TiO. Page pixel (907.60, 3062.61). The centre is a circle fit to the exposed magenta crescent after the diagonal series stroke was removed. Radius 18.77 px, rms 1.64 px, max residual 2.71 px, 64 edge pixels. Read lg p = -9.917 ± 0.010. x=907.60 is 36.4 px left of the labelled 1800 stub, inside the frame. The 1800-1900 segment is 3.73 px/K, so T = 1800 + (x-944.0)/3.73 = 1790.2 K. The next segment is 3.365 px/K; continued opening of the scale by the same 0.365 px/K step reads 1791.1 K. That 0.9 K gap is the extrapolation term, and with the fit residual it is ±1.0 K. The stored series-6 disk at (903.9, 3053.5) is a different series and was not moved."
+      T_range_K: [1790.2, 1790.2]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.010'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: Read uncertainty is ±0.010 in lg p and ±1.0 K. The lg p term is the 1.64 px crescent residual and the 0.0028 tick residual, in quadrature. The temperature term is that residual on the 3.73 px/K segment and the 0.9 K scale-compression gap, in quadrature. The paper prints no error bar on this marker.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1790.2'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: a
+            note: "Fig. 2a is partial pressure over perovskite versus T. This T is the piecewise reading of the x axis, extrapolated 36.4 px past the labelled 1800 stub."
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1790.2'
+        temperature_K: 1790.2
+        pressure_atm: '1.209341e-10'
+        log10_p: '-9.917'
+        composition_mol:
+          basis: pure_oxide_system
+          CaTiO3: '1'
+
+        page_pixel_x: '907.60'
+        page_pixel_y: '3062.61'
     - observation_id: shornikov_2019_eg_fig2a_TiO_1846_2
       type: partial_pressure
       experiment: shornikov-2019-eg-fig2a-perovskite
@@ -6199,6 +6248,56 @@ species:
 
         page_pixel_x: '4023.0'
         page_pixel_y: '2470.0'
+    - observation_id: shornikov_2019_eg_fig2b_TiO_x100_00
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2b-2300k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: b
+        series: '4'
+        marker_symbol: filled diamond
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 4, filled diamond, TiO. Page pixel (4124.5, 2469.0). The centre is the midpoint of the vertical magenta run at the station, y=2461-2477. The same chord on the neighbour at x=3937 is y=2465-2477 and its midpoint is the stored centre 2471.0. The run joins the horizontal bar; the bar is not a separate centre. There is no lower magenta tip. x is the labelled 100 tick at x=4124.5. The axis formula there reads 99.993 mol%, 0.007 from the printed 100, inside the 0.03 mol% tick residual, so the stored fractions are the pure TiO2 endmember. Read lg p = -5.483 ± 0.007. The 1 px run-end ambiguity and the 0.0029 tick residual, in quadrature, are that uncertainty. No mol% extrapolation."
+      T_range_K: [2300, 2300]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.007'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: Read uncertainty is ±0.007 in lg p and ±0.05 mol% TiO2. The lg p term is 1 px on the vertical run and the 0.0029 tick residual, in quadrature. The mol% term is 1 px (0.039 mol%) and the 0.03 mol% tick residual, in quadrature. The paper prints no error bar on this marker.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: b
+            note: The Fig. 2b caption states 2300 K.
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2300'
+        temperature_K: 2300
+        pressure_atm: '3.292204e-06'
+        log10_p: '-5.483'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '1.000000'
+          CaO: '0.000000'
+
+        page_pixel_x: '4124.5'
+        page_pixel_y: '2469.0'
   TiO2:
     observations:
     - observation_id: shornikov_2019_eg_fig2a_TiO2_1790_3
