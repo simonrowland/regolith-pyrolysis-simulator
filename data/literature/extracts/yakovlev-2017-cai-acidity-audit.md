@@ -33,10 +33,12 @@ Fig. 3 x = 0 is not in the fit. The printed 0 has no tick of the same length sep
 | fig2 | 27 | 0 | 0 |
 | fig3 | 34 | 5 | 0 |
 | fig4 | 58 | 0 | 0 |
-| fig5 | 25 | 0 | 0 |
-| fig6 | 20 | 0 | 1 |
+| fig5 | 26 | 0 | 0 |
+| fig6 | 21 | 0 | 1 |
 | fig7 | 39 | 0 | 0 |
 
+
+Curve-numeral check, fix round 1. On Fig. 4 the printed numeral 1 stands on the open-circle curve and the printed numeral 3 stands on the filled-triangle curve. The caption says (1) Ca and (3) SiO2, so those two series are stored that way. Numerals 2, 4, and 5 stay on the filled circles (Mg), diamonds (TiO2), and open squares (Al). A separate render of the same figure shows the same placement: label 1 beside the open circles (first stored point 1725.16 °C, log10 p = -7.770), label 2 beside the filled circles (first stored point 1578.44 °C, log10 p = -6.861), label 3 beside the filled triangles (first stored point 1577.49 °C, log10 p = -6.488), label 4 beside the diamonds, and label 5 beside the open squares. The stored counts are 14, 7, 16, 10, and 11. SiO2 partial pressures are the 8 Fig. 2 open circles plus these 16 Fig. 4 triangles. Fig. 2 matches its caption: (1) open circle SiO2, (2) filled circle Mg, (3) open square Ca, (4) filled square Al. Fig. 3 matches its caption: (1) filled circle MgO, (2) open circle SiO2, (3) downward triangle CaO, (4) open square Al2O3. Fig. 5 and Fig. 6 match their captions: (1) open circle SiO2, (2) filled circle SiO2, (3) open square MgO, (4) filled square MgO. Fig. 1 has no discrete markers. Fig. 7 is one filled-circle series. The Fig. 5 filled circle at 20 mol% CaO and the Fig. 6 open square under the filled square near 10 mol% Al2O3 were measured on the 1200 dpi render.
 Fig. 1 is eight continuous total-vapor-pressure curves (Kazenas and Tsvetkov, 1997). No discrete marker was found inside the frame, and the curves were not sampled.
 
 Fig. 7 reads are not scored observations. The ordinate is an MgO/SiO2 ratio, and there is no quantity token for that ratio. The correlation r = 0.8 stays the author_estimate already on the context record.
@@ -45,7 +47,7 @@ Fig. 3 stores one residue-composition observation per oxide marker. The y axis, 
 
 ## Standard state
 
-Activities in Fig. 5 and Fig. 6, published page 254: The article presents the generalized Raoult–Henry relation p_i = p_i° a_i = p_i° x_i γ_i and defines p_i° as the partial pressure of pure component i; physical phase is not stated.
+Activities in Fig. 5 and Fig. 6, published page 254, equation (4): Equation (4), published page 254: p_i = p_i° a_i = p_i° x_i γ_i, where p_i is the partial pressure of component i in melt, p_i° is the partial pressure of pure component i, a_i is the activity of component i in the melt, x_i is the molar fraction of component i in the melt, and γ_i is the activity coefficient of component i in the melt. The physical phase of the pure component is not stated.
 
 The pure-component phase is not stated, and this paper does not tabulate a pure-oxide melting temperature, so the phase is not inferred. Partial-pressure rows in Fig. 2 and Fig. 4 are the plotted pressures, not activities, and do not carry this sentence.
 
@@ -100,28 +102,28 @@ Fig. 2 series 1 and Fig. 4 series 3 are SiO2 partial pressures. The vapour rail 
 | fig3/4 open square | Al2O3 | 2808.0 | 1625.5 | Al2O3=0.78 ± 0.08 wt%; mass loss=2.38 ± 0.08 wt% | read |
 | fig4/5 open square | Al | 4321.0 | 2568.0 | T=2349.47 ± 0.53 °C; log10_p=-4.897 ± 0.003 | read |
 | fig4/5 open square | Al | 4174.0 | 2690.0 | T=2271.28 ± 0.53 °C; log10_p=-5.227 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 3805.8 | 2695.5 | T=2075.43 ± 0.53 °C; log10_p=-5.242 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 3877.6 | 2695.5 | T=2113.62 ± 0.53 °C; log10_p=-5.242 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 3690.6 | 2735.7 | T=2014.15 ± 0.53 °C; log10_p=-5.351 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 4009.3 | 2761.6 | T=2183.67 ± 0.53 °C; log10_p=-5.421 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 3947.1 | 2767.9 | T=2150.59 ± 0.53 °C; log10_p=-5.438 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 4054.8 | 2809.5 | T=2207.87 ± 0.53 °C; log10_p=-5.551 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 3618.6 | 2822.8 | T=1975.85 ± 0.53 °C; log10_p=-5.587 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 4168.2 | 2828.2 | T=2268.19 ± 0.53 °C; log10_p=-5.601 ± 0.003 | read |
+| fig4/1 open circle | Ca | 3805.8 | 2695.5 | T=2075.43 ± 0.53 °C; log10_p=-5.242 ± 0.003 | read |
+| fig4/1 open circle | Ca | 3877.6 | 2695.5 | T=2113.62 ± 0.53 °C; log10_p=-5.242 ± 0.003 | read |
+| fig4/1 open circle | Ca | 3690.6 | 2735.7 | T=2014.15 ± 0.53 °C; log10_p=-5.351 ± 0.003 | read |
+| fig4/1 open circle | Ca | 4009.3 | 2761.6 | T=2183.67 ± 0.53 °C; log10_p=-5.421 ± 0.003 | read |
+| fig4/1 open circle | Ca | 3947.1 | 2767.9 | T=2150.59 ± 0.53 °C; log10_p=-5.438 ± 0.003 | read |
+| fig4/1 open circle | Ca | 4054.8 | 2809.5 | T=2207.87 ± 0.53 °C; log10_p=-5.551 ± 0.003 | read |
+| fig4/1 open circle | Ca | 3618.6 | 2822.8 | T=1975.85 ± 0.53 °C; log10_p=-5.587 ± 0.003 | read |
+| fig4/1 open circle | Ca | 4168.2 | 2828.2 | T=2268.19 ± 0.53 °C; log10_p=-5.601 ± 0.003 | read |
 | fig4/5 open square | Al | 4057.0 | 2848.0 | T=2209.04 ± 0.53 °C; log10_p=-5.655 ± 0.003 | read |
 | fig4/5 open square | Al | 3970.0 | 2862.5 | T=2162.77 ± 0.53 °C; log10_p=-5.694 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 4317.6 | 2877.9 | T=2347.66 ± 0.53 °C; log10_p=-5.736 ± 0.003 | read |
+| fig4/1 open circle | Ca | 4317.6 | 2877.9 | T=2347.66 ± 0.53 °C; log10_p=-5.736 ± 0.003 | read |
 | fig4/5 open square | Al | 4030.5 | 2891.5 | T=2194.95 ± 0.53 °C; log10_p=-5.773 ± 0.003 | read |
 | fig4/5 open square | Al | 3911.0 | 2955.5 | T=2131.38 ± 0.53 °C; log10_p=-5.946 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 3505.6 | 2992.8 | T=1915.74 ± 0.53 °C; log10_p=-6.047 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 3424.2 | 3099.7 | T=1872.45 ± 0.53 °C; log10_p=-6.337 ± 0.003 | read |
+| fig4/1 open circle | Ca | 3505.6 | 2992.8 | T=1915.74 ± 0.53 °C; log10_p=-6.047 ± 0.003 | read |
+| fig4/1 open circle | Ca | 3424.2 | 3099.7 | T=1872.45 ± 0.53 °C; log10_p=-6.337 ± 0.003 | read |
 | fig4/5 open square | Al | 3880.6 | 3108.1 | T=2115.21 ± 0.53 °C; log10_p=-6.359 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 3332.1 | 3244.4 | T=1823.46 ± 0.53 °C; log10_p=-6.729 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 3241.5 | 3357.5 | T=1775.27 ± 0.53 °C; log10_p=-7.035 ± 0.003 | read |
+| fig4/1 open circle | Ca | 3332.1 | 3244.4 | T=1823.46 ± 0.53 °C; log10_p=-6.729 ± 0.003 | read |
+| fig4/1 open circle | Ca | 3241.5 | 3357.5 | T=1775.27 ± 0.53 °C; log10_p=-7.035 ± 0.003 | read |
 | fig4/5 open square | Al | 3798.0 | 3400.5 | T=2071.28 ± 0.53 °C; log10_p=-7.151 ± 0.003 | read |
 | fig4/5 open square | Al | 3685.0 | 3539.5 | T=2011.17 ± 0.53 °C; log10_p=-7.528 ± 0.003 | read |
 | fig4/5 open square | Al | 3619.0 | 3553.5 | T=1976.06 ± 0.53 °C; log10_p=-7.566 ± 0.003 | read |
-| fig4/3 open circle | SiO2 | 3147.3 | 3628.7 | T=1725.16 ± 0.53 °C; log10_p=-7.770 ± 0.003 | read |
+| fig4/1 open circle | Ca | 3147.3 | 3628.7 | T=1725.16 ± 0.53 °C; log10_p=-7.770 ± 0.003 | read |
 | fig4/5 open square | Al | 3505.5 | 3625.5 | T=1915.69 ± 0.53 °C; log10_p=-7.761 ± 0.003 | read |
 | fig5/1 open circle | SiO2 | 874.7 | 518.2 | a=0.9998 ± 0.0011; CaO=3.09 ± 0.02 mol% | read |
 | fig5/1 open circle | SiO2 | 1134.8 | 637.6 | a=0.8992 ± 0.0011; CaO=7.94 ± 0.02 mol% | read |
@@ -198,23 +200,25 @@ Fig. 2 series 1 and Fig. 4 series 3 are SiO2 partial pressures. The vapour rail 
 | fig4/4 filled diamond | TiO2 | 4049.4 | 3299.7 | T=2204.98 ± 0.53 °C; log10_p=-6.878 ± 0.003 | read |
 | fig4/4 filled diamond | TiO2 | 4183.6 | 3560.3 | T=2276.37 ± 0.53 °C; log10_p=-7.584 ± 0.003 | read |
 | fig4/2 filled circle | Mg | 3417.8 | 3135.8 | T=1869.05 ± 1.18 °C; log10_p=-6.434 ± 0.006 | read |
-| fig4/1 filled upward triangle | Ca | 3805.8 | 2901.8 | T=2075.44 ± 0.53 °C; log10_p=-5.801 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 2881.2 | 3065.9 | T=1583.59 ± 0.53 °C; log10_p=-6.245 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 4057.1 | 2950.9 | T=2209.09 ± 0.53 °C; log10_p=-5.934 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 2983.4 | 2996.9 | T=1637.96 ± 0.53 °C; log10_p=-6.058 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 3328.2 | 2698.9 | T=1821.39 ± 0.53 °C; log10_p=-5.251 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 3049.3 | 2950.7 | T=1673.01 ± 0.53 °C; log10_p=-5.933 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 3507.3 | 2757.6 | T=1916.67 ± 0.53 °C; log10_p=-5.410 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 4162.5 | 2990.8 | T=2265.17 ± 0.53 °C; log10_p=-6.042 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 3143.3 | 2872.0 | T=1723.04 ± 0.53 °C; log10_p=-5.720 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 3687.2 | 2909.9 | T=2012.32 ± 0.53 °C; log10_p=-5.823 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 3613.2 | 2889.9 | T=1972.98 ± 0.53 °C; log10_p=-5.768 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 4004.1 | 2927.0 | T=2180.92 ± 0.53 °C; log10_p=-5.869 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 3885.4 | 2907.7 | T=2117.77 ± 0.53 °C; log10_p=-5.817 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 2869.7 | 3155.7 | T=1577.49 ± 0.53 °C; log10_p=-6.488 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 3234.5 | 2816.9 | T=1771.54 ± 0.53 °C; log10_p=-5.571 ± 0.003 | read |
-| fig4/1 filled upward triangle | Ca | 3415.4 | 2641.1 | T=1867.75 ± 0.53 °C; log10_p=-5.095 ± 0.003 | read |
-| fig5/4 filled square | MgO | 1781.0 | 1439.5 | a=0.2237 ± 0.0031; CaO=19.99 ± 0.07 mol% | read |
+| fig4/3 filled upward triangle | SiO2 | 3805.8 | 2901.8 | T=2075.44 ± 0.53 °C; log10_p=-5.801 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 2881.2 | 3065.9 | T=1583.59 ± 0.53 °C; log10_p=-6.245 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 4057.1 | 2950.9 | T=2209.09 ± 0.53 °C; log10_p=-5.934 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 2983.4 | 2996.9 | T=1637.96 ± 0.53 °C; log10_p=-6.058 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 3328.2 | 2698.9 | T=1821.39 ± 0.53 °C; log10_p=-5.251 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 3049.3 | 2950.7 | T=1673.01 ± 0.53 °C; log10_p=-5.933 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 3507.3 | 2757.6 | T=1916.67 ± 0.53 °C; log10_p=-5.410 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 4162.5 | 2990.8 | T=2265.17 ± 0.53 °C; log10_p=-6.042 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 3143.3 | 2872.0 | T=1723.04 ± 0.53 °C; log10_p=-5.720 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 3687.2 | 2909.9 | T=2012.32 ± 0.53 °C; log10_p=-5.823 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 3613.2 | 2889.9 | T=1972.98 ± 0.53 °C; log10_p=-5.768 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 4004.1 | 2927.0 | T=2180.92 ± 0.53 °C; log10_p=-5.869 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 3885.4 | 2907.7 | T=2117.77 ± 0.53 °C; log10_p=-5.817 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 2869.7 | 3155.7 | T=1577.49 ± 0.53 °C; log10_p=-6.488 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 3234.5 | 2816.9 | T=1771.54 ± 0.53 °C; log10_p=-5.571 ± 0.003 | read |
+| fig4/3 filled upward triangle | SiO2 | 3415.4 | 2641.1 | T=1867.75 ± 0.53 °C; log10_p=-5.095 ± 0.003 | read |
+| fig5/2 filled circle | SiO2 | 1781.75 | 1445.50 | a=0.2186 ± 0.0051; CaO=20.01 ± 0.113 mol%; 1200 dpi re-read, halved, allowance 6 px, overlaps the series-4 square | read |
+| fig6/3 open square | MgO | 1352.25 | 3852.75 | a=0.1432 ± 0.0035; Al2O3=9.89 ± 0.067 mol%; 1200 dpi re-read, halved, allowance 4 px, open square under the filled square | read |
+| fig5/4 filled square | MgO | 1781.75 | 1448.75 | a=0.2159 ± 0.0051; CaO=20.01 ± 0.113 mol%; 1200 dpi re-read, halved, allowance 6 px, overlaps the series-2 circle | read |
 | fig5/2 filled circle | SiO2 | 1512.2 | 1095.5 | a=0.5135 ± 0.0011; CaO=14.98 ± 0.02 mol% | read |
 | fig5/2 filled circle | SiO2 | 1242.8 | 831.6 | a=0.7358 ± 0.0011; CaO=9.95 ± 0.02 mol% | read |
 | fig5/2 filled circle | SiO2 | 973.5 | 640.3 | a=0.8970 ± 0.0011; CaO=4.93 ± 0.02 mol% | read |
