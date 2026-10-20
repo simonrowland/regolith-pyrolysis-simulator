@@ -154,5 +154,7 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
         row for row in context
         if row["observation_id"] == "jin_2022_discussion_chromate_molar_solubility_context"
     )
+    assert chromate_estimate["locator"]["page"] == 9
+    assert chromate_estimate["locator"]["pdf_page_index"] == 8
     assert chromate_estimate["values"]["value_as_published"] == 2.09
     assert "77.6%" in chromate_estimate["values"]["relation_as_printed"]
