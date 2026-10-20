@@ -25,6 +25,7 @@ from simulator.accounting.lots import (
     ATTRIBUTION_METHODS,
     MATERIAL_ORIGINS,
     MaterialLot,
+    _species_moles_from_kg,
     allocate_pool_withdrawal,
 )
 from simulator.account_ids import (
@@ -1849,18 +1850,6 @@ def _sum_lot_atom_moles(
     return dict(sorted(atoms.items()))
 
 
-def _signed_atom_moles(
-    species_kg: Mapping[str, float], registry: Mapping[str, Any] | None
-) -> dict[str, float]:
-    atoms: defaultdict[str, float] = defaultdict(float)
-    for species, kg in species_kg.items():
-        formula = resolve_species_formula(species, registry)
-        species_moles = kg / formula.molar_mass_kg_per_mol()
-        for element, count in formula.elements.items():
-            atoms[element] += species_moles * count
-    return dict(sorted((element, value) for element, value in atoms.items() if value != 0.0))
-
-
 def _signed_atom_moles_from_species_mol(
     species_mol: Mapping[str, float], registry: Mapping[str, Any] | None
 ) -> dict[str, float]:
@@ -2284,8 +2273,7 @@ def _species_kg_to_mol(
             raise AccountingError(f"balance for species {name!r} must be finite")
         if abs(value) <= tolerance_kg:
             continue
-        formula = resolve_species_formula(name, registry)
-        converted[name] = value / formula.molar_mass_kg_per_mol()
+        converted[name] = _species_moles_from_kg(name, value, registry)
     return dict(sorted(converted.items()))
 
 
