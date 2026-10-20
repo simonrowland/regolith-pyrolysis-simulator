@@ -138,11 +138,15 @@ MRE_FIXED_REDUCIBLE_OXIDES = tuple(
 )
 
 
-def mre_control_out_of_domain_controls(
+def mre_control_domain_assessment(
     controls: Mapping[str, float],
-) -> dict[str, str]:
-    """Return finite controls outside the supported MRE operating window."""
+) -> tuple[dict[str, str], list[dict[str, object]]]:
+    """Separate invalid MRE operating controls from low-pO2 extrapolation."""
 
+    # Time, current, and voltage bounds are the built-in cell's supported
+    # operating envelope. The pO2 interval is the empirical certification
+    # band for the ideal-gas anode activity; its low-pressure Nernst extension
+    # remains computable and is reported as extrapolated.
     domain_bounds = {
         "dt_hr": (sys.float_info.min, 1.0, "hr"),
         "current_A": (sys.float_info.min, 3000.0, "A"),
@@ -150,6 +154,7 @@ def mre_control_out_of_domain_controls(
         "pO2_bar": (1e-9, 1.0, "bar"),
     }
     out_of_domain: dict[str, str] = {}
+    notices: list[dict[str, object]] = []
     for name, (minimum, maximum, unit) in domain_bounds.items():
         if name not in controls:
             continue
@@ -157,10 +162,27 @@ def mre_control_out_of_domain_controls(
         if value == 0.0 and name != "pO2_bar":
             continue
         if value < minimum:
-            out_of_domain[name] = f"below minimum {minimum:g} {unit}"
+            control_reason = f"below minimum {minimum:g} {unit}"
+            if name == "pO2_bar" and value >= sys.float_info.min:
+                notices.append({
+                    "kind": "out_of_certified_band",
+                    "control": name,
+                    "reason": MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                    "control_reason": control_reason,
+                    "authority_level": "extrapolated",
+                    "certified_band": {name: (minimum, maximum)},
+                })
+            else:
+                # IEEE-754 subnormals have reduced relative precision and
+                # sufficiently small values can round to zero in downstream
+                # products. Keep those finite values on the invalid-input
+                # side; ordinary low-pressure values are still extrapolated.
+                out_of_domain[name] = control_reason
         elif value > maximum:
+            # The MRE anode model has no compressed-gas state or fugacity
+            # correction above its 1-bar reference atmosphere.
             out_of_domain[name] = f"above maximum {maximum:g} {unit}"
-    return out_of_domain
+    return out_of_domain, notices
 
 
 def _without_mre_quantities(diagnostic: Mapping[str, object]) -> dict[str, object]:

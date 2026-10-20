@@ -308,7 +308,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             _without_mre_quantities,
             coerce_gas_product_fugacity_bar,
             current_efficiency_diagnostic,
-            mre_control_out_of_domain_controls,
+            mre_control_domain_assessment,
             mre_selectivity_weight,
             uncertified_multi_oxide_partition_targets,
         )
@@ -327,7 +327,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
 
         controls = unpack_controls(request)
         validated, invalid_controls = self._validate_controls(request, controls)
-        out_of_domain_controls = mre_control_out_of_domain_controls(
+        out_of_domain_controls, control_notices = mre_control_domain_assessment(
             {
                 name: value
                 for name, value in validated.items()
@@ -414,6 +414,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 melt_fO2_log=melt_fO2_log,
                 pressure_bar=request.pressure_bar,
                 transition=empty_transition,
+                control_notices=control_notices,
             )
 
         registry = request.account_view.species_formula_registry
@@ -490,6 +491,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             ),
             "fe2o3_fixed_full_reduction_skipped": True,
         }
+        if control_notices:
+            diagnostic["notices"] = control_notices
 
         if total_kg <= 0.0 or voltage_V <= 0.0 or current_A <= 0.0:
             return IntentResult(
@@ -1406,6 +1409,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         cls,
         *,
         diagnostic_skipped: str = "",
+        control_notices: list[dict[str, Any]] | None = None,
         request: "IntentRequest | None" = None,
         applied_anode_fO2_log: float = 0.0,
         melt_fO2_log: float | None = None,
@@ -1449,6 +1453,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             ),
             "fe2o3_fixed_full_reduction_skipped": True,
         }
+        if control_notices:
+            diag["notices"] = control_notices
         if diagnostic_skipped:
             diag["reason_skipped"] = diagnostic_skipped
         return IntentResult(
