@@ -145,11 +145,38 @@ def test_stage0_carbonate_code_table_is_atom_balanced() -> None:
 def _assert_stage0_carbonate_code_table_is_atom_balanced() -> None:
     registry = _species_registry()
 
-    for metal, oxide, atoms_per_oxide in core.STAGE0_CARBONATE_METAL_OXIDE_STOICH:
+    class _CompleteDecompositionRuntime:
+        def __init__(self) -> None:
+            self.species_formula_registry = registry
+
+        def _stage0_carbonate_decomposition_extent(
+            self, *_args
+        ) -> float:
+            return 1.0
+
+    runtime = _CompleteDecompositionRuntime()
+    for metal, _, atoms_per_oxide in core.STAGE0_CARBONATE_METAL_OXIDE_STOICH:
         carbonate = f"{metal}CO3" if atoms_per_oxide == 1.0 else f"{metal}2CO3"
+        feed_kg = resolve_species_formula(
+            carbonate, registry
+        ).molar_mass_kg_per_mol()
+        oxide_kg, gas_kg, _, _ = (
+            core.PyrolysisSimulator._decompose_single_carbonate_species(
+                runtime, carbonate, feed_kg, {}, 0.0
+            )
+        )
+        products_kg = {**oxide_kg, **gas_kg}
+        products = tuple(
+            (
+                product_kg
+                / resolve_species_formula(product, registry).molar_mass_kg_per_mol(),
+                product,
+            )
+            for product, product_kg in products_kg.items()
+        )
         reaction = _format_reaction(
             ((1.0, carbonate),),
-            ((1.0, oxide), (1.0, "CO2")),
+            products,
         )
         _assert_reaction_balanced(
             f"STAGE0_CARBONATE_METAL_OXIDE_STOICH[{metal!r}]",
