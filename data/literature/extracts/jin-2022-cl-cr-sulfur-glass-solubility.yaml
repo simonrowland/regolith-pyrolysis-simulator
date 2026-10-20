@@ -34,6 +34,12 @@ species:
       quench_state: asserted_preserved
       quench_note: Samples were quenched in water after melting at 1150 °C.
       units: fraction; percent as published
+      derivation:
+        relation: Cr(VI)/Cr(total) was measured by linear-combination fitting of Cr Kα1,2 X-ray fluorescence spectra to Na2CrO4 and Cr2O3 reference compounds.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 6, pdf_page_index: 5, section: '2.6 X-Ray Emission Spectroscopy (XES)', record: 'Cr K-alpha XES spectra (Figure 2) linear-combination fitted to reference compounds; fit inputs not reported numerically'}
+        output_unit: percent
       uncertainty:
         note: Per-point one-standard-deviation uncertainties are printed in Table 4 and retained with each point.
         confidence_level: one_sigma
