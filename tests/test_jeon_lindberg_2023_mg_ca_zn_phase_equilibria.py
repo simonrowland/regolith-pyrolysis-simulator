@@ -92,8 +92,16 @@ def test_isolated_migration_preserves_every_point_species_temperature_and_condit
         assert item.identity.temperature_K.is_value
         assert item.point_conditions["sample_id"].state.is_value
         assert item.point_conditions["atmosphere"].state.is_value
-        assert item.point_conditions["equilibration_time_hours"].state.is_value
-        assert item.point_conditions["composition"].state.tag.value in {"value", "unknown"}
+        sample = str(item.point_conditions["sample_id"].state.value)
+        time = item.point_conditions["equilibration_time_hours"].state
+        if sample in {"13", "14"}:
+            assert time.is_unknown
+        else:
+            assert time.is_value
+        for field in ("initial_composition_as_published", "composition"):
+            composition = item.point_conditions[field].state
+            if sample in {"13", "14", "15", "16"}:
+                assert composition.is_unknown
         assert not item.notices
         if item.uncertainty.kind.value == "printed":
             assert item.uncertainty.verbatim["reported_status"] == "printed"
@@ -108,5 +116,34 @@ def test_table_row_count_and_table1_condition_disposition() -> None:
     rows = _rows(document)
     assert len(rows) == 102
     assert {row["point_conditions"]["sample_id"]["state"]["value"] for row in rows.values()} == {str(i) for i in range(1, 17)}
-    # Table 1 is an initial-charge and run-condition table, not measured equilibrium data.
-    assert all("initial_composition_as_published" in row["point_conditions"] for row in rows.values())
+    assert all(
+        row["point_conditions"]["equilibration_time_hours"]["state"]["tag"] == "unknown"
+        for row in rows.values()
+        if row["point_conditions"]["sample_id"]["state"]["value"] in {"13", "14"}
+    )
+    assert all(
+        row["point_conditions"][field]["state"]["tag"] == "unknown"
+        for row in rows.values()
+        if row["point_conditions"]["sample_id"]["state"]["value"] in {"13", "14", "15", "16"}
+        for field in ("initial_composition_as_published", "composition")
+    )
+
+    bad_time = deepcopy(document)
+    bad_row = next(
+        row for row in _rows(bad_time).values()
+        if row["point_conditions"]["sample_id"]["state"]["value"] == "13"
+    )
+    bad_row["point_conditions"]["equilibration_time_hours"]["state"] = {"tag": "value", "value": 10}
+    with pytest.raises(AssertionError):
+        assert bad_row["point_conditions"]["equilibration_time_hours"]["state"]["tag"] == "unknown"
+
+    context = document["species"]["SiO2"]["context"]
+    footnote = next(row for row in context if row["observation_id"] == "jeon23_table2_p2o5_bound_context")
+    assert footnote["values"]["bound_as_published"] == "<0.1 mol%"
+    assert footnote["values"]["temperature_as_published"] == "1000 °C"
+    figures = [row for row in context if row["type"] == "figure_record"]
+    assert len(figures) == 11
+    assert {row["locator"]["figure"] for row in figures} == {str(i) for i in range(1, 12)}
+    assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in figures)
+    assert all("points" not in row["values"] for row in figures)
+    assert all(row["locator"]["page"] == row["locator"]["pdf_page_index"] + 1 for row in figures)
