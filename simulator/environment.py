@@ -38,6 +38,19 @@ class CoverGasCompositionUnavailable(ValueError):
     """The declared cover gas does not specify a usable composition."""
 
 
+def controlled_background_partial_pressure(
+    total_pressure: float, oxygen_partial_pressure: float, mole_fraction: float,
+) -> float:
+    """Background share of the non-commanded-O2 pressure, in input units.
+
+    Dalton: P=P_O2+P_background, hence p_i=y_i*max(P-P_O2,0).
+    y_i is dimensionless. At P=P_O2 no background remains; y_i=1 fills
+    the entire residual. Preserve the existing boundary fraction clamp.
+    """
+    fraction = min(1.0, max(0.0, float(mole_fraction)))
+    return max(0.0, total_pressure - oxygen_partial_pressure) * fraction
+
+
 def cover_gas_partial_pressures(
     atmosphere: str, total_pressure: float,
 ) -> dict[str, float]:

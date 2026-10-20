@@ -53,7 +53,10 @@ import math
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Optional
 
-from simulator.environment import cover_gas_partial_pressures
+from simulator.environment import (
+    controlled_background_partial_pressure,
+    cover_gas_partial_pressures,
+)
 from simulator.state import (
     GAS_CONSTANT,  # R: J/(mol·K)
     MOLAR_MASS,  # g/mol
@@ -1188,11 +1191,11 @@ class OverheadGasModel:
             if background_species and background_species.upper() != 'O2':
                 background_fraction = float(  # dimensionless — background gas mole fraction
                     getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
                 gas.composition[background_species] = max(  # mbar — background gas partial pressure
                     gas.composition.get(background_species, 0.0),
-                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction,  # mbar — background gas partial pressure share
+                    controlled_background_partial_pressure(
+                        melt.p_total_mbar, melt.pO2_mbar, background_fraction,
+                    ),  # mbar — background gas partial pressure share
                 )
 
         partial_pressure_sum_mbar = sum(  # mbar — sum of nonnegative reported partial pressures
@@ -1320,11 +1323,11 @@ class OverheadGasModel:
             if background_species and background_species.upper() != 'O2':
                 background_fraction = float(  # dimensionless — background gas mole fraction
                     getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
                 gas.composition[background_species] = max(  # mbar — background gas partial pressure
                     gas.composition.get(background_species, 0.0),
-                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction,  # mbar — background gas partial pressure share
+                    controlled_background_partial_pressure(
+                        melt.p_total_mbar, melt.pO2_mbar, background_fraction,
+                    ),  # mbar — background gas partial pressure share
                 )
 
     @staticmethod
