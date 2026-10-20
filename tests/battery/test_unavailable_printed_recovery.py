@@ -1,6 +1,8 @@
-"""Printed Ichise 1982 Table 2 activities the migrator used to leave UNAVAILABLE (b-981).
+"""Printed numbers the migrator used to leave UNAVAILABLE (b-981).
 
-Expected amounts are the MinerU decode of Table 2 (published p. 555), not a copy of the extract YAML.
+Expected amounts are the PDF table cells, not a copy of the extract YAML.
+Ichise Table 2 is the MinerU decode of the paper (published p. 555).
+Sossi Table 1 is the pdftotext of Geochimica et Cosmochimica Acta 288 (2020).
 """
 
 from __future__ import annotations
@@ -8,7 +10,7 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Quantity, UncertaintyKind, ValueKind
 from simulator.battery.migrate import select_declared_source
 from simulator.yaml_cache import load_cached_safe_yaml
 from tests.battery.test_migrate import _write_min_tree
@@ -44,6 +46,15 @@ _ICHISE_TABLE2 = (
     (Decimal("0.842"), Decimal("0.518")),
     (Decimal("0.912"), Decimal("0.360")),
     (Decimal("0.912"), Decimal("0.383")),
+)
+
+# Sossi et al., GCA 288 (2020) Table 1. d65Cu relative to the starting material.
+# (run slug as the migrator prints it, T_C, d65Cu, 2SD)
+_SOSSI_CU = (
+    ("p-5/04/17b", Decimal("1500"), Decimal("2.15"), Decimal("0.02")),
+    ("p-10/04/17a", Decimal("1500"), Decimal("1.03"), Decimal("0.02")),
+    ("p-7/04/17a", Decimal("1300"), Decimal("0.11"), Decimal("0.05")),
+    ("p-01/08/18d", Decimal("1396.6"), Decimal("11.96"), Decimal("0.09")),
 )
 
 
@@ -133,6 +144,129 @@ def test_renaming_ichise_activity_back_to_a_fe_drops_the_points(tmp_path: Path) 
     rows = _ichise_rows(result)
     assert len(rows) == 23
     assert all(row.value.kind is ValueKind.UNAVAILABLE for row in rows)
+
+
+def _sossi_run(result, parent: str, slug: str):
+    stem = "sossi-2020-cu-zn-isotope-evap-formalism"
+    needle = f"{stem}::{parent}::"
+    row_bit = f"row={slug}:"
+    matches = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(needle) and row_bit in oid
+    ]
+    assert len(matches) == 1, slug
+    return matches[0]
+
+
+def _printed_two_sd(obs) -> Decimal:
+    assert obs.uncertainty.kind is UncertaintyKind.PRINTED
+    verbatim = obs.uncertainty.verbatim
+    assert isinstance(verbatim, dict)
+    assert verbatim["units"] == "per mil"
+    return Decimal(str(verbatim["two_sd_per_mil"]))
+
+
+def test_sossi_cu_table1_isotope_deltas_are_points(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "sossi-2020-cu-zn-isotope-evap-formalism")
+    parent = "sossi_2020_cu_table1_measured_runs"
+    stem = "sossi-2020-cu-zn-isotope-evap-formalism"
+    cu = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(f"{stem}::{parent}::")
+    ]
+    assert len(cu) == 34
+    points = [obs for obs in cu if obs.value.kind is ValueKind.POINT]
+    unavailable = [obs for obs in cu if obs.value.kind is ValueKind.UNAVAILABLE]
+    assert len(points) == 22
+    assert len(unavailable) == 12
+    for slug, t_c, delta, two_sd in _SOSSI_CU:
+        obs = _sossi_run(result, parent, slug)
+        assert obs.value.kind is ValueKind.POINT
+        assert obs.value.point == delta
+        assert obs.value.approximate is False
+        assert obs.identity.species.formula == "Cu"
+        temperature = obs.point_conditions["temperature_K"]
+        assert temperature.state.value == t_c + Decimal("273.15")
+        assert temperature.inference is not None
+        assert obs.identity.temperature_K.value == t_c + Decimal("273.15")
+        assert _printed_two_sd(obs) == two_sd
+    # Table 1 leaves d65Cu blank for P 21/06/18a. That blank stays unknown.
+    blank = _sossi_run(result, parent, "p-21/06/18a")
+    assert blank.value.kind is ValueKind.UNAVAILABLE
+    # Zn rows print two isotope systems, or a contaminated d68 only.
+    # Neither becomes the observation's one isotope_delta.
+    zn_both = _sossi_run(result, "sossi_2020_zn_table1_measured_runs", "p-5/04/17b")
+    zn_68 = _sossi_run(result, "sossi_2020_zn_table1_measured_runs", "p-01/08/18c")
+    assert zn_both.value.kind is ValueKind.UNAVAILABLE
+    assert zn_68.value.kind is ValueKind.UNAVAILABLE
+
+
+def test_one_isotope_delta_key_is_a_point_and_two_are_not() -> None:
+    one = select_declared_source(
+        Quantity.ISOTOPE_DELTA,
+        "permil",
+        {"isotope_delta_isotope_delta": "2.15", "T_C": 1500},
+    )
+    assert one.value.kind is ValueKind.POINT
+    assert one.amount == Decimal("2.15")
+    printed_name = select_declared_source(
+        Quantity.ISOTOPE_DELTA,
+        "permil",
+        {"delta65Cu_SM_per_mil": "2.15", "T_C": 1500},
+    )
+    assert printed_name.value.kind is ValueKind.UNAVAILABLE
+    both = select_declared_source(
+        Quantity.ISOTOPE_DELTA,
+        "permil",
+        {
+            "isotope_delta_delta66": "5.54",
+            "isotope_delta_delta68": "10.79",
+        },
+    )
+    assert both.value.kind is ValueKind.UNAVAILABLE
+    # Ion-current ratios, log gamma, and a pressure-fit dict are not points
+    # under an isotope or activity read.
+    ratio = select_declared_source(
+        Quantity.ION_INTENSITY_RATIO,
+        None,
+        {"I_PbO_over_I_Pd": "1.2", "I_PO_over_I_Pd": "0.4"},
+    )
+    assert ratio.value.kind is ValueKind.UNAVAILABLE
+    log_gamma = select_declared_source(
+        Quantity.ACTIVITY_COEFFICIENT,
+        None,
+        {"log10_gamma_Si": "-0.3"},
+    )
+    assert log_gamma.value.kind is ValueKind.UNAVAILABLE
+
+
+def test_renaming_sossi_isotope_field_back_drops_the_points(tmp_path: Path) -> None:
+    path = _EXTRACTS / "sossi-2020-cu-zn-isotope-evap-formalism.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    cu = [
+        obs
+        for obs in doc["species"]["Cu"]["observations"]
+        if str(obs["observation_id"]).startswith("sossi_2020_cu_table1_measured_runs::")
+    ]
+    touched = 0
+    for obs in cu:
+        item = obs["values"]["series"][0]
+        if "isotope_delta_isotope_delta" in item:
+            item["delta65Cu_SM_per_mil"] = item.pop("isotope_delta_isotope_delta")
+            touched += 1
+    assert touched == 22
+    result = _migrate_real_extract_doc(tmp_path, doc)
+    stem = "sossi-2020-cu-zn-isotope-evap-formalism"
+    parent = "sossi_2020_cu_table1_measured_runs"
+    points = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(f"{stem}::{parent}::")
+        and obs.value.kind is ValueKind.POINT
+    ]
+    assert points == []
 
 
 def _migrate_real_extract_doc(tmp_path: Path, doc: dict):
