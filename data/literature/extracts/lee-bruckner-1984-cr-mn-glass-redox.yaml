@@ -1,0 +1,1188 @@
+schema_version: literature_extract.v1
+source_id: lee-bruckner-1984-cr-mn-glass-redox
+source:
+  citation: Lee, Jeong-Hoon & Brückner, Rolf (1984), "On chromium—manganese redox equilibrium in silicate and borate
+    glasses", Glastechnische Berichte 57(1).
+  year: 1984
+extraction:
+  method: MinerU tables reconciled with page text and 600 dpi PDF renders; printed compositions and ratio values
+    transcribed.
+  date: '2026-10-20'
+  worker: fam25-1020
+review_status: draft
+experiments:
+- experiment_id: lee_bruckner_1984_chromium_glasses
+  series: Chromium-bearing sodium silicate and sodium borate glasses; Table 1
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 8
+    table: '1'
+- experiment_id: lee_bruckner_1984_manganese_glasses
+  series: Manganese-bearing sodium silicate and sodium borate glasses; Table 2
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 8
+    table: '2'
+species:
+  Cr:
+    observations:
+    - observation_id: lee_bruckner_1984_table1_glass_density
+      experiment: lee_bruckner_1984_chromium_glasses
+      type: concentration_series
+      locator: &id001
+        page: 2
+        pdf_page_index: 1
+        published_page: 8
+        table: '1'
+      phase: glass
+      units: g/cm3
+      uncertainty:
+        note: No uncertainty is printed.
+      values:
+        quantity: density
+        formula: unknown
+        method_class: measured_direct
+        admission_status: admitted
+        method_as_printed: Chemical analysis and optical measurement of chromium-containing glasses.
+        points:
+        - sample: 80 SiO2, 20 Na2O
+          value: '2.388'
+          value_as_published: '2.388'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id001
+          density_g_cm3: '2.388'
+        - sample: 75 SiO2, 25 Na2O
+          value: '2.416'
+          value_as_published: '2.416'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id001
+          density_g_cm3: '2.416'
+        - sample: 70 SiO2, 30 Na2O
+          value: '2.470'
+          value_as_published: '2.470'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id001
+          density_g_cm3: '2.470'
+        - sample: 73 SiO2, 16 Na2O, 11 CaO
+          value: '2.495'
+          value_as_published: '2.495'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id001
+          density_g_cm3: '2.495'
+        - sample: 90 B2O3, 10 Na2O
+          value: '2.046'
+          value_as_published: '2.046'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id001
+          density_g_cm3: '2.046'
+        - sample: 80 B2O3, 20 Na2O
+          value: '2.184'
+          value_as_published: '2.184'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id001
+          density_g_cm3: '2.184'
+        - sample: 70 B2O3, 30 Na2O
+          value: '2.335'
+          value_as_published: '2.335'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id001
+          density_g_cm3: '2.335'
+    - observation_id: lee_bruckner_1984_table1_cr6_total
+      experiment: lee_bruckner_1984_chromium_glasses
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 8
+        table: '1'
+      phase: glass
+      units: '% of total Cr'
+      uncertainty:
+        note: No uncertainty is printed.
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 6
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - sample: sodium silicate 80 SiO2, 20 Na2O
+          value: '15.4'
+          value_as_published: '15.4'
+          unit: '%'
+          composition_as_printed: 80 mol% SiO2, 20 mol% Na2O; 0.1 mass% Cr2O3 added; complete melt composition unknown
+          T_C: null
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them
+                  to each glass row.
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            composition:
+              state:
+                tag: unknown
+                reason: Base glass composition and dopant are printed on different amount bases; complete melt composition
+                  is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium silicate 75 SiO2, 25 Na2O
+          value: '20.6'
+          value_as_published: '20.6'
+          unit: '%'
+          composition_as_printed: 75 mol% SiO2, 25 mol% Na2O; 0.1 mass% Cr2O3 added; complete melt composition unknown
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them
+                  to each glass row.
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            composition:
+              state:
+                tag: unknown
+                reason: Base glass composition and dopant are printed on different amount bases; complete melt composition
+                  is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium silicate 70 SiO2, 30 Na2O
+          value: '31.8'
+          value_as_published: '31.8'
+          unit: '%'
+          composition_as_printed: 70 mol% SiO2, 30 mol% Na2O; 0.1 mass% Cr2O3 added; complete melt composition unknown
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them
+                  to each glass row.
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            composition:
+              state:
+                tag: unknown
+                reason: Base glass composition and dopant are printed on different amount bases; complete melt composition
+                  is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium silicate 73 SiO2, 16 Na2O, 11 CaO
+          value: '20.0'
+          value_as_published: '20.0'
+          unit: '%'
+          composition_as_printed: 73 mol% SiO2, 16 mol% Na2O, 11 mol% CaO; 0.1 mass% Cr2O3 added; complete melt
+            composition unknown
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them
+                  to each glass row.
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            composition:
+              state:
+                tag: unknown
+                reason: Base glass composition and dopant are printed on different amount bases; complete melt composition
+                  is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium borate 90 B2O3, 10 Na2O
+          value: '13.45'
+          value_as_published: '13.45'
+          unit: '%'
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0.05 mass% Cr2O3 added; complete melt composition
+            unknown
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them
+                  to each glass row.
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            composition:
+              state:
+                tag: unknown
+                reason: Base glass composition and dopant are printed on different amount bases; complete melt composition
+                  is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium borate 80 B2O3, 20 Na2O
+          value: '22.20'
+          value_as_published: '22.20'
+          unit: '%'
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0.05 mass% Cr2O3 added; complete melt composition
+            unknown
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them
+                  to each glass row.
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            composition:
+              state:
+                tag: unknown
+                reason: Base glass composition and dopant are printed on different amount bases; complete melt composition
+                  is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium borate 70 B2O3, 30 Na2O
+          value: '35.89'
+          value_as_published: '35.89'
+          unit: '%'
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0.05 mass% Cr2O3 added; complete melt composition
+            unknown
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: The paper prints 1450 and 1300 °C for these melts but does not unambiguously assign them
+                  to each glass row.
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            composition:
+              state:
+                tag: unknown
+                reason: Base glass composition and dopant are printed on different amount bases; complete melt composition
+                  is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        method_as_printed: chemical analysis and optical measurement
+    - observation_id: lee_bruckner_1984_table1_cr3_total
+      experiment: lee_bruckner_1984_chromium_glasses
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 8
+        table: '1'
+      phase: glass
+      units: '% of total Cr'
+      uncertainty:
+        note: No uncertainty is printed.
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - sample: sodium silicate 80 SiO2, 20 Na2O
+          value: '84.6'
+          value_as_published: '84.6'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium silicate 75 SiO2, 25 Na2O
+          value: '79.4'
+          value_as_published: '79.4'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium silicate 70 SiO2, 30 Na2O
+          value: '68.2'
+          value_as_published: '68.2'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium silicate 73 SiO2, 16 Na2O, 11 CaO
+          value: '80.0'
+          value_as_published: '80.0'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium borate 90 B2O3, 10 Na2O
+          value: '86.55'
+          value_as_published: '86.55'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium borate 80 B2O3, 20 Na2O
+          value: '77.80'
+          value_as_published: '77.80'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium borate 70 B2O3, 30 Na2O
+          value: '64.11'
+          value_as_published: '64.11'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '1'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        method_as_printed: chemical analysis and optical measurement
+    context:
+    - species: Cr
+      observation_id: lee_bruckner_1984_table3_untyped
+      type: measured_table_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 10
+        table: '3'
+      units: mol/l
+      phase: glass
+      quantity_as_printed: Absorption of Cr6+ at 350 nm and change in Cr6+ concentration
+      schema_gap: No existing quantity token represents the printed concentration change ΔCr6+ in mol/l; absorption
+        values are optical measurements, not valence ratios.
+      values:
+        delta_Cr6_mol_l_as_printed:
+        - '-0.0047'
+        - '-0.0064'
+        - '-0.0072'
+        - '-0.0062'
+        - '+0.0016'
+        - '+0.0024'
+        - '+0.0010'
+        note: Seven mixed Cr/Mn glasses; values retain the printed sign.
+    - species: Cr
+      observation_id: lee_bruckner_1984_figure2_deferred
+      type: figure_only
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 9
+        figure: '2'
+      values:
+        method_class: figure_only
+        quantity_as_printed: optical absorbance
+        species: Cr
+        phase_as_printed: sodium silicate and sodium borate glasses
+        axes_as_printed:
+          x: wavelength / wavenumber
+          y: absorbance E/d
+        caption: Absorption curves of chromium-containing glasses
+        panels:
+        - a
+        - b
+        series:
+        - label: sodium silicate
+          marker_count: 3
+        - label: sodium borate
+          marker_count: 3
+        digitisation: deferred to a figure pass
+      units: absorbance E/d in cm^-1
+    - species: Cr
+      observation_id: lee_bruckner_1984_figure3_deferred
+      type: figure_only
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 10
+        figure: '3'
+      values:
+        method_class: figure_only
+        quantity: valence_ratio
+        species: Cr
+        phase_as_printed: mixed chromium- and manganese-bearing sodium silicate and borate glasses
+        axes_as_printed:
+          x: wavelength / wavenumber
+          y: absorbance E/d
+        caption: Absorption curves of sodium silicate glasses with chromium and manganese and reference glasses
+          with one transition-metal oxide
+        panels:
+        - a
+        - b
+        - c
+        - d
+        series:
+        - label: mixed chromium and manganese glasses
+          marker_count: 4
+        digitisation: deferred to a figure pass
+      units: absorbance E/d in cm^-1
+  Mn:
+    observations:
+    - observation_id: lee_bruckner_1984_table2_glass_density
+      experiment: lee_bruckner_1984_manganese_glasses
+      type: concentration_series
+      locator: &id002
+        page: 2
+        pdf_page_index: 1
+        published_page: 8
+        table: '2'
+      phase: glass
+      units: g/cm3
+      uncertainty:
+        note: No uncertainty is printed.
+      values:
+        quantity: density
+        formula: unknown
+        method_class: measured_direct
+        admission_status: admitted
+        method_as_printed: Chemical analysis and optical measurement of manganese-containing glasses.
+        points:
+        - sample: 80 SiO2, 20 Na2O
+          value: '2.398'
+          value_as_published: '2.398'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id002
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id002
+          density_g_cm3: '2.398'
+        - sample: 75 SiO2, 25 Na2O
+          value: '2.437'
+          value_as_published: '2.437'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id002
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id002
+          density_g_cm3: '2.437'
+        - sample: 70 SiO2, 30 Na2O
+          value: '2.481'
+          value_as_published: '2.481'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id002
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id002
+          density_g_cm3: '2.481'
+        - sample: 73 SiO2, 16 Na2O, 11 CaO
+          value: '2.508'
+          value_as_published: '2.508'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id002
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id002
+          density_g_cm3: '2.508'
+        - sample: 90 B2O3, 10 Na2O
+          value: '2.042'
+          value_as_published: '2.042'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id002
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id002
+          density_g_cm3: '2.042'
+        - sample: 80 B2O3, 20 Na2O
+          value: '2.189'
+          value_as_published: '2.189'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id002
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id002
+          density_g_cm3: '2.189'
+        - sample: 70 B2O3, 30 Na2O
+          value: '2.299'
+          value_as_published: '2.299'
+          unit: g/cm3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density measurement temperature is not reported.
+              locator: *id002
+            composition:
+              state:
+                tag: unknown
+                reason: Complete melt composition is not reported on a single amount basis.
+              locator: *id002
+          density_g_cm3: '2.299'
+    - observation_id: lee_bruckner_1984_table2_mn3_total
+      experiment: lee_bruckner_1984_manganese_glasses
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 8
+        table: '2'
+      phase: glass
+      units: '% of total Mn'
+      uncertainty:
+        note: No uncertainty is printed.
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - sample: sodium silicate 80 SiO2, 20 Na2O
+          value: '5.67'
+          value_as_published: '5.67'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '2'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium silicate 75 SiO2, 25 Na2O
+          value: '5.88'
+          value_as_published: '5.88'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '2'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium silicate 70 SiO2, 30 Na2O
+          value: '7.30'
+          value_as_published: '7.30'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '2'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium silicate 73 SiO2, 16 Na2O, 11 CaO
+          value: '7.91'
+          value_as_published: '7.91'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '2'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium borate 90 B2O3, 10 Na2O
+          value: '4.5'
+          value_as_published: '4.5'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '2'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium borate 80 B2O3, 20 Na2O
+          value: '13.25'
+          value_as_published: '13.25'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '2'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        - sample: sodium borate 70 B2O3, 30 Na2O
+          value: '20.0'
+          value_as_published: '20.0'
+          unit: '%'
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Temperature assignment is not stated per composition.
+              locator:
+                page: 1
+                pdf_page_index: 0
+            composition:
+              state:
+                tag: unknown
+                reason: Complete composition is not reported on a single amount basis.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                table: '2'
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Herstellung der Gläser
+        method_as_printed: chemical analysis and optical measurement of Mn3+ absorption
+    context:
+    - species: Cr
+      observation_id: lee_bruckner_1984_figure1_deferred
+      type: figure_only
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 8
+        figure: '1'
+      values:
+        method_class: figure_only
+        quantity_as_printed: optical absorbance
+        species: Mn
+        phase_as_printed: sodium borate and sodium silicate glasses
+        axes_as_printed:
+          x: wavelength / wavenumber
+          y: absorbance E/d
+        caption: Absorption curves of manganese-containing glasses
+        panels:
+        - a
+        - b
+        series:
+        - label: sodium borate
+          marker_count: 3
+        - label: sodium silicate
+          marker_count: 3
+        digitisation: deferred to a figure pass
+      units: absorbance E/d in cm^-1
+audit:
+  table_dispositions:
+  - table: '1'
+    page: 2
+    printed_rows: 7
+    disposition: typed
+    candidate_tokens:
+    - valence_ratio
+    - density
+    notes: Cr6+/ΣCr and Cr3+/ΣCr typed as printed percentages; table 1 also contains composition, density, concentrations
+      and optical/extinction data not represented by a fitting quantity token. The printed density column is typed
+      as bulk glass density with unknown formula.
+  - table: '2'
+    page: 2
+    printed_rows: 7
+    disposition: typed
+    candidate_tokens:
+    - valence_ratio
+    - density
+    notes: Mn3+/ΣMn typed as printed percentages; other columns are retained as table context only where no fitting
+      quantity token exists. The printed density column is typed as bulk glass density with unknown formula.
+  - table: '3'
+    page: 4
+    printed_rows: 7
+    disposition: context-no-token
+    candidate_tokens:
+    - valence_ratio
+    - optical_absorbance
+    notes: Delta Cr6+ concentration is not a valence ratio and optical absorbance has no quantity token.
+fidelity_samples:
+- path: species.Cr.observations[lee_bruckner_1984_table1_cr6_total].values.points[0].value
+  value: '15.4'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 8
+    table: '1'
+    row: 80 SiO2, 20 Na2O
