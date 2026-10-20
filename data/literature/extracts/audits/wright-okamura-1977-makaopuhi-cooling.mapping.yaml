@@ -1,0 +1,49 @@
+source_id: wright-okamura-1977-makaopuhi-cooling
+source:
+  citation: 'Wright, T. L. & Okamura, R. T. (1977), Cooling and Crystallization of Tholeiitic Basalt, 1965 Makaopuhi Lava Lake, Hawaii, U.S. Geological Survey Professional Paper 1004.'
+extraction:
+  method: mineru_table_draft emit; first three Table 17 columns only, which are footnoted electron-microprobe glass analyses by R. T. Helz
+  date: '2026-10-20'
+  worker: codex-resume-45736-1792513930
+review_status: draft
+tables:
+  - page: 42
+    table_index: 32
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt% as printed
+    published_page: 37
+    phase: glass
+    rows: [3, 4, 5, 6, 7, 8, 9, 10]
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+        phase: glass
+      - species_column: 1
+        value_column: 3
+        phase: glass
+      - species_column: 1
+        value_column: 4
+        phase: glass
+    conditions:
+      - key: T_C
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 42
+          pdf_page_index: 41
+          published_page: 37
+          table: '17'
+          note: No temperature of the glass analyses is printed.
+      - key: quench_state
+        state:
+          tag: value
+          value: not_stated
+        locator:
+          page: 42
+          pdf_page_index: 41
+          published_page: 37
+          table: '17'
+          note: The table does not state the quench history of the analyzed glass.
