@@ -742,6 +742,115 @@ def test_internal_analytical_singular_antoine_fit_refuses_without_arithmetic_err
         )
 
 
+def test_internal_analytical_antoine_pressure_overflow_refuses_all_rails() -> None:
+    from copy import deepcopy
+
+    from engines.builtin.vapor_pressure import GAS_RAIL_STANDARD_REACTION_KEY
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.equilibrium import EquilibriumMixin
+
+    overflowing = {"A": 400.0, "B": 100.0, "C": 0.0}
+
+    iron = deepcopy(VAPOR_PRESSURE_DATA["metals"]["Fe"])
+    iron["pure_component_antoine"] = dict(overflowing)
+    iron["antoine"] = dict(overflowing)
+    aluminum = deepcopy(VAPOR_PRESSURE_DATA["metals"]["Al"])
+    aluminum["liquid_oxide_standard_reaction"]["antoine"] = dict(overflowing)
+    magnesium = deepcopy(VAPOR_PRESSURE_DATA["metals"]["Mg"])
+    gas_rail = magnesium[GAS_RAIL_STANDARD_REACTION_KEY]
+    for key in ("status", "runtime_disposition", "authority_status"):
+        gas_rail.pop(key, None)
+    gas_rail["authoritative"] = True
+    gas_rail["antoine"] = dict(overflowing)
+    silicon_monoxide = deepcopy(VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"])
+    silicon_monoxide["antoine"] = dict(overflowing)
+
+    cases = (
+        (
+            "Fe",
+            {"FeO": 100.0},
+            {"metals": {"Fe": iron}, "oxide_vapors": {}},
+        ),
+        (
+            "Al",
+            {"Al2O3": 100.0},
+            {"metals": {"Al": aluminum}, "oxide_vapors": {}},
+        ),
+        (
+            "Mg",
+            {"MgO": 100.0},
+            {"metals": {"Mg": magnesium}, "oxide_vapors": {}},
+        ),
+        (
+            "SiO",
+            {"SiO2": 100.0},
+            {"metals": {}, "oxide_vapors": {"SiO": silicon_monoxide}},
+        ),
+    )
+    for species, composition, vapor_pressures in cases:
+        sim = _internal_analytical_host(
+            temperature_K=1700.0,
+            composition_wt_pct=composition,
+            vapor_pressures=vapor_pressures,
+        )
+
+        result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+        assert result.status == "refused", species
+        assert species not in result.vapor_pressures_Pa, species
+        assert any(
+            note.get("species") == species
+            and note.get("zero_because") == ZeroBecause.MISSING_COEFFICIENT.value
+            and note.get("doctrine_category") == CATEGORY_REFUSE
+            for note in result.diagnostics.get("silent_zero_notes") or []
+        ), species
+
+
+def test_internal_analytical_skips_absent_parent_before_model_resolution() -> None:
+    from simulator.equilibrium import EquilibriumMixin
+
+    sim = _internal_analytical_host(
+        temperature_K=1700.0,
+        composition_wt_pct={"SiO2": 100.0},
+        vapor_pressures={
+            "metals": {},
+            "oxide_vapors": {
+                "PO": {
+                    "parent_oxide": "P2O5",
+                    "reference_pressure_model": {"model": "nasa_cea_9"},
+                },
+            },
+        },
+    )
+
+    result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+    assert result.status == "ok"
+    assert "PO" not in result.vapor_pressures_Pa
+    assert not any(
+        note.get("species") == "PO"
+        and note.get("zero_because") == ZeroBecause.MISSING_THERMO.value
+        for note in result.diagnostics.get("silent_zero_notes") or []
+    )
+
+
+def test_internal_analytical_keeps_small_channel_omission_threshold() -> None:
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.equilibrium import EquilibriumMixin
+
+    sim = _internal_analytical_host(
+        temperature_K=1223.15,
+        composition_wt_pct={"Al2O3": 100.0},
+        vapor_pressures=VAPOR_PRESSURE_DATA,
+    )
+    sim.melt.campaign = SimpleNamespace(name="C0B")
+
+    result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+    assert result.status == "ok"
+    assert "Al2" not in result.vapor_pressures_Pa
+
+
 # ---------------------------------------------------------------------------
 # Instance 6: C7 Ca transport missing/non-finite inputs + bounded notes
 # ---------------------------------------------------------------------------
