@@ -361,6 +361,12 @@ VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG = (
 )
 VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_STATUS = "reconstructed_limited"
 PSEUDO_VAPOROCK_CURVE_FIT_SOURCE = "vaporock_backsolved_curve_fit"
+METAL_VAPOR_PRESSURE_OUT_OF_RANGE_REASON = (
+    "metal_vapor_pressure_outside_valid_range"
+)
+OXIDE_VAPOR_PRESSURE_OUT_OF_RANGE_REASON = (
+    "oxide_vapor_pressure_out_of_validated_range"
+)
 ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
 _BUILTIN_VAPOR_SOURCE_CLASSES = frozenset(
     {
@@ -2949,6 +2955,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                             metal_extrapolations[species] = {
                                 "temperature_K": T_K,
                                 "valid_range_K": (valid_low, valid_high),
+                                "authority_level": "extrapolated",
+                                "reason": METAL_VAPOR_PRESSURE_OUT_OF_RANGE_REASON,
                             }
                             warnings.append(
                                 f"{species} metal Antoine fit extrapolated beyond "
@@ -3108,6 +3116,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                             "temperature_K": T_K,
                             "valid_range_K": (vlo, vhi),
                             "rail": "liquid_oxide_standard_reaction",
+                            "authority_level": "extrapolated",
+                            "reason": METAL_VAPOR_PRESSURE_OUT_OF_RANGE_REASON,
                         }
                         warnings.append(
                             f"{species} liquid-oxide standard reaction "
@@ -3236,6 +3246,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                                 "temperature_K": T_K,
                                 "valid_range_K": (vlo, vhi),
                                 "rail": "gas_rail_standard_reaction",
+                                "authority_level": "extrapolated",
+                                "reason": METAL_VAPOR_PRESSURE_OUT_OF_RANGE_REASON,
                             }
                             warnings.append(
                                 f"{species} gas-rail liquid-oxide standard reaction "
@@ -3755,7 +3767,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                             "temperature_K": T_K,
                             "valid_range_K": (valid_low, valid_high),
                             "authority_level": "extrapolated",
-                            "reason": "oxide_vapor_pressure_out_of_validated_range",
+                            "reason": OXIDE_VAPOR_PRESSURE_OUT_OF_RANGE_REASON,
                         }
                     else:
                         extrapolation_allowed_range = _range_tuple(
@@ -3780,6 +3792,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         oxide_vapor_extrapolations[name] = {
                             "temperature_K": T_K,
                             "valid_range_K": (valid_low, valid_high),
+                            "authority_level": "extrapolated",
+                            "reason": OXIDE_VAPOR_PRESSURE_OUT_OF_RANGE_REASON,
                             "extrapolation_allowed_range_K": (
                                 allowed_low,
                                 allowed_high,
@@ -3844,6 +3858,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "valid_range_K": compiled_evaluator.valid_temperature_K,
                         "status": evaluation.status,
                         "acquisition_flag": evaluation.acquisition_flag,
+                        "authority_level": "extrapolated",
+                        "reason": evaluation.status,
                     }
                     warnings.append(str(evaluation.status))
                     # Premise: the compiled evaluator's consequence-aware
@@ -3852,10 +3868,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     # window and create a discontinuity at every grid floor.
                     # Algebra: P_eq = 10**log10(P_cont),
                     # with activity and fO2 powers already applied exactly once
-                    # by evaluate(). Units: P_eq remains Pa. Sanity: only the two
-                    # fields above change at the boundary (typed warning +
-                    # acquisition flag); the pressure remains continuous for every
-                    # status-bearing compiled carrier.
+                    # by evaluate(). Units: P_eq remains Pa. Sanity: the record
+                    # carries status, reason, authority, and acquisition flag;
+                    # pressure remains continuous for every status-bearing
+                    # compiled carrier.
             else:
                 # Premise: above-band SiO retains its source reaction fit.
                 # Algebra: log10(P_reference/Pa) = A - B/(T_K+C), unchanged;
@@ -3998,10 +4014,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
-                if name == "SiO" and oxide_extrapolated:
-                    vapor_pressure_provenance[name]["extrapolation_notice"] = dict(
-                        oxide_vapor_extrapolations[name]
-                    )
                 if compiled_evaluator is not None:
                     vapor_pressure_provenance[name][
                         "P_reference_model_Pa"
@@ -4023,6 +4035,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     self._pseudo_vapor_pressure_warning_seen,
                     stacklevel=2,
                 )
+
+        vapor_pressure_extrapolations = {
+            **metal_extrapolations,
+            **oxide_vapor_extrapolations,
+        }
+        for species, notice in vapor_pressure_extrapolations.items():
+            if (
+                notice.get("authority_level") != "extrapolated"
+                or not notice.get("reason")
+            ):
+                continue
+            provenance = vapor_pressure_provenance.get(species)
+            if provenance is not None:
+                provenance["extrapolation_notice"] = dict(notice)
 
         # YAML authority/bracket labels (pressure-neutral; Bug B pattern).
         species_authority: dict[str, dict[str, Any]] = {}
@@ -4114,10 +4140,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "pO2_floor_inversion_notices_by_species": floor_inversion_notices,
             "pO2_bar": transport_pO2_bar,
             "vacuum_floor_bar": vacuum_floor_bar,
-            "extrapolated_beyond_valid_range_K": {
-                **metal_extrapolations,
-                **oxide_vapor_extrapolations,
-            },
+            "extrapolated_beyond_valid_range_K": vapor_pressure_extrapolations,
             "ellingham_extrapolated_beyond_fit_range_K": (
                 {
                     species: data
