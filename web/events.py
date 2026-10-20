@@ -2479,8 +2479,6 @@ def _product_story_account_kg(sim):
 
 
 def _product_story_extracted_projection(sim, *, account_kg):
-    # Keep the raw extraction-evidence projection available when the canonical
-    # classifier fails; product-story classes below come from classify_products.
     metal_ingots = {}
     glass = {}
     captured_volatiles = {}
@@ -2607,6 +2605,7 @@ def _completion_payload(sim):
         classification = classify_products(sim)
         product_story = _product_story_payload(
             sim,
+            terminal_rump_by_species=terminal_rump_by_species,
             classification=classification,
             account_kg=product_story_account_kg,
             extracted_projection=extracted_product_projection,
@@ -2717,15 +2716,25 @@ def _product_story_bucket(species_kg, **details):
 def _product_story_payload(
     sim,
     *,
-    classification,
-    account_kg,
-    extracted_projection,
+    terminal_rump_by_species,
+    classification=None,
+    account_kg=None,
+    extracted_projection=None,
 ):
-    metal_ingots = dict(classification['ingots_metals']['species_kg'])
-    glass = dict(classification['glass']['species_kg'])
-    captured_volatiles = dict(
-        classification['captured_volatiles']['kg_by_species']
-    )
+    # Keep web's stage-provenance mapping; the shared classifier supplies only
+    # unavailable flags for these existing product totals.
+    if classification is None:
+        classification = classify_products(sim)
+    if account_kg is None:
+        account_kg = _product_story_account_kg(sim)
+    if extracted_projection is None:
+        extracted_projection = _product_story_extracted_projection(
+            sim,
+            account_kg=account_kg,
+        )
+    metal_ingots = dict(extracted_projection['metal_ingots'])
+    glass = dict(extracted_projection['glass'])
+    captured_volatiles = dict(extracted_projection['captured_volatiles'])
     escaped_to_vacuum = {}
     unrecovered_process_inventory = {}
     unclassified = {}
@@ -2774,17 +2783,15 @@ def _product_story_payload(
         for species, mass in sim.atom_ledger.project_account_kg(account).items():
             _merge_product_story_mass(wall_deposits, species, mass)
 
-    refractory_rump = classification['refractory_ceramic_rump']
-    refractory_ceramic = {
-        species: mass
-        for species, mass in refractory_rump['rump_kg_by_species'].items()
-        if species in TERMINAL_RUMP_REFRACTORY_OXIDES
-    }
-    terminal_residue = {
-        species: mass
-        for species, mass in refractory_rump['rump_kg_by_species'].items()
-        if species not in TERMINAL_RUMP_REFRACTORY_OXIDES
-    }
+    refractory_ceramic = {}
+    terminal_residue = {}
+    for species, mass in terminal_rump_by_species.items():
+        target = (
+            refractory_ceramic
+            if species in TERMINAL_RUMP_REFRACTORY_OXIDES
+            else terminal_residue
+        )
+        _merge_product_story_mass(target, species, mass)
 
     oxygen = _product_story_bucket(extracted_projection['oxygen'])
     oxygen['partition_kg'] = {
@@ -2849,31 +2856,33 @@ def _product_story_payload(
         ('captured_volatiles', 'captured_volatiles'),
         ('refractory_ceramic', 'refractory_ceramic_rump'),
     ):
-        source = classification[source_name]
-        if source.get('class_total_kg') is None:
-            bucket = story[name]
-            bucket['class_total_kg'] = None
-            bucket['flag'] = (
-                source.get('flag')
-                or classification['pure_silica_glass'].get('flag')
-            )
-        elif name != 'oxygen':
-            story[name]['class_total_kg'] = round(
-                float(source['class_total_kg']), 2
-            )
-    if story['oxygen']['class_total_kg'] is None:
+        source = classification.get(source_name)
+        if not isinstance(source, Mapping):
+            continue
+        flag = source.get('flag')
+        if not isinstance(flag, Mapping) or flag.get('status') != 'unavailable':
+            continue
+        story[name]['class_total_kg'] = None
+        story[name]['flag'] = dict(flag)
+    if story['oxygen'].get('class_total_kg') is None:
         story['oxygen']['partition_kg'] = dict.fromkeys(
             story['oxygen']['partition_kg']
         )
-    rump = classification['refractory_ceramic_rump']
-    for field, source_field in (
-        ('silicate_residual_kg', 'rump_silicate_residual_kg'),
-        ('unextracted_metals_kg', 'rump_unextracted_metals_kg'),
-    ):
-        if rump[source_field] is None:
-            story['terminal_residue'][field] = None
-            story['terminal_residue']['class_total_kg'] = None
-            story['terminal_residue']['flag'] = rump['flag']
+    rump = classification.get('refractory_ceramic_rump')
+    if isinstance(rump, Mapping):
+        rump_flag = rump.get('flag')
+        if (
+            isinstance(rump_flag, Mapping)
+            and rump_flag.get('status') == 'unavailable'
+        ):
+            for field, source_field in (
+                ('silicate_residual_kg', 'rump_silicate_residual_kg'),
+                ('unextracted_metals_kg', 'rump_unextracted_metals_kg'),
+            ):
+                if source_field in rump and rump[source_field] is None:
+                    story['terminal_residue'][field] = None
+                    story['terminal_residue']['class_total_kg'] = None
+                    story['terminal_residue']['flag'] = dict(rump_flag)
     return story
 
 

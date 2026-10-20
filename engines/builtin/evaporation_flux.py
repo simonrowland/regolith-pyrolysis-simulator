@@ -1392,6 +1392,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 missing_transport_parameters[species] = {
                     "policy": "fail_loud_missing_transport_parameters",
                     "carrier_gas": carrier_gas,
+                    "parent_oxide": str(stoich.get("parent_oxide") or ""),
                     "reason": str(exc),
                     "refusal_type": type(exc).__name__,
                     "status": "unavailable",

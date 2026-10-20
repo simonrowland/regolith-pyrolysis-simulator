@@ -284,6 +284,7 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     'Cr':  (2.880, 6000.0, 51.996),  # Estimated
     'Al':  (2.940, 3093.0, 26.982),  # Estimated
     'Ti':  (2.890, 6000.0, 47.867),  # Estimated
+    'Si':  (2.910, 3036.0, 28.085),  # Svehla 1962 NASA TR R-132 Table I, p. 24
     'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
 }
 
@@ -347,6 +348,10 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     'Ti': {
         'status': 'proxy',
         'source': 'estimated transition-metal vapor Lennard-Jones row',
+    },
+    'Si': {
+        'status': 'sourced',
+        'source': 'Svehla 1962 NASA TR R-132 Table I, p. 24',
     },
     'SiO': {
         'status': 'proxy',
