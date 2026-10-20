@@ -11,6 +11,7 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.account_ids import METAL_PHASE_ACCOUNTS
+from simulator.accounting.completeness import evaporation_quantity_unavailability
 from simulator.accounting.ledger import LedgerTransition
 from simulator.accounting.queries import is_reagent_bookkeeping_product
 from simulator.cost_energy import (
@@ -945,9 +946,14 @@ def _build_cost_rollup_diagnostic(
     else:
         product_allocation_input = furnace_input + auxiliary_electrical_input
     product_inputs = _cost_allocation_product_inputs(products_kg)
+    product_unavailable = evaporation_quantity_unavailability(
+        None,
+        None,
+        snapshots=snapshots,
+    )
     product_alloc = (
         _allocate_by_mass(product_inputs, product_allocation_input)
-        if product_inputs else {}
+        if product_inputs and product_unavailable is None else {}
     )
     product_costs = {
         key: dict(value)
@@ -992,18 +998,38 @@ def _build_cost_rollup_diagnostic(
             }
     if pumping_reason is not None:
         product_costs = _mark_product_costs_incomplete(product_costs, pumping_reason)
+    if product_unavailable is not None:
+        reason = product_unavailable["reason"]
+        for key, quantity in product_inputs.items():
+            account, species = _normalize_output_key(key)
+            if not any(
+                product_key.rsplit(":", 1)[-1] == species
+                for product_key in product_costs
+            ):
+                product_costs[f"{account}:{species}"] = {
+                    "quantity_kg": quantity,
+                }
+        product_costs = _mark_product_costs_incomplete(
+            product_costs,
+            reason,
+            entire_vector=True,
+        )
     allocation_status = (
         "allocated_by_product_mass"
         if product_inputs else "unallocated_no_product_mass"
     )
     if pumping_reason is not None:
         allocation_status = "incomplete_unavailable_pumping"
+    if product_unavailable is not None:
+        allocation_status = "incomplete_unavailable_products"
     run_input_cost = {
         "thermal_proxy": "thermal_flux_h = absolute_temperature_K * duration_h",
         "physical_cost": furnace_input.to_json(),
         "allocation_status": allocation_status,
         "owner_ratify_money_projection": project_owner_ratify_money(furnace_input),
     }
+    if product_unavailable is not None:
+        run_input_cost["unavailable_reason"] = product_unavailable["reason"]
     if pumping_enabled:
         summary["pumping_diagnostic"] = {
             **pumping_diagnostic,
@@ -1224,16 +1250,27 @@ def _pumping_unavailable_reason(
 def _mark_product_costs_incomplete(
     product_costs: dict[str, Any],
     reason: str,
+    *,
+    entire_vector: bool = False,
 ) -> dict[str, Any]:
     marked: dict[str, Any] = {}
     for key, entry in product_costs.items():
         if not isinstance(entry, Mapping):
             marked[key] = entry
             continue
-        cost_json = dict(entry.get("accumulated_cost") or {})
-        cost_json["electrical_kWh"] = unavailable_quantity(reason=reason, units="kWh")
         updated = dict(entry)
-        updated["accumulated_cost"] = cost_json
+        if entire_vector:
+            updated["accumulated_cost"] = unavailable_quantity(
+                reason=reason,
+                units="cost-vector",
+            )
+        else:
+            cost_json = dict(entry.get("accumulated_cost") or {})
+            cost_json["electrical_kWh"] = unavailable_quantity(
+                reason=reason,
+                units="kWh",
+            )
+            updated["accumulated_cost"] = cost_json
         updated["owner_ratify_money_projection"] = unavailable_quantity(
             reason=reason, units="USD"
         )

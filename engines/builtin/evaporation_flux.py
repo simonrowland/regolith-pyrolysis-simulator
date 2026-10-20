@@ -79,47 +79,45 @@ DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
     "disabled:missing-species-state-dependent-melt-transfer-inputs"
 )
 # EVAPORATION-only class proxies: systematically composed refractory carriers borrow
-# SiO sigma and epsilon/k because direct high-temperature transport data are
-# absent, but each retains its formula molar mass. Premise: Chapman-Enskog
-# D_AB scales as sqrt(1/M_A+1/M_B)/(sigma_AB^2*Omega_D); copying SiO's
-# (sigma, epsilon/k) therefore changes only the unknown collision class while
-# preserving the exactly derivable mass term. Units are Angstrom, K, g/mol.
+# the sourced SiO collision parameters because direct high-temperature transport
+# data are absent, but each retains its formula molar mass. Their collision pair is
+# read from simulator.condensation; this table stores only each formula mass.
 # Sanity: SiO itself is the closest measured rail carrier; this proxy affects
 # only continuum gas resistance, never K(T), P_eq, stoichiometry, or the
 # condensation/deposition transport table. Outputs remain status-bearing and
 # direct collision data remain acquisition targets.
-_EVAPORATION_LJ_PROXY_PARAMS = {
+_EVAPORATION_LJ_PROXY_MOLAR_MASSES = {
     # t-609/t-622: keep the diagnostic monoxide upper-screen flux computable without
     # pretending direct transport authority. The SiO collision class is a
     # status-bearing continuum-resistance proxy; exact formula masses remain
     # species-specific, and the request gate never admits inventory debit.
-    "FeO_association_gas": (3.374, 71.4, 71.8440),
-    "NiO_gas": (3.374, 71.4, 74.6924),
-    "MnO_gas": (3.374, 71.4, 70.937044),
-    "CoO_gas": (3.374, 71.4, 74.932194),
-    "CrO2": (3.374, 71.4, 83.9941),
-    "CrO": (3.374, 71.4, 67.9951),
-    "Al2": (3.374, 71.4, 53.9630770),
-    "AlO": (3.374, 71.4, 42.9805385),
-    "Al2O": (3.374, 71.4, 69.9620770),
-    "Al2O2": (3.374, 71.4, 85.9610770),
-    "Al2O3_gas": (3.374, 71.4, 101.9600770),
-    "AlO2": (3.374, 71.4, 58.9795385),
-    "Ca2": (3.374, 71.4, 80.1560),
-    "CaO_gas": (3.374, 71.4, 56.0770),
-    "TiO": (3.374, 71.4, 63.8660),
-    "TiO2_gas": (3.374, 71.4, 79.8650),
-    "CrO3": (3.374, 71.4, 99.9931),
-    "K2": (3.374, 71.4, 78.1966),
-    "K2O_gas": (3.374, 71.4, 94.1956),
-    "Mg2": (3.374, 71.4, 48.6100),
-    "MgO_gas": (3.374, 71.4, 40.3040),
-    "Na2": (3.374, 71.4, 45.97953856),
-    "Na2O_gas": (3.374, 71.4, 61.97853856),
-    "P2O5_gas": (3.374, 71.4, 141.942523996),
-    "Si2": (3.374, 71.4, 56.1700),
-    "Si3": (3.374, 71.4, 84.2550),
-    "SiO2_gas": (3.374, 71.4, 60.0830),
+    "FeO_association_gas": 71.8440,
+    "NiO_gas": 74.6924,
+    "MnO_gas": 70.937044,
+    "CoO_gas": 74.932194,
+    "CrO2": 83.9941,
+    "CrO": 67.9951,
+    "Al2": 53.9630770,
+    "AlO": 42.9805385,
+    "Al2O": 69.9620770,
+    "Al2O2": 85.9610770,
+    "Al2O3_gas": 101.9600770,
+    "AlO2": 58.9795385,
+    "Ca2": 80.1560,
+    "CaO_gas": 56.0770,
+    "TiO": 63.8660,
+    "TiO2_gas": 79.8650,
+    "CrO3": 99.9931,
+    "K2": 78.1966,
+    "K2O_gas": 94.1956,
+    "Mg2": 48.6100,
+    "MgO_gas": 40.3040,
+    "Na2": 45.97953856,
+    "Na2O_gas": 61.97853856,
+    "P2O5_gas": 141.942523996,
+    "Si2": 56.1700,
+    "Si3": 84.2550,
+    "SiO2_gas": 60.0830,
 }
 
 
@@ -534,6 +532,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     from simulator.condensation import (
         DEFAULT_CARRIER_GAS,
         GAS_CONSTANT_J_MOL_K,
+        _LENNARD_JONES_PARAMS,
         _chapman_enskog_d_ab_m2_s,
         _knudsen_number,
         _stirring_enhanced_sherwood,
@@ -677,12 +676,21 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             raise EvaporationFluxConfigurationError(
                 "gas resistance requires positive overhead_pressure_pa"
             )
+        proxy_molar_mass = _EVAPORATION_LJ_PROXY_MOLAR_MASSES.get(species)
+        species_params = None
+        if proxy_molar_mass is not None:
+            sio_sigma, sio_epsilon, _sio_molar_mass = _LENNARD_JONES_PARAMS["SiO"]
+            species_params = (
+                sio_sigma,
+                sio_epsilon,
+                proxy_molar_mass,
+            )
         d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
             species,
             max(effective_T_gas_K, 1.0),
             overhead_pa,
             carrier=str(carrier_gas or DEFAULT_CARRIER_GAS),
-            species_params=_EVAPORATION_LJ_PROXY_PARAMS.get(species),
+            species_params=species_params,
         )
         if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
             raise EvaporationFluxConfigurationError(

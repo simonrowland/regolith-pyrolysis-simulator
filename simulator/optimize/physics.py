@@ -17,6 +17,7 @@ from simulator.accounting.completeness import (
     TARGET_YIELD_DENOMINATOR_SOURCE,
     TARGET_YIELD_NUMERATOR_SOURCE,
     TARGET_YIELD_PROVENANCE_RULE,
+    evaporation_quantity_unavailability,
     extraction_completeness_by_target,
     target_species_yield_by_initial_cleaned_melt,
 )
@@ -789,6 +790,16 @@ class PhysicsConstraintSet:
             for target in self.target_species:
                 threshold = self._extraction_threshold_for_target(str(target))
                 result = by_target[str(target)]
+                unavailable = evaporation_quantity_unavailability(
+                    trace,
+                    str(target),
+                )
+                if unavailable:
+                    return _unavailable_gate(
+                        "extraction_completeness",
+                        threshold,
+                        unavailable["reason"],
+                    )
                 if result.completeness_fraction is None:
                     detail = _extraction_completeness_fail_closed_detail(result)
                     if detail.startswith("not-applicable:"):
@@ -1065,6 +1076,19 @@ def _extraction_completeness_by_target_for_trace(
     *,
     require_residual_species: bool = False,
 ) -> Mapping[str, TargetExtractionCompleteness]:
+    unavailable_results = {}
+    for target in constraints.target_species:
+        target = str(target)
+        unavailable = evaporation_quantity_unavailability(trace, target)
+        if unavailable:
+            unavailable_results[target] = TargetExtractionCompleteness(
+                target,
+                None,
+                None,
+                None,
+                None,
+                unavailable["reason"],
+            )
     provenance_results = _provenance_extraction_results_from_trace(
         trace,
         constraints,
@@ -1089,16 +1113,17 @@ def _extraction_completeness_by_target_for_trace(
             ledger_results,
             tuple(str(target) for target in constraints.target_species),
         )
-        return provenance_results
+        return MappingProxyType({**provenance_results, **unavailable_results})
     products = _required_mapping(trace, "product_ledger_kg")
     rump = _required_mapping(trace, "terminal_rump_by_species_kg")
-    return extraction_completeness_by_target(
+    results = extraction_completeness_by_target(
         tuple(str(target) for target in constraints.target_species),
         constraints.residual_species_by_target,
         products,
         rump,
         require_residual_species=require_residual_species,
     )
+    return MappingProxyType({**results, **unavailable_results})
 
 
 def _provenance_extraction_results_from_trace(
@@ -1674,6 +1699,18 @@ def _fail_closed(gate: str, threshold: ThresholdSpec, detail: str) -> GateMargin
         threshold=threshold,
         observed=math.nan,
         detail=f"fail-closed: {detail}",
+    )
+
+
+def _unavailable_gate(gate: str, threshold: ThresholdSpec, reason: str) -> GateMargin:
+    return replace(
+        _fail_closed(gate, threshold, reason),
+        observed=None,
+        status="unavailable",
+        authoritative=False,
+        output_status="unavailable",
+        status_reason=reason,
+        status_payload={"reason": reason},
     )
 
 
