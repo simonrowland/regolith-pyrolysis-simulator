@@ -10109,6 +10109,77 @@ def test_alphamelts_transport_config_refusal_pin_before_shared_validation(
 
 
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+def test_thermoengine_public_config_reaches_gas_resolver(backend_cls, monkeypatch):
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(
+        backend, monkeypatch, {'vapor_transport_pO2_bar': 1e-6},
+    )
+    helper = _vaporock_helper_returning({'SiO': 0.4})
+    backend._vaporock_helper = helper
+    backend._vapor_pressures_via_vaporock_or_antoine(
+        T_C=1600.0,
+        solved_melt_wt_pct={'SiO2': 100.0},
+        liquid_fraction=1.0,
+        fO2_log=-12.0,
+        pressure_bar=1e-6,
+        activities={'SiO2': 1.0},
+    )
+    assert helper.calls[0]['fO2_log'] == pytest.approx(-6.0)
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+@pytest.mark.parametrize('gas_bar', [0.0, 1e-10, float('nan'), float('inf')])
+def test_melts_public_config_rejects_invalid_transport_oxygen(
+    backend_cls, monkeypatch, gas_bar,
+):
+    with pytest.raises(ValueError, match='vapor_transport_pO2_bar must be finite'):
+        _initialize_melts_transport_for_oxygen_test(
+            backend_cls(), monkeypatch, {'vapor_transport_pO2_bar': gas_bar},
+        )
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
+def test_live_transport_control_can_cross_simulator_boundary(backend_cls, monkeypatch):
+    backend = backend_cls()
+    assert _initialize_melts_transport_for_oxygen_test(
+        backend, monkeypatch, {'vapor_transport_pO2_bar': 1e-6},
+    )
+    helper = _vaporock_helper_returning({'SiO': 0.4})
+    backend._vaporock_helper = helper
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.backend = backend
+    assert sim._backend_accepts_kwarg('vapor_transport_pO2_bar')
+
+    def native_solve(**kwargs):
+        backend._vapor_pressures_via_vaporock_or_antoine(
+            T_C=kwargs['temperature_C'],
+            solved_melt_wt_pct=kwargs['comp_wt'],
+            liquid_fraction=1.0,
+            fO2_log=kwargs['fO2_log'],
+            pressure_bar=kwargs['pressure_bar'],
+            activities={},
+        )
+        return EquilibriumResult(status='ok', liquid_fraction=1.0)
+
+    monkeypatch.setattr(backend, '_equilibrate_prepared', native_solve)
+    for gas_bar, expected_log in ((1e-5, -5.0), (1e-7, -7.0), (None, -6.0)):
+        kwargs = {}
+        if gas_bar is not None and sim._backend_accepts_kwarg('vapor_transport_pO2_bar'):
+            kwargs['vapor_transport_pO2_bar'] = gas_bar
+        backend.equilibrate(
+            temperature_C=1600.0,
+            composition_kg={
+                'SiO2': 49.0, 'Al2O3': 15.0, 'FeO': 10.0,
+                'Fe2O3': 1.0, 'MgO': 10.0, 'CaO': 10.0, 'Na2O': 5.0,
+            },
+            fO2_log=-12.0,
+            pressure_bar=1.0,
+            **kwargs,
+        )
+        assert helper.calls[-1]['fO2_log'] == pytest.approx(expected_log)
+
+
+@pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 def test_vapor_bridge_uses_same_gas_oxygen_as_shadow(backend_cls):
     from engines.vaporock import VapoRockProvider
     from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView

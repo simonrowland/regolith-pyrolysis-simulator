@@ -1048,6 +1048,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._vapor_pressure_table: Optional[dict] = None
         self._subprocess_vapor_pressure_provider = None
         self._vapor_transport_pO2_bar = DEFAULT_VACUUM_FLOOR_BAR
+        self._configured_vapor_transport_pO2_bar = self._vapor_transport_pO2_bar
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
 
     def _set_vapor_transport_pO2_bar(self, value: object) -> None:
@@ -1065,6 +1066,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._set_vapor_transport_pO2_bar(config.get(
             'vapor_transport_pO2_bar', DEFAULT_VACUUM_FLOOR_BAR,
         ))
+        self._configured_vapor_transport_pO2_bar = self._vapor_transport_pO2_bar
 
     def initialize(self, config: dict) -> bool:
         """
@@ -1447,12 +1449,19 @@ class _MELTSBackendSupport(MeltBackend):
                     species_formula_registry: Optional[Mapping[str, object]] = None,
                     redox_mode: Optional[str] = None,
                     subprocess_run_mode: AlphaMELTSSubprocessRunMode | str | None = None,
+                    vapor_transport_pO2_bar: Optional[float] = None,
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium.
 
         Routes to the configured alphaMELTS transport.
+        ``vapor_transport_pO2_bar`` overrides the configured gas environment
+        for this call only; it does not change the intrinsic melt fO2.
         """
+        self._set_vapor_transport_pO2_bar(
+            self._configured_vapor_transport_pO2_bar
+            if vapor_transport_pO2_bar is None else vapor_transport_pO2_bar
+        )
         if redox_mode not in (None, REDOX_MODE_NOT_AN_INPUT):
             raise ValueError(f'unsupported redox_mode={redox_mode!r}')
         if redox_mode == REDOX_MODE_NOT_AN_INPUT and fO2_log is not None:
