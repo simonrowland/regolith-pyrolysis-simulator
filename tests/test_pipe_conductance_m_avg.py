@@ -120,6 +120,14 @@ def test_pure_sio_returns_sio_molar_mass():
     assert M_avg == pytest.approx(MOLAR_MASS["SiO"] / 1000.0)
 
 
+@pytest.mark.parametrize("species", ["GeO", "SnO", "PbO", "WO3", "Re2O7"])
+def test_formula_resolver_parses_well_formed_formula_without_registry(species):
+    formula = resolve_species_formula(species, {})
+
+    assert formula.species == species
+    assert formula.molar_mass_g_mol > 0.0
+
+
 def test_catalog_generated_carrier_uses_formula_registry_molar_mass():
     """A carrier absent from the legacy mass table stays in gas accounting."""
 
@@ -192,6 +200,41 @@ def test_overhead_unresolvable_carrier_refuses_partial_pressures():
 
     assert exc_info.value.parameter == "species_molar_mass"
     assert exc_info.value.value == "unresolvable-carrier"
+
+
+def test_pipe_mean_molar_mass_pin_skips_unresolvable_positive_carrier():
+    mean_mass = _mean_molar_mass_kg_mol(
+        {"Na": 1.0, "unresolvable-carrier": 1.0}
+    )
+
+    assert mean_mass == pytest.approx(
+        resolve_species_formula("Na").molar_mass_kg_per_mol()
+    )
+
+
+def test_batch_setup_pin_accepts_unresolvable_positive_flow_species():
+    bundle = load_config_bundle()
+    vapor_pressures = dict(bundle.vapor_pressures)
+    vapor_pressures["metals"] = dict(bundle.vapor_pressures["metals"])
+    vapor_pressures["oxide_vapors"] = dict(
+        bundle.vapor_pressures["oxide_vapors"]
+    )
+    vapor_pressures["metals"]["unresolvable-metal"] = dict(
+        vapor_pressures["metals"]["Na"]
+    )
+    vapor_pressures["oxide_vapors"]["unresolvable-oxide"] = dict(
+        vapor_pressures["oxide_vapors"]["SiO"]
+    )
+
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend, bundle.setpoints, bundle.feedstocks, vapor_pressures
+    )
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+
+    assert "unresolvable-metal" in sim.vapor_pressures["metals"]
+    assert "unresolvable-oxide" in sim.vapor_pressures["oxide_vapors"]
 
 
 def test_pure_kr_returns_kr_molar_mass_without_fallback():

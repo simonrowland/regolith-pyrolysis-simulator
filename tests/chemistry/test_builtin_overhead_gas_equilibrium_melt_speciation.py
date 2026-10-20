@@ -7,10 +7,23 @@ import math
 
 import pytest
 
+from engines.builtin.overhead_gas_equilibrium import (
+    BuiltinOverheadGasEquilibriumProvider,
+)
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.campaigns import CampaignManager
 from simulator.state import CampaignPhase, GAS_CONSTANT
 from tests.chemistry.conftest import _build_sim
+
+
+def test_gamma_one_oxide_activity_pin_silently_drops_unlisted_oxide():
+    activities = (
+        BuiltinOverheadGasEquilibriumProvider._oxide_activity_proxy_gamma_1(
+            {"Na2O": 50.0, "Cr2O3": 50.0}
+        )
+    )
+
+    assert activities == {"Na2O": 1.0}
 
 
 def test_partial_campaign_condenser_geometry_deep_merges_once_at_campaign_start(
