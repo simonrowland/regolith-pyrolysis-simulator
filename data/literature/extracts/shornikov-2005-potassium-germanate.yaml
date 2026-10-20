@@ -8,7 +8,11 @@ source:
 extraction:
   method: No MinerU table. Table 1 (published page 1348) and Table 2 (published page 1354) were transcribed
     from the text layer and checked cell by cell on 600 dpi renders. No digit was changed. Fig. 2 panel
-    (a) series 4 stars were read from labelled ticks at 600 dpi. Other figures were not digitised.
+    (a) series 4 stars were read from labelled ticks at 600 dpi. Table 2 enthalpies and entropies are stored
+    per mol_species. The fusion-entropy unit is stored as J/mol K; the caption prints J/(mol K). Fig. 2 panels
+    (c), (d) and (e) series-4 stars that sit clear of the other glyphs were read from labelled ticks. Those
+    reads stay context. Delta_fG/(RT) and delta_fS have no quantity, and the melt delta_fH is not one oxide
+    partial enthalpy. Stars that sit on another glyph, or outside the labelled ticks, are deferred.
   date: '2026-10-20'
   worker: t1372-w2-w8-t1
 review_status: draft
@@ -818,8 +822,10 @@ species:
         log10_activity_mean: '-9.0165'
         T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '54.80'
-        x_GeO2: '0.5480'
-        x_K2O: '0.4520'
+        composition_mol:
+          GeO2: '0.5480'
+          K2O: '0.4520'
+          basis: printed_mole_fraction
         series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
         marker: open star
         marker_centre_px_read_1: (1059.2, 577.5)
@@ -833,17 +839,15 @@ species:
               endmember:
                 formula: K2O
                 phase:
-                  tag: unknown
-                  reason: Equations (8) and (9) use p^0. The paper does not state whether the pure oxide
-                    is solid or liquid.
+                  tag: value
+                  value: l
                 polymorph:
                   tag: unknown
-                  reason: The paper does not name a polymorph of the pure-oxide reference.
+                  reason: The paper does not name a polymorph of the pure K2O reference.
               component_basis: K2O
-          inferred: false
-          note: 'Equations (8) and (9), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p^0(K)^2 p^0(O2)^(1/2)]
-            and a(GeO2) = p(GeO) p(O2)^(1/2) / [p^0(GeO) p^0(O2)^(1/2)]. The paper does not state the
-            phase of the pure-oxide reference.'
+          inferred: true
+          inference: 'Extract inference (owner ruling 2026-10-20, stable phase at the experiment temperature). Eq. (2), published page 1346, defines a(i) = p(i)/p0(i), with p0 the equilibrium partial pressure over the corresponding pure oxide. Eq. (8), published page 1350, writes that ratio for K2O from reaction (3), [K2O] = 2(K) + 1/2(O2). The paper does not name the pure-oxide phase. These points are at 1400 K. Shornikov (2013) Table 2, published page 110, prints Tm(K2O) = 1013±10 K (Glushko et al. 1978–1982), so the melting band is 1003–1023 K. 1400 K is 377 K above that band. The stable phase of pure K2O at 1400 K is liquid.'
+          note: 'Eq. (2), published page 1346: a(i) = p(i)/p0(i) over the corresponding oxide. Eq. (8), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p0(K)^2 p0(O2)^(1/2)].'
           locator:
             page: 6
             pdf_page_index: 5
@@ -890,8 +894,10 @@ species:
         log10_activity_mean: '-9.5160'
         T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '59.59'
-        x_GeO2: '0.5959'
-        x_K2O: '0.4041'
+        composition_mol:
+          GeO2: '0.5959'
+          K2O: '0.4041'
+          basis: printed_mole_fraction
         series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
         marker: open star
         marker_centre_px_read_1: (1189.7, 638.5)
@@ -905,17 +911,15 @@ species:
               endmember:
                 formula: K2O
                 phase:
-                  tag: unknown
-                  reason: Equations (8) and (9) use p^0. The paper does not state whether the pure oxide
-                    is solid or liquid.
+                  tag: value
+                  value: l
                 polymorph:
                   tag: unknown
-                  reason: The paper does not name a polymorph of the pure-oxide reference.
+                  reason: The paper does not name a polymorph of the pure K2O reference.
               component_basis: K2O
-          inferred: false
-          note: 'Equations (8) and (9), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p^0(K)^2 p^0(O2)^(1/2)]
-            and a(GeO2) = p(GeO) p(O2)^(1/2) / [p^0(GeO) p^0(O2)^(1/2)]. The paper does not state the
-            phase of the pure-oxide reference.'
+          inferred: true
+          inference: 'Extract inference (owner ruling 2026-10-20, stable phase at the experiment temperature). Eq. (2), published page 1346, defines a(i) = p(i)/p0(i), with p0 the equilibrium partial pressure over the corresponding pure oxide. Eq. (8), published page 1350, writes that ratio for K2O from reaction (3), [K2O] = 2(K) + 1/2(O2). The paper does not name the pure-oxide phase. These points are at 1400 K. Shornikov (2013) Table 2, published page 110, prints Tm(K2O) = 1013±10 K (Glushko et al. 1978–1982), so the melting band is 1003–1023 K. 1400 K is 377 K above that band. The stable phase of pure K2O at 1400 K is liquid.'
+          note: 'Eq. (2), published page 1346: a(i) = p(i)/p0(i) over the corresponding oxide. Eq. (8), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p0(K)^2 p0(O2)^(1/2)].'
           locator:
             page: 6
             pdf_page_index: 5
@@ -962,8 +966,10 @@ species:
         log10_activity_mean: '-9.8185'
         T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '62.41'
-        x_GeO2: '0.6241'
-        x_K2O: '0.3759'
+        composition_mol:
+          GeO2: '0.6241'
+          K2O: '0.3759'
+          basis: printed_mole_fraction
         series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
         marker: open star
         marker_centre_px_read_1: (1266.9, 675.8)
@@ -977,17 +983,15 @@ species:
               endmember:
                 formula: K2O
                 phase:
-                  tag: unknown
-                  reason: Equations (8) and (9) use p^0. The paper does not state whether the pure oxide
-                    is solid or liquid.
+                  tag: value
+                  value: l
                 polymorph:
                   tag: unknown
-                  reason: The paper does not name a polymorph of the pure-oxide reference.
+                  reason: The paper does not name a polymorph of the pure K2O reference.
               component_basis: K2O
-          inferred: false
-          note: 'Equations (8) and (9), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p^0(K)^2 p^0(O2)^(1/2)]
-            and a(GeO2) = p(GeO) p(O2)^(1/2) / [p^0(GeO) p^0(O2)^(1/2)]. The paper does not state the
-            phase of the pure-oxide reference.'
+          inferred: true
+          inference: 'Extract inference (owner ruling 2026-10-20, stable phase at the experiment temperature). Eq. (2), published page 1346, defines a(i) = p(i)/p0(i), with p0 the equilibrium partial pressure over the corresponding pure oxide. Eq. (8), published page 1350, writes that ratio for K2O from reaction (3), [K2O] = 2(K) + 1/2(O2). The paper does not name the pure-oxide phase. These points are at 1400 K. Shornikov (2013) Table 2, published page 110, prints Tm(K2O) = 1013±10 K (Glushko et al. 1978–1982), so the melting band is 1003–1023 K. 1400 K is 377 K above that band. The stable phase of pure K2O at 1400 K is liquid.'
+          note: 'Eq. (2), published page 1346: a(i) = p(i)/p0(i) over the corresponding oxide. Eq. (8), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p0(K)^2 p0(O2)^(1/2)].'
           locator:
             page: 6
             pdf_page_index: 5
@@ -1034,8 +1038,10 @@ species:
         log10_activity_mean: '-10.2325'
         T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '66.40'
-        x_GeO2: '0.6640'
-        x_K2O: '0.3360'
+        composition_mol:
+          GeO2: '0.6640'
+          K2O: '0.3360'
+          basis: printed_mole_fraction
         series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
         marker: open star
         marker_centre_px_read_1: (1377.3, 727.5)
@@ -1049,17 +1055,15 @@ species:
               endmember:
                 formula: K2O
                 phase:
-                  tag: unknown
-                  reason: Equations (8) and (9) use p^0. The paper does not state whether the pure oxide
-                    is solid or liquid.
+                  tag: value
+                  value: l
                 polymorph:
                   tag: unknown
-                  reason: The paper does not name a polymorph of the pure-oxide reference.
+                  reason: The paper does not name a polymorph of the pure K2O reference.
               component_basis: K2O
-          inferred: false
-          note: 'Equations (8) and (9), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p^0(K)^2 p^0(O2)^(1/2)]
-            and a(GeO2) = p(GeO) p(O2)^(1/2) / [p^0(GeO) p^0(O2)^(1/2)]. The paper does not state the
-            phase of the pure-oxide reference.'
+          inferred: true
+          inference: 'Extract inference (owner ruling 2026-10-20, stable phase at the experiment temperature). Eq. (2), published page 1346, defines a(i) = p(i)/p0(i), with p0 the equilibrium partial pressure over the corresponding pure oxide. Eq. (8), published page 1350, writes that ratio for K2O from reaction (3), [K2O] = 2(K) + 1/2(O2). The paper does not name the pure-oxide phase. These points are at 1400 K. Shornikov (2013) Table 2, published page 110, prints Tm(K2O) = 1013±10 K (Glushko et al. 1978–1982), so the melting band is 1003–1023 K. 1400 K is 377 K above that band. The stable phase of pure K2O at 1400 K is liquid.'
+          note: 'Eq. (2), published page 1346: a(i) = p(i)/p0(i) over the corresponding oxide. Eq. (8), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p0(K)^2 p0(O2)^(1/2)].'
           locator:
             page: 6
             pdf_page_index: 5
@@ -1106,8 +1110,10 @@ species:
         log10_activity_mean: '-10.8370'
         T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '71.83'
-        x_GeO2: '0.7183'
-        x_K2O: '0.2817'
+        composition_mol:
+          GeO2: '0.7183'
+          K2O: '0.2817'
+          basis: printed_mole_fraction
         series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
         marker: open star
         marker_centre_px_read_1: (1527.7, 803.6)
@@ -1121,17 +1127,15 @@ species:
               endmember:
                 formula: K2O
                 phase:
-                  tag: unknown
-                  reason: Equations (8) and (9) use p^0. The paper does not state whether the pure oxide
-                    is solid or liquid.
+                  tag: value
+                  value: l
                 polymorph:
                   tag: unknown
-                  reason: The paper does not name a polymorph of the pure-oxide reference.
+                  reason: The paper does not name a polymorph of the pure K2O reference.
               component_basis: K2O
-          inferred: false
-          note: 'Equations (8) and (9), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p^0(K)^2 p^0(O2)^(1/2)]
-            and a(GeO2) = p(GeO) p(O2)^(1/2) / [p^0(GeO) p^0(O2)^(1/2)]. The paper does not state the
-            phase of the pure-oxide reference.'
+          inferred: true
+          inference: 'Extract inference (owner ruling 2026-10-20, stable phase at the experiment temperature). Eq. (2), published page 1346, defines a(i) = p(i)/p0(i), with p0 the equilibrium partial pressure over the corresponding pure oxide. Eq. (8), published page 1350, writes that ratio for K2O from reaction (3), [K2O] = 2(K) + 1/2(O2). The paper does not name the pure-oxide phase. These points are at 1400 K. Shornikov (2013) Table 2, published page 110, prints Tm(K2O) = 1013±10 K (Glushko et al. 1978–1982), so the melting band is 1003–1023 K. 1400 K is 377 K above that band. The stable phase of pure K2O at 1400 K is liquid.'
+          note: 'Eq. (2), published page 1346: a(i) = p(i)/p0(i) over the corresponding oxide. Eq. (8), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p0(K)^2 p0(O2)^(1/2)].'
           locator:
             page: 6
             pdf_page_index: 5
@@ -1178,8 +1182,10 @@ species:
         log10_activity_mean: '-12.3315'
         T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '82.93'
-        x_GeO2: '0.8293'
-        x_K2O: '0.1707'
+        composition_mol:
+          GeO2: '0.8293'
+          K2O: '0.1707'
+          basis: printed_mole_fraction
         series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
         marker: open star
         marker_centre_px_read_1: (1833.0, 988.2)
@@ -1193,17 +1199,15 @@ species:
               endmember:
                 formula: K2O
                 phase:
-                  tag: unknown
-                  reason: Equations (8) and (9) use p^0. The paper does not state whether the pure oxide
-                    is solid or liquid.
+                  tag: value
+                  value: l
                 polymorph:
                   tag: unknown
-                  reason: The paper does not name a polymorph of the pure-oxide reference.
+                  reason: The paper does not name a polymorph of the pure K2O reference.
               component_basis: K2O
-          inferred: false
-          note: 'Equations (8) and (9), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p^0(K)^2 p^0(O2)^(1/2)]
-            and a(GeO2) = p(GeO) p(O2)^(1/2) / [p^0(GeO) p^0(O2)^(1/2)]. The paper does not state the
-            phase of the pure-oxide reference.'
+          inferred: true
+          inference: 'Extract inference (owner ruling 2026-10-20, stable phase at the experiment temperature). Eq. (2), published page 1346, defines a(i) = p(i)/p0(i), with p0 the equilibrium partial pressure over the corresponding pure oxide. Eq. (8), published page 1350, writes that ratio for K2O from reaction (3), [K2O] = 2(K) + 1/2(O2). The paper does not name the pure-oxide phase. These points are at 1400 K. Shornikov (2013) Table 2, published page 110, prints Tm(K2O) = 1013±10 K (Glushko et al. 1978–1982), so the melting band is 1003–1023 K. 1400 K is 377 K above that band. The stable phase of pure K2O at 1400 K is liquid.'
+          note: 'Eq. (2), published page 1346: a(i) = p(i)/p0(i) over the corresponding oxide. Eq. (8), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p0(K)^2 p0(O2)^(1/2)].'
           locator:
             page: 6
             pdf_page_index: 5
@@ -1250,8 +1254,10 @@ species:
         log10_activity_mean: '-13.7360'
         T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '91.00'
-        x_GeO2: '0.9100'
-        x_K2O: '0.0900'
+        composition_mol:
+          GeO2: '0.9100'
+          K2O: '0.0900'
+          basis: printed_mole_fraction
         series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
         marker: open star
         marker_centre_px_read_1: (2057.7, 1160.3)
@@ -1265,17 +1271,15 @@ species:
               endmember:
                 formula: K2O
                 phase:
-                  tag: unknown
-                  reason: Equations (8) and (9) use p^0. The paper does not state whether the pure oxide
-                    is solid or liquid.
+                  tag: value
+                  value: l
                 polymorph:
                   tag: unknown
-                  reason: The paper does not name a polymorph of the pure-oxide reference.
+                  reason: The paper does not name a polymorph of the pure K2O reference.
               component_basis: K2O
-          inferred: false
-          note: 'Equations (8) and (9), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p^0(K)^2 p^0(O2)^(1/2)]
-            and a(GeO2) = p(GeO) p(O2)^(1/2) / [p^0(GeO) p^0(O2)^(1/2)]. The paper does not state the
-            phase of the pure-oxide reference.'
+          inferred: true
+          inference: 'Extract inference (owner ruling 2026-10-20, stable phase at the experiment temperature). Eq. (2), published page 1346, defines a(i) = p(i)/p0(i), with p0 the equilibrium partial pressure over the corresponding pure oxide. Eq. (8), published page 1350, writes that ratio for K2O from reaction (3), [K2O] = 2(K) + 1/2(O2). The paper does not name the pure-oxide phase. These points are at 1400 K. Shornikov (2013) Table 2, published page 110, prints Tm(K2O) = 1013±10 K (Glushko et al. 1978–1982), so the melting band is 1003–1023 K. 1400 K is 377 K above that band. The stable phase of pure K2O at 1400 K is liquid.'
+          note: 'Eq. (2), published page 1346: a(i) = p(i)/p0(i) over the corresponding oxide. Eq. (8), published page 1350: a(K2O) = p(K)^2 p(O2)^(1/2) / [p0(K)^2 p0(O2)^(1/2)].'
           locator:
             page: 6
             pdf_page_index: 5
@@ -1295,25 +1299,581 @@ species:
               point: '1400'
           locator: *id021
     context:
-    - observation_id: ge_2005_fig2_other_series_refused
+    - observation_id: ge_2005_fig2d_dfH_54_80
+      type: melt_formation_enthalpy_figure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (d), 600 dpi page px. Labelled y tick lines: 0 at 1808.5, -30 at 2005.5, -60 at 2202.5, -90 at 2399.5, -120 at 2597.5, -150 at 2794.5. Least squares y = -6.574286*delta_fH + 1808.262, residual rms 0.264 px. Labelled x tick lines, shared with panel (b): 50 mol% GeO2 at 2972.5, 60 at 3246.5, 70 at 3521.5, 80 at 3795.5, 90 at 4070.0. x = 27.440*mol% + 1600.400, residual rms 0.200 px. The 100 mol% label sits on the right-hand frame near x 4347 and was not used as a tick. Read 1 is the dark centroid in a vertical window at the printed composition. Read 2 is the centroid inside a 12 px radius. The crosshair on the 600 dpi crop sits on the open star. Half-width 1.5 kJ/mol covers a 6 px centre error. This star, 54.80 mol% GeO2: read 1 page px (3105.4, 2634.3) -125.65 kJ/mol; read 2 page px (3106.8, 2633.6) -125.53 kJ/mol.'
+      units: kJ/mol
+      values:
+        delta_fH_kJ_mol: '-125.59'
+        read_1_kJ_mol: '-125.65'
+        read_2_kJ_mol: '-125.53'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '54.80'
+        composition_mol:
+          GeO2: '0.5480'
+          K2O: '0.4520'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px_read_1: (3105.4, 2634.3)
+        marker_centre_px_read_2: (3106.8, 2633.6)
+        dpi: '600'
+        read_half_width_kJ_mol: '1.5'
+        reason_not_scored: 'Fig. 2 caption calls this the enthalpy of formation of the melts. The axis is ΔfH(T), kJ/mol. Scoring it as delta_fH would file it as one oxide species. It is the melt value at the printed composition, so it stays context. The paper does not state formation from the elements or from the oxides.'
+    - observation_id: ge_2005_fig2d_dfH_59_59
+      type: melt_formation_enthalpy_figure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (d), 600 dpi page px. Labelled y tick lines: 0 at 1808.5, -30 at 2005.5, -60 at 2202.5, -90 at 2399.5, -120 at 2597.5, -150 at 2794.5. Least squares y = -6.574286*delta_fH + 1808.262, residual rms 0.264 px. Labelled x tick lines, shared with panel (b): 50 mol% GeO2 at 2972.5, 60 at 3246.5, 70 at 3521.5, 80 at 3795.5, 90 at 4070.0. x = 27.440*mol% + 1600.400, residual rms 0.200 px. The 100 mol% label sits on the right-hand frame near x 4347 and was not used as a tick. Read 1 is the dark centroid in a vertical window at the printed composition. Read 2 is the centroid inside a 12 px radius. The crosshair on the 600 dpi crop sits on the open star. Half-width 1.5 kJ/mol covers a 6 px centre error. This star, 59.59 mol% GeO2: read 1 page px (3236.9, 2577.3) -116.98 kJ/mol; read 2 page px (3237.4, 2576.5) -116.86 kJ/mol.'
+      units: kJ/mol
+      values:
+        delta_fH_kJ_mol: '-116.92'
+        read_1_kJ_mol: '-116.98'
+        read_2_kJ_mol: '-116.86'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '59.59'
+        composition_mol:
+          GeO2: '0.5959'
+          K2O: '0.4041'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px_read_1: (3236.9, 2577.3)
+        marker_centre_px_read_2: (3237.4, 2576.5)
+        dpi: '600'
+        read_half_width_kJ_mol: '1.5'
+        reason_not_scored: 'Fig. 2 caption calls this the enthalpy of formation of the melts. The axis is ΔfH(T), kJ/mol. Scoring it as delta_fH would file it as one oxide species. It is the melt value at the printed composition, so it stays context. The paper does not state formation from the elements or from the oxides.'
+    - observation_id: ge_2005_fig2d_dfH_62_41
+      type: melt_formation_enthalpy_figure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (d), 600 dpi page px. Labelled y tick lines: 0 at 1808.5, -30 at 2005.5, -60 at 2202.5, -90 at 2399.5, -120 at 2597.5, -150 at 2794.5. Least squares y = -6.574286*delta_fH + 1808.262, residual rms 0.264 px. Labelled x tick lines, shared with panel (b): 50 mol% GeO2 at 2972.5, 60 at 3246.5, 70 at 3521.5, 80 at 3795.5, 90 at 4070.0. x = 27.440*mol% + 1600.400, residual rms 0.200 px. The 100 mol% label sits on the right-hand frame near x 4347 and was not used as a tick. Read 1 is the dark centroid in a vertical window at the printed composition. Read 2 is the centroid inside a 12 px radius. The crosshair on the 600 dpi crop sits on the open star. Half-width 1.5 kJ/mol covers a 6 px centre error. This star, 62.41 mol% GeO2: read 1 page px (3313.0, 2535.6) -110.63 kJ/mol; read 2 page px (3313.1, 2534.5) -110.47 kJ/mol.'
+      units: kJ/mol
+      values:
+        delta_fH_kJ_mol: '-110.55'
+        read_1_kJ_mol: '-110.63'
+        read_2_kJ_mol: '-110.47'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '62.41'
+        composition_mol:
+          GeO2: '0.6241'
+          K2O: '0.3759'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px_read_1: (3313.0, 2535.6)
+        marker_centre_px_read_2: (3313.1, 2534.5)
+        dpi: '600'
+        read_half_width_kJ_mol: '1.5'
+        reason_not_scored: 'Fig. 2 caption calls this the enthalpy of formation of the melts. The axis is ΔfH(T), kJ/mol. Scoring it as delta_fH would file it as one oxide species. It is the melt value at the printed composition, so it stays context. The paper does not state formation from the elements or from the oxides.'
+    - observation_id: ge_2005_fig2d_dfH_66_40
+      type: melt_formation_enthalpy_figure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (d), 600 dpi page px. Labelled y tick lines: 0 at 1808.5, -30 at 2005.5, -60 at 2202.5, -90 at 2399.5, -120 at 2597.5, -150 at 2794.5. Least squares y = -6.574286*delta_fH + 1808.262, residual rms 0.264 px. Labelled x tick lines, shared with panel (b): 50 mol% GeO2 at 2972.5, 60 at 3246.5, 70 at 3521.5, 80 at 3795.5, 90 at 4070.0. x = 27.440*mol% + 1600.400, residual rms 0.200 px. The 100 mol% label sits on the right-hand frame near x 4347 and was not used as a tick. Read 1 is the dark centroid in a vertical window at the printed composition. Read 2 is the centroid inside a 12 px radius. The crosshair on the 600 dpi crop sits on the open star. Half-width 1.5 kJ/mol covers a 6 px centre error. This star, 66.40 mol% GeO2: read 1 page px (3420.9, 2472.5) -101.04 kJ/mol; read 2 page px (3419.3, 2472.0) -100.97 kJ/mol.'
+      units: kJ/mol
+      values:
+        delta_fH_kJ_mol: '-101.00'
+        read_1_kJ_mol: '-101.04'
+        read_2_kJ_mol: '-100.97'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '66.40'
+        composition_mol:
+          GeO2: '0.6640'
+          K2O: '0.3360'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px_read_1: (3420.9, 2472.5)
+        marker_centre_px_read_2: (3419.3, 2472.0)
+        dpi: '600'
+        read_half_width_kJ_mol: '1.5'
+        reason_not_scored: 'Fig. 2 caption calls this the enthalpy of formation of the melts. The axis is ΔfH(T), kJ/mol. Scoring it as delta_fH would file it as one oxide species. It is the melt value at the printed composition, so it stays context. The paper does not state formation from the elements or from the oxides.'
+    - observation_id: ge_2005_fig2d_dfH_71_83
+      type: melt_formation_enthalpy_figure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (d), 600 dpi page px. Labelled y tick lines: 0 at 1808.5, -30 at 2005.5, -60 at 2202.5, -90 at 2399.5, -120 at 2597.5, -150 at 2794.5. Least squares y = -6.574286*delta_fH + 1808.262, residual rms 0.264 px. Labelled x tick lines, shared with panel (b): 50 mol% GeO2 at 2972.5, 60 at 3246.5, 70 at 3521.5, 80 at 3795.5, 90 at 4070.0. x = 27.440*mol% + 1600.400, residual rms 0.200 px. The 100 mol% label sits on the right-hand frame near x 4347 and was not used as a tick. Read 1 is the dark centroid in a vertical window at the printed composition. Read 2 is the centroid inside a 12 px radius. The crosshair on the 600 dpi crop sits on the open star. Half-width 1.5 kJ/mol covers a 6 px centre error. This star, 71.83 mol% GeO2: read 1 page px (3568.7, 2389.9) -88.47 kJ/mol; read 2 page px (3566.2, 2389.3) -88.39 kJ/mol.'
+      units: kJ/mol
+      values:
+        delta_fH_kJ_mol: '-88.43'
+        read_1_kJ_mol: '-88.47'
+        read_2_kJ_mol: '-88.39'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '71.83'
+        composition_mol:
+          GeO2: '0.7183'
+          K2O: '0.2817'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px_read_1: (3568.7, 2389.9)
+        marker_centre_px_read_2: (3566.2, 2389.3)
+        dpi: '600'
+        read_half_width_kJ_mol: '1.5'
+        reason_not_scored: 'Fig. 2 caption calls this the enthalpy of formation of the melts. The axis is ΔfH(T), kJ/mol. Scoring it as delta_fH would file it as one oxide species. It is the melt value at the printed composition, so it stays context. The paper does not state formation from the elements or from the oxides.'
+    - observation_id: ge_2005_fig2d_dfH_82_93
+      type: melt_formation_enthalpy_figure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (d), 600 dpi page px. Labelled y tick lines: 0 at 1808.5, -30 at 2005.5, -60 at 2202.5, -90 at 2399.5, -120 at 2597.5, -150 at 2794.5. Least squares y = -6.574286*delta_fH + 1808.262, residual rms 0.264 px. Labelled x tick lines, shared with panel (b): 50 mol% GeO2 at 2972.5, 60 at 3246.5, 70 at 3521.5, 80 at 3795.5, 90 at 4070.0. x = 27.440*mol% + 1600.400, residual rms 0.200 px. The 100 mol% label sits on the right-hand frame near x 4347 and was not used as a tick. Read 1 is the dark centroid in a vertical window at the printed composition. Read 2 is the centroid inside a 12 px radius. The crosshair on the 600 dpi crop sits on the open star. Half-width 1.5 kJ/mol covers a 6 px centre error. This star, 82.93 mol% GeO2: read 1 page px (3874.8, 2183.7) -57.11 kJ/mol; read 2 page px (3874.0, 2184.0) -57.15 kJ/mol.'
+      units: kJ/mol
+      values:
+        delta_fH_kJ_mol: '-57.13'
+        read_1_kJ_mol: '-57.11'
+        read_2_kJ_mol: '-57.15'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '82.93'
+        composition_mol:
+          GeO2: '0.8293'
+          K2O: '0.1707'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px_read_1: (3874.8, 2183.7)
+        marker_centre_px_read_2: (3874.0, 2184.0)
+        dpi: '600'
+        read_half_width_kJ_mol: '1.5'
+        reason_not_scored: 'Fig. 2 caption calls this the enthalpy of formation of the melts. The axis is ΔfH(T), kJ/mol. Scoring it as delta_fH would file it as one oxide species. It is the melt value at the printed composition, so it stays context. The paper does not state formation from the elements or from the oxides.'
+    - observation_id: ge_2005_fig2d_dfH_91_00
+      type: melt_formation_enthalpy_figure
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (d), 600 dpi page px. Labelled y tick lines: 0 at 1808.5, -30 at 2005.5, -60 at 2202.5, -90 at 2399.5, -120 at 2597.5, -150 at 2794.5. Least squares y = -6.574286*delta_fH + 1808.262, residual rms 0.264 px. Labelled x tick lines, shared with panel (b): 50 mol% GeO2 at 2972.5, 60 at 3246.5, 70 at 3521.5, 80 at 3795.5, 90 at 4070.0. x = 27.440*mol% + 1600.400, residual rms 0.200 px. The 100 mol% label sits on the right-hand frame near x 4347 and was not used as a tick. Read 1 is the dark centroid in a vertical window at the printed composition. Read 2 is the centroid inside a 12 px radius. The crosshair on the 600 dpi crop sits on the open star. Half-width 1.5 kJ/mol covers a 6 px centre error. This star, 91.00 mol% GeO2: read 1 page px (4094.7, 2027.2) -33.30 kJ/mol; read 2 page px (4092.2, 2026.5) -33.20 kJ/mol.'
+      units: kJ/mol
+      values:
+        delta_fH_kJ_mol: '-33.25'
+        read_1_kJ_mol: '-33.30'
+        read_2_kJ_mol: '-33.20'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '91.00'
+        composition_mol:
+          GeO2: '0.9100'
+          K2O: '0.0900'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px_read_1: (4094.7, 2027.2)
+        marker_centre_px_read_2: (4092.2, 2026.5)
+        dpi: '600'
+        read_half_width_kJ_mol: '1.5'
+        reason_not_scored: 'Fig. 2 caption calls this the enthalpy of formation of the melts. The axis is ΔfH(T), kJ/mol. Scoring it as delta_fH would file it as one oxide species. It is the melt value at the printed composition, so it stays context. The paper does not state formation from the elements or from the oxides.'
+    - observation_id: ge_2005_fig2c_g_over_rt_54_80
+      type: gibbs_over_rt_schema_gap
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (c). Labelled y tick lines: 0 at 1808.5, -3 at 2014.5, -6 at 2220.5, -9 at 2426.5, -12 at 2632.5, -15 at 2838.5. Least squares y = -68.666667*(ΔfG/(RT)) + 1808.500, residual rms 0.000 px. X tick lines are unlabelled on this panel. They sit at the same page-x as the labelled mol% ticks of panels (a) and (e): 50 at 930.5, 60 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5. Those labelled ticks are the calibration. Read half-width 0.15 in ΔfG/(RT) covers a 6 px centre error. This star, 54.80 mol% GeO2: read 1 page px (1063.3, 2659.9) -12.399; read 2 y 2658.9 -12.385. The crosshair sits on the open star, clear of the square below it.'
+      units: dimensionless
+      values:
+        delta_fG_over_RT: '-12.392'
+        read_1: '-12.399'
+        read_2: '-12.385'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '54.80'
+        composition_mol:
+          GeO2: '0.5480'
+          K2O: '0.4520'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        dpi: '600'
+        read_half_width: '0.15'
+        reason_not_scored: 'The axis prints ΔfG(T)/(RT), not ΔfG. delta_fG is an energy. No quantity token exists for the dimensionless ratio. The read is kept here.'
+    - observation_id: ge_2005_fig2c_g_over_rt_59_59
+      type: gibbs_over_rt_schema_gap
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (c). Labelled y tick lines: 0 at 1808.5, -3 at 2014.5, -6 at 2220.5, -9 at 2426.5, -12 at 2632.5, -15 at 2838.5. Least squares y = -68.666667*(ΔfG/(RT)) + 1808.500, residual rms 0.000 px. X tick lines are unlabelled on this panel. They sit at the same page-x as the labelled mol% ticks of panels (a) and (e): 50 at 930.5, 60 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5. Those labelled ticks are the calibration. Read half-width 0.15 in ΔfG/(RT) covers a 6 px centre error. This star, 59.59 mol% GeO2: read 1 page px (1196.4, 2597.5) -11.490; read 2 y 2598.2 -11.501. The crosshair sits on the open star, clear of the square below it.'
+      units: dimensionless
+      values:
+        delta_fG_over_RT: '-11.496'
+        read_1: '-11.490'
+        read_2: '-11.501'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '59.59'
+        composition_mol:
+          GeO2: '0.5959'
+          K2O: '0.4041'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        dpi: '600'
+        read_half_width: '0.15'
+        reason_not_scored: 'The axis prints ΔfG(T)/(RT), not ΔfG. delta_fG is an energy. No quantity token exists for the dimensionless ratio. The read is kept here.'
+    - observation_id: ge_2005_fig2e_dfS_71_83
+      type: formation_entropy_schema_gap
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (e). Labelled y tick lines: 10 at 3151.5, 0 at 3326.5, -10 at 3502.5, -20 at 3678.0, -30 at 3853.5, -40 at 4029.0. Least squares y = -17.554286*ΔfS + 3326.852, residual rms 0.171 px, with ΔfS in J/(mol K). Labelled x tick lines: 60 mol% GeO2 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5, and 50 and 100 are printed under the axis on the same scale as panel (a) (50 at 930.5). x = 27.45*mol% - 442. Read half-width 0.5 J/(mol K) covers a 6 px centre error. This star, 71.83 mol% GeO2: read 1 page px (1528.9, 3160.2) 9.494 J/(mol K); read 2 y 3160.1 9.498. The crosshair sits on the open star.'
+      units: J/(mol K)
+      values:
+        delta_fS_J_mol_K: '9.496'
+        read_1: '9.494'
+        read_2: '9.498'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '71.83'
+        composition_mol:
+          GeO2: '0.7183'
+          K2O: '0.2817'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        dpi: '600'
+        read_half_width_J_mol_K: '0.5'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints ΔfS(T), J/(mol K).'
+    - observation_id: ge_2005_fig2e_dfS_82_93
+      type: formation_entropy_schema_gap
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (e). Labelled y tick lines: 10 at 3151.5, 0 at 3326.5, -10 at 3502.5, -20 at 3678.0, -30 at 3853.5, -40 at 4029.0. Least squares y = -17.554286*ΔfS + 3326.852, residual rms 0.171 px, with ΔfS in J/(mol K). Labelled x tick lines: 60 mol% GeO2 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5, and 50 and 100 are printed under the axis on the same scale as panel (a) (50 at 930.5). x = 27.45*mol% - 442. Read half-width 0.5 J/(mol K) covers a 6 px centre error. This star, 82.93 mol% GeO2: read 1 page px (1834.0, 3189.4) 7.830 J/(mol K); read 2 y 3190.1 7.789. The crosshair sits on the open star.'
+      units: J/(mol K)
+      values:
+        delta_fS_J_mol_K: '7.810'
+        read_1: '7.830'
+        read_2: '7.789'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '82.93'
+        composition_mol:
+          GeO2: '0.8293'
+          K2O: '0.1707'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        dpi: '600'
+        read_half_width_J_mol_K: '0.5'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints ΔfS(T), J/(mol K).'
+    - observation_id: ge_2005_fig2e_dfS_91_00
+      type: formation_entropy_schema_gap
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (e). Labelled y tick lines: 10 at 3151.5, 0 at 3326.5, -10 at 3502.5, -20 at 3678.0, -30 at 3853.5, -40 at 4029.0. Least squares y = -17.554286*ΔfS + 3326.852, residual rms 0.171 px, with ΔfS in J/(mol K). Labelled x tick lines: 60 mol% GeO2 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5, and 50 and 100 are printed under the axis on the same scale as panel (a) (50 at 930.5). x = 27.45*mol% - 442. Read half-width 0.5 J/(mol K) covers a 6 px centre error. This star, 91.00 mol% GeO2: read 1 page px (2057.0, 3263.2) 3.626 J/(mol K); read 2 y 3263.4 3.613. The crosshair sits on the open star.'
+      units: J/(mol K)
+      values:
+        delta_fS_J_mol_K: '3.620'
+        read_1: '3.626'
+        read_2: '3.613'
+        T_K: '1400'
+        composition_mol_percent_GeO2_as_printed: '91.00'
+        composition_mol:
+          GeO2: '0.9100'
+          K2O: '0.0900'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        dpi: '600'
+        read_half_width_J_mol_K: '0.5'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints ΔfS(T), J/(mol K).'
+    - observation_id: ge_2005_fig2b_star_54_80_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (b), series 4, 54.80 mol% GeO2. The vertical window upper peak is the series-1 filled triangle. The next peak, page px about (3104, 1515), is a star drawn on the series-3 square. That y is below the last labelled tick, -2 at y 936.5, so a value would extrapolate. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '54.80'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'The vertical window upper peak is the series-1 filled triangle. The next peak, page px about (3104, 1515), is a star drawn on the series-3 square. That y is below the last labelled tick, -2 at y 936.5, so a value would extrapolate. Deferred.'
+    - observation_id: ge_2005_fig2b_star_59_59_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (b), series 4, 59.59 mol% GeO2. Same geometry. Overlapped star and square near page px (3235, 1311), below the -2 tick. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '59.59'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'Same geometry. Overlapped star and square near page px (3235, 1311), below the -2 tick. Deferred.'
+    - observation_id: ge_2005_fig2b_star_62_41_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (b), series 4, 62.41 mol% GeO2. Same geometry. Overlapped star and square near page px (3312, 1204), below the -2 tick. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '62.41'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'Same geometry. Overlapped star and square near page px (3312, 1204), below the -2 tick. Deferred.'
+    - observation_id: ge_2005_fig2b_star_66_40_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (b), series 4, 66.40 mol% GeO2. Same geometry. Overlapped star and square near page px (3421, 1075), below the -2 tick. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '66.40'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'Same geometry. Overlapped star and square near page px (3421, 1075), below the -2 tick. Deferred.'
+    - observation_id: ge_2005_fig2b_star_71_83_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (b), series 4, 71.83 mol% GeO2. The series converge. The window does not put a crosshair on a star that is clear of the triangle and the square inside the labelled y span. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '71.83'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'The series converge. The window does not put a crosshair on a star that is clear of the triangle and the square inside the labelled y span. Deferred.'
+    - observation_id: ge_2005_fig2b_star_82_93_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (b), series 4, 82.93 mol% GeO2. Only one compact peak, and the crosshair sits on the series-1 triangle. The star is not separated. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '82.93'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'Only one compact peak, and the crosshair sits on the series-1 triangle. The star is not separated. Deferred.'
+    - observation_id: ge_2005_fig2b_star_91_00_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (b), series 4, 91.00 mol% GeO2. The crosshair sits on the triangle/square pair near log a about -0.3. The star is not separated. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '91.00'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'The crosshair sits on the triangle/square pair near log a about -0.3. The star is not separated. Deferred.'
+    - observation_id: ge_2005_fig2c_star_62_41_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (c), series 4, 62.41 mol% GeO2. The open star is drawn on the open square. The crosshair cannot be placed on one glyph. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '62.41'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'The open star is drawn on the open square. The crosshair cannot be placed on one glyph. Deferred.'
+    - observation_id: ge_2005_fig2c_star_66_40_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (c), series 4, 66.40 mol% GeO2. The open star is drawn on the open square. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '66.40'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'The open star is drawn on the open square. Deferred.'
+    - observation_id: ge_2005_fig2c_star_71_83_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (c), series 4, 71.83 mol% GeO2. The open star is drawn on the open square. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '71.83'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'The open star is drawn on the open square. Deferred.'
+    - observation_id: ge_2005_fig2c_star_82_93_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (c), series 4, 82.93 mol% GeO2. The open star is drawn on the open square. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '82.93'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'The open star is drawn on the open square. Deferred.'
+    - observation_id: ge_2005_fig2c_star_91_00_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (c), series 4, 91.00 mol% GeO2. The star, the square and the filled triangle meet. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '91.00'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'The star, the square and the filled triangle meet. Deferred.'
+    - observation_id: ge_2005_fig2e_star_54_80_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (e), series 4, 54.80 mol% GeO2. The star centre is near page y 3111, above the highest labelled tick (10 at y 3151.5). Not extrapolated. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '54.80'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'The star centre is near page y 3111, above the highest labelled tick (10 at y 3151.5). Not extrapolated. Deferred.'
+    - observation_id: ge_2005_fig2e_star_59_59_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (e), series 4, 59.59 mol% GeO2. Star centre near page y 3122, above the 10 tick at y 3151.5. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '59.59'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'Star centre near page y 3122, above the 10 tick at y 3151.5. Deferred.'
+    - observation_id: ge_2005_fig2e_star_62_41_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (e), series 4, 62.41 mol% GeO2. Star centre near page y 3128, above the 10 tick at y 3151.5. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '62.41'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'Star centre near page y 3128, above the 10 tick at y 3151.5. Deferred.'
+    - observation_id: ge_2005_fig2e_star_66_40_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1347
+        figure: '2'
+        note: 'Panel (e), series 4, 66.40 mol% GeO2. Star centre near page y 3137, above the 10 tick at y 3151.5. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+      units: as reported
+      values:
+        composition_mol_percent_GeO2_as_printed: '66.40'
+        series_as_printed: '4'
+        decision: deferred
+        reason: 'Star centre near page y 3137, above the 10 tick at y 3151.5. Deferred.'
+    - observation_id: ge_2005_fig2_replots_refused
       type: figure_series_refused
       locator:
         page: 3
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
+        note: 'Legend check on the 600 dpi page. Series 1 filled triangles are emf measurements [1]. Series 2 open triangles are calorimetry at 1223 K [9]. Series 3 open squares are KEMS at 1300 K [19]. None of these is this work. Each is refused as a replot. Centres were not stored.'
       units: as reported
       values:
-        panel_a_series_1: filled triangles, emf [1]. Replot. Not read.
-        panel_a_series_3: open squares, KEMS at 1300 K [19]. Replot. Not read.
-        panels_b_to_e: Series 4 stars are visible, but automatic centres fell on the guide curve or a
-          neighbouring symbol. Not admitted. See the audit.
-        fig_3: Arrhenius comparison of p(GeO). The numbers are Table 1. Markers were not read a second
-          time.
-        fig_4: Axis label prints log p(i, 1033 K). Caption prints 1300 K. Temperature is not unique. Markers
-          refused.
-        fig_5: Nine-panel comparison at 1473 K. Series 4 is this work, drawn as curves with markers that
-          were not separated from the lines. Not read.
+        decision: refused
+        reason: Replots of cited measurements. Not this work.
+    - observation_id: ge_2005_fig3_refused
+      type: figure_series_refused
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1349
+        figure: '3'
+        note: 'Arrhenius comparison of p(GeO). The admitted numbers are Table 1. Markers were not read a second time.'
+      units: as reported
+      values:
+        decision: refused
+        reason: Replot of Table 1 partial pressures.
+    - observation_id: ge_2005_fig4_refused
+      type: figure_series_refused
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 1350
+        figure: '4'
+        note: 'The axis prints log p(i, 1033 K) and the caption prints 1300 K. Both are on the 600 dpi page. Every marker is refused because the temperature is not unique. The series are filled circles p(GeO), squares p(K) and triangles p(O2).'
+      units: as reported
+      values:
+        decision: refused
+        reason: Axis temperature 1033 K and caption temperature 1300 K disagree.
+    - observation_id: ge_2005_fig5_deferred
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Nine panels at 1473 K for (1) Na2O-SiO2, (2) Na2O-GeO2, (3) K2O-SiO2 and (4) K2O-GeO2. Series 4 is this work. On the 600 dpi page the markers lie on the guide curves. Separating a marker from its curve is deferred to t-1380. No value was read. Panels: (a, b) activities, (c) Gibbs energy of melt formation, (d, e) partial enthalpies, (f) enthalpy of melt formation, (g, h) partial entropies, (i) the caption text says enthalpy and the panel axis prints an entropy. The caption is quoted in the audit.'
+      units: as reported
+      values:
+        decision: deferred
+        defer_to: t-1380
+        reason: Markers were not separated from the guide curves.
   GeO2:
     observations: []
     context:
@@ -1538,7 +2098,7 @@ species:
           a pure-oxide reference phase.'
         per_as_printed: per mole of the compound, as printed
       phase: cr
-      per: mol_compound
+      per: mol_species
       T_range_K:
       - 879.0
       - 1050.0
@@ -1594,9 +2154,10 @@ species:
         T_K: '1249'
         attribution: Table 2, calorimetry cited as [51–53].
         compound_as_printed: K2O·SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
         phase_basis: Melting of the named compound. The solid that melts is crystalline.
       phase: cr
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -1614,16 +2175,20 @@ species:
         table: '2'
         row_label: K2O·SiO2
         column_header: ΔmS, J/(mol K)
-      units: J/(mol K)
+        note: 'Caption prints J/(mol K). The stored unit is J/mol K, the same unit.'
+      units: J/mol K
       values:
         quantity: entropy_of_fusion
         method_class: quoted_attributed
         value: '7.04'
+        units_as_printed: J/(mol K)
+        units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1249'
         attribution: Table 2.
         compound_as_printed: K2O·SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
       phase: cr
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -1647,13 +2212,14 @@ species:
         method_class: model_derived
         value: '-137.15'
         compound_as_printed: K2O·SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
         standard_state: 'Table 2 caption, published page 1354: enthalpies and entropies of melt formation
           in the systems K2O–SiO2 and Na2O–SiO2, evaluated in this work from earlier data. The caption
           does not say whether formation is from the elements or from the oxides, and it does not state
           a pure-oxide reference phase.'
         parents_note: Printed melt ΔfH equals printed solid ΔfH plus printed ΔmH.
       phase: l
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -1756,7 +2322,7 @@ species:
           a pure-oxide reference phase.'
         per_as_printed: per mole of the compound, as printed
       phase: cr
-      per: mol_compound
+      per: mol_species
       T_range_K:
       - 869.0
       - 1014.0
@@ -1812,9 +2378,10 @@ species:
         T_K: '1318'
         attribution: Table 2, calorimetry cited as [51–53].
         compound_as_printed: K2O·2SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
         phase_basis: Melting of the named compound. The solid that melts is crystalline.
       phase: cr
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -1832,16 +2399,20 @@ species:
         table: '2'
         row_label: K2O·2SiO2
         column_header: ΔmS, J/(mol K)
-      units: J/(mol K)
+        note: 'Caption prints J/(mol K). The stored unit is J/mol K, the same unit.'
+      units: J/mol K
       values:
         quantity: entropy_of_fusion
         method_class: quoted_attributed
         value: '8.10'
+        units_as_printed: J/(mol K)
+        units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1318'
         attribution: Table 2.
         compound_as_printed: K2O·2SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
       phase: cr
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -1865,13 +2436,14 @@ species:
         method_class: model_derived
         value: '-101.89'
         compound_as_printed: K2O·2SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
         standard_state: 'Table 2 caption, published page 1354: enthalpies and entropies of melt formation
           in the systems K2O–SiO2 and Na2O–SiO2, evaluated in this work from earlier data. The caption
           does not say whether formation is from the elements or from the oxides, and it does not state
           a pure-oxide reference phase.'
         parents_note: Printed melt ΔfH equals printed solid ΔfH plus printed ΔmH.
       phase: l
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -1974,7 +2546,7 @@ species:
           a pure-oxide reference phase.'
         per_as_printed: per mole of the compound, as printed
       phase: cr
-      per: mol_compound
+      per: mol_species
       T_range_K:
       - 891.0
       - 1041.0
@@ -2059,7 +2631,7 @@ species:
           a pure-oxide reference phase.'
         per_as_printed: per mole of the compound, as printed
       phase: cr
-      per: mol_compound
+      per: mol_species
       T_range_K:
       - 953.0
       - 1110.0
@@ -2115,9 +2687,10 @@ species:
         T_K: '1362'
         attribution: Table 2, calorimetry cited as [51–53].
         compound_as_printed: Na2O·SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
         phase_basis: Melting of the named compound. The solid that melts is crystalline.
       phase: cr
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -2135,16 +2708,20 @@ species:
         table: '2'
         row_label: Na2O·SiO2
         column_header: ΔmS, J/(mol K)
-      units: J/(mol K)
+        note: 'Caption prints J/(mol K). The stored unit is J/mol K, the same unit.'
+      units: J/mol K
       values:
         quantity: entropy_of_fusion
         method_class: quoted_attributed
         value: '19.09'
+        units_as_printed: J/(mol K)
+        units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1362'
         attribution: Table 2.
         compound_as_printed: Na2O·SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
       phase: cr
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -2168,13 +2745,14 @@ species:
         method_class: model_derived
         value: '-89.40'
         compound_as_printed: Na2O·SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
         standard_state: 'Table 2 caption, published page 1354: enthalpies and entropies of melt formation
           in the systems K2O–SiO2 and Na2O–SiO2, evaluated in this work from earlier data. The caption
           does not say whether formation is from the elements or from the oxides, and it does not state
           a pure-oxide reference phase.'
         parents_note: Printed melt ΔfH equals printed solid ΔfH plus printed ΔmH.
       phase: l
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -2257,7 +2835,7 @@ species:
           a pure-oxide reference phase.'
         per_as_printed: per mole of the compound, as printed
       phase: cr
-      per: mol_compound
+      per: mol_species
       T_range_K:
       - 973.0
       - 1078.0
@@ -2313,9 +2891,10 @@ species:
         T_K: '1147'
         attribution: Table 2, calorimetry cited as [51–53].
         compound_as_printed: Na2O·2SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
         phase_basis: Melting of the named compound. The solid that melts is crystalline.
       phase: cr
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -2333,16 +2912,20 @@ species:
         table: '2'
         row_label: Na2O·2SiO2
         column_header: ΔmS, J/(mol K)
-      units: J/(mol K)
+        note: 'Caption prints J/(mol K). The stored unit is J/mol K, the same unit.'
+      units: J/mol K
       values:
         quantity: entropy_of_fusion
         method_class: quoted_attributed
         value: '10.96'
+        units_as_printed: J/(mol K)
+        units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1147'
         attribution: Table 2.
         compound_as_printed: Na2O·2SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
       phase: cr
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -2366,13 +2949,14 @@ species:
         method_class: model_derived
         value: '-61.09'
         compound_as_printed: Na2O·2SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
         standard_state: 'Table 2 caption, published page 1354: enthalpies and entropies of melt formation
           in the systems K2O–SiO2 and Na2O–SiO2, evaluated in this work from earlier data. The caption
           does not say whether formation is from the elements or from the oxides, and it does not state
           a pure-oxide reference phase.'
         parents_note: Printed melt ΔfH equals printed solid ΔfH plus printed ΔmH.
       phase: l
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -2455,7 +3039,7 @@ species:
           a pure-oxide reference phase.'
         per_as_printed: per mole of the compound, as printed
       phase: cr
-      per: mol_compound
+      per: mol_species
       T_range_K:
       - 974.0
       - 1071.0
@@ -2512,9 +3096,10 @@ species:
         T_K: '1081'
         attribution: Table 2, calorimetry cited as [51–53].
         compound_as_printed: 3Na2O·8SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
         phase_basis: Melting of the named compound. The solid that melts is crystalline.
       phase: cr
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -2532,16 +3117,20 @@ species:
         table: '2'
         row_label: 3Na2O·8SiO2
         column_header: ΔmS, J/(mol K)
-      units: J/(mol K)
+        note: 'Caption prints J/(mol K). The stored unit is J/mol K, the same unit.'
+      units: J/mol K
       values:
         quantity: entropy_of_fusion
         method_class: quoted_attributed
         value: '7.35'
+        units_as_printed: J/(mol K)
+        units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1081'
         attribution: Table 2.
         compound_as_printed: 3Na2O·8SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
       phase: cr
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:
@@ -2565,13 +3154,14 @@ species:
         method_class: model_derived
         value: '-50.35'
         compound_as_printed: 3Na2O·8SiO2
+        per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
         standard_state: 'Table 2 caption, published page 1354: enthalpies and entropies of melt formation
           in the systems K2O–SiO2 and Na2O–SiO2, evaluated in this work from earlier data. The caption
           does not say whether formation is from the elements or from the oxides, and it does not state
           a pure-oxide reference phase.'
         parents_note: Printed melt ΔfH equals printed solid ΔfH plus printed ΔmH.
       phase: l
-      per: mol_compound
+      per: mol_species
       point_conditions:
         temperature_K:
           state:

@@ -52,16 +52,62 @@ Tick calibration is in the locator note. Residual rms on the nine labelled y tic
 
 A crosshair on the 600 dpi crop sits on the star, not on the square or the triangle. Series 1 triangles ([1], emf) and series 3 squares ([19], 1300 K) are replots and were not read.
 
-## Other figures, refused
+## Fig. 2 panels (b)–(e), fix round
 
-- Fig. 2 panels (b)–(e): series 4 stars are on the page. Crosshair checks put the automatic centre on the guide curve or on a neighbouring symbol. No value was stored.
-- Fig. 3: Arrhenius plot of the Table 1 p(GeO) sets. The admitted numbers are the table. Markers were not read again.
-- Fig. 4: the axis label prints `log p(i, 1033 K)` and the caption prints 1300 K. Both are on the 600 dpi page. The temperature is not unique, so every marker on the three series is refused. Compositions run from about 55 to 100 mol% GeO2 with filled circles (p(GeO)), squares (p(K)) and triangles (p(O2)).
-- Fig. 5, published page 1352: nine panels at 1473 K for four glass-forming systems. Series 4 is this work. Markers were not separated from the curves. Not read.
+Legend on the 600 dpi page, checked before any glyph was refused. Panel (b) and (c): filled triangle = 1 (emf [1]), open square = 3 (KEMS 1300 K [19]), open star = 4 (this work, 1400 K). Panel (d): open triangle = 2 (calorimetry 1223 K [9]), open star = 4. Panel (e): filled triangle = 1, open star = 4.
 
-## Standard state for the activities
+Tick lines were measured on the tick stub, not on the numeral. Panel (a) recovers the ticks already used for the seven admitted stars (y −9 at 574.5 through −17 at 1565.5; x 50 at 930.5 through 90 at 2028.5). Panel (d) and (b) x ticks: 50 at 2972.5, 60 at 3246.5, 70 at 3521.5, 80 at 3795.5, 90 at 4070.0; fit x = 27.440·mol% + 1600.400, rms 0.200 px. Panel (d) y: 0 at 1808.5, −30 at 2005.5, −60 at 2202.5, −90 at 2399.5, −120 at 2597.5, −150 at 2794.5; y = −6.574286·ΔfH + 1808.262, rms 0.264 px. Panel (b) labelled y ticks only: 0 at 515.5, −1 at 726.5, −2 at 936.5. The ticks below −2 are unlabelled and were not used. Panel (c) y: 0, −3, −6, −9, −12, −15 at 1808.5, 2014.5, 2220.5, 2426.5, 2632.5, 2838.5; the fit is exact. Panel (c) does not repeat the mol% numerals; its x ticks sit on the same page-x as the labelled ticks of panels (a) and (e). Panel (e) y: 10, 0, −10, −20, −30, −40 at 3151.5, 3326.5, 3502.5, 3678.0, 3853.5, 4029.0; rms 0.171 px.
 
-Equations (8) and (9) on published page 1350 ratio the measured partial pressures to p^0. The paper does not say whether p^0 is the pure solid or the pure liquid. The structured standard_state has phase tag unknown, inferred false. Expected migration phase: unknown.
+A vertical window at each printed melt composition, then a 12 px disk centroid. The same window on panel (a) recovers the admitted star to within about 5–15 px, so a candidate was admitted only after the 600 dpi crosshair sat on the open star and the two centroids agreed. Stored value is the mean. Half-width covers a 6 px centre error: ±1.5 kJ/mol, ±0.15 in ΔfG/(RT), ±0.5 J/(mol K).
+
+| panel | mol% GeO2 | decision | value | centre (read 1, page px) |
+| --- | --- | --- | --- | --- |
+| (d) series 4 | 54.80 | read, context | −125.59 kJ/mol | (3105.4, 2634.3) |
+| (d) series 4 | 59.59 | read, context | −116.92 kJ/mol | (3236.9, 2577.3) |
+| (d) series 4 | 62.41 | read, context | −110.55 kJ/mol | (3313.0, 2535.6) |
+| (d) series 4 | 66.40 | read, context | −101.00 kJ/mol | (3420.9, 2472.5) |
+| (d) series 4 | 71.83 | read, context | −88.43 kJ/mol | (3568.7, 2389.9) |
+| (d) series 4 | 82.93 | read, context | −57.13 kJ/mol | (3874.8, 2183.7) |
+| (d) series 4 | 91.00 | read, context | −33.25 kJ/mol | (4094.7, 2027.2) |
+| (c) series 4 | 54.80 | read, context | −12.392 | (1063.3, 2659.9) |
+| (c) series 4 | 59.59 | read, context | −11.496 | (1196.4, 2597.5) |
+| (c) series 4 | 62.41 | deferred | star drawn on the square | |
+| (c) series 4 | 66.40 | deferred | star drawn on the square | |
+| (c) series 4 | 71.83 | deferred | star drawn on the square | |
+| (c) series 4 | 82.93 | deferred | star drawn on the square | |
+| (c) series 4 | 91.00 | deferred | star, square and triangle meet | |
+| (e) series 4 | 71.83 | read, context | 9.496 J/(mol K) | (1528.9, 3160.2) |
+| (e) series 4 | 82.93 | read, context | 7.810 J/(mol K) | (1834.0, 3189.4) |
+| (e) series 4 | 91.00 | read, context | 3.620 J/(mol K) | (2057.0, 3263.2) |
+| (e) series 4 | 54.80 | deferred | centre y 3111 is above the 10 tick at 3151.5 | |
+| (e) series 4 | 59.59 | deferred | centre y 3122 is above the 10 tick | |
+| (e) series 4 | 62.41 | deferred | centre y 3128 is above the 10 tick | |
+| (e) series 4 | 66.40 | deferred | centre y 3137 is above the 10 tick | |
+| (b) series 4 | 54.80 | deferred | star on the square, and y is below the −2 tick | |
+| (b) series 4 | 59.59 | deferred | star on the square, below the −2 tick | |
+| (b) series 4 | 62.41 | deferred | star on the square, below the −2 tick | |
+| (b) series 4 | 66.40 | deferred | star on the square, below the −2 tick | |
+| (b) series 4 | 71.83 | deferred | star not clear of the triangle inside the labelled span | |
+| (b) series 4 | 82.93 | deferred | window peak is the series-1 triangle | |
+| (b) series 4 | 91.00 | deferred | window peak is the triangle/square pair | |
+
+Panel (d) reads are the enthalpy of formation of the melt. They are not scored as delta_fH of K2O or of GeO2. Panel (c) is ΔfG(T)/(RT), which is not delta_fG. Panel (e) is ΔfS(T), which is not entropy_of_fusion. Series 1, 2 and 3 are replots ([1], [9], [19]) and are refused. Their centres were not stored.
+
+GeO2 activities on panel (b) were not admitted. No GeO2 melting temperature is printed in this paper, and none is cited from a table on this base, so a GeO2 activity reference would stay phase unknown even if a star were read.
+
+## Other figures
+
+- Fig. 3: Arrhenius plot of the Table 1 p(GeO) sets. The admitted numbers are the table. Markers were not read again. Refused as a replot.
+- Fig. 4: the axis label prints `log p(i, 1033 K)` and the caption prints 1300 K. Both are on the 600 dpi page. Every marker is refused because the temperature is not unique. The three series are filled circles (p(GeO)), squares (p(K)) and triangles (p(O2)).
+- Fig. 5, published page 1352, 600 dpi. Caption: thermodynamic data for melts in (1) Na2O–SiO2, (2) Na2O–GeO2, (3) K2O–SiO2 and (4) K2O–GeO2 at 1473 K. (a, b) activities of the alkali and glass-forming oxides, (c) Gibbs energy of melt formation, (d, e) partial enthalpies, (f) enthalpy of melt formation, (g, h) partial entropies, (i) the caption text says enthalpy while the panel axis prints an entropy. Series 4 is this work. The markers lie on the guide curves. Separating them is deferred to t-1380. No value was read.
+
+## Standard state for the K2O activities
+
+Eq. (2) on published page 1346 is a(i) = p(i)/p0(i), with p0 over the corresponding oxide. Eq. (8) on published page 1350 writes that ratio for K2O. The paper does not name the pure-oxide phase. The points are at 1400 K. Shornikov (2013) Table 2, published page 110, prints Tm(K2O) = 1013±10 K (Glushko et al. 1978–1982), melting band 1003–1023 K. 1400 K is 377 K above that band, so the stable phase is liquid. Structured standard_state: raoultian K2O, phase tag value l, inferred true. A read-only migration lands identity.reference_state as raoultian pure K2O, phase l, on all seven points.
+
+## Per-mole basis and fusion-entropy unit
+
+Table 2 headers print kJ/mol and J/(mol K). Published page 1351 says the melt-formation comparison is per mole of the appropriate compound. The stored basis is mol_species. The five fusion entropies are stored as J/mol K, with units_as_printed J/(mol K).
 
 ## Render checks
 
