@@ -161,6 +161,60 @@ def test_harness_keeps_refused_empty_deposit_lifetime_unavailable() -> None:
     )
 
 
+def test_harness_retains_refusal_across_later_measured_zero_campaign() -> None:
+    refusal_notice = {
+        "wall_saturation_pressure_refusals_by_species": {
+            "Mg": {
+                "hot_wall": {
+                    "status": "refused",
+                    "reason": "wall_saturation_pressure_out_of_domain",
+                    "output_status": "status_bearing",
+                }
+            }
+        }
+    }
+    artifacts = (
+        _artifact({}, authority=refusal_notice),
+        _artifact({}),
+    )
+
+    result = FoulingLifecycleHarness(
+        lambda index: artifacts[index],
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=1000.0,
+        thickness_limit_m=0.001,
+        resinter_threshold_kg=10.0,
+    ).run((0, 1))
+
+    first_total = result.run_records[0].campaigns_to_resinter_total
+    second_record = result.run_records[1]
+    cumulative_authority = (
+        second_record.cumulative_snapshot.wall_deposit_sticking_authority
+    )
+    second_total = second_record.campaigns_to_resinter_total
+    assert first_total.value is None
+    assert first_total.refusal is not None
+    assert cumulative_authority is not None
+    assert cumulative_authority["status_bearing_refusal_count"] == 1
+    assert cumulative_authority["wall_saturation_pressure_refused_species"] == (
+        "Mg",
+    )
+    assert second_total.value is None
+    assert second_total.refusal is not None
+    assert second_total.refusal["count"] == 1
+    assert second_total.refusal["authority"]["code"] == (
+        "wall_deposit_saturation_pressure_refused"
+    )
+    assert second_total.refusal["authority"][
+        "wall_saturation_pressure_refused_species"
+    ] == ("Mg",)
+    assert (
+        second_total.refusal["authority"]["status_bearing_refusal_count"] == 1
+    )
+    assert result.campaigns_to_resinter_total.value is None
+    assert result.campaigns_to_resinter_total.refusal == second_total.refusal
+
+
 def test_harness_rejects_warm_worker_reused_atom_ledger() -> None:
     ledger = object()
 
