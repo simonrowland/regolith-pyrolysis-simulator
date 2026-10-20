@@ -175,7 +175,7 @@ separately subtracts the species' overhead partial pressure and applies gas-side
 Pure-MgO congruent vaporization is a third boundary condition: co-evolved Mg and O₂ are solved
 self-consistently. Its agreement validates the JANAF reaction basis, but does not justify substituting
 far-field overhead O₂ for a buffered melt's oxygen chemical potential.
-<!-- impl: §2.3 -> engines/builtin/vapor_pressure.py:3938 — SiO mass-action multiplier -->
+<!-- impl: §2.3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:3938 — SiO mass-action multiplier -->
 <!-- impl: §2.3 -> simulator/vapour_rail/channels.py clamp_physical_pO2_bar:834; simulator/physical_constants.py:49 — O2-channel envelope -->
 <!-- impl: §2.3 -> engines/builtin/_common.py resolve_transport_pO2_bar:344; simulator/environment.py:11-13 — transport floor -->
 <!-- impl: §2.3 -> data/vapor_pressures.yaml families.oxide_vapors_sio_family.physical_properties.species.SiO.pO2_reference_bar:4699 — SiO reference -->
