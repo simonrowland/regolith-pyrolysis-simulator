@@ -3811,6 +3811,42 @@ def _activity_contract_refusal(
     )
 
 
+def _activity_request_or_contract_refusal(
+    engine: Engine,
+    *,
+    experiment: Experiment,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+) -> tuple[Any, EnginePrediction | None]:
+    """Ready melt-activity request, or the contract refusal when it is not.
+
+    One owner for both ``predict_with_engine`` and ``compile_residual``.
+    A malformed row composition is ``RefusalReason.INVALID_SOURCE``.
+    ``run_validity_gates`` does not read that composition.
+    """
+
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    generated = activity_request_for_engine(experiment, observation, engine.value)
+    if generated is not None and generated.payload is not None:
+        return generated, None
+    requested = (
+        identity.composition
+        if identity.composition is not None and identity.composition.is_value
+        else None
+    )
+    return None, _activity_contract_refusal(
+        engine,
+        channel=channel,
+        sources=sources,
+        identity=identity,
+        requested=requested,
+        generated=generated,
+    )
+
+
 def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
     return Notice(
         kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
@@ -5015,7 +5051,6 @@ def predict_with_engine(
         # Activity rows use the melt-activity contract. A gap is a typed
         # refusal. No engine fO2 default is an input on this path.
         from simulator.battery.enums import AmountBasis
-        from simulator.battery.generators.bench import activity_request_for_engine
         from simulator.battery.records import Composition as OxideComposition
         from simulator.chemistry.melt_activity import (
             MELT_OXIDE_CATIONS_PER_FORMULA,
@@ -5056,16 +5091,17 @@ def predict_with_engine(
                 },
                 identity=identity,
             )
-        generated = activity_request_for_engine(experiment, observation, engine.value)
-        if generated is None or generated.payload is None:
-            return _activity_contract_refusal(
-                engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=identity.composition if identity.composition is not None and identity.composition.is_value else None,
-                generated=generated,
-            )
+        generated, contract_refusal = _activity_request_or_contract_refusal(
+            engine,
+            experiment=experiment,
+            observation=observation,
+            identity=identity,
+            channel=channel,
+            sources=sources,
+        )
+        if contract_refusal is not None:
+            return contract_refusal
+        assert generated is not None and generated.payload is not None
         # Malformed composition is INVALID_SOURCE above. A crystal sample
         # with a valid request is still not a melt observable.
         if sample_phase_detail is not None:
@@ -6877,6 +6913,33 @@ def compile_residual(
         )
 
     if sample_phase_detail is not None:
+        # Validity gates do not read the row composition. The activity
+        # contract does. A malformed print is INVALID_SOURCE and wins.
+        # Any other contract gap stays behind this return: a crystalline
+        # sample is not a melt observable even when its reference also
+        # fails to match. The injected predictor is not the contract.
+        if experiment is not None and isinstance(identity, Identity):
+            contract_observation = implied_alpha_reference or reference
+            contract_identity = contract_observation.identity
+            if isinstance(contract_identity, Identity):
+                _generated, contract_refusal = _activity_request_or_contract_refusal(
+                    engine,
+                    experiment=experiment,
+                    observation=contract_observation,
+                    identity=contract_identity,
+                    channel=ENGINE_CHANNELS[engine],
+                    sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                )
+                if (
+                    contract_refusal is not None
+                    and contract_refusal.refusal_reason is RefusalReason.INVALID_SOURCE
+                ):
+                    return _refused(
+                        RefusalReason.INVALID_SOURCE,
+                        contract_refusal.refusal_detail
+                        or {"reason": RefusalReason.INVALID_SOURCE.value},
+                        execution=contract_refusal.execution,
+                    )
         return _refused(
             RefusalReason.UNSUPPORTED,
             sample_phase_detail,
