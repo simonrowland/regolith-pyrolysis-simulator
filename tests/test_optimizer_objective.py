@@ -1105,6 +1105,77 @@ def test_finite_threshold_null_coating_rate_stays_unavailable_in_run_reference()
     )
 
 
+def test_finite_threshold_refused_empty_deposit_is_unavailable_for_lifespan_cost(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.5)
+    run_execution = _refused_empty_wall_deposit_execution()
+    sim = run_execution.simulator
+
+    summary = objective_module._furnace_lifespan_cost_summary(run_execution, sim)
+
+    assert summary["furnace_lifespan_consumed_fraction"] is None
+    assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
+    assert summary["wall_deposit_total_kg"] is None
+    assert summary["wall_deposit_cumulative_total_kg"] is None
+    assert objective_module._furnace_lifespan_consumed_fraction(
+        run_execution,
+        sim,
+    ) is None
+
+
+def test_finite_threshold_refused_empty_deposit_is_unavailable_for_depreciation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.5)
+    run_execution = _refused_empty_wall_deposit_execution()
+    sim = run_execution.simulator
+    sim.energy_cumulative_breakdown_kWh = {
+        "electrical": 0.0,
+        "evaporation_thermal": 0.0,
+    }
+    cost_parameters = _furnace_test_cost_parameters()
+
+    depreciation = objective_module._depreciation_expense_per_run_summary(
+        run_execution,
+        sim,
+        cost_parameters=cost_parameters,
+    )
+    marginal = objective_module._marginal_extraction_cost_summary(
+        sim,
+        objective_module._product_ledger(sim),
+        run_execution=run_execution,
+        cost_parameters=cost_parameters,
+    )
+    metric_value = _metric_value(
+        "throughput_cost_owner_ratify_usd",
+        sim,
+        objective_module._product_ledger(sim),
+        {},
+        run_execution=run_execution,
+        cost_parameters=cost_parameters,
+    )
+    reference = _run_reference(
+        run_execution,
+        {},
+        cost_parameters=cost_parameters,
+    )
+    record = SimpleNamespace(
+        objectives={"throughput_cost_owner_ratify_usd": None},
+        product_summary=reference.product_summary,
+    )
+
+    assert depreciation["depreciation_expense_per_run_usd"] is None
+    assert depreciation["status"] == "wall_deposit_unavailable"
+    assert depreciation["wall_deposit_total_kg"] is None
+    assert marginal["marginal_cost_usd"] is None
+    assert metric_value is None
+    assert study._record_objective_scores(
+        record,
+        (ObjectiveDefinition("throughput_cost_owner_ratify_usd", "minimize", "USD"),),
+    ) == (None,)
+
+
 def test_furnace_amortization_clean_recipe_skips_missing_lifetime() -> None:
     assert furnace_amortization_cost_per_run(
         20.0, None, 0.0, 1.0, has_positive_fouling=False
