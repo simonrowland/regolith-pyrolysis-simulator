@@ -1683,11 +1683,17 @@ def _trace_with_optimizer_coating_report(
         )
     normalized_deposit: dict[tuple[str, str], float] = {}
     by_species: dict[str, float] = {}
+    null_deposit_entry = False
     for key, raw_kg in raw_deposit.items():
         if not isinstance(key, tuple) or len(key) != 2:
             raise CoatingFeasibilityReportError(
                 "wall deposit key must be (segment, species)"
             )
+        if raw_kg is None:
+            # b-808: a null kilogram is unknown. Leave it out of the numeric
+            # sum; do not price it as a measured zero.
+            null_deposit_entry = True
+            continue
         try:
             kg = float(raw_kg)
         except (TypeError, ValueError) as exc:
@@ -1754,6 +1760,8 @@ def _trace_with_optimizer_coating_report(
         output_status = "non-authoritative-threshold"
         status_reason = "resinter threshold is not grounded"
     report = dict(runner_report)
+    if null_deposit_entry:
+        report["wall_quantity_unavailable"] = True
     report.update(
         campaigns_to_resinter_worst_segment=campaigns,
         campaigns_to_resinter_total=aggregate_campaigns,
@@ -1810,9 +1818,14 @@ def _trace_with_optimizer_coating_report(
             "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
         ] = refused_flux_bounds
     if threshold_parametric:
-        report["unqualified_deposition_rate_kg_per_campaign"] = float(
-            runner_report.get("wall_deposit_kg_per_campaign", 0.0) or 0.0
-        )
+        raw_rate = runner_report.get("wall_deposit_kg_per_campaign", 0.0)
+        if raw_rate is None:
+            # A null campaign total is unavailable, not a measured zero.
+            report["wall_quantity_unavailable"] = True
+        else:
+            report["unqualified_deposition_rate_kg_per_campaign"] = float(
+                raw_rate
+            )
         if charge_mass_kg is None:
             report.update(
                 coating_constraint_mode="no_unqualified_deposition",

@@ -3195,6 +3195,84 @@ def test_optimizer_overlay_bounds_refused_wall_species_from_snapshot_flux() -> N
     assert coating.status_payload["coating_warning_flags"][0]["species"] == "CrO2"
 
 
+def test_optimizer_overlay_null_wall_deposit_entry_is_unavailable() -> None:
+    """b-808: a null segment deposit is excluded, not priced as zero."""
+
+    trace = _trace()
+    trace.wall_deposit_by_segment_species_kg = {("hot_wall", "SiO"): None}
+    overlay = evaluate_module._trace_with_optimizer_coating_report(
+        _execution(trace=trace),
+        PhysicsConstraintSet(active_gates=("coating",)),
+        spec=SimpleNamespace(mass_kg=1.0),
+    )
+    coating = PhysicsConstraintSet(active_gates=("coating",)).coating(overlay)
+
+    assert coating.feasible is False
+    assert coating.status == "unavailable"
+    assert coating.observed is None
+    assert coating.status_payload["coating_verdict"] == "unavailable"
+
+
+def test_optimizer_overlay_null_refused_species_stays_flux_bounded() -> None:
+    """A null kilogram for a refused species is the flux bound, not a zero."""
+
+    trace = _trace()
+    trace.wall_deposit_by_segment_species_kg = {("hot_wall", "CrO2"): None}
+    trace.wall_deposit_sticking_authority = {
+        "authoritative_for_deposit_mass": False,
+        "code": "wall_saturation_pressure_refused",
+        "wall_saturation_pressure_refused_species": ["CrO2"],
+    }
+    snapshot = _snapshot()
+    snapshot.duration_h = 2.0
+    snapshot.evap_flux = EvaporationFlux(species_kg_hr={"CrO2": 2.0e-4})
+    execution = _execution(trace=trace, snapshots=(snapshot,))
+    overlay = evaluate_module._trace_with_optimizer_coating_report(
+        execution,
+        PhysicsConstraintSet(active_gates=("coating",)),
+        spec=SimpleNamespace(mass_kg=1.0),
+    )
+    coating = PhysicsConstraintSet(active_gates=("coating",)).coating(overlay)
+
+    assert coating.feasible
+    assert coating.status == "warning"
+    assert coating.status_payload["coating_warning_flags"][0]["species"] == "CrO2"
+
+
+def test_parametric_null_campaign_deposit_is_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A null parametric campaign total must not collapse to a measured zero."""
+
+    import simulator.runner as runner_module
+
+    monkeypatch.setattr(
+        runner_module,
+        "_wall_fouling_report",
+        lambda *_args, **_kwargs: {
+            "campaigns_to_resinter": "resinter_threshold_kg / 0",
+            "aggregate_campaigns_to_resinter": "resinter_threshold_kg / 0",
+            "authoritative_for_resinter": True,
+            "output_status": "authoritative",
+            "status_reason": "",
+            "wall_deposit_kg_per_campaign": None,
+        },
+    )
+    trace = _trace()
+    trace.wall_deposit_by_segment_species_kg = {}
+    overlay = evaluate_module._trace_with_optimizer_coating_report(
+        _execution(trace=trace),
+        PhysicsConstraintSet(active_gates=("coating",)),
+        spec=SimpleNamespace(mass_kg=1.0),
+    )
+    coating = PhysicsConstraintSet(active_gates=("coating",)).coating(overlay)
+
+    assert coating.feasible is False
+    assert coating.status == "unavailable"
+    assert coating.observed is None
+    assert coating.status_payload["coating_verdict"] == "unavailable"
+
+
 def test_optimizer_coating_overlay_preserves_proven_zero_authority() -> None:
     trace = _trace()
     trace.wall_deposit_by_segment_species_kg = {("hot_wall", "SiO"): 0.0}
