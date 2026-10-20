@@ -492,6 +492,7 @@ from simulator.state import (
 from simulator.vapour_rail.batch import FluxActivationContext
 from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import (
+    _EVAPORATION_ALPHA_GROUPS,
     EvaporationFluxRefusal,
     EvaporationMixin,
 )
@@ -1524,10 +1525,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         previous_carbonate_specs = self._stage0_carbonate_decomposition_specs
         previous_foulant_diagnostics = self._stage0_foulant_diagnostics
         self.species_formula_registry = self._registry_for_feedstock(fs)
-        # Must be set before _build_process_inventory so Stage-0 oxidation
-        # can look up the Sephton refractory-C partition for this feed.
-        self._batch_feedstock_key = str(feedstock_key)
         try:
+            unresolved_species = []
+            for group_name in _EVAPORATION_ALPHA_GROUPS:
+                group = self.vapor_pressures.get(group_name, {}) or {}
+                for species, row in group.items():
+                    # Dormant catalog rows cannot carry positive flow.
+                    if (
+                        isinstance(row, Mapping)
+                        and row.get('flux_dormant') is True
+                    ):
+                        continue
+                    try:
+                        resolve_species_formula(
+                            str(species), self.species_formula_registry
+                        )
+                    except AccountingError:
+                        unresolved_species.append(str(species))
+            if unresolved_species:
+                from simulator.condensation import DepositionInputRefusal
+
+                unresolved_species = sorted(set(unresolved_species))
+                raise DepositionInputRefusal(
+                    'species_molar_mass',
+                    unresolved_species,
+                    'configured positive-flow vapor species must have a '
+                    'resolvable formula',
+                )
+
+            # Must be set before _build_process_inventory so Stage-0 oxidation
+            # can look up the Sephton refractory-C partition for this feed.
+            self._batch_feedstock_key = str(feedstock_key)
             inventory = self._build_process_inventory(
                 fs, mass_value, feedstock_key=feedstock_key,
             )

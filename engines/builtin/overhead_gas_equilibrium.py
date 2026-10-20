@@ -331,16 +331,27 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
     def _oxide_activity_proxy_gamma_1(composition_wt_pct: Any) -> dict[str, float]:
         if not isinstance(composition_wt_pct, Mapping):
             return {}
+        from simulator.condensation import DepositionInputRefusal
+
         oxide_moles: dict[str, float] = {}
         for oxide, wt_pct in dict(composition_wt_pct).items():
-            molar_mass = _OXIDE_MOLAR_MASS_G_MOL.get(str(oxide))
-            if molar_mass is None:
-                continue
             if not is_declared_real_scalar(wt_pct, allow_numeric_str=True):
                 continue
             amount = max(0.0, float(wt_pct or 0.0))
             if amount > 0.0:
-                oxide_moles[str(oxide)] = amount / molar_mass
+                oxide_name = str(oxide)
+                # This proxy is defined on a closed nine-oxide mass table.
+                # Refuse every positive constituent outside that domain so a
+                # partial composition never gets normalized silently.
+                molar_mass = _OXIDE_MOLAR_MASS_G_MOL.get(oxide_name)
+                if molar_mass is None:
+                    raise DepositionInputRefusal(
+                        "species_molar_mass",
+                        oxide_name,
+                        "positive constituent is outside the closed "
+                        "nine-oxide gamma-one proxy domain",
+                    )
+                oxide_moles[oxide_name] = amount / molar_mass
         total = sum(oxide_moles.values())
         if total <= 0.0:
             return {}

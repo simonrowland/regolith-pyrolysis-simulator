@@ -322,6 +322,24 @@ def _stage_area_ratio_provenance_record(
     return record
 
 
+def _resolved_species_molar_mass_kg_mol(
+    species: str,
+    species_formula_registry: Optional[Mapping[str, Any]],
+) -> float:
+    """Resolve one gas carrier mass or refuse the missing input."""
+    species_name = str(species)
+    try:
+        return resolve_species_formula(
+            species_name, species_formula_registry
+        ).molar_mass_kg_per_mol()
+    except UnknownSpeciesError as exc:
+        raise DepositionInputRefusal(
+            "species_molar_mass",
+            species_name,
+            f"formula could not be resolved: {exc}",
+        ) from exc
+
+
 def _mean_molar_mass_kg_mol(
     species_kg: Optional[Mapping[str, float]],
     *,
@@ -352,12 +370,13 @@ def _mean_molar_mass_kg_mol(
 
     Returns:
         Mean molar mass in kg/mol, or the documented fallback when
-        the mixture is empty / unresolvable. There is no fixed numeric
+        the mixture is empty. There is no fixed numeric
         domain: any finite positive molar mass resolved from the species
         formula resolver is eligible. For sanity, pure He
         returns 0.004002602 kg/mol, while a registered 300 g/mol species
-        returns 0.300 kg/mol. Unresolved species are skipped rather than
-        contaminating the denominator. The result is always finite and positive.
+        returns 0.300 kg/mol. A positive species with no resolvable formula
+        raises a typed refusal instead of contaminating the denominator. The
+        result is always finite and positive.
     """
     if not species_kg:
         if fallback_engagement_recorder is not None:
@@ -372,15 +391,9 @@ def _mean_molar_mass_kg_mol(
             continue
         if not math.isfinite(mass) or mass <= 0.0:
             continue
-        try:
-            molar_mass_kg_mol = resolve_species_formula(
-                str(species), species_formula_registry
-            ).molar_mass_kg_per_mol()
-        except UnknownSpeciesError:
-            # Unknown species — skip rather than poison the mean.
-            # The fallback covers the "all unknown" degenerate case
-            # via total_mol == 0 below.
-            continue
+        molar_mass_kg_mol = _resolved_species_molar_mass_kg_mol(
+            str(species), species_formula_registry
+        )
         total_kg += mass
         total_mol += mass / molar_mass_kg_mol  # mol — kg / (kg/mol)
     if total_mol <= 0.0 or total_kg <= 0.0:
@@ -1212,16 +1225,9 @@ class OverheadGasModel:
             # (kg/hr)/(kg/mol)=mol/hr; p_i=y_i*P remains mbar. Sanity: equal
             # molar Na and H2 flow receive equal partial pressures.
             species_name = str(species)
-            try:
-                molar_mass_kg_mol = resolve_species_formula(
-                    species_name, species_formula_registry
-                ).molar_mass_kg_per_mol()
-            except UnknownSpeciesError as exc:
-                raise DepositionInputRefusal(
-                    "species_molar_mass",
-                    species_name,
-                    f"formula could not be resolved: {exc}",
-                ) from exc
+            molar_mass_kg_mol = _resolved_species_molar_mass_kg_mol(
+                species_name, species_formula_registry
+            )
             molar_flow_by_species[species_name] = (
                 mass_rate_kg_hr / molar_mass_kg_mol
             )
