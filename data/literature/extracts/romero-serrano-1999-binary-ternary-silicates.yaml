@@ -1,0 +1,467 @@
+schema_version: literature_extract.v1
+source_id: romero-serrano-1999-binary-ternary-silicates
+source:
+  citation: 'Romero-Serrano, A. & Pelton, A. D. (1999). Thermodynamic Analysis of Binary and Ternary Silicate Systems by a Structural Model. ISIJ International, 39(5), 399–408.'
+  year: 1999
+  corpus_asset: raw/romero-serrano-1999-binary-ternary-silicates/romero-serrano-1999-binary-ternary-silicates.pdf
+  sha256: 9dc21535f19b12dde91fbdb99e18fd52ffcc41ef3d5bd7c10ea668a8b808cec6
+extraction:
+  method: >-
+    Born-digital pdftotext-layout transcription for cited invariant points and figure captions; 600 dpi renders of physical PDF pages 3–10 were used to inventory and count plotted markers. Table 1 was reviewed but not emitted as observations because its un-attributed pure-phase thermochemistry is model input and the primary values already have a canonical store location.
+  date: '2026-10-20'
+  worker: fam19-1019
+review_status: draft
+fidelity_samples:
+  - path: species.SiO2.observations[romero_1999_glasser_osborn_invariant_a].values.points[0].T_C
+    value: 1480
+    note: Quoted experimental invariant point attributed to Glasser and Osborn [19], physical PDF page 6.
+  - path: species.SiO2.observations[romero_1999_riboud_muan_invariant_a].values.points[0].T_C
+    value: 1185
+    note: Quoted experimental invariant point attributed to Riboud and Muan [20], physical PDF page 7.
+  - path: species.SiO2.observations[romero_1999_osborn_muan_invariant_a].values.points[0].T_C
+    value: 1470
+    note: Quoted experimental invariant point (a) attributed to Osborn and Muan [22], physical PDF page 8.
+  - path: species.SiO2.observations[romero_1999_osborn_muan_invariant_b].values.points[0].T_C
+    value: 1305
+    note: Quoted experimental invariant point (b) attributed to Osborn and Muan [22], physical PDF page 8.
+species:
+  SiO2:
+    observations:
+      - observation_id: romero_1999_glasser_osborn_invariant_a
+        type: transition_point
+        phase: l
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 404
+          section: 6.1, SiO2–MnO–MgO system
+          note: Prose compares the calculated invariant point a with the experimental value from [19], which is also plotted in Fig. 8 on PDF page 7; it remains one observation.
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: invariant_temperature
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Glasser and Osborn [19]
+          liquid_phase: l
+          points:
+            - sample_id_as_published: invariant point a
+              T_C: 1480
+              composition_as_printed_partial_wt_percent: {SiO2: '55', MnO: '25'}
+              point_conditions:
+                T_C:
+                  state: {tag: value, value: 1480}
+                  locator: {page: 6, pdf_page_index: 5, published_page: 404, section: 6.1}
+                composition:
+                  state:
+                    tag: unknown
+                    reason: Only SiO2 and MnO mass percentages are printed for this SiO2–MnO–MgO invariant point; MgO is omitted and no remainder is inferred.
+                  locator: {page: 6, pdf_page_index: 5, published_page: 404, section: 6.1}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: The cited prose reports no pressure for this invariant point.}
+                  locator: {page: 6, pdf_page_index: 5, published_page: 404, section: 6.1}
+                fO2_log:
+                  state: {tag: unknown, reason: The cited prose reports no oxygen fugacity for this invariant point.}
+                  locator: {page: 6, pdf_page_index: 5, published_page: 404, section: 6.1}
+      - observation_id: romero_1999_riboud_muan_invariant_a
+        type: transition_point
+        phase: l
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 405
+          section: 6.2, SiO2–FeO–MnO system
+          note: The quoted experimental invariant point is compared with the calculated point a and attributed to [20].
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: invariant_temperature
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Riboud and Muan [20]
+          liquid_phase: l
+          points:
+            - sample_id_as_published: invariant point a
+              T_C: 1185
+              composition_as_printed_partial_wt_percent: {SiO2: '39.9', MnO: '23.9'}
+              point_conditions:
+                T_C:
+                  state: {tag: value, value: 1185}
+                  locator: {page: 7, pdf_page_index: 6, published_page: 405, section: 6.2}
+                composition:
+                  state:
+                    tag: unknown
+                    reason: Only SiO2 and MnO mass percentages are printed for this SiO2–FeO–MnO invariant point; FeO is omitted and no remainder is inferred.
+                  locator: {page: 7, pdf_page_index: 6, published_page: 405, section: 6.2}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: The cited prose reports no pressure for this invariant point.}
+                  locator: {page: 7, pdf_page_index: 6, published_page: 405, section: 6.2}
+                fO2_log:
+                  state: {tag: unknown, reason: The cited prose reports no oxygen fugacity for this invariant point.}
+                  locator: {page: 7, pdf_page_index: 6, published_page: 405, section: 6.2}
+      - observation_id: romero_1999_osborn_muan_invariant_a
+        type: transition_point
+        phase: l
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 406
+          section: 6.3, SiO2–FeO–MgO system
+          note: Experimental invariant point a attributed to [22].
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: invariant_temperature
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Osborn and Muan [22]
+          liquid_phase: l
+          points:
+            - sample_id_as_published: invariant point a
+              T_C: 1470
+              composition_as_printed_partial_wt_percent: {SiO2: '56.4', FeO: '20.0'}
+              point_conditions:
+                T_C:
+                  state: {tag: value, value: 1470}
+                  locator: {page: 8, pdf_page_index: 7, published_page: 406, section: 6.3}
+                composition:
+                  state:
+                    tag: unknown
+                    reason: Only SiO2 and FeO mass percentages are printed for this SiO2–FeO–MgO invariant point; MgO is omitted and no remainder is inferred.
+                  locator: {page: 8, pdf_page_index: 7, published_page: 406, section: 6.3}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: The cited prose reports no pressure for this invariant point.}
+                  locator: {page: 8, pdf_page_index: 7, published_page: 406, section: 6.3}
+                fO2_log:
+                  state: {tag: unknown, reason: The cited prose reports no oxygen fugacity for this invariant point.}
+                  locator: {page: 8, pdf_page_index: 7, published_page: 406, section: 6.3}
+      - observation_id: romero_1999_osborn_muan_invariant_b
+        type: transition_point
+        phase: l
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 406
+          section: 6.3, SiO2–FeO–MgO system
+          note: Experimental invariant point b attributed to [22].
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: invariant_temperature
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Osborn and Muan [22]
+          liquid_phase: l
+          points:
+            - sample_id_as_published: invariant point b
+              T_C: 1305
+              composition_as_printed_partial_wt_percent: {SiO2: '45.3', FeO: '45.7'}
+              point_conditions:
+                T_C:
+                  state: {tag: value, value: 1305}
+                  locator: {page: 8, pdf_page_index: 7, published_page: 406, section: 6.3}
+                composition:
+                  state:
+                    tag: unknown
+                    reason: Only SiO2 and FeO mass percentages are printed for this SiO2–FeO–MgO invariant point; MgO is omitted and no remainder is inferred.
+                  locator: {page: 8, pdf_page_index: 7, published_page: 406, section: 6.3}
+                total_pressure_Pa:
+                  state: {tag: unknown, reason: The cited prose reports no pressure for this invariant point.}
+                  locator: {page: 8, pdf_page_index: 7, published_page: 406, section: 6.3}
+                fO2_log:
+                  state: {tag: unknown, reason: The cited prose reports no oxygen fugacity for this invariant point.}
+                  locator: {page: 8, pdf_page_index: 7, published_page: 406, section: 6.3}
+    context:
+      - observation_id: romero_1999_table_1_pure_phase_model_inputs
+        type: model_input_context
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 400
+          table: '1'
+          note: Table 1 is headed Thermodynamic Properties Relative to Elements at 298.15 K.
+        units: As printed in Table 1; no values re-emitted.
+        candidate_tokens_considered: [delta_fH, S, cp]
+        reason_unscored: >-
+          The 20-row table gives pure-phase H/S baselines and Cp coefficients used as model inputs. It has no per-row attribution, and the primary thermo compilations already have a canonical store location, so these values are not duplicated.
+        values:
+          method_class: model_derived
+          quantity_as_printed: Pure-phase enthalpy and entropy baselines and heat-capacity polynomial coefficients
+          numeric_rows_printed: 20
+          table_role: model inputs
+      - observation_id: romero_1999_figure_1
+        type: figure_record
+        locator: {page: 3, pdf_page_index: 2, published_page: 401, figure: '1'}
+        panel: whole_figure
+        attribution: Experimental points are attributed to references [5], [6], [7] and [8] in the caption.
+        units: Temperature °C; mole fraction SiO2.
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species: MgO–SiO2 system
+          phase: liquidus and solidus boundaries
+          temperature_as_printed: Variable; y-axis is temperature in °C.
+          axes_as_printed:
+            x: Mole fraction SiO2
+            y: Temperature (°C)
+          caption: 'Optimized MgO–SiO2 phase diagram. Experimental points: ○ [5]; ◇ [6]; ▽ [7]; □ [8].'
+          series:
+            - {name: "[5] open circles", marker_count: 5, evidence_class: quoted_attributed}
+            - {name: "[6] open diamonds", marker_count: 2, evidence_class: quoted_attributed}
+            - {name: "[7] open inverted triangles", marker_count: 8, evidence_class: quoted_attributed}
+            - {name: "[8] open squares", marker_count: 11, evidence_class: quoted_attributed}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_2
+        type: figure_record
+        locator: {page: 3, pdf_page_index: 2, published_page: 401, figure: '2'}
+        panel: whole_figure
+        attribution: Experimental points are attributed to references [6], [10], [11] and [12] in the caption.
+        units: Temperature °C; mole fraction SiO2.
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species: FeO–SiO2 system
+          phase: liquidus and solidus boundaries
+          temperature_as_printed: Variable; y-axis is temperature in °C.
+          axes_as_printed:
+            x: Mole fraction SiO2
+            y: Temperature (°C)
+          caption: 'Optimized FeO–SiO2 phase diagram. Experimental points: △ [6]; ○ [10]; ◇ [11]; □ [12].'
+          series:
+            - {name: "[6] open triangles", marker_count: 10, evidence_class: quoted_attributed}
+            - {name: "[10] open circles", marker_count: 9, evidence_class: quoted_attributed}
+            - {name: "[11] open diamonds", marker_count: 6, evidence_class: quoted_attributed}
+            - {name: "[12] open squares", marker_count: 10, evidence_class: quoted_attributed}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_3
+        type: figure_record
+        locator: {page: 4, pdf_page_index: 3, published_page: 402, figure: '3'}
+        panel: whole_figure
+        attribution: Experimental points from [14] as printed in the caption.
+        units: Temperature °C; mole fraction MgO.
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species: MnO–MgO system
+          phase: liquidus and solidus boundaries
+          temperature_as_printed: Variable; y-axis is temperature in °C.
+          axes_as_printed:
+            x: Mole fraction MgO
+            y: Temperature (°C)
+          caption: 'Optimized MnO–MgO phase diagram. Experimental points: □ [14].'
+          series:
+            - {name: "[14] open squares", marker_count: 5, evidence_class: quoted_attributed}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_4
+        type: figure_record
+        locator: {page: 4, pdf_page_index: 3, published_page: 402, figure: '4'}
+        panel: whole_figure
+        attribution: Experimental points from [15] as printed in the caption.
+        units: Temperature °C; mole fraction FeO.
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species: MgO–FeO system
+          phase: liquidus and solidus boundaries
+          temperature_as_printed: Variable; y-axis is temperature in °C.
+          axes_as_printed:
+            x: Mole fraction FeO
+            y: Temperature (°C)
+          caption: 'Optimized MgO–FeO phase diagram. Experimental points: □ [15].'
+          series:
+            - {name: "[15] plotted open circles; caption symbol is open square", marker_count: 15, evidence_class: quoted_attributed}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+          note: The 600 dpi plot symbols appear circular although the caption gives a square symbol.
+      - observation_id: romero_1999_figure_5
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, published_page: 403, figure: '5'}
+        panel: whole_figure
+        attribution: Experimental points from [17] as printed in the caption.
+        units: Temperature °C; mole fraction MnO.
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species: FeO–MnO system
+          phase: liquidus and solidus boundaries
+          temperature_as_printed: Variable; y-axis is temperature in °C.
+          axes_as_printed:
+            x: Mole fraction MnO
+            y: Temperature (°C)
+          caption: 'Optimized FeO–MnO phase diagram. Experimental points: □ [17].'
+          series:
+            - {name: "[17] open squares", marker_count: 4, evidence_class: quoted_attributed}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_6
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, published_page: 403, figure: '6'}
+        panel: whole_figure
+        attribution: Present-work model schematic.
+        units: Interaction-energy terms (ω − ηT), J/mol.
+        values:
+          quantity: unavailable
+          schema_gap: The schematic interaction-energy representation has no matching existing quantity token.
+          species: Ternary SiO2–AO–BO system
+          phase: liquid model
+          temperature_as_printed: No fixed temperature is printed for the schematic.
+          axes_as_printed:
+            vertices: AO; BO; SiO2
+            interior: Gᴱ_AO–BO
+          caption: Illustration of the asymmetric approximation for estimating the excess free energy in a ternary from binary values.
+          series:
+            - {name: Asymmetric approximation schematic, marker_count: 0, evidence_class: model_derived}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_7
+        type: figure_record
+        locator: {page: 6, pdf_page_index: 5, published_page: 404, figure: '7'}
+        panel: whole_figure
+        attribution: Present-work calculated optimized liquidus diagram.
+        units: Temperature °C; weight percent.
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species: SiO2–MnO–MgO system
+          phase: liquidus surface
+          temperature_as_printed: Variable; isotherms are labelled in °C.
+          axes_as_printed:
+            x: Weight percent in ternary composition triangle (SiO2, MnO, MgO vertices)
+            y: Temperature contours (°C)
+          caption: Optimized SiO2–MnO–MgO phase diagram (liquidus). Temperature in °C.
+          series:
+            - {name: Calculated liquidus isotherms and phase boundaries, marker_count: 0, evidence_class: model_derived}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_8
+        type: figure_record
+        locator: {page: 7, pdf_page_index: 6, published_page: 405, figure: '8'}
+        panel: whole_figure
+        attribution: Glasser and Osborn [19] as printed in the caption.
+        units: Temperature °C; mole fraction Mn2SiO4.
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species: Mg2SiO4–Mn2SiO4 pseudo-binary system
+          phase: liquidus and olivine boundaries
+          temperature_as_printed: Variable; y-axis is temperature in °C.
+          axes_as_printed:
+            x: Mole fraction Mn2SiO4
+            y: Temperature (°C)
+          caption: Optimized pseudo-binary Mg2SiO4–Mn2SiO4 phase diagram. Points from Glasser and Osborn [19].
+          series:
+            - {name: "Glasser and Osborn [19] filled circles", marker_count: 14, evidence_class: quoted_attributed}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_9
+        type: figure_record
+        locator: {page: 7, pdf_page_index: 6, published_page: 405, figure: '9'}
+        panel: whole_figure
+        attribution: Present-work calculated optimized liquidus diagram.
+        units: Temperature °C; weight percent.
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species: SiO2–FeO–MnO system
+          phase: liquidus surface
+          temperature_as_printed: Variable; isotherms are labelled in °C.
+          axes_as_printed:
+            x: Weight percent in ternary composition triangle (SiO2, FeO, MnO vertices)
+            y: Temperature contours (°C)
+          caption: Optimized SiO2–FeO–MnO phase diagram (liquidus). Temperature in °C.
+          series:
+            - {name: Calculated liquidus isotherms and phase boundaries, marker_count: 0, evidence_class: model_derived}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_10
+        type: figure_record
+        locator: {page: 7, pdf_page_index: 6, published_page: 405, figure: '10'}
+        panel: whole_figure
+        attribution: Ban-ya et al. [21] for the experimental iso-activity points.
+        units: Dimensionless activity; liquid standard state.
+        values:
+          quantity: activity
+          method_class: model_derived
+          species: FeO
+          phase: liquid
+          temperature_as_printed: 1450 °C
+          standard_state_as_printed: liquid standard state
+          axes_as_printed:
+            x: Ternary SiO2–FeO–MnO composition triangle
+            y: FeO activity iso-activity contours
+          caption: 'Calculated and experimental [21] iso-activity curves at 1450°C in liquid SiO2–FeO–MnO solution (liquid standard state).'
+          series:
+            - {name: aFeO = 0.1 filled circles, marker_count: 4, evidence_class: quoted_attributed, standard_state_as_printed: liquid standard state}
+            - {name: aFeO = 0.3 open circles, marker_count: 5, evidence_class: quoted_attributed, standard_state_as_printed: liquid standard state}
+            - {name: aFeO = 0.5 filled squares, marker_count: 6, evidence_class: quoted_attributed, standard_state_as_printed: liquid standard state}
+            - {name: aFeO = 0.7 open squares, marker_count: 5, evidence_class: quoted_attributed, standard_state_as_printed: liquid standard state}
+            - {name: aFeO = 0.9 filled triangles, marker_count: 4, evidence_class: quoted_attributed, standard_state_as_printed: liquid standard state}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_11
+        type: figure_record
+        locator: {page: 8, pdf_page_index: 7, published_page: 406, figure: '11'}
+        panel: whole_figure
+        attribution: Present-work calculated optimized liquidus diagram.
+        units: Temperature °C; weight percent.
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species: SiO2–FeO–MgO system
+          phase: liquidus surface
+          temperature_as_printed: Variable; isotherms are labelled in °C.
+          axes_as_printed:
+            x: Weight percent in ternary composition triangle (SiO2, FeO, MgO vertices)
+            y: Temperature contours (°C)
+          caption: Optimized SiO2–FeO–MgO phase diagram (liquidus). Temperature in °C.
+          series:
+            - {name: Calculated liquidus isotherms and phase boundaries, marker_count: 0, evidence_class: model_derived}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_12
+        type: figure_record
+        locator: {page: 8, pdf_page_index: 7, published_page: 406, figure: '12'}
+        panel: whole_figure
+        attribution: Bowen and Schairer [23] as printed in the caption.
+        units: Temperature °C; mole fraction Fe2SiO4.
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species: Mg2SiO4–Fe2SiO4 pseudo-binary system
+          phase: liquidus and olivine boundaries
+          temperature_as_printed: Variable; y-axis is temperature in °C.
+          axes_as_printed:
+            x: Mole fraction Fe2SiO4
+            y: Temperature (°C)
+          caption: Optimized pseudo-binary Mg2SiO4–Fe2SiO4 phase diagram. Points from Bowen and Schairer [23].
+          series:
+            - {name: "Bowen and Schairer [23] open circles", marker_count: 14, evidence_class: quoted_attributed}
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: romero_1999_figure_13
+        type: figure_record
+        locator: {page: 9, pdf_page_index: 8, published_page: 407, figure: '13'}
+        panel: whole_figure
+        attribution: Present-work structural-model calculations.
+        units: Gibbs free energy of mixing, kJ/mol; mole fraction SiO2.
+        values:
+          quantity: unavailable
+          schema_gap: The store has no quantity token for Gibbs free energy of mixing; delta_fG would represent a different quantity.
+          species: MO–SiO2 binary systems (M = Fe, Mn, Mg, Ca, Na)
+          phase: liquid silicate melt
+          temperature_as_printed: 1873 K
+          axes_as_printed:
+            x: Mole fraction SiO2
+            y: Gibbs Energy of Mixing (kJ/mol)
+          caption: 'Calculated Gibbs free energy of mixing of the MO–SiO2 binary systems (M = Fe, Mn, Mg, Ca, Na) at 1873 K.'
+          series:
+            - {name: FeO–SiO2, marker_count: 0, evidence_class: model_derived}
+            - {name: MnO–SiO2, marker_count: 0, evidence_class: model_derived}
+            - {name: MgO–SiO2, marker_count: 0, evidence_class: model_derived}
+            - {name: CaO–SiO2, marker_count: 0, evidence_class: model_derived}
+            - {name: Na2O–SiO2, marker_count: 0, evidence_class: model_derived}
+          numeric_points: none
+          digitisation: deferred to a figure pass
