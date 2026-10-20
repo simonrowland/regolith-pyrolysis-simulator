@@ -46,12 +46,12 @@ Published page 1432 is PDF page 5 (pdf_page_index 4), not page 4. The caption as
 
 Both panels were calibrated from the inward tick stubs on the 600 dpi render. Fig. 3a: 473 px per 200 K, residual 0 on 1800, 2000, 2200, 2400; 464 px per 0.01 in activity, residual 0 on 0.03, 0.02, 0.01. The unlabelled frame is at a = 0.00503, not at zero. Fig. 3b: least-squares temperature residuals at most 1.24 K; activity residuals at most 0.000034. The unlabelled frame is at a = 0.0498.
 
-An open-circle centre is a white pixel whose rays to the inner stroke have median 37 px (panel a) or 32 px (panel b). Eighteen Fig. 3a circles and fifteen Fig. 3b circles are stored. The five added this round are partial rings, read where a sector of the series radius is visible. Isolated circles (ray std under 2 px) are stored at ±0.0002 and ±2 K on panel a, and at ±0.001 and ±3 K on panel b. Circles whose neighbour cuts the ring are stored wider: ±0.0005 and ±4 K, or ±0.002 and ±5 K. Each centre was checked by drawing it back on the render.
+A marker is a centre, or an assignable exposed arc, inside a stated uncertainty. The uncertainty is wider when only an arc is visible. An open-circle centre is a white pixel whose rays meet the stroke near the series radius, 37 px on panel a and 32 px on panel b. Twenty-one Fig. 3a circles and fifteen Fig. 3b circles are stored. Isolated circles (ray std under 2 px) are stored at ±0.0002 and ±2 K on panel a, and at ±0.001 and ±3 K on panel b. Circles whose neighbour cuts the ring are stored wider: ±0.0005 and ±4 K, or ±0.002 and ±5 K. Each centre was checked against the 600 dpi render.
 
-Added this round, each a white pixel whose rays agree on one radius:
+Each overlapping pair is stored as two rows:
 
-- (1485.00, 1001.00), CaO, 2033.2 K, activity 0.0236. 210 degrees at radius 35 px. This one arc is both nominations (1463, 981) and (1487, 1000). The stored circle at (1521.50, 967.00) is 50 px away. Uncertainty ±0.0005 and ±6 K.
-- (2001.00, 840.00), CaO, 2251.4 K, activity 0.0270. 200 degrees at radius 34.5 px. This one arc is both nominations (1963, 846) and (2004, 841). Uncertainty ±0.0005 and ±6 K. The sample is liquid perovskite: 2251.4 K is 10 K above the 2241 K melting temperature.
+- (1485.00, 1001.00), CaO, 2033.2 K, activity 0.0236, is the right-hand circle. The left circle is (1452.00, 976.00), 2019.2 K, activity 0.0241, 59 of 72 rays at radius 35 px. Uncertainty ±0.0005 and ±4 K. The sample is crystalline perovskite, 222 K below 2241 K.
+- (2001.00, 840.00), CaO, 2251.4 K, activity 0.0270, is the right-hand ring. The sample is liquid perovskite, 10 K above 2241 K. The left ring is (1967.00, 846.00), 2237.0 K, activity 0.0269, 62 of 72 rays at radius 40 px. Uncertainty ±0.0005 and ±4 K. The sample is crystalline perovskite, 4 K below 2241 K, within 100 K of that melting temperature. CaO is crystalline lime at both temperatures.
 - (1534.00, 2812.00), TiO2, 2100.1 K, activity 0.1997. 250 degrees at radius 31 px. The literature error bar takes the missing sector. The pure oxide is crystalline, 85 K below 2185 K and 2 K from the lower listed melting temperature 2098 K. Uncertainty ±0.001 and ±4 K.
 - (1198.00, 3048.00), TiO2, 1940.2 K, activity 0.1518. 240 degrees at radius 31.5 px, 48 px from the stored circle at (1231.00, 3083.00). Uncertainty ±0.001 and ±4 K.
 - (1887.00, 2604.00), TiO2, 2268.1 K, activity 0.2419. 230 degrees at radius 31 px. The pure oxide is liquid, 83 K above 2185 K. The sample is liquid perovskite, 27 K above 2241 K. Uncertainty ±0.001 and ±4 K.
@@ -60,7 +60,7 @@ Still refused, one by one:
 
 - The legend open circle at (2213, 3127) is a complete 32 px ring and it is the series-3 key.
 - (1640, 911) is the literature half-filled symbol. A 160 degree ring is visible at (1644, 913); the symbol is not a series-3 open circle.
-- (1634, 967) has no single centre. The best sectors are 150 degrees, and the candidate centres sit about 16 px apart at radii from 19 to 31 px.
+- (1637.00, 972.00) is stored. It is the open circle below the half-filled symbol: 2097.5 K, activity 0.0242, 65 of 72 rays at radius 39 px. Uncertainty ±0.0005 and ±4 K. CaO is crystalline lime. The sample is crystalline perovskite, 144 K below 2241 K.
 - (1065, 3176) has a 170 degree sector at radius 25 to 28 px, short of the series radius 32 px, and the centre moves 14 px between the two best fits.
 
 The same page says the crystalline-state activities at 2182–2241 K were determined using the data in [47]. The caption still assigns the open circles to this work, so those points are stored, with that sentence left in the audit rather than used to drop them.
@@ -74,7 +74,10 @@ Emit cannot put `transition_temperature` on `T_K`, and one mapping cannot carry 
 | series | species | x | y | value | decision |
 | --- | --- | --- | --- | --- | --- |
 | a/3 open circle | CaO | 2001.00 | 840.00 | activity=0.0270 | read |
+| a/3 open circle | CaO | 1967.00 | 846.00 | activity=0.0269 | read |
 | a/3 open circle | CaO | 1485.00 | 1001.00 | activity=0.0236 | read |
+| a/3 open circle | CaO | 1452.00 | 976.00 | activity=0.0241 | read |
+| a/3 open circle | CaO | 1637.00 | 972.00 | activity=0.0242 | read |
 | a/3 open circle | CaO | 904.00 | 1132.00 | activity=0.0207 | read |
 | a/3 open circle | CaO | 1031.50 | 1112.50 | activity=0.0212 | read |
 | a/3 open circle | CaO | 1103.00 | 1075.50 | activity=0.0220 | read |
@@ -106,3 +109,6 @@ Emit cannot put `transition_temperature` on `T_K`, and one mapping cannot carry 
 | b/3 open circle | TiO2 | 2048.50 | 2589.00 | activity=0.2449 | read |
 | b/3 open circle | TiO2 | 2105.00 | 2585.00 | activity=0.2457 | read |
 | b/3 open circle | TiO2 | 2159.00 | 2579.00 | activity=0.2469 | read |
+| legend open circle | series 3 | 2213 | 3127 | — | refused: series key, not a datum |
+| half-filled circle | literature | 1640 | 911 | — | refused: series 2 of [46] or [47], not a series-3 open circle |
+| b/3 open arc | TiO2 | 1065 | 3176 | — | refused: sector radius 25-28 px, short of the series radius 32 px, and the centre moves 14 px |
