@@ -116,7 +116,7 @@ Fig. 2 caption: SiO2 (1) and P4O10 (2) activities and mixing energies (3, 4) at 
 | Fig. 5B endpoint disk | refused | (4002, 1020), r≈24. Filled disk at the right frame of panel B, crown at y=995, midline x=4002. Red, black and blue curves meet here. Not assigned to one series. Not read. |
 | Fig. 5A panel letter | legend glyph | (1972, 2031), the ring around the panel letter A. Not a data marker. |
 | Fig. 5B panel letter | legend glyph | (3857, 2032), the ring around the panel letter B, between counters (3857, 2013) and (3859, 2051). Not a data marker. |
-| Fig. 5 filled-core scan | scan | Both panels, 600 dpi, PDF page 6, window x 500–4080 and y 980–2220. Masks: red is R≥150, G≤80, B≤90; black is R, G and B ≤60; blue is B≥120 and B exceeds R and G. A distance transform keeps a local core only at radius ≥15 px. Open-circle rings are thinner than that, so they are not cores; their rows above are the census. Blue produced no core, so curves 3, 6 and 9 have no filled marker. |
+| Fig. 5 filled-core scan | scan | Both panels, 600 dpi, PDF page 6, window x 500–4080 and y 980–2220. Red mask, as run: R≥150, G≤80, B≤90, R≥G+80 and R≥B+60. Black mask, as run: R≤60, G≤60 and B≤60. Blue mask, as run for that pass: B≥120, B≥R+50, B≥G+40 and R≤140. That blue mask has no local core of radius ≥15 px. A looser reading, B≥120 and B>R and B>G, does: the ten blue rows below. A distance transform keeps a local core only at radius ≥15 px. Open-circle rings are thinner than that, so they are not cores; their rows above are the census. None of the blue cores is a filled marker. |
 | Fig. 5 scan core | red r=29.7 | (2773, 2052). Matched row (2773, 2052). Paired row (2758, 2039) is 19.8 px away inside this core. |
 | Fig. 5 scan core | red r=29.0 | (2825, 2083). Matched row (2825, 2083). |
 | Fig. 5 scan core | red r=24.7 | (2934, 2085). Matched row (2941, 2090), 8.6 px away. |
@@ -144,6 +144,16 @@ Fig. 2 caption: SiO2 (1) and P4O10 (2) activities and mixing energies (3, 4) at 
 | Fig. 5 scan core | black r=22.8 | (997, 1188). Matched row (998, 1188). |
 | Fig. 5 scan core | black r=21.2 | (908, 1131). Matched row (908, 1132). |
 | Fig. 5 scan core | black r=15.7 | (1997, 2050). Panel A letter stroke, not a data marker. Nearest glyph (1972, 2031). |
+| Fig. 5 scan core | blue r=21.93 pale artifact | (1325, 1120), panel A. Predicate B≥120 and B>R and B>G. Centre pixel (249, 250, 255). The core is the near-white gap between blue strokes, not ink. Not a marker. |
+| Fig. 5 scan core | blue r=16.16 curve junction | (1367, 1118), panel A. Centre (2, 2, 250). Two blue strokes cross, and the core is that overlap. Not a marker. |
+| Fig. 5 scan core | blue r=15.30 curve junction | (1402, 1114), panel A. Centre (1, 1, 243). Same crossing, 35 px from (1367, 1118). Not a marker. |
+| Fig. 5 scan core | blue r=15.30 curve junction | (1420, 1113), panel A. Centre (17, 18, 227). 18 px from (1402, 1114), the second maximum on that overlap. Not a marker. |
+| Fig. 5 scan core | blue r=17.00 pale artifact | (1916, 1154), panel A. Centre (6, 4, 210) on one straight stroke. Saturated-ink radius is 6 px; the pale fringe admitted by B>R and B>G lifts the core to 17. Not a marker. |
+| Fig. 5 scan core | blue r=15.23 label | (1861, 1199), panel A. Centre (88, 100, 203) on numeral 3. The glyph is pale blue, and the loose mask fills it to this radius. Not a marker. |
+| Fig. 5 scan core | blue r=19.92 label | (709, 1492), panel A. Centre (250, 246, 255) in the counter of numeral 6. The hole is near-white and the mask admits it. Not a marker. |
+| Fig. 5 scan core | blue r=20.59 label | (3437, 1231), panel B. Centre (235, 251, 255) in the counter of numeral 9. Same near-white hole. Not a marker. |
+| Fig. 5 scan core | blue r=15.23 pale artifact | (3325, 1216), panel B. Centre (10, 5, 222) on one straight stroke. Saturated-ink radius is 6 px; the pale fringe lifts the core to 15.2. Not a marker. |
+| Fig. 5 scan core | blue r=15.00 pale artifact | (3661, 1129), panel B. Centre (5, 4, 211) on one straight stroke. Saturated-ink radius is 5 px; the pale fringe lifts the core to 15. Not a marker. |
 | Fig. 5 scan core | split disk | Raw radius falls under 15 where a stroke crosses a filled disk. A radius-22 template that counts that colour plus the crossing stroke recovers (605, 1022), (2488, 1063), the three endpoint disks, and the new black row (1058, 1238). The new red row (856, 1342) is the bead between (824, 1319) and (885, 1369). Other template peaks land on a listed open circle, a panel letter, a blue-curve junction, or the neck between two listed filled circles. |
 | Fig. 1 | refused | Phase diagram of Rahman et al. (2013) and Jantzen et al. (2019). |
 
