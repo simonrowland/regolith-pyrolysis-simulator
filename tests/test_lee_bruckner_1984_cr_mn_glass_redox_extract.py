@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 from copy import deepcopy
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import NoticeKind, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -27,6 +27,12 @@ def test_lee_bruckner_table_values_migrate_as_species_bound_points():
         if observation.identity.quantity.value is Quantity.VALENCE_RATIO:
             expected_species = "Cr" if "::lee_bruckner_1984_table1_" in observation.observation_id else "Mn"
             assert observation.identity.species.formula == expected_species
+            assert observation.value.point <= Decimal("1")
+            assert observation.derivation.output_unit == "dimensionless"
+            assert all(
+                notice.kind is not NoticeKind.SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE
+                for notice in observation.notices
+            )
         else:
             assert observation.identity.quantity.value is Quantity.DENSITY
             assert observation.identity.species.formula == "unknown"
@@ -37,11 +43,23 @@ def test_lee_bruckner_table_values_migrate_as_species_bound_points():
         if observation.identity.quantity.value is Quantity.VALENCE_RATIO:
             assert observation.point_conditions["atmosphere_as_printed"].state.value == "air"
 
+    for formula in ("Cr", "Mn"):
+        for item in source["species"][formula]["observations"]:
+            if item["values"]["quantity"] != "valence_ratio":
+                continue
+            migrated_rows = [
+                observation for observation in observations
+                if observation.observation_id.split("::")[1] == item["observation_id"]
+            ]
+            assert len(migrated_rows) == len(item["values"]["points"])
+            for observation, point in zip(migrated_rows, item["values"]["points"]):
+                assert observation.value.point == Decimal(point["value"]) / Decimal("100")
+
     cr6 = next(
         observation for observation in observations
         if "::lee_bruckner_1984_table1_cr6_total::" in observation.observation_id
     )
-    assert cr6.value.point == Decimal("15.4")
+    assert cr6.value.point == Decimal("0.154")
     assert cr6.locator.page == 2
     assert cr6.locator.published_page == 8
     density = next(
