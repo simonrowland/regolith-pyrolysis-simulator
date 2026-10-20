@@ -58,6 +58,27 @@ def _seed_redox_liquidus_curve(sim: PyrolysisSimulator) -> None:
     }
 
 
+def test_legacy_iw_diagnostic_output_float_hex_grid() -> None:
+    sim = _make_sim("lunar_mare_low_ti")
+    temperatures_K = (-1.0, 0.0, 1.0, 298.15, 1273.15, 1873.15, 2273.15)
+    expected_iw_hex = (
+        "-0x1.2000000000000p+3",
+        "-0x1.2000000000000p+3",
+        "-0x1.a921b851eb852p+14",
+        "-0x1.52d6962e523f2p+6",
+        "-0x1.d9cbb058b627cp+3",
+        "-0x1.fd6049b57f6fep+2",
+        "-0x1.59c07b43c3d12p+2",
+    )
+
+    actual_iw_hex = tuple(
+        sim._compute_fe_redox_split_diagnostic(temperature_K)["iw_log"].hex()
+        for temperature_K in temperatures_K
+    )
+
+    assert actual_iw_hex == expected_iw_hex
+
+
 def test_fe_redox_split_snapshot_field_is_diagnostic_only() -> None:
     sim = _make_sim("lunar_mare_low_ti")
     before_inventory = copy.deepcopy(sim.inventory)
