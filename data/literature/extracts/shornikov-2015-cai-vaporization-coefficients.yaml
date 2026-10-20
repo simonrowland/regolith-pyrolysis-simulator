@@ -54,6 +54,7 @@ species:
       values:
         quantity: alpha
         method_class: model_derived
+        admission_status: rejected
         attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Knyazeva and Vasil''ev, 1972.'
         alpha_as_printed: '0.79 ± 0.20*'
         alpha: '0.79'
@@ -89,6 +90,7 @@ species:
       values:
         quantity: alpha
         method_class: model_derived
+        admission_status: rejected
         attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Claasen and Veenemans, 1933.'
         alpha_as_printed: '1.11 ± 0.30*'
         alpha: '1.11'
@@ -427,6 +429,7 @@ species:
       values:
         quantity: alpha
         method_class: model_derived
+        admission_status: rejected
         attribution: 'Cell asterisk. Footnote: Calculated in the course of this research. Reference cell: Lukin and Poluboyarinov, 1964.'
         alpha_as_printed: '0.59 ± 0.20*'
         alpha: '0.59'
@@ -1346,7 +1349,7 @@ species:
         series_refused:
         - id: '1'
           citation: Hashimoto, 1990
-          what: Open circles on line 1 in both panels. Panel (a), log p(SiO), has three circles on the high-temperature limb of the step and six on the low-temperature limb. Panel (b), log p(SiO2), has three and five. Langmuir total pressure from a graphite crucible. Literature, not this paper.
+          what: Open circles on line 1 in both panels, and the step near 10^4/T = 5.0 is on this line. Panel (a), log p(SiO), has three circles on the high-temperature limb and six on the low-temperature limb. Panel (b), log p(SiO2), has three and six. Langmuir total pressure from a graphite crucible. Literature, not this paper.
         - id: '2'
           citation: Shornikov et al., 1998, 1999
           what: Pt-cell partial pressure. A stroke with no open circle separable from the line. Prior KEMS paper.
@@ -1361,7 +1364,7 @@ species:
           what: Mo-cell partial pressure. A stroke with no open circle separable from the line. Prior KEMS paper.
         - id: '6'
           citation: calculated in this publication from Glushko et al., 1978–1982
-          what: Solid calculated curve for chemically neutral conditions, with a step near 10^4/T = 5.0. No marker on the curve.
+          what: Solid calculated curve for chemically neutral conditions. Continuous. No step and no marker. The step is on line 1.
         prose_bounds:
         - Mo-cell p(SiO) differs by almost 10^2 from the p(SiO) calculated for chemically neutral conditions (published p. 1085, Fig. 1a).
         - p(SiO2) values for cells of any type agree with the thermochemical values within unsystematic errors no greater than 15% (published p. 1085, Fig. 1b).
@@ -1514,6 +1517,7 @@ species:
       values:
         quantity: alpha
         method_class: model_derived
+        admission_status: rejected
         attribution: Evaluated in this study from experimental data (Darken and Gurry, 1946) and thermochemical data in Glushko et al. (1978–1982).
         alpha: '1.00'
         alpha_as_printed: '1.00 ± 0.20'
