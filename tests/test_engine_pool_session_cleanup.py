@@ -24,20 +24,26 @@ from simulator.engine_pool import (
 )
 
 
-def _bootstrap_cleanup_worker():
-    return None, "cleanup-ready"
+def _bootstrap_cleanup_worker(handler_started=None):
+    return handler_started, "cleanup-ready"
 
 
-def _handle_cleanup_request(_resource, request, _errlog):
+def _handle_cleanup_request(resource, request, _errlog):
+    if isinstance(request, dict) and request.get("sleep_forever"):
+        if resource is not None:
+            resource.set()
+        while True:
+            time.sleep(0.05)
     if isinstance(request, dict) and request.get("delay"):
         time.sleep(float(request["delay"]))
     return request
 
 
-def _cleanup_worker(_index, *, call_timeout_s=1.0):
+def _cleanup_worker(_index, *, call_timeout_s=1.0, handler_started=None):
     return WarmEngineWorker(
         name="session-cleanup-test",
         bootstrap=_bootstrap_cleanup_worker,
+        bootstrap_args=(handler_started,),
         handler=_handle_cleanup_request,
         startup_timeout_s=2.0,
         call_timeout_s=call_timeout_s,
@@ -135,6 +141,38 @@ def test_sessionfinish_interrupts_in_flight_job_within_automatic_budget():
     _run_cleanup_scenario_in_child(
         _sessionfinish_interrupts_in_flight_job_within_automatic_budget
     )
+
+
+def test_aborting_running_request_reaps_and_restarts_its_worker_slot():
+    context = multiprocessing.get_context("spawn")
+    handler_started = context.Event()
+    pool = EngineWorkerPool(
+        lambda index: _cleanup_worker(
+            index,
+            call_timeout_s=30.0,
+            handler_started=handler_started,
+        ),
+        size=1,
+    )
+    try:
+        first = pool.submit({'sleep_forever': True}, timeout_s=30.0)
+        assert handler_started.wait(timeout=5.0)
+        worker = pool.workers[0]
+        first_pid = worker.process.pid
+
+        assert first.cancel() is False
+        assert pool._abort_request(first) is True
+        with pytest.raises((EngineWorkerDied, EngineWorkerTimeout)):
+            first.result(timeout=3.0)
+        assert worker.process is None
+        with pytest.raises(ProcessLookupError):
+            os.kill(first_pid, 0)
+
+        second = pool.submit({'value': 'restarted'}, timeout_s=3.0)
+        assert second.result(timeout=5.0) == {'value': 'restarted'}
+        assert worker.process.pid != first_pid
+    finally:
+        pool.close(cancel_pending=True, timeout_s=3.0)
 
 
 def _registry_cancel_escalates_concurrent_graceful_close():
