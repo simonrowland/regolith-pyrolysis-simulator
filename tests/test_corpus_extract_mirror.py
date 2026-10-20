@@ -2,18 +2,21 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
 
+from tests.tools._corpus_root import corpus_root
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
-# The corpus checkout to compare against. REGOLITH_CORPUS_ROOT lets a gate point at a
-# specific clone (the controller's, or a CI-provisioned one) instead of the default path.
-CORPUS_ROOT = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+# REGOLITH_CORPUS_ROOT, else the sibling regolith-corpus checkout. See corpus_root.
+CORPUS_ROOT = corpus_root()
 
 
-@pytest.mark.skipif(not CORPUS_ROOT.is_dir(), reason="regolith-corpus checkout is absent")
+@pytest.mark.skipif(
+    CORPUS_ROOT is None or not CORPUS_ROOT.is_dir(),
+    reason="regolith-corpus checkout is absent",
+)
 def test_corpus_extracts_are_byte_identical_in_simulator_mirror() -> None:
     src_dir = CORPUS_ROOT / "extracts"
     dest_dir = REPO_ROOT / "data" / "literature" / "extracts"
@@ -27,7 +30,10 @@ def test_corpus_extracts_are_byte_identical_in_simulator_mirror() -> None:
         assert dest.read_bytes() == src.read_bytes(), f"simulator mirror diverged: {src.name}"
 
 
-@pytest.mark.skipif(not CORPUS_ROOT.is_dir(), reason="regolith-corpus checkout is absent")
+@pytest.mark.skipif(
+    CORPUS_ROOT is None or not CORPUS_ROOT.is_dir(),
+    reason="regolith-corpus checkout is absent",
+)
 def test_simulator_extracts_are_byte_identical_in_corpus_mirror() -> None:
     src_dir = REPO_ROOT / "data" / "literature" / "extracts"
     dest_dir = CORPUS_ROOT / "extracts"

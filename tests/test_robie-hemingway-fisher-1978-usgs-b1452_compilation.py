@@ -1,7 +1,6 @@
 """Coverage and source-losslessness checks for USGS Bulletin 1452."""
 
 import copy
-import os
 import hashlib
 import json
 import re
@@ -11,6 +10,8 @@ from functools import lru_cache
 from pathlib import Path
 
 import pytest
+
+from tests.tools._corpus_root import corpus_root
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
     COMPILATION_ROOT,
     ROLE,
@@ -39,17 +40,18 @@ MINERU_CHUNKS = [
 ]
 
 
-CORPUS_CHECKOUT = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
+_CORPUS = corpus_root()
+_CORPUS_OR_MISSING = (
+    _CORPUS if _CORPUS is not None else Path("missing-regolith-corpus")
 )
 MINERU_ROOT = (
-    CORPUS_CHECKOUT
+    _CORPUS_OR_MISSING
     / "text"
     / "robie-hemingway-fisher-1978-usgs-b1452"
     / "mineru"
 )
 SOURCE_PDF = (
-    CORPUS_CHECKOUT
+    _CORPUS_OR_MISSING
     / "raw"
     / "robie-hemingway-fisher-1978-usgs-b1452"
     / "robie-hemingway-fisher-1978-usgs-b1452.pdf"

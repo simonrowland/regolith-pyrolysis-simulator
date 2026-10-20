@@ -22,7 +22,7 @@ from tools import validate_literature_extracts as vle
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
 
-ABS = "/Users/someone/Repos/regolith-corpus/raw/probe/probe.pdf"
+ABS = "/opt/probe/regolith-corpus/raw/probe/probe.pdf"
 REL = "corpus/raw/probe/probe.pdf"
 
 # Minimal extract that validate_extract_document accepts with zero errors;
@@ -153,7 +153,7 @@ _PLANT_FORMS = {
     "list_element": "  {key}: [{rel}, {abs}]\n",
     "alias_in_list": "  probe_anchor: &probe_abs {abs}\n  {key}: [{rel}, *probe_abs]\n",
 }
-_PLANT_ABS = "/Users/someone/Repos/regolith-corpus/raw/probe/t1.csv"
+_PLANT_ABS = "/opt/probe/regolith-corpus/raw/probe/t1.csv"
 _PLANT_REL = "tables/probe/t1.csv"
 
 

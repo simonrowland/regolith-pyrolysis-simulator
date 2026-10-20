@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.tools._corpus_root import corpus_root
 from tools import mineru_table_qa as qa
 
 
@@ -204,15 +205,12 @@ def test_calibration_tsv_matches_live_scores_and_ranks_mangled_tables(tmp_path: 
     calibration = repo_root / "tests/tools/mineru_table_qa_calibration.tsv"
     output = tmp_path / "calibration.tsv"
     env = os.environ.copy()
-    env.setdefault("MPLCONFIGDIR", "/private/tmp/claude-501/main-review/mplcache")
     repo_path = str(repo_root)
     env["PYTHONPATH"] = os.pathsep.join(
         part for part in (repo_path, env.get("PYTHONPATH", "")) if part
     )
-    corpus_root = Path(os.environ.get(
-        "REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"
-    )).expanduser()
-    if not corpus_root.is_dir():
+    checkout = corpus_root()
+    if checkout is None or not checkout.is_dir():
         pytest.skip("regolith-corpus checkout is absent")
 
     subprocess.run(
@@ -220,7 +218,7 @@ def test_calibration_tsv_matches_live_scores_and_ranks_mangled_tables(tmp_path: 
             sys.executable,
             str(repo_root / "tests/tools/calibrate_mineru_table_qa.py"),
             str(calibration),
-            str(corpus_root),
+            str(checkout),
             str(output),
         ],
         cwd=repo_root,

@@ -177,7 +177,7 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
 
 
 def test_is_legacy_cache_version_detects_path_identity() -> None:
-    legacy = "alphaMELTS subprocess (/Users/me/alphamelts2)"
+    legacy = "alphaMELTS subprocess (/opt/alphamelts2)"
     modern = "alphaMELTS 2.3.1 (digest=sha256:deadbeef)"
     assert is_legacy_cache_version(legacy) is True
     assert is_legacy_cache_version(modern) is False
@@ -189,7 +189,7 @@ def test_rekey_migration_round_trip_and_idempotency(
 ) -> None:
     _sample_config(tmp_path, monkeypatch)
     db_path = tmp_path / "cache.sqlite"
-    legacy_version = "alphaMELTS subprocess (/Users/me/alphamelts2)"
+    legacy_version = "alphaMELTS subprocess (/opt/alphamelts2)"
     # VR-3 (be07c4d5) retired the June redox-v3 corpus: optimizer identity
     # dropped data/provider fingerprints and bumped corpus_version to
     # analytical-corpus-2026-07-31-vapour-rail-key-v2, declared

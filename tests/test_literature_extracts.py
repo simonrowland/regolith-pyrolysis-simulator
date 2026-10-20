@@ -2019,7 +2019,7 @@ def test_structured_sample_requires_locator():
 
 def test_refuses_absolute_provenance_path():
     doc = _minimal_extract()
-    doc["extraction"]["provenance_path"] = "/Users/someone/Dropbox/docs-private/x.md"
+    doc["extraction"]["provenance_path"] = "/opt/probe/docs-private/x.md"
     errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
     assert any("repository-relative" in e for e in errs)
 

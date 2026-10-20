@@ -622,13 +622,13 @@ def test_export_host_path_redaction_resists_encoding_and_case_bypass() -> None:
     from simulator.optimize.save_bundle import _sanitize_manifest_for_export
 
     redacted = {
-        "upper_uri": "FILE:///Users/simon/secret",
-        "mixed_uri": "File:/Users/simon/secret",
-        "encoded_uri": "file:%2FUsers%2Fsimon%2Fsecret",
-        "encoded_abs": "%2FUsers%2Fsimon%2Fsecret",
-        "double_encoded_abs": "%252FUsers%252Fsimon%252Fsecret%252Fseed.json",
-        "unicode_solidus": "／Users／simon／secret",
-        "plain_abs": "/Users/simon/secret",
+        "upper_uri": "FILE:///opt/probe/secret",
+        "mixed_uri": "File:/opt/probe/secret",
+        "encoded_uri": "file:%2Fopt%2Fprobe%2Fsecret",
+        "encoded_abs": "%2Fopt%2Fprobe%2Fsecret",
+        "double_encoded_abs": "%252Fopt%252Fprobe%252Fsecret%252Fseed.json",
+        "unicode_solidus": "／opt／probe／secret",
+        "plain_abs": "/opt/probe/secret",
         "win_drive": "C:\\Users\\simon\\secret\\seed.json",
         "win_drive_encoded": "C:%5CUsers%5Csimon%5Csecret",
         "backslash_root": "\\work\\prior\\pareto.json",
