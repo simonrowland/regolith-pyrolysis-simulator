@@ -667,7 +667,7 @@ temperature, and are labelled UNCERTIFIED. The ferric full-reduction rung is ref
 path can reduce ferric to ferrous through an explicitly uncertified diagnostic route rather than a
 validated ferric-current-partition model. Metal-phase settling and drain-tap are not modelled —
 reduced metal accumulates in a single account and is reported directly as product.
-<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider._nernst_voltage:977 — Nernst correction -->
+<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider._nernst_voltage:1029 — Nernst correction -->
 <!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider.dispatch:281 — Faraday ledger step -->
 
 ### §7.4 Redox capacity: the liquidus scalar and the negligible-mol floor

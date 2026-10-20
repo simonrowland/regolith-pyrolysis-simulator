@@ -79,6 +79,7 @@ defence.
 from __future__ import annotations
 
 import math
+import sys
 from collections import defaultdict
 from collections.abc import Mapping
 from typing import Any
@@ -286,11 +287,13 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         from simulator.accounting.formulas import resolve_species_formula
         from simulator.electrolysis import (
             ELECTRONS_PER_OXIDE,
+            _faraday_reduced_extent,
             FERRIC_TO_FERROUS_ELECTRONS,
             FERRIC_TO_FERROUS_FEO_PER_FE2O3,
             FERRIC_TO_FERROUS_O2_PER_FE2O3,
             FERRIC_TO_FERROUS_REFERENCE_V,
             FERRIC_TO_FERROUS_REFERENCE_STATUS,
+            MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
             MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,
@@ -323,7 +326,16 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             return wrong_intent
 
         controls = unpack_controls(request)
-        validated, invalid_controls = self._validate_controls(request, controls)
+        validated, invalid_controls, out_of_domain_controls = (
+            self._validate_controls(request, controls)
+        )
+        if out_of_domain_controls:
+            return self._invalid_result(
+                request,
+                reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                invalid=out_of_domain_controls,
+                energy_kWh=0.0,
+            )
         if invalid_controls:
             return self._invalid_result(
                 request,
@@ -751,6 +763,13 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # legacy ``t_s = 3600.0`` exactly when dt_hr=1.0, scales for
         # future tick changes.
         t_s = 3600.0 * dt_hr
+        if not math.isfinite(t_s):
+            return self._invalid_result(
+                request,
+                reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                invalid={"dt_hr": "Faraday integration time is not finite"},
+                energy_kWh=0.0,
+            )
 
         debits_mol: dict[str, dict[str, float]] = defaultdict(dict)
         credits_mol: dict[str, dict[str, float]] = defaultdict(dict)
@@ -784,10 +803,25 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             )
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)
 
-            uncapped_moles_reduced = (
-                I_species * eta_CE * t_s
-            ) / (n_e * FARADAY)
-            kg_oxide_reduced = uncapped_moles_reduced * M_oxide_gmol / 1000.0
+            extent = _faraday_reduced_extent(
+                I_species,
+                eta_CE,
+                t_s,
+                n_e,
+                M_oxide_gmol,
+                faraday=FARADAY,
+            )
+            if extent is None:
+                return self._invalid_result(
+                    request,
+                    reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                    invalid={
+                        "current_A": "Faraday extent is not finite",
+                        "dt_hr": "Faraday integration exceeds the admitted window",
+                    },
+                    energy_kWh=0.0,
+                )
+            uncapped_moles_reduced, kg_oxide_reduced = extent
 
             # Cap at melt availability. Re-derive mol from the capped
             # kg to keep mol-native bookkeeping consistent with the
@@ -799,7 +833,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             moles_reduced = kg_oxide_reduced * 1000.0 / M_oxide_gmol
             species_cap_ratio = 0.0
             if uncapped_moles_reduced > 0.0:
-                species_cap_ratio = min(1.0, moles_reduced / uncapped_moles_reduced)
+                uncapped_ratio = moles_reduced / uncapped_moles_reduced
+                if not math.isfinite(uncapped_ratio):
+                    return self._invalid_result(
+                        request,
+                        reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                        invalid={"current_A": "Faraday cap ratio is not finite"},
+                        energy_kWh=0.0,
+                    )
+                species_cap_ratio = min(1.0, uncapped_ratio)
             billable_current_A += I_species * species_cap_ratio
 
             if kg_oxide_reduced <= 1e-10:
@@ -921,9 +963,17 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # their full current share. Preserve exact commanded energy when no cap
         # bound.
         energy_current_A = billable_current_A if any_capped else current_A
-        diagnostic["energy_kWh"] = (
+        energy_kWh = (
             voltage_V * energy_current_A * dt_hr / 1000.0
         )
+        if not math.isfinite(energy_kWh):
+            return self._invalid_result(
+                request,
+                reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+                invalid={"voltage_V": "billed electrolysis energy is not finite"},
+                energy_kWh=0.0,
+            )
+        diagnostic["energy_kWh"] = energy_kWh
 
         # Assemble the proposal in mol-native form.
         if not oxide_mol_total:
@@ -1053,7 +1103,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
     def _validate_controls(
         request: IntentRequest,
         controls: Mapping[str, Any],
-    ) -> tuple[dict[str, float], dict[str, str]]:
+    ) -> tuple[dict[str, float], dict[str, str], dict[str, str]]:
         raw_values = {
             "voltage_V": (
                 0.0
@@ -1114,7 +1164,25 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             and values["temperature_C"] <= -CELSIUS_TO_KELVIN_OFFSET
         ):
             invalid["temperature_C"] = "must_be_above_absolute_zero"
-        return values, invalid
+
+        domain_bounds = {
+            "dt_hr": (sys.float_info.min, 1.0, "hr"),
+            "current_A": (sys.float_info.min, 3000.0, "A"),
+            "voltage_V": (sys.float_info.min, 5.0, "V"),
+            "pO2_bar": (1e-9, 1.0, "bar"),
+        }
+        out_of_domain: dict[str, str] = {}
+        for name, (minimum, maximum, unit) in domain_bounds.items():
+            if name not in values or name in invalid:
+                continue
+            value = values[name]
+            if value == 0.0 and name != "pO2_bar":
+                continue
+            if value < minimum:
+                out_of_domain[name] = f"below minimum {minimum:g} {unit}"
+            elif value > maximum:
+                out_of_domain[name] = f"above maximum {maximum:g} {unit}"
+        return values, invalid, out_of_domain
 
     @staticmethod
     def _coerce_allowed_oxides(
@@ -1141,15 +1209,19 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         *,
         reason: str,
         invalid: Mapping[str, str],
+        energy_kWh: float | None = None,
     ) -> IntentResult:
+        diagnostic = {
+            "reason_refused": reason,
+            "invalid_controls": dict(invalid),
+        }
+        if energy_kWh is not None:
+            diagnostic["energy_kWh"] = energy_kWh
         return IntentResult(
             intent=request.intent,
             status="refused",
             transition=None,
-            diagnostic={
-                "reason_refused": reason,
-                "invalid_controls": dict(invalid),
-            },
+            diagnostic=diagnostic,
         )
 
     @staticmethod

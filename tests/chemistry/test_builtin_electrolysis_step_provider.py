@@ -481,6 +481,124 @@ def test_provider_rejects_wrong_intent(
     assert result.transition is None
 
 
+@pytest.mark.parametrize(
+    "control_name", ["dt_hr", "current_A", "voltage_V", "pO2_bar"]
+)
+@pytest.mark.parametrize("value", [1e-308, 1e30, 1e308])
+def test_provider_refuses_extreme_finite_electrolysis_controls(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    control_name,
+    value,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "SiO2": 10.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+            },
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    controls = {
+        "voltage_V": 5.0,
+        "current_A": 100.0,
+        "dt_hr": 1.0,
+        "pO2_bar": 1.0,
+        "allowed_oxides": ["SiO2"],
+    }
+    controls[control_name] = value
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1575.0,
+            pressure_bar=1.0,
+            control_inputs=controls,
+        )
+    )
+
+    assert result.status == "refused", result.diagnostic
+    assert result.transition is None
+    diagnostic = dict(result.diagnostic or {})
+    assert (
+        diagnostic["reason_refused"]
+        == "electrolysis_control_out_of_domain"
+    )
+    invalid_controls = diagnostic["invalid_controls"]
+    assert control_name in invalid_controls
+    bound_direction = "below minimum" if value < 1.0 else "above maximum"
+    assert bound_direction in invalid_controls[control_name]
+    expected_units = {
+        "dt_hr": "hr",
+        "current_A": "A",
+        "voltage_V": "V",
+        "pO2_bar": "bar",
+    }
+    assert expected_units[control_name] in invalid_controls[control_name]
+    assert diagnostic.get("energy_kWh", 0.0) == 0.0
+
+
+def test_provider_refuses_nonfinite_faraday_extent(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    monkeypatch,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {"FeO": 10.0},
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    monkeypatch.setattr("simulator.state.FARADAY", 1e-308)
+    monkeypatch.setattr(
+        BuiltinElectrolysisStepProvider,
+        "_nernst_voltage",
+        staticmethod(lambda *args, **kwargs: 0.0),
+    )
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1575.0,
+            pressure_bar=1.0,
+            control_inputs={
+                "voltage_V": 5.0,
+                "current_A": 100.0,
+                "dt_hr": 1.0,
+                "pO2_bar": 1.0,
+                "allowed_oxides": ["FeO"],
+            },
+        )
+    )
+
+    assert result.status == "refused", result.diagnostic
+    assert result.transition is None
+    diagnostic = dict(result.diagnostic or {})
+    assert (
+        diagnostic["reason_refused"]
+        == "electrolysis_control_out_of_domain"
+    )
+    assert diagnostic["energy_kWh"] == 0.0
+
+
 def test_empty_melt_result_carries_redox_diagnostics(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -685,7 +803,7 @@ def test_live_mre_converts_ferric_inventory_to_ferrous_behavior(
         feedstocks_data,
         setpoints_data,
     )
-    fe2o3_mol = 10.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
+    fe2o3_mol = 8.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
     view = ProviderAccountView(
         accounts={
             "process.cleaned_melt": {"Fe2O3": fe2o3_mol},
@@ -705,7 +823,7 @@ def test_live_mre_converts_ferric_inventory_to_ferrous_behavior(
             fe_redox_policy="kress91_live",
             control_inputs={
                 "voltage_V": 5.0,
-                "current_A": 1.0e9,
+                "current_A": 3000.0,
                 "dt_hr": 1.0,
                 "melt_fO2_log": -7.25,
             },
@@ -768,7 +886,7 @@ def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
         legacy = sim.electrolysis_model.step_hour(
             melt_state=sim.melt,
             voltage_V=5.0,
-            current_A=1.0e9,
+            current_A=3000.0,
             T_C=1575.0,
         )
         view = ProviderAccountView(
@@ -791,7 +909,7 @@ def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
                 fe_redox_policy="kress91_live",
                 control_inputs={
                     "voltage_V": 5.0,
-                    "current_A": 1.0e9,
+                    "current_A": 3000.0,
                     "dt_hr": 1.0,
                     "melt_fO2_log": fO2_log,
                     "allowed_oxides": ["FeO"],
@@ -1008,8 +1126,8 @@ def test_allowed_sio2_target_still_converts_ferric_inventory_to_ferrous(
         feedstocks_data,
         setpoints_data,
     )
-    fe2o3_mol = 10.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
-    sio2_mol = 10.0 / (MOLAR_MASS["SiO2"] / 1000.0)
+    fe2o3_mol = 1.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
+    sio2_mol = 1.0 / (MOLAR_MASS["SiO2"] / 1000.0)
     view = ProviderAccountView(
         accounts={
             "process.cleaned_melt": {
@@ -1032,7 +1150,7 @@ def test_allowed_sio2_target_still_converts_ferric_inventory_to_ferrous(
             fe_redox_policy="kress91_live",
             control_inputs={
                 "voltage_V": 5.0,
-                "current_A": 1.0e9,
+                "current_A": 3000.0,
                 "dt_hr": 1.0,
                 "melt_fO2_log": -7.25,
                 "allowed_oxides": ["SiO2"],
@@ -1124,7 +1242,7 @@ def test_empty_allowed_oxides_filter_reduces_nothing_not_everything(
         )
         controls = {
             "voltage_V": 1.7,
-            "current_A": 1.0e9,
+            "current_A": 3000.0,
             "dt_hr": 1.0,
             "melt_fO2_log": -7.25,
         }
@@ -1438,7 +1556,7 @@ def test_depletion_hour_energy_scales_by_capped_faradaic_charge(
     voltage_V = (
         ElectrolysisModel().nernst_voltage("FeO", temperature_C, 1.0) + 0.05
     )
-    current_A = 1.0e6
+    current_A = 3000.0
 
     legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
         sim=sim,
@@ -1750,7 +1868,7 @@ def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
         setpoints_data,
     )
     sim.atom_ledger = sim._new_atom_ledger()
-    nio_initial_mol = 10.0 / (MOLAR_MASS["NiO"] / 1000.0)
+    nio_initial_mol = 1.0 / (MOLAR_MASS["NiO"] / 1000.0)
     sim.atom_ledger.load_external_mol(
         "process.cleaned_melt", {"NiO": nio_initial_mol}, source="test seed",
         material_origin="feedstock",
@@ -1776,7 +1894,7 @@ def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
         pressure_bar=1e-6,
         control_inputs={
             "voltage_V": DECOMP_VOLTAGES["NiO"] + 0.10,
-            "current_A": 1.0e6,
+            "current_A": 3000.0,
             "dt_hr": 1.0,
             "allowed_oxides": ["NiO"],
         },
@@ -1854,7 +1972,7 @@ def test_provider_matches_legacy_feo_partition_with_ferric_present(
     sim.melt.temperature_C = 1600.0
 
     voltage_V = 5.0  # high enough to reduce both
-    current_A = 1.0e9
+    current_A = 3000.0
 
     legacy = sim.electrolysis_model.step_hour(
         melt_state=sim.melt,

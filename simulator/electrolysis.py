@@ -115,10 +115,12 @@ MRE_CURRENT_PARTITION_SOURCE = (
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
+MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL = "electrolysis_control_out_of_domain"
 MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
 MRE_PRODUCT_PHASE_MISMATCH_REFUSAL = "mre_product_phase_mismatch_refused"
 MRE_TERMINAL_PHYSICS_REFUSAL_REASONS = frozenset({
     "invalid_electrolysis_control",
+    MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
     MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
@@ -146,6 +148,24 @@ def _without_mre_quantities(diagnostic: Mapping[str, object]) -> dict[str, objec
         "energy_kWh",
     }
     return {key: value for key, value in diagnostic.items() if key not in quantity_keys}
+
+
+def _faraday_reduced_extent(
+    species_current_A: float,
+    current_efficiency: float,
+    duration_s: float,
+    electrons_per_formula: int,
+    oxide_molar_mass_gmol: float,
+    faraday: float,
+) -> tuple[float, float] | None:
+    """Return finite uncapped Faraday moles and oxide kg, else refuse."""
+    uncapped_moles = (
+        species_current_A * current_efficiency * duration_s
+    ) / (electrons_per_formula * faraday)
+    oxide_kg = uncapped_moles * oxide_molar_mass_gmol / 1000.0
+    if not math.isfinite(uncapped_moles) or not math.isfinite(oxide_kg):
+        return None
+    return uncapped_moles, oxide_kg
 
 
 class MREElectrolysisRefusal(RuntimeError):
@@ -876,8 +896,22 @@ class ElectrolysisModel:
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)  # g/mol
             t_s = 3600.0  # 1 hour in seconds
 
-            uncapped_moles_reduced = (I_species * eta_CE * t_s) / (n * FARADAY)
-            kg_oxide_reduced = uncapped_moles_reduced * M_oxide_gmol / 1000.0  # g->kg
+            extent = _faraday_reduced_extent(
+                I_species,
+                eta_CE,
+                t_s,
+                n,
+                M_oxide_gmol,
+                faraday=FARADAY,
+            )
+            if extent is None:
+                result['reason_refused'] = MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+                result['invalid_controls'] = {
+                    'current_A': 'Faraday extent is not finite',
+                    'dt_hr': 'Faraday integration exceeds the admitted window',
+                }
+                return _without_mre_quantities(result)
+            uncapped_moles_reduced, kg_oxide_reduced = extent
 
             # Don't reduce more than available
             available = melt_state.composition_kg.get(oxide, 0.0)
