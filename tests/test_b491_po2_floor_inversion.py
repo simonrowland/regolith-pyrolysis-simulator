@@ -55,6 +55,56 @@ def _request(*, pO2_bar: float, intrinsic_fO2_log: float) -> IntentRequest:
     )
 
 
+@pytest.mark.parametrize("observation", [True, False], ids=["observation", "headspace"])
+def test_b984_sio_uses_actual_oxygen_beyond_evaluator_band(observation):
+    provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
+    answers = {}
+    receipts = {}
+    for oxygen in (1e-31, 1e-30, 1e-29, 100.0, 1000.0):
+        controls = {"pO2_bar": oxygen}
+        if observation:
+            controls["pO2_admission"] = "observation"
+        else:
+            controls["vacuum_floor_bar"] = 1e-40
+        answer = provider.dispatch(IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=1600.0,
+            pressure_bar=1.0,
+            control_inputs=controls,
+        ))
+        assert str(answer.status) == "ok"
+        assert answer.diagnostic["pO2_bar"] == oxygen
+        answers[oxygen] = answer.diagnostic["vapor_pressures_Pa"]["SiO"]
+        receipts[oxygen] = answer
+
+    # SiO2(l) -> SiO(g) + 1/2 O2(g): at fixed T and activity,
+    # K = (P_SiO/P0) * (pO2/P0)**(1/2) / a_SiO2, so P_SiO ∝ pO2**-1/2.
+    # Ratios are dimensionless (bar/bar); the limiting trend remains monotone
+    # through both band edges. No absolute pressure is fitted to this test.
+    for oxygen, pressure in answers.items():
+        assert pressure / answers[1e-29] == pytest.approx((oxygen / 1e-29) ** -0.5)
+
+    for oxygen, answer in receipts.items():
+        provenance = answer.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
+        notice = provenance.get("extrapolation_notice")
+        if oxygen in (1e-31, 1000.0):
+            assert notice["reason"] == "pO2_outside_evaluator_band"
+            assert notice["pO2_bar_used"] == oxygen
+            assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)
+            assert notice["was_clamped"] is False
+            assert any(
+                "pO2_outside_evaluator_band" in warning
+                and repr(oxygen) in warning and "certified_band" in warning
+                for warning in answer.warnings
+            )
+        else:
+            assert notice is None
+
+
 def test_helper_flags_floor_and_skips_positive_exponent() -> None:
     notice = melt_dissociation_pO2_floor_inversion_notice(
         species="Si",
@@ -436,13 +486,13 @@ def test_lowest_catalog_body_floor_does_not_invert() -> None:
     assert diagnostic["vapor_pressures_Pa"]["Na"] < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
 
 
-def test_catalog_and_channel_floor_clamps_carry_floor_notice() -> None:
-    """M06: catalog evaluate and O2 clamp publish the existing floor notice."""
+def test_catalog_and_channel_admit_actual_oxygen_with_domain_notice() -> None:
+    """Outside-band oxygen changes mass action and carries its domain notice."""
 
     from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
     from simulator.vapour_rail.channels import (
         REACTION_PLANE_MELT_INTERFACE,
-        clamp_physical_pO2_bar,
+        validate_physical_pO2_bar,
         o2_potential_from_pO2_bar,
     )
 
@@ -453,37 +503,37 @@ def test_catalog_and_channel_floor_clamps_carry_floor_notice() -> None:
     at_floor = evaluator.evaluate(1700.0, source_activity=1e-30, pO2_bar=1e-30)
     control = evaluator.evaluate(1700.0, source_activity=1e-30, pO2_bar=1e-9)
 
-    assert below.pressure_pa == pytest.approx(at_floor.pressure_pa)
+    assert below.pressure_pa / at_floor.pressure_pa == pytest.approx(1e10)
     assert below.pressure_pa > 0.0
     assert below.pressure_pa < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
     assert below.status is None
     assert below.extrapolation_notice is not None
     assert below.extrapolation_notice["reason"] == (
-        MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+        "pO2_outside_evaluator_band"
     )
     assert below.extrapolation_notice["authority_level"] == "extrapolated"
     assert below.extrapolation_notice["certified_band"]["pO2_bar"] == (
-        MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
+        MELT_DISSOCIATION_PO2_MIN_BAR,
         MELT_DISSOCIATION_PO2_MAX_BAR,
     )
     assert at_floor.extrapolation_notice is not None
     assert control.pressure_pa > 0.0
-    assert control.pressure_pa / below.pressure_pa == pytest.approx(1e-21, rel=1e-9)
+    assert control.pressure_pa / below.pressure_pa == pytest.approx(1e-31, rel=1e-9)
     assert control.extrapolation_notice is None
 
-    assert clamp_physical_pO2_bar(1e-40) == MELT_DISSOCIATION_PO2_MIN_BAR
+    assert validate_physical_pO2_bar(1e-40) == 1e-40
     potential = o2_potential_from_pO2_bar(
         pO2_bar=1e-40,
         temperature_K=1700.0,
         reaction_plane=REACTION_PLANE_MELT_INTERFACE,
     )
-    assert potential.legacy_pO2_bar == MELT_DISSOCIATION_PO2_MIN_BAR
+    assert potential.legacy_pO2_bar == 1e-40
     assert potential.verdict.value == "Point"
     receipt = dict(potential.observation_or_setpoint_receipt)
     assert receipt["pO2_bar_input"] == pytest.approx(1e-40)
-    assert receipt["pO2_bar_clamped"] == MELT_DISSOCIATION_PO2_MIN_BAR
+    assert receipt["pO2_bar_clamped"] == 1e-40
     assert receipt["extrapolation_notice"]["reason"] == (
-        MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+        "pO2_outside_evaluator_band"
     )
     in_band = o2_potential_from_pO2_bar(
         pO2_bar=1e-9,
@@ -508,7 +558,8 @@ def test_positive_exponent_catalog_path_does_not_flag_floor_inversion() -> None:
     assert floor.pressure_pa > 0.0
     assert control.pressure_pa > 0.0
     assert floor.pressure_pa < control.pressure_pa
-    assert floor.extrapolation_notice is None
+    assert floor.extrapolation_notice["reason"] == "pO2_outside_evaluator_band"
+    assert floor.extrapolation_notice["was_clamped"] is False
     assert control.extrapolation_notice is None
 
 
