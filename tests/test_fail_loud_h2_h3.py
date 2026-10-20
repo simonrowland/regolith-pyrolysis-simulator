@@ -174,13 +174,30 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
     assert result.diagnostic["pO2_bar"] == pytest.approx(1.0e-9)
     assert all(math.isfinite(value) for value in pressures.values())
 
-    with pytest.raises(VaporPressureComputationError, match="out_of_validated_range"):
-        provider.dispatch(
-            _vapor_request(
-                temperature_c=3000.0,
-                pO2_bar=1.0e-9,
-            )
+    extreme = provider.dispatch(
+        _vapor_request(
+            temperature_c=3000.0,
+            pO2_bar=1.0e-9,
         )
+    )
+    extreme_pressures = dict(extreme.diagnostic["vapor_pressures_Pa"])
+    extrapolations = extreme.diagnostic["extrapolated_beyond_valid_range_K"]
+    provenance = extreme.diagnostic["vapor_pressure_numerator_provenance"]
+
+    assert extreme.status == "ok"
+    assert all(math.isfinite(value) for value in extreme_pressures.values())
+    compiled_out_of_range = {
+        species: notice
+        for species, notice in extrapolations.items()
+        if notice.get("acquisition_flag")
+    }
+    assert {"Si2", "Si3", "SiO2_gas"} <= compiled_out_of_range.keys()
+    for species, notice in compiled_out_of_range.items():
+        assert notice["status"]
+        assert notice["acquisition_flag"]
+        assert notice["reason"] == notice["status"]
+        assert notice["authority_level"] == "extrapolated"
+        assert provenance[species]["extrapolation_notice"] == notice
 
 
 def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
