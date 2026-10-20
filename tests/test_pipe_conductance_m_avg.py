@@ -21,6 +21,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.condensation import CondensationModel
 from simulator.core import PyrolysisSimulator
@@ -122,7 +123,7 @@ def test_pure_sio_returns_sio_molar_mass():
 def test_catalog_generated_carrier_uses_formula_registry_molar_mass():
     """A carrier absent from the legacy mass table stays in gas accounting."""
 
-    formula = SimpleNamespace(molar_mass_g_mol=79.865)
+    formula = resolve_species_formula("TiO2")
     M_avg = _mean_molar_mass_kg_mol(
         {"TiO2_gas": 1.0},
         species_formula_registry={"TiO2_gas": formula},
@@ -139,8 +140,8 @@ def test_catalog_generated_carriers_reach_overhead_partial_pressures():
         total_kg_hr=0.135942,
     )
     registry = {
-        "TiO2_gas": SimpleNamespace(molar_mass_g_mol=79.865),
-        "CaO_gas": SimpleNamespace(molar_mass_g_mol=56.077),
+        "TiO2_gas": resolve_species_formula("TiO2"),
+        "CaO_gas": resolve_species_formula("CaO"),
     }
 
     partials = OverheadGasModel.species_partial_pressures(
@@ -161,6 +162,34 @@ def test_catalog_generated_carriers_reach_overhead_partial_pressures():
     assert gas.composition["TiO2_gas"] == pytest.approx(
         gas.composition["CaO_gas"]
     )
+
+
+def test_overhead_formula_only_carrier_pressure_pin_before_fix():
+    """Pin the base behavior that drops formula-resolvable H2 from Dalton's law."""
+
+    na_kg_hr = resolve_species_formula("Na").molar_mass_kg_per_mol()
+    h2_kg_hr = resolve_species_formula("H2").molar_mass_kg_per_mol()
+    flux = EvaporationFlux(
+        species_kg_hr={"Na": na_kg_hr, "H2": h2_kg_hr},
+        total_kg_hr=na_kg_hr + h2_kg_hr,
+    )
+
+    partials = OverheadGasModel.species_partial_pressures(flux, 10.0, {})
+
+    assert partials == {"Na": 10.0}
+
+
+def test_overhead_unresolvable_carrier_pressure_pin_before_fix():
+    """Pin the base behavior that silently drops an unresolvable carrier."""
+
+    flux = EvaporationFlux(
+        species_kg_hr={"Na": 1.0, "unresolvable-carrier": 1.0},
+        total_kg_hr=2.0,
+    )
+
+    partials = OverheadGasModel.species_partial_pressures(flux, 10.0, {})
+
+    assert partials == {"Na": 10.0}
 
 
 def test_pure_kr_returns_kr_molar_mass_without_fallback():
