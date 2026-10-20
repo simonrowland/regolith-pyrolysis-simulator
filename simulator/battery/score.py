@@ -613,6 +613,9 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
             return Rail.SIO_EVOLUTION
         return Rail.VAPOUR
     if quantity in MELT_ACTIVITY_QUANTITIES:
+        # Sample phase is not a quantity property. A typed non-melt sample
+        # is refused by melt_activity_sample_phase_refusal and stays on this
+        # rail so the refusal is visible rather than dropped.
         return Rail.MELT_ACTIVITY
     if (
         quantity in FORMATION_QUANTITIES
@@ -658,6 +661,39 @@ def no_headline_rail_reason(
     if quantity in KINETIC_YIELD_QUANTITIES:
         return "non_alkali_kinetic"
     return f"no_headline_rail:{quantity.value}"
+
+
+# Liquid and the two frozen-liquid tokens. Source spellings such as
+# "condensed_liquid" and "basaltic_silicate_melt" are already Phase.L.
+# Glass and supercooled liquid are melt-like samples, not solid solutions.
+_MELT_ACTIVITY_SAMPLE_PHASES = frozenset(
+    {Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
+)
+SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE = (
+    "sample_phase_not_melt_activity_observable"
+)
+
+
+def melt_activity_sample_phase_refusal(
+    identity: Identity,
+) -> dict[str, object] | None:
+    """Detail when a typed non-melt sample is not a melt-activity observable.
+
+    Unknown and not-applicable phases are not a crystalline-sample statement,
+    so those rows stay on the melt-activity path. ``None`` means score it.
+    """
+
+    quantity = quantity_token(identity)
+    if quantity not in MELT_ACTIVITY_QUANTITIES:
+        return None
+    phase = phase_token(identity.species)
+    if phase is None or phase in _MELT_ACTIVITY_SAMPLE_PHASES:
+        return None
+    return {
+        "reason": SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE,
+        "sample_phase": phase.value,
+        "quantity": quantity.value,
+    }
 
 
 def residual_key(
@@ -4666,6 +4702,20 @@ def predict_with_engine(
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
     _require_score_engine(engine)
+    identity = observation.identity
+    if isinstance(identity, Identity):
+        sample_phase_detail = melt_activity_sample_phase_refusal(identity)
+        if sample_phase_detail is not None:
+            return EnginePrediction(
+                engine=engine,
+                channel=ENGINE_CHANNELS[engine],
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail=sample_phase_detail,
+                identity=identity,
+            )
     from simulator.diagnostic_helpers.binary_pot_battery import (
         ARM_HEADLINE,
         ARM_QUALIFICATION,
@@ -4689,7 +4739,6 @@ def predict_with_engine(
     quantity = quantity_token(observation.identity)
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
-    identity = observation.identity
     if not isinstance(identity, Identity) or quantity is None:
         return EnginePrediction(
             engine=engine,
@@ -6564,7 +6613,15 @@ def compile_residual(
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     source_reference = reference
-    reference = fusion_comparison_reference(reference, engine=engine)
+    sample_phase_detail = (
+        melt_activity_sample_phase_refusal(reference.identity)
+        if isinstance(reference.identity, Identity)
+        else None
+    )
+    # A crystalline sample is not converted onto a liquid reference. That
+    # conversion is a melt comparison, and this row is not one.
+    if sample_phase_detail is None:
+        reference = fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     formula = identity.species.formula if isinstance(identity, Identity) else ""
@@ -6660,6 +6717,13 @@ def compile_residual(
                 refusal=ResidualRefusal(reason, dict(detail), check_refs=_check_refs(gates, reason)),
             ),
             candidate,
+        )
+
+    if sample_phase_detail is not None:
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            sample_phase_detail,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
         )
 
     if (
@@ -10845,6 +10909,12 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
     reason = str(refusal.get("reason") or "")
     detail = refusal.get("detail")
     detail_reason = str(detail.get("reason") or "") if isinstance(detail, Mapping) else ""
+    if (
+        rail == Rail.MELT_ACTIVITY.value
+        and reason == RefusalReason.UNSUPPORTED.value
+        and detail_reason == SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE
+    ):
+        return False
     if rail == Rail.REDOX.value and reason == RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value:
         return False
     if (
