@@ -3769,13 +3769,15 @@ def _composition_located_from_values(
     locator: Locator | None,
     role_refusal: list[str] | None = None,
 ) -> Located[Composition] | None:
-    """Convert a typed role, a derivation note, or a structurally signaled FeOT map.
+    """Convert a typed role or a structurally signaled FeOT map.
 
-    ``composition_role`` is the typed declaration. A ``composition_derivation``
-    note is the older admission green used for a printed wt% map that names
-    its own conversion (Banya Table 3). Role rows keep that note in the
-    derivation inputs. Note-only rows do not: green's derivation recorded the
-    weights and molar masses without copying the note text.
+    A ``composition_derivation`` note does not admit a map. ``add271eb0``
+    requires the role token or FeOT. Green omitted the note text from
+    derivation inputs. ``initial_charge_only`` still keeps it, and so does a
+    ``datum_state`` note that states the K2O/SiO2 complement (the Plante
+    provenance green recorded as the literal ``values.composition_derivation``).
+    Any other ``datum_state`` note stays out, so a measured map matches the
+    note-free derivation green produced.
     """
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
@@ -3789,18 +3791,25 @@ def _composition_located_from_values(
     if not wt:
         return None
     has_feot = any(str(oxide).strip() == "FeOT" for oxide in wt)
-    has_derivation_note = isinstance(source_note, str) and bool(source_note.strip())
-    admitted_by_role_or_feot = has_feot or role in _COMPOSITION_ROLE_TOKENS
-    if not admitted_by_role_or_feot and not has_derivation_note:
+    if not has_feot and role not in _COMPOSITION_ROLE_TOKENS:
         return None
+    complement_note = (
+        isinstance(source_note, str)
+        and "SiO2" in source_note
+        and "K2O" in source_note
+        and "100" in source_note
+    )
+    pass_note = role == INITIAL_CHARGE_ONLY_PROXY_FLAG or has_feot or (
+        role == "datum_state" and complement_note
+    )
     derivation = wt_pct_to_mole_fraction_derivation(
         wt,
         locator,
-        source_note=source_note if admitted_by_role_or_feot else None,
+        source_note=source_note if pass_note else None,
     )
     if set(wt) == {"K2O", "SiO2"} and wt["SiO2"] == Decimal("100") - wt["K2O"]:
-        # This lineage follows from the printed Decimal values only for the
-        # exact binary map; prose stays in derivation inputs as provenance.
+        # The relation follows from the printed Decimal values. pass_note
+        # decides whether the note text is also an input.
         derivation = replace(
             derivation,
             relation="SiO2_wt_pct=100-K2O_wt_pct;" + derivation.relation,
@@ -14655,7 +14664,9 @@ class Migrator:
             # Otherwise derive the mole-fraction point here. sample_from_equipment
             # no longer invents an experiment initial from an untyped map
             # (bad7fd5eb); that gate must not drop the point composition.
-            if "composition" not in point_conditions:
+            # A refused composition_role stays queued and untyped (b716).
+            # A row with no role still derives, which is the Basu recovery.
+            if "composition" not in point_conditions and not composition_role_refusal:
                 derived = row_sample.initial_composition
                 if derived is None:
                     printed = row_sample.printed_composition

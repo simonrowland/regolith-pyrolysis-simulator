@@ -3072,13 +3072,15 @@ _GREEN_TYPED_INITIAL_EXCEPTIONS = frozenset(
     }
 )
 
-# Identity composition or point conditions still differ from green 4153a7c4b
-# on these sources only. Each one is a typed charge, a catalogue proxy, or
-# the Plante datum-note input. Activity rows that only lost a derived point
-# composition (Basu and the same printed-map family) are not listed: those
-# were the bad7fd5eb regression and must match.
-_GREEN_OBSERVATION_COMPOSITION_EXCEPTIONS = frozenset(
+# Sources whose identity composition, point conditions, or experiment
+# initial still differ from green 4153a7c4b. Activity rows that only lost
+# a derived point composition are absent: that was the bad7fd5eb regression.
+_GREEN_COMPOSITION_DRIFT_SOURCES = frozenset(
     {
+        # Generated experiment gains a starting composition.
+        "kems-006-zhang-2021",
+        # Typed initials kept; locator note and empty derivation parameters.
+        "kems-012-sossi-2019",
         # Table 5 typed charge. Four rows gain a point composition
         # (5582ddc39, 362141f44, 160b7c6c4).
         "kems-015-hashimoto-1983",
@@ -3093,8 +3095,12 @@ _GREEN_OBSERVATION_COMPOSITION_EXCEPTIONS = frozenset(
         # "values.composition_derivation"; this tip stores the note
         # (add271eb0, 5e5f06cd4).
         "kems-042-plante-1979",
-        # proxy_flag initial_charge_only on the typed charge rows (829ce3701).
+        # Unbound quoted composition withheld as an initial (bad7fd5eb).
+        "kems-044-robinot-2026",
+        # proxy_flag initial_charge_only; three conflicting initials withheld.
         "kems-137-bischof-2023",
+        # Typed 12-digit paste kept instead of a prose re-derivation.
+        "norris-2017-earth-volatiles-nature",
         # Typed starting glass: order, last digit, and proxy (3692a683d).
         "ta-flemetakis-2024",
     }
@@ -3147,12 +3153,17 @@ def _plain_digest(payload: object) -> str:
 
 def _census_typed_initials_and_observations(
     module,
-) -> tuple[dict[str, object], dict[str, tuple[str, str, str]]]:
-    """Typed experiment initials, plus one digest per observation.
+) -> tuple[
+    dict[str, object],
+    dict[str, tuple[str, str, str]],
+    dict[str, tuple[str | None, str]],
+]:
+    """Typed experiment initials, observation digests, and initial digests.
 
     Each observation maps to (source_id, identity-composition digest,
-    point-conditions digest). Both sides use this tip's ``to_plain``, and
-    the digest keeps dict order, so an oxide reordering fails the census.
+    point-conditions digest). Each experiment maps to (source_id, initial
+    digest), including an absent initial. Both sides use this tip's
+    ``to_plain``, and the digest keeps dict order.
     """
 
     migrator = module.Migrator(root=REPO_ROOT)
@@ -3160,13 +3171,13 @@ def _census_typed_initials_and_observations(
         migrator._migrate_extract(path)
     for work_id in list(migrator.result.works):
         migrator._promote_universal_observation_printed_compositions(work_id)
-    typed: dict[str, object] = {}
-    for experiment_id, experiment in migrator.result.experiments.items():
-        initial = experiment.sample.initial_composition
-        if initial is not None and initial.state.is_value:
-            typed[experiment_id] = initial
+    source_by_experiment: dict[str, str] = {}
     observations: dict[str, tuple[str, str, str]] = {}
     for observation in migrator.result.observations.values():
+        if observation.experiment_id and observation.source_id:
+            source_by_experiment.setdefault(
+                observation.experiment_id, observation.source_id
+            )
         plain = to_plain(observation)
         identity = plain.get("identity") if isinstance(plain, dict) else None
         composition = identity.get("composition") if isinstance(identity, dict) else None
@@ -3176,12 +3187,31 @@ def _census_typed_initials_and_observations(
             _plain_digest(composition),
             _plain_digest(point_conditions),
         )
-    return typed, observations
+    # A declared experiment can differ while none of its observations carry
+    # that id. The work names its source when it has only one.
+    source_by_work: dict[str, str] = {}
+    for work_id, work in migrator.result.works.items():
+        if len(work.source_ids) == 1:
+            source_by_work[work_id] = work.source_ids[0]
+    typed: dict[str, object] = {}
+    initials: dict[str, tuple[str | None, str]] = {}
+    for experiment_id, experiment in migrator.result.experiments.items():
+        initial = experiment.sample.initial_composition
+        if initial is not None and initial.state.is_value:
+            typed[experiment_id] = initial
+        initials[experiment_id] = (
+            source_by_experiment.get(experiment_id)
+            or source_by_work.get(experiment.work_id or ""),
+            _plain_digest(to_plain(initial) if initial is not None else None),
+        )
+    return typed, observations, initials
 
 
 def _sources_with_composition_drift(
     green: dict[str, tuple[str, str, str]],
     current: dict[str, tuple[str, str, str]],
+    green_initials: dict[str, tuple[str | None, str]],
+    current_initials: dict[str, tuple[str | None, str]],
 ) -> set[str]:
     drifted: set[str] = set()
     for observation_id in set(green) | set(current):
@@ -3189,6 +3219,15 @@ def _sources_with_composition_drift(
         current_row = current.get(observation_id)
         if green_row is None or current_row is None or green_row[1:] != current_row[1:]:
             drifted.add((green_row or current_row)[0])
+    for experiment_id in set(green_initials) | set(current_initials):
+        green_row = green_initials.get(experiment_id)
+        current_row = current_initials.get(experiment_id)
+        if green_row is None or current_row is None or green_row[1] != current_row[1]:
+            source = (green_row or current_row)[0]
+            if source is None:
+                drifted.add(experiment_id)
+            else:
+                drifted.add(source)
     return drifted
 
 
@@ -3196,15 +3235,17 @@ def test_every_extract_keeps_green_typed_initials() -> None:
     """A migrator change must not drop an initial or a point composition green still types.
 
     One pass per module. Typed initials must cover green 4153a7c4b minus
-    the four experiment exceptions. Identity composition and point
-    conditions must match except the sources documented above. A source
-    in that set that no longer differs fails too, so the list cannot go stale.
+    the four experiment exceptions. Identity composition, point conditions,
+    and experiment initials must match except the eleven sources above.
+    A source in that set that no longer differs fails too.
     """
 
-    green_typed, green_obs = _census_typed_initials_and_observations(
+    green_typed, green_obs, green_initials = _census_typed_initials_and_observations(
         _green_migrate_module()
     )
-    current_typed, current_obs = _census_typed_initials_and_observations(migrate_module)
+    current_typed, current_obs, current_initials = _census_typed_initials_and_observations(
+        migrate_module
+    )
     green_ids = set(green_typed)
     missing = green_ids - _GREEN_TYPED_INITIAL_EXCEPTIONS - set(current_typed)
     assert missing == set()
@@ -3219,10 +3260,12 @@ def test_every_extract_keeps_green_typed_initials() -> None:
             {oxide: as_decimal(weight) for oxide, weight in weights.items()}
         )
         assert dict(initial.state.value.components) == dict(expected.components)
-    drifted = _sources_with_composition_drift(green_obs, current_obs)
-    assert drifted == _GREEN_OBSERVATION_COMPOSITION_EXCEPTIONS, (
-        f"unexpected {sorted(drifted - _GREEN_OBSERVATION_COMPOSITION_EXCEPTIONS)}; "
-        f"no longer drifting {sorted(_GREEN_OBSERVATION_COMPOSITION_EXCEPTIONS - drifted)}"
+    drifted = _sources_with_composition_drift(
+        green_obs, current_obs, green_initials, current_initials
+    )
+    assert drifted == _GREEN_COMPOSITION_DRIFT_SOURCES, (
+        f"unexpected {sorted(drifted - _GREEN_COMPOSITION_DRIFT_SOURCES)}; "
+        f"no longer drifting {sorted(_GREEN_COMPOSITION_DRIFT_SOURCES - drifted)}"
     )
 
 
