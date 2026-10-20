@@ -9,7 +9,10 @@ import yaml
 
 from simulator.battery.enums import EvidenceClass, Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT
-from tests.literature_extract_test_helpers import iter_locators
+from tests.literature_extract_test_helpers import (
+    assert_no_unavailable_observation_values,
+    iter_locators,
+)
 
 
 EXTRACT = (
@@ -104,6 +107,7 @@ def test_isolated_migration_pins_species_temperature_and_oxygen_conditions() -> 
     result = migrator.result
     observations = tuple(result.observations.values())
     assert len(observations) == 43
+    assert_no_unavailable_observation_values(observations)
     assert not result.validation.hard_issues
     assert not result.registry_issues
 

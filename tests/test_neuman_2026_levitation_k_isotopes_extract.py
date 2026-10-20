@@ -13,7 +13,10 @@ import yaml
 
 from simulator.battery.enums import Quantity
 from simulator.battery.migrate import Migrator, REPO_ROOT
-from tests.literature_extract_test_helpers import iter_locators
+from tests.literature_extract_test_helpers import (
+    assert_no_unavailable_observation_values,
+    iter_locators,
+)
 
 
 SID = "neuman-2026-levitation-k-isotopes"
@@ -287,6 +290,7 @@ def test_isolated_migration_preserves_species_and_run_conditions() -> None:
     source = _source_observations(document)
     rows = _migrate(document)
     assert len(rows) == 2258
+    assert_no_unavailable_observation_values(rows)
     assert not any(
         row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION for row in rows
     )

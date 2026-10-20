@@ -8,7 +8,10 @@ import pytest
 import yaml
 
 from simulator.battery.migrate import Migrator, REPO_ROOT, wt_pct_to_mole_fraction
-from tests.literature_extract_test_helpers import iter_locators
+from tests.literature_extract_test_helpers import (
+    assert_no_unavailable_observation_values,
+    iter_locators,
+)
 
 
 EXTRACT = (
@@ -203,6 +206,7 @@ def test_figures_are_deferred_and_migration_has_no_pressure_points() -> None:
     migrator.finalize()
     result = migrator.result
     assert len(result.observations) == 0
+    assert_no_unavailable_observation_values(result.observations.values())
     assert len(result.experiments) == 4
     experiment_ids = (
         "schneider_1981_kcas_vp_1",

@@ -11,7 +11,10 @@ import yaml
 
 from simulator.battery.enums import Phase, Quantity
 from simulator.battery.migrate import Migrator, REPO_ROOT
-from tests.literature_extract_test_helpers import iter_locators
+from tests.literature_extract_test_helpers import (
+    assert_no_unavailable_observation_values,
+    iter_locators,
+)
 
 
 EXTRACT = (
@@ -173,6 +176,7 @@ def test_every_typed_component_keeps_its_species_and_conditions_in_migration() -
     assert len(result.observations) == 15
     assert not result.validation.hard_issues
     assert not result.registry_issues
+    assert_no_unavailable_observation_values(result.observations.values())
     assert all(row.value.kind.value == "point" for row in result.observations.values())
     source_rows_by_id = {
         observation["observation_id"]: (formula, observation)

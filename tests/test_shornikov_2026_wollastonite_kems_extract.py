@@ -12,7 +12,10 @@ import yaml
 
 from simulator.battery.enums import EvidenceClass, Phase, Quantity, UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT
-from tests.literature_extract_test_helpers import iter_locators
+from tests.literature_extract_test_helpers import (
+    assert_no_unavailable_observation_values,
+    iter_locators,
+)
 
 
 SID = "shornikov-2026-wollastonite-kems"
@@ -113,6 +116,7 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
     migrated = [row for row in result.observations.values() if row.source_id == SID]
 
     assert len(migrated) == 170
+    assert_no_unavailable_observation_values(migrated)
     assert result.validation is not None and not result.validation.hard_issues
     assert not result.registry_issues
 
@@ -147,6 +151,13 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
 
     activities = [row for row in migrated if row.identity.quantity.value is Quantity.ACTIVITY]
     assert len(activities) == 2
+    activity_values = {row.identity.species.formula: row.value for row in activities}
+    assert activity_values["CaO"].kind is ValueKind.POINT
+    assert activity_values["CaO"].point == Decimal("0.015")
+    assert activity_values["CaO"].approximate is True
+    assert activity_values["SiO2"].kind is ValueKind.POINT
+    assert activity_values["SiO2"].point == Decimal("0.20")
+    assert activity_values["SiO2"].approximate is True
     expected_reference_phases = {"CaO": Phase.CR}
     for row in activities:
         formula = row.identity.species.formula
