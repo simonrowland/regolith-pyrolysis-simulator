@@ -3188,6 +3188,11 @@ def test_shornikov_pressure_rows_use_initial_charge_only(tmp_path: Path) -> None
         "shornikov-2025-saratov-alkali-evaporation.yaml",
         _SHORNIKOV_PRESSURE_ROWS[0],
     )
+    role = values["composition_role"]
+    assert role["value"] == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert role["locator"]["published_page"] == 115
+    assert "SiO2 (54.44)" in role["quote"]
+    assert "residual melt" in role["locator"]["note"]
     printed = values["oxides_wt_pct"]
     expected = wt_pct_to_mole_fraction(
         {oxide: as_decimal(weight) for oxide, weight in printed.items()}
