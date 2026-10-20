@@ -802,10 +802,19 @@ def test_legacy_step_hour_refuses_binary64_overflow_before_empty_melt_energy():
             },
             "pO2_bar",
         ),
+        (
+            {"voltage_V": None, "current_A": 100.0, "T_C": 1600.0},
+            "voltage_V",
+        ),
+        (
+            {"voltage_V": 3.0, "current_A": None, "T_C": 1600.0},
+            "current_A",
+        ),
     ],
     ids=[
         "negative-current", "negative-voltage", "zero-pO2",
         "nan-voltage", "infinite-current", "nan-pO2",
+        "missing-voltage", "missing-current",
     ],
 )
 def test_legacy_step_hour_invalid_controls_raise_typed_value_error(
