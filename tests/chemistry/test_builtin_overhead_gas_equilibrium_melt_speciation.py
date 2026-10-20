@@ -7,10 +7,35 @@ import math
 
 import pytest
 
+from engines.builtin.overhead_gas_equilibrium import (
+    BuiltinOverheadGasEquilibriumProvider,
+)
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.campaigns import CampaignManager
+from simulator.condensation import DepositionInputRefusal
 from simulator.state import CampaignPhase, GAS_CONSTANT
 from tests.chemistry.conftest import _build_sim
+
+
+def test_gamma_one_oxide_activity_refuses_positive_out_of_domain_oxide():
+    with pytest.raises(DepositionInputRefusal) as exc_info:
+        BuiltinOverheadGasEquilibriumProvider._oxide_activity_proxy_gamma_1(
+            {"Na2O": 50.0, "Cr2O3": 50.0}
+        )
+
+    assert exc_info.value.parameter == "species_molar_mass"
+    assert exc_info.value.value == "Cr2O3"
+    assert "nine-oxide proxy domain" in exc_info.value.reason
+
+
+def test_gamma_one_oxide_activity_refuses_unresolvable_positive_oxide():
+    with pytest.raises(DepositionInputRefusal) as exc_info:
+        BuiltinOverheadGasEquilibriumProvider._oxide_activity_proxy_gamma_1(
+            {"Na2O": 50.0, "unresolvable-oxide": 50.0}
+        )
+
+    assert exc_info.value.parameter == "species_molar_mass"
+    assert exc_info.value.value == "unresolvable-oxide"
 
 
 def test_partial_campaign_condenser_geometry_deep_merges_once_at_campaign_start(
