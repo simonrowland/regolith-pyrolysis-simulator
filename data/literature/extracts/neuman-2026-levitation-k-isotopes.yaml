@@ -4906,6 +4906,167 @@ species:
         digitisation: deferred to a figure pass
         attribution: Neuman et al. (2026)
         schema_gap: No matching numeric store token for the plotted element-loss or K-fraction-remaining values.
+    - observation_id: neuman_2026_main_text_basalt_loss_summaries_p54
+      type: printed_data_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 54
+        note: Results text on physical PDF page 5; percentages verified with pdftotext -f 5 -l 5.
+      units: percent of initial element concentration, as reported
+      values:
+        quantity: element-specific evaporative loss fraction
+        method_class: measured_direct
+        candidate_tokens:
+        - mass_loss_fraction
+        - residue_component_composition
+        reason: The text reports component-specific depletion fractions from measured glass compositions. The
+          mass_loss_fraction token describes bulk sample mass loss, and residue_component_composition already
+          holds measured concentrations; no existing token represents component-specific loss fractions.
+        material: Ortenberg Basalt
+        rows:
+        - sample_id: 3–5
+          temperature_C: '2000'
+          duration_s: '100'
+          fO2_target: IW − 1
+          element: K
+          loss_as_printed: '~75% of the initial K'
+        - sample_id: 3–5
+          temperature_C: '2000'
+          duration_s: '100'
+          fO2_target: IW − 1
+          element: Cu
+          loss_as_printed: 99.8%
+        - sample_id: 3–5
+          temperature_C: '2000'
+          duration_s: '100'
+          fO2_target: IW − 1
+          element: Zn
+          loss_as_printed: 94%
+        - sample_id: 1–5
+          sample_table_locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 52
+            table: '1'
+            row: 1–5
+          temperature_C: '2000'
+          duration_s: '100'
+          fO2_target: pure O2
+          element: K
+          loss_as_printed: 45%
+        - sample_id: 2–5
+          sample_table_locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 52
+            table: '1'
+            row: 2–5
+          temperature_C: '2000'
+          duration_s: '100'
+          fO2_target: IW + 3
+          element: K
+          loss_as_printed: 59%
+        - temperature_C: '2000'
+          element: Rb
+          loss_as_printed: up to 88%
+        - temperature_C: '2000'
+          element: Na
+          loss_as_printed: up to 74%
+        - temperature_C: '2000'
+          element: Ga
+          loss_as_printed: up to 40%
+        - sample_id: 4–2
+          temperature_C: '1800'
+          duration_s: '70'
+          fO2_target: IW − 1
+          element: K
+          loss_as_printed: 29%
+        - sample_id: 3–4
+          temperature_C: '2000'
+          duration_s: '70'
+          fO2_target: IW − 1
+          element: K
+          loss_as_printed: 56%
+    - observation_id: neuman_2026_main_text_basalt_loss_summaries_p56
+      type: printed_data_context
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 56
+        note: Results text on physical PDF page 7; percentages verified with pdftotext -f 7 -l 7.
+      units: percent of initial element concentration, as reported
+      values:
+        quantity: element-specific evaporative loss fraction
+        method_class: measured_direct
+        candidate_tokens:
+        - mass_loss_fraction
+        - residue_component_composition
+        reason: The text reports component-specific depletion fractions from measured glass compositions. The
+          mass_loss_fraction token describes bulk sample mass loss, and residue_component_composition already
+          holds measured concentrations; no existing token represents component-specific loss fractions.
+        material: Ortenberg Basalt
+        rows:
+        - sample_id: 4–2
+          temperature_C: '1800'
+          duration_s: '70'
+          fO2_target: IW − 1
+          element: Cu
+          loss_as_printed: 97%
+        - sample_id: 4–2
+          temperature_C: '1800'
+          duration_s: '70'
+          fO2_target: IW − 1
+          element: Zn
+          loss_as_printed: 94%
+        - sample_id: 4–2
+          temperature_C: '1800'
+          duration_s: '70'
+          fO2_target: IW − 1
+          element: Rb
+          loss_as_printed: 42%
+        - sample_id: 4–2
+          temperature_C: '1800'
+          duration_s: '70'
+          fO2_target: IW − 1
+          element: Na
+          loss_as_printed: 27%
+        - sample_id: 4–2
+          temperature_C: '1800'
+          duration_s: '70'
+          fO2_target: IW − 1
+          element: Ga
+          loss_as_printed: 9.2%
+    - observation_id: neuman_2026_main_text_loess_loss_summaries_p58
+      type: printed_data_context
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 58
+        note: Results text on physical PDF page 9; percentages verified with pdftotext -f 9 -l 9.
+      units: percent of initial element concentration, as reported
+      values:
+        quantity: element-specific evaporative loss fraction
+        method_class: measured_direct
+        candidate_tokens:
+        - mass_loss_fraction
+        - residue_component_composition
+        reason: The text reports component-specific depletion fractions from measured glass compositions. The
+          mass_loss_fraction token describes bulk sample mass loss, and residue_component_composition already
+          holds measured concentrations; no existing token represents component-specific loss fractions.
+        material: Chinese Loess
+        temperature_C: '2046'
+        rows:
+        - sample_id: 5–10
+          duration_s: '100'
+          fO2_target: IW − 1
+          element: K
+          loss_as_printed: 32%
+        - element: Zn
+          loss_as_printed: up to 85%
+        - element: Cu
+          sample_id: 5–10
+          loss_as_printed: nearly all of the Cu was lost in the most extreme case
     - observation_id: neuman_2026_supplementary_figure_s1_context
       type: figure_only
       locator:
@@ -136495,10 +136656,8 @@ species:
         - mass_loss_fraction
         - residue_component_composition
         - evaporation_rate
-        reason: Table S1 reports measured starting/ending bead masses but not a mass-loss fraction. Computing that
-          fraction requires these untokened input masses to resolve to a registered TABLE_CSV source asset; the
-          Neuman MMC2 workbook has no INDEX table asset. Its calculated K evaporation number, J and timescales are
-          model-derived and remain context.
+        reason: data in publisher supplement MMC2 Table S1, not in corpus; fetch queued 2026-10-20. The listed
+          calculated K evaporation number, J and timescales are model-derived and remain context.
         rows:
         - sample: 1–1
           material: Basalt

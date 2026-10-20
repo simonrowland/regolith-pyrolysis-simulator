@@ -219,6 +219,64 @@ def test_render_grid_and_both_cell_mutations_are_detected() -> None:
         assert _render_grid(changed_extract) == TABLE_RENDER
 
 
+def test_printed_loss_summaries_and_missing_supplement_are_context_only() -> None:
+    document = _document()
+    contexts = {
+        observation["observation_id"]: observation
+        for block in document["species"].values()
+        for observation in block.get("context", [])
+    }
+
+    expected_rows = {
+        "neuman_2026_main_text_basalt_loss_summaries_p54": [
+            ("3–5", "K", "~75% of the initial K"),
+            ("3–5", "Cu", "99.8%"),
+            ("3–5", "Zn", "94%"),
+            ("1–5", "K", "45%"),
+            ("2–5", "K", "59%"),
+            (None, "Rb", "up to 88%"),
+            (None, "Na", "up to 74%"),
+            (None, "Ga", "up to 40%"),
+            ("4–2", "K", "29%"),
+            ("3–4", "K", "56%"),
+        ],
+        "neuman_2026_main_text_basalt_loss_summaries_p56": [
+            ("4–2", "Cu", "97%"),
+            ("4–2", "Zn", "94%"),
+            ("4–2", "Rb", "42%"),
+            ("4–2", "Na", "27%"),
+            ("4–2", "Ga", "9.2%"),
+        ],
+        "neuman_2026_main_text_loess_loss_summaries_p58": [
+            ("5–10", "K", "32%"),
+            (None, "Zn", "up to 85%"),
+            ("5–10", "Cu", "nearly all of the Cu was lost in the most extreme case"),
+        ],
+    }
+    for observation_id, expected in expected_rows.items():
+        observation = contexts[observation_id]
+        assert observation["type"] == "printed_data_context"
+        assert observation["values"]["candidate_tokens"] == [
+            "mass_loss_fraction",
+            "residue_component_composition",
+        ]
+        assert [
+            (
+                row.get("sample_id"),
+                row["element"],
+                row["loss_as_printed"],
+            )
+            for row in observation["values"]["rows"]
+        ] == expected
+
+    supplement = contexts["neuman_2026_supplementary_table_s1_mass_loss_inputs"]
+    assert supplement["type"] == "printed_data_context"
+    assert supplement["values"]["reason"].startswith(
+        "data in publisher supplement MMC2 Table S1, not in corpus; fetch queued 2026-10-20"
+    )
+    assert len(supplement["values"]["rows"]) == 49
+
+
 def test_isolated_migration_preserves_species_and_run_conditions() -> None:
     document = _document()
     source = _source_observations(document)
