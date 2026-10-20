@@ -1,0 +1,231 @@
+schema_version: literature_extract.v1
+source_id: schreiber-1996-fe-mn-cr-redox-interactions
+source:
+  citation: Schreiber, H. D., Peters, L. J., Beckman, J. W. & Schreiber, C. W. (1996), "Redox chemistry of iron-manganese and iron-chromium interactions in soda lime silicate glass melts", Glastechnische Berichte Glass Science and Technology 69(9), 269–277.
+  year: 1996
+  doi: 10.34657/13315
+extraction:
+  method: MinerU table draft reconciled with pdftotext-layout and 600 dpi renders of Tables 1, 4 and 5; figure records retained without numeric points per wave rules.
+  date: '2026-10-20'
+  worker: fam25-1020
+review_status: draft
+species:
+  Fe:
+    observations: []
+    context:
+    - observation_id: schreiber_1996_figure1_fe_deferred
+      type: figure_only
+      locator: {page: 4, pdf_page_index: 3, published_page: 272, figure: '1'}
+      phase: quenched soda-lime silicate glass
+      units: '[Fe2+]/[Fe] in %'
+      values:
+        method_class: figure_only
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [2], denominator_kind: total_element, denominator_element: Fe, value_form: fraction}
+        species: Fe
+        phase_as_printed: soda-lime silicate glass quenched from melt
+        T_C_range: ['1100', '1400']
+        fO2_as_printed: approximately 10^-0.7 bar; air
+        axes_as_printed: {x: 'Temperature in °C', y: '[M^+]/[M] in %'}
+        caption: Temperature dependence of individual iron, manganese and chromium redox equilibria in soda-lime silicate glass composition; M = Fe, Mn, Cr.
+        panel: none
+        series: [{label: Fe2+ / Fe3+, marker_count: 4}]
+        attribution: Schreiber et al. (1996), spectrophotometric measurements in quenched glass.
+        quench_status: asserted_preserved
+        digitisation: deferred to a figure pass
+    - observation_id: schreiber_1996_table1_nominal_additions
+      type: context_only
+      locator: {page: 3, pdf_page_index: 2, published_page: 271, table: '1'}
+      units: wt%
+      values:
+        quantity_as_printed: nominal weight percentages of added elements in soda-lime silicate base compositions
+        units: wt%
+        method_class: measured_direct
+        reason: These are nominal elemental additions, not complete melt compositions or redox ratios.
+        rows:
+        - {sample: Fe, Fe: '0.98', Mn: null, Cr: null}
+        - {sample: Mn, Fe: null, Mn: '1.10', Cr: null}
+        - {sample: Cr, Fe: null, Mn: null, Cr: '0.052'}
+        - {sample: FeMn1, Fe: '0.98', Mn: '0.98', Cr: null}
+        - {sample: FeMn2, Fe: '0.49', Mn: '0.98', Cr: null}
+        - {sample: FeMn3, Fe: '0.20', Mn: '0.98', Cr: null}
+        - {sample: FeCr1, Fe: '0.98', Mn: null, Cr: '0.055'}
+        - {sample: FeCr2, Fe: '0.48', Mn: null, Cr: '0.054'}
+        - {sample: FeCr3, Fe: '0.19', Mn: null, Cr: '0.053'}
+        - {sample: FeCr4, Fe: '0.98', Mn: null, Cr: '0.17'}
+        - {sample: FeCr5, Fe: '0.98', Mn: null, Cr: '0.31'}
+    - observation_id: schreiber_1996_table2_relative_reduction_potentials
+      type: context_only
+      locator: {page: 5, pdf_page_index: 4, published_page: 273, table: '2'}
+      units: V
+      values:
+        quantity_as_printed: relative reduction potential E'
+        units: V
+        method_class: model_derived
+        schema_gap: No existing quantity token represents relative reduction potential.
+        columns: ['Na-Ca silicate 1400°C this work', 'Na-Ca silicate 1400°C [3]', 'Na-borosilicate 1150°C [10]', 'Na-Ca silicate 1100°C [22]', 'Na2Si2O5 1085°C [23]', 'EFEL Na2Si2O5 1085°C [24]', 'E1/2 Na-Ca silicate 1250°C [17]']
+        rows:
+        - {species: Mn, values: ['+1.2', '+1.2', '+0.8', '—', '+0.7', '−0.1', '−0.18']}
+        - {species: Cr, values: ['+0.4', '+0.2', '−0.3', '−0.9', '—', '+0.05', '−0.10']}
+        - {species: Fe, values: ['−1.0', '−1.0', '−1.7', '−1.9', '−2.1', '+0.4', '−0.47']}
+        attribution: The paper states E' values are calculated from data in references [22] and [23]; other columns are attributed in their headers.
+    - observation_id: schreiber_1996_table3_reduction_enthalpies
+      type: context_only
+      locator: {page: 6, pdf_page_index: 5, published_page: 274, table: '3'}
+      units: kJ/(mol M)
+      values:
+        quantity_as_printed: enthalpy of reduction, ΔHred
+        units: kJ/(mol M)
+        method_class: model_derived
+        schema_gap: ΔHred is a redox reaction enthalpy and does not match delta_fH, absolute S, or partial_molar_enthalpy.
+        columns: ['Na-Ca silicate this work', 'Na-Ca silicate [22]', 'Na-Ca silicate [13]', 'Na-borosilicate [10]', 'Na2Si2O5 [23]']
+        rows:
+        - {species: Mn, values: ['36 ± 7', '—', '43 to 53', '54 ± 13', '59']}
+        - {species: Cr, values: ['79 ± 28', '76', '—', '42 ± 13', '—']}
+        - {species: Fe, values: ['107 ± 18', '102', '85 to 105', '240 ± 100', '117']}
+    - observation_id: schreiber_1996_figure2_fe_concentration_deferred
+      type: figure_only
+      locator: {page: 7, pdf_page_index: 6, published_page: 275, figure: '2'}
+      phase: soda-lime silicate glass; sample FeMn1
+      units: Fe2+ concentration in wt%
+      values:
+        method_class: figure_only
+        quantity_as_printed: individual iron redox ion concentration versus temperature
+        species: Fe
+        phase_as_printed: glass composition containing 0.98 wt% Fe and 0.98 wt% Mn (FeMn1)
+        T_C_range: ['0', '1500']
+        axes_as_printed: {x: 'Temperature in °C', y: '[M^x+] in wt%'}
+        caption: Temperature dependence of individual iron and manganese redox ion distribution in the soda-lime silicate glass composition containing 0.98 wt% Fe and 0.98 wt% Mn (sample FeMn1); θ of redox fixation is the postulated kinetic-model temperature at which distributions become frozen-in.
+        panel: none
+        series: [{label: Fe2+, marker_count: 4}]
+        attribution: Schreiber et al. (1996); figure contains measured markers and a kinetic-model depiction.
+        digitisation: deferred to a figure pass
+  Mn:
+    observations: []
+    context:
+    - observation_id: schreiber_1996_figure1_mn_deferred
+      type: figure_only
+      locator: {page: 4, pdf_page_index: 3, published_page: 272, figure: '1'}
+      phase: quenched soda-lime silicate glass
+      units: '[Mn3+]/[Mn] in %'
+      values:
+        method_class: figure_only
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_element: Mn, value_form: fraction}
+        species: Mn
+        phase_as_printed: soda-lime silicate glass quenched from melt
+        T_C_range: ['1100', '1400']
+        fO2_as_printed: approximately 10^-0.7 bar; air
+        axes_as_printed: {x: 'Temperature in °C', y: '[M^+]/[M] in %'}
+        caption: Temperature dependence of individual iron, manganese and chromium redox equilibria in soda-lime silicate glass composition; M = Fe, Mn, Cr.
+        panel: none
+        series: [{label: Mn3+ / Mn2+, marker_count: 4}]
+        attribution: Schreiber et al. (1996), spectrophotometric measurements in quenched glass.
+        quench_status: asserted_preserved
+        digitisation: deferred to a figure pass
+    - observation_id: schreiber_1996_table4_manganese_ion_concentrations
+      type: context_only
+      locator: {page: 6, pdf_page_index: 5, published_page: 274, table: '4'}
+      phase: quenched soda-lime silicate glass
+      units: wt%
+      values:
+        quantity_as_printed: ion concentration in wt%; measured Mn3+ concentration and qualitative Fe2+ presence
+        units: wt%
+        method_class: measured_direct
+        schema_gap: Candidate tokens are valence_ratio and equilibrium_phase_composition; neither represents an individual ion's absolute concentration in wt%. The measured entries are retained here; only Figure 1 reports ratios, and its points are deferred.
+        base_composition: 17 mol% Na2O, 11 mol% CaO, 72 mol% SiO2 plus listed nominal Fe and Mn additions
+        added_elements_units: wt%
+        atmosphere: air
+        log10_fO2_bar: {value: '−0.7', approximate: true}
+        T_C: [1400, 1300, 1200, 1100]
+        columns: [sample, added_Fe_wt%, added_Mn_wt%, T_C, separate_couples_Fe2+, separate_couples_Mn3+, predicted_Fe2+, predicted_Mn3+, measured_Fe2+_qualitative, measured_Mn3+]
+        rows:
+        - {sample: FeMn1, Fe_wt%: '0.98', Mn_wt%: '0.98', T_C: 1400, separate: ['0.13', '0.04'], predicted: ['0.09', '0'], measured: [present, '0']}
+        - {sample: FeMn1, Fe_wt%: '0.98', Mn_wt%: '0.98', T_C: 1300, separate: ['0.06', '0.05'], predicted: ['0.01', '0'], measured: [present, '0']}
+        - {sample: FeMn1, Fe_wt%: '0.98', Mn_wt%: '0.98', T_C: 1200, separate: ['0.04', '0.06'], predicted: ['0', '0.03'], measured: [absent, '0.03']}
+        - {sample: FeMn1, Fe_wt%: '0.98', Mn_wt%: '0.98', T_C: 1100, separate: ['0.025', '0.07'], predicted: ['0', '0.045'], measured: [absent, '0.04']}
+        - {sample: FeMn2, Fe_wt%: '0.49', Mn_wt%: '0.98', T_C: 1400, separate: ['0.065', '0.04'], predicted: ['0.02', '0'], measured: [present, '0']}
+        - {sample: FeMn2, Fe_wt%: '0.49', Mn_wt%: '0.98', T_C: 1300, separate: ['0.03', '0.05'], predicted: ['0', '0.025'], measured: [absent, '0.03']}
+        - {sample: FeMn2, Fe_wt%: '0.49', Mn_wt%: '0.98', T_C: 1200, separate: ['0.015', '0.06'], predicted: ['0', '0.05'], measured: [absent, '0.05']}
+        - {sample: FeMn2, Fe_wt%: '0.49', Mn_wt%: '0.98', T_C: 1100, separate: ['0.01', '0.07'], predicted: ['0', '0.06'], measured: [absent, '0.05']}
+        - {sample: FeMn3, Fe_wt%: '0.20', Mn_wt%: '0.98', T_C: 1400, separate: ['0.025', '0.04'], predicted: ['0', '0.015'], measured: [absent, '0.02']}
+        - {sample: FeMn3, Fe_wt%: '0.20', Mn_wt%: '0.98', T_C: 1300, separate: ['0.01', '0.05'], predicted: ['0', '0.045'], measured: [absent, '0.04']}
+        - {sample: FeMn3, Fe_wt%: '0.20', Mn_wt%: '0.98', T_C: 1200, separate: ['0.008', '0.06'], predicted: ['0', '0.05'], measured: [absent, '0.04']}
+        - {sample: FeMn3, Fe_wt%: '0.20', Mn_wt%: '0.98', T_C: 1100, separate: ['0.005', '0.07'], predicted: ['0', '0.065'], measured: [absent, '0.06']}
+    - observation_id: schreiber_1996_figure2_mn_concentration_deferred
+      type: figure_only
+      locator: {page: 7, pdf_page_index: 6, published_page: 275, figure: '2'}
+      phase: soda-lime silicate glass; sample FeMn1
+      units: Mn3+ concentration in wt%
+      values:
+        method_class: figure_only
+        quantity_as_printed: individual manganese redox ion concentration versus temperature
+        species: Mn
+        phase_as_printed: glass composition containing 0.98 wt% Fe and 0.98 wt% Mn (FeMn1)
+        T_C_range: ['0', '1500']
+        axes_as_printed: {x: 'Temperature in °C', y: '[M^x+] in wt%'}
+        caption: Temperature dependence of individual iron and manganese redox ion distribution in the soda-lime silicate glass composition containing 0.98 wt% Fe and 0.98 wt% Mn (sample FeMn1); θ of redox fixation is the postulated kinetic-model temperature at which distributions become frozen-in.
+        panel: none
+        series: [{label: Mn3+, marker_count: 4}]
+        attribution: Schreiber et al. (1996); figure contains measured markers and a kinetic-model depiction.
+        digitisation: deferred to a figure pass
+  Cr:
+    observations: []
+    context:
+    - observation_id: schreiber_1996_figure1_cr_deferred
+      type: figure_only
+      locator: {page: 4, pdf_page_index: 3, published_page: 272, figure: '1'}
+      phase: quenched soda-lime silicate glass
+      units: '[Cr6+]/[Cr] in %'
+      values:
+        method_class: figure_only
+        quantity: valence_ratio
+        valence_basis: {numerator_oxidation_states: [6], denominator_kind: total_element, denominator_element: Cr, value_form: fraction}
+        species: Cr
+        phase_as_printed: soda-lime silicate glass quenched from melt
+        T_C_range: ['1100', '1400']
+        fO2_as_printed: approximately 10^-0.7 bar; air
+        axes_as_printed: {x: 'Temperature in °C', y: '[M^+]/[M] in %'}
+        caption: Temperature dependence of individual iron, manganese and chromium redox equilibria in soda-lime silicate glass composition; M = Fe, Mn, Cr.
+        panel: none
+        series: [{label: Cr6+ / Cr3+, marker_count: 4}]
+        attribution: Schreiber et al. (1996), spectrophotometric measurements in quenched glass.
+        quench_status: asserted_preserved
+        digitisation: deferred to a figure pass
+    - observation_id: schreiber_1996_table5_chromium_ion_concentrations
+      type: context_only
+      locator: {page: 7, pdf_page_index: 6, published_page: 275, table: '5'}
+      phase: quenched soda-lime silicate glass
+      units: wt%
+      values:
+        quantity_as_printed: ion concentration in wt%; measured Cr6+ concentration and qualitative Fe2+ presence
+        units: wt%
+        method_class: measured_direct
+        schema_gap: Candidate tokens are valence_ratio and equilibrium_phase_composition; neither represents an individual ion's absolute concentration in wt%. The measured entries are retained here; only Figure 1 reports ratios, and its points are deferred.
+        base_composition: 17 mol% Na2O, 11 mol% CaO, 72 mol% SiO2 plus listed nominal Fe and Cr additions
+        added_elements_units: wt%
+        atmosphere: air
+        log10_fO2_bar: {value: '−0.7', approximate: true}
+        T_C: [1400, 1300, 1200, 1100]
+        columns: [sample, added_Fe_wt%, added_Cr_wt%, T_C, separate_couples_Fe2+, separate_couples_Cr6+, predicted_Fe2+, predicted_Cr6+, measured_Fe2+_qualitative, measured_Cr6+]
+        rows:
+        - {sample: FeCr1, Fe_wt%: '0.98', Cr_wt%: '0.055', T_C: 1400, separate: ['0.13', '0.006'], predicted: ['0.04', '0'], measured: [present, '0']}
+        - {sample: FeCr1, Fe_wt%: '0.98', Cr_wt%: '0.055', T_C: 1300, separate: ['0.06', '0.011'], predicted: ['0.01', '0'], measured: [present, '0']}
+        - {sample: FeCr1, Fe_wt%: '0.98', Cr_wt%: '0.055', T_C: 1200, separate: ['0.04', '0.016'], predicted: ['0', '0.003'], measured: [absent, '0.004']}
+        - {sample: FeCr1, Fe_wt%: '0.98', Cr_wt%: '0.055', T_C: 1100, separate: ['0.025', '0.016'], predicted: ['0', '0.008'], measured: [absent, '0.009']}
+        - {sample: FeCr2, Fe_wt%: '0.48', Cr_wt%: '0.054', T_C: 1400, separate: ['0.06', '0.006'], predicted: ['0.015', '0'], measured: [present, '0']}
+        - {sample: FeCr2, Fe_wt%: '0.48', Cr_wt%: '0.054', T_C: 1300, separate: ['0.03', '0.011'], predicted: ['0', '0'], measured: [present, '0']}
+        - {sample: FeCr2, Fe_wt%: '0.48', Cr_wt%: '0.054', T_C: 1200, separate: ['0.02', '0.016'], predicted: ['0', '0.009'], measured: [absent, '0.009']}
+        - {sample: FeCr2, Fe_wt%: '0.48', Cr_wt%: '0.054', T_C: 1100, separate: ['0.01', '0.016'], predicted: ['0', '0.012'], measured: [absent, '0.017']}
+        - {sample: FeCr3, Fe_wt%: '0.195', Cr_wt%: '0.053', T_C: 1400, separate: ['0.025', '0.006'], predicted: ['0.002', '0'], measured: [present, '0']}
+        - {sample: FeCr3, Fe_wt%: '0.195', Cr_wt%: '0.053', T_C: 1300, separate: ['0.01', '0.011'], predicted: ['0', '0.007'], measured: [absent, '0.007']}
+        - {sample: FeCr3, Fe_wt%: '0.195', Cr_wt%: '0.053', T_C: 1200, separate: ['0.008', '0.016'], predicted: ['0', '0.019'], measured: [absent, '0.015']}
+        - {sample: FeCr3, Fe_wt%: '0.195', Cr_wt%: '0.053', T_C: 1100, separate: ['0.005', '0.016'], predicted: ['0', '0.014'], measured: [absent, '0.02']}
+        - {sample: FeCr4, Fe_wt%: '0.98', Cr_wt%: '0.17', T_C: 1400, separate: ['0.13', '0.017'], predicted: ['0.03', '0'], measured: [present, '0']}
+        - {sample: FeCr4, Fe_wt%: '0.98', Cr_wt%: '0.17', T_C: 1300, separate: ['0.06', '0.035'], predicted: ['0', '0.015'], measured: [absent, '0.013']}
+        - {sample: FeCr4, Fe_wt%: '0.98', Cr_wt%: '0.17', T_C: 1200, separate: ['0.04', '0.05'], predicted: ['0', '0.037'], measured: [absent, '0.04']}
+        - {sample: FeCr4, Fe_wt%: '0.98', Cr_wt%: '0.17', T_C: 1100, separate: ['0.025', '0.05'], predicted: ['0', '0.04'], measured: [absent, '>0.03']}
+        - {sample: FeCr5, Fe_wt%: '0.98', Cr_wt%: '0.31', T_C: 1400, separate: ['0.13', '0.031'], predicted: ['0.01', '0'], measured: [present, '0']}
+        - {sample: FeCr5, Fe_wt%: '0.98', Cr_wt%: '0.31', T_C: 1300, separate: ['0.06', '0.061'], predicted: ['0', '0.04'], measured: [absent, '>0.03']}
+        - {sample: FeCr5, Fe_wt%: '0.98', Cr_wt%: '0.31', T_C: 1200, separate: ['0.04', '0.09'], predicted: ['0', '0.08'], measured: [absent, '>0.03']}
+        - {sample: FeCr5, Fe_wt%: '0.98', Cr_wt%: '0.31', T_C: 1100, separate: ['0.025', '0.09'], predicted: ['0', '0.08'], measured: [absent, '>0.03']}
