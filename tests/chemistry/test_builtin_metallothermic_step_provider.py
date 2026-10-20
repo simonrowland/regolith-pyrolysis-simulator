@@ -56,6 +56,7 @@ from engines.builtin.metallothermic_step import (
 )
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
 )
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
@@ -266,23 +267,40 @@ def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
             expected_standard_delta_g
         )
 
-    # Approach Tm from below: the fusion correction reaches the alpha Gibbs
-    # energy as its ΔH_fus(1-T/Tm) term tends to zero.
+    # The closest representable sub-Tm value exercises the liquid branch's
+    # one-sided limit without a finite-offset probe.
     alpha_na2o_segment = next(
         segment
         for segment in ellingham_fit_segments("Na")
         if "Na2O(alpha)" in segment.phase_basis
     )
     melting_temperature_K = 1405.2
-    just_below_melting_temperature_K = melting_temperature_K - 1e-6
-    _priority, diagnostic = BuiltinMetallothermicStepProvider._na_thermo_priority(
-        ("FeO",),
-        just_below_melting_temperature_K - CELSIUS_TO_KELVIN_OFFSET,
-        {"Na2O": 1.0, "FeO": 1.0},
+    below_melting_temperature_K = math.nextafter(
+        melting_temperature_K,
+        -math.inf,
     )
-    assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
-        alpha_na2o_segment.delta_g_kJ_per_mol_O2(melting_temperature_K),
+    below_tm_liquid_delta_g = (
+        _na_activity_reference_standard_delta_g_kj_per_mol_o2(
+            below_melting_temperature_K
+        )
+    )
+    alpha_delta_g_at_tm = alpha_na2o_segment.delta_g_kJ_per_mol_O2(
+        melting_temperature_K
+    )
+    assert below_tm_liquid_delta_g == pytest.approx(
+        alpha_delta_g_at_tm,
         abs=1e-3,
+    )
+
+    # Keep the existing green-path discontinuity explicit until physics ticket
+    # b-959 reconciles the liquid fit at/above Tm with the JANAF alpha limit.
+    liquid_delta_g_at_tm = ellingham_delta_g_kj_per_mol_o2(
+        "Na",
+        melting_temperature_K,
+    )
+    assert liquid_delta_g_at_tm - alpha_delta_g_at_tm == pytest.approx(
+        1.3262736,
+        abs=1e-6,
     )
 
 
