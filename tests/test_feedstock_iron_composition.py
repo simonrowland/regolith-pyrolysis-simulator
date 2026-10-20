@@ -149,6 +149,26 @@ def test_redox_helpers_consume_both_measured_oxides() -> None:
     assert split_fO2 != ferrous_only_fO2
 
 
+def test_intrinsic_melt_fO2_legacy_iw_grid_float_hex() -> None:
+    composition = _measured_split()["composition_wt_pct"]
+    temperatures_K = (-1.0, 0.0, 1.0, 298.15, 1273.15, 1873.15, 2273.15, 3000.0)
+    expected_fO2_hex = (
+        "-0x1.2000000000000p+3",
+        "-0x1.2000000000000p+3",
+        "-0x1.2000000000000p+3",
+        "-0x1.2000000000000p+3",
+        "-0x1.2000000000000p+3",
+        "-0x1.0118a744d3a73p+3",
+        "-0x1.5e918017ebafap+2",
+        "-0x1.49d8a6abb98d4p+1",
+    )
+
+    assert tuple(
+        intrinsic_melt_fO2(composition, temperature_K).hex()
+        for temperature_K in temperatures_K
+    ) == expected_fO2_hex
+
+
 def test_unknown_split_is_all_ferrous_with_typed_oxygen_upper_absence() -> None:
     entry = _unknown_split()
     resolved = resolve_feedstock_composition(entry)
