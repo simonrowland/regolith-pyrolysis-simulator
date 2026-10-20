@@ -17,8 +17,17 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 
 
 # Regenerated at openimcc f037d05; the low-temperature Si2/Si3 gas rows come from upstream 8b99c3e.
+# d-071 openimcc 100df4f re-anchors FeO(l) on Darken & Gurry (1946) / Masson (1965),
+# Ref DG46-MASSON65. The Fe–Mg–Si pots move with that standard state. The largest
+# relative shifts are the high-oxygen polymers (Si3 about -22% at 1200 K with no
+# cell, W4O12 about +22% at 1700 K on W), because pO2 moves and those stoichiometries
+# amplify it. CaO–SiO2 pressures do not move. At 1200 K the Fe-019 supercooled-liquid
+# notice drops: the liquid row is no longer the JANAF fusion marker, so Fe and FeO
+# domain flags are absent. The Fe and FeO channel class becomes janaf_fitted. The
+# oxide authority primary_measurement_reanchored (rank 4) outranks the gas JANAF fit
+# (rank 3), and the channel keeps the least-authoritative row. 249fde5 still reported
+# janaf_transcribed. ccabd0b keeps the 100df4f pressures and the new class.
 # Float outputs are stored as float.hex strings so these are exact pins.
-_IRON_LOW_FLAGS = "FeO(l) uses a source-tabulated supercooled liquid branch below the 1650 K fusion marker (Fe-019)"
 _GOLDEN = {
     ("cao_sio2_40_60", 1200.0, None): {
         "pressures": {
@@ -88,81 +97,81 @@ _GOLDEN = {
     },
     ("feo_mgo_sio2_30_20_50", 1200.0, None): {
         "pressures": {
-            "Fe": "0x1.9ab04b48fa33dp-27", "FeO": "0x1.51f31284b1206p-33",
-            "Mg": "0x1.2badb1443a838p-35", "MgO": "0x1.9b72b08cf1669p-51",
-            "O": "0x1.1afe7d89c263bp-31", "O2": "0x1.21a4ead5094d7p-28",
-            "Si": "0x1.e0178d9b1308ep-81", "Si2": "0x1.11a788952f041p-151",
-            "Si3": "0x1.205c3df676ecfp-212", "SiO": "0x1.6ee9fa97739e8p-34",
-            "SiO2": "0x1.629d69bf2766fp-41",
+            "Fe": "0x1.b809f9a06a029p-27", "FeO": "0x1.77201368019ecp-33",
+            "Mg": "0x1.2d809aa80e3e5p-35", "MgO": "0x1.acd74675b03d8p-51",
+            "O": "0x1.252c348600ea7p-31", "O2": "0x1.36dabbe7fa937p-28",
+            "Si": "0x1.b99470fb07c6bp-81", "Si2": "0x1.cf05bd6b67315p-152",
+            "Si3": "0x1.c0c40fba15110p-213", "SiO": "0x1.5d9e7cb565bc2p-34",
+            "SiO2": "0x1.5e0d999029c52p-41",
         },
-        "total": "0x1.2344c146dd4a2p-26", "pO2": "0x1.7ba47809e0c68p-45",
-        "residual": "0x1.13a3f2adafb66p-50", "iterations": 14,
-        "O": (("O2", "0x1.0c74c5e9972eep-46"), ("O", "0x1.72f0080b4eb1fp-50"), ("FeO", "0x1.a213c2947944ap-53"), ("SiO", "0x1.21baea9f5e0dbp-53"), ("SiO2", "0x1.dfb669c874fb6p-60")),
-        "metal": (("Fe", "0x1.20219e351840ep-46"), ("SiO", "0x1.21baea9f5e0dbp-52"), ("FeO", "0x1.a213c2947944ap-53"), ("Mg", "0x1.3eb25ff51d446p-54"), ("SiO2", "0x1.dfb669c874fb6p-60")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Fe", _IRON_LOW_FLAGS), ("FeO", _IRON_LOW_FLAGS), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "total": "0x1.37ca6950dbe12p-26", "pO2": "0x1.977170307807cp-45",
+        "residual": "0x1.4ef3db7464879p-49", "iterations": 14,
+        "O": (("O2", "0x1.201d633ce9e4ap-46"), ("O", "0x1.8047802a1b698p-50"), ("FeO", "0x1.d0113db9f4368p-53"), ("SiO", "0x1.1412ca2755b56p-53"), ("SiO2", "0x1.d98aa147c3c9ep-60")),
+        "metal": (("Fe", "0x1.34b912c0475cfp-46"), ("SiO", "0x1.1412ca2755b56p-52"), ("FeO", "0x1.d0113db9f4368p-53"), ("Mg", "0x1.40a2eaf591fe9p-54"), ("SiO2", "0x1.d98aa147c3c9ep-60")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
         "flux": None, "buffer": None,
     },
     ("feo_mgo_sio2_30_20_50", 1200.0, "W"): {
         "pressures": {
-            "Fe": "0x1.e2c1d4341bc6ap-22", "FeO": "0x1.51f31284b1206p-33",
-            "Mg": "0x1.604445ac1857ap-30", "MgO": "0x1.9b72b08cf1669p-51",
-            "O": "0x1.e17e9a832f578p-37", "O2": "0x1.a33d77b49769cp-39",
-            "Si": "0x1.4baf7d83951b2p-70", "Si2": "0x1.053cf472e11b3p-130",
-            "Si3": "0x1.7c5dab096efcdp-181", "SiO": "0x1.af4d019c0a7b4p-29",
-            "SiO2": "0x1.629d69bf2766fp-41", "W2O6": "0x1.d3941fab43ed5p-24",
-            "W3O8": "0x1.cffc362d0cccep-27", "W3O9": "0x1.4b45d2a231c7bp-24",
-            "W4O12": "0x1.79fff6eaeb5c4p-33", "WO": "0x1.52c6b3247cf30p-54",
-            "WO2": "0x1.182929f8283ecp-42", "WO3": "0x1.06d4634c2355cp-33",
+            "Fe": "0x1.08ad896858a8cp-21", "FeO": "0x1.77201368019ecp-33",
+            "Mg": "0x1.6ab320ddea276p-30", "MgO": "0x1.acd74675b03d8p-51",
+            "O": "0x1.e769b11ff0c3fp-37", "O2": "0x1.ad9c133663f68p-39",
+            "Si": "0x1.3f8407b3d9de4p-70", "Si2": "0x1.e4d6ed374c56cp-131",
+            "Si3": "0x1.5403fee2b110ep-181", "SiO": "0x1.a4953afb16902p-29",
+            "SiO2": "0x1.5e0d999029c52p-41", "W2O6": "0x1.f723adb693eefp-24",
+            "W3O8": "0x1.ff9f2c8f6efccp-27", "W3O9": "0x1.71c61bba31a51p-24",
+            "W4O12": "0x1.b5aeaa9ea4d50p-33", "WO": "0x1.56f0b48b84b3fp-54",
+            "WO2": "0x1.1f1720cd3d7d0p-42", "WO3": "0x1.10a418e83738dp-33",
         },
-        "total": "0x1.5f1b1e17de2a9p-21", "pO2": "0x1.12c0d185abe4ap-55",
-        "residual": "0x1.f1ce1dcfe930dp-48", "iterations": 22,
-        "O": (("W2O6", "0x1.5589cf27d5d48p-42"), ("W3O9", "0x1.285b8eb17c7f3p-42"), ("W3O8", "0x1.7547d86a091afp-45"), ("SiO", "0x1.5492952a894e0p-48"), ("W4O12", "0x1.86792fd81e23ep-51")),
-        "metal": (("Fe", "0x1.52b175aaa4435p-41"), ("SiO", "0x1.5492952a894e0p-47"), ("Mg", "0x1.769f522e7eddap-49"), ("FeO", "0x1.a213c2947944ap-53"), ("SiO2", "0x1.dfb669c874fb6p-60")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Fe", _IRON_LOW_FLAGS), ("FeO", _IRON_LOW_FLAGS), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
-        "flux": "0x1.fbde39f6ea1ffp-1", "buffer": "0x1.0e9617dca9e3ap-54",
+        "total": "0x1.806976f32f73cp-21", "pO2": "0x1.198c8abf750a1p-55",
+        "residual": "0x1.cc4a5858196f6p-47", "iterations": 22,
+        "O": (("W2O6", "0x1.6f8369e6f2731p-42"), ("W3O9", "0x1.4acd05883a59fp-42"), ("W3O8", "0x1.9b9acff0f37a6p-45"), ("SiO", "0x1.4c1bfc6fe4d54p-48"), ("W4O12", "0x1.c4201126c5c3ap-51")),
+        "metal": (("Fe", "0x1.7362ca3f477c1p-41"), ("SiO", "0x1.4c1bfc6fe4d54p-47"), ("Mg", "0x1.81b7ad0c6f85ap-49"), ("FeO", "0x1.d0113db9f4368p-53"), ("SiO2", "0x1.d98aa147c3c9ep-60")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flux": "0x1.fc4c57904c896p-1", "buffer": "0x1.0e9617dca9e3ap-54",
     },
     ("feo_mgo_sio2_30_20_50", 1700.0, None): {
         "pressures": {
-            "Fe": "0x1.8aa0dd5632b47p-8", "FeO": "0x1.9e5d975ea14b2p-12",
-            "Mg": "0x1.19e008c7d3f58p-13", "MgO": "0x1.d01573a64b28ap-23",
-            "O": "0x1.6a1474dcb24ecp-11", "O2": "0x1.38d2cd5a4ebc3p-9",
-            "Si": "0x1.a72d2091b808bp-43", "Si2": "0x1.6ab401f2cbe15p-89",
-            "Si3": "0x1.15b03442b17c8p-129", "SiO": "0x1.3f4d4fac51d81p-10",
-            "SiO2": "0x1.3d8621230d247p-16",
+            "Fe": "0x1.badca78fc8739p-8", "FeO": "0x1.e64dffeec0490p-12",
+            "Mg": "0x1.1e7f04c3794dap-13", "MgO": "0x1.ed4a7e8f60e07p-23",
+            "O": "0x1.7aa8e63859a96p-11", "O2": "0x1.5620cbe824bf3p-9",
+            "Si": "0x1.7a39ba64f1504p-43", "Si2": "0x1.21bdc1f855fb9p-89",
+            "Si3": "0x1.8c87adf20a2bdp-130", "SiO": "0x1.2a73f3bc43d26p-10",
+            "SiO2": "0x1.3661979684638p-16",
         },
-        "total": "0x1.640b134936631p-7", "pO2": "0x1.9a062164eb413p-26",
-        "residual": "0x1.8429435597256p-46", "iterations": 16,
-        "O": (("O2", "0x1.21f0950a42d87p-27"), ("SiO", "0x1.f8448061ae368p-30"), ("O", "0x1.da99a74782e98p-30"), ("FeO", "0x1.004e45a6c37f8p-31"), ("SiO2", "0x1.ad89795d7606dp-35")),
-        "metal": (("Fe", "0x1.14dd1e1562203p-27"), ("SiO", "0x1.f8448061ae368p-29"), ("FeO", "0x1.004e45a6c37f8p-31"), ("Mg", "0x1.2bc37a265355ap-32"), ("SiO2", "0x1.ad89795d7606dp-35")),
+        "total": "0x1.84391dc5e0db2p-7", "pO2": "0x1.c06f24fcd4552p-26",
+        "residual": "0x1.accb8a2bdc850p-50", "iterations": 16,
+        "O": (("O2", "0x1.3d19ca56986a6p-27"), ("O", "0x1.f0551a765c21ap-30"), ("SiO", "0x1.d7574fbf080a2p-30"), ("FeO", "0x1.2ccdbcd9e77a6p-31"), ("SiO2", "0x1.a3dfe2028ae22p-35")),
+        "metal": (("Fe", "0x1.36b41762a4491p-27"), ("SiO", "0x1.d7574fbf080a2p-29"), ("FeO", "0x1.2ccdbcd9e77a6p-31"), ("Mg", "0x1.30ad895022f98p-32"), ("SiO2", "0x1.a3dfe2028ae22p-35")),
         "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
         "flux": None, "buffer": None,
     },
     ("feo_mgo_sio2_30_20_50", 1700.0, "W"): {
         "pressures": {
-            "Fe": "0x1.34f739e7d709ep-4", "FeO": "0x1.9e5d975ea14b2p-12",
-            "Mg": "0x1.b96044577e061p-10", "MgO": "0x1.d01573a64b28ap-23",
-            "O": "0x1.ce7802bd953b5p-15", "O2": "0x1.fe55bec420599p-17",
-            "Si": "0x1.0365afbd5453dp-35", "Si2": "0x1.109083dd6ba20p-74",
-            "Si3": "0x1.ffa860c3bf4c7p-108", "SiO": "0x1.f3fb2c3ca2b0fp-7",
-            "SiO2": "0x1.3d8621230d247p-16", "W2O6": "0x1.2a5fbe92451cfp-5",
-            "W3O8": "0x1.8aaa80f549292p-9", "W3O9": "0x1.30523130fd939p-8",
-            "W4O12": "0x1.77b622be710d1p-16", "WO": "0x1.27aa7d06f2463p-25",
-            "WO2": "0x1.42645d917962dp-17", "WO3": "0x1.efd5abec4dd29p-13",
+            "Fe": "0x1.648953e7bacbbp-4", "FeO": "0x1.e64dffeec0490p-12",
+            "Mg": "0x1.cd4d0d3b1dba5p-10", "MgO": "0x1.ed4a7e8f60e07p-23",
+            "O": "0x1.d6578113fcce1p-15", "O2": "0x1.07ede7626663ep-16",
+            "Si": "0x1.ea49ec70c5d9dp-36", "Si2": "0x1.e6de98b947f1ep-75",
+            "Si3": "0x1.afddcef0e3723p-108", "SiO": "0x1.e08d9adfebcf0p-7",
+            "SiO2": "0x1.3661979684638p-16", "W2O6": "0x1.4a2d872d23589p-5",
+            "W3O8": "0x1.c3bae69ba5728p-9", "W3O9": "0x1.624089b4217e7p-8",
+            "W4O12": "0x1.cc131f43b3ef0p-16", "WO": "0x1.2cb30918dfa29p-25",
+            "WO2": "0x1.4d76546047cc2p-17", "WO3": "0x1.04cbb0333149dp-12",
         },
-        "total": "0x1.18fe1594be388p-3", "pO2": "0x1.4e73fedd1a5cap-33",
-        "residual": "0x1.adf36d5df9408p-49", "iterations": 21,
-        "O": (("W2O6", "0x1.b3e38ca7a9dd0p-24"), ("SiO", "0x1.8ace2c72c1ccfp-26"), ("W3O9", "0x1.103f20418afd8p-26"), ("W3O8", "0x1.3d833fd2b7b2dp-27"), ("FeO", "0x1.004e45a6c37f8p-31")),
-        "metal": (("Fe", "0x1.b1876739ddc4ep-24"), ("SiO", "0x1.8ace2c72c1ccfp-25"), ("Mg", "0x1.d563049099255p-29"), ("FeO", "0x1.004e45a6c37f8p-31"), ("SiO2", "0x1.ad89795d7606dp-35")),
+        "total": "0x1.3a4d0e3679a72p-3", "pO2": "0x1.59effb42cc2a2p-33",
+        "residual": "0x1.4f98b9ef123eap-48", "iterations": 21,
+        "O": (("W2O6", "0x1.e259b9a654f36p-24"), ("SiO", "0x1.7b76d7ce4b86cp-26"), ("W3O9", "0x1.3cea40c187443p-26"), ("W3O8", "0x1.6b6bd919820fap-27"), ("FeO", "0x1.2ccdbcd9e77a6p-31")),
+        "metal": (("Fe", "0x1.f4474029ba693p-24"), ("SiO", "0x1.7b76d7ce4b86cp-25"), ("Mg", "0x1.ea93829a0ae1dp-29"), ("FeO", "0x1.2ccdbcd9e77a6p-31"), ("SiO2", "0x1.a3dfe2028ae22p-35")),
         "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
-        "flux": "0x1.af9765346ab04p-1", "buffer": "0x1.673a0a0b49045p-30",
+        "flux": "0x1.b8edd4f9643b1p-1", "buffer": "0x1.673a0a0b49045p-30",
     },
 }
 
 _PROVENANCE_CLASSES = {
     "Al": "janaf_fitted", "Al2": "janaf_fitted", "Al2O": "janaf_fitted",
     "Al2O2": "janaf_fitted", "AlO": "janaf_fitted", "AlO2": "janaf_fitted",
-    "Ca": "janaf_fitted", "CaO": "janaf_fitted", "Fe": "janaf_transcribed",
-    "FeO": "janaf_transcribed", "K": "estimated_systematic",
+    "Ca": "janaf_fitted", "CaO": "janaf_fitted", "Fe": "janaf_fitted",
+    "FeO": "janaf_fitted", "K": "estimated_systematic",
     "K2": "estimated_systematic", "K2O": "estimated_systematic",
     "KO": "estimated_systematic", "Mg": "janaf_fitted",
     "MgO": "janaf_fitted", "Na": "janaf_fitted", "Na2": "janaf_fitted",
@@ -185,7 +194,7 @@ _DOMAIN_FLAGS = {
         "AlO2": _COMMON_LOW_FLAGS,
         "Ca": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
         "CaO": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
-        "Fe": _IRON_LOW_FLAGS, "FeO": _IRON_LOW_FLAGS,
+        "Fe": None, "FeO": None,
         "K": _POTASSIUM_OXIDE_LOW_FLAGS, "K2": _POTASSIUM_OXIDE_LOW_FLAGS,
         "K2O": _POTASSIUM_OXIDE_LOW_FLAGS, "KO": _POTASSIUM_OXIDE_LOW_FLAGS,
         "Mg": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
@@ -266,8 +275,10 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
             "condensate_table_digest": package_identity.condensate_table_digest,
             "gas_table_digest": package_identity.gas_table_digest,
         },
-        "pack": "1.0.3-d066-v1",
-        "pack_digest": "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75",
+        # d-071 ccabd0b reuses pack version 1.0.4-d066-v2. The d066-v1 digest
+        # was 02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75.
+        "pack": "1.0.4-d066-v2",
+        "pack_digest": "ac88aa2272c50d1cbf300634737c5d0071bddee0cd0f0483a6530c4a4992c393",
         "package_version": "0.1.0.dev0",
     }
 

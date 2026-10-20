@@ -352,10 +352,15 @@ def _history_request(composition, temperature_K, hour, previous=None):
 def test_successful_openimcc_physics_is_bit_identical() -> None:
     result = _provider().dispatch(_history_request(BASE_MELT_MOL, 2400.65, 61))
     # Re-measured after merging green a822c275f: d-173 moves the engine pin
-    # from e975edd to e1423d8. JSON round-trips preserve float bits.
+    # from e975edd to e1423d8. d-071 moves it again. The hash was
+    # 0dbdc3673e0d640898dad7b848278f93322c0b48898050618b21811bd63c7e78
+    # through openimcc 1942696. 249fde5 (MgAl2O4 fusion) and 100df4f
+    # (FeO(l) re-anchor) change the pressures. ccabd0b keeps those
+    # pressures and changes the hash because the pack version, digest
+    # and engine binding are inside it. JSON round-trips preserve float bits.
     assert hashlib.sha256(
         json.dumps(_physics(result), sort_keys=True).encode()
-    ).hexdigest() == "0dbdc3673e0d640898dad7b848278f93322c0b48898050618b21811bd63c7e78"
+    ).hexdigest() == "e12fc971020c2d350193a6bbf5e57990e7a51b85f8a19c78bb41ee5e5b7c1901"
 
 
 @pytest.mark.parametrize("gap_K, hour_gap", [
@@ -519,11 +524,14 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
     single-cation basis. One step must land within 1% for each parent
     the cap allows. The zero-order hold of the call-61 coefficient misses
     that bound. Na2O's cap is zero, so its gamma stays at the certificate.
-    Call 63 is inside the SiO2 cap (SiO2 error about -2.0%). Call 64 is
-    just past that cap, so gamma freezes at the call-63 value instead of
-    falling through to the table. The in-cap slope, read at s=3, is the
-    measured SiO2 growth of -3.7%. Call 66 is the cap plus two thermal
-    steps; the frozen error stays below the table's error.
+    Call 63 is inside the SiO2 cap. On d066-v1 the SiO2 error was about
+    -2.0% (-0.01951927876547091). d-071 openimcc 249fde5 moves it to
+    about -1.83%, and 100df4f / ccabd0b hold -0.018338553406669098.
+    Call 64 is just past that cap, so gamma freezes at the call-63 value
+    instead of falling through to the table. The in-cap slope, read at
+    s=3, is the measured SiO2 growth against the logged solve. Call 66
+    is the cap plus two thermal steps; the frozen error stays below the
+    table's error.
     """
 
     provider = _provider()
@@ -627,11 +635,21 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
         assert notice["progress_s"] == pytest.approx(call_index - 61)
         solved = _solved_effective_gamma(call_index, "SiO2")
         if call_index == 63:
-            assert (live_gamma[63] - solved) / solved == pytest.approx(-0.020, abs=0.0015)
+            # d-071. The d066-v1 ratio -0.01951927876547091 is outside this
+            # band. The move is the MgAl2O4 fusion correction (249fde5);
+            # the FeO re-anchor shifts the seventh digit.
+            assert (live_gamma[63] - solved) / solved == pytest.approx(
+                -0.018338553406669098, abs=0.0005
+            )
     # Past the cap, gamma is the last in-cap extrapolation, not a new step.
     assert live_gamma[64] == live_gamma[63]
     # The slope published while still inside the cap, read at s=3, is the
-    # measured SiO2 growth of -3.7% against the logged solve.
+    # measured SiO2 growth against the logged solve. It was
+    # -0.03667452370456019 (−3.67%) through openimcc 1942696, inside the
+    # old −3.7% ± 0.15 percentage-point band. d-071 249fde5 (MgAl2O4
+    # fusion) moves the live certificate slope to −3.40%. 100df4f shifts
+    # the eighth digit and ccabd0b holds −0.03402765742046241. The logged
+    # call-64 gamma does not move, so the ratio tracks the live slope.
     in_cap = next(n for n in authority["notices"] if n.get("parent") == "SiO2")
     s_three = (
         (_LUNAR_SOLVED_T_K[64] - in_cap["temperature_K"])
@@ -640,7 +658,9 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
     assert s_three == pytest.approx(3.0)
     predicted = math.exp(in_cap["ln_gamma_last"] + in_cap["ln_gamma_slope"] * s_three)
     solved_64 = _solved_effective_gamma(64, "SiO2")
-    assert (predicted - solved_64) / solved_64 == pytest.approx(-0.037, abs=0.0015)
+    assert (predicted - solved_64) / solved_64 == pytest.approx(
+        -0.03402765742046241, abs=0.0005
+    )
 
     # Call 66 is five thermal steps from call 61: the SiO2 cap plus two.
     beyond = _refuse_lunar_call(provider, monkeypatch, 66, chained)
@@ -787,8 +807,14 @@ def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> N
         "SiO2", refused_65["composition"],
         temperature_K=refused_65["T_K"], authority=authority_65,
     )
+    # d-071. The reference line is the historical c2b7b4e probe gammas.
+    # Live probe gammas move at openimcc 249fde5, so the ratio leaves 0
+    # (it was 1.7673900327583708e-15 through 1942696) and becomes
+    # 0.011330388717366009. 100df4f / ccabd0b hold this value. The old
+    # ±0.01 band contained both 0 and the new ratio; this band does not
+    # contain 0.
     assert (activity_65.effective_gamma - reference) / reference == pytest.approx(
-        0.0, abs=0.01,
+        0.011330355283529284, abs=0.0005,
     )
     assert activity_65.activity != melt_oxide_activity(
         "SiO2", refused_65["composition"],
@@ -953,7 +979,9 @@ def test_above_cap_openimcc_route_feeds_flux_with_provenance() -> None:
 
     assert high_t["provider"] == "openimcc"
     assert high_t["temperature_domain_status"] == "in_domain"
-    assert high_t["openimcc_pack_version"] == "1.0.3-d066-v1"
+    # d-071 default. ccabd0b reuses the version string that 249fde5
+    # introduced; 100df4f briefly called the same physics 1.0.5-d066-v3.
+    assert high_t["openimcc_pack_version"] == "1.0.4-d066-v2"
     assert high_t["openimcc_pack_digest"]
     assert set(high_t["activities_by_oxide"]) == {
         "Na2O",
@@ -1105,8 +1133,14 @@ def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
     assert high_t["activities_by_oxide"]["K2O"] == constant_gamma.activity
     assert high_t["openimcc_activities_by_oxide"]["K2O"] != constant_gamma.activity
     assert high_t["seam"]["K2O"]["ratio_dex_selected_over_below_cap"] == 0.0
+    # d-071 on BASE_MELT_MOL, not the Zhang composition. The dex was
+    # -0.24814525336393226 through 1942696, -0.2523860056747584 at
+    # 249fde5, and -0.2320801850936827 from 100df4f onward (6.5% less
+    # negative than the d066-v1 pin). Constant-gamma K is fixed, so the
+    # step tracks the openimcc K2O activity. The FeO re-anchor is the
+    # step that reaches this value; ccabd0b does not move it.
     assert high_t["seam"]["K2O"]["would_be_openimcc_step_dex"] == pytest.approx(
-        -0.24814525336393226
+        -0.2320801850936827
     )
     assert high_t["authority_exclusions"]["K2O"]["tracking_id"] == "t-999"
     reason = high_t["authority_exclusions"]["K2O"]["reason"]
@@ -1194,8 +1228,13 @@ def test_ae95_depleted_melt_continuation_root_is_selected_by_provider() -> None:
     assert high_t["provider"] == "openimcc"
     assert high_t["fallback"] is False
     assert "fallback_reason" not in high_t
+    # d-071 parent SiO2 activity on the captured ae95 melt. It was
+    # 3.4859611072197934e-9 through 1942696. 249fde5 (MgAl2O4 fusion)
+    # moves it to 3.553418291524387e-9 (+1.93%). 100df4f then moves it
+    # by a further -0.008% to this value, and ccabd0b holds it. Under
+    # 10%, and still the MgAl2O4 correction.
     assert high_t["activities_by_oxide"]["SiO2"] == pytest.approx(
-        3.4859611072197934e-9,
+        3.5531167084043982e-9,
         rel=1e-9,
         abs=0.0,
     )

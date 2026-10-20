@@ -994,14 +994,26 @@ def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
         "Na2O": 2.27,
         "K2O": 2.49,
     }
+    # d-071. Single-cation gamma = a/x on the Zhang N-MORB wt% basis.
+    # KO0.5 at 1473.15 K: 1.6697561241999281e-6 -> 2.137531039892675e-6
+    # (+28.0%). NaO0.5 at the same point: 0.00013466805822228952 ->
+    # 0.0001676673829753759 (+24.5%). At 1673.15 K, KO0.5
+    # 9.441799509227296e-6 -> 1.122088678316465e-5 (+18.8%) and NaO0.5
+    # 0.0004922752489405557 -> 0.0005741281312713278 (+16.6%). Unchanged
+    # through openimcc 1942696. 249fde5 (Shornikov 2017 MgAl2O4 fusion)
+    # is the first step; 100df4f (FeO(l) Darken-Gurry/Masson re-anchor)
+    # is the second. ccabd0b rewrites the version string and does not
+    # move the activities. Both corrections stabilise competing
+    # associates, so free alkali oxide rises. The rel 1e-2 band is the
+    # anchor tolerance, not the size of the move.
     expected = {
         1473.15: {
-            "KO0.5": 1.6697561241999281e-6,
-            "NaO0.5": 0.00013466805822228952,
+            "KO0.5": 2.137531039892675e-6,
+            "NaO0.5": 0.0001676673829753759,
         },
         1673.15: {
-            "KO0.5": 9.441799509227296e-6,
-            "NaO0.5": 0.0004922752489405557,
+            "KO0.5": 1.122088678316465e-5,
+            "NaO0.5": 0.0005741281312713278,
         },
     }
     for temperature_K, anchors in expected.items():

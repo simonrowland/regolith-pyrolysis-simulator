@@ -531,8 +531,10 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert handle.available, handle.unavailable_reason
     backend = handle.backend
     assert backend is not None
+    # d-071 default melt digest at openimcc ccabd0b. The d066-v1 digest
+    # was 02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75.
     assert handle.identity["pack_digest"] == (
-        "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+        "ac88aa2272c50d1cbf300634737c5d0071bddee0cd0f0483a6530c4a4992c393"
     )
     assert handle.identity["model_id"] == backend.model_id
     cell = equilibrate_cell(
@@ -1560,7 +1562,7 @@ assert {
     if candidate.engine is not None
 } == {(True, "independent")}
 assert any(
-    "openimcc-pack-digest:02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+    "openimcc-pack-digest:ac88aa2272c50d1cbf300634737c5d0071bddee0cd0f0483a6530c4a4992c393"
     in candidate.engine.coefficient_sources
     for _, candidate in engine_rows
     if candidate.engine is not None

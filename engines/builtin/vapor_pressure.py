@@ -590,10 +590,20 @@ _PROJECTED_COMPOSITION_WARNING_TIERS = (
 # The Zhang anchor passes composition_kg in oxide wt% (the eight supported
 # oxides from the bridge test); the bridge converts that mass basis to moles.
 # Activity and mole fraction are both dimensionless, so their ratio Gamma is
-# dimensionless too. This reproduces the wording-file sanity values: D066 is
-# 1.67e-6 / 9.44e-6 and published-core is 3.5e-9 / 2.4e-8 at 1473 / 1673 K.
-# The content digest keys each evaluation so packs sharing a model id cannot
-# reuse one another's numbers.
+# dimensionless too. This reproduces the wording-file sanity values.
+# published-core is 3.5e-9 / 2.4e-8 at 1473 / 1673 K. The d-071 default
+# (openimcc ccabd0b, digest ac88aa22…) prints 2.14e-6 / 1.12e-5. On the
+# Zhang N-MORB wt% basis the 1473 K single-cation gamma was
+# 1.6697561241999281e-6 under d066-v1 and is 2.137531039892675e-6 now
+# (+28.0%). The move splits at the Gale-type N-MORB proxy, 1673 K, as
+# parent a(K2O): openimcc 249fde5 (MgAl2O4 fusion from Shornikov 2017)
+# multiplies it by 1.106, and 100df4f (FeO(l) Darken-Gurry/Masson
+# re-anchor) multiplies that by 1.171. 1942696 and ccabd0b are 1.000
+# against their parents, so the total factor is 1.295. Both corrections
+# stabilise competing associates and draw Al2O3 and SiO2 away from the
+# K associates, so free K2O rises. The content digest keys each
+# evaluation so packs sharing a model id cannot reuse one another's
+# numbers.
 _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
     "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c": {
         "pack_alias": "published-core",
@@ -608,13 +618,13 @@ _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
             1673.15: True,
         },
     },
-    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75": {
+    "ac88aa2272c50d1cbf300634737c5d0071bddee0cd0f0483a6530c4a4992c393": {
         "pack_alias": "default",
         "model_id": "IMCC-SF04-D066",
-        "pack_version": "1.0.3-d066-v1",
+        "pack_version": "1.0.4-d066-v2",
         "gamma_ko0_5_by_temperature_K": {
-            1473.15: "1.67e-6",
-            1673.15: "9.44e-6",
+            1473.15: "2.14e-6",
+            1673.15: "1.12e-5",
         },
         "kcaal_si2o7_active_by_temperature_K": {
             1473.15: False,

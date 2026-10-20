@@ -373,14 +373,21 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
 
     # openimcc 4fe8eaf refit the CaO(l) continuation used by this Hashimoto
     # probe; at 30c51c8 the alpha=1 and 0.25 results are 0.8286161505495706 Pa
-    # and 0.3003449996328013 Pa, respectively.
+    # and 0.3003449996328013 Pa. Those Pa values were still the d066-v1 pin
+    # (pO2 0x1.160995d98f6e4p-17, 0.8286161505495706 Pa at alpha=1). d-071
+    # openimcc 249fde5 moves alpha=1 by +0.26% (0.8307320141688443 Pa).
+    # 100df4f re-anchors FeO(l), and the vacuum oxygen balance follows that
+    # standard state: alpha=1 becomes 0.9216674327271643 Pa (+11.2% versus
+    # the d066-v1 pin) and alpha=0.25 becomes 0.33536809943014373 Pa
+    # (+11.7%). ccabd0b does not move either root. 8cd96dd's oxide-parent
+    # count was already inside the d066-v1 pin.
     # The two engines still use their own melt channel pressures for both arms.
-    assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.160995d98f6e4p-17"
+    assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.3542a12f3caa5p-17"
     assert (
         solved["openimcc"][1.0].pO2_bar * PA_PER_BAR
-    ).hex() == "0x1.a8406047187bap-1"
+    ).hex() == "0x1.d7e4cb32b3f16p-1"
     assert solved["openimcc"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.3003449996328013, rel=2.0e-5
+        0.33536809943014373, rel=2.0e-5
     )
     assert solved["internal-analytical"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
         1.025329, rel=2.0e-5
