@@ -215,8 +215,7 @@ def validate_fo2_grid(fo2_log10_bar: Sequence[float]) -> tuple[float, ...]:
             ))
         except (ValueError, OverflowError) as exc:
             raise EngineCrosscheckError(
-                "fO2 grid falls below the live rail transport floor (1e-9 bar); "
-                "no floor substitution is permitted"
+                f"invalid observation oxygen in fO2 grid: {exc}"
             ) from exc
     if len(set(values)) != len(values):
         raise EngineCrosscheckError("fO2 grid must not contain duplicates")
@@ -264,6 +263,7 @@ def _rail_request(
     oxygen_bar = 10.0**fo2_log10_bar
     control_inputs: dict[str, Any] = {
         "pO2_bar": oxygen_bar,
+        "pO2_admission": "observation",
         "intrinsic_fO2_log": fo2_log10_bar,
     }
     if process_phase is not None:
@@ -806,8 +806,8 @@ def build_crosscheck_report(
             "p_floor_Pa": p_floor_Pa,
             "vaporock_external_gate": [VAPOROCK_T_MIN_K, VAPOROCK_T_MAX_K],
             "fo2_grid_note": (
-                "Fixed admitted grid used on both sources; IW-1 can fall below the "
-                "live rail 1e-9 bar floor at low T and is not silently clamped."
+                "Observation oxygen is admitted unchanged on both sources when "
+                "finite and positive, without a simulated-headspace floor."
             ),
         },
         "composition": {

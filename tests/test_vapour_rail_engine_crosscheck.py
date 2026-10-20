@@ -137,10 +137,15 @@ def test_domain_grid_refuses_before_any_engine_call():
     assert vaporock.calls == []
 
 
-def test_fo2_grid_refuses_floor_substitution():
-    with pytest.raises(EngineCrosscheckError, match="floor"):
-        validate_fo2_grid([-10.0, -9.0])
+def test_fo2_grid_admits_observations_without_floor_substitution():
+    assert validate_fo2_grid([-10.0, -9.0]) == (-10.0, -9.0)
     assert validate_fo2_grid([-7.0, -9.0, -8.0]) == (-9.0, -8.0, -7.0)
+
+
+@pytest.mark.parametrize('invalid', [float('nan'), float('inf'), -400., 400.])
+def test_fo2_grid_refuses_invalid_observation_oxygen(invalid):
+    with pytest.raises(EngineCrosscheckError):
+        validate_fo2_grid([invalid, -9.0])
 
 
 def test_fo2_grid_admitted_numeric_pin():
@@ -150,6 +155,22 @@ def test_fo2_grid_admitted_numeric_pin():
     assert tuple(value.hex() for value in grid) == (
         '-0x1.2000000000000p+3', '-0x1.9ba2953c667e0p+2',
     )
+
+
+def test_rail_observation_oxygen_reaches_transport_unchanged():
+    import math
+    from simulator.vapour_rail.engine_crosscheck import _rail_request, load_rail_provider
+
+    oxygen = 1.3e-12
+    grid = validate_fo2_grid([math.log10(oxygen), -9.0])
+    provider, _ = load_rail_provider()
+    request = _rail_request(composition_mol={'MgO': 100.0}, temperature_K=1873.15,
+                            fo2_log10_bar=grid[0], pressure_bar=1.0)
+    result = provider.dispatch(request)
+    assert result.status == 'ok'
+    assert request.control_inputs['pO2_bar'] == result.diagnostic['pO2_bar']
+    # The grid is log10(bar), so only its logarithm round-trip can change bits.
+    assert math.log10(result.diagnostic['pO2_bar']) == grid[0]
 
 
 def test_runner_hard_requires_vr5_warm_pool():

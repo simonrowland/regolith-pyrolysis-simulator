@@ -87,6 +87,31 @@ BASELINES_PATH = (
 REGEN_ENV = "RPS_T512_REGEN_ROLLUP"
 
 
+def test_melt_observation_oxygen_admission_and_exact_cache(vapor_pressure_data, monkeypatch):
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+    receipts = []
+    dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def capture(provider, request):
+        result = dispatch(provider, request)
+        receipts.append((request.control_inputs['pO2_bar'], result.diagnostic['pO2_bar']))
+        return result
+
+    monkeypatch.setattr(BuiltinVaporPressureProvider, 'dispatch', capture)
+    monkeypatch.setattr(extract_reproduction, '_MELT_PSAT_CACHE', {})
+    oxygen = (1.3e-12, 1.0001e-9, 1.0004e-9)
+    results = [extract_reproduction._engine_melt_psat_pa('Mg', 1873.15, p, vapor_pressure_data)
+               for p in oxygen]
+    assert all(reason is None for _, reason, _ in results)
+    assert receipts == [(p, p) for p in oxygen]
+    assert [runtime['pO2_bar'] for _, _, runtime in results] == list(oxygen)
+    assert results[1][0] != results[2][0]
+    cached = extract_reproduction._engine_melt_psat_pa('Mg', 1873.15, oxygen[2], vapor_pressure_data)
+    assert cached == results[2]
+    assert len(receipts) == 3
+
+
 def _record_pin_key(record) -> tuple[str, str]:
     return (str(record.case_id), str(record.observable_id))
 

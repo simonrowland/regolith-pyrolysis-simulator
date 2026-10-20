@@ -1625,7 +1625,7 @@ def _engine_melt_psat_pa(
     )
     cache_key = (
         round(float(T_K), 6),
-        round(float(pO2_bar), 12),
+        float(pO2_bar),
         tuple(sorted((str(k), round(float(v), 12)) for k, v in account.items())),
     )
     cached_surface = _MELT_PSAT_CACHE.get(cache_key)
@@ -1638,9 +1638,11 @@ def _engine_melt_psat_pa(
                 species_formula_registry={},
             ),
             temperature_C=float(T_K) - 273.15,
-            pressure_bar=max(float(pO2_bar), 1.0e-30),
-            fO2_log=math.log10(max(float(pO2_bar), 1.0e-30)),
-            control_inputs={"pO2_bar": float(pO2_bar)},
+            pressure_bar=float(pO2_bar),
+            fO2_log=math.log10(float(pO2_bar)),
+            control_inputs={
+                "pO2_bar": float(pO2_bar), "pO2_admission": "observation",
+            },
         )
         try:
             result = provider.dispatch(request)
