@@ -219,6 +219,27 @@ def test_refused_oxygen_partition_renders_unavailable_without_numeric_cast():
     assert 'Source-side O₂ potential subtotal (emitted; not recovered/captured): unavailable kg' in report
 
 
+def test_refused_rump_totals_render_unavailable_without_numeric_cast():
+    classification = _empty_classification()
+    classification['refractory_ceramic_rump'].update({
+        'rump_total_kg': None,
+        'rump_refractory_oxides_kg': None,
+        'rump_silicate_residual_kg': None,
+        'rump_unextracted_metals_kg': None,
+        'class_total_kg': None,
+        'flag': {
+            'status': 'unavailable',
+            'authority': 'unavailable',
+            'reason': 'Si: EvaporationFluxConfigurationError',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert 'Residual inventory total (not a product total): unavailable kg' in report
+    assert 'Refractory oxides floor (by physics): unavailable kg' in report
+
+
 def test_rump_class_shows_per_species_breakdown():
     classification = _empty_classification()
     classification['refractory_ceramic_rump'] = {
