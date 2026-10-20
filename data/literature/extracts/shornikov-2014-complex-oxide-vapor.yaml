@@ -1,0 +1,99 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2014-complex-oxide-vapor
+source:
+  citation: Shornikov, S. I., and Yakovlev, O. I. (2014). A Study of Complex Gaseous
+    Oxides over the CaO–MgO–Al2O3–TiO2–SiO2 Melts. 45th Lunar and Planetary Science
+    Conference, abstract 1624.
+  year: 2014
+  corpus_asset: raw/shornikov-2014-complex-oxide-vapor/shornikov-2014-complex-oxide-vapor.pdf
+  corpus_sha256: be60bd75c6223243d72831c61ec50decb339ebc2ea1bd7c0922ded2a18900126
+  duplicate_of: shornikov-2015-complex-oxide-vapor
+extraction:
+  method: Conference abstract of the 2015 Geochemistry International paper. The 120 dpi
+    page renders were used only to see whether the three figures have markers. No
+    coordinate was read. The journal extract already holds the 1% bound, the 1500–2500 K
+    span, and Table 2.
+  date: '2026-10-20'
+  worker: t1372-w2-w9-t1
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables: []
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: sh14_duplicate_of_2015
+      type: conference_abstract_of_journal
+      locator:
+        page: 1
+        pdf_page_index: 0
+        note: Header prints 45th Lunar and Planetary Science Conference (2014) 1624.pdf.
+          Both pages were read from pdftotext and from the 120 dpi renders.
+      units: as printed
+      standard_state: Equation (8) writes p(AlSiO) as proportional to a(Al2O3) to the
+        power 1/2 times a(SiO2), divided by p(O) to the power 5/2. The abstract does
+        not state whether either activity is referred to a solid oxide, a liquid oxide,
+        or a polymorph.
+      values:
+        duplicate_of: shornikov-2015-complex-oxide-vapor
+        evidence: Same authors, same Vernadsky affiliation, same system, and the same
+          1% Knudsen-cell bound at 1500–2500 K for (CaAlO), (CaSiO3), (MgAlO), (AlSiO),
+          and (CaTiO3). The journal paper (Geochemistry International 53(8), 690–699,
+          received 20 March 2014) is the full article.
+        repeated_in_the_journal: the 1% bound and the 1500–2500 K span
+        labels_the_journal_does_not_print:
+        - Fig. 1 is calculated at 2200 K. The journal Fig. 1 labels the Al2O3–SiO2
+          panel at 2300 K and the CaO–SiO2 panel at 2100 K.
+        - Fig. 3 is calculated at 2200 K. The journal Fig. 2 labels the mullite panel
+          at 2000 K.
+        - Fig. 2 cites Shornikov 2003, Herald of the Earth Sciences Department of RAS,
+          21, No. 1. The journal spinel temperature panel cites Shornikov 2001.
+        expected_migration_phase: unknown
+    - observation_id: sh14_fig1_calculated_2200
+      type: figure_series_refusal
+      locator:
+        page: 1
+        pdf_page_index: 0
+        figure: '1'
+        note: 120 dpi render. Five continuous curves versus SiO2 mole percent. Line 1
+          ends in a filled square and line 4 ends in a filled circle at the right
+          border. Those two marks were not calibrated. The ordinate is log p(i), atm.
+      units: as printed
+      values:
+        temperature_K: 2200
+        attribution: calculated from experimental data [2, 3], Shornikov et al. 1994
+          and Shornikov and Archakov 2000
+        symbols_as_printed: 1 (SiO), 2 (Al), 3 (O2), 4 (AlSiO), 5 total vapor pressure
+        decision: refused
+        reason: Calculated curves from the cited experiments. The endpoint marks were
+          not read.
+    - observation_id: sh14_fig2_spinel_cited
+      type: figure_series_refusal
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '2'
+        note: 120 dpi render. Four lines of filled circles versus 1/T. The labelled
+          temperatures run from 2100 K down through 1900 K. No tick calibration was made.
+      units: as printed
+      values:
+        symbols_as_printed: 1 (Mg), 2 (O), 3 (AlO), 4 (MgAlO)
+        attribution: Knudsen effusion mass spectrometry [4], Shornikov 2003
+        decision: refused
+        reason: The caption assigns the points to Shornikov 2003. They were not read.
+    - observation_id: sh14_fig3_mullite_2200
+      type: figure_series_refusal
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '3'
+        note: 120 dpi render. Five continuous curves versus log p(O2). No data markers.
+      units: as printed
+      values:
+        temperature_K: 2200
+        compound_as_printed: mullite Al6Si2O13
+        attribution: calculated from experimental data [2, 3]
+        symbols_as_printed: 1 (SiO), 2 (Al), 3 (O), 4 (AlSiO), 5 total vapor pressure
+        decision: refused
+        reason: Calculated curves. No marker to read.
