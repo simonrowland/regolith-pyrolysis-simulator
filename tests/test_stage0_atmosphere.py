@@ -1,6 +1,7 @@
 from copy import deepcopy
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.core import Atmosphere, CampaignPhase, PyrolysisSimulator
@@ -18,7 +19,7 @@ C0_ENDPOINT_SETPOINTS = {
 }
 
 
-def _sim(feedstocks):
+def _sim(feedstocks, *, finite_headspace=False):
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     # Stepping crosses the strict VR-11 vapour boundary even though these tests
@@ -29,7 +30,10 @@ def _sim(feedstocks):
     )
     return PyrolysisSimulator(
         backend,
-        {"campaigns": {"C0": deepcopy(C0_ENDPOINT_SETPOINTS)}},
+        {
+            "campaigns": {"C0": deepcopy(C0_ENDPOINT_SETPOINTS)},
+            "overhead_headspace": {"enabled": finite_headspace, "volume_m3": 1.0},
+        },
         feedstocks,
         vapor_pressures,
     )
@@ -48,7 +52,8 @@ def test_stage0_lunar_feedstock_uses_hard_vacuum():
     assert sim.melt.pO2_mbar == 0.0
 
 
-def test_stage0_mars_feedstock_uses_surface_co2_backpressure():
+@pytest.mark.parametrize("finite_headspace", [False, True])
+def test_stage0_mars_feedstock_uses_surface_co2_backpressure(finite_headspace):
     sim = _sim(
         {
             "mars": {
@@ -57,7 +62,8 @@ def test_stage0_mars_feedstock_uses_surface_co2_backpressure():
                 "surface_pressure_mbar": 6,
                 "atmosphere": "96% CO2",
             }
-        }
+        },
+        finite_headspace=finite_headspace,
     )
 
     sim.load_batch("mars")
@@ -69,6 +75,8 @@ def test_stage0_mars_feedstock_uses_surface_co2_backpressure():
     assert sim.melt.pO2_mbar == 0.0
     assert snapshot.overhead.pressure_mbar == 6.0
     assert snapshot.overhead.composition["CO2"] == 5.76
+    # Pin both overhead implementations before consolidating the cover-gas rule.
+    assert snapshot.overhead.composition["CO2"].hex() == (5.76).hex()
 
 
 def test_all_builtin_mars_feedstocks_define_co2_environment():
