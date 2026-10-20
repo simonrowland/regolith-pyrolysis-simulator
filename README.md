@@ -201,6 +201,8 @@ The 2026-09-26 figures previously shown here came from a run with a redox-runawa
 
 Run on green commit `a4608882dcdad6ab67ca0381284d4c65055c1160` with the built-in analytical backend:
 
+Per-element destination atom fractions:
+
 | element | condensed | retained in melt | vented | other (O₂, wall, overhead) |
 |---|---:|---:|---:|---:|
 | Al | 0.000 | 1.000 | 0.000 | 0.000 |
@@ -216,13 +218,13 @@ Run on green commit `a4608882dcdad6ab67ca0381284d4c65055c1160` with the built-in
 
 | result | value |
 |---|---:|
-| Melt rump | 0.349 kg |
-| Condensed | 0.342 kg |
-| O₂, source-side and not recovered | 0.165 kg |
-| Vented | 0.144 kg |
-| Wall | 0.000200 kg |
-| Cleanup-sequestered | 0.000700 kg |
-| Tapped | 0.000200 kg |
+| Melt rump | 0.3485 kg |
+| Condensed | 0.3416 kg |
+| O₂, source-side and not recovered | 0.1645 kg |
+| Vented | 0.1442 kg |
+| Wall | 0.0002 kg |
+| Cleanup-sequestered | 0.0007 kg |
+| Tapped | 0.0002 kg |
 | Furnace endpoint | 2200 °C at hour 213; held through hour 225 |
 | Mass-closure residual | below 1e-14 (max element residual ~1e-15; limit 5e-14) |
 
@@ -236,9 +238,9 @@ Run on green commit `a4608882dcdad6ab67ca0381284d4c65055c1160` with the built-in
 
 ### What this run does NOT yet show
 
-This run does not show Fe capture, Mg-crown extraction, alkali capture, or O₂ recovery; see the open
-issues above. The refractory rump remains. `redox_buffer_retained` is 0 for every element, including
-oxygen.
+This run does not show Fe capture, Mg-crown extraction, full alkali capture (about 37% is vented), or
+O₂ recovery; see the open issues above. The refractory rump remains. `redox_buffer_retained` is 0 for
+every element, including oxygen.
 
 Report fields: `status` is `ok`, `reason` is `''`, `error_message` is `''`, and
 `run_metadata.backend` is `internal-analytical`. The `vapor_pressure_source_report` has 32 species
