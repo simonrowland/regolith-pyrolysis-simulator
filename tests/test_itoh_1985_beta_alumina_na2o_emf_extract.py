@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Phase, Quantity, ReferenceStateConvention, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -74,6 +74,11 @@ def test_every_typed_activity_migrates_as_the_printed_na2o_point() -> None:
     document = _document()
     activities = document["species"]["Na2O"]["observations"]
     assert len(activities) == 9
+    assert all(item["standard_state"]["inferred"] is True for item in activities)
+    assert all(
+        item["standard_state"]["state"]["value"]["endmember"]["phase"]["value"] == "cr"
+        for item in activities
+    )
     assert all(item["values"]["quantity"] == "activity" for item in activities)
     assert all(item["phase"] == "cr" for item in activities)
     assert all(item["values"]["phase_as_printed"].startswith("solid assemblage") for item in activities)
@@ -94,9 +99,16 @@ def test_every_typed_activity_migrates_as_the_printed_na2o_point() -> None:
         assert observation.identity.species.formula == "Na2O"
         assert observation.identity.quantity.value is Quantity.ACTIVITY
         assert observation.value.kind is ValueKind.POINT
+        assert observation.notices == ()
         assert observation.identity.temperature_K.value == Decimal("1000")
         assert observation.identity.composition.is_unknown
-        assert observation.identity.reference_state.is_unknown
+        assert not observation.identity.reference_state.is_unknown
+        reference = observation.identity.reference_state.value
+        assert reference.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference.endmember.formula == "Na2O"
+        assert reference.endmember.phase.value is Phase.CR
+        assert reference.endmember.polymorph.value.value == "alpha"
+        assert reference.component_basis == "Na2O"
         assert observation.identity.fO2_Pa.is_unknown
         assert observation.identity.total_pressure_Pa.is_unknown
     actual_by_id = {item.observation_id.split("::", 1)[1]: item.value.point for item in migrated}
@@ -136,3 +148,15 @@ def test_table2_calculated_pressure_rows_are_retained_in_context() -> None:
     assert rows[-1]["T_K"] == 1200
     assert rows[-1]["alpha_beta"]["CO2"] == "6.64e3"
     assert rows[-1]["beta_beta_prime"]["SO3"] == "9.59e-9"
+
+
+def test_printed_equations_and_abstract_body_range_discrepancy_are_retained() -> None:
+    records = {
+        record["observation_id"]: record
+        for record in _document()["species"]["Na2O"]["context"]
+    }
+    thermochemical = records["itoh_1985_thermochemical_equations_12_13_14_15_context"]
+    assert len(thermochemical["values"]["equations_as_printed"]) == 4
+    vapor = records["itoh_1985_sodium_vapor_pressure_equations_19_20_context"]
+    assert vapor["values"]["pressure_as_printed"] == "P = 101325 Pa"
+    assert len(vapor["values"]["equations_as_printed"]) == 2
