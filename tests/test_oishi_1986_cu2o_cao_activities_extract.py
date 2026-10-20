@@ -55,7 +55,7 @@ def test_table1_cells_match_independent_600_dpi_transcription_and_mutations() ->
         assert _table1_grid(mutated_extract) == TABLE1_RENDER_GRID
 
 
-def test_table1_component_rows_migrate_as_points_and_keep_unknown_oxygen_honest() -> None:
+def test_table1_component_rows_migrate_as_points_with_printed_oxygen_log() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
@@ -68,12 +68,18 @@ def test_table1_component_rows_migrate_as_points_and_keep_unknown_oxygen_honest(
     assert all(observation.value.kind is ValueKind.POINT for observation in observations)
     assert all(observation.identity.temperature_K.value == 1573 for observation in observations)
     printed_logs = ("-3.48", "-3.52", "-3.56", "-3.62", "-3.70", "-3.66", "-3.77", "-3.74", "-3.76", "-3.84", "-3.78", "-3.81")
+    landed_logs = []
     for observation in observations:
         oxygen = observation.point_conditions["fO2_log"]
-        assert oxygen.state.is_unknown
+        assert oxygen.state.is_value
         assert oxygen.locator is not None
-        assert "p° = 101325 Pa = 1 atm" in oxygen.locator.note
+        landed_logs.append(str(oxygen.state.value))
+        assert any(
+            f"log(pO2/p°) = {printed_log} as printed; p° = 101325 Pa = 1 atm" in oxygen.locator.note
+            for printed_log in printed_logs
+        )
         assert not observation.identity.fO2_Pa.is_value
+    assert sorted(landed_logs) == sorted(printed_logs * 4)
     for formula in ("Cu", "O", "CaO", "MgO"):
         rows = document["species"][formula]["observations"]
         assert [row["values"]["log_fO2"]["value"] for row in rows] == list(printed_logs)
