@@ -8,8 +8,11 @@ source:
   corpus_asset: raw/shornikov-2002-aluminosilicate-solid-phases/shornikov-2002-aluminosilicate-solid-phases.pdf
 extraction:
   method: Prose values checked against pdftotext-layout and the 600 dpi page renders. No content_list
-    table exists. Figure 2 was inspected at 1200 dpi. Three filled diamonds on panel (a) match legend VIII
-    and were scored at 84.14 mol% Al2O3. Other cores that survive a 2 px opening are dashes of
+    table exists. Figure 2 was inspected at 1200 dpi. Two filled diamonds on the panel (a) fit match
+    legend VIII and stay at the printed 84.14 mol% Al2O3. The diamond at (5892.5, 2993.5) is 0.161 dex
+    below that fit at nearly the same T. The caption says replica filled symbols are a changed composition
+    whose mole percent is not printed, so that point keeps T and p and its composition is unknown.
+    Other cores that survive a 2 px opening are dashes of
     the dotted fit lines or symbols still crossed by those dashes; each has an audit row.
     Figure 3 is a broken-axis schematic on S/M/A labels and was not digitized. The mullite
     formation enthalpy keeps the printed least-squares lineage; the Gibbs-energy grid is not printed.
@@ -163,9 +166,12 @@ species:
           The diamond at the top of that crop is the legend entry, not a datum. A 2 px opening
           leaves 24x24 dash cores of the dotted lines (area about 417) and a few larger cores
           still crossed by dashes. Three filled diamonds at (5898.5, 2903.8), (6042.5, 2897.7) and (5892.5, 2993.5)
-          match legend VIII and are stored on shornikov_2002_fig2a_sio_viii. Every other core
-          has its own audit row. Replica filled symbols are changed composition, and the new
-          mole percent is not printed, so the stored value is the printed 84.14 mol% Al2O3.
+          match legend VIII. The two on the fit, (5898.5, 2903.8) and (6042.5, 2897.7), are stored
+          on shornikov_2002_fig2a_sio_viii at the printed 84.14 mol% Al2O3. The diamond at
+          (5892.5, 2993.5) is 0.161 dex below the first of those at nearly the same T. It is stored
+          on shornikov_2002_fig2a_sio_replica. The caption says replica filled symbols refer to
+          samples with changed composition, and that mole percent is not printed, so the composition
+          is unknown. Every other core has its own audit row.
           The same overlap holds on panels (b) and (c).'
         sample_mol_percent_Al2O3: 1.19, 3.31, 12.84, 28.20, 60.00, 67.63, 70.21, 84.14
         temperature_span_as_printed_K: 1676–2327
@@ -186,6 +192,46 @@ species:
 
   SiO:
     observations:
+    - observation_id: shornikov_2002_fig2a_sio_replica
+      type: partial_pressure
+      locator:
+        page: 2
+        published_page: 83
+        pdf_page_index: 1
+        figure: '2'
+        note: "Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). This filled diamond is at (5892.5, 2993.5). It is 0.161 dex below the legend-VIII diamond at (5898.5, 2903.8), at 1724.7 K against 1725.5 K. The caption on this page says: Replica filled symbols refer to data on samples with changed composition. The new mole percent is not printed, so the composition is unknown and 84.14 mol% is not stored. T and p are unchanged. T = 1700 + (x-5692.0)/8.105 from the labelled ticks 1700 at x=5692.0 and 1800 at x=6502.5. neg_log10_p = 5 + (y-2885.5)/557 from -5 at y=2885.5 and -6 at y=3442.5. The centre is the dark centroid inside a 30 px radius, threshold 70. Half the diamond, clear of the dotted line, is 24 px: 0.043 dex and 3.0 K. Partial pressure is not an activity, so the pure-oxide rule is not applied."
+      T_range_K:
+      - 1724.7
+      - 1724.7
+      phase: gas
+      experiment: shornikov-2002-doklady-solid-kems
+      regime: kems_effusion
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        gas_species: SiO(g)
+        formula: SiO
+        points:
+        - temperature_K: 1724.7
+          neg_log10_p_as_read: '5.194'
+          pressure_atm: 6.397348e-06
+          read_uncertainty_dex: '0.043'
+          read_uncertainty_K: '3.0'
+          audit_read_id: shornikov_2002_f2a_sio_01
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: 'Caption, published page 83: Replica filled symbols refer to data on samples with changed composition. The new mole percent is not printed.'
+              locator:
+                published_page: 83
+                pdf_page_index: 1
+                page: 2
+                figure: '2'
+                note: Mean (5892.5, 2993.5); filled-diamond dark centroid; replica filled symbol, composition changed and not printed; audit shornikov_2002_f2a_sio_01.
     - observation_id: shornikov_2002_fig2a_sio_viii
       type: partial_pressure
       locator:
@@ -193,9 +239,9 @@ species:
         published_page: 83
         pdf_page_index: 1
         figure: '2'
-        note: "Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). The three points are filled diamonds matching legend VIII. The printed composition is 84.14 mol% Al2O3. The caption says replica filled symbols refer to samples whose composition changed, and that new mole percent is not printed, so no other composition was stored. The diamond at (5892.5, 2993.5) lies 0.16 dex below its neighbour at nearly the same T and is the one most likely to be a replica; it is still stored as 84.14 mol%. T ticks bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105. Spacing further right is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6 at y=3442.5, so neg_log10_p = 5 + (y-2885.5)/557. Centres are dark centroids inside a 30 px radius, threshold 70. The line-inflated component bbox is not the marker width. Half the diamond, clear of the dotted line, is 24 px: 0.043 dex and 3.0 K. The diamond beside the VIII legend glyph is not a datum. Partial pressure is not an activity, so the pure-oxide rule is not applied."
+        note: "Figure 2 panel (a), 1200 dpi, PDF page 2, published page 83. Quantity as printed is log10 p(SiO). Two filled diamonds lie on the fit and match legend VIII. The printed composition of numeral VIII is 84.14 mol% Al2O3. The offset diamond at (5892.5, 2993.5) is the replica and is stored on shornikov_2002_fig2a_sio_replica with unknown composition. T ticks bracketing these points: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105. Spacing further right is not uniform and was not used. Log ticks bracketing the points: -5 at y=2885.5 and -6 at y=3442.5, so neg_log10_p = 5 + (y-2885.5)/557. Centres are dark centroids inside a 30 px radius, threshold 70. The line-inflated component bbox is not the marker width. Half the diamond, clear of the dotted line, is 24 px: 0.043 dex and 3.0 K. The diamond beside the VIII legend glyph is not a datum. Partial pressure is not an activity, so the pure-oxide rule is not applied."
       T_range_K:
-      - 1724.7
+      - 1725.5
       - 1743.2
       phase: gas
       experiment: shornikov-2002-doklady-solid-kems
@@ -210,34 +256,6 @@ species:
         formula: SiO
         curve_as_printed: VIII
         points:
-        - temperature_K: 1724.7
-          neg_log10_p_as_read: '5.194'
-          pressure_atm: 6.397348e-06
-          read_uncertainty_dex: '0.043'
-          read_uncertainty_K: '3.0'
-          Al2O3_mole_percent_as_read: '84.14'
-          composition_mol:
-            Al2O3: '0.8414'
-            SiO2: '0.1586'
-          audit_read_id: shornikov_2002_f2a_sio_01
-          point_conditions:
-            composition:
-              state:
-                tag: value
-                value:
-                  basis: printed_binary_mole_percent_Al2O3
-                  amount_basis: mole_fraction
-                  components:
-                  - - Al2O3
-                    - '0.8414'
-                  - - SiO2
-                    - '0.1586'
-              locator:
-                published_page: 83
-                pdf_page_index: 1
-                page: 2
-                figure: '2'
-                note: Mean (5892.5, 2993.5); filled-diamond dark centroid; legend VIII, 84.14 mol% Al2O3, not an axis read; audit shornikov_2002_f2a_sio_01.
         - temperature_K: 1725.5
           neg_log10_p_as_read: '5.033'
           pressure_atm: 9.268298e-06

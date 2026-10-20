@@ -30,7 +30,7 @@ No content_list table. Figure 1 is a phase-diagram comparison.
 |---|---|---|---|
 | phase boundaries | Figure 1 | continuous comparison curves | refused: not discrete legend symbols of Figure 2. No pressure centre. |
 
-Figure 2 (published p. 83) was re-read at 1200 dpi (`p2002-p-2.png`, PDF page 2). Panel frames, page pixels: (a) y-axis x=5430, y=1155-3541, x-axis y=3541, x=5430-8913. T ticks used for the three diamonds: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105. Later T spacing is 729.5, 653.5, and 593 px per 100 K and was not used. Log ticks used: -5 at y=2885.5 and -6 at y=3442.5, so -log = 5 + (y-2885.5)/557. The -4 to -5 gap is 608 px, not the same. Panel (b) y-axis x=5522, y=3971-6238, x-axis y=6238. Panel (c) y-axis x=5430, y=6719-9130, x-axis y=9130. The diamond beside the VIII legend entry is not a datum. Three filled diamonds on panel (a) match that legend symbol and are stored at the printed 84.14 mol% Al2O3. The caption says replica filled symbols are a changed composition, and the new mole percent is not printed, so none was invented. The point at (5892.5, 2993.5) is 0.16 dex below its neighbour and is the likely replica. Filled components and closed holes from the same page scan are one row each below. A component within 8 px of a stored centre or a dash core is not repeated.
+Figure 2 (published p. 83) was re-read at 1200 dpi (`p2002-p-2.png`, PDF page 2). Panel frames, page pixels: (a) y-axis x=5430, y=1155-3541, x-axis y=3541, x=5430-8913. T ticks used for the three diamonds: 1700 at x=5692.0 and 1800 at x=6502.5, so T = 1700 + (x-5692.0)/8.105. Later T spacing is 729.5, 653.5, and 593 px per 100 K and was not used. Log ticks used: -5 at y=2885.5 and -6 at y=3442.5, so -log = 5 + (y-2885.5)/557. The -4 to -5 gap is 608 px, not the same. Panel (b) y-axis x=5522, y=3971-6238, x-axis y=6238. Panel (c) y-axis x=5430, y=6719-9130, x-axis y=9130. The diamond beside the VIII legend entry is not a datum. Two filled diamonds on the fit match legend VIII and stay at the printed 84.14 mol% Al2O3. The caption says: "Replica filled symbols refer to data on samples with changed composition." The diamond at (5892.5, 2993.5) is 0.161 dex below the diamond at (5898.5, 2903.8) (neg-log 5.194 versus 5.033) at 1724.7 K versus 1725.5 K. That offset point keeps its T and p, and its composition is unknown. 84.14 mol% is not stored on it. Filled components and closed holes from the same page scan are one row each below. A component within 8 px of a stored centre or a dash core is not repeated.
 
 Figure 3 (published p. 84): log p at 1850 K. The y axis is broken between -4.0 and -8.5. The x axis is S, M, A only.
 
@@ -43,7 +43,7 @@ Figure 3 (published p. 84): log p at 1850 K. The y axis is broken between -4.0 a
 
 | id | pixel | symbol | decision |
 |---|---|---|---|
-| shornikov_2002_f2a_sio_01 | (5892.5, 2993.5) | filled diamond VIII | read: T=1724.7 K, -log 5.194, 84.14 mol% Al2O3, p=6.397348e-06 atm |
+| shornikov_2002_f2a_sio_01 | (5892.5, 2993.5) | filled diamond, replica | read: T=1724.7 K, -log 5.194, p=6.397348e-06 atm. Composition unknown: caption says replica filled symbols are a changed composition and does not print the mole percent. |
 | shornikov_2002_f2a_sio_02 | (5898.5, 2903.8) | filled diamond VIII | read: T=1725.5 K, -log 5.033, 84.14 mol% Al2O3, p=9.268298e-06 atm |
 | shornikov_2002_f2a_sio_03 | (6042.5, 2897.7) | filled diamond VIII | read: T=1743.2 K, -log 5.022, 84.14 mol% Al2O3, p=9.506048e-06 atm |
 
