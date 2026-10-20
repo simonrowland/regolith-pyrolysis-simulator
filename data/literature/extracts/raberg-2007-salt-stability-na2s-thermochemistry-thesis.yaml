@@ -9,15 +9,21 @@ extraction:
   date: '2026-10-20'
   worker: fam30-1020
   source_note: >-
-    This 48-page thesis summary contains several results papers. The Na2S EMF thermochemistry and Na2CO3-Na2S phase-diagram
-    results are also published papers and are retained as context to avoid duplicate scoring. No corresponding published-paper
-    extracts or observation ids exist in this seat, so the source links are recorded by DOI for controller resolution. Thesis-only
-    Na2SO3 stability findings are typed. No phase-diagram or EMF figure points are digitized.
+    This 48-page thesis summary contains several results papers. Thesis-only Na2SO3 stability findings and the measured-tabulated
+    Na2S standard enthalpy and entropy are typed. The latter also appear in the 2007 journal paper and carry its DOI in their notes.
+    Figure points remain deferred. The fitted EMF and Gibbs-energy equations are model-derived context; the phase-diagram temperature
+    difference is numeric context because no store token represents a temperature difference.
 review_status: draft
 fidelity_samples:
   - path: species.Na2SO3.observations[raberg2007_na2so3_solid_solid_transition].values.T_C
     value: 675
     locator: {page: 3, pdf_page_index: 2, section: Abstract}
+  - path: species.Na2S.observations[raberg2007_na2s_delta_fH298_text].values.delta_f_H
+    value: -369.0
+    locator: {page: 37, pdf_page_index: 36, published_page: 27, section: '3.4 Determination of thermodynamic properties of Na2S using solid-state EMF measurements'}
+  - path: species.Na2S.observations[raberg2007_na2s_S298_text].values.S
+    value: 97.0
+    locator: {page: 37, pdf_page_index: 36, published_page: 27, section: '3.4 Determination of thermodynamic properties of Na2S using solid-state EMF measurements'}
 species:
   MgO:
     observations: []
@@ -101,9 +107,49 @@ species:
             - {name: HT-XRD pattern, marker_count: 0}
           digitisation: deferred to a figure pass
   Na2S:
-    observations: []
+    observations:
+      - observation_id: raberg2007_na2s_delta_fH298_text
+        type: gibbs_table
+        locator: {page: 37, pdf_page_index: 36, published_page: 27, section: '3.4 Determination of thermodynamic properties of Na2S using solid-state EMF measurements'}
+        phase: s
+        phase_as_printed: Na2S(s)
+        per: mol_species
+        units: kJ/mol
+        standard_state: Standard enthalpy of formation from elements for Na2S(s), at 298.15 K.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: 298.15}
+            locator: {page: 37, pdf_page_index: 36, published_page: 27, section: '3.4 Determination of thermodynamic properties of Na2S using solid-state EMF measurements'}
+        values:
+          quantity: delta_fH
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          delta_f_H: -369.0
+          delta_f_H_as_printed: '−369.0'
+          note: Also published in Lindberg et al. 2007, J. Chem. Thermodyn., doi:10.1016/j.jct.2006.06.003.
+        uncertainty: {reported_status: printed, value_kJ_mol-1: 1.0}
+      - observation_id: raberg2007_na2s_S298_text
+        type: gibbs_table
+        locator: {page: 37, pdf_page_index: 36, published_page: 27, section: '3.4 Determination of thermodynamic properties of Na2S using solid-state EMF measurements'}
+        phase: s
+        phase_as_printed: Na2S(s)
+        per: mol_species
+        units: J/mol K
+        standard_state: Third-law standard entropy for Na2S(s), at 298.15 K.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: 298.15}
+            locator: {page: 37, pdf_page_index: 36, published_page: 27, section: '3.4 Determination of thermodynamic properties of Na2S using solid-state EMF measurements'}
+        values:
+          quantity: S
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          S: 97.0
+          S_as_printed: '97.0'
+          note: Also published in Lindberg et al. 2007, J. Chem. Thermodyn., doi:10.1016/j.jct.2006.06.003.
+        uncertainty: {reported_status: printed, value_J_per_mol_K: 2.0}
     context:
-      - observation_id: raberg2007_na2s_emf_thermochemistry_published_repeat
+      - observation_id: raberg2007_na2s_emf_fitted_model_context
         type: published_result_context
         locator: {page: 37, pdf_page_index: 36, published_page: 27, section: '3.4 Determination of thermodynamic properties of Na2S'}
         units: kJ/mol, J/(mol K), voltage, and printed equation variables
@@ -111,7 +157,7 @@ species:
           quantity_as_published: measured EMF fit and evaluated Na2S thermochemical properties
           method_class: model_derived
           evidence_class: model_derived
-          reason: These results repeat the published Na2S solid-state EMF paper; retain context pending a published observation id rather than scoring the same result twice.
+          reason: Fitted log Kf and ΔfG equations combine these EMF measurements with literature data, so remain model-derived context. The measured-reduced standard ΔfH and S values are typed from the thesis because the later publication has no extract yet.
           published_paper:
             citation: 'Lindberg, G., Larsson, A., Råberg, M., Boström, D., Backman, R. & Nordin, A. (2007). Determination of thermodynamic properties of Na2S using solid-state EMF measurements. Journal of Chemical Thermodynamics, 39(1), 44–48.'
             doi: 10.1016/j.jct.2006.06.003
@@ -120,9 +166,6 @@ species:
           fitted_emf_equation_as_published: 'Efit/V (±0.00047) = 0.63650 − 0.00584732(T/K) + 0.00073190(T/K) ln(T/K)'
           equilibrium_constant_equation_as_published: 'log Kf(Na2S(s)) (±0.05) = 216.28 − 4750(T/K)−1 − 28.28878 ln(T/K)'
           Gibbs_energy_equation_as_published: 'ΔfG°(Na2S(s))/(kJ mol−1) (±1.0) = 90.9 − 4.1407(T/K) + 0.5415849(T/K) ln(T/K)'
-          standard_enthalpy_of_formation_as_published: 'ΔfH°(Na2S(s), 298.15 K) = −369.0 ± 1.0 kJ/mol'
-          standard_entropy_as_published: 'S°(Na2S(s), 298.15 K) = 97.0 ± 2.0 J/(mol K), evaluated by third-law analysis'
-          publication_link_state: no matching published extract or observation id found in the current seat
       - observation_id: raberg2007_thermochemical_uncertainties_table2_context
         type: textual_fact
         locator: {page: 28, pdf_page_index: 27, published_page: 18, table: '2'}
@@ -146,25 +189,12 @@ species:
           temperature: 870–1000 K
           axes_as_published: {x: temperature (K), y: voltage (V)}
           caption: Experimental values with the fitted function. Cell A and Cell B.
+          note: Raw measured points remain deferred; also published in Lindberg et al. 2007, J. Chem. Thermodyn., doi:10.1016/j.jct.2006.06.003.
           panel: all
           series:
             - {name: Cell A, marker_count: not countable (overplotted)}
             - {name: Cell B, marker_count: not countable (overplotted)}
           digitisation: deferred to a figure pass
-      - observation_id: raberg2007_naco3_na2s_published_phase_diagram_context
-        type: published_result_context
-        locator: {page: 30, pdf_page_index: 29, published_page: 20, section: '3.2 Improvement of the binary phase diagram Na2CO3-Na2S'}
-        units: °C
-        values:
-          quantity_as_published: Na2CO3-Na2S liquidus and solidus measurements
-          method_class: measured_direct
-          evidence_class: measured_direct
-          reason: Thesis Paper II is also the published phase-diagram study; its figure points are deferred and its printed atmosphere comparison is preserved without duplicating scored points.
-          published_paper:
-            citation: 'Råberg, M., Boström, D., Nordin, A., Rosén, E. & Warnqvist, B. (2003). Improvement of the binary phase diagram Na2CO3-Na2S. Energy & Fuels, 17(6), 1591–1594.'
-            doi: 10.1021/ef0340256
-          printed_result: CO2-atmosphere melting points were about 8 °C higher than corresponding points under an inert atmosphere.
-          publication_link_state: no matching published extract or observation id found in the current seat
       - observation_id: raberg2007_figure12_phase_diagram_deferred
         type: figure_record
         locator: {page: 31, pdf_page_index: 30, published_page: 21, figure: '12'}
@@ -179,6 +209,8 @@ species:
           atmosphere: Ar and CO2 datasets
           axes_as_published: {x: 'molar composition XNa2S', y: 'temperature (°C)'}
           caption: The binary phase diagram Na2CO3-Na2S. The magnification shows the Na2CO3(ss) boundary and melting-point difference for XNa2S = 0, 0.1, 0.15, and 0.2 in Ar and CO2 atmospheres.
+          printed_result: 'CO2-atmosphere melting points were about 8 °C higher than corresponding points under an inert atmosphere.'
+          note: The full measurement series is also published in Råberg et al. 2003, Energy Fuels, doi:10.1021/ef0340256; figure points are deferred, and no token fits the printed temperature-difference result.
           panel: all
           series:
             - {name: Tegman and Warnqvist literature data, marker_count: not countable (overplotted)}
