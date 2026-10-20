@@ -150,6 +150,49 @@ def _simulator_ledger_fingerprint(sim) -> tuple:
     )
 
 
+def _dispatch_single_control_value(
+    *,
+    control_name: str,
+    value: float,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "SiO2": 10.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+            },
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    controls = {
+        "voltage_V": 5.0,
+        "current_A": 100.0,
+        "dt_hr": 1.0,
+        "pO2_bar": 1.0,
+        "allowed_oxides": ["SiO2"],
+    }
+    controls[control_name] = value
+    return BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1575.0,
+            pressure_bar=1.0,
+            control_inputs=controls,
+        )
+    )
+
+
 @pytest.fixture(
     scope="module",
     params=[
@@ -545,6 +588,62 @@ def test_provider_refuses_extreme_finite_electrolysis_controls(
     }
     assert expected_units[control_name] in invalid_controls[control_name]
     assert diagnostic.get("energy_kWh", 0.0) == 0.0
+
+
+def test_provider_predicts_and_flags_finite_low_po2_outside_certified_band(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    result = _dispatch_single_control_value(
+        control_name="pO2_bar",
+        value=1e-12,
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+    )
+
+    assert result.status == "ok", result.diagnostic
+    assert result.transition is not None
+    notices = result.diagnostic["notices"]
+    assert len(notices) == 1
+    notice = notices[0]
+    assert notice["kind"] == "out_of_certified_band"
+    assert notice["control"] == "pO2_bar"
+    assert notice["reason"] == "electrolysis_control_out_of_domain"
+    assert notice["control_reason"] == "below minimum 1e-09 bar"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"] == {"pO2_bar": (1e-9, 1.0)}
+
+
+@pytest.mark.parametrize(
+    "control_name", ["dt_hr", "current_A", "voltage_V", "pO2_bar"]
+)
+@pytest.mark.parametrize(
+    "value", [float("nan"), float("inf"), float("-inf")],
+    ids=["nan", "positive-infinity", "negative-infinity"],
+)
+def test_provider_refuses_nonfinite_electrolysis_controls(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    control_name,
+    value,
+):
+    result = _dispatch_single_control_value(
+        control_name=control_name,
+        value=value,
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+    )
+
+    assert result.status == "refused", result.diagnostic
+    assert result.transition is None
+    assert (
+        result.diagnostic["reason_refused"] == "invalid_electrolysis_control"
+    )
+    assert control_name in result.diagnostic["invalid_controls"]
 
 
 def test_provider_refuses_nonfinite_faraday_extent(
