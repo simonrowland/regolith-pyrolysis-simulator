@@ -96,6 +96,22 @@ def test_configure_campaign_pressure_defaults_match_legacy_constants(
     assert melt.atmosphere is atmosphere
 
 
+def test_c4_default_applies_declared_n2_engineering_band():
+    setpoints = _setpoints()
+    c4 = setpoints["campaigns"]["C4"]
+    bounds = c4["continuum_pressure_bounds"]
+    melt = MeltState()
+
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C4)
+
+    assert melt.atmosphere is Atmosphere.CONTROLLED_O2
+    assert melt.pO2_mbar == pytest.approx(c4["pO2_mbar_default"])
+    assert melt.background_gas_species == bounds["carrier_gas"]
+    pN2_mbar = melt.p_total_mbar - melt.pO2_mbar
+    minimum_pN2_mbar, maximum_pN2_mbar = bounds["pN2_mbar"]
+    assert minimum_pN2_mbar <= pN2_mbar <= maximum_pN2_mbar
+
+
 def test_c6_continuum_derivation_uses_selected_static_hold_temperature():
     campaign = _setpoints()["campaigns"]["C6"]
     continuum = campaign["continuum_pressure_bounds"]
