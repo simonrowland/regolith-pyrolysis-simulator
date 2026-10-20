@@ -1582,7 +1582,11 @@ class PyrolysisRun:
             strict_result_contract=self.strict_result_contract,
         )
 
-        final_summary = _final_summary_report(final_state, execution)
+        final_summary = _final_summary_report(
+            final_state,
+            execution,
+            sim.species_formula_registry,
+        )
         per_hour_summary = list(execution.per_hour)
         if self.include_wall_deposit_rate_diagnostics:
             snapshots = tuple(execution.snapshots)
@@ -3348,14 +3352,13 @@ def _stage_silica_fume_kg(sim: PyrolysisSimulator) -> dict[str, float]:
 def _kg_by_species_from_mol_state(
     state: Mapping[str, Mapping[str, float]],
     account: str,
+    species_formula_registry: Mapping[str, Any] | None,
 ) -> dict[str, float]:
     species_mol = state.get(account, {})
     kg_by_species: dict[str, float] = {}
     for species, mol in sorted(species_mol.items()):
-        molar_mass_g_mol = MOLAR_MASS.get(species)
-        if molar_mass_g_mol is None:
-            continue
-        kg = float(mol) * (molar_mass_g_mol / 1000.0)
+        formula = resolve_species_formula(species, species_formula_registry)
+        kg = float(mol) * formula.molar_mass_kg_per_mol()
         if abs(kg) > 1e-12:
             kg_by_species[species] = _clean_report_float(kg)
     return kg_by_species
@@ -3363,9 +3366,10 @@ def _kg_by_species_from_mol_state(
 
 def _wall_deposit_report_kg(
     state: Mapping[str, Mapping[str, float]],
+    species_formula_registry: Mapping[str, Any] | None,
 ) -> dict[str, float]:
     wall_deposit_kg = _kg_by_species_from_mol_state(
-        state, WALL_DEPOSIT_ACCOUNT,
+        state, WALL_DEPOSIT_ACCOUNT, species_formula_registry,
     )
     segment_accounts = sorted(
         account
@@ -3374,7 +3378,7 @@ def _wall_deposit_report_kg(
     )
     for account in segment_accounts:
         for species, kg in _kg_by_species_from_mol_state(
-            state, account,
+            state, account, species_formula_registry,
         ).items():
             wall_deposit_kg[species] = wall_deposit_kg.get(species, 0.0) + kg
     for species in SIO_WALL_DEPOSIT_SPECIES:
@@ -3424,9 +3428,13 @@ def _sio_wall_terminal_mol(wall_deposit: Mapping[str, float]) -> float:
 def _final_summary_report(
     final_state: Mapping[str, Mapping[str, float]],
     execution: RunExecution,
+    species_formula_registry: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
     return {
-        "wall_deposit_by_species_kg": _wall_deposit_report_kg(final_state),
+        "wall_deposit_by_species_kg": _wall_deposit_report_kg(
+            final_state,
+            species_formula_registry,
+        ),
         "deposit_by_surface_species_kg": _nested_species_kg_from_segment_species(
             execution.trace.wall_deposit_by_segment_species_kg,
         ),
@@ -4298,7 +4306,10 @@ def build_sio_yield_report(
             {},
         ) or {}
     )
-    wall_deposit_kg = _wall_deposit_report_kg(final_state)
+    wall_deposit_kg = _wall_deposit_report_kg(
+        final_state,
+        sim.species_formula_registry,
+    )
     wall_fouling = _wall_fouling_report(
         wall_deposit_kg,
         wall_deposit_by_segment_species=(
@@ -5343,7 +5354,11 @@ def _runner_failure_result(
     }
     if sim is not None:
         final = _safe_failure_value(
-            lambda: _final_summary_report(final_state, execution),
+            lambda: _final_summary_report(
+                final_state,
+                execution,
+                sim.species_formula_registry,
+            ),
             final,
         )
     stage_report = (

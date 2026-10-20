@@ -871,7 +871,7 @@ def test_lab_surface_deposit_accounts_conserve_and_roll_up_by_surface() -> None:
     assert after_kg == pytest.approx(before_kg, abs=1.0e-15)
     assert ledger.total_kg_by_account("process.overhead_gas") == pytest.approx(0.0)
 
-    report = _wall_deposit_report_kg(state)
+    report = _wall_deposit_report_kg(state, ledger.registry)
     report_mol = _wall_deposit_mol_by_species(state)
     trace_surface_kg = wall_deposit_by_segment_species_kg(ledger)
 
@@ -886,10 +886,11 @@ def test_lab_surface_deposit_accounts_conserve_and_roll_up_by_surface() -> None:
 def test_wall_deposit_report_includes_formula_only_species() -> None:
     account = f"{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}stage_4_to_stage_5"
     ledger = AtomLedger(
+        registry={"In2O": {"formula": "In2O"}},
         initial_balances={account: {"In2O": 3.741952825179326e-11}}
     )
 
-    report = _wall_deposit_report_kg(ledger.mol_by_account())
+    report = _wall_deposit_report_kg(ledger.mol_by_account(), ledger.registry)
 
     assert report["In2O"] == pytest.approx(
         ledger.project_account_kg(account)["In2O"]
