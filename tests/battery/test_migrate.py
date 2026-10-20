@@ -6705,7 +6705,11 @@ def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = 
 
 @pytest.mark.parametrize(
     ("printed", "operator", "expected"),
-    ((">77", ">", Decimal("0.77")), ("<5", "<", Decimal("0.05"))),
+    (
+        (">77", ">", Decimal("0.77")),
+        ("<5", "<", Decimal("0.05")),
+        (">77 %", ">", Decimal("0.77")),
+    ),
 )
 def test_named_mass_loss_bounds_migrate_as_typed_values(
     tmp_path: Path, printed: str, operator: str, expected: Decimal
@@ -6740,6 +6744,56 @@ def test_named_mass_loss_bounds_migrate_as_typed_values(
     assert source_extract["species"]["Na"]["observations"][0]["values"][
         "mass_loss_pct"
     ] == printed
+
+
+@pytest.mark.parametrize(
+    ("printed_bound", "expected"),
+    (("77", Decimal("0.77")), ("45", Decimal("0.45"))),
+)
+def test_structured_named_mass_loss_bounds_migrate_as_typed_values(
+    tmp_path: Path, printed_bound: str, expected: Decimal
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="mass pct V2O5 extracted, as printed",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "mass_loss_pct": {
+                "kind": "bound",
+                "bound_operator": ">",
+                "bound_value": printed_bound,
+            },
+            "value_as_printed": f"more than {printed_bound} mass pct V2O5 extracted",
+            "unavailable_reason": (
+                "legacy_migrator_does_not_lift_bound_named_mass_loss_field; t-1367 adds shared support"
+            ),
+        },
+    )
+    source_root = _write_min_tree(tmp_path, extract)
+    result = migrate(source_root, write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.BOUND
+    assert observation.value.bound_operator == ">"
+    assert observation.value.bound_value == expected
+    source_extract = yaml.safe_load(
+        (source_root / "data/literature/extracts/fixture-source.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert source_extract["species"]["Na"]["observations"][0]["values"][
+        "mass_loss_pct"
+    ] == {
+        "kind": "bound",
+        "bound_operator": ">",
+        "bound_value": printed_bound,
+    }
+    assert source_extract["species"]["Na"]["observations"][0]["values"][
+        "value_as_printed"
+    ] == f"more than {printed_bound} mass pct V2O5 extracted"
 
 
 def test_named_mass_loss_percent_point_remains_a_fraction(tmp_path: Path) -> None:
@@ -6842,6 +6896,28 @@ def test_malformed_named_mass_loss_bound_has_typed_unavailable_reason(
     assert "mass_loss_pct is not a clean one-sided bound" in (
         observation.value.unavailable_reason or ""
     )
+
+
+def test_malformed_named_mass_loss_bound_falls_through_to_later_field(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="wt_pct",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "mass_loss_fraction": ">77 +/- 5",
+            "mass_loss_pct": 77,
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.77")
 
 
 def test_located_printed_and_initial_pins_numeric_composition() -> None:

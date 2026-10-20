@@ -5346,6 +5346,35 @@ def _named_fraction_bound_selection(
 
     raw = payload.get(key)
     field_units = _printed_unit_for_field(payload, key) or units
+    if isinstance(raw, Mapping) and raw.get("kind") == ValueKind.BOUND.value:
+        try:
+            value = _value_from_plain(raw)
+        except (AssertionError, KeyError, TypeError, ValueError, ArithmeticError):
+            value = None
+        if (
+            value is None
+            or value.kind is not ValueKind.BOUND
+            or value.bound_operator not in {"<", "<=", ">", ">="}
+            or value.bound_value is None
+        ):
+            return _unavailable_selection(
+                f"{key} is not a clean structured one-sided bound: {raw!r}",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+            )
+        bound = value.bound_value
+        trail = "identity"
+        if _percent_named_fraction_field(key, field_units):
+            bound /= Decimal("100")
+            trail = "percent_to_fraction"
+        return SourceSelection(
+            value=replace(value, bound_value=bound),
+            field_name=key,
+            unit_trail=trail,
+            unused_ancillary=_unused_ancillary(payload, key),
+            condition_ranges=condition_ranges,
+        )
     if isinstance(raw, Mapping):
         raw = raw.get("value")
     if not isinstance(raw, str) or not _NAMED_FRACTION_BOUND_PREFIX_RE.match(raw):
@@ -8993,6 +9022,7 @@ def _selection_from_named_field(
         return None
     if q_token is Quantity.FE3_FE2_RATIO:
         return _fe3_fe2_ratio_selection(payload, condition_ranges)
+    malformed_fraction_bound: SourceSelection | None = None
     for key in QUANTITY_SOURCE_FIELDS.get(q_token, ()):
         if key not in payload:
             continue
@@ -9018,7 +9048,10 @@ def _selection_from_named_field(
                 payload, key, units, condition_ranges
             )
             if bound is not None:
-                return bound
+                if bound.available:
+                    return bound
+                malformed_fraction_bound = bound
+                continue
         amount = _numeric_field(payload, key)
         if amount is None:
             continue
@@ -9125,6 +9158,8 @@ def _selection_from_named_field(
             return _interval_selection(
                 lo, hi, range_key or "range", payload, condition_ranges
             )
+    if malformed_fraction_bound is not None:
+        return malformed_fraction_bound
     return None
 
 
