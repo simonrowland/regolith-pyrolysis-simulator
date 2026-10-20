@@ -80,6 +80,7 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.battery.validity import run_validity_gates, underdetermined_apparatus
+import simulator.battery.score as score_mod
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
     SCORE_ENGINE_SET,
@@ -88,6 +89,11 @@ from simulator.battery.score import (
     ScoreContext,
     SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
+    _battery_hero_minor_foulant_facets,
+    _battery_hero_sio2_mole_fraction,
+    _battery_hero_sweet_spot_records,
+    _paired_engine_rail_benchmarks,
+    _residual_engine_observable,
     compile_residual,
     compute_metric,
     dumps_residual_line,
@@ -4670,6 +4676,862 @@ def test_measured_engine_rail_records_group_source_relation() -> None:
         (SourceRelation.INDEPENDENT.value, 1),
         (SourceRelation.TRAINING.value, 1),
     ]
+
+
+def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> None:
+    rows = [
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "3"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "internal-vaporock",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "4"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "openimcc"},
+            "numeric": {"operation": "dex", "value": "1"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "comparison-only",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "100"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "thermoengine"},
+            "numeric": {"operation": "dex", "value": "2"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "0.5"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "internal-vaporock",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "4"},
+        },
+        {
+            "rail": Rail.REDOX.value,
+            "reference": "redox-primary",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "0.3"},
+        },
+        {
+            "rail": Rail.REDOX.value,
+            "reference": "redox-primary",
+            "candidate_request": {"engine": "openimcc"},
+            "numeric": {"operation": "dex", "value": "0.2"},
+        },
+    ]
+
+    records = _paired_engine_rail_benchmarks(
+        rows,
+        primary_engines=("openimcc", "internal-analytical"),
+        comparison_engines=("vaporock", "thermoengine", "alphamelts", "magemin"),
+        rails=(Rail.VAPOUR.value, Rail.REDOX.value),
+    )
+    by_key = {
+        (record["rail"], record["primary_engine"]): record for record in records
+    }
+
+    assert by_key[(Rail.VAPOUR.value, "openimcc")] == {
+        "rail": Rail.VAPOUR.value,
+        "primary_engine": "openimcc",
+        "benchmark_engine": "vaporock",
+        "n": 1,
+        "primary_rms_dex": "1",
+        "benchmark_rms_dex": "0.5",
+    }
+    assert by_key[(Rail.VAPOUR.value, "internal-analytical")] == {
+        "rail": Rail.VAPOUR.value,
+        "primary_engine": "internal-analytical",
+        "benchmark_engine": "thermoengine",
+        "n": 1,
+        "primary_rms_dex": "3",
+        "benchmark_rms_dex": "2",
+    }
+    for primary in ("openimcc", "internal-analytical"):
+        assert by_key[(Rail.REDOX.value, primary)] == {
+            "rail": Rail.REDOX.value,
+            "primary_engine": primary,
+            "benchmark_engine": None,
+            "n": 0,
+            "primary_rms_dex": None,
+            "benchmark_rms_dex": None,
+        }
+
+
+def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
+    from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+    unsupported_thermo = {
+        "rail": Rail.THERMOCHEMISTRY.value,
+        "candidate_request": {
+            "engine": Engine.ALPHAMELTS.value,
+            "quantity": Quantity.H_MINUS_H298.value,
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {"reason": "quantity_not_predicted"},
+        },
+        "execution": {"state": ExecutionState.UNSUPPORTED.value},
+    }
+    assert Quantity.H_MINUS_H298 not in _engine_thermo_quantities(Engine.ALPHAMELTS)
+    assert not _residual_engine_observable(unsupported_thermo)
+
+    supported_thermo = {
+        "rail": Rail.THERMOCHEMISTRY.value,
+        "candidate_request": {
+            "engine": Engine.THERMOENGINE.value,
+            "quantity": Quantity.CP.value,
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {"reason": "quantity_not_predicted"},
+        },
+        "execution": {"state": ExecutionState.UNSUPPORTED.value},
+    }
+    assert Quantity.CP in _engine_thermo_quantities(Engine.THERMOENGINE)
+    assert _residual_engine_observable(supported_thermo)
+
+    for reason in (
+        RefusalReason.IDENTITY_INCOMPLETE,
+        RefusalReason.METRIC_DOMAIN,
+    ):
+        assert _residual_engine_observable(
+            {
+                "rail": Rail.REDOX.value,
+                "candidate_request": {
+                    "engine": Engine.INTERNAL_ANALYTICAL.value,
+                    "quantity": Quantity.FE3_FE2_RATIO.value,
+                },
+                "execution": {"state": ExecutionState.NOT_PROBED.value},
+                "refusal": {"reason": reason.value},
+            }
+        )
+
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.VAPOUR.value,
+            "candidate_request": {"engine": Engine.MAGEMIN.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.MELT_ACTIVITY.value,
+            "candidate_request": {"engine": Engine.MAGEMIN.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.REDOX.value,
+            "candidate_request": {"engine": Engine.ALPHAMELTS.value},
+            "refusal": {
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value
+            },
+        }
+    )
+    assert _residual_engine_observable(
+        {
+            "rail": Rail.VAPOUR.value,
+            "candidate_request": {"engine": Engine.VAPOROCK.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    # Line 3,981,466 in the pinned battery archive: this is one of the 92
+    # MAGEMin vapour refusals after equilibrate_cell ran.
+    attempted_magemin_vapour = {
+        "rail": Rail.VAPOUR.value,
+        "candidate_request": {
+            "engine": Engine.MAGEMIN.value,
+            "channel": Engine.MAGEMIN.value,
+            "quantity": Quantity.P_SAT.value,
+        },
+        "execution": {
+            "state": "unsupported",
+            "call_evidence": "equilibrate_cell:magemin:host=Mac-Studio-256-2:exit=None",
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {
+                "engine_reason": "forbidden_species",
+                "refusal_reason": "out_of_basis",
+            },
+        },
+    }
+    assert _residual_engine_observable(attempted_magemin_vapour)
+    assert not _residual_engine_observable(
+        {
+            **attempted_magemin_vapour,
+            "execution": {"state": "not_probed"},
+        }
+    )
+
+
+def _hero_deck_score_row(
+    *,
+    rail: str,
+    formula: str,
+    quantity: str,
+    composition: dict[str, object],
+    residual_dex: Decimal,
+    candidate_value: str,
+    fO2_pa: str | None = None,
+    engine: str = "openimcc",
+) -> dict[str, object]:
+    identity = {
+        "composition": {"tag": "value", "value": composition},
+        "fO2_Pa": (
+            {"tag": "value", "value": fO2_pa}
+            if fO2_pa is not None
+            else {"tag": "unknown", "reason": "not reported"}
+        ),
+        "quantity": {"tag": "value", "value": quantity},
+        "species": {"formula": formula},
+        "temperature_K": {"tag": "value", "value": "1200"},
+    }
+    return {
+        "candidate_request": {"engine": engine, "experiment_id": "deck-test"},
+        "candidate_observation": {
+            "engine": {"name": engine},
+            "experiment_id": "deck-test",
+            "identity": identity,
+            "value": {"kind": "point", "point": candidate_value},
+        },
+        "execution": {"state": "produced"},
+        "notices": [],
+        "numeric": {
+            "operation": "dex",
+            "unit": "dimensionless",
+            "value": str(residual_dex),
+        },
+        "rail": rail,
+        "reference": "measured-row",
+        "status": "no_band",
+    }
+
+
+def test_battery_hero_deck_scores_polymerisation_and_delta_iw() -> None:
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["MgO", "0.5"], ["SiO2", "0.5"]],
+    }
+    row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity="p_partial",
+        composition=composition,
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+        fO2_pa="100000",
+    )
+
+    stored = F.observation(
+        "measured-row",
+        "deck-test-experiment",
+        Identity(
+            quantity=Quantity.P_PARTIAL,
+            species=Species("Fe", Phase.G),
+            temperature_K=State.of(Decimal("1200")),
+            fO2_Pa=State.of(Decimal("100000")),
+        ),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    result = score_mod._battery_hero_deck_records(
+        [row], observations={stored.observation_id: stored}
+    )
+    polymerisation = next(
+        point for point in result["points"]
+        if point["chart"] == "polymerisation"
+    )
+    redox = next(
+        point for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+    )
+
+    # MgSiO3 has two non-bridging oxygens per tetrahedral Si in the standard
+    # oxide stoichiometry. The output is pinned by exact binary value.
+    assert float(polymerisation["x_value"]).hex() == "0x1.0000000000000p+1"
+    assert float(polymerisation["y_value"]).hex() == "0x1.999999999999ap-3"
+    expected_delta_iw = -feo_iw_log10_fO2_bar(1200.0)
+    assert float(redox["x_value"]).hex() == expected_delta_iw.hex()
+
+
+def test_battery_hero_nbo_t_refuses_free_oxygen_beyond_four() -> None:
+    def composition(cao: str, sio2: str) -> dict[str, object]:
+        return {
+            "amount_basis": AmountBasis.MOLE_FRACTION.value,
+            "components": [["CaO", cao], ["SiO2", sio2]],
+        }
+
+    below_limit = score_mod._battery_hero_nbo_t(composition("0.5", "0.5"))
+    orthosilicate = score_mod._battery_hero_nbo_t(
+        composition(
+            "0.6666666666666666666666666667",
+            "0.3333333333333333333333333333",
+        )
+    )
+    beyond_limit = score_mod._battery_hero_nbo_t(composition("0.75", "0.25"))
+
+    assert below_limit == Decimal("2")
+    assert orthosilicate == Decimal("4")
+    assert beyond_limit.reason == "free_oxygen_beyond_orthosilicate"
+    assert beyond_limit.detail == {"computed_value": Decimal("6")}
+
+    over_orthosilicate_row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity="p_partial",
+        composition=composition("0.75", "0.25"),
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+    )
+    records = score_mod._battery_hero_deck_records([over_orthosilicate_row])
+    assert not any(
+        point["chart"] == "polymerisation" for point in records["points"]
+    )
+    assert records["axis_refusals"][
+        (
+            "polymerisation",
+            "openimcc",
+            "free_oxygen_beyond_orthosilicate",
+        )
+    ] == 1
+
+
+def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
+    from simulator.battery.score import compute_metric
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["CaO", "0.5"]],
+    }
+    pO2_row = _hero_deck_score_row(
+        rail=Rail.SIO_EVOLUTION.value,
+        formula="SiO",
+        quantity="p_partial",
+        composition=composition,
+        residual_dex=Decimal("0.125"),
+        candidate_value="2.0",
+        fO2_pa="1000",
+    )
+    sio_redox_row = _hero_deck_score_row(
+        rail=Rail.SIO_EVOLUTION.value,
+        formula="SiO",
+        quantity="p_partial",
+        composition=composition,
+        residual_dex=Decimal("-0.25"),
+        candidate_value="1.5",
+        fO2_pa="100000",
+    )
+    sio_observations = {
+        "sio-pO2-reference": F.observation(
+            "sio-pO2-reference",
+            "deck-sio-experiment",
+            Identity(
+                quantity=Quantity.P_PARTIAL,
+                species=Species("SiO", Phase.G),
+                temperature_K=State.of(Decimal("1200")),
+                fO2_Pa=State.of(Decimal("1000")),
+            ),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="deck-test",
+        ),
+        "sio-redox-high-fo2": F.observation(
+            "sio-redox-high-fo2",
+            "deck-sio-experiment",
+            Identity(
+                quantity=Quantity.P_PARTIAL,
+                species=Species("SiO", Phase.G),
+                temperature_K=State.of(Decimal("1200")),
+                fO2_Pa=State.of(Decimal("100000")),
+            ),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="deck-test",
+        ),
+    }
+    pO2_row["reference"] = "sio-pO2-reference"
+    sio_redox_row["reference"] = "sio-redox-high-fo2"
+    dex = compute_metric(
+        MetricOperation.DEX, Decimal("2.5"), Decimal("1.25")
+    )
+    assert dex is not None
+    redox_row = _hero_deck_score_row(
+        rail=Rail.REDOX.value,
+        formula="Fe",
+        quantity="fe3_fe2_ratio",
+        composition=composition,
+        residual_dex=dex,
+        candidate_value="2.5",
+        fO2_pa="20892.96130854039",
+    )
+
+    result = score_mod._battery_hero_deck_records(
+        [pO2_row, sio_redox_row, redox_row],
+        observations=sio_observations,
+    )
+    sio = next(
+        point for point in result["points"]
+        if point["chart"] == "sio_evolution"
+    )
+    cross = next(
+        point for point in result["points"]
+        if point["chart"] == "fo2_cross_comparison"
+    )
+    sio_redox = next(
+        point for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+        and point["reference"] == "sio-redox-high-fo2"
+    )
+
+    assert sio["group_label"] == "10^-2–10^-1 bar"
+    assert float(cross["x_value"]) == pytest.approx(1.25, rel=1e-15)
+    assert float(cross["y_value"]).hex() == "0x1.4000000000000p+1"
+    assert float(sio_redox["x_value"]).hex() == (
+        -feo_iw_log10_fO2_bar(1200.0)
+    ).hex()
+
+
+def test_battery_hero_deck_uses_store_oxygen_request_for_axis() -> None:
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+    }
+    oxygen_identity = Identity(
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Fe", Phase.G),
+        temperature_K=State.of(Decimal("1200")),
+        fO2_Pa=State.of(Decimal("10")),
+    )
+    stored = F.observation(
+        "store-oxygen-reference",
+        "deck-oxygen-experiment",
+        oxygen_identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity=Quantity.P_PARTIAL.value,
+        composition=composition,
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+        engine=Engine.OPENIMCC.value,
+    )
+    row["reference"] = stored.observation_id
+
+    result = score_mod._battery_hero_deck_records(
+        [row], observations={stored.observation_id: stored}
+    )
+    point = next(
+        point for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+    )
+
+    # The scorer's Po2Request converts 10 Pa to 1e-4 bar; do not trust the
+    # deliberately absent fO2 on the residual candidate payload.
+    expected = score_mod._battery_hero_delta_iw(Decimal("1200"), Decimal("10"))
+    assert expected is not None
+    assert float(point["x_value"]).hex() == float(expected).hex()
+    assert Decimal(str(point["fO2_Pa"])) == Decimal("10")
+
+
+def test_solved_effusion_po2_bar_keeps_its_binary_value() -> None:
+    notice = Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=(
+            score_mod.OXYGEN_BALANCE_NOTICE_PREFIX
+            + ' {"pO2_bar":2.747e-10}'
+        ),
+        origin=f"engine:{Engine.OPENIMCC.value}",
+    )
+    prediction = EnginePrediction(
+        engine=Engine.OPENIMCC,
+        channel="test",
+        execution=Execution(state=ExecutionState.PRODUCED),
+        notices=(notice,),
+    )
+
+    assert score_mod._solved_effusion_po2_bar(prediction).hex() == (
+        "0x1.2e092d150c4aap-32"
+    )
+
+
+def test_battery_hero_deck_uses_solved_oxygen_balance_notice() -> None:
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+    }
+    oxygen_identity = Identity(
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Fe", Phase.G),
+        temperature_K=State.of(Decimal("1200")),
+    )
+    fe = F.observation(
+        "solved-fe-reference",
+        "deck-solved-oxygen-experiment",
+        oxygen_identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    sio = F.observation(
+        "solved-sio-reference",
+        "deck-solved-oxygen-experiment",
+        replace(
+            oxygen_identity,
+            species=Species("SiO", Phase.G),
+        ),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    solved_notice = {
+        "kind": NoticeKind.SOURCE_DISAGREEMENT.value,
+        "origin": f"engine:{Engine.OPENIMCC.value}",
+        "reason": (
+            score_mod.OXYGEN_BALANCE_NOTICE_PREFIX
+            + ' {"kind":"fo2_oxygen_balance_effusion_solved",'
+            + '"oxygen_condition_source":"openimcc_oxygen_balance_condition_only",'
+            + '"pO2_bar":2.747e-10}'
+        ),
+    }
+    fe_row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity=Quantity.P_PARTIAL.value,
+        composition=composition,
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+    )
+    sio_row = _hero_deck_score_row(
+        rail=Rail.SIO_EVOLUTION.value,
+        formula="SiO",
+        quantity=Quantity.P_PARTIAL.value,
+        composition=composition,
+        residual_dex=Decimal("-0.25"),
+        candidate_value="1.5",
+    )
+    fe_row["reference"] = fe.observation_id
+    sio_row["reference"] = sio.observation_id
+    fe_row["notices"] = [solved_notice]
+    sio_row["notices"] = [solved_notice]
+
+    result = score_mod._battery_hero_deck_records(
+        [fe_row, sio_row],
+        observations={fe.observation_id: fe, sio.observation_id: sio},
+    )
+    redox = next(
+        point
+        for point in result["points"]
+        if point["chart"] == "redox_sensitivity"
+    )
+    evolution = next(
+        point
+        for point in result["points"]
+        if point["chart"] == "sio_evolution"
+    )
+    pO2_bar = Decimal("2.747e-10")
+    expected_delta_iw = pO2_bar.log10() - Decimal(
+        str(feo_iw_log10_fO2_bar(1200.0, a_feo=1.0))
+    )
+
+    assert redox["oxygen_mode"] == "solved"
+    assert redox["oxygen_source"] == "openimcc_oxygen_balance_condition_only"
+    assert redox["oxygen_kind"] == "fo2_oxygen_balance_effusion_solved"
+    assert float(redox["x_value"]).hex() == float(expected_delta_iw).hex()
+    assert Decimal(str(redox["fO2_Pa"])) == pO2_bar * Decimal("1e5")
+    assert evolution["oxygen_mode"] == "solved"
+    assert evolution["oxygen_source"] == redox["oxygen_source"]
+    assert evolution["oxygen_kind"] == redox["oxygen_kind"]
+    assert evolution["group_label"] == "10^-10–10^-9 bar"
+
+
+def test_battery_hero_residue_requires_typed_mass_loss_at_same_time() -> None:
+    composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+    }
+    temperature = State.of(Decimal("1200"))
+    residue_identity = Identity(
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        species=Species("Fe", Phase.L),
+        temperature_K=temperature,
+    )
+    mass_loss_identity = Identity(
+        quantity=Quantity.MASS_LOSS_FRACTION,
+        species=Species("Fe", Phase.G),
+        temperature_K=temperature,
+    )
+    residue = F.observation(
+        "residue-at-10-min",
+        "deck-residue-experiment",
+        residue_identity,
+        Decimal("2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    other_residue = F.observation(
+        "residue-at-20-min",
+        "deck-residue-experiment",
+        residue_identity,
+        Decimal("3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    mass_loss = F.observation(
+        "typed-mass-loss-at-10-min",
+        "deck-residue-experiment",
+        mass_loss_identity,
+        Decimal("0.25"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    residue = replace(
+        residue,
+        point_conditions={
+            **(residue.point_conditions or {}),
+            "time_min": Located(State.of(Decimal("10"))),
+        },
+    )
+    other_residue = replace(
+        other_residue,
+        point_conditions={
+            **(other_residue.point_conditions or {}),
+            "time_min": Located(State.of(Decimal("20"))),
+        },
+    )
+    mass_loss = replace(
+        mass_loss,
+        point_conditions={"time_min": Located(State.of(Decimal("10")))},
+    )
+    rows = [
+        _hero_deck_score_row(
+            rail=Rail.RESIDUE_COMPOSITION.value,
+            formula="Fe",
+            quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION.value,
+            composition=composition,
+            residual_dex=Decimal("0.125"),
+            candidate_value="2",
+            engine=Engine.INTERNAL_ANALYTICAL.value,
+        ),
+        _hero_deck_score_row(
+            rail=Rail.RESIDUE_COMPOSITION.value,
+            formula="Fe",
+            quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION.value,
+            composition=composition,
+            residual_dex=Decimal("-0.25"),
+            candidate_value="3",
+            engine=Engine.INTERNAL_ANALYTICAL.value,
+        ),
+    ]
+    rows[0]["reference"] = residue.observation_id
+    rows[1]["reference"] = other_residue.observation_id
+
+    result = score_mod._battery_hero_deck_records(
+        rows,
+        observations={
+            residue.observation_id: residue,
+            other_residue.observation_id: other_residue,
+            mass_loss.observation_id: mass_loss,
+        },
+    )
+    points = [
+        point for point in result["points"]
+        if point["chart"] == "residue_composition"
+    ]
+
+    assert len(points) == 1
+    assert float(points[0]["x_value"]).hex() == "0x1.0000000000000p-2"
+    assert float(points[0]["y_value"]).hex() == "0x1.0000000000000p-3"
+    assert result["axis_refusals"][
+        ("residue_composition", Engine.INTERNAL_ANALYTICAL.value, "no recorded mass loss")
+    ] == 1
+
+
+def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
+    mole_composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.02"]],
+    }
+    assert _battery_hero_sio2_mole_fraction(mole_composition) == Decimal("0.02")
+    assert _battery_hero_sio2_mole_fraction(
+        {
+            "amount_basis": AmountBasis.MASS_PERCENT.value,
+            "components": [["SiO2", "2"]],
+        }
+    ) is None
+    assert _battery_hero_sio2_mole_fraction(
+        {
+            "amount_basis": AmountBasis.MOLE_FRACTION.value,
+            "components": [["SiO2", "1.01"]],
+        }
+    ) is None
+    samples = [
+        (Rail.VAPOUR.value, "openimcc", "100", mole_composition, "-1"),
+        (Rail.VAPOUR.value, "openimcc", "199.9", mole_composition, "3"),
+        (
+            Rail.VAPOUR.value,
+            "openimcc",
+            "200",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["SiO2", "0.05"]],
+            },
+            "6",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "openimcc",
+            "199",
+            {
+                "amount_basis": AmountBasis.MASS_PERCENT.value,
+                "components": [["SiO2", "0.02"]],
+            },
+            "100",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-7",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-1",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-3",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "600",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["SiO2", "1"]],
+            },
+            "-8",
+        ),
+    ]
+
+    records = _battery_hero_sweet_spot_records(samples)
+    openimcc_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "100"
+        and row["sio2_lower"] == "0.00"
+    )
+    assert openimcc_cell["n"] == 2
+    assert Decimal(str(openimcc_cell["median_abs_dex"])) == Decimal("2")
+    assert openimcc_cell["color_eligible"] is False
+
+    boundary_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "200"
+        and row["sio2_lower"] == "0.05"
+    )
+    assert boundary_cell["n"] == 1
+    assert Decimal(str(boundary_cell["median_abs_dex"])) == Decimal("6")
+
+    shared_empty_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "500"
+        and row["sio2_lower"] == "0.95"
+    )
+    assert shared_empty_cell["n"] == 0
+    assert shared_empty_cell["median_abs_dex"] is None
+    zero_sio2_cell = next(
+        row
+        for row in records
+        if row["engine"] == "vaporock"
+        and row["temperature_lower_K"] == "500"
+        and row["sio2_lower"] == "0.00"
+    )
+    assert zero_sio2_cell["n"] == 3
+    assert Decimal(str(zero_sio2_cell["median_abs_dex"])) == Decimal("3")
+    assert zero_sio2_cell["color_eligible"] is True
+    upper_boundary_cell = next(
+        row
+        for row in records
+        if row["engine"] == "vaporock"
+        and row["temperature_lower_K"] == "600"
+        and row["sio2_lower"] == "0.95"
+    )
+    assert upper_boundary_cell["n"] == 1
+    assert Decimal(str(upper_boundary_cell["median_abs_dex"])) == Decimal("8")
+    assert upper_boundary_cell["color_eligible"] is False
+    openimcc_temperature_bins = {
+        (row["temperature_lower_K"], row["temperature_upper_K"])
+        for row in records
+        if row["engine"] == "openimcc"
+    }
+    vaporock_temperature_bins = {
+        (row["temperature_lower_K"], row["temperature_upper_K"])
+        for row in records
+        if row["engine"] == "vaporock"
+    }
+    assert openimcc_temperature_bins == vaporock_temperature_bins
+
+
+@pytest.mark.parametrize(
+    ("formula", "is_alkali_salt"),
+    [("Na", False), ("Na2O", False), ("NaCl", True), ("K2SO4", True)],
+)
+def test_battery_hero_alkali_salt_facets_require_a_salt_anion(
+    formula: str, is_alkali_salt: bool
+) -> None:
+    assert (
+        "minor:alkali_salts" in _battery_hero_minor_foulant_facets(formula)
+    ) is is_alkali_salt
 
 
 def test_measured_headline_mode_serializes_typed_residuals_end_to_end(

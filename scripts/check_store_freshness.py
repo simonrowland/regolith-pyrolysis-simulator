@@ -137,6 +137,24 @@ CODE_INPUTS = (
 #     hard_issues=3334; j01 7/7). This acknowledges STORE outputs only; the
 #     scoring change (cell-balance residuals per engine) is covered by the
 #     commits' tests.
+#   23bee5e7b, 8c154cdb0, ed246fcb7, 62224868f: b-932, the alphaMELTS redox
+#     handoff. 23bee5e7b moves the multivalent-melt rule into
+#     simulator/melt_backend/base.py (score.py and generators/bench.py import
+#     it). 8c154cdb0 made score.py require oxygen for every modeled quantity
+#     over a multivalent melt; 62224868f removes that branch again, restoring
+#     the identity-profile rule. ed246fcb7 keeps alphaMELTS's not-an-input
+#     oxygen mode in the melt backends and
+#     diagnostic_helpers/binary_pot_battery.py; its score.py change is a
+#     comment.
+#   2e69a5faa, 4f9402dea, 31bb956c5, cdd49ec85: t-1347, the hero deck. These
+#     add scorer-owned deck axes in score.py (solved oxygen conditions, typed
+#     deck records, the NBO/T domain bound) that the hero plotter reads.
+#   9364d3828: b-782. diagnostic_references() also routes observations that
+#     is_compilation_evidence() flags to the diagnostic path.
+#   The landing train's full regen of b143 (tip 800c01e37 on green 95a870f36)
+#     produced no store change (observations=126296 queue=80926
+#     hard_issues=3334; j01 7/7). This acknowledges STORE outputs only; the
+#     scoring and diagnostic changes are covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "80fad2bfa",
     "09c498b65",
@@ -147,6 +165,9 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "8d90cc936",
     "f522e152c", "da3640753", "e84b44277",
     "554fd0e07", "b746bcf30", "3a27c5abd",
+    "23bee5e7b", "8c154cdb0", "ed246fcb7", "62224868f",
+    "2e69a5faa", "4f9402dea", "31bb956c5", "cdd49ec85",
+    "9364d3828",
 })
 
 

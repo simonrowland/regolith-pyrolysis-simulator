@@ -384,6 +384,10 @@ def test_parse_needs_channel_baf_entry():
     entry = {
         "element": "Ba",
         "carrier": "BaF",
+        "verdict": "NEEDS-CHANNEL",
+        "pathway": "parent_oxide_x_halogen_exchange",
+        "required_channels": [CHANNEL_F2],
+        "refusal_code": REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING,
         "missing": (
             "NEEDS-CHANNEL: runtime lacks non-O2 chemical-potential channel; "
             "pathway=parent_oxide_x_halogen_exchange; CEA parent oxide BaO_cr"
@@ -413,30 +417,40 @@ def test_coverage_ledger_typed_reasons_consume_needs_channel():
 
 
 def test_reconstruct_878_pathway_cohort_from_ledger():
-    """Design §2.2 878 figure must be reproducible from the free-text ledger."""
+    """Design §2.2 878 figure must be reproducible from typed ledger fields."""
 
     result = reconstruct_878_pathway_cohort(gaps_path=DATA / "vapour_rail_coverage_gaps.yaml")
-    # Document the actual reconstruction; the design total is 878.  If the
-    # free-text pathway labels drift, surface the counts rather than silently
-    # pass.
     by = dict(result["by_pathway"])
     total = int(result["total"])
-    # Soft gate: total should be in the NEEDS-CHANNEL neighborhood; the
-    # design's 878 is the target.  Report both.
-    assert total > 0, by
-    # Prefer exact 878 when the ledger still carries the design pathways.
-    if total == 878:
-        assert result["reproducible"] is True
-    else:
-        # Still assert the six pathway labels are present as keys.
-        assert set(by) == {
-            "parent_oxide_x_halogen_exchange",
-            "element_condensed_x_halogen_exchange",
-            "catalog_base_x_halogen_exchange",
-            "base_x_hydrogen_exchange",
-            "halide_condensed_family",
-            "related_binary_condensed",
-        }
+    assert total == 878
+    assert by == {
+        "parent_oxide_x_halogen_exchange": 303,
+        "element_condensed_x_halogen_exchange": 215,
+        "catalog_base_x_halogen_exchange": 146,
+        "base_x_hydrogen_exchange": 87,
+        "halide_condensed_family": 107,
+        "related_binary_condensed": 20,
+    }
+    assert result["halide_ratio_mismatch_rows"] == 107
+    assert result["reproducible"] is True
+
+
+def test_reconstruct_878_pathway_cohort_ignores_missing_prose():
+    entry = {
+        "verdict": "NEEDS-CHANNEL",
+        "pathway": "halide_condensed_family",
+        "missing": "ratio mismatch described here",
+    }
+    original = reconstruct_878_pathway_cohort(entries=[entry])
+    edited = reconstruct_878_pathway_cohort(
+        entries=[{**entry, "missing": "description edited"}]
+    )
+
+    assert dict(original["by_pathway"]) == dict(edited["by_pathway"])
+    assert original["total"] == edited["total"] == 1
+    assert original["halide_ratio_mismatch_rows"] == edited[
+        "halide_ratio_mismatch_rows"
+    ] == 1
 
 
 

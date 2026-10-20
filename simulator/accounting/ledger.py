@@ -357,11 +357,11 @@ class AtomLedger:
 
         self._load_account_policies(account_policies)
         for account, species_kg in dict(initial_balances or {}).items():
-            cleaned_kg = _clean_species_kg(species_kg, self.balance_tolerance_kg)
+            cleaned_kg = _clean_species_kg(species_kg)
             self._balances[str(account)] = _species_kg_to_mol(
                 cleaned_kg,
                 self.registry,
-                tolerance_kg=self.balance_tolerance_kg,
+                tolerance_kg=0.0,
             )
             self._record_movement_scale(
                 self._movement_scale_kg,
@@ -2248,15 +2248,9 @@ def _apply_lot(
     }
 
 
-def _clean_species_kg(species_kg: Mapping[str, float], tolerance_kg: float) -> dict[str, float]:
-    cleaned: dict[str, float] = {}
-    for species, kg in species_kg.items():
-        value = float(kg)
-        if not math.isfinite(value):
-            raise AccountingError(f"balance for species {species!r} must be finite")
-        if abs(value) > tolerance_kg:
-            cleaned[str(species)] = value
-    return dict(sorted(cleaned.items()))
+def _clean_species_kg(species_kg: Mapping[str, float]) -> dict[str, float]:
+    lot = MaterialLot("initial_balances", species_kg)
+    return dict(lot.without_empty().species_kg)
 
 
 def _clean_species_mol(

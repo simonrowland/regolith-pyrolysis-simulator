@@ -1889,11 +1889,16 @@ def _decision_payload(decision):
     }
 
 
-def _rounded_positive_species(values, digits: int) -> dict[str, float]:
+def _rounded_positive_species(
+    values,
+    digits: int,
+    *,
+    minimum_amount: float = 1e-12,
+) -> dict[str, float]:
     species = {}
     for key, value in dict(values or {}).items():
         amount = float(value or 0.0)
-        if amount > 1e-12:
+        if amount > minimum_amount:
             species[str(key)] = round(amount, digits)
     return dict(sorted(species.items()))
 
@@ -1901,11 +1906,10 @@ def _rounded_positive_species(values, digits: int) -> dict[str, float]:
 def _wt_pct_from_kg(species_kg: dict[str, float]) -> dict[str, float]:
     total_kg = sum(float(value or 0.0) for value in species_kg.values())
     if total_kg <= 0.0:
-        return {}
+        return {species: 0.0 for species in sorted(species_kg)}
     return {
         species: round(float(kg) / total_kg * 100.0, 2)
         for species, kg in sorted(species_kg.items())
-        if float(kg or 0.0) > 1e-12
     }
 
 
@@ -1915,7 +1919,10 @@ def _pot_composition_kg(sim, snapshot) -> dict[str, float]:
         return {}
     try:
         return _rounded_positive_species(
-            ledger.project_account_kg('process.cleaned_melt'), 4)
+            ledger.project_account_kg('process.cleaned_melt'),
+            4,
+            minimum_amount=0.0,
+        )
     except Exception as exc:
         _safe_log(f'Unable to read cleaned-melt ledger for web tick: {exc}')
         return {}
@@ -2497,11 +2504,13 @@ def _merge_product_story_mass(target, species, mass):
 
 
 def _product_story_bucket(species_kg, **details):
-    rounded_species = {
-        species: round(mass, 2)
-        for species, mass in sorted(species_kg.items())
-        if float(mass) > 0.0
-    }
+    rounded_species = {}
+    for species, mass in sorted(species_kg.items()):
+        if float(mass) <= 0.0:
+            continue
+        displayed_mass = round(mass, 2)
+        if displayed_mass != 0.0:
+            rounded_species[species] = displayed_mass
     return {
         'species_kg': rounded_species,
         **{key: round(float(value), 2) for key, value in details.items()},

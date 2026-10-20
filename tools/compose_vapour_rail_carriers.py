@@ -30,7 +30,7 @@ from simulator.vapour_rail.catalog import compile_vapour_rail_catalog  # noqa: E
 from simulator.vapour_rail.channels import (  # noqa: E402
     ChannelCompositionRefusal,
     REFUSAL_CARBON_SIDE_OWNER_MISSING,
-    attempt_channel_composition,
+    _compose_typed_gap_entry,
 )
 GAPS_PATH = ROOT / "data/vapour_rail_coverage_gaps.yaml"
 CATALOG_PATH = ROOT / "data/vapor_pressures.yaml"
@@ -38,14 +38,10 @@ CEA_PATH = ROOT / "data/literature/extracts/nasa-cea-thermo.yaml"
 
 STRICT = "COMPOSABLE-NOW-STRICT"
 CLIPPED = "COMPOSABLE-NOW-CLIPPED"
-NEEDS_CHANNEL = "NEEDS-CHANNEL"
 OPERATING_LOW_K = 1300.0
 OPERATING_HIGH_K = 2300.0
 R_J_MOL_K = 8.31446261815324
 
-_PATHWAY_RE = re.compile(r"\bpathway=([a-z0-9_]+)")
-_ANCHOR_RE = re.compile(r"; anchor (\S+) (?:covers|partial)")
-_OVERLAP_RE = re.compile(r"\boverlap_fraction=([0-9.]+)")
 _FORMULA_TOKEN_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?|\.\d+)?")
 
 
@@ -57,7 +53,6 @@ class Candidate:
     pathway: str
     anchor_key: str | None
     overlap_fraction: float
-    missing: str
 
 
 @dataclass(frozen=True)
@@ -91,9 +86,9 @@ def _load_yaml(path: Path) -> Mapping[str, Any]:
     return payload
 
 
-def _tier(missing: str) -> str | None:
+def _tier(verdict: str) -> str | None:
     for value in (STRICT, CLIPPED):
-        if missing.startswith(value + ":"):
+        if verdict == value:
             return value
     return None
 
@@ -107,28 +102,26 @@ def load_candidates() -> tuple[Candidate, ...]:
     for row in rows:
         if not isinstance(row, Mapping):
             continue
-        missing = str(row.get("missing") or "")
-        tier = _tier(missing)
+        tier = _tier(str(row.get("verdict") or ""))
         if tier is None:
             continue
-        pathway_match = _PATHWAY_RE.search(missing)
-        anchor_match = _ANCHOR_RE.search(missing)
-        if pathway_match is None:
+        pathway = row.get("pathway")
+        if not isinstance(pathway, str):
             raise ValueError(f"unparseable composable row: {row!r}")
-        pathway = pathway_match.group(1)
-        if anchor_match is None and pathway != "catalog_self_executable":
+        anchor_key = row.get("anchor_key")
+        if anchor_key is not None and not isinstance(anchor_key, str):
             raise ValueError(f"unparseable composable row: {row!r}")
-        overlap_match = _OVERLAP_RE.search(missing)
-        overlap = float(overlap_match.group(1)) if overlap_match else 1.0
+        if anchor_key is None and pathway != "catalog_self_executable":
+            raise ValueError(f"unparseable composable row: {row!r}")
+        overlap = float(row.get("overlap_fraction", 1.0))
         out.append(
             Candidate(
                 element=str(row["element"]),
                 carrier=str(row["carrier"]),
                 tier=tier,
                 pathway=pathway,
-                anchor_key=anchor_match.group(1) if anchor_match else None,
+                anchor_key=anchor_key,
                 overlap_fraction=overlap,
-                missing=missing,
             )
         )
     return tuple(out)
@@ -142,22 +135,15 @@ def load_entries() -> tuple[Mapping[str, Any], ...]:
 
 
 def typed_refusal(row: Mapping[str, Any]) -> ChannelCompositionRefusal | None:
-    """Consume one tiered ledger row and return t-571's typed refusal.
+    """Consume one typed ledger verdict and return t-571's refusal.
 
     COMPOSABLE rows return ``None``.  NEEDS-CHANNEL rows must execute the
     channel resolver and may never fall through to the O2-only generator.
     """
 
-    missing = str(row.get("missing") or "")
-    if not missing.startswith(NEEDS_CHANNEL + ":"):
+    result = _compose_typed_gap_entry(row)
+    if result is None:
         return None
-    pathway_match = _PATHWAY_RE.search(missing)
-    result = attempt_channel_composition(
-        carrier=str(row.get("carrier") or ""),
-        element=str(row.get("element") or ""),
-        pathway=pathway_match.group(1) if pathway_match else None,
-        missing_text=missing,
-    )
     if not isinstance(result, ChannelCompositionRefusal):
         raise AssertionError(
             f"NEEDS-CHANNEL carrier {row.get('carrier')} resolved numerically"
@@ -1119,7 +1105,7 @@ def _patch_existing_executable_receipt(
 
 
 def _remove_selected_gap_blocks(
-    text: str, selected: set[tuple[str, str, str]]
+    text: str, selected: set[tuple[str, str]]
 ) -> tuple[str, int]:
     block_re = re.compile(r"(?ms)^- element:.*?(?=^- element:|\Z)")
     removed = 0
@@ -1131,7 +1117,7 @@ def _remove_selected_gap_blocks(
         if not isinstance(parsed, list) or len(parsed) != 1 or not isinstance(parsed[0], Mapping):
             raise ValueError("failed to parse coverage-gap entry block")
         row = parsed[0]
-        key = (str(row.get("element")), str(row.get("carrier")), str(row.get("missing")))
+        key = (str(row.get("element")), str(row.get("carrier")))
         if key in selected:
             removed += 1
         else:
@@ -1236,7 +1222,7 @@ def compose(*, pilot: str | None, apply: bool) -> Mapping[str, Any]:
         if species.code_metadata.hot_train_applicability != "not_applicable":
             raise AssertionError(f"{carrier}: generated row became hot-train applicable")
 
-    selected_keys = {(row.element, row.carrier, row.missing) for row in selected}
+    selected_keys = {(row.element, row.carrier) for row in selected}
     gaps_before = GAPS_PATH.read_text(encoding="utf-8")
     gaps_after, removed = _remove_selected_gap_blocks(gaps_before, selected_keys)
     yaml.safe_load(gaps_after)

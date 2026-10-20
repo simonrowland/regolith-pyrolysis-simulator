@@ -11,6 +11,7 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.accounting.ledger import LedgerTransition
+from simulator.accounting.lots import MaterialLot
 from simulator.cost_energy import (
     ELECTRICAL_USD_PER_KWH,
     FURNACE_USD_PER_H,
@@ -20,7 +21,12 @@ from simulator.cost_energy import (
     owner_ratify_cost_placeholders,
     unavailable_reason_of,
 )
-from simulator.cost_ledger import CostImportContext, CostLedger, CostVector
+from simulator.cost_ledger import (
+    VECTOR_TOLERANCE,
+    CostImportContext,
+    CostLedger,
+    CostVector,
+)
 from simulator.cost_ledger import build_cost_rollup_diagnostic, run_pumping_input_cost
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -85,6 +91,38 @@ def test_computed_energy_and_non_electrical_cost_controls(intent, diagnostic, en
     assert result is not None
     assert result.processing_cost_added.electrical_kWh == pytest.approx(energy)
     assert ledger.summary()["warnings"] == []
+
+
+def test_sub_tolerance_reagent_debit_is_below_cost_input_floor():
+    tiny_kg = 3.226e-13
+    ledger = CostLedger()
+    transition = LedgerTransition(
+        "tiny_reagent_cost_floor",
+        debits=(
+            MaterialLot("process.reagent_inventory", {"Si": tiny_kg}),
+            MaterialLot("process.cleaned_melt", {"Fe": 1.0}),
+        ),
+        credits=(
+            MaterialLot(
+                "process.metal_phase",
+                {"Fe": 1.0, "Si": tiny_kg},
+            ),
+        ),
+    )
+
+    result = ledger.observe_transition(
+        intent=ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+        transition=transition,
+        strict=True,
+    )
+
+    assert result is None
+    warnings = ledger.summary()["warnings"]
+    assert len(warnings) == 1
+    assert "cost_debit_below_quantity_floor" in warnings[0]
+    assert "skipped_keys=1" in warnings[0]
+    assert f"total_kg={tiny_kg:.12g}" in warnings[0]
+    assert f"floor_kg={VECTOR_TOLERANCE:.1e}" in warnings[0]
 
 
 def test_cost_ledger_mass_allocates_normal_coproducts_by_product_mass():

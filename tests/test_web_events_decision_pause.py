@@ -81,7 +81,11 @@ def _deterministic_liquidus_gate(monkeypatch, tmp_path):
     monkeypatch.setattr(
         PyrolysisSimulator,
         '_freeze_gate_curve_record',
-        lambda self: write_gate_curve_memo_record(self, curve),
+        lambda self: write_gate_curve_memo_record(
+            self,
+            curve,
+            provider_outcome='produced',
+        ),
     )
     original_load_yaml = events_module._load_yaml
 

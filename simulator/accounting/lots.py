@@ -229,7 +229,11 @@ class MaterialLot:
                 raise AccountingError(
                     f"mol-basis lot mass for species {name!r} must be non-negative"
                 )
-            if abs(value) <= EMPTY_KG_TOLERANCE and name not in nonzero_mol_species:
+            if (
+                value <= 0.0
+                and abs(value) <= EMPTY_KG_TOLERANCE
+                and name not in nonzero_mol_species
+            ):
                 value = 0.0
             normalized[name] = normalized.get(name, 0.0) + value
 
@@ -304,7 +308,7 @@ class MaterialLot:
         kept = {
             species: kg
             for species, kg in self.species_kg.items()
-            if abs(kg) > tolerance_kg or species in nonzero_mol_species
+            if abs(kg) > tolerance_kg or species in nonzero_mol_species or kg > 0.0
         }
         return MaterialLot(
             self.account,

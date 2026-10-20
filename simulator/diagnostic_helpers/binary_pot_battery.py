@@ -43,6 +43,7 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
+from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
 from simulator.melt_regime import (
     legacy_raw_liquid_fraction_is_zero,
     liquid_fraction_invalidity,
@@ -106,7 +107,7 @@ PO2_COMMANDED = "commanded"
 PO2_OXYGEN_BALANCE_EFFUSION = "oxygen_balance_effusion"
 # Caller-stated oxygen omission, including condensed activity without a
 # multivalent element, is never rewritten as engine fO2 = -9.
-PO2_NOT_AN_INPUT = "not_an_input"
+PO2_NOT_AN_INPUT = REDOX_MODE_NOT_AN_INPUT
 
 REFUSAL_OUT_OF_BASIS = "out_of_basis"
 REFUSAL_COMPOSITION_PROJECTED = "composition_projected"
@@ -3105,15 +3106,16 @@ def assess_qualification_gate(
 ) -> dict[str, Any]:
     """Record the MELTS domain-gate verdict without refusing the call."""
 
+    from engines.engine_commissioning import assess_engine_commissioning
     from engines.alphamelts.domain import AlphaMELTSDomainGate
 
     band = melts_certified_band()
-    assessment = AlphaMELTSDomainGate.assess(composition_wt_pct)
+    domain_assessment = AlphaMELTSDomainGate.assess(composition_wt_pct)
     t_min, t_max = band["temperature_K"]
     t_value = float(temperature_K)
     t_failed = t_value < float(t_min) or t_value > float(t_max)
-    warnings = list(assessment.warnings)
-    failed = list(assessment.failed_constraints)
+    warnings = list(domain_assessment.warnings)
+    failed = list(domain_assessment.failed_constraints)
     if t_failed:
         failed.append("temperature_range")
         warnings.append(
@@ -3121,21 +3123,32 @@ def assess_qualification_gate(
             f"[{t_min:g}, {t_max:g}] K"
         )
     sio2 = float(composition_wt_pct.get("SiO2", 0.0) or 0.0)
-    crash_floor = float(band["sio2_crash_floor_wt_pct"])
-    below_crash_floor = sio2 < crash_floor
-    if below_crash_floor and not assessment.outside_certified_band:
+    commissioning = assess_engine_commissioning(
+        "alphamelts",
+        sio2_wt_pct=sio2,
+        temperature_K=t_value,
+    )
+    crash_floor = commissioning.spec.sio2_wt_pct.observed_crash_floor_wt_pct
+    below_crash_floor = commissioning.below_crash_floor
+    if (
+        below_crash_floor
+        and crash_floor is not None
+        and not domain_assessment.outside_certified_band
+    ):
         # 30–34 wt% sliver: default band admits it; crash floor does not.
         warnings.append(
             f"SiO2 = {sio2:.3f} wt% is below the measured alphaMELTS "
             f"crash floor {crash_floor:g} wt%"
         )
-    valid = bool(assessment.valid) and not t_failed
+    valid = bool(domain_assessment.valid) and not t_failed
     return {
         "valid": valid,
         "warnings": warnings,
-        "reason": assessment.reason,
+        "reason": domain_assessment.reason,
         "failed_constraints": tuple(failed),
-        "silicate_network_band_wt_pct": list(assessment.silicate_network_band_wt_pct),
+        "silicate_network_band_wt_pct": list(
+            domain_assessment.silicate_network_band_wt_pct
+        ),
         "temperature_K": t_value,
         "temperature_in_band": not t_failed,
         "sio2_wt_pct": sio2,
@@ -4048,6 +4061,15 @@ def equilibrate_cell(
         parameters = {}
     if "fO2_log" in parameters:
         kwargs["fO2_log"] = fo2_log
+    if "redox_mode" in parameters and po2.mode == PO2_NOT_AN_INPUT:
+        from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+        from simulator.melt_backend.base import multivalent_components
+
+        if not multivalent_components(
+            pot.composition_wt_pct,
+            oxide_aliases=MELTS_OXIDE_ALIASES,
+        ):
+            kwargs["redox_mode"] = REDOX_MODE_NOT_AN_INPUT
     if "po2_request" in parameters:
         kwargs["po2_request"] = po2
     if "call_timeout_s" in parameters:

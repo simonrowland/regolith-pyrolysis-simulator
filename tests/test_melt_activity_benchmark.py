@@ -1430,6 +1430,10 @@ def test_generate_report_states_measured_unlatched_coverage_when_supplied():
     assert "produced 1/1 usable predictions (Yamaguchi: 1/1)" in report
     assert "2/3" in report
     assert "not taken from the latched CSV" in report
+    assert (
+        "ThermoEngine isolated-mode ceiling narrative condition: "
+        "met (adapter latch and measured isolated results)"
+    ) in report
     assert "isolated-mode ceiling" in report
     assert "isolated retry remains required" in report
     assert "ThermoEngineFO2UndefinedError" in report
@@ -2707,13 +2711,29 @@ def test_run_benchmark_passes_producer_close_marker_to_point_and_probe_detectors
     assert result["metadata"]["thermoengine_probe_latch"] is None
 
 
-def test_tracked_melt_activity_report_excludes_retired_thermoengine_narrative():
+def test_tracked_melt_activity_report_records_thermoengine_narrative_condition():
     # 65a8273a4 added the stale 32/110 passage; regeneration ebf488e12 removed it.
     text = (
         benchmark.DEFAULT_OUTPUT_DIR / "report.md"
     ).read_text(encoding="utf-8")
     assert "STALE (t-681" not in text
-    assert "isolated-mode ceiling" not in text
+    condition_line = next(
+        (
+            line
+            for line in text.splitlines()
+            if line.startswith(
+                "ThermoEngine isolated-mode ceiling narrative condition: "
+            )
+        ),
+        None,
+    )
+    assert condition_line is not None
+    condition_met = condition_line.startswith(
+        "ThermoEngine isolated-mode ceiling narrative condition: met "
+    )
+    assert (
+        "is an isolated-mode ceiling, not a sequential-mode result:" in text
+    ) is condition_met
     assert "Combined **32/110** is an" not in text
 
 

@@ -3092,6 +3092,20 @@ def generate_report(
             for row in thermoengine_rows
         )
         latch = thermoengine_latch or detect_thermoengine_adapter_latch(point_rows)
+        isolated_measured = (
+            latch is not None
+            and latch.get("isolated_total") is not None
+            and latch.get("isolated_usable") is not None
+        )
+        lines.append("")
+        lines.append(
+            "ThermoEngine isolated-mode ceiling narrative condition: "
+            + (
+                "met (adapter latch and measured isolated results)"
+                if isolated_measured
+                else "not met (adapter latch and measured isolated results)"
+            )
+        )
         lines.append("")
         if latch:
             after_id = latch.get("latch_after_point_id") or "an earlier point"
@@ -3101,7 +3115,6 @@ def generate_report(
             yam_latched = int(latch.get("yamaguchi_latched_count") or 0)
             isolated_total = latch.get("isolated_total")
             isolated_usable = latch.get("isolated_usable")
-            isolated_measured = isolated_total is not None and isolated_usable is not None
             inherited_phrase = _latched_status_phrase(thermoengine_rows, latch)
             lines.append(
                 f"ThermoEngine sequential one-process yield: "

@@ -989,6 +989,28 @@ def test_status_strip_harness_loads_production_lifecycle_module_order():
     assert rendered["final"]["statusText"] == "Complete"
 
 
+def test_furnace_material_default_label_does_not_claim_a_fixed_ceiling():
+    template = (_REPO_ROOT / "web" / "templates" / "simulator.html").read_text()
+    controls = _SIMULATOR_CONTROLS_JS.read_text()
+
+    assert '<option value="" selected>Default</option>' in template
+    assert 'id="furnace-material-error"' in template
+    assert "Default (1800 C ceiling)" not in template
+    assert "Default (1800 C ceiling)" not in controls
+
+
+def test_furnace_material_catalog_failure_is_reported():
+    rendered = _render_status_strip(
+        sequence=[],
+        simulate_furnace_catalog_failure=True,
+    )
+
+    assert rendered["final"]["furnaceMaterialErrorHidden"] is False
+    assert rendered["final"]["furnaceMaterialErrorText"] == (
+        "Could not load furnace material options. The default remains selected."
+    )
+
+
 def test_duplicate_pending_starts_accept_only_latest_generation():
     sequence = [
         {"event": "start_click", "payload": {}},
@@ -1468,6 +1490,7 @@ def _render_status_strip(
     sequence,
     mutate_badge_clobber=False,
     mutate_no_tick_recovery=False,
+    simulate_furnace_catalog_failure=False,
 ):
     completed = subprocess.run(
         ["node", str(_STATUS_STRIP_HARNESS)],
@@ -1482,6 +1505,7 @@ def _render_status_strip(
                 "sequence": sequence,
                 "mutate_badge_clobber": mutate_badge_clobber,
                 "mutate_no_tick_recovery": mutate_no_tick_recovery,
+                "simulate_furnace_catalog_failure": simulate_furnace_catalog_failure,
             }
         ),
         text=True,

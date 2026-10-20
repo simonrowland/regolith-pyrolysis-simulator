@@ -29,6 +29,10 @@ from simulator.state import (
     MeltState,
     ProcessInventory,
 )
+from simulator.transport_constants import (
+    FREE_MOLECULAR_KNUDSEN_MIN,
+    VISCOUS_KNUDSEN_MAX,
+)
 from tests.chemistry.conftest import _build_sim
 
 
@@ -190,9 +194,71 @@ def _external_input_mass_kg(sim) -> float:
     )
 
 
+def _continuum_extrapolation_notices(diagnostic: dict) -> list[dict]:
+    notices = []
+    notice = diagnostic.get("continuum_extrapolation_notice")
+    if isinstance(notice, dict):
+        notices.append(notice)
+    for series in (diagnostic.get("evaporation_series_resistance", {}) or {}).values():
+        if isinstance(series, dict):
+            notice = series.get("continuum_extrapolation_notice")
+            if isinstance(notice, dict):
+                notices.append(notice)
+    return notices
+
+
+def _evaporation_transport_diagnostic(sim) -> dict | None:
+    diagnostic = dict(getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {})
+    if diagnostic.get("evaporation_series_resistance"):
+        return diagnostic
+    return None
+
+
+def _assert_transitional_steps_are_flagged(diagnostics: list[dict]) -> None:
+    out_of_domain_steps = []
+    for step_number, diagnostic in enumerate(diagnostics, start=1):
+        series = diagnostic.get("evaporation_series_resistance", {}) or {}
+        out_of_domain_species = []
+        for species, species_diagnostic in series.items():
+            if not isinstance(species_diagnostic, dict):
+                continue
+            knudsen_number = species_diagnostic.get("knudsen_number")
+            if (
+                isinstance(knudsen_number, (int, float))
+                and species_diagnostic.get("gas_resistance_weight", 0.0) > 0.0
+                and VISCOUS_KNUDSEN_MAX
+                <= knudsen_number
+                < FREE_MOLECULAR_KNUDSEN_MIN
+            ):
+                out_of_domain_species.append(species)
+        if not out_of_domain_species:
+            continue
+
+        out_of_domain_steps.append(step_number)
+        notices = _continuum_extrapolation_notices(diagnostic)
+        assert notices, f"out-of-domain transport at step {step_number} was unflagged"
+        for notice in notices:
+            assert notice["reason"] == "viscous_p_bulk_transport_out_of_domain"
+            assert notice["authority_level"] == "extrapolated"
+            assert notice["status"] == "extrapolated"
+            assert notice["p_bulk_transport_domain"] == "out_of_domain_transitional"
+            assert notice["VISCOUS_KNUDSEN_MAX"] == VISCOUS_KNUDSEN_MAX
+            assert notice["FREE_MOLECULAR_KNUDSEN_MIN"] == (
+                FREE_MOLECULAR_KNUDSEN_MIN
+            )
+        for species in out_of_domain_species:
+            series_notice = series[species].get("continuum_extrapolation_notice")
+            assert series_notice or any(
+                species in notice.get("affected_species", ())
+                for notice in notices
+            ), f"out-of-domain species {species} at step {step_number} lacked a notice"
+
+    assert out_of_domain_steps, "the run must reach out-of-domain transport"
+
+
 def _run_c2a_staged_to_completion(
     sim,
-) -> tuple[int, EvaporationFluxRefusal | None]:
+) -> tuple[EvaporationFluxRefusal | None, list[dict]]:
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
@@ -202,6 +268,7 @@ def _run_c2a_staged_to_completion(
     }
     steps = 0
     refusal = None
+    transport_diagnostics = []
     while not sim.is_complete() and steps < 500:
         if sim.paused_for_decision:
             decision = sim.pending_decision
@@ -210,18 +277,14 @@ def _run_c2a_staged_to_completion(
                 choice = (decision.options or [None])[0]
             sim.apply_decision(decision.decision_type, choice)
             continue
-        ledger_before = sim.atom_ledger.mol_by_account()
-        transitions_before = tuple(sim.atom_ledger.transitions)
-        drift_before = sim.atom_ledger.element_atom_drift_report()
         try:
             sim.step()
         except EvaporationFluxRefusal as exc:
             refusal = exc
-            assert sim.atom_ledger.mol_by_account() == ledger_before
-            assert tuple(sim.atom_ledger.transitions) == transitions_before
-            assert sim.atom_ledger.element_atom_drift_report() == drift_before
             break
         steps += 1
+        if diagnostic := _evaporation_transport_diagnostic(sim):
+            transport_diagnostics.append(diagnostic)
         # Typed campaign-endpoint refusal is non-resumable (no next decision).
         # Treat it as a finished batch for mass-balance closure checks.
         if getattr(sim, "campaign_endpoint_refused", lambda: False)():
@@ -231,7 +294,124 @@ def _run_c2a_staged_to_completion(
         or sim.campaign_endpoint_refused()
         or refusal is not None
     )
-    return steps, refusal
+    return refusal, transport_diagnostics
+
+
+def _capture_post_mg_c2a_hold_limit(monkeypatch, campaign_mgr) -> dict:
+    limits = {}
+    configure_campaign = campaign_mgr.configure_campaign
+
+    def configure_and_capture(melt, campaign):
+        configure_campaign(melt, campaign)
+        if campaign == CampaignPhase.C2A:
+            limits[CampaignPhase.C2A] = campaign_mgr._max_hold_hr(
+                CampaignPhase.C2A
+            )
+
+    monkeypatch.setattr(campaign_mgr, "configure_campaign", configure_and_capture)
+    return limits
+
+
+def _assert_staged_route_extent(sim, post_mg_c2a_hold_limit: dict) -> None:
+    campaign_mgr = sim.campaign_mgr
+    snapshots = sim.record.snapshots
+    campaign_progression = [
+        snapshot.campaign
+        for index, snapshot in enumerate(snapshots)
+        if index == 0 or snapshot.campaign != snapshots[index - 1].campaign
+    ]
+    staged_index = campaign_progression.index(CampaignPhase.C2A_STAGED)
+    staged_route = campaign_progression[staged_index:]
+    fixed_route = [
+        CampaignPhase.C2A_STAGED,
+        CampaignPhase.C3_NA,
+        CampaignPhase.C4,
+    ]
+    assert staged_route[: len(fixed_route)] == fixed_route
+
+    campaign_hours = {
+        campaign: sum(snapshot.campaign == campaign for snapshot in snapshots)
+        for campaign in campaign_progression
+    }
+    assert campaign_hours[CampaignPhase.C2A_STAGED] <= (
+        campaign_mgr._configured_staged_max_hold_hr(CampaignPhase.C2A_STAGED)
+    )
+    staged_schedule = campaign_mgr._campaign_config(CampaignPhase.C2A_STAGED)
+    na_cleanup_limit_hr = float(
+        staged_schedule["na_shuttle_stage"]["duration_h"]
+    )
+    assert 0 < campaign_hours[CampaignPhase.C3_NA] <= na_cleanup_limit_hr
+
+    c4_snapshots = [
+        snapshot
+        for snapshot in snapshots
+        if snapshot.campaign == CampaignPhase.C4
+    ]
+    assert c4_snapshots
+    c4_refusal = dict(sim._last_c4_refusal_diagnostic or {})
+    c4_diagnostic = dict(c4_refusal.get("diagnostic") or {})
+    c4_termination = dict(campaign_mgr.last_c4_termination or {})
+    if sim.campaign_endpoint_refused():
+        c4_end_reason = c4_diagnostic.get("reason_refused")
+    else:
+        assert c4_termination
+        c4_end_reason = c4_termination["outcome"]
+    acquisition_limit_hr, _ = campaign_mgr._c4_target_acquisition_limit()
+    process_limit_hr, _ = campaign_mgr._c4_process_wall_clock_limit()
+
+    if c4_end_reason == "c4_preheat_wall_clock_exhausted":
+        assert sim.campaign_endpoint_refused()
+        assert c4_refusal["status"] == "refused"
+        assert c4_refusal["campaign"] == CampaignPhase.C4.name
+        assert staged_route == fixed_route
+        c4_hours = campaign_hours[CampaignPhase.C4]
+        assert c4_hours == c4_diagnostic["completed_campaign_hour"]
+        assert c4_hours - c4_diagnostic["acquisition_opportunity_hr"] == pytest.approx(
+            acquisition_limit_hr + process_limit_hr
+        )
+        return
+
+    assert not sim.campaign_endpoint_refused()
+    assert not c4_refusal
+    assert sim.is_complete()
+    completed_route = [
+        *fixed_route,
+        CampaignPhase.C2A,
+        CampaignPhase.C6,
+    ]
+    assert staged_route == completed_route
+
+    c4_termination = dict(campaign_mgr.last_c4_termination or {})
+    assert c4_termination["outcome"] == c4_end_reason
+    completed_window_hr = float(c4_termination["completed_window_hr"])
+    assert 0 < completed_window_hr <= campaign_mgr._max_hold_hr(CampaignPhase.C4)
+
+    c4_window_low_C, _ = campaign_mgr._c4_temperature_window()
+    c4_acquired_index = next(
+        (
+            index
+            for index, snapshot in enumerate(c4_snapshots)
+            if float(snapshot.temperature_C) >= c4_window_low_C
+        ),
+        None,
+    )
+    assert c4_acquired_index is not None
+    c4_acquisition_hours = campaign_mgr._c4_acquisition_opportunity_hr(
+        completed_campaign_hour=float(c4_acquired_index + 1),
+        c4_snapshots=c4_snapshots[:c4_acquired_index],
+        transport_state=None,
+        current_acquired=True,
+    )
+    c4_process_hours = len(c4_snapshots) - c4_acquired_index
+    assert 0 < c4_acquisition_hours <= acquisition_limit_hr
+    assert 0 < c4_process_hours <= process_limit_hr
+    assert CampaignPhase.C2A in post_mg_c2a_hold_limit
+    assert 0 < campaign_hours[CampaignPhase.C2A] <= post_mg_c2a_hold_limit[
+        CampaignPhase.C2A
+    ]
+    assert 0 < campaign_hours[CampaignPhase.C6] <= campaign_mgr._max_hold_hr(
+        CampaignPhase.C6
+    )
 
 
 def test_mass_balance_counts_process_inventory_without_o2_double_count():
@@ -397,6 +577,10 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
         additives_kg={"K": 26.0, "Na": 12.0},
     )
     _install_liquidus_stub(sim)
+    post_mg_c2a_hold_limit = _capture_post_mg_c2a_hold_limit(
+        monkeypatch,
+        sim.campaign_mgr,
+    )
 
     liquid_fractions = []
     original_liquid_fraction = sim._freeze_gate_liquid_fraction_factor
@@ -412,19 +596,11 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
         record_liquid_fraction,
     )
 
-    steps, refusal = _run_c2a_staged_to_completion(sim)
+    refusal, transport_diagnostics = _run_c2a_staged_to_completion(sim)
+    assert refusal is None
+    _assert_staged_route_extent(sim, post_mg_c2a_hold_limit)
+    _assert_transitional_steps_are_flagged(transport_diagnostics)
 
-    # The run now stops at the first unsupported transitional-Kn flux point.
-    # The refused hour is rolled back exactly by the helper above; the ledger
-    # prefix still has to close on both freeze-gate paths.
-    # Both configurations complete 13 ledger-authorized hours, then refuse
-    # before committing the first unsupported transitional-Kn hour.
-    assert steps == 13
-    assert refusal is not None
-    assert refusal.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert refusal.diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert refusal.diagnostic["evaporation_flux_kg_hr"] is None
-    assert 0.01 <= refusal.diagnostic["knudsen_number"] < 10.0
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions
@@ -465,12 +641,14 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(1800)
 @pytest.mark.serial
-def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
+def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal(
+    monkeypatch,
+):
     # DEFAULT_MASS_TOLERANCE_KG (20 g) bounds a single transition only.
-    # The no-MRE campaign now ends at the first unsupported transitional-Kn
-    # flux point. If each committed prefix transition closed a little short or
-    # long with a consistent sign, cumulative drift could still grow while
-    # every individual transition passed. Guard that prefix directly.
+    # If each committed prefix transition closed a little short or long with a
+    # consistent sign, cumulative drift could still grow while every
+    # individual transition passed. Guard that prefix across either lawful C4
+    # end and the resulting staged route.
     feedstocks = _load_data_yaml("feedstocks.yaml")
     setpoints = _load_data_yaml("setpoints.yaml")
     vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
@@ -485,8 +663,12 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
     sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C0)
+    post_mg_c2a_hold_limit = _capture_post_mg_c2a_hold_limit(
+        monkeypatch,
+        sim.campaign_mgr,
+    )
 
-    # Drive the no-MRE path until the transitional-Kn refusal.
+    # Drive the no-MRE path through its legal C4 end.
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
         DecisionType.PATH_AB: "A_staged",
@@ -495,6 +677,7 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
     }
     steps = 0
     refusal = None
+    transport_diagnostics = []
     while not sim.is_complete() and steps < 5000:
         if sim.paused_for_decision:
             decision = sim.pending_decision
@@ -503,23 +686,20 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
                 choice = (decision.options or [None])[0]
             sim.apply_decision(decision.decision_type, choice)
             continue
-        ledger_before = sim.atom_ledger.mol_by_account()
-        transitions_before = tuple(sim.atom_ledger.transitions)
-        drift_before = sim.atom_ledger.element_atom_drift_report()
         try:
             sim.step()
         except EvaporationFluxRefusal as exc:
             refusal = exc
-            assert sim.atom_ledger.mol_by_account() == ledger_before
-            assert tuple(sim.atom_ledger.transitions) == transitions_before
-            assert sim.atom_ledger.element_atom_drift_report() == drift_before
             break
         steps += 1
+        if diagnostic := _evaporation_transport_diagnostic(sim):
+            transport_diagnostics.append(diagnostic)
+        if sim.campaign_endpoint_refused():
+            break
 
-    assert refusal is not None
-    assert refusal.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert refusal.diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert refusal.diagnostic["evaporation_flux_kg_hr"] is None
+    assert refusal is None
+    _assert_staged_route_extent(sim, post_mg_c2a_hold_limit)
+    _assert_transitional_steps_are_flagged(transport_diagnostics)
     transitions = sim.atom_ledger.transitions
     assert transitions
 
@@ -534,7 +714,7 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
     # single per-transition tolerance -- yet leaves ample headroom.
     assert cumulative_imbalance_kg < 1e-6
 
-    # The committed prefix at refusal must still close to ~zero. The
+    # The ledger at either legal campaign end must still close to ~zero. The
     # absolute floor is 5e-12 % (the legacy kg-native path holds
     # ~7e-13 %; the kernel-routed EVAPORATION_TRANSITION provider
     # introduces an additional ULP per species per transition through

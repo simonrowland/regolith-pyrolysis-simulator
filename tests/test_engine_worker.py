@@ -11,6 +11,7 @@ import time
 
 import pytest
 
+import simulator.engine_pool as engine_pool_module
 from simulator.engine_pool import (
     ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S,
     ENGINE_WORKER_CANCEL_POLL_S,
@@ -40,6 +41,8 @@ def _handle_test_request(resource, request, _errlog):
         raise EngineWorkerTimeout('nested native engine', 0.125, phase='job')
     if request.get('raise'):
         raise ValueError('tainted native request')
+    if request.get('hang'):
+        threading.Event().wait()
     delay = float(request.get('delay', 0.0))
     if delay:
         time.sleep(delay)
@@ -261,13 +264,51 @@ def test_nested_typed_timeout_crosses_worker_boundary_and_respawns():
     worker.close()
 
 
-def test_queue_pool_keeps_draining_while_one_slot_hangs():
-    with EngineWorkerPool(lambda _index: _test_worker(timeout_s=0.08), size=2) as pool:
-        hung = pool.submit({**_points()[0], 'delay': 0.3})
-        fast = [pool.submit(point) for point in _points()[1:7]]
-        assert all(future.result(timeout=1.0) for future in fast)
-        with pytest.raises(EngineWorkerTimeout):
-            hung.result(timeout=1.0)
+def test_queue_pool_keeps_draining_while_one_slot_hangs(monkeypatch):
+    class FakeClock:
+        def __init__(self):
+            self._thread_state = threading.local()
+
+        def monotonic(self):
+            return getattr(self._thread_state, 'now', 0.0)
+
+        def consume(self, duration):
+            self._thread_state.now = self.monotonic() + duration
+
+        def sleep(self, _duration):
+            pass
+
+    def consume_budget_on_first_poll(connection, clock):
+        real_poll = connection.poll
+        first_poll = True
+
+        def poll(timeout):
+            nonlocal first_poll
+            if first_poll:
+                first_poll = False
+                # Simulate the worker thread being descheduled for 100 ms
+                # without waiting. The old 80 ms default budget expires.
+                clock.consume(0.1)
+                return False
+            return real_poll(0.0)
+
+        connection.poll = poll
+
+    with EngineWorkerPool(lambda _index: _test_worker(timeout_s=5.0), size=2) as pool:
+        clock = FakeClock()
+        with monkeypatch.context() as patch:
+            patch.setattr(engine_pool_module, 'time', clock)
+            for worker in pool.workers:
+                consume_budget_on_first_poll(worker.connection, clock)
+
+            # Only the deliberately hung request gets the short call wall.
+            hung = pool.submit({**_points()[0], 'hang': True}, timeout_s=0.08)
+            fast = [pool.submit(point) for point in _points()[1:7]]
+            assert all(
+                future.result(timeout=_RENDEZVOUS_TIMEOUT_S) for future in fast
+            )
+            with pytest.raises(EngineWorkerTimeout):
+                hung.result(timeout=_RENDEZVOUS_TIMEOUT_S)
 
 
 def test_submit_with_no_live_consumer_refuses_instead_of_hanging_forever():

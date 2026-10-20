@@ -56,6 +56,13 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 _RECIPE_DIR = _REPO_ROOT / "data" / "recipes"
 
 
+def test_product_story_bucket_omits_species_rounded_to_zero() -> None:
+    bucket = web_events._product_story_bucket({"Fe": 3e-13})
+
+    assert bucket["species_kg"] == {}
+    assert bucket["class_total_kg"] == 0.0
+
+
 def _identified_socket_client(app):
     http_client = app.test_client()
     assert http_client.get("/").status_code == 200
@@ -5495,10 +5502,7 @@ class RaisingCleanedMeltLedger:
         raise RuntimeError("cleaned melt unavailable")
 
 
-@pytest.mark.parametrize("ledger", [None, RaisingCleanedMeltLedger()])
-def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
-    ledger,
-):
+def _cleaned_melt_test_sim():
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -5517,7 +5521,14 @@ def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
         {"metals": {}, "oxide_vapors": {}},
     )
     sim.load_batch("s_type")
-    snapshot = sim._make_snapshot()
+    return sim, sim._make_snapshot()
+
+
+@pytest.mark.parametrize("ledger", [None, RaisingCleanedMeltLedger()])
+def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
+    ledger,
+):
+    sim, snapshot = _cleaned_melt_test_sim()
     assert snapshot.inventory.melt_oxide_kg["SiO2"] > 0
     sim.atom_ledger = ledger
 
@@ -5531,6 +5542,30 @@ def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
 
     assert payload["pot_composition"] == {}
     assert payload["pot_composition_wt_pct"] == {}
+
+
+def test_tick_keeps_trace_species_keys_in_pot_composition(monkeypatch):
+    sim, snapshot = _cleaned_melt_test_sim()
+    ledger = sim.atom_ledger
+    project_account_kg = ledger.project_account_kg
+
+    def project_with_trace_species(account):
+        species = project_account_kg(account)
+        if account == "process.cleaned_melt":
+            return {**species, "PbO": 1e-13}
+        return species
+
+    monkeypatch.setattr(ledger, "project_account_kg", project_with_trace_species)
+    payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="",
+        backend_status="internal-analytical",
+        backend_authoritative=False,
+    )
+
+    assert payload["pot_composition"].get("PbO") == 0.0
+    assert payload["pot_composition_wt_pct"].get("PbO") == 0.0
 
 
 def test_web_pause_resume_is_result_neutral(monkeypatch, tmp_path):
