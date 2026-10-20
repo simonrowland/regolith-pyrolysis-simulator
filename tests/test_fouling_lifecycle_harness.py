@@ -125,6 +125,36 @@ def test_harness_runs_n_iterations_without_ledger_reuse_or_closure_breach() -> N
     assert result.lifecycle_projection.cascade_knee_provisional is None
 
 
+def test_harness_keeps_refused_empty_deposit_lifetime_unavailable() -> None:
+    refusal_notice = {
+        "wall_saturation_pressure_refusals_by_species": {
+            "Mg": {
+                "hot_wall": {
+                    "status": "refused",
+                    "reason": "wall_saturation_pressure_out_of_domain",
+                    "output_status": "status_bearing",
+                }
+            }
+        }
+    }
+
+    result = FoulingLifecycleHarness(
+        lambda _index: _artifact({}, authority=refusal_notice),
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=1000.0,
+        thickness_limit_m=0.001,
+        resinter_threshold_kg=10.0,
+    ).run((0,))
+
+    total = result.campaigns_to_resinter_total
+    assert total.value is None
+    assert total.authoritative_for_resinter is False
+    assert total.notices[-1]["status_bearing_refusal_count"] == 1
+    assert total.notices[-1]["wall_saturation_pressure_refused_species"] == (
+        "Mg",
+    )
+
+
 def test_harness_rejects_warm_worker_reused_atom_ledger() -> None:
     ledger = object()
 
