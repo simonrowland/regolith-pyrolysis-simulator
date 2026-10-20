@@ -10066,6 +10066,48 @@ def _vaporock_helper_returning(pressures, status='ok'):
     return _Helper()
 
 
+def _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, config):
+    if isinstance(backend, ThermoEngineBackend):
+        monkeypatch.setattr(backend, '_initialize_vaporock_delegate', lambda: None)
+        monkeypatch.setattr(
+            'simulator.melt_backend.thermoengine.ThermoEngineTransport',
+            lambda **_kwargs: types.SimpleNamespace(
+                initialize=lambda: True,
+                health_check=lambda **_kwargs: (True, None),
+                engine_version='test',
+                close=lambda: None,
+            ),
+        )
+    else:
+        monkeypatch.setattr(
+            backend, '_find_project_binary',
+            lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        )
+    return backend.initialize(config)
+
+
+@pytest.mark.parametrize('gas_bar', [1e-9, 2e-9, 1e-6])
+def test_alphamelts_transport_config_pin_before_shared_validation(
+    monkeypatch, gas_bar,
+):
+    backend = AlphaMELTSBackend()
+    assert _initialize_melts_transport_for_oxygen_test(
+        backend, monkeypatch, {'vapor_transport_pO2_bar': gas_bar},
+    )
+    assert backend._vapor_transport_pO2_bar == gas_bar
+
+
+@pytest.mark.parametrize('gas_bar', [0.0, 1e-10, float('nan'), float('inf')])
+def test_alphamelts_transport_config_refusal_pin_before_shared_validation(
+    monkeypatch, gas_bar,
+):
+    backend = AlphaMELTSBackend()
+    with pytest.raises(ValueError, match='vapor_transport_pO2_bar must be finite'):
+        _initialize_melts_transport_for_oxygen_test(
+            backend, monkeypatch, {'vapor_transport_pO2_bar': gas_bar},
+        )
+
+
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 def test_vapor_bridge_uses_same_gas_oxygen_as_shadow(backend_cls):
     from engines.vaporock import VapoRockProvider
