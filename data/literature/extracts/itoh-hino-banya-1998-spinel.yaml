@@ -441,6 +441,7 @@ species:
         - O
         - Ca
         temperature_as_printed: 1873 K
+        annotation_as_printed: '[Al]init. = 0.5 mass%; crucible composition: (%MgO)0.4(%CaO)0.6'
         caption: Concentration change of the dissolved elements in liquid iron after addition of Al at 1873 K.
         panel: whole figure
         axes_as_printed:
@@ -466,6 +467,7 @@ species:
   MgO:
     observations:
     - observation_id: itoh_1998_spinel_formation_logKf_1873K
+      admission_status: admitted
       type: gibbs_table
       locator:
         source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
@@ -686,6 +688,7 @@ species:
   Al2O3:
     observations:
     - observation_id: itoh_1998_calcium_aluminate_formation_logKf_1873K
+      admission_status: admitted
       type: gibbs_table
       locator:
         source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf

@@ -72,6 +72,7 @@ def test_printed_solid_formation_constants_validate_and_migrate_as_points() -> N
         row = actual[obs_id]
         assert row.value.kind.value == "point"
         assert row.value.point == value
+        assert row.notices == ()
         assert row.identity.species.formula == formula
         assert row.identity.temperature_K.is_value
         assert row.identity.temperature_K.value == Decimal("1873")
@@ -102,6 +103,9 @@ def test_figures_1_to_8_are_deferred_with_source_marker_counts() -> None:
         if record["type"] == "figure_record"
     }
     assert set(figures) == set(FIGURE_MARKERS)
+    assert figures["2"]["values"]["annotation_as_printed"] == (
+        "[Al]init. = 0.5 mass%; crucible composition: (%MgO)0.4(%CaO)0.6"
+    )
     for number, record in figures.items():
         values = record["values"]
         assert values["caption"]
