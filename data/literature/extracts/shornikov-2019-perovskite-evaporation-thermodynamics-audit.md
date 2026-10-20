@@ -1,26 +1,36 @@
-# Shornikov 2019 Experiment in Geosciences perovskite — extraction audit
+# Audit — shornikov-2019-perovskite-evaporation-thermodynamics
 
-Shornikov, S. I. Thermodynamics of evaporation of perovskite — the mineral of white inclusions of chondrites. Experiment in Geosciences, 2019, Volume 25, No. 1, pp. 38–40. The running header is “Problems of planetology, cosmochemistry and meteoritica”. pdfinfo Title is that section title, not the article title. Author line is Shornikov only (Vernadsky). PDF page 1 also contains the end of a Lyul/enstatite abstract. That abstract is not extracted.
+Fix round t1372-w4-fix1-t5. PDF page 2 render `eg-p2-2.png`, 4961×7016 px at 600 dpi.
 
-## Duplicate verdict
+## Equations (8)–(9)
 
-Not the same document as:
+Printed on published page 39, read on the 600 dpi crop, not from pdftotext (pdftotext dropped the degree signs):
 
-- `metsoc-2019-6005`: Shornikov and Yakovlev, “Mass spectrometric study of perovskite evaporation from Knudsen cell”, 82nd Meteoritical Society, abstract 6005.
-- `shornikov-2019-perovskite-evaporation`: TMS chapter, “High-Temperature Study of Perovskite Evaporation”, pp. 253–263.
-- `shornikov-2019-perovskite-evaporation-rjpc`: “Mass-Spectrometric Study of Evaporation of Perovskite”, RJPC 93(6), 1024–1031.
-- `shornikova-2019-perovskite-thermodynamics`: RJPC 93(8), 1428–1434, DOI 10.1134/S0036024419080284.
+Values of oxide activities (a_i) in perovskite and in the CaO–TiO2 melts were calculated on the Lewis ratio:
 
-The formation sentence −39.88±0.54 kJ/mol, 3.15±0.28 J/(mol K), and melting 47.61±1.84 kJ/mol at 2241±10 K is the same campaign. The RJPC thermodynamics Table 1 prints −39.98±0.54 for the 1791–2241 K row. This note does not score either number. It is not a duplicate of the whole paper: the EG figures of melt activities and mixing energies are not those tables.
+(8) a_CaO = p_CaO / p°_CaO
 
-## Admitted
+(9) a_TiO2 = p_TiO2. / p°_TiO2
 
-No scored observations. No MinerU table.
+The degree sign is on the denominator only. Equation (9) has a full stop after the numerator. The paper does not print the words "pure simple oxide".
+
+## Axis fits
+
+Fig. 2a lg p residual ≤ 0.0034. Fig. 2a T is piecewise between the five measured major ticks (the gaps are 373, 336.5, 304.5 and 277 px per 100 K). Fig. 2b lg p residual ≤ 0.008. Fig. 2b mol% residual ≤ 0.03. Fig. 3a activity residual ≤ 0.0004. Fig. 3a mol% residual ≤ 0.07. Fig. 3b energy residual ≤ 0.02 kJ/mol. Fig. 3b mol% residual ≤ 0.05.
+
+## Counts
+
+Fig. 2a stored partial pressures: 79.
+Fig. 2b stored partial pressures: 101.
+Fig. 3a stored activities: 54.
+Fig. 3b stored mixing-energy points (context): 15.
+
+Fig. 3b isolated circles were checked on the contact sheet. The six half-centroids are the two sides of three touching pairs; their uncertainty is ±1.5 kJ/mol and ±1.5 mol%.
 
 ## Standard state
 
-Equations (8) and (9) are the Lewis ratio a = p / p° over the pure simple oxide. The paper does not state solid or liquid. Fig. 3a is at 2250 K, so the pure-oxide-at-T ruling would apply to a stored activity. No activity point was stored, because the curves were not separable, so no inferred phase was written onto a scored row. CaO at 2250 K would be solid on the JANAF Tm = 3200 K already used in `stolyarova-1996-cao-alumina-silica-kems`. TiO2 was not given a phase: Shornikova 2019 Table 2 lists TiO2 melting temperatures from 2098 K to 2185±10 K, and 2250 K is within about 100 K of the highest of those.
+Fig. 3a CaO at 2250 K is crystalline lime. The deciding melting temperature is 2843 K, Table 2 of the sister RJPC paper, 593 K above 2250 K. Fig. 3a TiO2 is liquid: the highest listed melting temperature is 2185±10 K, and 2250 K is 65 K above it. Fig. 3a CaTiO3 is liquid: this paper prints 2241±10 K, and 2250 K lies inside that band.
 
-## Figures
+## Not stored
 
-Fig. 1 is Gong et al. (2018). Fig. 2 has eight crossing vapour-pressure series and was not read. Fig. 3a series 1, 2, and 4 are this study at 2250 K; series 3 and 5 are Banon et al. (1981) at 2150 K and were not read. Fig. 3b series 1 is this study; series 2–4 are other Shornikov papers. No marker was stored.
+Red Fig. 2a stroke left of x=1459, and between x=1628 and x=1771: line, not a disk. No separate black Fig. 2a core at x=1958 or x=2186. The green core above the top tick is outside the panel. The blue disk at x=2186 is the O2 series; no separate Ti core. Fig. 2b green series 5 leaves through the top border after the x=2970 station. Fig. 2b red has no closed circle at x=3475. Fig. 2b blue series 7 has no separable centre at x=2970, 3174 and 3386, and series 3 has none at x=2646 or x=4023. Fig. 2b series 6 is stored only at the six stations where the purple filled centre is isolated. Fig. 3a series 3 and 5 are Banon et al. 1981. Fig. 3b series 2–4 are other papers. Fig. 1 is Gong et al. 2018.
