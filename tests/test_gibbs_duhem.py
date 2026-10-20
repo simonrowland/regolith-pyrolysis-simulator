@@ -437,8 +437,8 @@ def test_verdict_thresholds_are_overridable_and_defaults_asserted():
 @pytest.mark.parametrize(
     ("coarse_residual", "expected_ratio", "expected_verdict"),
     [
-        (0.019, 1.9, "inconsistent"),
-        (0.021, 2.1, "discretisation_limited"),
+        (0.001, 0.1, "inconsistent"),
+        (0.4, 40.0, "discretisation_limited"),
     ],
 )
 def test_verdict_shrink_threshold_has_margin(
@@ -461,6 +461,10 @@ def test_verdict_shrink_threshold_has_margin(
         report.residual_at_double_resolution
     )
     assert ratio == pytest.approx(expected_ratio)
+    if expected_verdict == "inconsistent":
+        assert ratio <= BATTERY_DISCRETISATION_SHRINK_MIN / 10
+    else:
+        assert ratio >= 10 * BATTERY_DISCRETISATION_SHRINK_MIN
     assert (expected_ratio < BATTERY_DISCRETISATION_SHRINK_MIN) == (
         expected_verdict == "inconsistent"
     )
