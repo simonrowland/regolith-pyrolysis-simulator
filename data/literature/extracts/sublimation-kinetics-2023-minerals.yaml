@@ -556,9 +556,9 @@ species:
         scale_bar_as_printed: 600 um (panel d)
         note: Partial melting of the regolith simulant material was also stated at 1200 C in the introduction
           (p. 2). Not a calibrated melting-point measurement.
+    context:
     - observation_id: shaw_2023_lms1_quoted_spec_density
-      type: rate_series
-      class_tag: quoted
+      type: characterization
       locator:
         published_page: 3
         pdf_page_index: 3
@@ -571,9 +571,12 @@ species:
       units: g/cm3 as printed
       values:
         quantity: density
-        method_class: quoted_from_other_workers
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
         density_g_cm3: 3.03
-        cited: Isachenkov et al. 2022 Icarus 376:114873 (their ref. [10])
+        value_as_published: "3.03 g/cm3"
+        attribution: LMS-1 simulant specifications (Isachenkov et al. 2022 Icarus 376:114873, their ref. [10]);
+          quoted, not measured in Shaw et al. (2023)
   '12022':
     observations:
     - observation_id: shaw_2023_table1_apollo_12022_composition_snyder
