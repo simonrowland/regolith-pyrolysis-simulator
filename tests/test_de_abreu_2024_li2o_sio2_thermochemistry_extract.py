@@ -50,6 +50,30 @@ RENDER_TABLE2_GRID = [
     ("LSO_7", "0.35", "0.65", "1288 K/2 h", "Li4SiO4", "68.1", "11.4266", "6.1680", "16.6824", "98.4"),
 ]
 
+EXPECTED_FORMULA_BY_OBSERVATION_ID = {
+    "deabreu2024_table5_li4sio4_delta_fH_1": "Li4SiO4",
+    "deabreu2024_table5_li2sio3_delta_fH_2": "Li2SiO3",
+    "deabreu2024_table5_li2sio3_delta_fH_3": "Li2SiO3",
+    "deabreu2024_table5_li2sio3_delta_fH_4": "Li2SiO3",
+    "deabreu2024_table5_li2sio3_delta_fH_5": "Li2SiO3",
+    "deabreu2024_table5_li2sio3_S_7": "Li2SiO3",
+    "deabreu2024_table5_li2si2o5_delta_fH_6": "Li2Si2O5",
+    "deabreu2024_table5_li2si2o5_S_8": "Li2Si2O5",
+    "deabreu2024_figure3_li4sio4_second_order_transition": "Li4SiO4",
+}
+EXPECTED_FORMULA_BY_OBSERVATION_ID.update(
+    {f"deabreu2024_table6_g6_r{i}": "Li4SiO4" for i in range(1, 5)}
+)
+EXPECTED_FORMULA_BY_OBSERVATION_ID.update(
+    {f"deabreu2024_table6_g7_r{i}": "Li2SiO3" for i in range(1, 7)}
+)
+EXPECTED_FORMULA_BY_OBSERVATION_ID.update(
+    {f"deabreu2024_table6_g8_r{i}": "Li2Si2O5" for i in range(1, 4)}
+)
+EXPECTED_FORMULA_BY_OBSERVATION_ID.update(
+    {f"deabreu2024_table6_g9_r{i}": "Li2Si2O5" for i in range(1, 5)}
+)
+
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -141,6 +165,7 @@ def test_mutating_either_independent_grid_or_extract_cell_is_detected() -> None:
 
 def test_measured_table_values_and_render_pins_are_preserved() -> None:
     document = _document()
+    contexts = _contexts(document)
     obs = {
         row["observation_id"]: row
         for species in document["species"].values()
@@ -149,29 +174,91 @@ def test_measured_table_values_and_render_pins_are_preserved() -> None:
     assert obs["deabreu2024_table5_li4sio4_delta_fH_1"]["values"]["delta_f_H_as_printed"] == "-2328.9"
     assert obs["deabreu2024_table5_li2sio3_delta_fH_2"]["values"]["delta_f_H_as_printed"] == "-1646.1"
     assert obs["deabreu2024_table5_li2si2o5_S_8"]["values"]["entropy_as_printed"] == "122.2"
-    assert obs["deabreu2024_table6_g1_r1"]["values"]["T_K"] == "1263"
-    assert obs["deabreu2024_table6_g2_r4"]["values"]["T_K"] == "1289.4"
     assert obs["deabreu2024_table6_g8_r2"]["values"]["T_K"] == "1215"
     assert obs["deabreu2024_figure3_li4sio4_second_order_transition"]["values"]["T_K"] == "873.4"
-    assert obs["deabreu2024_table6_g2_r4"]["values"]["same_measurement_also_reported_as"]["value_as_printed"] == "1289 K"
+    g8 = obs["deabreu2024_table6_g8_r2"]["values"]
+    assert g8["table_type_as_printed"] == "Congruent"
+    assert "discussion calls this reaction polymorphic" in g8["classification_note"]
+    assert "Table 6 prints Congruent" in g8["classification_note"]
+    assert contexts["deabreu2024_table6_g2_r4"]["values"]["same_measurement_also_reported_as"]["value_as_printed"] == "1289 K"
+    for observation_id in EXPECTED_FORMULA_BY_OBSERVATION_ID:
+        assert obs[observation_id]["values"].get("formula") == EXPECTED_FORMULA_BY_OBSERVATION_ID[observation_id]
+    for observation_id in (
+        *(f"deabreu2024_table6_g6_r{i}" for i in range(1, 5)),
+        *(f"deabreu2024_table6_g7_r{i}" for i in range(1, 7)),
+        *(f"deabreu2024_table6_g9_r{i}" for i in range(1, 5)),
+    ):
+        assert obs[observation_id]["phase"] == "cr"
+    for observation_id, row in obs.items():
+        if observation_id.startswith("deabreu2024_table5_"):
+            assert "standard_pressure_Pa" not in row["values"]
+            assert "standard_pressure_Pa" not in row.get("point_conditions", {})
+    assert "1 bar reference" in document["extraction"]["method"]
+
+
+def test_multiphase_transition_rows_are_retained_in_context_only() -> None:
+    expected = {
+        "deabreu2024_table6_g1_r1": (
+            "1263", "Liq. ⇌ Li2O + Li4SiO4", "DTA", "Liquid + Li2O + Li4SiO4"
+        ),
+        "deabreu2024_table6_g2_r1": (
+            "1297", "Liq. ⇌ Li4SiO4 + Li2SiO3", "DTA", "Liquid + Li4SiO4 + Li2SiO3"
+        ),
+        "deabreu2024_table6_g2_r2": (
+            "1297", "Liq. ⇌ Li4SiO4 + Li2SiO3", "DTA", "Liquid + Li4SiO4 + Li2SiO3"
+        ),
+        "deabreu2024_table6_g2_r4": (
+            "1289.4", "Liq. ⇌ Li4SiO4 + Li2SiO3", "DTA", "Liquid + Li4SiO4 + Li2SiO3"
+        ),
+        "deabreu2024_table6_g3_r1": (
+            "1307", "Liq. ⇌ Li2SiO3 + h-Li2Si2O5", "DTA", "Liquid + Li2SiO3 + h-Li2Si2O5"
+        ),
+        "deabreu2024_table6_g4_r1": (
+            "1301", "Liq. ⇌ h-Li2Si2O5 + Trd-SiO2", "quenching method", "Liquid + h-Li2Si2O5 + tridymite-SiO2"
+        ),
+        "deabreu2024_table6_g5_r1": (
+            "1103", "Li2O + Li4SiO4 ⇌ Li8SiO6", "DTA", "Li2O + Li4SiO4 + Li8SiO6"
+        ),
+    }
+    document = _document()
+    contexts = _contexts(document)
+    observed_ids = {
+        row["observation_id"]
+        for species in document["species"].values()
+        for row in species["observations"]
+    }
+    for observation_id, (temperature, reaction, technique, assemblage) in expected.items():
+        assert observation_id not in observed_ids
+        row = contexts[observation_id]
+        values = row["values"]
+        assert values["quantity_token"] == "unavailable"
+        assert values["candidate_tokens_considered"] == ["transition_temperature"]
+        assert values["temperature_as_printed"] == temperature
+        assert values["phase_reaction_as_printed"] == reaction
+        assert values["technique_as_printed"] == technique
+        assert values["assemblage_as_printed"] == assemblage
 
 
 def test_isolated_migration_preserves_formula_temperature_conditions_and_values() -> None:
     document = _document()
     expected_by_id = {
-        row["observation_id"]: (formula, row["values"]["T_K"])
-        for formula, species in document["species"].items()
+        row["observation_id"]: (
+            EXPECTED_FORMULA_BY_OBSERVATION_ID[row["observation_id"]],
+            row["values"]["T_K"],
+        )
+        for species in document["species"].values()
         for row in species["observations"]
     }
+    assert set(expected_by_id) == set(EXPECTED_FORMULA_BY_OBSERVATION_ID)
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
     records = list(migrator.result.observations.values())
-    assert len(records) == 33
+    assert len(records) == 26
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
-    assert sum(len(rows) for rows in migrator.result.context_by_work.values()) == 26
+    assert sum(len(rows) for rows in migrator.result.context_by_work.values()) == 33
     for record in records:
         raw_id = record.observation_id.split("::")[-1]
         expected_formula, expected_temperature = expected_by_id[raw_id]
@@ -181,7 +268,7 @@ def test_isolated_migration_preserves_formula_temperature_conditions_and_values(
             for row in species["observations"]
             if row["observation_id"] == raw_id
         )
-        expected_formula = source_observation["values"].get("formula") or expected_formula
+        assert source_observation["values"].get("formula") == expected_formula
         assert record.identity.species.formula == expected_formula
         temperature = record.point_conditions["temperature_K"]
         assert temperature.state.is_value
