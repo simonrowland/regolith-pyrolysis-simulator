@@ -217,12 +217,23 @@ else
 fi
 
 STATUS="FAIL"
-if [ "$RC" -eq 0 ]; then
-  STATUS="PASS"
-fi
+INFRA_REASON=""
+case "$RC" in
+  0) STATUS="PASS" ;;
+  2) STATUS="INFRA"; INFRA_REASON="not-evaluated" ;;
+  3) STATUS="INFRA"; INFRA_REASON="studio-disk-preflight-refusal" ;;
+  90) STATUS="INFRA"; INFRA_REASON="pytest-reportlog-missing" ;;
+  91) STATUS="INFRA"; INFRA_REASON="watchdog-wedge-bootstrap-or-wall-cap" ;;
+  92) STATUS="INFRA"; INFRA_REASON="ssh-transport-or-evidence-retrieval" ;;
+  93) STATUS="INFRA"; INFRA_REASON="stale-artifact-cleanup-failure" ;;
+  94) STATUS="INFRA"; INFRA_REASON="sustained-rss-watchdog-kill" ;;
+esac
 # One-line result for the date file (scheduler-friendly greppable).
-# Format: DATE STATUS tip=<sha> job=<name> junit=<path> exit=<rc> wall_cap_s=<n>
+# Format: DATE STATUS tip=<sha> job=<name> junit=<path> exit=<rc> wall_cap_s=<n> [reason=<infra reason>]
 ONE_LINE="${DATE_UTC} ${STATUS} tip=${TIP_SHA} job=${JOB_NAME} junit=${JUNIT_DST} exit=${RC} wall_cap_s=${CI_WALL_CAP_S}"
+if [ -n "$INFRA_REASON" ]; then
+  ONE_LINE="$ONE_LINE reason=$INFRA_REASON"
+fi
 {
   echo "# Nightly gate ${DATE_UTC}"
   echo
@@ -234,6 +245,7 @@ ONE_LINE="${DATE_UTC} ${STATUS} tip=${TIP_SHA} job=${JOB_NAME} junit=${JUNIT_DST
   echo "- wall_cap_s: ${CI_WALL_CAP_S}"
   echo "- worktree: \`${NIGHTLY_WT}\`"
   echo "- studio-ci exit: ${RC}"
+  if [ -n "$INFRA_REASON" ]; then echo "- reason: ${INFRA_REASON}"; fi
   echo "- junit: \`${JUNIT_DST}\`"
 } > "$RESULT_MD"
 
