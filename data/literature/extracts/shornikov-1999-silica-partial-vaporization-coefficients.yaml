@@ -10,7 +10,7 @@ extraction:
     rows as header. The scratch CSV set rows 7–9 to body after the 600 dpi render agreed with MinerU on
     every this-work cell. No digit was changed. Temperature ranges were not passed through the temperature
     column. Tables 1–3 this-work A/B and a/b coefficients are context rows, because a two-coefficient
-    law is not a point pressure. Literature rows and Figs. 1–5 were not emitted.
+    law is not a point pressure. Literature rows were not emitted. Fig. 2 and Fig. 4 this-work markers were read at 1200 dpi into the existing context rows. Figs. 1, 3, and 5 were not emitted.
   date: '2026-10-20'
   worker: t1372-w2-w9-t1
 review_status: draft
@@ -572,28 +572,1010 @@ species:
         published_page: 191
         pdf_page_index: 4
         figure: '2'
-        note: 'Fig. 2a plots this work''s effective p(SiO) against 1000/T for four values of f, with markers
-          on the fit lines. The lines are Table 1. The markers were not read: no labelled-tick calibration
-          was stored, and a marker count was not invented. No point pressure is stored.'
-      units: figure-only
+        note: >
+          Fig. 2a, published p. 191, is log10 of the effective p(SiO) against 1000/T for this work in molybdenum cells. The four lines are the Table 1 fits. Markers were read at 1200 dpi from labelled tick strokes. Reads and defers are context, method_class figure_only, and are not scored partial pressures. The paper prints [SiO2] and does not name solid, liquid, or a polymorph. The decision table, the tick pixels, and the bare stretches are in the audit sidecar. Tick fit and residual are also in values.y_fit and values.x_fit. Read uncertainty is ±0.06 dex and ±0.002 in 1000/T.
+      units: log10 p_ef, atm as printed; 1200 dpi figure read
       values:
-        quantity: figure not digitized
+        quantity: log10_p_ef_figure_read
         method_class: figure_only
-        digitized: false
+        digitized: true
+        scored: false
+        dpi: 1200
+        read_uncertainty_dex: '0.06'
+        read_uncertainty_1000_over_T: '0.002'
+        gas_species: SiO(g)
+        condensed_as_printed: '[SiO2]'
+        phase_as_printed: The paper does not name solid, liquid, or a polymorph.
+        y_fit: log10 p = -0.228969 + (-2.766679e-03) * y_corrected; rms 0.00325 dex; max 0.00580
+        x_fit: 1000/T = 0.396295 + (6.501402e-05) * x; rms 0.000079; max 0.000130
+        markers:
+        - id: 2a-00
+          decision: defer
+          reason: 0.10 to 0.18 dex off the nearer Table line
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-3.480'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5176'
+          T_K: '1931.9'
+          cx_px: '1866.1'
+          cy_px: '1172.2'
+          dt_px: '20.0'
+          dpi: 1200
+          nearer_offset_dex: '0.111'
+          second_offset_abs_dex: '0.170'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: false
+        - id: 2a-02
+          decision: defer
+          reason: isolated triangle; not assigned to a Table line
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-3.568'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5275'
+          T_K: '1895.6'
+          cx_px: '2018.6'
+          cy_px: '1202.1'
+          dt_px: '17.0'
+          dpi: 1200
+          nearer_offset_dex: '0.300'
+          second_offset_abs_dex: '0.352'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-03
+          decision: defer
+          reason: series 1 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-4.471'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5488'
+          T_K: '1822.2'
+          cx_px: '2345.6'
+          cy_px: '1525.0'
+          dt_px: '29.1'
+          dpi: 1200
+          nearer_offset_dex: '-0.010'
+          second_offset_abs_dex: '0.028'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-04
+          decision: defer
+          reason: series 1 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-4.778'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5597'
+          T_K: '1786.7'
+          cx_px: '2513.1'
+          cy_px: '1634.1'
+          dt_px: '31.1'
+          dpi: 1200
+          nearer_offset_dex: '-0.014'
+          second_offset_abs_dex: '0.018'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-05
+          decision: defer
+          reason: series 1 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-5.143'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5731'
+          T_K: '1745.0'
+          cx_px: '2719.0'
+          cy_px: '1763.9'
+          dt_px: '30.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.006'
+          second_offset_abs_dex: '0.018'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-06
+          decision: defer
+          reason: series 1 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-5.228'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5770'
+          T_K: '1733.0'
+          cx_px: '2779.9'
+          cy_px: '1794.1'
+          dt_px: '17.0'
+          dpi: 1200
+          nearer_offset_dex: '0.019'
+          second_offset_abs_dex: '0.040'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-07
+          decision: refuse
+          reason: dt below 10 px and off every Table line; not a filled marker
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-3.221'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5774'
+          T_K: '1732.0'
+          cx_px: '2784.9'
+          cy_px: '1068.5'
+          dt_px: '8.0'
+          dpi: 1200
+          nearer_offset_dex: '2.036'
+          second_offset_abs_dex: '2.056'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-08
+          decision: defer
+          reason: series 1 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-5.265'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5781'
+          T_K: '1729.9'
+          cx_px: '2796.0'
+          cy_px: '1807.4'
+          dt_px: '15.5'
+          dpi: 1200
+          nearer_offset_dex: '0.011'
+          second_offset_abs_dex: '0.031'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-09
+          decision: defer
+          reason: series 1 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-5.378'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5820'
+          T_K: '1718.4'
+          cx_px: '2855.6'
+          cy_px: '1847.5'
+          dt_px: '27.7'
+          dpi: 1200
+          nearer_offset_dex: '0.007'
+          second_offset_abs_dex: '0.024'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-10
+          decision: defer
+          reason: series 1 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-5.421'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5830'
+          T_K: '1715.3'
+          cx_px: '2871.7'
+          cy_px: '1862.9'
+          dt_px: '26.1'
+          dpi: 1200
+          nearer_offset_dex: '-0.007'
+          second_offset_abs_dex: '0.010'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-11
+          decision: defer
+          reason: series 1 and 3 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 1
+          series_second: 3
+          log10_p_ef: '-5.886'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6000'
+          T_K: '1666.6'
+          cx_px: '3133.9'
+          cy_px: '2028.0'
+          dt_px: '25.5'
+          dpi: 1200
+          nearer_offset_dex: '0.003'
+          second_offset_abs_dex: '0.004'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-12
+          decision: defer
+          reason: series 1 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.282'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6108'
+          T_K: '1637.1'
+          cx_px: '3300.1'
+          cy_px: '2169.2'
+          dt_px: '24.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.091'
+          second_offset_abs_dex: '0.092'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-13
+          decision: refuse
+          reason: dt below 10 px and off every Table line; not a filled marker
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-7.718'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6329'
+          T_K: '1580.0'
+          cx_px: '3639.2'
+          cy_px: '2684.8'
+          dt_px: '5.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.913'
+          second_offset_abs_dex: '0.928'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: false
+        - id: 2a-14
+          decision: defer
+          reason: series 2 and 3 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 2
+          series_second: 3
+          log10_p_ef: '-4.464'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5477'
+          T_K: '1825.7'
+          cx_px: '2329.4'
+          cy_px: '1522.9'
+          dt_px: '29.1'
+          dpi: 1200
+          nearer_offset_dex: '0.006'
+          second_offset_abs_dex: '0.017'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-15
+          decision: defer
+          reason: series 2 and 3 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 2
+          series_second: 3
+          log10_p_ef: '-4.762'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5586'
+          T_K: '1790.1'
+          cx_px: '2496.7'
+          cy_px: '1628.6'
+          dt_px: '30.6'
+          dpi: 1200
+          nearer_offset_dex: '0.005'
+          second_offset_abs_dex: '0.013'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-16
+          decision: defer
+          reason: 0.10 to 0.18 dex off the nearer Table line
+          series: null
+          series_nearer: 2
+          series_second: 3
+          log10_p_ef: '-5.847'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5935'
+          T_K: '1685.0'
+          cx_px: '3033.1'
+          cy_px: '2015.2'
+          dt_px: '22.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.131'
+          second_offset_abs_dex: '0.134'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-17
+          decision: defer
+          reason: 0.10 to 0.18 dex off the nearer Table line
+          series: null
+          series_nearer: 2
+          series_second: 1
+          log10_p_ef: '-6.130'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6046'
+          T_K: '1653.9'
+          cx_px: '3204.7'
+          cy_px: '2115.4'
+          dt_px: '23.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.110'
+          second_offset_abs_dex: '0.113'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-18
+          decision: defer
+          reason: series 3 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-3.689'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5162'
+          T_K: '1937.2'
+          cx_px: '1844.3'
+          cy_px: '1248.0'
+          dt_px: '22.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.057'
+          second_offset_abs_dex: '0.078'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-19
+          decision: defer
+          reason: 0.10 to 0.18 dex off the nearer Table line
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-4.113'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5300'
+          T_K: '1886.8'
+          cx_px: '2056.4'
+          cy_px: '1398.9'
+          dt_px: '27.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.109'
+          second_offset_abs_dex: '0.126'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-20
+          decision: defer
+          reason: series 3 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-4.342'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5399'
+          T_K: '1852.1'
+          cx_px: '2209.1'
+          cy_px: '1480.0'
+          dt_px: '33.2'
+          dpi: 1200
+          nearer_offset_dex: '-0.071'
+          second_offset_abs_dex: '0.085'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-21
+          decision: defer
+          reason: series 3 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-4.379'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5412'
+          T_K: '1847.7'
+          cx_px: '2229.1'
+          cy_px: '1493.2'
+          dt_px: '26.4'
+          dpi: 1200
+          nearer_offset_dex: '-0.073'
+          second_offset_abs_dex: '0.087'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-23
+          decision: defer
+          reason: series 3 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-4.935'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5644'
+          T_K: '1771.8'
+          cx_px: '2585.4'
+          cy_px: '1690.3'
+          dt_px: '25.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.005'
+          second_offset_abs_dex: '0.012'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-24
+          decision: defer
+          reason: series 3 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-5.118'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5688'
+          T_K: '1758.0'
+          cx_px: '2653.8'
+          cy_px: '1755.7'
+          dt_px: '23.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.068'
+          second_offset_abs_dex: '0.073'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-25
+          decision: defer
+          reason: series 3 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-5.132'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5711'
+          T_K: '1751.0'
+          cx_px: '2688.8'
+          cy_px: '1760.2'
+          dt_px: '28.3'
+          dpi: 1200
+          nearer_offset_dex: '-0.021'
+          second_offset_abs_dex: '0.025'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-26
+          decision: defer
+          reason: series 3 and 2 both within 0.10 dex and not separable
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-5.512'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5860'
+          T_K: '1706.3'
+          cx_px: '2918.6'
+          cy_px: '1895.1'
+          dt_px: '27.0'
+          dpi: 1200
+          nearer_offset_dex: '0.002'
+          second_offset_abs_dex: '0.002'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-27
+          decision: defer
+          reason: 0.10 to 0.18 dex off the nearer Table line
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-6.186'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6156'
+          T_K: '1624.3'
+          cx_px: '3373.7'
+          cy_px: '2133.7'
+          dt_px: '14.3'
+          dpi: 1200
+          nearer_offset_dex: '0.125'
+          second_offset_abs_dex: '0.134'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: false
+        - id: 2a-29
+          decision: refuse
+          reason: dt below 10 px and off every Table line; not a filled marker
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-6.111'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6288'
+          T_K: '1590.4'
+          cx_px: '3576.1'
+          cy_px: '2104.6'
+          dt_px: '2.2'
+          dpi: 1200
+          nearer_offset_dex: '0.553'
+          second_offset_abs_dex: '0.567'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: false
+        - id: 2a-30
+          decision: refuse
+          reason: dt below 10 px and off every Table line; not a filled marker
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-6.335'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6297'
+          T_K: '1588.2'
+          cx_px: '3589.4'
+          cy_px: '2185.3'
+          dt_px: '8.0'
+          dpi: 1200
+          nearer_offset_dex: '0.353'
+          second_offset_abs_dex: '0.367'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: false
+        - id: 2a-31
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-5.642'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5132'
+          T_K: '1948.7'
+          cx_px: '1797.6'
+          cy_px: '1954.5'
+          dt_px: '15.5'
+          dpi: 1200
+          nearer_offset_dex: '-0.068'
+          second_offset_abs_dex: '2.092'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: false
+        - id: 2a-32
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-5.964'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5291'
+          T_K: '1890.1'
+          cx_px: '2042.4'
+          cy_px: '2067.9'
+          dt_px: '20.6'
+          dpi: 1200
+          nearer_offset_dex: '0.032'
+          second_offset_abs_dex: '1.984'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-33
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-5.955'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5307'
+          T_K: '1884.4'
+          cx_px: '2067.0'
+          cy_px: '2064.4'
+          dt_px: '21.2'
+          dpi: 1200
+          nearer_offset_dex: '0.083'
+          second_offset_abs_dex: '1.932'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-34
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-6.421'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5415'
+          T_K: '1846.7'
+          cx_px: '2233.6'
+          cy_px: '2231.1'
+          dt_px: '17.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.097'
+          second_offset_abs_dex: '2.107'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-35
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-6.595'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5483'
+          T_K: '1824.0'
+          cx_px: '2337.3'
+          cy_px: '2292.8'
+          dt_px: '17.7'
+          dpi: 1200
+          nearer_offset_dex: '-0.092'
+          second_offset_abs_dex: '2.099'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-37
+          decision: defer
+          reason: 0.10 to 0.18 dex off the nearer Table line
+          series: null
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-7.053'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5652'
+          T_K: '1769.2'
+          cx_px: '2598.2'
+          cy_px: '2455.5'
+          dt_px: '14.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.102'
+          second_offset_abs_dex: '2.100'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-38
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-7.328'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5768'
+          T_K: '1733.8'
+          cx_px: '2775.8'
+          cy_px: '2553.2'
+          dt_px: '19.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.072'
+          second_offset_abs_dex: '2.065'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-40
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 2
+          log10_p_ef: '-7.615'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5910'
+          T_K: '1692.1'
+          cx_px: '2994.4'
+          cy_px: '2654.3'
+          dt_px: '28.0'
+          dpi: 1200
+          nearer_offset_dex: '0.018'
+          second_offset_abs_dex: '1.967'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2a-41
+          decision: defer
+          reason: 0.10 to 0.18 dex off the nearer Table line
+          series: null
+          series_nearer: 4
+          series_second: 2
+          log10_p_ef: '-7.826'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5918'
+          T_K: '1689.7'
+          cx_px: '3007.3'
+          cy_px: '2730.6'
+          dt_px: '14.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.172'
+          second_offset_abs_dex: '2.155'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: false
+
     - observation_id: sh99_fig4a
       type: experiment_series
       locator:
         published_page: 192
         pdf_page_index: 5
         figure: '4'
-        note: Fig. 4a plots p_ef/p_eq for (SiO) against f. Series 1–10 are the effusion results of references
-          [15] and [16]. Series 11–16 are this work and are the input to the Table 3 least-squares constants.
-          Markers were not read. No ratio is stored.
-      units: figure-only
+        note: >
+          Fig. 4a is p_ef/p_eq for (SiO) against 1000 f. Series 1-10 are the effusion results of references [15] and [16] and were not read. Series 11-16 are this work. Isolated symbols were read at 1200 dpi from labelled ticks (y glyphs 1.0, 0.6, and 0; x glyphs 1 and 10). Fused symbols are deferred to their shared window. The open cell, 1000 f = 375, is off the frame. The ratio is not an alpha and not a partial pressure. Isolated-symbol read uncertainty is ±0.02 in the ratio (±0.03 for the taller open diamond at 1000 f = 2.39). Y calibration uses labelled ticks 1.0, 0.6, and 0. X calibration uses labelled ticks 1 and 10.
+      units: p_ef/p_eq, dimensionless; 1200 dpi figure read
       values:
-        quantity: figure not digitized
+        quantity: p_ef_over_p_eq_figure_read
         method_class: figure_only
-        digitized: false
+        digitized: true
+        scored: false
+        dpi: 1200
+        series_1_to_10: refused; effusion results of references [15] and [16], as the caption states
+        open_cell_1000f_375: off the frame; predicted x about 8145, last tick near 6985
+        markers:
+        - id: 4a-f1.12-s11
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2109-2435, cx 3431.5; ratio at the window ends 0.994
+            to 0.872; centroid is not a series value
+          series: 11
+          T_K_caption: 1700
+          ratio_window_top: '0.994'
+          ratio_window_bottom: '0.872'
+          nominal_1000f: '1.12'
+          measured_1000f: '1.110'
+          cx_px: '3431.5'
+          cy_px: '2258.6'
+          y_window: 2109-2435
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f1.12-s12
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2109-2435, cx 3431.5; ratio at the window ends 0.994
+            to 0.872; centroid is not a series value
+          series: 12
+          T_K_caption: 1750
+          ratio_window_top: '0.994'
+          ratio_window_bottom: '0.872'
+          nominal_1000f: '1.12'
+          measured_1000f: '1.110'
+          cx_px: '3431.5'
+          cy_px: '2258.6'
+          y_window: 2109-2435
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f1.12-s13
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2109-2435, cx 3431.5; ratio at the window ends 0.994
+            to 0.872; centroid is not a series value
+          series: 13
+          T_K_caption: 1800
+          ratio_window_top: '0.994'
+          ratio_window_bottom: '0.872'
+          nominal_1000f: '1.12'
+          measured_1000f: '1.110'
+          cx_px: '3431.5'
+          cy_px: '2258.6'
+          y_window: 2109-2435
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f1.12-s14
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2109-2435, cx 3431.5; ratio at the window ends 0.994
+            to 0.872; centroid is not a series value
+          series: 14
+          T_K_caption: 1850
+          ratio_window_top: '0.994'
+          ratio_window_bottom: '0.872'
+          nominal_1000f: '1.12'
+          measured_1000f: '1.110'
+          cx_px: '3431.5'
+          cy_px: '2258.6'
+          y_window: 2109-2435
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f1.12-s15
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2109-2435, cx 3431.5; ratio at the window ends 0.994
+            to 0.872; centroid is not a series value
+          series: 15
+          T_K_caption: 1900
+          ratio_window_top: '0.994'
+          ratio_window_bottom: '0.872'
+          nominal_1000f: '1.12'
+          measured_1000f: '1.110'
+          cx_px: '3431.5'
+          cy_px: '2258.6'
+          y_window: 2109-2435
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f1.12-s16
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2109-2435, cx 3431.5; ratio at the window ends 0.994
+            to 0.872; centroid is not a series value
+          series: 16
+          T_K_caption: 1950
+          ratio_window_top: '0.994'
+          ratio_window_bottom: '0.872'
+          nominal_1000f: '1.12'
+          measured_1000f: '1.110'
+          cx_px: '3431.5'
+          cy_px: '2258.6'
+          y_window: 2109-2435
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f2.39-s11
+          decision: read
+          reason: isolated symbol; connected-component centroid
+          series: 11
+          T_K_caption: 1700
+          ratio_p_ef_over_p_eq: '0.956'
+          uncertainty_ratio: '0.02'
+          nominal_1000f: '2.39'
+          measured_1000f: '2.396'
+          cx_px: '4053.2'
+          cy_px: '2210.4'
+          y_window: 2168-2252
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f2.39-s12
+          decision: read
+          reason: isolated symbol; connected-component centroid
+          series: 12
+          T_K_caption: 1750
+          ratio_p_ef_over_p_eq: '0.919'
+          uncertainty_ratio: '0.03'
+          nominal_1000f: '2.39'
+          measured_1000f: '2.394'
+          cx_px: '4052.6'
+          cy_px: '2310.2'
+          y_window: 2254-2376
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f2.39-s13
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2389-2760, cx 4053.4; ratio at the window ends 0.889
+            to 0.750; centroid is not a series value
+          series: 13
+          T_K_caption: 1800
+          ratio_window_top: '0.889'
+          ratio_window_bottom: '0.750'
+          nominal_1000f: '2.39'
+          measured_1000f: '2.397'
+          cx_px: '4053.4'
+          cy_px: '2561.1'
+          y_window: 2389-2760
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f2.39-s14
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2389-2760, cx 4053.4; ratio at the window ends 0.889
+            to 0.750; centroid is not a series value
+          series: 14
+          T_K_caption: 1850
+          ratio_window_top: '0.889'
+          ratio_window_bottom: '0.750'
+          nominal_1000f: '2.39'
+          measured_1000f: '2.397'
+          cx_px: '4053.4'
+          cy_px: '2561.1'
+          y_window: 2389-2760
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f2.39-s15
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2389-2760, cx 4053.4; ratio at the window ends 0.889
+            to 0.750; centroid is not a series value
+          series: 15
+          T_K_caption: 1900
+          ratio_window_top: '0.889'
+          ratio_window_bottom: '0.750'
+          nominal_1000f: '2.39'
+          measured_1000f: '2.397'
+          cx_px: '4053.4'
+          cy_px: '2561.1'
+          y_window: 2389-2760
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f2.39-s16
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2389-2760, cx 4053.4; ratio at the window ends 0.889
+            to 0.750; centroid is not a series value
+          series: 16
+          T_K_caption: 1950
+          ratio_window_top: '0.889'
+          ratio_window_bottom: '0.750'
+          nominal_1000f: '2.39'
+          measured_1000f: '2.397'
+          cx_px: '4053.4'
+          cy_px: '2561.1'
+          y_window: 2389-2760
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f3.35-s11
+          decision: read
+          reason: isolated symbol; connected-component centroid
+          series: 11
+          T_K_caption: 1700
+          ratio_p_ef_over_p_eq: '0.944'
+          uncertainty_ratio: '0.02'
+          nominal_1000f: '3.35'
+          measured_1000f: '3.340'
+          cx_px: '4321.7'
+          cy_px: '2243.7'
+          y_window: 2198-2290
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f3.35-s12
+          decision: read
+          reason: isolated symbol; connected-component centroid
+          series: 12
+          T_K_caption: 1750
+          ratio_p_ef_over_p_eq: '0.895'
+          uncertainty_ratio: '0.02'
+          nominal_1000f: '3.35'
+          measured_1000f: '3.339'
+          cx_px: '4321.4'
+          cy_px: '2372.9'
+          y_window: 2329-2420
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f3.35-s13
+          decision: read
+          reason: isolated symbol; connected-component centroid
+          series: 13
+          T_K_caption: 1800
+          ratio_p_ef_over_p_eq: '0.847'
+          uncertainty_ratio: '0.02'
+          nominal_1000f: '3.35'
+          measured_1000f: '3.338'
+          cx_px: '4321.2'
+          cy_px: '2500.7'
+          y_window: 2456-2547
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f3.35-s14
+          decision: read
+          reason: isolated symbol; connected-component centroid
+          series: 14
+          T_K_caption: 1850
+          ratio_p_ef_over_p_eq: '0.805'
+          uncertainty_ratio: '0.02'
+          nominal_1000f: '3.35'
+          measured_1000f: '3.345'
+          cx_px: '4322.8'
+          cy_px: '2614.2'
+          y_window: 2568-2659
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f3.35-s15
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2672-2857, cx 4321.4; ratio at the window ends 0.783
+            to 0.713; centroid is not a series value
+          series: 15
+          T_K_caption: 1900
+          ratio_window_top: '0.783'
+          ratio_window_bottom: '0.713'
+          nominal_1000f: '3.35'
+          measured_1000f: '3.339'
+          cx_px: '4321.4'
+          cy_px: '2766.5'
+          y_window: 2672-2857
+          dpi: 1200
+          method_class: figure_only
+        - id: 4a-f3.35-s16
+          decision: defer
+          reason: fused with the other symbols in this column; shared window y 2672-2857, cx 4321.4; ratio at the window ends 0.783
+            to 0.713; centroid is not a series value
+          series: 16
+          T_K_caption: 1950
+          ratio_window_top: '0.783'
+          ratio_window_bottom: '0.713'
+          nominal_1000f: '3.35'
+          measured_1000f: '3.339'
+          cx_px: '4321.4'
+          cy_px: '2766.5'
+          y_window: 2672-2857
+          dpi: 1200
+          method_class: figure_only
+
     - observation_id: sh99_fig5_nagai
       type: experiment_series
       locator:
@@ -1089,13 +2071,537 @@ species:
         published_page: 191
         pdf_page_index: 4
         figure: '2'
-        note: Fig. 2b is the same kind of plot for (SiO2). The lines are the Table 2 (SiO2) rows. Markers
-          were not read and no point pressure is stored.
-      units: figure-only
+        note: >
+          Fig. 2b is the same plot for (SiO2). The lines are the Table 2 (SiO2) rows. Markers were read at 1200 dpi. Series 2 (Table n = 7, sigma_B ±0.38) has one separable circle; the other six are not separable and were not invented. Reads are context, not scored partial pressures. The condensed phase is unstated. Tick fit is in values.y_fit. Read uncertainty is ±0.04 dex and ±0.002 in 1000/T.
+      units: log10 p_ef, atm as printed; 1200 dpi figure read
       values:
-        quantity: figure not digitized
+        quantity: log10_p_ef_figure_read
         method_class: figure_only
-        digitized: false
+        digitized: true
+        scored: false
+        dpi: 1200
+        read_uncertainty_dex: '0.04'
+        read_uncertainty_1000_over_T: '0.002'
+        gas_species: SiO2(g)
+        condensed_as_printed: '[SiO2]'
+        phase_as_printed: The paper does not name solid, liquid, or a polymorph.
+        y_fit: log10 p = -0.073775 + (-1.651526e-03) * y_corrected; rms 0.00078 dex; max 0.00110
+        x_fit: 1000/T = 0.437526 + (3.852175e-05) * x; rms 0.000057; max 0.000095
+        markers:
+        - id: 2b-00
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.460'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5240'
+          T_K: '1908.3'
+          cx_px: '2245.2'
+          cy_px: '3860.1'
+          dt_px: '19.0'
+          dpi: 1200
+          nearer_offset_dex: '0.057'
+          second_offset_abs_dex: '0.414'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: false
+        - id: 2b-01
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.518'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5261'
+          T_K: '1900.9'
+          cx_px: '2298.1'
+          cy_px: '3894.7'
+          dt_px: '14.6'
+          dpi: 1200
+          nearer_offset_dex: '0.058'
+          second_offset_abs_dex: '0.417'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-02
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.824'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5344'
+          T_K: '1871.2'
+          cx_px: '2514.9'
+          cy_px: '4078.2'
+          dt_px: '26.7'
+          dpi: 1200
+          nearer_offset_dex: '-0.005'
+          second_offset_abs_dex: '0.357'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-03
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-7.006'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5389'
+          T_K: '1855.6'
+          cx_px: '2632.1'
+          cy_px: '4186.8'
+          dt_px: '15.3'
+          dpi: 1200
+          nearer_offset_dex: '-0.055'
+          second_offset_abs_dex: '0.309'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-04
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-7.022'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5405'
+          T_K: '1850.0'
+          cx_px: '2674.4'
+          cy_px: '4196.0'
+          dt_px: '19.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.023'
+          second_offset_abs_dex: '0.342'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-09
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-7.341'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5491'
+          T_K: '1821.2'
+          cx_px: '2896.0'
+          cy_px: '4387.3'
+          dt_px: '15.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.094'
+          second_offset_abs_dex: '0.274'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-11
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-7.365'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5520'
+          T_K: '1811.5'
+          cx_px: '2972.8'
+          cy_px: '4401.0'
+          dt_px: '15.7'
+          dpi: 1200
+          nearer_offset_dex: '-0.032'
+          second_offset_abs_dex: '0.338'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-14
+          decision: defer
+          reason: 0.10 to 0.18 dex off the nearer Table line
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-7.698'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5607'
+          T_K: '1783.5'
+          cx_px: '3197.3'
+          cy_px: '4599.9'
+          dt_px: '15.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.112'
+          second_offset_abs_dex: '0.261'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-16
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-7.714'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5640'
+          T_K: '1773.0'
+          cx_px: '3283.3'
+          cy_px: '4609.1'
+          dt_px: '15.6'
+          dpi: 1200
+          nearer_offset_dex: '-0.032'
+          second_offset_abs_dex: '0.343'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-18
+          decision: refuse
+          reason: dt below 10 px and off every Table line; not a filled marker
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.814'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5784'
+          T_K: '1729.0'
+          cx_px: '3656.0'
+          cy_px: '4060.0'
+          dt_px: '6.0'
+          dpi: 1200
+          nearer_offset_dex: '1.287'
+          second_offset_abs_dex: '1.668'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-19
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-8.095'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5785'
+          T_K: '1728.7'
+          cx_px: '3658.9'
+          cy_px: '4835.5'
+          dt_px: '15.5'
+          dpi: 1200
+          nearer_offset_dex: '0.009'
+          second_offset_abs_dex: '0.391'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2b-20
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-8.225'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5805'
+          T_K: '1722.6'
+          cx_px: '3711.7'
+          cy_px: '4913.7'
+          dt_px: '18.4'
+          dpi: 1200
+          nearer_offset_dex: '-0.061'
+          second_offset_abs_dex: '0.321'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2b-21
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-8.112'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5812'
+          T_K: '1720.7'
+          cx_px: '3728.7'
+          cy_px: '4845.0'
+          dt_px: '14.2'
+          dpi: 1200
+          nearer_offset_dex: '0.071'
+          second_offset_abs_dex: '0.453'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2b-22
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-8.233'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5822'
+          T_K: '1717.6'
+          cx_px: '3756.0'
+          cy_px: '4918.5'
+          dt_px: '19.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.020'
+          second_offset_abs_dex: '0.362'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2b-23
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-8.352'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5873'
+          T_K: '1702.6'
+          cx_px: '3889.0'
+          cy_px: '4989.1'
+          dt_px: '26.6'
+          dpi: 1200
+          nearer_offset_dex: '0.010'
+          second_offset_abs_dex: '0.395'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: false
+        - id: 2b-24
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 2
+          series_nearer: 2
+          series_second: 3
+          log10_p_ef: '-7.989'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5603'
+          T_K: '1784.7'
+          cx_px: '3187.9'
+          cy_px: '4776.2'
+          dt_px: '20.8'
+          dpi: 1200
+          nearer_offset_dex: '-0.040'
+          second_offset_abs_dex: '0.075'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-28
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 3
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-6.904'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5187'
+          T_K: '1927.9'
+          cx_px: '2107.0'
+          cy_px: '4130.5'
+          dt_px: '24.2'
+          dpi: 1200
+          nearer_offset_dex: '-0.056'
+          second_offset_abs_dex: '0.187'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-31
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 3
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-7.379'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5384'
+          T_K: '1857.4'
+          cx_px: '2618.0'
+          cy_px: '4413.1'
+          dt_px: '24.8'
+          dpi: 1200
+          nearer_offset_dex: '0.043'
+          second_offset_abs_dex: '0.080'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-38
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 3
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-7.935'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5542'
+          T_K: '1804.5'
+          cx_px: '3028.4'
+          cy_px: '4745.3'
+          dt_px: '24.7'
+          dpi: 1200
+          nearer_offset_dex: '-0.051'
+          second_offset_abs_dex: '0.168'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2b-39
+          decision: refuse
+          reason: dt below 10 px and off every Table line; not a filled marker
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-8.407'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5601'
+          T_K: '1785.5'
+          cx_px: '3181.2'
+          cy_px: '5029.8'
+          dt_px: '6.4'
+          dpi: 1200
+          nearer_offset_dex: '-0.352'
+          second_offset_abs_dex: '0.467'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: false
+        - id: 2b-40
+          decision: refuse
+          reason: numeral glyph on the plot, dt below the filled-marker cut
+          series: null
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-7.382'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5103'
+          T_K: '1959.7'
+          cx_px: '1889.0'
+          cy_px: '4422.1'
+          dt_px: '2.8'
+          dpi: 1200
+          nearer_offset_dex: '0.317'
+          second_offset_abs_dex: '0.780'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: false
+        - id: 2b-41
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-7.776'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5133'
+          T_K: '1948.1'
+          cx_px: '1967.7'
+          cy_px: '4659.9'
+          dt_px: '15.3'
+          dpi: 1200
+          nearer_offset_dex: '0.011'
+          second_offset_abs_dex: '1.085'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: false
+        - id: 2b-43
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-8.033'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5213'
+          T_K: '1918.3'
+          cx_px: '2174.6'
+          cy_px: '4813.7'
+          dt_px: '15.6'
+          dpi: 1200
+          nearer_offset_dex: '-0.017'
+          second_offset_abs_dex: '1.110'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2b-47
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-8.308'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5309'
+          T_K: '1883.6'
+          cx_px: '2424.0'
+          cy_px: '4977.4'
+          dt_px: '16.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.014'
+          second_offset_abs_dex: '1.104'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2b-48
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-8.402'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5341'
+          T_K: '1872.3'
+          cx_px: '2507.0'
+          cy_px: '5033.7'
+          dt_px: '14.4'
+          dpi: 1200
+          nearer_offset_dex: '-0.016'
+          second_offset_abs_dex: '1.105'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2b-49
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-8.445'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5355'
+          T_K: '1867.3'
+          cx_px: '2544.3'
+          cy_px: '5059.0'
+          dt_px: '15.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.017'
+          second_offset_abs_dex: '1.105'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2b-50
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-8.599'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5412'
+          T_K: '1847.6'
+          cx_px: '2692.6'
+          cy_px: '5150.7'
+          dt_px: '14.4'
+          dpi: 1200
+          nearer_offset_dex: '-0.006'
+          second_offset_abs_dex: '1.093'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+
     - observation_id: sh99_fig3_silver
       type: experiment_series
       locator:
@@ -1115,13 +2621,152 @@ species:
         published_page: 192
         pdf_page_index: 5
         figure: '4'
-        note: Fig. 4b is the same ratio for (SiO2), series 14–16, this work. Markers were not read. The
-          fit is the Table 3 (SiO2) rows.
-      units: figure-only
+        note: >
+          Fig. 4b is the same ratio for (SiO2), series 14, 15, and 16. Each orifice is one ink pile of the three symbols. Each series is deferred to that shared pile. No series has its own centre. The fit constants are the Table 3 (SiO2) rows. The ratio is not an alpha. The pile-centre locator is ±0.03 in the ratio. Y calibration uses labelled ticks 0.6, 0.2, and 0. X calibration uses labelled ticks 1, 2, and 3.
+      units: p_ef/p_eq, dimensionless; 1200 dpi figure read
       values:
-        quantity: figure not digitized
+        quantity: p_ef_over_p_eq_figure_read
         method_class: figure_only
-        digitized: false
+        digitized: true
+        scored: false
+        dpi: 1200
+        markers:
+        - id: 4b-left-s14
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 14
+          T_K_caption: 1850
+          pile_centre_ratio: '0.617'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '1.112'
+          nominal_1000f: '1.12'
+          cx_px: '2866'
+          cy_px: '5679'
+          dt_px: '19.1'
+          thick_window: x 2822-2896, y 5625-5691
+          dpi: 1200
+          method_class: figure_only
+        - id: 4b-left-s15
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 15
+          T_K_caption: 1900
+          pile_centre_ratio: '0.617'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '1.112'
+          nominal_1000f: '1.12'
+          cx_px: '2866'
+          cy_px: '5679'
+          dt_px: '19.1'
+          thick_window: x 2822-2896, y 5625-5691
+          dpi: 1200
+          method_class: figure_only
+        - id: 4b-left-s16
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 16
+          T_K_caption: 1950
+          pile_centre_ratio: '0.617'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '1.112'
+          nominal_1000f: '1.12'
+          cx_px: '2866'
+          cy_px: '5679'
+          dt_px: '19.1'
+          thick_window: x 2822-2896, y 5625-5691
+          dpi: 1200
+          method_class: figure_only
+        - id: 4b-mid-s14
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 14
+          T_K_caption: 1850
+          pile_centre_ratio: '0.245'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '2.385'
+          nominal_1000f: '2.39'
+          cx_px: '3784'
+          cy_px: '6337'
+          dt_px: '17.7'
+          thick_window: x 3755-3818, y 6298-6351
+          dpi: 1200
+          method_class: figure_only
+        - id: 4b-mid-s15
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 15
+          T_K_caption: 1900
+          pile_centre_ratio: '0.245'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '2.385'
+          nominal_1000f: '2.39'
+          cx_px: '3784'
+          cy_px: '6337'
+          dt_px: '17.7'
+          thick_window: x 3755-3818, y 6298-6351
+          dpi: 1200
+          method_class: figure_only
+        - id: 4b-mid-s16
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 16
+          T_K_caption: 1950
+          pile_centre_ratio: '0.245'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '2.385'
+          nominal_1000f: '2.39'
+          cx_px: '3784'
+          cy_px: '6337'
+          dt_px: '17.7'
+          thick_window: x 3755-3818, y 6298-6351
+          dpi: 1200
+          method_class: figure_only
+        - id: 4b-right-s14
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 14
+          T_K_caption: 1850
+          pile_centre_ratio: '0.214'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '3.311'
+          nominal_1000f: '3.35'
+          cx_px: '4452'
+          cy_px: '6391'
+          dt_px: '15.2'
+          thick_window: x 4419-4477, y 6377-6418
+          dpi: 1200
+          method_class: figure_only
+        - id: 4b-right-s15
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 15
+          T_K_caption: 1900
+          pile_centre_ratio: '0.214'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '3.311'
+          nominal_1000f: '3.35'
+          cx_px: '4452'
+          cy_px: '6391'
+          dt_px: '15.2'
+          thick_window: x 4419-4477, y 6377-6418
+          dpi: 1200
+          method_class: figure_only
+        - id: 4b-right-s16
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 16
+          T_K_caption: 1950
+          pile_centre_ratio: '0.214'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '3.311'
+          nominal_1000f: '3.35'
+          cx_px: '4452'
+          cy_px: '6391'
+          dt_px: '15.2'
+          thick_window: x 4419-4477, y 6377-6418
+          dpi: 1200
+          method_class: figure_only
+
   Si2O2:
     observations:
     - observation_id: shornikov_1999_silica_partial_vaporization_coefficients_p008_t04_r09_c03
@@ -1562,26 +3207,784 @@ species:
         published_page: 191
         pdf_page_index: 4
         figure: '2'
-        note: Fig. 2c is the same kind of plot for (Si2O2). The lines are the Table 2 (Si2O2) rows. Markers
-          were not read and no point pressure is stored.
-      units: figure-only
+        note: >
+          Fig. 2c is the same plot for (Si2O2). The lines are the Table 2 (Si2O2) rows. Markers were read at 1200 dpi. Two numeral glyphs on the x-axis label row are refused. One isolated triangle is deferred and not assigned. Reads are context, not scored partial pressures. Tick fit is in values.y_fit. Read uncertainty is ±0.04 dex and ±0.002 in 1000/T.
+      units: log10 p_ef, atm as printed; 1200 dpi figure read
       values:
-        quantity: figure not digitized
+        quantity: log10_p_ef_figure_read
         method_class: figure_only
-        digitized: false
+        digitized: true
+        scored: false
+        dpi: 1200
+        read_uncertainty_dex: '0.04'
+        read_uncertainty_1000_over_T: '0.002'
+        gas_species: Si2O2(g)
+        condensed_as_printed: '[SiO2]'
+        phase_as_printed: The paper does not name solid, liquid, or a polymorph.
+        y_fit: log10 p = 5.824708 + (-1.890249e-03) * y_corrected; rms 0.00624 dex; max 0.00882
+        x_fit: 1000/T = 0.419617 + (4.823581e-05) * x; rms 0.000057; max 0.000085
+        markers:
+        - id: 2c-00
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-5.742'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5241'
+          T_K: '1908.2'
+          cx_px: '2165.3'
+          cy_px: '6115.6'
+          dt_px: '22.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.039'
+          second_offset_abs_dex: '0.448'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: false
+        - id: 2c-01
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-5.730'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5256'
+          T_K: '1902.8'
+          cx_px: '2196.2'
+          cy_px: '6109.1'
+          dt_px: '15.0'
+          dpi: 1200
+          nearer_offset_dex: '0.020'
+          second_offset_abs_dex: '0.508'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2c-03
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.083'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5351'
+          T_K: '1868.9'
+          cx_px: '2393.8'
+          cy_px: '6294.2'
+          dt_px: '17.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.031'
+          second_offset_abs_dex: '0.461'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-04
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.078'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5384'
+          T_K: '1857.5'
+          cx_px: '2461.8'
+          cy_px: '6291.2'
+          dt_px: '15.3'
+          dpi: 1200
+          nearer_offset_dex: '0.077'
+          second_offset_abs_dex: '0.570'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-05
+          decision: defer
+          reason: isolated triangle; not assigned to a Table line
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.262'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5485'
+          T_K: '1823.1'
+          cx_px: '2672.2'
+          cy_px: '6386.7'
+          dt_px: '15.5'
+          dpi: 1200
+          nearer_offset_dex: '0.215'
+          second_offset_abs_dex: '0.712'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-06
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.554'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5512'
+          T_K: '1814.2'
+          cx_px: '2728.1'
+          cy_px: '6540.5'
+          dt_px: '18.0'
+          dpi: 1200
+          nearer_offset_dex: '0.009'
+          second_offset_abs_dex: '0.507'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-07
+          decision: defer
+          reason: 0.10 to 0.18 dex off the nearer Table line
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.733'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5521'
+          T_K: '1811.3'
+          cx_px: '2746.5'
+          cy_px: '6635.3'
+          dt_px: '14.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.142'
+          second_offset_abs_dex: '0.356'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-08
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.870'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5604'
+          T_K: '1784.6'
+          cx_px: '2917.8'
+          cy_px: '6706.0'
+          dt_px: '15.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.017'
+          second_offset_abs_dex: '0.485'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-11
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-6.866'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5637'
+          T_K: '1774.1'
+          cx_px: '2986.5'
+          cy_px: '6703.7'
+          dt_px: '15.0'
+          dpi: 1200
+          nearer_offset_dex: '0.091'
+          second_offset_abs_dex: '0.595'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-12
+          decision: refuse
+          reason: dt below 10 px and off every Table line; not a filled marker
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-5.816'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5649'
+          T_K: '1770.3'
+          cx_px: '3011.3'
+          cy_px: '6147.5'
+          dt_px: '2.2'
+          dpi: 1200
+          nearer_offset_dex: '1.180'
+          second_offset_abs_dex: '1.684'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2c-17
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-7.545'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5810'
+          T_K: '1721.3'
+          cx_px: '3345.0'
+          cy_px: '7059.6'
+          dt_px: '15.8'
+          dpi: 1200
+          nearer_offset_dex: '-0.039'
+          second_offset_abs_dex: '0.471'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-18
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-7.576'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5822'
+          T_K: '1717.8'
+          cx_px: '3369.6'
+          cy_px: '7075.9'
+          dt_px: '16.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.033'
+          second_offset_abs_dex: '0.478'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-20
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-7.758'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5875'
+          T_K: '1702.1'
+          cx_px: '3481.0'
+          cy_px: '7171.0'
+          dt_px: '17.9'
+          dpi: 1200
+          nearer_offset_dex: '-0.044'
+          second_offset_abs_dex: '0.469'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-25
+          decision: refuse
+          reason: dt below 10 px and off every Table line; not a filled marker
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-8.229'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5970'
+          T_K: '1675.2'
+          cx_px: '3676.5'
+          cy_px: '7418.6'
+          dt_px: '5.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.216'
+          second_offset_abs_dex: '0.300'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2c-28
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-8.392'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6109'
+          T_K: '1636.8'
+          cx_px: '3966.3'
+          cy_px: '7502.2'
+          dt_px: '14.9'
+          dpi: 1200
+          nearer_offset_dex: '0.065'
+          second_offset_abs_dex: '0.586'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2c-32
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-8.820'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6203'
+          T_K: '1612.0'
+          cx_px: '4161.5'
+          cy_px: '7727.2'
+          dt_px: '12.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.066'
+          second_offset_abs_dex: '0.460'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2c-33
+          decision: refuse
+          reason: numeral glyph (6 or 4) on the x-axis label row
+          series: null
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-9.017'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6204'
+          T_K: '1611.8'
+          cx_px: '4162.8'
+          cy_px: '7831.3'
+          dt_px: '10.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.260'
+          second_offset_abs_dex: '0.265'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2c-34
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-8.679'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6211'
+          T_K: '1610.0'
+          cx_px: '4177.7'
+          cy_px: '7652.3'
+          dt_px: '15.0'
+          dpi: 1200
+          nearer_offset_dex: '0.100'
+          second_offset_abs_dex: '0.626'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: false
+        - id: 2c-35
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 1
+          series_nearer: 1
+          series_second: 2
+          log10_p_ef: '-8.841'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6212'
+          T_K: '1609.7'
+          cx_px: '4179.6'
+          cy_px: '7737.9'
+          dt_px: '11.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.058'
+          second_offset_abs_dex: '0.468'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: false
+        - id: 2c-37
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 2
+          series_nearer: 2
+          series_second: 3
+          log10_p_ef: '-7.252'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5570'
+          T_K: '1795.3'
+          cx_px: '2848.4'
+          cy_px: '6909.1'
+          dt_px: '24.2'
+          dpi: 1200
+          nearer_offset_dex: '-0.005'
+          second_offset_abs_dex: '0.140'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-38
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 2
+          series_nearer: 2
+          series_second: 3
+          log10_p_ef: '-7.432'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5611'
+          T_K: '1782.2'
+          cx_px: '2933.5'
+          cy_px: '7003.2'
+          dt_px: '22.2'
+          dpi: 1200
+          nearer_offset_dex: '-0.053'
+          second_offset_abs_dex: '0.093'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-44
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 3
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-6.628'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5349'
+          T_K: '1869.5'
+          cx_px: '2390.2'
+          cy_px: '6582.8'
+          dt_px: '30.1'
+          dpi: 1200
+          nearer_offset_dex: '0.051'
+          second_offset_abs_dex: '0.090'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-45
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 3
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-6.899'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5420'
+          T_K: '1845.1'
+          cx_px: '2536.8'
+          cy_px: '6724.8'
+          dt_px: '22.8'
+          dpi: 1200
+          nearer_offset_dex: '0.008'
+          second_offset_abs_dex: '0.134'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-49
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 3
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-7.279'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5526'
+          T_K: '1809.7'
+          cx_px: '2756.7'
+          cy_px: '6923.7'
+          dt_px: '14.4'
+          dpi: 1200
+          nearer_offset_dex: '-0.029'
+          second_offset_abs_dex: '0.173'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-50
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 3
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-7.323'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5531'
+          T_K: '1807.8'
+          cx_px: '2768.3'
+          cy_px: '6946.9'
+          dt_px: '24.7'
+          dpi: 1200
+          nearer_offset_dex: '-0.055'
+          second_offset_abs_dex: '0.199'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-55
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-7.622'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5138'
+          T_K: '1946.3'
+          cx_px: '1952.4'
+          cy_px: '7112.3'
+          dt_px: '18.4'
+          dpi: 1200
+          nearer_offset_dex: '-0.034'
+          second_offset_abs_dex: '1.624'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2c-57
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-7.658'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5172'
+          T_K: '1933.4'
+          cx_px: '2023.5'
+          cy_px: '7130.4'
+          dt_px: '14.3'
+          dpi: 1200
+          nearer_offset_dex: '0.042'
+          second_offset_abs_dex: '1.549'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-59
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-7.911'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5226'
+          T_K: '1913.5'
+          cx_px: '2135.0'
+          cy_px: '7263.7'
+          dt_px: '19.7'
+          dpi: 1200
+          nearer_offset_dex: '-0.037'
+          second_offset_abs_dex: '1.629'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: true
+        - id: 2c-61
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-8.105'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5312'
+          T_K: '1882.5'
+          cx_px: '2313.7'
+          cy_px: '7364.7'
+          dt_px: '16.2'
+          dpi: 1200
+          nearer_offset_dex: '0.049'
+          second_offset_abs_dex: '1.545'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2c-63
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-8.381'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5383'
+          T_K: '1857.6'
+          cx_px: '2461.3'
+          cy_px: '7509.6'
+          dt_px: '15.3'
+          dpi: 1200
+          nearer_offset_dex: '0.004'
+          second_offset_abs_dex: '1.592'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: true
+        - id: 2c-65
+          decision: read
+          reason: within 0.10 dex of one Table line
+          series: 4
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-8.556'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5415'
+          T_K: '1846.7'
+          cx_px: '2527.2'
+          cy_px: '7601.6'
+          dt_px: '16.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.067'
+          second_offset_abs_dex: '1.664'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: false
+        - id: 2c-66
+          decision: refuse
+          reason: numeral glyph (6 or 4) on the x-axis label row
+          series: null
+          series_nearer: 4
+          series_second: 3
+          log10_p_ef: '-9.005'
+          uncertainty_dex: '0.04'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.5450'
+          T_K: '1834.8'
+          cx_px: '2599.6'
+          cy_px: '7838.1'
+          dt_px: '10.0'
+          dpi: 1200
+          nearer_offset_dex: '-0.402'
+          second_offset_abs_dex: '2.000'
+          outside_labelled_ticks: true
+          inside_nearer_line_printed_T: false
+
     - observation_id: sh99_fig4c
       type: experiment_series
       locator:
         published_page: 192
         pdf_page_index: 5
         figure: '4'
-        note: Fig. 4c is the same ratio for (Si2O2), series 14–16, this work. Markers were not read. The
-          fit is the Table 3 (Si2O2) rows.
-      units: figure-only
+        note: >
+          Fig. 4c is the same ratio for (Si2O2), series 14, 15, and 16, deferred the same way as Fig. 4b. The left pile measures 1000 f near 1.31, not the nominal 1.12, and there is no separable mark at x for 1.12. The middle and right piles land on 2.39 and 3.35. The ratio is not an alpha. The pile-centre locator is ±0.03 in the ratio. Y calibration uses labelled ticks 0.6 and 0. X calibration uses labelled ticks 1, 2, and 3.
+      units: p_ef/p_eq, dimensionless; 1200 dpi figure read
       values:
-        quantity: figure not digitized
+        quantity: p_ef_over_p_eq_figure_read
         method_class: figure_only
-        digitized: false
+        digitized: true
+        scored: false
+        dpi: 1200
+        markers:
+        - id: 4c-left-s14
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 14
+          T_K_caption: 1850
+          pile_centre_ratio: '0.470'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '1.306'
+          nominal_1000f: '1.12'
+          cx_px: '5943'
+          cy_px: '6011'
+          dt_px: '17.7'
+          thick_window: x 5915-5980, y 5971-6023
+          dpi: 1200
+          method_class: figure_only
+        - id: 4c-left-s15
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 15
+          T_K_caption: 1900
+          pile_centre_ratio: '0.470'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '1.306'
+          nominal_1000f: '1.12'
+          cx_px: '5943'
+          cy_px: '6011'
+          dt_px: '17.7'
+          thick_window: x 5915-5980, y 5971-6023
+          dpi: 1200
+          method_class: figure_only
+        - id: 4c-left-s16
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 16
+          T_K_caption: 1950
+          pile_centre_ratio: '0.470'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '1.306'
+          nominal_1000f: '1.12'
+          cx_px: '5943'
+          cy_px: '6011'
+          dt_px: '17.7'
+          thick_window: x 5915-5980, y 5971-6023
+          dpi: 1200
+          method_class: figure_only
+        - id: 4c-mid-s14
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 14
+          T_K_caption: 1850
+          pile_centre_ratio: '0.130'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '2.397'
+          nominal_1000f: '2.39'
+          cx_px: '6648'
+          cy_px: '6550'
+          dt_px: '19.1'
+          thick_window: x 6612-6684, y 6502-6562
+          dpi: 1200
+          method_class: figure_only
+        - id: 4c-mid-s15
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 15
+          T_K_caption: 1900
+          pile_centre_ratio: '0.130'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '2.397'
+          nominal_1000f: '2.39'
+          cx_px: '6648'
+          cy_px: '6550'
+          dt_px: '19.1'
+          thick_window: x 6612-6684, y 6502-6562
+          dpi: 1200
+          method_class: figure_only
+        - id: 4c-mid-s16
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 16
+          T_K_caption: 1950
+          pile_centre_ratio: '0.130'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '2.397'
+          nominal_1000f: '2.39'
+          cx_px: '6648'
+          cy_px: '6550'
+          dt_px: '19.1'
+          thick_window: x 6612-6684, y 6502-6562
+          dpi: 1200
+          method_class: figure_only
+        - id: 4c-right-s14
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 14
+          T_K_caption: 1850
+          pile_centre_ratio: '0.119'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '3.359'
+          nominal_1000f: '3.35'
+          cx_px: '7270'
+          cy_px: '6567'
+          dt_px: '19.2'
+          thick_window: x 7235-7308, y 6500-6578
+          dpi: 1200
+          method_class: figure_only
+        - id: 4c-right-s15
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 15
+          T_K_caption: 1900
+          pile_centre_ratio: '0.119'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '3.359'
+          nominal_1000f: '3.35'
+          cx_px: '7270'
+          cy_px: '6567'
+          dt_px: '19.2'
+          thick_window: x 7235-7308, y 6500-6578
+          dpi: 1200
+          method_class: figure_only
+        - id: 4c-right-s16
+          decision: defer
+          reason: three symbols occupy one ink pile; this series has no separate centre
+          series: 16
+          T_K_caption: 1950
+          pile_centre_ratio: '0.119'
+          uncertainty_ratio: '0.03'
+          measured_1000f: '3.359'
+          nominal_1000f: '3.35'
+          cx_px: '7270'
+          cy_px: '6567'
+          dt_px: '19.2'
+          thick_window: x 7235-7308, y 6500-6578
+          dpi: 1200
+          method_class: figure_only
+
 fidelity_samples:
 - species: SiO
   observable: alpha
