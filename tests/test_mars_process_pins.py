@@ -1,10 +1,26 @@
 """Pre-move binary64 pins for the pressure owners (fd288e7d7)."""
 
 import pytest
+from copy import deepcopy
 
 from simulator.core import _feedstock_surface_pressure_mbar
 from simulator.chemistry.offgas_fo2 import co2_dissociation_partials_bar
 from simulator.pumping_cost import estimate_subambient_pump_cost
+from simulator.campaigns import CampaignManager
+from simulator.state import CampaignPhase, MeltState
+from simulator.config import load_config_bundle
+
+
+@pytest.mark.parametrize('carrier,expected', [('pN2', 'N2'), ('pAr', 'Ar'), ('pCO2', 'CO2')])
+@pytest.mark.parametrize('campaign', [CampaignPhase.C2A, CampaignPhase.C2A_STAGED])
+def test_campaign_carrier_pre_move_pin(carrier, expected, campaign):
+    key = 'C2A_continuous' if campaign is CampaignPhase.C2A else 'C2A_staged'
+    setpoints = deepcopy(load_config_bundle().setpoints)
+    setpoints['campaigns'][key]['carrier_gas'] = carrier
+    manager = CampaignManager(setpoints)
+    melt = MeltState()
+    manager.configure_campaign(melt, campaign)
+    assert melt.background_gas_species == expected
 
 
 @pytest.mark.parametrize(
