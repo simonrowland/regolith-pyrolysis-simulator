@@ -482,8 +482,8 @@ def estimate_subambient_pump_cost(
         # Pump and line conductance are in series at the chamber:
         # 1/S_eff = 1/S_pump + 1/C_line. The supplied C_line is required to
         # have already passed the applicable Knudsen-regime correlation.
-        effective_speed_ceiling_m3_s = 1.0 / (
-            1.0 / speed_ceiling + 1.0 / line_conductance_m3_s
+        effective_speed_ceiling_m3_s = _effective_pump_speed_m3_s(
+            speed_ceiling, line_conductance_m3_s,
         )
         feasible = (
             math.isfinite(required_speed_m3_s)
@@ -904,3 +904,9 @@ def _exp_or_inf(log_value: float) -> float:
         return math.exp(log_value)
     except OverflowError:
         return math.inf
+
+
+def _effective_pump_speed_m3_s(pump_speed: float, line_conductance: float) -> float:
+    # Series transport resistances: 1/S_eff=1/S_pump+1/C_line.
+    # All speeds are m3/s; C->infinity recovers S_pump.
+    return 1.0 / (1.0 / pump_speed + 1.0 / line_conductance)
