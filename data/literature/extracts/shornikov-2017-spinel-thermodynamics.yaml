@@ -1,0 +1,610 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2017-spinel-thermodynamics
+source:
+  citation: >-
+    Shornikov, S. I. (2017). Thermodynamic Properties of Spinel MgAl2O4:
+    A Mass Spectrometric Study. Russian Journal of Physical Chemistry A,
+    91(2), 287–294.
+  doi: 10.1134/S0036024417020303
+  year: 2017
+  corpus_asset: raw/shornikov-2017-spinel-thermodynamics/shornikov-2017-spinel-thermodynamics.pdf
+extraction:
+  method: >-
+    mineru_table_draft emit of Table 1 CSV row 29 and Table 2 CSV row 14.
+    The ± cells were split by hand after a 600 dpi render check. The Table 1
+    minus sign is the en dash pdftotext reads (U+2013); MinerU stored an ASCII
+    hyphen. Table 2 column headers were rewritten from the render because
+    MinerU had folded the MgO body rows into the header. The liquid-state
+    pair on published page 292 is prose, added by hand from that render.
+  date: '2026-10-20'
+  worker: t1372-w1-w3-t1
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables:
+    - page: 2
+      table_index: 1
+      count: 0
+    - page: 4
+      table_index: 2
+      count: 0
+fidelity_samples:
+  - path: species.MgAl2O4.observations[shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03].values.value
+    value: '-12.02'
+    locator:
+      page: 2
+      published_page: 288
+      pdf_page_index: 1
+      table: '1'
+      note: >-
+        Table 1 this-work ΔH_T. 600 dpi render of PDF page 2. pdftotext
+        prints an en dash before 12.02.
+  - path: species.MgAl2O4.observations[shornikov_2017_spinel_thermodynamics_p002_t01_r29_c04].values.value
+    value: '5.03'
+    locator:
+      page: 2
+      published_page: 288
+      pdf_page_index: 1
+      table: '1'
+      note: Table 1 this-work ΔS_T. 600 dpi render of PDF page 2.
+  - path: species.MgAl2O4.observations[shornikov_2017_spinel_thermodynamics_p004_t02_r14_c03].values.value
+    value: '55.81'
+    locator:
+      page: 4
+      published_page: 290
+      pdf_page_index: 3
+      table: '2'
+      note: Table 2 this-work ΔH_melt. 600 dpi render of PDF page 4.
+  - path: species.MgAl2O4.observations[shornikov_2017_spinel_thermodynamics_p004_t02_r14_c04].values.value
+    value: '23.06'
+    locator:
+      page: 4
+      published_page: 290
+      pdf_page_index: 3
+      table: '2'
+      note: Table 2 this-work ΔS_melt. 600 dpi render of PDF page 4.
+  - path: species.MgAl2O4.observations[shornikov_2017_spinel_thermodynamics_p004_t02_r14_c02].values.T_K
+    value: '2420'
+    locator:
+      page: 4
+      published_page: 290
+      pdf_page_index: 3
+      table: '2'
+      note: Table 2 this-work T_melt. 600 dpi render of PDF page 4.
+  - path: species.MgAl2O4.observations[shornikov_2017_spinel_thermodynamics_liquid_delta_fH].values.value
+    value: '43.79'
+    locator:
+      page: 6
+      published_page: 292
+      pdf_page_index: 5
+      equation: '19'
+      note: Liquid-state formation enthalpy in the prose on PDF page 6.
+experiments:
+  - experiment_id: shornikov_2017_spinel_thermodynamics_kems
+    method: knudsen_effusion
+    locator: &experiment_locator
+      page: 3
+      published_page: 289
+      pdf_page_index: 2
+      section: INTRODUCTION
+      note: >-
+        Stoichiometric spinel was studied by Knudsen effusion mass spectrometry
+        at 1850–2300 K. Experimental details of the apparatuses are described
+        in reference [52]. This paper does not restate the cell metal.
+species:
+  MgAl2O4:
+    observations:
+      - observation_id: shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
+        type: gibbs_table
+        regime: tabulation
+        locator: &table1_h
+          page: 2
+          published_page: 288
+          pdf_page_index: 1
+          table: '1'
+          row: 29
+          column: 3
+          row_label: This work
+          column_header: ΔH_T, kJ/mol
+          note: >-
+            MinerU CSV row 29. 600 dpi render of PDF page 2 shows Knudsen mass
+            spectrometry, 1851–2298, −12.02 ± 1.14, 5.03 ± 0.56, This work.
+            pdftotext uses U+2013 before 12.02. MinerU stored an ASCII hyphen.
+            The emitted column header was the LaTeX fragment; the caption header
+            is written here.
+        units: kJ/mol
+        phase: cr
+        per: mol_species
+        standard_state: >-
+          Formation of crystalline spinel from simple oxides, as printed in
+          the Table 1 caption and equation (19). The paper does not state
+          whether those simple oxides are solid or liquid.
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        mineru_flags: []
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          value: '-12.02'
+          value_as_printed: '–12.02 ± 1.14'
+          temperature_span_as_printed: '1851–2298'
+          method_as_printed: Knudsen mass spectrometry
+          attribution: >-
+            Table 1 this-work row. Least squares of this paper's ΔG_T for
+            crystalline spinel, equation (19), assumed constant over the
+            printed range. Per 1 mol of compound.
+        uncertainty:
+          value: '1.14'
+          unit: kJ/mol
+          basis: as printed
+          confidence_level: not_stated
+          note: The paper prints ± and does not state the confidence level.
+        point_conditions:
+          composition: &spinel_composition
+            state:
+              tag: value
+              value:
+                basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+                amount_basis: mole_fraction
+                components:
+                  - [MgO, '0.5']
+                  - [Al2O3, '0.5']
+            locator:
+              page: 3
+              published_page: 289
+              pdf_page_index: 2
+              section: INTRODUCTION
+              note: The paper studies stoichiometric spinel MgAl2O4.
+          temperature_K:
+            state:
+              tag: unknown
+              reason: >-
+                Table 1 prints 1851–2298 K for this least-squares constant,
+                not a point. No midpoint is stored.
+            locator: *table1_h
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *table1_h
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *table1_h
+        T_range_K: [1851, 2298]
+      - observation_id: shornikov_2017_spinel_thermodynamics_p002_t01_r29_c04
+        type: gibbs_table
+        regime: tabulation
+        locator: &table1_s
+          page: 2
+          published_page: 288
+          pdf_page_index: 1
+          table: '1'
+          row: 29
+          column: 4
+          row_label: This work
+          column_header: ΔS_T, J/(mol K)
+          note: >-
+            Same Table 1 this-work row as the enthalpy. 600 dpi render of
+            PDF page 2. The schema has no formation-entropy token.
+        units: J/(mol K)
+        phase: cr
+        per: mol_species
+        standard_state: >-
+          Formation of crystalline spinel from simple oxides, as printed in
+          the Table 1 caption and equation (19). The paper does not state
+          whether those simple oxides are solid or liquid.
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        mineru_flags: []
+        values:
+          quantity: delta_fS
+          method_class: measured_reduced
+          value: '5.03'
+          value_as_printed: '5.03 ± 0.56'
+          temperature_span_as_printed: '1851–2298'
+          method_as_printed: Knudsen mass spectrometry
+          attribution: >-
+            Table 1 this-work formation entropy. Least squares of ΔG_T,
+            equation (19). Retained and refused because the schema has no
+            delta_fS token.
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            The extract schema has no token for formation entropy delta_fS;
+            the printed cell is retained.
+        uncertainty:
+          value: '0.56'
+          unit: J/(mol K)
+          basis: as printed
+          confidence_level: not_stated
+          note: The paper prints ± and does not state the confidence level.
+        point_conditions:
+          composition: *spinel_composition
+          temperature_K:
+            state:
+              tag: unknown
+              reason: >-
+                Table 1 prints 1851–2298 K for this least-squares constant,
+                not a point. No midpoint is stored.
+            locator: *table1_s
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *table1_s
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *table1_s
+        T_range_K: [1851, 2298]
+      - observation_id: shornikov_2017_spinel_thermodynamics_p004_t02_r14_c03
+        type: heat_capacity_and_heat_content_series
+        locator: &table2_h
+          page: 4
+          published_page: 290
+          pdf_page_index: 3
+          table: '2'
+          row: 14
+          column: 3
+          row_label: This work
+          column_header: ΔH_melt, kJ/mol
+          note: >-
+            MinerU CSV row 14, the last row of the MgAl2O4 block. 600 dpi
+            render of PDF page 4 shows 2420 ± 25, 55.81 ± 4.62, 23.06 ± 1.73,
+            This work, above the Al2O3 block. Emit's column header included
+            the MgO literature cells because MinerU had marked those body rows
+            as header. The header written here is the printed column header.
+        units: kJ/mol
+        phase: cr
+        per: mol_species
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        mineru_flags:
+          - non_numeric_in_numeric_column
+        values:
+          quantity: heat_of_fusion
+          method_class: measured_reduced
+          value: '55.81'
+          value_as_printed: '55.81 ± 4.62'
+          T_K: '2420'
+          attribution: >-
+            Table 2 this-work melting enthalpy. Equations (20) and (22):
+            liquid-state formation enthalpy minus crystalline formation
+            enthalpy. The same row prints T_melt 2420 ± 25 K; that ± is on
+            the transition_point row, not on this enthalpy.
+        uncertainty:
+          value: '4.62'
+          unit: kJ/mol
+          basis: as printed
+          confidence_level: not_stated
+          note: The paper prints ± and does not state the confidence level.
+        point_conditions:
+          composition: *spinel_composition
+          temperature_K:
+            state:
+              tag: value
+              value: {kind: point, point: '2420'}
+            locator: *table2_h
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not print a total pressure for this melting enthalpy.
+            locator: *table2_h
+      - observation_id: shornikov_2017_spinel_thermodynamics_p004_t02_r14_c04
+        type: heat_capacity_and_heat_content_series
+        locator: &table2_s
+          page: 4
+          published_page: 290
+          pdf_page_index: 3
+          table: '2'
+          row: 14
+          column: 4
+          row_label: This work
+          column_header: ΔS_melt, J/(mol K)
+          note: >-
+            Same Table 2 this-work row. The caption prints J/(mol K). The
+            stored unit is J/mol K, the same unit, so migration can read it.
+            600 dpi render of PDF page 4.
+        units: J/mol K
+        phase: cr
+        per: mol_species
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        mineru_flags:
+          - non_numeric_in_numeric_column
+        values:
+          quantity: entropy_of_fusion
+          method_class: measured_reduced
+          value: '23.06'
+          value_as_printed: '23.06 ± 1.73'
+          units_as_printed: J/(mol K)
+          T_K: '2420'
+          attribution: >-
+            Table 2 this-work melting entropy. Equation (21): liquid-state
+            formation entropy minus crystalline formation entropy.
+        uncertainty:
+          value: '1.73'
+          unit: J/(mol K)
+          basis: as printed
+          confidence_level: not_stated
+          note: The paper prints ± and does not state the confidence level.
+        point_conditions:
+          composition: *spinel_composition
+          temperature_K:
+            state:
+              tag: value
+              value: {kind: point, point: '2420'}
+            locator: *table2_s
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not print a total pressure for this melting entropy.
+            locator: *table2_s
+      - observation_id: shornikov_2017_spinel_thermodynamics_p004_t02_r14_c02
+        type: transition_point
+        locator: &table2_t
+          page: 4
+          published_page: 290
+          pdf_page_index: 3
+          table: '2'
+          row: 14
+          column: 2
+          row_label: This work
+          column_header: T_melt, K
+          note: >-
+            Same Table 2 this-work row. Emit stored 2420 ± 25 on values.value.
+            transition_temperature is read from T_K, so the number was moved
+            here after the 600 dpi render check. PDF page 4.
+        units: K
+        phase: cr
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        mineru_flags:
+          - non_numeric_in_numeric_column
+        values:
+          quantity: transition_temperature
+          method_class: measured_reduced
+          property_kind: melting_point
+          T_K: '2420'
+          T_m_K: '2420'
+          value_as_printed: '2420 ± 25'
+          attribution: >-
+            Table 2 this-work melting temperature. Equation (22):
+            ΔH_melt / ΔS_melt. The paper calculates it from the liquid and
+            crystalline formation constants; it is not a separate pyrometry run.
+        uncertainty:
+          value: '25'
+          unit: K
+          basis: as printed
+          confidence_level: not_stated
+          note: The ± is printed on the melting temperature. Confidence level is not stated.
+        point_conditions:
+          composition: *spinel_composition
+          temperature_K:
+            state:
+              tag: value
+              value: {kind: point, point: '2420'}
+            locator: *table2_t
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not print a total pressure for this melting temperature.
+            locator: *table2_t
+      - observation_id: shornikov_2017_spinel_thermodynamics_liquid_delta_fH
+        type: gibbs_table
+        locator: &liquid_h
+          page: 6
+          published_page: 292
+          pdf_page_index: 5
+          equation: '19'
+          paragraph: liquid-state formation
+          note: >-
+            Prose, not a table cell. 600 dpi render of PDF page 6:
+            ΔH_T(MgAl2O4) = 43.79 ± 4.84 kJ/mol and
+            ΔS_T(MgAl2O4) = 28.09 ± 1.64 J/(mol K), liquid state, equation (19).
+        units: kJ/mol
+        phase: l
+        per: mol_species
+        standard_state: >-
+          Formation of spinel in the liquid state from simple oxides, equation
+          (19), published page 292. The paper does not state whether those
+          simple oxides are solid or liquid.
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          value: '43.79'
+          value_as_printed: '43.79 ± 4.84'
+          attribution: >-
+            Published page 292. Gibbs energies of spinel formation in the
+            liquid state, from the MgAl2O4–SiO2 melt activities of equations
+            (16) and (17), reduced by equation (19). The sentence does not
+            print a temperature or a range for this constant.
+        uncertainty:
+          value: '4.84'
+          unit: kJ/mol
+          basis: as printed
+          confidence_level: not_stated
+          note: The paper prints ± and does not state the confidence level.
+        point_conditions:
+          composition: *spinel_composition
+          temperature_K:
+            state:
+              tag: unknown
+              reason: >-
+                The liquid-state sentence does not print a temperature or a
+                range. The Table 1 range is not copied onto it.
+            locator: *liquid_h
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *liquid_h
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *liquid_h
+      - observation_id: shornikov_2017_spinel_thermodynamics_liquid_delta_fS
+        type: gibbs_table
+        locator: &liquid_s
+          page: 6
+          published_page: 292
+          pdf_page_index: 5
+          equation: '19'
+          paragraph: liquid-state formation
+          note: >-
+            Same prose sentence as the liquid formation enthalpy. 600 dpi
+            render of PDF page 6. The schema has no formation-entropy token.
+        units: J/(mol K)
+        phase: l
+        per: mol_species
+        standard_state: >-
+          Formation of spinel in the liquid state from simple oxides, equation
+          (19), published page 292. The paper does not state whether those
+          simple oxides are solid or liquid.
+        experiment: shornikov_2017_spinel_thermodynamics_kems
+        values:
+          quantity: delta_fS
+          method_class: measured_reduced
+          value: '28.09'
+          value_as_printed: '28.09 ± 1.64'
+          attribution: >-
+            Published page 292, liquid-state formation entropy from equation
+            (19). Retained and refused because the schema has no delta_fS token.
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            The extract schema has no token for formation entropy delta_fS;
+            the printed cell is retained.
+        uncertainty:
+          value: '1.64'
+          unit: J/(mol K)
+          basis: as printed
+          confidence_level: not_stated
+          note: The paper prints ± and does not state the confidence level.
+        point_conditions:
+          composition: *spinel_composition
+          temperature_K:
+            state:
+              tag: unknown
+              reason: >-
+                The liquid-state sentence does not print a temperature or a
+                range. The Table 1 range is not copied onto it.
+            locator: *liquid_s
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *liquid_s
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: *liquid_s
+    context:
+      - observation_id: shornikov_2017_spinel_thermodynamics_table1_literature
+        type: literature_compilation_not_extracted
+        locator:
+          page: 2
+          published_page: 288
+          pdf_page_index: 1
+          table: '1'
+          note: Thirty literature rows. The this-work row is the observation above.
+        units: as printed
+        values:
+          literature_row_count: 30
+          reason: >-
+            Table 1 has 31 body rows. One is this work. The other 30 are cited
+            calorimetry, EMF, thermochemical calculations, and earlier KEMS.
+            They are not measurements of this paper and are not stored.
+      - observation_id: shornikov_2017_spinel_thermodynamics_table2_literature
+        type: literature_compilation_not_extracted
+        locator:
+          page: 4
+          published_page: 290
+          pdf_page_index: 3
+          table: '2'
+          note: >-
+            MgO, the other MgAl2O4 rows, and Al2O3. MinerU had marked the four
+            MgO rows as header because of a rowspan. The render shows they are
+            body rows.
+        units: as printed
+        values:
+          literature_row_count: 15
+          reason: >-
+            Table 2 has four MgO rows, eight other MgAl2O4 rows, and three
+            Al2O3 rows. They are cited melting data, not this paper's result.
+            They are not stored.
+      - observation_id: shornikov_2017_spinel_thermodynamics_fig1_heat_capacity
+        type: figure_context_not_digitised
+        locator:
+          page: 1
+          published_page: 287
+          pdf_page_index: 0
+          figure: '1'
+          note: Literature heat capacity of spinel. Not this paper's measurements.
+        units: as printed
+        values:
+          status: context_only
+          reason: Figure 1 compares published heat-capacity curves. No point was read.
+      - observation_id: shornikov_2017_spinel_thermodynamics_fig2_delta_g
+        type: figure_context_not_digitised
+        locator:
+          page: 3
+          published_page: 289
+          pdf_page_index: 2
+          figure: '2'
+          note: >-
+            ΔG_T of spinel formation from simple oxides. Series 16 is this
+            study. Series 13 and 15 lie on the same trend.
+        units: kJ/mol
+        values:
+          status: context_only
+          reason: >-
+            The pointwise Gibbs energies are not tabulated. Series 16 cannot
+            be separated from series 13 and 15 within a stated energy
+            uncertainty. The least-squares enthalpy and entropy of those
+            points are the Table 1 this-work cells. No figure point is stored.
+            MinerU's invented chart table was ignored.
+      - observation_id: shornikov_2017_spinel_thermodynamics_fig3_pressures
+        type: figure_context_not_digitised
+        locator:
+          page: 5
+          published_page: 291
+          pdf_page_index: 4
+          figure: '3'
+          note: >-
+            Caption: partial pressures of the gas over spinel, reference [1].
+        units: atm
+        values:
+          status: context_only
+          reason: >-
+            Figure 3 is the pressure series of Shornikov 2017, Russian Journal
+            of Physical Chemistry A 91(1), 10–16, already extracted as
+            shornikov-2017-spinel-evaporation. It is not re-extracted.
+      - observation_id: shornikov_2017_spinel_thermodynamics_fig4_activities
+        type: figure_context_not_digitised
+        locator:
+          page: 5
+          published_page: 291
+          pdf_page_index: 4
+          figure: '4'
+          equation: '12-13'
+          note: >-
+            Activities of MgO (panel a) and Al2O3 (panel b). Series 8 is this
+            work. Series 5, 6, and 7 are earlier KEMS studies.
+        units: dimensionless
+        values:
+          status: context_only
+          standard_state_as_printed: >-
+            where p_i and p_i° are the partial pressures of the components of
+            the gas phase over spinel and simple oxide (pure component),
+            respectively.
+          reference_phase: >-
+            The paper does not state whether that pure-component simple oxide
+            is solid or liquid, and it does not state the temperature of the
+            reference-pressure measurement. The pure-oxide-at-experiment-T
+            ruling was not applied. No melting point was used.
+          reason: >-
+            Both panels are linear. Series 8 is open right-pointing triangles.
+            Series 5–7 are the same family of triangles and overlap series 8
+            from about 1850 K to 2300 K. A marker cannot be assigned to this
+            work within a stated activity uncertainty. No activity number is
+            stored. MinerU's invented scatter table was ignored.
+      - observation_id: shornikov_2017_spinel_thermodynamics_fig5_phase_diagram
+        type: figure_context_not_digitised
+        locator:
+          page: 5
+          published_page: 291
+          pdf_page_index: 4
+          figure: '5'
+          note: Phase diagram of MgAl2O4–SiO2 cited to reference [55].
+        units: as printed
+        values:
+          status: context_only
+          reason: >-
+            Figure 5 is a cited phase diagram, not a measurement of this paper.
+            MinerU's invented contour table was ignored.
