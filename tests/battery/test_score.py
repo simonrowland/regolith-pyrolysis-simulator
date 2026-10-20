@@ -5914,7 +5914,12 @@ def test_melt_like_sample_activity_stays_on_the_melt_activity_rail(
 
 
 def test_unknown_sample_phase_activity_stays_on_the_melt_activity_rail() -> None:
-    """An untyped phase is not a crystalline-sample statement."""
+    """An untyped phase is not a crystalline-sample statement.
+
+    Identity comparison already refuses an unknown species phase, so the
+    row is not a numeric melt miss. The phase gate must leave that refusal
+    in place rather than reclassifying it.
+    """
 
     experiment, reference = _oxide_activity_at_sample_phase(
         State.unknown("source does not state phase"),
@@ -5924,11 +5929,13 @@ def test_unknown_sample_phase_activity_stays_on_the_melt_activity_rail() -> None
 
     assert calls == [reference.observation_id]
     assert residual.rail is Rail.MELT_ACTIVITY
-    assert residual.numeric is not None
-    assert residual.status is not ResidualStatus.REFUSED
-    assert residual.refusal is None or (
-        residual.refusal.detail.get("reason") != _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
-    )
+    assert residual.numeric is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert "species.phase" in residual.refusal.detail["fields"]
+    assert residual.refusal.detail.get("reason") != _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+    assert _residual_engine_observable(residual_to_plain(residual)) is True
 
 
 def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None:
