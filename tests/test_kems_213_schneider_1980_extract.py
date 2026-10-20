@@ -254,3 +254,15 @@ def test_figure_records_are_deferred_and_locators_use_physical_pages() -> None:
     assert locators
     assert all(locator["page"] == locator["pdf_page_index"] + 1 for locator in locators)
     assert all(locator["published_page"] == locator["page"] - 4 for locator in locators)
+
+
+def test_qualitative_activity_reference_phase_remains_explicitly_unknown() -> None:
+    document = _document()
+    record = next(
+        item
+        for item in document["species"]["K"]["context"]
+        if item["observation_id"] == "schneider_1980_qualitative_k2o_activity_effect"
+    )
+    reference = record["values"]["activity_reference_state"]
+    assert reference["state"] == "unknown"
+    assert "no reference measurement temperature" in reference["reason"]

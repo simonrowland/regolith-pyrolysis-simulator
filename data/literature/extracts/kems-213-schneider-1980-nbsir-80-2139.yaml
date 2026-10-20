@@ -151,7 +151,10 @@ species:
         statement_as_printed: >-
           The authors describe CaO as increasing K2O activity, with its major effect appearing at lower K2O
           concentrations. No numerical K2O activity or activity reference state is printed.
-        activity_reference_state: not stated
+        activity_reference_state:
+          state: unknown
+          reason: The report prints no reference measurement temperature, so the stable pure-oxide reference
+            phase cannot be inferred.
     - observation_id: schneider_1980_oxygen_pressure_measurement_without_values
       type: typed_refusal
       locator: {page: 6, pdf_page_index: 5, published_page: 2, section: Vaporization Studies}

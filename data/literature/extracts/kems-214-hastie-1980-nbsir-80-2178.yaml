@@ -750,9 +750,15 @@ species:
         sample_id: K1
         composition_as_printed: remaining K2O mole fractions labeled 0.08–0.154; individual composition
           values are not digitised.
-        standard_state_as_printed: pure K2O reference; the cited reference phase is not stated, so no
-          solid/liquid basis is assigned.
-        standard_state_inferred: false
+        standard_state_as_printed: pure K2O reference; the phase is inferred from the reference
+          temperature range and K2O phase equilibrium.
+        standard_state:
+          phase: liquid
+          inferred: true
+          basis: Pure K2O melts at 919 K (Natola and Touzain, 1970, DOI 10.1139/v70-324); the plotted
+            reference data span 1200–1900 K, so the stable reference phase is liquid throughout.
+          transition_notice: The plotted range begins 281 K above the fusion point, outside the approximately
+            100 K transition notice range.
   Mg:
     observations:
     - observation_id: hastie_1980_table3_Mg_partial_pressure

@@ -164,3 +164,19 @@ def test_deferred_figures_have_metadata_but_no_numeric_points() -> None:
     ]
     assert len(secondary) == 3
     assert all(locator["table"] == "2" and locator["page"] == 106 for locator in secondary)
+
+
+def test_k2o_activity_coefficient_uses_inferred_liquid_reference() -> None:
+    document = _document()
+    record = next(
+        item
+        for item in document["species"]["K2O"]["context"]
+        if item["observation_id"] == "hastie_1980_appb_fig7_K2O_activity_coefficient"
+    )
+    standard_state = record["values"]["standard_state"]
+    assert standard_state["phase"] == "liquid"
+    assert standard_state["inferred"] is True
+    assert "919 K" in standard_state["basis"]
+    assert "Natola and Touzain" in standard_state["basis"]
+    assert "1200–1900 K" in standard_state["basis"]
+    assert "281 K" in standard_state["transition_notice"]
