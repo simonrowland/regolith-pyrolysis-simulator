@@ -12,12 +12,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sqlite3
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
-
-from simulator.scalar_boundary import finite_float
 
 
 BELOW_LIQUIDUS_HONEST_REFUSAL = "below-liquidus-honest-refusal"
@@ -61,9 +60,17 @@ def _normalise(value: Any) -> str:
     return str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
 
 
+def _finite_float(value: Any) -> float | None:
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return None
+    return result if math.isfinite(result) else None
+
+
 def _number(row: Mapping[str, Any], *names: str) -> float | None:
     for name in names:
-        value = finite_float(row.get(name))
+        value = _finite_float(row.get(name))
         if value is not None:
             return value
     return None
