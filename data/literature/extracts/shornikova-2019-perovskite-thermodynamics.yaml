@@ -1,0 +1,4010 @@
+schema_version: literature_extract.v1
+source_id: shornikova-2019-perovskite-thermodynamics
+source:
+  citation: Shornikova, S. I. (2019). High-temperature mass spectrometry study of the thermodynamic properties
+    of CaTiO3 perovskite. Russian Journal of Physical Chemistry A, 93(8), 1428–1434. doi:10.1134/S0036024419080284.
+  year: 2019
+  byline_as_printed: S. I. Shornikova
+  byline_note: The English byline prints Shornikova. The correspondence address is sergey.shornikov@gmail.com,
+    and the Russian-text citation line uses Shornikov. The source id keeps the corpus spelling shornikova.
+  doi: 10.1134/S0036024419080284
+extraction:
+  method: mineru_table_draft emit, then a post-process that splits printed ± cells checked on the 600
+    dpi page, attaches the T and Ref. cells, and moves melting temperatures onto T_K
+  date: '2026-10-20'
+  worker: t1372-w1-w4-t1
+review_status: draft
+skipped_empty_or_dash:
+  total: 10
+  tables:
+  - page: 2
+    table_index: 1
+    count: 2
+  - page: 4
+    table_index: 2
+    count: 0
+  - page: 4
+    table_index: 2
+    count: 0
+  - page: 4
+    table_index: 2
+    count: 0
+  - page: 4
+    table_index: 2
+    count: 0
+  - page: 4
+    table_index: 2
+    count: 3
+  - page: 4
+    table_index: 2
+    count: 3
+  - page: 4
+    table_index: 2
+    count: 0
+  - page: 4
+    table_index: 2
+    count: 1
+  - page: 4
+    table_index: 2
+    count: 1
+species:
+  CaTiO3:
+    observations:
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r03_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '298'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-40.48'
+        attribution: Table 1 Ref. [5, 18]. The cited paper is not stored in this extract.
+        value_as_printed: -40.48 ± 0.42
+        method_as_printed: HF/HCl solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '298'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '0.42'
+        verbatim: -40.48 ± 0.42
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 298.0
+      - 298.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '298'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r04_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '298'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-41.84'
+        attribution: Table 1 Ref. [17]. The cited paper is not stored in this extract.
+        value_as_printed: -41.84 ± 1.88
+        method_as_printed: Bomb calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '298'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.88'
+        verbatim: -41.84 ± 1.88
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 298.0
+      - 298.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '298'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r05_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '298'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-40.48'
+        attribution: Table 1 Ref. [11]. The cited paper is not stored in this extract.
+        value_as_printed: -40.48 ± 1.65
+        method_as_printed: Adiabatic calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '298'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.65'
+        verbatim: -40.48 ± 1.65
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 298.0
+      - 298.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '298'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r06_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '298'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-47.11'
+        attribution: Table 1 Ref. [13]. The cited paper is not stored in this extract.
+        value_as_printed: -47.11 ± 1.41
+        method_as_printed: Adiabatic calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '298'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.41'
+        verbatim: -47.11 ± 1.41
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 298.0
+      - 298.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '298'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r07_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '298'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-42.98'
+        attribution: Table 1 Ref. [27]. The cited paper is not stored in this extract.
+        value_as_printed: -42.98 ± 1.96
+        method_as_printed: $Na_6Mo_4O_{15}$  solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '298'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.96'
+        verbatim: -42.98 ± 1.96
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 298.0
+      - 298.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '298'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r08_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 888–972
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-37.05'
+        attribution: Table 1 Ref. [34]. The cited paper is not stored in this extract.
+        value_as_printed: -37.05 ± 3.28
+        method_as_printed: EMF
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_range_as_printed: 888–972
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '3.28'
+        verbatim: -37.05 ± 3.28
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 888.0
+      - 972.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 1 prints the temperature as the interval 888–972. No midpoint is invented.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: 888–972
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r09_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 900–1250
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-40.07'
+        attribution: Table 1 Ref. [36]. The cited paper is not stored in this extract.
+        value_as_printed: -40.07 ± 0.05
+        method_as_printed: EMF
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_range_as_printed: 900–1250
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '0.05'
+        verbatim: -40.07 ± 0.05
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 900.0
+      - 1250.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 1 prints the temperature as the interval 900–1250. No midpoint is invented.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: 900–1250
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r10_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '973'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-38.73'
+        attribution: Table 1 Ref. [22]. The cited paper is not stored in this extract.
+        value_as_printed: -38.73 ± 1.34
+        method_as_printed: $Pb_2B_2O_5$  solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '973'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.34'
+        verbatim: -38.73 ± 1.34
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 973.0
+      - 973.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '973'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '973'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r11_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '975'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-42.25'
+        attribution: Table 1 Ref. [24, 25]. The cited paper is not stored in this extract.
+        value_as_printed: -42.25 ± 1.05
+        method_as_printed: $Na_6Mo_4O_{15}$  solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '975'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.05'
+        verbatim: -42.25 ± 1.05
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 975.0
+      - 975.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '975'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '975'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r12_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '975'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-41.88'
+        attribution: Table 1 Ref. [26]. The cited paper is not stored in this extract.
+        value_as_printed: -41.88 ± 1.36
+        method_as_printed: $Na_6Mo_4O_{15}$  solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '975'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.36'
+        verbatim: -41.88 ± 1.36
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 975.0
+      - 975.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '975'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '975'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r13_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '976'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-42.86'
+        attribution: Table 1 Ref. [23]. The cited paper is not stored in this extract.
+        value_as_printed: -42.86 ± 1.71
+        method_as_printed: $Na_6Mo_4O_{15}$  solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '976'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.71'
+        verbatim: -42.86 ± 1.71
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 976.0
+      - 976.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '976'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '976'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r14_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '1046'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-42.38'
+        attribution: Table 1 Ref. [22]. The cited paper is not stored in this extract.
+        value_as_printed: -42.38 ± 1.82
+        method_as_printed: $Pb_2B_2O_5$  solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '1046'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.82'
+        verbatim: -42.38 ± 1.82
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1046.0
+      - 1046.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1046'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '1046'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r15_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1068 ± 2
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-40.45'
+        attribution: Table 1 Ref. [19]. The cited paper is not stored in this extract.
+        value_as_printed: -40.45 ± 1.15
+        method_as_printed: $(Li,Na)BO_2$  solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '1068'
+        T_as_printed: 1068 ± 2
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.15'
+        verbatim: -40.45 ± 1.15
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1068.0
+      - 1068.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1068'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: 1068 ± 2
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r16_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '1073'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-40.43'
+        attribution: Table 1 Ref. [20]. The cited paper is not stored in this extract.
+        value_as_printed: -40.43 ± 1.87
+        method_as_printed: $Pb_2B_2O_5$  solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '1073'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.87'
+        verbatim: -40.43 ± 1.87
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1073.0
+      - 1073.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1073'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '1073'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r17_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '1074'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-43.78'
+        attribution: Table 1 Ref. [21]. The cited paper is not stored in this extract.
+        value_as_printed: -43.78 ± 1.73
+        method_as_printed: $Pb_2B_2O_5$  solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '1074'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.73'
+        verbatim: -43.78 ± 1.73
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1074.0
+      - 1074.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1074'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '1074'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r18_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '1078'
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-42.83'
+        attribution: Table 1 Ref. [30]. The cited paper is not stored in this extract.
+        value_as_printed: -42.83 ± 3.12
+        method_as_printed: $Pb_2B_2O_5$  solution calorimetry
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '1078'
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '3.12'
+        verbatim: -42.83 ± 3.12
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1078.0
+      - 1078.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1078'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: '1078'
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r19_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1180–1290
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-26.88'
+        attribution: Table 1 Ref. [33]. The cited paper is not stored in this extract.
+        value_as_printed: -26.88 ± 8.05
+        method_as_printed: EMF
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_range_as_printed: 1180–1290
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '8.05'
+        verbatim: -26.88 ± 8.05
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1180.0
+      - 1290.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 1 prints the temperature as the interval 1180–1290. No midpoint is invented.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: 1180–1290
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r21_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1600–1800
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-37.19'
+        attribution: Table 1 Ref. [7]. The cited paper is not stored in this extract.
+        value_as_printed: -37.19 ± 0.14
+        method_as_printed: Thermochemical calculations
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_range_as_printed: 1600–1800
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '0.14'
+        verbatim: -37.19 ± 0.14
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1600.0
+      - 1800.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 1 prints the temperature as the interval 1600–1800. No midpoint is invented.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: 1600–1800
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r22_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1600–2100
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-38.23'
+        attribution: Table 1 Ref. [8]. The cited paper is not stored in this extract.
+        value_as_printed: -38.23 ± 0.04
+        method_as_printed: Thermochemical calculations
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_range_as_printed: 1600–2100
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '0.04'
+        verbatim: -38.23 ± 0.04
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1600.0
+      - 2100.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 1 prints the temperature as the interval 1600–2100. No midpoint is invented.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: 1600–2100
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r23_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1600–2100
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-37.47'
+        attribution: Table 1 Ref. [9]. The cited paper is not stored in this extract.
+        value_as_printed: -37.47 ± 0.03
+        method_as_printed: Thermochemical calculations
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_range_as_printed: 1600–2100
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '0.03'
+        verbatim: -37.47 ± 0.03
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1600.0
+      - 2100.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 1 prints the temperature as the interval 1600–2100. No midpoint is invented.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: 1600–2100
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r24_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1740 ± 20
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        value: '-37.55'
+        attribution: Table 1 Ref. [37]. The cited paper is not stored in this extract.
+        value_as_printed: -37.55 ± 3.76
+        method_as_printed: DTA
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_K: '1740'
+        T_as_printed: 1740 ± 20
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '3.76'
+        verbatim: -37.55 ± 3.76
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1740.0
+      - 1740.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1740'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: 1740 ± 20
+            column_header: T, K
+            published_page: 1429
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r25_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1791–2241
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: derived_least_squares
+        value: '-39.98'
+        value_as_printed: -39.98 ± 0.54
+        method_as_printed: Knudsen effusion mass spectrometry
+        derivation_as_printed: Footnote * is this work. The enthalpy is the least-squares fit of equation
+          (12), ΔG_T = ΔH_T − TΔS_T, over the printed interval.
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_range_as_printed: 1791–2241
+        phase_basis: Equations (13)–(15), published page 1432, subtract the crystalline (sol) residual
+          from the liquid residual. The liquid residual is the 2241–2398 row. This 1791–2241 row is the
+          crystalline residual. The table cell does not print the word crystalline.
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '0.54'
+        verbatim: -39.98 ± 0.54
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 1791.0
+      - 2241.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 1 prints the temperature as the interval 1791–2241. No midpoint is invented.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: 1791–2241
+            column_header: T, K
+            published_page: 1429
+      phase: cr
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p002_t01_r26_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 2241–2398
+        column_header: $\Delta H_T$
+        published_page: 1429
+        note: 600 dpi render checked the Table 1 head, both Table 1 this-work rows, and the Table 2 this-work
+          row. MinerU and pdftotext agree on the remaining numeric cells. pdftotext prints the minus as
+          U+2013; the stored hyphen is ASCII.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: derived_least_squares
+        value: '7.73'
+        value_as_printed: 7.73 ± 1.76
+        method_as_printed: Knudsen effusion mass spectrometry
+        derivation_as_printed: Footnote * is this work. The enthalpy is the least-squares fit of equation
+          (12), ΔG_T = ΔH_T − TΔS_T, over the printed interval.
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        T_range_as_printed: 2241–2398
+        phase_basis: Published page 1432 assigns 7.73 ± 1.76 kJ/mol and 24.39 ± 0.76 J/(mol K) to perovskite
+          in the liquid state. Those are this row. The oxide reference phase is still not stated.
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.76'
+        verbatim: 7.73 ± 1.76
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+        from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is [CaO]
+        + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the pure
+        solid or the pure liquid.'
+      T_range_K:
+      - 2241.0
+      - 2398.0
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Table 1 prints the temperature as the interval 2241–2398. No midpoint is invented.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            row_label: 2241–2398
+            column_header: T, K
+            published_page: 1429
+      phase: l
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r08_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2188'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [7]. The cited paper is not stored in this extract.
+        value_as_printed: '2188'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2188'
+        T_m_K: '2188'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2188'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r09_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2188'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [40]. The cited paper is not stored in this extract.
+        value_as_printed: '2188'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2188'
+        T_m_K: '2188'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2188'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r10_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2220 ± 20
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [37]. The cited paper is not stored in this extract.
+        value_as_printed: 2220 ± 20
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2220'
+        T_m_K: '2220'
+        property_kind: melting_point
+        T_as_printed: 2220 ± 20
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '20'
+        verbatim: 2220 ± 20
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on T_melt.
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2220 ± 20
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r11_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2233 ± 30
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [6, 8]. The cited paper is not stored in this extract.
+        value_as_printed: 2233 ± 30
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2233'
+        T_m_K: '2233'
+        property_kind: melting_point
+        T_as_printed: 2233 ± 30
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '30'
+        verbatim: 2233 ± 30
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on T_melt.
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2233 ± 30
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r12_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2233'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [9]. The cited paper is not stored in this extract.
+        value_as_printed: '2233'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2233'
+        T_m_K: '2233'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2233'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r13_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2241 ± 10
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: transition_temperature
+        method_class: derived_least_squares
+        value_as_printed: 2241 ± 10
+        derivation_as_printed: Footnote * is this work. Equations (13)–(15) calculate the melting enthalpy,
+          entropy, and temperature from the liquid and crystalline residuals. This is not a calorimetric
+          measurement.
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2241'
+        T_m_K: '2241'
+        property_kind: melting_point
+        T_as_printed: 2241 ± 10
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '10'
+        verbatim: 2241 ± 10
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on T_melt.
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2241 ± 10
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r14_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2243 ± 10
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [39]. The cited paper is not stored in this extract.
+        value_as_printed: 2243 ± 10
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2243'
+        T_m_K: '2243'
+        property_kind: melting_point
+        T_as_printed: 2243 ± 10
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '10'
+        verbatim: 2243 ± 10
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on T_melt.
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2243 ± 10
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r15_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2243'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [43]. The cited paper is not stored in this extract.
+        value_as_printed: '2243'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2243'
+        T_m_K: '2243'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2243'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r09_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2188'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '41.84'
+        attribution: Table 2 Ref. [40]. The cited paper is not stored in this extract.
+        value_as_printed: '41.84'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2188'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2188'
+          locator: &id001
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2188'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id001
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r10_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2220 ± 20
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '56.65'
+        attribution: Table 2 Ref. [37]. The cited paper is not stored in this extract.
+        value_as_printed: 56.65 ± 11.33
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2220'
+        T_as_printed: 2220 ± 20
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '11.33'
+        verbatim: 56.65 ± 11.33
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2220'
+          locator: &id002
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2220 ± 20
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id002
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r12_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2233'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '53.32'
+        attribution: Table 2 Ref. [9]. The cited paper is not stored in this extract.
+        value_as_printed: '53.32'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2233'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2233'
+          locator: &id003
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2233'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id003
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r13_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2241 ± 10
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: heat_of_fusion
+        method_class: derived_least_squares
+        value: '47.61'
+        value_as_printed: 47.61 ± 1.84
+        derivation_as_printed: Footnote * is this work. Equations (13)–(15) calculate the melting enthalpy,
+          entropy, and temperature from the liquid and crystalline residuals. This is not a calorimetric
+          measurement.
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2241'
+        T_as_printed: 2241 ± 10
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.84'
+        verbatim: 47.61 ± 1.84
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator: &id004
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2241 ± 10
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id004
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r15_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2243'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '63.65'
+        attribution: Table 2 Ref. [43]. The cited paper is not stored in this extract.
+        value_as_printed: '63.65'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2243'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2243'
+          locator: &id005
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2243'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id005
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r09_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2188'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '19.12'
+        attribution: Table 2 Ref. [40]. The cited paper is not stored in this extract.
+        value_as_printed: '19.12'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2188'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2188'
+          locator: &id006
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2188'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id006
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r10_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2220 ± 20
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '25.52'
+        attribution: Table 2 Ref. [37]. The cited paper is not stored in this extract.
+        value_as_printed: 25.52 ± 5.10
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2220'
+        T_as_printed: 2220 ± 20
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '5.10'
+        verbatim: 25.52 ± 5.10
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2220'
+          locator: &id007
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2220 ± 20
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id007
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r12_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2233'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '23.88'
+        attribution: Table 2 Ref. [9]. The cited paper is not stored in this extract.
+        value_as_printed: '23.88'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2233'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2233'
+          locator: &id008
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2233'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id008
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r13_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2241 ± 10
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: entropy_of_fusion
+        method_class: derived_least_squares
+        value: '21.24'
+        value_as_printed: 21.24 ± 0.81
+        derivation_as_printed: Footnote * is this work. Equations (13)–(15) calculate the melting enthalpy,
+          entropy, and temperature from the liquid and crystalline residuals. This is not a calorimetric
+          measurement.
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2241'
+        T_as_printed: 2241 ± 10
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '0.81'
+        verbatim: 21.24 ± 0.81
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2241'
+          locator: &id009
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2241 ± 10
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id009
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r15_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2243'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '28.38'
+        attribution: Table 2 Ref. [43]. The cited paper is not stored in this extract.
+        value_as_printed: '28.38'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2243'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2243'
+          locator: &id010
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2243'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id010
+    context:
+    - observation_id: shornikova_2019_table1_delta_s_r02
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '298'
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 1.05 ± 0.21
+        T_as_printed: '298'
+        means_of_study: HF/HCl solution calorimetry
+        ref_as_printed: '[10]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r03
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '298'
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 1.86 ± 0.71
+        T_as_printed: '298'
+        means_of_study: HF/HCl solution calorimetry
+        ref_as_printed: '[5, 18]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r05
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '298'
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 2.40 ± 0.35
+        T_as_printed: '298'
+        means_of_study: Adiabatic calorimetry
+        ref_as_printed: '[11]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r06
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '298'
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 2.72 ± 0.23
+        T_as_printed: '298'
+        means_of_study: Adiabatic calorimetry
+        ref_as_printed: '[13]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r08
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 888–972
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 4.62 ± 3.54
+        T_as_printed: 888–972
+        means_of_study: EMF
+        ref_as_printed: '[34]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r09
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 900–1250
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 3.15 ± 0.05
+        T_as_printed: 900–1250
+        means_of_study: EMF
+        ref_as_printed: '[36]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r16
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '1073'
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 4.37 ± 1.23
+        T_as_printed: '1073'
+        means_of_study: $Pb_2B_2O_5$  solution calorimetry
+        ref_as_printed: '[20]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r19
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1180–1290
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 11.07 ± 6.44
+        T_as_printed: 1180–1290
+        means_of_study: EMF
+        ref_as_printed: '[33]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r20
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '1300'
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 2.82 ± 1.29
+        T_as_printed: '1300'
+        means_of_study: Raman spectroscopy
+        ref_as_printed: '[32]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r21
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1600–1800
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 5.85 ± 0.09
+        T_as_printed: 1600–1800
+        means_of_study: Thermochemical calculations
+        ref_as_printed: '[7]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r22
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1600–2100
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 5.00 ± 0.02
+        T_as_printed: 1600–2100
+        means_of_study: Thermochemical calculations
+        ref_as_printed: '[8]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r23
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1600–2100
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 5.60 ± 0.02
+        T_as_printed: 1600–2100
+        means_of_study: Thermochemical calculations
+        ref_as_printed: '[9]'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r25
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 1791–2241
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 3.15 ± 0.28
+        T_as_printed: 1791–2241
+        means_of_study: Knudsen effusion mass spectrometry
+        ref_as_printed: '*'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_table1_delta_s_r26
+      type: formation_entropy_schema_gap
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: 2241–2398
+        column_header: ΔS_T
+        published_page: 1429
+        note: Quantity has no formation-entropy token. entropy_of_fusion is the melting entropy and S
+          is absolute entropy, so this printed ΔS_T is not scored.
+      units: J/(mol K)
+      values:
+        delta_S_T_as_printed: 24.39 ± 0.76
+        T_as_printed: 2241–2398
+        means_of_study: Knudsen effusion mass spectrometry
+        ref_as_printed: '*'
+        reaction_as_printed: '[CaO] + [TiO2] = [CaTiO3]'
+        standard_state: 'Table 1 caption, published page 1429: enthalpy and entropy of perovskite formation
+          from simple oxides, calculated per 1 mol of compound. Equation (2), published page 1429, is
+          [CaO] + [TiO2] = [CaTiO3]. The paper does not state whether each simple-oxide reference is the
+          pure solid or the pure liquid.'
+    - observation_id: shornikova_2019_abstract_formation_numbers
+      type: abstract_table_discrepancy
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 1428
+        section: Abstract
+        note: The abstract and the conclusions print −39.88 ± 0.54 kJ/mol. Table 1 prints −39.98 ± 0.54
+          for the 1791–2241 K this-work row. Both are kept as printed. The table cell is the scored observation.
+      units: kJ/mol and J/(mol K)
+      values:
+        delta_H_as_printed: −39.88 ± 0.54 kJ/mol
+        delta_S_as_printed: 3.15 ± 0.28 J/(mol K)
+        delta_H_melt_as_printed: 47.61 ± 1.84 kJ/mol at 2241 ± 10 K
+        not_scored_because: The abstract enthalpy is 0.10 kJ/mol from the Table 1 cell. It is not a second
+          measurement.
+    - observation_id: shornikova_2019_activity_reference_not_digitized
+      type: activity_figure_not_digitized
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1431
+        equation: 5-6
+        figure: '3'
+        note: Fig. 3 open circles are this work and carry printed error bars. They overlap the filled
+          circles of series 1 and 2. A centre cannot be separated within a stated read uncertainty, so
+          no activity is stored.
+      units: dimensionless activity
+      values:
+        standard_state: 'Published page 1431, under equations (5) and (6): pi and pi° are the partial
+          pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.
+          The paper does not state whether that pure component is solid or liquid. The reference temperature
+          is the temperature of each activity point, which was not digitized. Phase is not stated.'
+        series_this_work: Fig. 3 series 3, open circles
+        series_not_this_work: series 1–2 are [46] and [47]; series 4–5 are [44] and [45]
+    - observation_id: shornikova_2019_fig4_pressures_from_ref2
+      type: figure_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1432
+        figure: '4'
+      units: atm
+      values:
+        reason_not_extracted: Fig. 4 caption says the partial pressures are from reference [2], the earlier
+          evaporation paper, not a new measurement in this article.
+    - observation_id: shornikova_2019_fig2_gibbs_curve_not_digitized
+      type: figure_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1430
+        figure: '2'
+      units: kJ/mol
+      values:
+        reason_not_extracted: Fig. 2 series 9 is this work. The admitted result of that curve is the least-squares
+          Table 1 row, so the line is not digitized.
+    - observation_id: shornikova_2019_fig5_devries_diagram
+      type: figure_context
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 1433
+        figure: '5'
+      units: as printed
+      values:
+        reason_not_extracted: Fig. 5 is the CaTiO3–SiO2 phase diagram from reference [39], not this study.
+    - observation_id: shornikova_2019_equipment_ref48
+      type: apparatus
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1431
+        section: Results and discussion
+      units: as printed
+      values:
+        sentence_as_printed: The experimental features of the used equipment were described in detail
+          in [48].
+        ref_48: S. I. Shornikov, I. Yu. Archakov, and T. Yu. Chemekova, Russ. J. Phys. Chem. A 74, 677
+          (2000).
+        cell_material: This paper does not restate the cell material.
+  CaO:
+    observations:
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r02_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2843'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [43]. The cited paper is not stored in this extract.
+        value_as_printed: '2843'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2843'
+        T_m_K: '2843'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2843'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r03_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2845'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [9]. The cited paper is not stored in this extract.
+        value_as_printed: '2845'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2845'
+        T_m_K: '2845'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2845'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r04_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2898'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [3]. The cited paper is not stored in this extract.
+        value_as_printed: '2898'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2898'
+        T_m_K: '2898'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2898'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r05_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2900 ± 150
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [41]. The cited paper is not stored in this extract.
+        value_as_printed: 2900 ± 150
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2900'
+        T_m_K: '2900'
+        property_kind: melting_point
+        T_as_printed: 2900 ± 150
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '150'
+        verbatim: 2900 ± 150
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on T_melt.
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2900 ± 150
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r06_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2980'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [38]. The cited paper is not stored in this extract.
+        value_as_printed: '2980'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2980'
+        T_m_K: '2980'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2980'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r07_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '3200'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [8, 42]. The cited paper is not stored in this extract.
+        value_as_printed: '3200'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '3200'
+        T_m_K: '3200'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '3200'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r02_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2843'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '52.00'
+        attribution: Table 2 Ref. [43]. The cited paper is not stored in this extract.
+        value_as_printed: '52.00'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2843'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2843'
+          locator: &id011
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2843'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id011
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r03_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2845'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '79.50'
+        attribution: Table 2 Ref. [9]. The cited paper is not stored in this extract.
+        value_as_printed: '79.50'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2845'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2845'
+          locator: &id012
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2845'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id012
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r04_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2898'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '50.21'
+        attribution: Table 2 Ref. [3]. The cited paper is not stored in this extract.
+        value_as_printed: '50.21'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2898'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2898'
+          locator: &id013
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2898'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id013
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r05_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2900 ± 150
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '52.00'
+        attribution: Table 2 Ref. [41]. The cited paper is not stored in this extract.
+        value_as_printed: 52.00 ± 5.00
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2900'
+        T_as_printed: 2900 ± 150
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '5.00'
+        verbatim: 52.00 ± 5.00
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2900'
+          locator: &id014
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2900 ± 150
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id014
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r06_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2980'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '51.21'
+        attribution: Table 2 Ref. [38]. The cited paper is not stored in this extract.
+        value_as_printed: '51.21'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2980'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2980'
+          locator: &id015
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2980'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id015
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r07_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '3200'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '79.50'
+        attribution: Table 2 Ref. [8, 42]. The cited paper is not stored in this extract.
+        value_as_printed: '79.50'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '3200'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3200'
+          locator: &id016
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '3200'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id016
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r02_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2843'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '18.29'
+        attribution: Table 2 Ref. [43]. The cited paper is not stored in this extract.
+        value_as_printed: '18.29'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2843'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2843'
+          locator: &id017
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2843'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id017
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r03_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2845'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '27.94'
+        attribution: Table 2 Ref. [9]. The cited paper is not stored in this extract.
+        value_as_printed: '27.94'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2845'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2845'
+          locator: &id018
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2845'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id018
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r04_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2898'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '17.33'
+        attribution: Table 2 Ref. [3]. The cited paper is not stored in this extract.
+        value_as_printed: '17.33'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2898'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2898'
+          locator: &id019
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2898'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id019
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r05_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2900 ± 150
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '17.93'
+        attribution: Table 2 Ref. [41]. The cited paper is not stored in this extract.
+        value_as_printed: 17.93 ± 1.72
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2900'
+        T_as_printed: 2900 ± 150
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '1.72'
+        verbatim: 17.93 ± 1.72
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2900'
+          locator: &id020
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2900 ± 150
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id020
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r06_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2980'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '17.19'
+        attribution: Table 2 Ref. [38]. The cited paper is not stored in this extract.
+        value_as_printed: '17.19'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2980'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2980'
+          locator: &id021
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2980'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id021
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r07_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '3200'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '24.84'
+        attribution: Table 2 Ref. [8, 42]. The cited paper is not stored in this extract.
+        value_as_printed: '24.84'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '3200'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3200'
+          locator: &id022
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '3200'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id022
+  TiO2:
+    observations:
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r16_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2098'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [38]. The cited paper is not stored in this extract.
+        value_as_printed: '2098'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2098'
+        T_m_K: '2098'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2098'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r17_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2103'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [7]. The cited paper is not stored in this extract.
+        value_as_printed: '2103'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2103'
+        T_m_K: '2103'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2103'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r18_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2103'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [43]. The cited paper is not stored in this extract.
+        value_as_printed: '2103'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2103'
+        T_m_K: '2103'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2103'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r19_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2130 ± 20
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [8, 42]. The cited paper is not stored in this extract.
+        value_as_printed: 2130 ± 20
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2130'
+        T_m_K: '2130'
+        property_kind: melting_point
+        T_as_printed: 2130 ± 20
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '20'
+        verbatim: 2130 ± 20
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on T_melt.
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2130 ± 20
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r20_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2130'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [9]. The cited paper is not stored in this extract.
+        value_as_printed: '2130'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2130'
+        T_m_K: '2130'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2130'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r21_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2143'
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags: []
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [3]. The cited paper is not stored in this extract.
+        value_as_printed: '2143'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2143'
+        T_m_K: '2143'
+        property_kind: melting_point
+      per: mol_species
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2143'
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r22_c02
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2185 ± 10
+        column_header: $T_{\text{melt}},\mathrm{K}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Table 2 Ref. [41]. The cited paper is not stored in this extract.
+        value_as_printed: 2185 ± 10
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2185'
+        T_m_K: '2185'
+        property_kind: melting_point
+        T_as_printed: 2185 ± 10
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '10'
+        verbatim: 2185 ± 10
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on T_melt.
+      phase: cr
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure for this melting temperature.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2185 ± 10
+            published_page: 1431
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r16_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2098'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '47.70'
+        attribution: Table 2 Ref. [38]. The cited paper is not stored in this extract.
+        value_as_printed: '47.70'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2098'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2098'
+          locator: &id023
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2098'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id023
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r18_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2103'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '66.90'
+        attribution: Table 2 Ref. [43]. The cited paper is not stored in this extract.
+        value_as_printed: '66.90'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2103'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2103'
+          locator: &id024
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2103'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id024
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r19_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2130 ± 20
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '66.94'
+        attribution: Table 2 Ref. [8, 42]. The cited paper is not stored in this extract.
+        value_as_printed: 66.94 ± 16.70
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2130'
+        T_as_printed: 2130 ± 20
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '16.70'
+        verbatim: 66.94 ± 16.70
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2130'
+          locator: &id025
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2130 ± 20
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id025
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r20_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2130'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '46.02'
+        attribution: Table 2 Ref. [9]. The cited paper is not stored in this extract.
+        value_as_printed: '46.02'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2130'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2130'
+          locator: &id026
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2130'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id026
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r21_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2143'
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '64.85'
+        attribution: Table 2 Ref. [3]. The cited paper is not stored in this extract.
+        value_as_printed: '64.85'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2143'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2143'
+          locator: &id027
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2143'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id027
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r22_c03
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2185 ± 10
+        column_header: $\Delta H_{\text{melt}},\mathrm{kJ/mol}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: kJ/mol
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        value: '68.00'
+        attribution: Table 2 Ref. [41]. The cited paper is not stored in this extract.
+        value_as_printed: 68.00 ± 8.00
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2185'
+        T_as_printed: 2185 ± 10
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '8.00'
+        verbatim: 68.00 ± 8.00
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2185'
+          locator: &id028
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2185 ± 10
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id028
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r16_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2098'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '22.73'
+        attribution: Table 2 Ref. [38]. The cited paper is not stored in this extract.
+        value_as_printed: '22.73'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2098'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2098'
+          locator: &id029
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2098'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id029
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r18_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2103'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '31.81'
+        attribution: Table 2 Ref. [43]. The cited paper is not stored in this extract.
+        value_as_printed: '31.81'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2103'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2103'
+          locator: &id030
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2103'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id030
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r19_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2130 ± 20
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '31.43'
+        attribution: Table 2 Ref. [8, 42]. The cited paper is not stored in this extract.
+        value_as_printed: 31.43 ± 7.84
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2130'
+        T_as_printed: 2130 ± 20
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '7.84'
+        verbatim: 31.43 ± 7.84
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2130'
+          locator: &id031
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2130 ± 20
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id031
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r20_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2130'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '21.61'
+        attribution: Table 2 Ref. [9]. The cited paper is not stored in this extract.
+        value_as_printed: '21.61'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2130'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2130'
+          locator: &id032
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2130'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id032
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r21_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: '2143'
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags: []
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '30.26'
+        attribution: Table 2 Ref. [3]. The cited paper is not stored in this extract.
+        value_as_printed: '30.26'
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2143'
+      per: mol_species
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2143'
+          locator: &id033
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: '2143'
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id033
+    - observation_id: shornikova_2019_perovskite_thermodynamics_p004_t02_r22_c04
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row_label: 2185 ± 10
+        column_header: $\Delta S_{\text{melt}},\mathrm{J/(mol K)}$
+        published_page: 1431
+        note: 600 dpi render checked the Table 2 this-work row (2241 ± 10, 47.61 ± 1.84, 21.24 ± 0.81).
+          MinerU and pdftotext agree on the other Table 2 numeric cells.
+      units: J/mol K
+      mineru_flags:
+      - non_numeric_in_numeric_column
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        value: '31.12'
+        attribution: Table 2 Ref. [41]. The cited paper is not stored in this extract.
+        value_as_printed: 31.12 ± 3.66
+        phase_basis: Table 2 is the melting of the named compound. The solid that melts is crystalline.
+          The cell does not print a phase token.
+        T_K: '2185'
+        T_as_printed: 2185 ± 10
+      per: mol_species
+      uncertainty:
+        kind: printed
+        value: '3.66'
+        verbatim: 31.12 ± 3.66
+        basis: table cell, one printed ±; the paper does not state the confidence level. The half-width
+          is the printed ± on this cell.
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2185'
+          locator: &id034
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row_label: 2185 ± 10
+            column_header: T_melt, K
+            published_page: 1431
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Table 2 does not print a total pressure.
+          locator: *id034
+fidelity_samples:
+- path: species.CaTiO3.observations[shornikova_2019_perovskite_thermodynamics_p002_t01_r25_c03].values.value
+  value: '-39.98'
+  locator:
+    page: 2
+    published_page: 1429
+    table: '1'
+    note: This-work 1791–2241 K enthalpy. 600 dpi render.
+- path: species.CaTiO3.observations[shornikova_2019_perovskite_thermodynamics_p002_t01_r25_c03].values.value_as_printed
+  value: -39.98 ± 0.54
+  locator:
+    page: 2
+    published_page: 1429
+    table: '1'
+    note: Same cell, full printed ±.
+- path: species.CaTiO3.observations[shornikova_2019_perovskite_thermodynamics_p002_t01_r26_c03].values.value
+  value: '7.73'
+  locator:
+    page: 2
+    published_page: 1429
+    table: '1'
+    note: This-work liquid interval enthalpy. 600 dpi render.
+- path: species.CaTiO3.observations[shornikova_2019_perovskite_thermodynamics_p004_t02_r13_c02].values.T_K
+  value: '2241'
+  locator:
+    page: 4
+    published_page: 1431
+    table: '2'
+    note: This-work melting temperature. 600 dpi render of 2241 ± 10.
+- path: species.CaTiO3.observations[shornikova_2019_perovskite_thermodynamics_p004_t02_r13_c03].values.value
+  value: '47.61'
+  locator:
+    page: 4
+    published_page: 1431
+    table: '2'
+    note: This-work melting enthalpy. 600 dpi render of 47.61 ± 1.84.
