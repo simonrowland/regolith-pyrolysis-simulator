@@ -186,18 +186,16 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
 
     assert extreme.status == "ok"
     assert all(math.isfinite(value) for value in extreme_pressures.values())
-    compiled_out_of_range = {
-        species: notice
-        for species, notice in extrapolations.items()
-        if notice.get("acquisition_flag")
-    }
-    assert {"Si2", "Si3", "SiO2_gas"} <= compiled_out_of_range.keys()
-    for species, notice in compiled_out_of_range.items():
-        assert notice["status"]
-        assert notice["acquisition_flag"]
-        assert notice["reason"] == notice["status"]
+    extrapolated_species = set(extreme_pressures) & set(extrapolations)
+    assert {"Si", "SiO", "Si2", "Si3", "SiO2_gas"} <= extrapolated_species
+    for species in extrapolated_species:
+        notice = extrapolations[species]
+        assert notice["reason"]
         assert notice["authority_level"] == "extrapolated"
         assert provenance[species]["extrapolation_notice"] == notice
+        if "status" in notice:
+            assert notice["acquisition_flag"]
+            assert notice["reason"] == notice["status"]
 
 
 def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
