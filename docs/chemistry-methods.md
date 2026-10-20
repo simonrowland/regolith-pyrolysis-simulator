@@ -145,12 +145,28 @@ SiO2(melt) → SiO(g) + ½ O2(g)
 p(SiO) ∝ a(SiO2) / √pO2
 ```
 
-The effective SiO pressure carries an explicit inverse-root overhead oxygen-pressure term above the vacuum floor,
-`a(SiO₂) × √(pO₂_ref / pO₂)` with `pO₂_ref = 1×10⁻⁹ bar`, so that lowering the overhead oxygen pressure
-raises the SiO pressure and raising it suppresses SiO. This is the physical basis of the "hold pO₂ to
-lock silicon in the melt, drop toward vacuum to release it" control described in `docs/concepts.md`.
-When `pO₂` is at or below that floor, the suppression term is not applied again; the model reads the
-hard-vacuum reference rather than extrapolating the divergence.
+The builtin SiO standard-reaction pressure is referenced to `pO₂_ref = 1×10⁻⁹ bar` at unit SiO₂
+activity. The provider applies melt activity and the dissociation mass-action term once:
+
+```
+P_SiO = P_ref(T) × a_SiO₂ × √(pO₂_ref / pO₂_used)
+pO₂_used = min(max(pO₂_transport, 1×10⁻³⁰ bar), 100 bar)
+```
+
+The ratio is dimensionless because both oxygen partial pressures are in bar; `P_ref` and `P_SiO` are
+in Pa. At the reference pressure, `√(1×10⁻⁹ / 1×10⁻⁹) = 1`. At the lunar environment floor,
+`√(1×10⁻⁹ / 1.3×10⁻¹²) = √769.230769… = 27.7350`, so the SiO pressure is boosted by 27.735×
+relative to the same temperature and activity at the reference pressure. The O₂-channel envelope
+limits the multiplier itself to `√(1×10⁻⁹ / 1×10⁻³⁰) = 3.1623×10¹⁰` at its low-pressure edge and
+`√(1×10⁻⁹ / 100) = 3.1623×10⁻⁶` at its high-pressure edge; there is no SiO clip at `pO₂_ref`.
+
+Transport pO₂ is separately gated by the request or body's vacuum floor: an explicit value below that
+floor is rejected, and an omitted value resolves to the floor. The default floor is `1×10⁻⁹ bar`,
+while the configured lunar floor is `1.3×10⁻¹² bar`; therefore the lunar-floor calculation above
+uses an accepted transport pO₂ without changing the SiO reference fit. This is the physical basis of
+the "hold pO₂ to lock silicon in the melt, drop toward vacuum to release it" control described in
+`docs/concepts.md`. Whether the inverse-root fit remains physically accurate down to every configured
+body floor is an applicability question; the model does not impose an additional SiO-specific cap.
 The species-specific oxygen-pressure slopes for the other oxides (the `−1/n_M` family in
 `docs/concepts.md`) follow from the same formation-reaction stoichiometry, but their oxygen-activity
 basis is not the SiO overhead lever. For a non-FeO metal such as Mg, the source pressure is the amount
@@ -159,8 +175,10 @@ separately subtracts the species' overhead partial pressure and applies gas-side
 Pure-MgO congruent vaporization is a third boundary condition: co-evolved Mg and O₂ are solved
 self-consistently. Its agreement validates the JANAF reaction basis, but does not justify substituting
 far-field overhead O₂ for a buffered melt's oxygen chemical potential.
-<!-- impl: §2.3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:1180 — SiO pO2 suppression -->
-<!-- impl: §2.3 -> data/vapor_pressures.yaml families.oxide_vapors_sio_family.physical_properties.species.SiO.suppression_equation:4625 — SiO equation metadata -->
+<!-- impl: §2.3 -> engines/builtin/vapor_pressure.py:3938 — SiO mass-action multiplier -->
+<!-- impl: §2.3 -> simulator/vapour_rail/channels.py clamp_physical_pO2_bar:834; simulator/physical_constants.py:49 — O2-channel envelope -->
+<!-- impl: §2.3 -> engines/builtin/_common.py resolve_transport_pO2_bar:344; simulator/environment.py:11-13 — transport floor -->
+<!-- impl: §2.3 -> data/vapor_pressures.yaml families.oxide_vapors_sio_family.physical_properties.species.SiO.pO2_reference_bar:4699 — SiO reference -->
 
 ### §2.4 Metal vapor versus oxide vapor
 
