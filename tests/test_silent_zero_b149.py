@@ -505,6 +505,34 @@ def test_internal_analytical_missing_metal_coefficients_refuse() -> None:
     assert note["field"] == "antoine_coefficients"
 
 
+def test_internal_analytical_missing_liquid_reaction_coefficients_refuse() -> None:
+    from copy import deepcopy
+
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.equilibrium import EquilibriumMixin
+
+    aluminum = deepcopy(VAPOR_PRESSURE_DATA["metals"]["Al"])
+    aluminum["liquid_oxide_standard_reaction"].pop("antoine")
+    sim = _internal_analytical_host(
+        temperature_K=1700.0,
+        composition_wt_pct={"Al2O3": 100.0},
+        vapor_pressures={"metals": {"Al": aluminum}, "oxide_vapors": {}},
+    )
+
+    result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+    assert result.status == "refused"
+    notes = result.diagnostics.get("silent_zero_notes") or []
+    note = next(
+        n
+        for n in notes
+        if n.get("species") == "Al"
+        and n.get("zero_because") == ZeroBecause.MISSING_COEFFICIENT.value
+    )
+    assert note["doctrine_category"] == CATEGORY_REFUSE
+    assert note["field"] == "antoine_coefficients"
+
+
 def test_internal_analytical_out_of_range_oxide_pressure_is_flagged() -> None:
     from simulator.condensation import VAPOR_PRESSURE_DATA
     from simulator.equilibrium import EquilibriumMixin
