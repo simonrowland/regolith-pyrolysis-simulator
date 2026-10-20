@@ -22,7 +22,21 @@ Caption: dots are experimental activities of ZnO (1), P4O10 (2) and Gibbs energi
 | Panel a, open squares, legend 2 | refused | Thirteen data squares on the 600 dpi crop, plus the legend glyph. Same caption assignment. |
 | Panel a, line 4 | refused | Continuous calculated lg a(ZnO). No discrete calculated markers. |
 | Panel a, line 5 | refused | Continuous calculated lg a(P4O10). No discrete calculated markers. |
-| Panel b, filled circles, legend 3 | refused | Eleven data circles with error bars on the 600 dpi crop, plus the legend disk. Caption assigns them to the cited experiments. |
+| Panel b, symbol 3, filled circle | refused | (727, 3893), r=25.2, 600 dpi, PDF page 2. Cited KEMS [6, 7]. No ΔfG read. |
+| Panel b, symbol 3, filled circle | refused | (995, 3885), r=26.0. Same caption assignment. No ΔfG read. |
+| Panel b, symbol 3, filled circle | refused | (1047, 3833), r=26.5. Separation 24.0 px from (1071, 3834), inside one diameter. Overlap; not read. |
+| Panel b, symbol 3, filled circle | refused | (1071, 3834), r=27.1. The other member of that pair. Two circles, confirmed on the crop, not one split peak. |
+| Panel b, symbol 3, filled circle | refused | (1198, 3793), r=25.6. Separation 50.7 px from (1247, 3780), inside one diameter (~52 px). Overlap; not read. |
+| Panel b, symbol 3, filled circle | refused | (1247, 3780), r=25.5. The other member of that pair. |
+| Panel b, symbol 3, filled circle | refused | (1431, 3827), r=25.6. Triple with (1464, 3867) and (1486, 3809). Pairwise separations 51.9, 57.9 and 62.0 px. The 51.9 px pair is inside one diameter. Not read. |
+| Panel b, symbol 3, filled circle | refused | (1464, 3867), r=25.9. Same triple. |
+| Panel b, symbol 3, filled circle | refused | (1486, 3809), r=25.5. Same triple. |
+| Panel b, symbol 3, filled circle | refused | (1622, 3736), r=26.0. Separation 49.2 px from (1667, 3716), inside one diameter. Overlap; not read. |
+| Panel b, symbol 3, filled circle | refused | (1667, 3716), r=25.2. The other member of that pair. |
+| Panel b, symbol 3, filled circle | refused | (1711, 3660), r=26.0. Isolated from its neighbours. Cited series. No ΔfG read. |
+| Panel b, symbol 3, filled circle | refused | (1781, 3605), r=25.6. Cited series. No ΔfG read. |
+| Panel b, symbol 3, filled circle | refused | (1919, 3512), r=26.6. Rightmost data circle. Cited series. No ΔfG read. |
+| Panel b, legend disk, symbol 3 | legend glyph | (1942, 4002), r=19.9, below the frame near the numeral 3. Not a data point. |
 | Panel b, line 6 | refused | Continuous calculated ΔfG curve. No discrete calculated markers. The prose minimum, about −87.5 kJ/mol at Zn2P4O12, is stored as context. |
 
 MinerU's invented chart tables in the markdown were ignored.
