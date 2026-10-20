@@ -12,6 +12,7 @@ from typing import Any, NamedTuple
 from simulator.alpha_kinetics import parse_alpha_contract
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.chemistry.depletion import _finite_parent_debit
 from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -3822,7 +3823,6 @@ class EvaporationMixin:
             })
 
         effective_rates: dict[str, float] = {}
-        max_fraction = math.nextafter(1.0, 0.0)
         for parent_oxide in sorted(parent_groups):
             entries = parent_groups[parent_oxide]
             available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
@@ -3830,11 +3830,8 @@ class EvaporationMixin:
                 entry['parent_draw_kg_hr'] for entry in entries)
             if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= 1e-12:
                 continue
-            k_hr = total_parent_draw_kg_hr / available_parent_kg
-            depletion_fraction = -math.expm1(-k_hr * dt_hr)
-            depletion_fraction = max(
-                0.0, min(max_fraction, depletion_fraction))
-            parent_draw_kg = available_parent_kg * depletion_fraction
+            parent_draw_kg = _finite_parent_debit(
+                available_parent_kg, total_parent_draw_kg_hr, dt_hr)
             for entry in entries:
                 share = entry['parent_draw_kg_hr'] / total_parent_draw_kg_hr
                 product_kg = (
@@ -3864,11 +3861,8 @@ class EvaporationMixin:
                 effective_rates.pop(species, None)
             return effective_rates
 
-        max_fraction = math.nextafter(1.0, 0.0)
-        k_hr = total_o2_draw_kg_hr / float(available_o2_kg)
-        depletion_fraction = -math.expm1(-k_hr * dt_hr)
-        depletion_fraction = max(0.0, min(max_fraction, depletion_fraction))
-        allowed_o2_draw_kg = float(available_o2_kg) * depletion_fraction
+        allowed_o2_draw_kg = _finite_parent_debit(
+            float(available_o2_kg), total_o2_draw_kg_hr, dt_hr)
         by_species_draw = dict(o2_draws)
         for species, required_o2_kg_hr in o2_draws:
             if required_o2_kg_hr <= 1e-12:
