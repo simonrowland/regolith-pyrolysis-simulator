@@ -9,7 +9,7 @@ import re
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -96,7 +96,11 @@ def split_value_and_error(raw_cell: str) -> tuple[str, str | None]:
 
 
 def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[str]]) -> None:
-    table1 = extract["species"]["SiO2"]["observations"]
+    table1 = [
+        row
+        for row in extract["species"]["SiO2"]["observations"]
+        if row["values"].get("quantity") == "residue_composition_vs_time"
+    ]
     composition = {
         row["values"]["analytical_method"]: row["values"]["series"]
         for row in table1
@@ -151,14 +155,25 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
         sample, raw = line.split(" ", maxsplit=1)
         printed_rows[sample] = raw.split("|")
 
+    def mass_loss_observation(source: dict, sample: str) -> dict:
+        matches = [
+            row
+            for row in source["species"]["SiO2"]["observations"]
+            if row["observation_id"] == f"wang_2001_table2_{sample.lower()}_mass_loss"
+        ]
+        assert len(matches) == 1
+        return matches[0]
+
     def assert_mass_loss_grid_matches_render(source: dict, rendered: dict[str, list[str]]) -> None:
+        assert not any(f"SC{index}" in source["species"] for index in range(1, 17))
+        mass_loss_rows = [
+            row
+            for row in source["species"]["SiO2"]["observations"]
+            if row["values"].get("quantity") == "mass_loss_fraction"
+        ]
+        assert len(mass_loss_rows) == 16
         for sample, expected in rendered.items():
-            observations = source["species"][sample]["observations"]
-            observation = next(
-                row for row in observations
-                if row["observation_id"] == f"wang_2001_table2_{sample.lower()}_mass_loss"
-            )
-            assert len(observations) == 1
+            observation = mass_loss_observation(source, sample)
             point = observation["values"]["points"][0]
             assert point["sample"] == sample
             assert [
@@ -169,6 +184,14 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
             assert point["locator"]["pdf_page_index"] == 5
             assert point["locator"]["table"] == "2"
             assert point["locator"]["row"] == sample
+            assert point["oxides_wt_pct"] == {
+                "MgO": "24.8",
+                "Al2O3": "2.46",
+                "SiO2": "33.8",
+                "CaO": "2.04",
+                "TiO2": "0.110",
+                "FeO": "36.7",
+            }
 
     assert_mass_loss_grid_matches_render(extract, printed_rows)
     changed_render = deepcopy(printed_rows)
@@ -176,11 +199,11 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
     with pytest.raises(AssertionError):
         assert_mass_loss_grid_matches_render(extract, changed_render)
     changed_extract = deepcopy(extract)
-    changed_extract["species"]["SC2"]["observations"][0]["values"]["points"][0]["mass_loss_wt_pct"] = "999"
+    mass_loss_observation(changed_extract, "SC2")["values"]["points"][0]["mass_loss_wt_pct"] = "999"
     with pytest.raises(AssertionError):
         assert_mass_loss_grid_matches_render(changed_extract, printed_rows)
 
-    sc1 = extract["species"]["SC1"]["observations"][0]["values"]["points"][0]
+    sc1 = mass_loss_observation(extract, "SC1")["values"]["points"][0]
     assert "Table 1 prints 57.35; values disagree; the source does not reconcile them" in sc1["locator"]["note"]
     assert sc1["locator"]["note"].endswith("physical PDF page 4, published page 482, Table 1, row SC1.")
 
@@ -215,7 +238,7 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
             **{formula: 16 for formula in ("La", "Ce", "Pr", "Nd", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu")},
         },
         Quantity.ISOTOPE_DELTA: {"O": 30, "Mg": 30, "Si": 30},
-        Quantity.MASS_LOSS_FRACTION: {f"SC{index}": 1 for index in range(1, 17)},
+        Quantity.MASS_LOSS_FRACTION: {"unknown": 16},
     }
     actual_by_quantity: dict[Quantity, Counter[str]] = defaultdict(Counter)
     actual_by_sample: dict[tuple[Quantity, str], Counter[str]] = defaultdict(Counter)
@@ -248,13 +271,23 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         for name in required_conditions:
             assert name in conditions and conditions[name].locator is not None, (quantity, sample, formula, name)
         assert all(condition.locator is not None for condition in conditions.values())
+        pressure = conditions["total_pressure_Pa"]
+        assert pressure.state.is_value
+        assert pressure.state.value.kind is ValueKind.POINT
+        assert pressure.state.value.point == Decimal("0.00013332236842105")
+        assert pressure.state.value.approximate is True
+        assert pressure.locator.page == 3
         if quantity is Quantity.MASS_LOSS_FRACTION:
-            assert formula == sample
+            assert formula == "unknown"
             assert row.identity.species.phase.value == "l"
-            assert conditions["printed_composition"].state.value.startswith(
-                "Table 1 starting comp. b (actual composition calculated from reagent amounts weighed):"
-            )
-            assert conditions["printed_composition"].locator.page == 4
+            assert conditions["printed_composition"].state.value == {
+                "MgO": "24.8",
+                "Al2O3": "2.46",
+                "SiO2": "33.8",
+                "CaO": "2.04",
+                "TiO2": "0.11",
+                "FeO": "36.7",
+            }
 
     for quantity, expected in expected_by_quantity.items():
         assert actual_by_quantity[quantity] == Counter(expected)

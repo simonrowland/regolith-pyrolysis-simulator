@@ -303,16 +303,13 @@ def test_appendix_a2_a5_grids_bind_all_cells_and_both_mutations_fail() -> None:
         assert_appendix_grid_matches_render(extract, changed_render)
 
     changed_extract = deepcopy(extract)
-    point = next(
-        point
-        for observation in changed_extract["species"]["Ti"]["observations"]
-        for point in observation["values"].get("points", [])
-        if point.get("appendix_table") == "A2a"
-        and point.get("sample") == "CST5a"
-        and point.get("label") == "First"
-        and observation["values"]["quantity"] == "Ti3plus_over_total_Ti"
+    evidence = next(
+        row
+        for row in changed_extract["species"]["Ti"]["context"]
+        if row["values"].get("source_table") == "A2a"
+        and row["values"].get("sample_as_printed") == "CST5a"
     )
-    point["value"] = point["value_as_printed"] = "9.99"
+    evidence["values"]["percent_readings"]["first"]["as_printed"] = "9.99"
     with pytest.raises(AssertionError):
         assert_appendix_grid_matches_render(changed_extract, APPENDIX_RENDER_GRID)
 
@@ -362,8 +359,8 @@ def test_thesis_replicates_link_to_published_tranell_2002_observations() -> None
             encoding="utf-8"
         )
     )
-    published_ids = {
-        observation["observation_id"]
+    published_by_id = {
+        observation["observation_id"]: observation["values"]["points"][0]
         for observation in published["species"]["Ti"]["observations"]
     }
     duplicates = [
@@ -372,18 +369,56 @@ def test_thesis_replicates_link_to_published_tranell_2002_observations() -> None
         if row["type"] in {"replicate_evidence", "duplicate_table_record"}
     ]
 
-    assert len(duplicates) == 43
-    assert sum(row["type"] == "replicate_evidence" for row in duplicates) == 41
+    assert len(duplicates) == 59
+    assert sum(row["type"] == "replicate_evidence" for row in duplicates) == 57
+    typed_ids = {
+        observation["observation_id"]
+        for observation in extract["species"]["Ti"]["observations"]
+    }
+    suffix_duplicates = []
     for row in duplicates:
         values = row["values"]
         assert values["duplicate_source_id"] == "tranell-2002-titanium-valence"
-        assert values["duplicate_observation_id"] in published_ids
-        if row["type"] == "replicate_evidence":
-            assert set(values["percent_readings"]) == {"unit", "first", "repeat", "spread"}
-            assert set(values["ratio_readings"]) == {"unit", "first", "repeat", "spread"}
+        published_point = published_by_id[values["duplicate_observation_id"]]
+        sample = values["sample_as_printed"]
+        base_sample = sample[:-1] if sample.endswith(("a", "b")) else sample
+        assert base_sample == published_point["sample"]
+        assert values["oxygen_partial_pressure_as_printed"] == (
+            f"{published_point['oxygen_partial_pressure']['value']} "
+            f"{published_point['oxygen_partial_pressure']['units']}"
+        )
+
+        ratio_readings = values["ratio_readings"]
+        assert set(values["percent_readings"]) == {"unit", "first", "repeat", "spread"}
+        assert set(ratio_readings) == {"unit", "first", "repeat", "spread"}
+        ratio_values = [
+            Decimal(reading["as_printed"])
+            for reading in (ratio_readings["first"], ratio_readings["repeat"])
+            if reading is not None and reading["state"] == "printed"
+        ]
+        ratio_mean = sum(ratio_values, Decimal("0")) / Decimal(len(ratio_values))
+        assert abs(ratio_mean - Decimal(published_point["value"])) <= Decimal("0.002")
+
+        printed_temperature = Decimal(values["temperature_K_as_printed"])
+        published_temperature = Decimal(published_point["T_K"])
+        if sample == "CST5b":
+            assert row["observation_id"] == "tranell_1999_a2j_cst5b_duplicate_evidence"
+            assert printed_temperature == Decimal("1873")
+            assert published_temperature == Decimal("1843")
+            assert ratio_mean == Decimal("0.15989")
+            assert "0.18008 and 0.1397" in values["reason"]
+            assert "1843 K and 0.160" in values["reason"]
+            assert "disagree on T as printed" in values["reason"]
         else:
-            assert values["percent_readings"]["spread"] == "not applicable; one kinetic reading is printed"
-            assert values["ratio_readings"]["spread"] == "not applicable; one kinetic reading is printed"
+            assert printed_temperature == published_temperature
+
+        if sample.endswith(("a", "b")):
+            suffix_duplicates.append(row)
+            source_id = row["observation_id"].removesuffix("_duplicate_evidence")
+            assert f"{source_id}_percent" not in typed_ids
+            assert f"{source_id}_ratio" not in typed_ids
+
+    assert len(suffix_duplicates) == 16
 
 
 def test_all_deferred_figures_have_identity_series_and_marker_inventory() -> None:
@@ -473,8 +508,9 @@ def test_table42_keeps_silicon_basis_unknown_and_infers_silica_reservoir_phase()
 
 
 def thesis_pdf_or_skip() -> Path:
+    corpus_parent = ROOT.parent.parent.parent if ROOT.parent.name == "worktrees" else ROOT.parent
     corpus_root = Path(
-        os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
+        os.environ.get("REGOLITH_CORPUS_ROOT", corpus_parent / "regolith-corpus")
     )
     pdf_path = corpus_root / "raw/tranell-1999-unsw-thesis/tranell-1999-unsw-thesis.pdf"
     if not pdf_path.is_file():
@@ -549,9 +585,9 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
 
     assert not migrator.result.validation.hard_issues
     observations = tuple(migrator.result.observations.values())
-    assert len(observations) == 92
+    assert len(observations) == 44
     assert sum(row.identity.species.formula == "Si" for row in observations) == 4
-    assert sum(row.identity.species.formula == "Ti" for row in observations) == 88
+    assert sum(row.identity.species.formula == "Ti" for row in observations) == 40
     for row in observations:
         assert row.identity.species.formula in {"Si", "Ti"}
         assert row.identity.temperature_K is not None
@@ -564,9 +600,26 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
         assert oxygen.state.is_value and str(oxygen.state.value) == "10^-12"
         assert oxygen.locator.page == 118
     ti_rows = [row for row in observations if row.identity.species.formula == "Ti"]
+    rendered_temperatures = {
+        (fields[0].upper(), fields[1].upper()): Decimal(fields[4])
+        for fields in (
+            line.split("|") for line in APPENDIX_RENDER_GRID.splitlines()[1:]
+        )
+    }
     for row in ti_rows:
         assert row.identity.temperature_K.is_value
         assert row.point_conditions["temperature_K"].state.is_value
+        locator_note = row.locator.note or ""
+        assert "row=" in locator_note
+        source_row = locator_note.split("row=", maxsplit=1)[1].split(";", maxsplit=1)[0]
+        table = row.locator.table.upper()
+        if table in {"A3A", "A3B"}:
+            source_row = "CST12"
+        expected_temperature = rendered_temperatures[
+            (table, source_row.upper())
+        ]
+        assert row.identity.temperature_K.value == expected_temperature
+        assert row.point_conditions["temperature_K"].state.value == expected_temperature
         assert row.point_conditions["oxygen_partial_pressure"].state.is_value
         assert row.point_conditions["composition"].state is not None
         assert row.point_conditions["quench_state"].state.is_value
