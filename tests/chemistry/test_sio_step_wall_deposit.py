@@ -8,11 +8,11 @@ from typing import Any
 import pytest
 
 from simulator.accounting import resolve_species_formula
-from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator import condensation as condensation_module
 from simulator.condensation import (
     CondensationModel,
     CondensationTrain,
+    DepositionInputRefusal,
     WallSaturationPressureRefusal,
     _antoine_psat_pa,
     _flowing_species_partial_pressures_pa,
@@ -374,7 +374,7 @@ def test_flowing_species_partial_pressure_includes_formula_only_carrier(
 
 
 def test_flowing_species_partial_pressure_refuses_unresolvable_species() -> None:
-    with pytest.raises(UnknownSpeciesError):
+    with pytest.raises(DepositionInputRefusal, match="unresolved_species"):
         _flowing_species_partial_pressures_pa(
             {"unresolved_species": 1.0},
             1000.0,
