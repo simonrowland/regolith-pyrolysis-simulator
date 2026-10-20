@@ -1,0 +1,515 @@
+schema_version: literature_extract.v1
+source_id: hamuyuni-2016-copper-oxide-solubility-thesis-summary
+source:
+  citation: Hamuyuni, Joseph (2016). Solubility of high melting temperature oxides (CaO, Al2O3, Cr2O3) in copper
+    oxide liquid. Aalto University Doctoral Dissertation 145/2016. Public thesis summary; the appendices containing
+    the four journal papers are absent.
+  year: 2016
+  corpus_asset: raw/hamuyuni-2016-copper-oxide-solubility-thesis-summary/hamuyuni-2016-copper-oxide-solubility-thesis-summary.pdf
+extraction:
+  method: Born-digital pdftotext-layout text; tables 1–2 checked as printed, with figures retained as deferred records.
+  date: '2026-10-20'
+  worker: codex-resume-89514-1792530821
+  review_status: draft
+review_status: draft
+fidelity_samples: []
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: hamuyuni_summary_printed_numeric_results_context
+      type: quoted_attributed
+      locator:
+        page: 27
+        pdf_page_index: 26
+        published_page: 10
+        note: Chapter 4.4 summary of publication [IV]
+      units: wt.% Cr2O3; °C
+      attribution_as_published: Hamuyuni and Taskinen, publication [IV], Liquidus experimental data for the system
+        Cu-O-Cr2O3 in air (2016).
+      values:
+        quantity_as_published: measured Cr2O3 solubility and eutectic values restated in the thesis summary
+        units_as_published: wt.% Cr2O3; °C
+        printed_values_as_published: The Cr2O3 content of liquid oxide is reported as 2.36–3.39 wt.% over the studied
+          temperature range; eutectic temperature 1112 ± 2 °C at 2.06 wt.% Cr2O3. These summary statements restate
+          publication [IV] and are not scored twice.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        - transition_temperature
+        disposition: context_only_summary_restatement_of_publication_IV
+    - observation_id: hamuyuni_table1_materials_context
+      type: context_only
+      locator:
+        page: 29
+        pdf_page_index: 28
+        published_page: 12
+        table: '1'
+      units: not applicable
+      values:
+        quantity_as_published: source and purity of materials used in the study
+        printed_values_as_published: Aluminium(III) oxide powder 0.999; argon compressed gas 0.99999; calcium oxalate
+          monohydrate powder 0.99; calcium oxide powder 0.99 (Alfa Aesar) and 0.999 (Sigma-Aldrich); copper lump/pellet
+          0.99996; copper(II) oxide powder 0.99995; chromium(III) oxide powder 0.9997; platinum wire 0.9999. These
+          characterize reagents and starting materials, not equilibrium phase compositions, solubilities, thermochemical
+          properties, or other simulator quantities.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        - activity
+        - transition_temperature
+        disposition: context_no_quantity_token_for_material_provenance
+    - observation_id: hamuyuni_table2_phase_assemblages_context
+      type: context_only
+      locator:
+        page: 39
+        pdf_page_index: 38
+        published_page: 22
+        table: '2'
+      units: phase labels
+      values:
+        quantity_as_published: phase assemblages at five triple points
+        printed_values_as_published: '1: Liquid + Halite + C3A; 2: Liquid + C3A + C12A7; 3: Liquid + C12A7 + CA;
+          4: Liquid + CA + CA2; 5: Liquid + CA2 + CA6 (CuAlO2 at 1150 °C). Table 2 contains phase labels but no
+          measured numeric phase composition.'
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition: context_no_numeric_composition_in_table
+    - observation_id: hamuyuni_2016_figure_1_deferred
+      type: figure_record
+      locator:
+        page: 22
+        pdf_page_index: 21
+        published_page: 5
+        figure: '1'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: unavailable
+        species:
+        - Cu2O
+        - CaO
+        - Al2O3
+        - Cr2O3
+        phase: as described by the figure caption
+        temperature_as_printed: not applicable or as printed
+        axes_as_printed:
+          x: as printed in figure
+          y: as printed in figure
+        caption: Major phase equilibria experimental methods.
+        series: []
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_2_deferred
+      type: figure_record
+      locator:
+        page: 24
+        pdf_page_index: 23
+        published_page: 7
+        figure: '2'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: unavailable
+        species:
+        - Cu2O
+        - CaO
+        - Al2O3
+        - Cr2O3
+        phase: as described by the figure caption
+        temperature_as_printed: not applicable or as printed
+        axes_as_printed:
+          x: as printed in figure
+          y: as printed in figure
+        caption: Selected sub-routines of the equilibration and quenching method.
+        series: []
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_3_deferred
+      type: figure_record
+      locator:
+        page: 30
+        pdf_page_index: 29
+        published_page: 13
+        figure: '3'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: unavailable
+        species:
+        - Cu2O
+        - CaO
+        - Al2O3
+        - Cr2O3
+        phase: as described by the figure caption
+        temperature_as_printed: not applicable or as printed
+        axes_as_printed:
+          x: as printed in figure
+          y: as printed in figure
+        caption: Equilibration experimental apparatus. A- Lenton vertical electrical resistance tube fur- nace (Type;
+          LTF- 16/450), B- Gas flow control mechanism, C-Temperature measurement de- vices.
+        series: []
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_4_deferred
+      type: figure_record
+      locator:
+        page: 32
+        pdf_page_index: 31
+        published_page: 15
+        figure: '4'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: unavailable
+        species:
+        - Cu2O
+        - CaO
+        - Al2O3
+        - Cr2O3
+        phase: as described by the figure caption
+        temperature_as_printed: not applicable or as printed
+        axes_as_printed:
+          x: as printed in figure
+          y: as printed in figure
+        caption: A schematic vertical section of the furnace and its auxiliaries, and the suspension tech- nique.
+        series: []
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_5_deferred
+      type: figure_record
+      locator:
+        page: 35
+        pdf_page_index: 34
+        published_page: 18
+        figure: '5'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: unavailable
+        species:
+        - Cu2O
+        - CaO
+        - Al2O3
+        - Cr2O3
+        phase: as described by the figure caption
+        temperature_as_printed: not applicable or as printed
+        axes_as_printed:
+          x: as printed in figure
+          y: as printed in figure
+        caption: The oxygen potential phase diagram of the Cu-O system [52].
+        series:
+        - name: thermodynamic calculation/model series
+          marker: line or model symbol as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_6_deferred
+      type: figure_record
+      locator:
+        page: 35
+        pdf_page_index: 34
+        published_page: 18
+        figure: '6'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: unavailable
+        species:
+        - Cu2O
+        - CaO
+        - Al2O3
+        - Cr2O3
+        phase: as described by the figure caption
+        temperature_as_printed: not applicable or as printed
+        axes_as_printed:
+          x: as printed in figure
+          y: as printed in figure
+        caption: The calculated copper-oxygen phase diagram. L1 is liquid copper, L2 is liquid oxide [52].
+        series:
+        - name: thermodynamic calculation/model series
+          marker: line or model symbol as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_7_deferred
+      type: figure_record
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 19
+        figure: '7'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: unavailable
+        species:
+        - Cu2O
+        - CaO
+        - Al2O3
+        - Cr2O3
+        phase: as described by the figure caption
+        temperature_as_printed: not applicable or as printed
+        axes_as_printed:
+          x: as printed in figure
+          y: as printed in figure
+        caption: A calculated isothermal ternary section in the Cu-O-CaO system at 1100 C.
+        series:
+        - name: thermodynamic calculation/model series
+          marker: line or model symbol as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_8_deferred
+      type: figure_record
+      locator:
+        page: 37
+        pdf_page_index: 36
+        published_page: 20
+        figure: '8'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: equilibrium_phase_composition
+        species:
+        - CaO
+        phase: liquid oxide
+        temperature_as_printed: temperature varies as plotted
+        axes_as_printed:
+          x: temperature (°C)
+          y: CaO solubility in liquid oxide
+        caption: Solubility of CaO in liquid oxide phase for the system Cu-O-CaO in air.
+        series:
+        - name: experimental data series shown in the figure
+          marker: as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_9_deferred
+      type: figure_record
+      locator:
+        page: 38
+        pdf_page_index: 37
+        published_page: 21
+        figure: '9'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: equilibrium_phase_composition
+        species:
+        - CaO
+        phase: liquid oxide
+        temperature_as_printed: temperature varies as plotted
+        axes_as_printed:
+          x: temperature (°C)
+          y: CaO solubility in liquid oxide
+        caption: Solubility of CaO in liquid oxide phase for the system Cu-O-CaO in equilibrium with copper.
+        series:
+        - name: experimental data series shown in the figure
+          marker: as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_10_deferred
+      type: figure_record
+      locator:
+        page: 40
+        pdf_page_index: 39
+        published_page: 23
+        figure: '10'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: unavailable
+        species:
+        - Cu2O
+        - CaO
+        - Al2O3
+        - Cr2O3
+        phase: as described by the figure caption
+        temperature_as_printed: not applicable or as printed
+        axes_as_printed:
+          x: as printed in figure
+          y: as printed in figure
+        caption: Calculated isothermal ternary section of the system ‘Cu2O’-CaO-Al2O3 at 1150 oC and experimental
+          points superimposed; numbers refer to phase equilibria of Table 2.
+        series:
+        - name: thermodynamic calculation/model series
+          marker: line or model symbol as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_11_deferred
+      type: figure_record
+      locator:
+        page: 41
+        pdf_page_index: 40
+        published_page: 24
+        figure: '11'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: unavailable
+        species:
+        - Cu2O
+        - CaO
+        - Al2O3
+        - Cr2O3
+        phase: as described by the figure caption
+        temperature_as_printed: not applicable or as printed
+        axes_as_printed:
+          x: as printed in figure
+          y: as printed in figure
+        caption: Calculated isothermal ternary section of the system ‘Cu2O’-CaO-Al2O3 at 1400 ÛC and experimental
+          points superimposed; numbers refer to phase equilibria of Table 2.
+        series:
+        - name: thermodynamic calculation/model series
+          marker: line or model symbol as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_12_deferred
+      type: figure_record
+      locator:
+        page: 41
+        pdf_page_index: 40
+        published_page: 24
+        figure: '12'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: equilibrium_phase_composition
+        species:
+        - Cu2O
+        phase: solid calcium aluminate / halite
+        temperature_as_printed: temperature varies as plotted
+        axes_as_printed:
+          x: temperature or triple-point identifier as printed
+          y: Cu2O solubility in solid phase (wt.%)
+        caption: The solubility of cuprite in halite and calcium aluminate. The number at the end of each label
+          denotes a three phase equilibrium of Table 2.
+        series:
+        - name: experimental data series shown in the figure
+          marker: as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_13_deferred
+      type: figure_record
+      locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 25
+        figure: '13'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: equilibrium_phase_composition
+        species:
+        - Cu2O
+        phase: solid calcium aluminate / halite
+        temperature_as_printed: temperature varies as plotted
+        axes_as_printed:
+          x: temperature or triple-point identifier as printed
+          y: Cu2O solubility in solid phase (wt.%)
+        caption: The solubility of cuprite in halite and dodeca-calcium hepta-aluminate.
+        series:
+        - name: experimental data series shown in the figure
+          marker: as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_14_deferred
+      type: figure_record
+      locator:
+        page: 43
+        pdf_page_index: 42
+        published_page: 26
+        figure: '14'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: unavailable
+        species:
+        - Cu2O
+        - CaO
+        - Al2O3
+        - Cr2O3
+        phase: as described by the figure caption
+        temperature_as_printed: not applicable or as printed
+        axes_as_printed:
+          x: as printed in figure
+          y: as printed in figure
+        caption: A backscattered SEM image of a polished section from a quenched sample equili- brated at 1200 ÛC.
+          Cu2O precipitates can be observed at the liquid oxide–solid boundary
+        series: []
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_15_deferred
+      type: figure_record
+      locator:
+        page: 44
+        pdf_page_index: 43
+        published_page: 27
+        figure: '15'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: equilibrium_phase_composition
+        species:
+        - Cr2O3
+        phase: liquid oxide
+        temperature_as_printed: temperature varies as plotted
+        axes_as_printed:
+          x: temperature (°C)
+          y: Cr2O3 solubility in liquid oxide (wt.%)
+        caption: Solubility of Cr2O3 in liquid liquid phase in the system Cu-O-Cr2O3 in air.
+        series:
+        - name: experimental data series shown in the figure
+          marker: as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_2016_figure_16_deferred
+      type: figure_record
+      locator:
+        page: 45
+        pdf_page_index: 44
+        published_page: 28
+        figure: '16'
+      panel: whole_figure
+      attribution: As captioned; this public thesis summary reproduces results from publications [I]–[IV] where
+        applicable.
+      units: as printed in figure
+      values:
+        quantity: equilibrium_phase_composition
+        species:
+        - Cr2O3
+        phase: liquid oxide at solid oxide saturation
+        temperature_as_printed: temperature varies as plotted
+        axes_as_printed:
+          x: temperature (°C)
+          y: Cr2O3 composition / Cr2O3-to-Cu mole ratio as printed
+        caption: A comparison of calculated (MTOX) and experimental results for the system Cu-O- Cr2O3 in air at
+          solid oxide saturation.
+        series:
+        - name: experimental data series shown in the figure
+          marker: as drawn
+          marker_count: not counted; numeric points deferred
+        - name: thermodynamic calculation/model series
+          marker: line or model symbol as drawn
+          marker_count: not counted; numeric points deferred
+        digitisation: deferred to a figure pass
