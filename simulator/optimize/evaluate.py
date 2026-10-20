@@ -3504,7 +3504,7 @@ def _profile_lab_schedule(
         for point in schedule["melt_temperature_C"]
     )
     if scheduled_peak > ceiling_C:
-        raise EvaluationInputError(
+        raise _CandidateAdmissionError(
             f"lab_schedule_temperature_exceeds_{ceiling_bound}: "
             f"{scheduled_peak:g} C > {ceiling_C:g} C"
         )
@@ -3620,7 +3620,7 @@ def _profile_thermal_window_schedule(
         recipe_patch=recipe_patch,
     )
     if max_hold_hr is not None and float(total_hours) > max_hold_hr:
-        raise EvaluationInputError(
+        raise _CandidateAdmissionError(
             f"{campaign} thermal_window_{max_hold_bound} refusal: "
             f"requires {total_hours:g} h "
             f"(preheat {preheat_hours:g} h + hold {duration_h:g} h) but "
