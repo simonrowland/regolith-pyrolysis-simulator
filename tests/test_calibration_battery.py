@@ -166,141 +166,119 @@ def test_unknown_evidence_marker_never_scores(extract_comparator, key, nested):
     assert all(set(r["signed_residual"].values()) == {None} for r in rows)
 
 
-def _evidence_marker_reader_sites(source, relative):
+def _refusal_reason_payload_reads(tree, refusal_reasons):
     import ast
+
+    aliases = {}
+
+    def string_value(node):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return node.value
+        if isinstance(node, ast.Name):
+            return aliases.get(node.id)
+        return None
+
+    assignments = [node for node in ast.walk(tree)
+                    if isinstance(node, (ast.Assign, ast.AnnAssign))]
+    for _ in assignments:
+        for node in assignments:
+            value = string_value(node.value)
+            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+            for target in targets:
+                if isinstance(target, ast.Name):
+                    if value is None:
+                        aliases.pop(target.id, None)
+                    else:
+                        aliases[target.id] = value
+
+    reads = []
+
+    def record(key, site):
+        reason = string_value(key)
+        if reason in refusal_reasons:
+            reads.append((reason, site.lineno))
+
+    for node in ast.walk(tree):
+        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "get"):
+            if node.args:
+                record(node.args[0], node)
+            for keyword in node.keywords:
+                if keyword.arg in (None, "key"):
+                    record(keyword.value, node)
+        elif isinstance(node, ast.Subscript):
+            record(node.slice, node)
+        elif isinstance(node, ast.Compare):
+            left = node.left
+            for operator, comparator in zip(node.ops, node.comparators):
+                if isinstance(operator, (ast.In, ast.NotIn)):
+                    record(left, node)
+                left = comparator
+    return sorted(reads)
+
+
+def _evidence_marker_reader_sites(source, relative, refusal_reasons=frozenset()):
+    import ast
+
     physical_keys = {"system_class", "property_kind", "alpha_kind", "provenance_class",
                      "standard_state_kind"}
     output_keys = {"measurement_kind", "reported_status", "observable_status",
                    "comparator_status", "provider_status", "antoine_provenance_class",
                    "observation_system_class", "claim_kind"}
-
-    def is_marker_key(key):
-        return (
-            isinstance(key, str)
-            and key.isidentifier()
-            and key not in physical_keys | output_keys
-            and (key in {"class", "class_tag", "status", "semantics"}
-                 or key.startswith("evidence_")
-                 or key.endswith(("_class", "_status", "_role", "_kind")))
-        )
-
-    def is_payload_mapping(node):
-        return (
-            isinstance(node, ast.Name)
-            and node.id in {"markers", "obs", "payload", "values"}
-        ) or (
-            isinstance(node, ast.Attribute) and node.attr in {"values", "admission_metadata"}
-        )
-
     tree = ast.parse(source)
-    parents = {child: parent for parent in ast.walk(tree)
-               for child in ast.iter_child_nodes(parent)}
-    literal_sequences = {}
-    vocabulary_keys = []
+    refusal_owner = relative == "simulator/diagnostic_helpers/extract_reproduction.py"
+    if refusal_owner:
+        refusal_reads = _refusal_reason_payload_reads(tree, refusal_reasons)
+        assert not refusal_reads, f"refusal reason literals are payload reads: {refusal_reads}"
 
-    def dict_keys(node):
-        keys = []
-        for key, value in zip(node.keys, node.values):
-            if isinstance(key, ast.Constant) and isinstance(key.value, str):
-                keys.append(key.value)
-            elif key is None and isinstance(value, ast.DictComp):
-                for generator in value.generators:
-                    if isinstance(generator.iter, (ast.Tuple, ast.List, ast.Set)):
-                        keys.extend(item.value for item in generator.iter.elts
-                                     if isinstance(item, ast.Constant)
-                                     and isinstance(item.value, str))
-        return keys
-
+    readers = []
     for node in ast.walk(tree):
-        if isinstance(node, (ast.Assign, ast.AnnAssign)):
-            value = node.value
-            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-            if isinstance(value, ast.Dict) and any(
-                isinstance(target, ast.Name) and target.id == "_EVIDENCE_VOCABULARY"
-                for target in targets
-            ):
-                vocabulary_keys = dict_keys(value)
-
-    def literal_keys(node):
-        if isinstance(node, (ast.Tuple, ast.List, ast.Set)):
-            return [item.value for item in node.elts
-                    if isinstance(item, ast.Constant) and isinstance(item.value, str)]
-        if isinstance(node, ast.Name):
-            return literal_sequences.get(node.id, [])
-        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
-                and node.func.attr == "items" and isinstance(node.func.value, ast.Name)
-                and node.func.value.id == "_EVIDENCE_VOCABULARY"):
-            return vocabulary_keys
-        if isinstance(node, ast.Constant) and isinstance(node.value, str):
-            return [node.value]
-        return []
-
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.Assign, ast.AnnAssign)):
-            value = node.value
-            keys = literal_keys(value) if value is not None else []
-            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-            for target in targets:
-                if isinstance(target, ast.Name) and keys:
-                    literal_sequences[target.id] = keys
-
-    def keys_for_read(key_node, site):
-        if isinstance(key_node, ast.Constant) and isinstance(key_node.value, str):
-            return [key_node.value]
-        if isinstance(key_node, ast.Name):
-            aliases = literal_keys(key_node)
-            if aliases:
-                return aliases
-            parent = parents.get(site)
-            while parent is not None:
-                if isinstance(parent, (ast.For, ast.comprehension)):
-                    target_names = {n.id for n in ast.walk(parent.target)
-                                    if isinstance(n, ast.Name)}
-                    if key_node.id in target_names:
-                        return literal_keys(parent.iter)
-                parent = parents.get(parent)
-        return []
-
-    readers = set()
-
-    def record(key_node, site):
-        for key in keys_for_read(key_node, site):
-            if is_marker_key(key):
-                readers.add((relative, site.lineno, key))
-
-    for node in ast.walk(tree):
-        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
-                and node.func.attr == "get" and node.args
-                and is_payload_mapping(node.func.value)):
-            record(node.args[0], node)
-        elif isinstance(node, ast.Subscript) and is_payload_mapping(node.value):
-            record(node.slice, node)
-        elif isinstance(node, ast.Compare):
-            for operator, comparator in zip(node.ops, node.comparators):
-                if isinstance(operator, (ast.In, ast.NotIn)):
-                    if is_payload_mapping(comparator):
-                        record(node.left, node)
-                    elif is_payload_mapping(node.left):
-                        record(comparator, node)
-        elif isinstance(node, ast.Call) and len(node.args) > 1:
-            reader_name = (node.func.id if isinstance(node.func, ast.Name)
-                           else node.func.attr if isinstance(node.func, ast.Attribute) else None)
-            if reader_name == "_evidence_marker" and is_payload_mapping(node.args[0]):
-                record(node.args[1], node)
-    return sorted(readers)
+        # Scan definitions too: aliases, unpacking, helper calls and
+        # comprehensions must not escape the marker vocabulary guard.
+        if not isinstance(node, ast.Constant) or not isinstance(node.value, str):
+            continue
+        key = node.value
+        if not key.isidentifier():
+            continue
+        if key in physical_keys | output_keys:
+            continue
+        if (key in {"class", "class_tag", "status", "semantics"}
+                or key.startswith("evidence_")
+                or key.endswith(("_class", "_status", "_role", "_kind"))):
+            if not (refusal_owner and key in refusal_reasons):
+                readers.append((relative, node.lineno, key))
+    return readers
 
 
-def test_evidence_marker_reader_detection_uses_payload_accesses():
+def test_evidence_marker_reader_scan_exempts_only_declared_refusal_reasons():
     from simulator.diagnostic_helpers import extract_reproduction as e
 
+    refusal_reasons = e._SYSTEM_CLASS_REFUSAL_REASONS
+    reason = next(code for code in refusal_reasons if code.startswith("missing_"))
+    owner = "simulator/diagnostic_helpers/extract_reproduction.py"
     assert _evidence_marker_reader_sites(
-        'reason = "missing_system_class"', "fixture.py"
+        f"reason = {reason!r}", owner, refusal_reasons
     ) == []
-    readers = _evidence_marker_reader_sites(
+
+    for source in (
+        f"payload.get({reason!r})",
+        f"payload[{reason!r}]",
+        f"{reason!r} in payload",
+        f"key = {reason!r}\npayload.get(key)",
+    ):
+        with pytest.raises(AssertionError, match="refusal reason literals are payload reads"):
+            _evidence_marker_reader_sites(source, owner, refusal_reasons)
+
+    direct = _evidence_marker_reader_sites(
         'token = values.get("x_class")', "fixture.py"
     )
-    assert readers == [("fixture.py", 1, "x_class")]
-    assert readers[0][2] not in e._EVIDENCE_VOCABULARY
+    alias = _evidence_marker_reader_sites(
+        'evidence = payload\nevidence.get("x_class")', "fixture.py"
+    )
+    assert direct == [("fixture.py", 1, "x_class")]
+    assert alias == [("fixture.py", 2, "x_class")]
+    assert direct[0][2] not in e._EVIDENCE_VOCABULARY
+    assert alias[0][2] not in e._EVIDENCE_VOCABULARY
 
 
 def test_every_evidence_marker_reader_has_closed_vocabulary():
@@ -309,11 +287,13 @@ def test_every_evidence_marker_reader_has_closed_vocabulary():
 
     root = Path(__file__).resolve().parents[1]
     readers = []
-    for relative in ("simulator/diagnostic_helpers/extract_reproduction.py",
+    refusal_owner = "simulator/diagnostic_helpers/extract_reproduction.py"
+    for relative in (refusal_owner,
                      "simulator/diagnostic_helpers/qualitative_skip.py",
                      "scripts/calibration_battery.py"):
         readers.extend(_evidence_marker_reader_sites(
-            (root / relative).read_text(), relative
+            (root / relative).read_text(), relative,
+            e._SYSTEM_CLASS_REFUSAL_REASONS if relative == refusal_owner else frozenset(),
         ))
     assert readers
     missing = [reader for reader in readers if reader[2] not in e._EVIDENCE_VOCABULARY]
