@@ -51,7 +51,7 @@ The Lewis-ratio sentence does not say that p° was measured, or tabulated, at th
 
 ## Counts
 
-Fig. 2 partial pressures in the table below include the round-2 markers (one Fig. 2a TiO2 disk, twelve Fig. 2b TiO2 triangles, two Ti triangles, and two O2 triangles) and the round-3 reads: one Fig. 2a Ti disk, the Fig. 2a O2 centre moved in y only, one Fig. 2b CaO arc, one Fig. 2b O2 tip, the Ti triangle moved from (4050.0, 3085.6) to (4024.0, 3096.0), and seven series-6 O triangles. Fig. 3a activities are unchanged in value. Fig. 3b mixing energies stay context.
+Fig. 2 partial pressures in the table below include the round-2 markers (one Fig. 2a TiO2 disk, twelve Fig. 2b TiO2 triangles, two Ti triangles, and two O2 triangles) and the round-3 reads: one Fig. 2a Ti disk, the Fig. 2a O2 centre moved in y only, one Fig. 2b CaO arc, one Fig. 2b O2 tip, the Ti triangle moved from (4050.0, 3085.6) to (4024.0, 3096.0), and seven series-6 O triangles. Round 4 adds the right-spine Ti triangle at (4124.5, 3094.0) and the right-spine O2 triangle at (4124.0, 2657.0). Fig. 3a activities are unchanged in value. Fig. 3b mixing energies stay context.
 
 ## Refusals, one marker at a time
 
@@ -63,8 +63,12 @@ A marker is a centre, or an assignable exposed arc or tip, inside a stated uncer
 - Fig. 2b red at x=3475: stored at (3474.5, 3105.0) from the exposed lower arc. The clean circle at (3556, 3121) fixes the 9 px offset from the arc bottom.
 - Fig. 2b navy at x=3386: stored at (3386.0, 2686.0) from the tip at (3386, 2702). The clean triangle at (3324, 2691) fixes the 16 px offset.
 - Fig. 2b Ti at x=4023: stored at (4024.0, 3096.0). The apex is y=3080-3084. Sibling triangles place the centre 16 px below the first apex row. The purple diamond crosses the body. The blue glyph near (4070, 3056) is the series label 3. The old centre (4050.0, 3085.6) is blank page.
-- Fig. 2b series 6. The clean triangle at (2646, 2475) has its one-pixel tip 8 px below the stored centre, so a new centre is tip y minus 8. Stored tips: (3266, 2521), (3323, 2519), (3386, 2516), (3474, 2512), (3557, 2510), (3640, 2507), (4125, 2502). Refused: x=2709, two offset clumps and the one-pixel pixel at (2707, 2490) is not on the body axis; x=2780, 13 scattered pixels and no tip; x=2839, a flat band at y=2500-2510 whose right edge is the series line; x=3174, the lowest ink is x=3158-3164, 13 px left of the station, and it is not a tip. Series 4 is not used as the comparison.
-- Fig. 3a near x=1119, y=4632: the black ink is the series line crossing the blue CaTiO3 disk at (1119.5, 4597.9). Not stored.
+- Fig. 2b series 6. The clean triangle at (2646, 2475) has its one-pixel tip 8 px below the stored centre, so a new centre is tip y minus 8. Stored tips: (3266, 2521), (3323, 2519), (3386, 2516), (3474, 2512), (3557, 2510), (3640, 2507), (4125, 2502). x=2709 stays refused: two offset clumps, and the pixel at (2707, 2490) is not on the body axis. x=2780, x=2839 and x=3174 are deferred below. Series 4 is not used as the comparison.
+- Fig. 2b Ti at x=4124.5: stored at (4124.5, 3094.0). Saturated-blue apex y=3078-3079, x midpoint 4124.5. Centre y = 3078 + 16. The bar at y=3090-3096 crosses the body. lg p = -9.071. The glyph near (4070, 3056) remains the series label.
+- Fig. 2b O2 at x=4124: stored at (4124.0, 2657.0). One-pixel navy tip at (4124, 2673). Centre y = 2673 - 16. lg p = -6.562. The diagonal trail at x=4062-4092 is not the tip.
+- Fig. 2a magenta TiO near x=907, crop x=860-980, y=3020-3095. The left edge runs off the crop. A leftmost-magenta fit gives radius 122 px, rms 2.05. Deferred.
+- Fig. 2b TiO near x=4125, crop x=4040-4180, y=2380-2520. The narrow tip at y=2463 widens into the frame bar by y=2473. The longest vertical colour chord is that bar, so the filled-diamond centre is not assigned. Deferred.
+- Fig. 3a near x=1119, y=4632. Black pixels below the blue disk form a curve plus a vertical stroke. Circle fits of that ink move between radius 20 and 68 px, with rms 1.0 to 6.4. Deferred. The blue disk at (1119.5, 4597.9) stays stored.
 - Fig. 3a series 3 and 5 are Banon et al. 1981. Fig. 3b series 2–4 are other papers. Fig. 1 is Gong et al. 2018.
 
 ## This-work markers
@@ -353,7 +357,11 @@ A marker is a centre, or an assignable exposed arc or tip, inside a stated uncer
 | a/1 black stroke | Ca | 2186 | — | — | refused: no separate black disk |
 | b/3 label | Ti | 4070 | 3056 | — | refused: series label 3, not a triangle |
 | b/6 purple ink | O | 2709 | 2490 | — | refused: two offset clumps, no one tip on an axis |
-| b/6 purple ink | O | 2780 | — | — | refused: 13 scattered pixels, no tip |
-| b/6 purple ink | O | 2839 | 2505 | — | refused: flat band y=2500-2510, no tip |
-| b/6 purple ink | O | 3174 | 2514 | — | refused: lowest ink at x=3158-3164, not a tip on the station |
-| a/4 black patch | CaTiO3 | 1119 | 4632 | — | refused: series line across the blue disk at (1119.5, 4597.9) |
+| b/3 open triangle | Ti | 4124.5 | 3094.0 | log10_p=-9.071 | read |
+| b/7 open triangle | O2 | 4124.0 | 2657.0 | log10_p=-6.562 | read |
+| a/4 magenta ink | TiO | 907 | 3066 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=860-980, y=3020-3095; left edge leaves the crop, fitted radius 122 px |
+| b/4 filled diamond | TiO | 4125 | 2470 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=4040-4180, y=2380-2520; the tip widens into the frame and the longest vertical chord is the bar |
+| b/6 purple ink | O | 2780 | 2513 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=2765-2805, y=2488-2525; one disconnected pixel at (2779, 2513) |
+| b/6 purple ink | O | 2839 | 2505 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=2799-2885, y=2460-2540; lowest ink is x=2849-2885, off the station |
+| b/6 purple ink | O | 3174 | 2514 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=3125-3210, y=2460-2540; lowest ink is x=3158-3164 |
+| a/4 black patch | CaTiO3 | 1119 | 4632 | — | deferred: overlapping, arc-fit needed (t-1380); crop x=1070-1170, y=4550-4665; black-ink fits move, rms 1.0 to 6.4 |
