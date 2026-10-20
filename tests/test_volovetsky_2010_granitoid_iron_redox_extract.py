@@ -35,7 +35,7 @@ def test_volovetsky_table1_components_migrate_with_sample_conditions_and_species
     migrator.finalize()
 
     migrated = migrator.result.observations
-    assert len(migrated) == 41
+    assert len(migrated) == 22
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
 
@@ -79,8 +79,10 @@ def test_volovetsky_table1_components_migrate_with_sample_conditions_and_species
         for item in source["species"]["Fe"]["context"]
         if item["observation_id"].endswith("composition_repeated_in_2012")
     }
-    assert set(repeated_context) == {"I2", "I3R-29"}
+    assert set(repeated_context) == {"P9", "I2-N15", "I2", "I3R-29"}
     for sample, expected_observation in {
+        "P9": "volo12_p9_initial_fe_redox",
+        "I2-N15": "volo12_i2_granite_table1",
         "I2": "volo12_i2_granite_table1",
         "I3R-29": "volo12_i2_granite_table1",
     }.items():

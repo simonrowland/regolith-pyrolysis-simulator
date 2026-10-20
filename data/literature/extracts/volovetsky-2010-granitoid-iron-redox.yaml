@@ -12,14 +12,14 @@ extraction:
   worker: fam25-1020
 review_status: draft
 fidelity_samples:
-- path: species.SiO2.observations[volovetsky_2010_table1_p9_sio2].values.points[0].value
-  value: '68.28'
+- path: species.SiO2.observations[volovetsky_2010_table1_p9_n2_sio2].values.points[0].value
+  value: '70.00'
   locator:
     page: 3
     pdf_page_index: 2
     published_page: 2
     table: '1'
-    row: P9
+    row: P9-N2
     column: SiO2
 - path: species.FeO.observations[volovetsky_2010_table1_p9_37_feo].values.points[0].value
   value: '4.05'
@@ -30,14 +30,14 @@ fidelity_samples:
     table: '1'
     row: P9-37
     column: FeO
-- path: species.Na2O.observations[volovetsky_2010_table1_i2_n15_na2o].values.points[0].value
-  value: '3.76'
+- path: species.Na2O.observations[volovetsky_2010_table1_p9_37_na2o].values.points[0].value
+  value: '3.52'
   locator:
     page: 3
     pdf_page_index: 2
     published_page: 2
     table: '1'
-    row: I2-N15
+    row: P9-37
     column: Na2O
 experiments:
 - experiment_id: volo2010_table1_p9
@@ -103,50 +103,6 @@ experiments:
 species:
   SiO2:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_sio2
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id001
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: SiO2
-        note: Table 1 row P9, column SiO2.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id002
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id001
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: SiO2
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: SiO2
-          row_as_printed: P9
-          value_as_published: '68.28'
-          value: '68.28'
-          point_conditions: *id002
     - observation_id: volovetsky_2010_table1_p9_n2_sio2
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -259,108 +215,8 @@ species:
               section: Samples and experimental methods
       regime: quench_equilibration
       quench_statement: *id008
-    - observation_id: volovetsky_2010_table1_i2_n15_sio2
-      experiment: volo2010_table1_i2_n15
-      type: equilibrium_phase_composition
-      locator: &id009
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: I2-N15
-        column: SiO2
-        note: Table 1 row I2-N15, column SiO2.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id010
-        T_C:
-          state:
-            tag: value
-            value: '1240'
-          locator: *id009
-        fO2_log:
-          state:
-            tag: value
-            value: '-7.0'
-          locator: *id009
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: SiO2
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: I2-N15
-          sample_material_as_published: glass sample
-          species_as_printed: SiO2
-          row_as_printed: I2-N15
-          value_as_published: '73.53'
-          value: '73.53'
-          point_conditions: *id010
-          T_C: '1240'
-          quench_statement: &id011
-            text: Samples were quenched by immersing them into water after they had been drawn from the furnace.
-            preservation: not_stated
-            quench_direction: not_stated
-            locator:
-              page: 3
-              pdf_page_index: 2
-              published_page: 2
-              section: Samples and experimental methods
-      regime: quench_equilibration
-      quench_statement: *id011
   TiO2:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_tio2
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id012
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: TiO2
-        note: Table 1 row P9, column TiO2.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id013
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id012
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id012
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: TiO2
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: TiO2
-          row_as_printed: P9
-          value_as_published: '0.36'
-          value: '0.36'
-          point_conditions: *id013
     - observation_id: volovetsky_2010_table1_p9_n2_tio2
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -473,108 +329,8 @@ species:
               section: Samples and experimental methods
       regime: quench_equilibration
       quench_statement: *id019
-    - observation_id: volovetsky_2010_table1_i2_n15_tio2
-      experiment: volo2010_table1_i2_n15
-      type: equilibrium_phase_composition
-      locator: &id020
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: I2-N15
-        column: TiO2
-        note: Table 1 row I2-N15, column TiO2.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id021
-        T_C:
-          state:
-            tag: value
-            value: '1240'
-          locator: *id020
-        fO2_log:
-          state:
-            tag: value
-            value: '-7.0'
-          locator: *id020
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: TiO2
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: I2-N15
-          sample_material_as_published: glass sample
-          species_as_printed: TiO2
-          row_as_printed: I2-N15
-          value_as_published: '0.06'
-          value: '0.06'
-          point_conditions: *id021
-          T_C: '1240'
-          quench_statement: &id022
-            text: Samples were quenched by immersing them into water after they had been drawn from the furnace.
-            preservation: not_stated
-            quench_direction: not_stated
-            locator:
-              page: 3
-              pdf_page_index: 2
-              published_page: 2
-              section: Samples and experimental methods
-      regime: quench_equilibration
-      quench_statement: *id022
   Al2O3:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_al2o3
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id023
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: Al2O3
-        note: Table 1 row P9, column Al2O3.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id024
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id023
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id023
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: Al2O3
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: Al2O3
-          row_as_printed: P9
-          value_as_published: '7.39'
-          value: '7.39'
-          point_conditions: *id024
     - observation_id: volovetsky_2010_table1_p9_n2_al2o3
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -687,108 +443,8 @@ species:
               section: Samples and experimental methods
       regime: quench_equilibration
       quench_statement: *id030
-    - observation_id: volovetsky_2010_table1_i2_n15_al2o3
-      experiment: volo2010_table1_i2_n15
-      type: equilibrium_phase_composition
-      locator: &id031
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: I2-N15
-        column: Al2O3
-        note: Table 1 row I2-N15, column Al2O3.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id032
-        T_C:
-          state:
-            tag: value
-            value: '1240'
-          locator: *id031
-        fO2_log:
-          state:
-            tag: value
-            value: '-7.0'
-          locator: *id031
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: Al2O3
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: I2-N15
-          sample_material_as_published: glass sample
-          species_as_printed: Al2O3
-          row_as_printed: I2-N15
-          value_as_published: '14.15'
-          value: '14.15'
-          point_conditions: *id032
-          T_C: '1240'
-          quench_statement: &id033
-            text: Samples were quenched by immersing them into water after they had been drawn from the furnace.
-            preservation: not_stated
-            quench_direction: not_stated
-            locator:
-              page: 3
-              pdf_page_index: 2
-              published_page: 2
-              section: Samples and experimental methods
-      regime: quench_equilibration
-      quench_statement: *id033
   FeO:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_feo
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id034
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: FeO
-        note: Table 1 row P9, column FeO.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id035
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id034
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id034
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: FeO
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: FeO
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: FeO
-          row_as_printed: P9
-          value_as_published: '7.82'
-          value: '7.82'
-          point_conditions: *id035
     - observation_id: volovetsky_2010_table1_p9_n2_feo
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -901,108 +557,8 @@ species:
               section: Samples and experimental methods
       regime: quench_equilibration
       quench_statement: *id041
-    - observation_id: volovetsky_2010_table1_i2_n15_feo
-      experiment: volo2010_table1_i2_n15
-      type: equilibrium_phase_composition
-      locator: &id042
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: I2-N15
-        column: FeO
-        note: Table 1 row I2-N15, column FeO.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id043
-        T_C:
-          state:
-            tag: value
-            value: '1240'
-          locator: *id042
-        fO2_log:
-          state:
-            tag: value
-            value: '-7.0'
-          locator: *id042
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: FeO
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: FeO
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: I2-N15
-          sample_material_as_published: glass sample
-          species_as_printed: FeO
-          row_as_printed: I2-N15
-          value_as_published: '2.98'
-          value: '2.98'
-          point_conditions: *id043
-          T_C: '1240'
-          quench_statement: &id044
-            text: Samples were quenched by immersing them into water after they had been drawn from the furnace.
-            preservation: not_stated
-            quench_direction: not_stated
-            locator:
-              page: 3
-              pdf_page_index: 2
-              published_page: 2
-              section: Samples and experimental methods
-      regime: quench_equilibration
-      quench_statement: *id044
   MnO:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_mno
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id045
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: MnO
-        note: Table 1 row P9, column MnO.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id046
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id045
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id045
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: MnO
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: MnO
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: MnO
-          row_as_printed: P9
-          value_as_published: '0.31'
-          value: '0.31'
-          point_conditions: *id046
     - observation_id: volovetsky_2010_table1_p9_n2_mno
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -1117,50 +673,6 @@ species:
       quench_statement: *id052
   MgO:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_mgo
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id053
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: MgO
-        note: Table 1 row P9, column MgO.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id054
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id053
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id053
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: MgO
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: MgO
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: MgO
-          row_as_printed: P9
-          value_as_published: '0.07'
-          value: '0.07'
-          point_conditions: *id054
     - observation_id: volovetsky_2010_table1_p9_n2_mgo
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -1273,108 +785,8 @@ species:
               section: Samples and experimental methods
       regime: quench_equilibration
       quench_statement: *id060
-    - observation_id: volovetsky_2010_table1_i2_n15_mgo
-      experiment: volo2010_table1_i2_n15
-      type: equilibrium_phase_composition
-      locator: &id061
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: I2-N15
-        column: MgO
-        note: Table 1 row I2-N15, column MgO.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id062
-        T_C:
-          state:
-            tag: value
-            value: '1240'
-          locator: *id061
-        fO2_log:
-          state:
-            tag: value
-            value: '-7.0'
-          locator: *id061
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: MgO
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: MgO
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: I2-N15
-          sample_material_as_published: glass sample
-          species_as_printed: MgO
-          row_as_printed: I2-N15
-          value_as_published: '0.14'
-          value: '0.14'
-          point_conditions: *id062
-          T_C: '1240'
-          quench_statement: &id063
-            text: Samples were quenched by immersing them into water after they had been drawn from the furnace.
-            preservation: not_stated
-            quench_direction: not_stated
-            locator:
-              page: 3
-              pdf_page_index: 2
-              published_page: 2
-              section: Samples and experimental methods
-      regime: quench_equilibration
-      quench_statement: *id063
   CaO:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_cao
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id064
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: CaO
-        note: Table 1 row P9, column CaO.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id065
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id064
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id064
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: CaO
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: CaO
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: CaO
-          row_as_printed: P9
-          value_as_published: '0.34'
-          value: '0.34'
-          point_conditions: *id065
     - observation_id: volovetsky_2010_table1_p9_n2_cao
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -1487,108 +899,8 @@ species:
               section: Samples and experimental methods
       regime: quench_equilibration
       quench_statement: *id071
-    - observation_id: volovetsky_2010_table1_i2_n15_cao
-      experiment: volo2010_table1_i2_n15
-      type: equilibrium_phase_composition
-      locator: &id072
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: I2-N15
-        column: CaO
-        note: Table 1 row I2-N15, column CaO.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id073
-        T_C:
-          state:
-            tag: value
-            value: '1240'
-          locator: *id072
-        fO2_log:
-          state:
-            tag: value
-            value: '-7.0'
-          locator: *id072
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: CaO
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: CaO
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: I2-N15
-          sample_material_as_published: glass sample
-          species_as_printed: CaO
-          row_as_printed: I2-N15
-          value_as_published: '1.62'
-          value: '1.62'
-          point_conditions: *id073
-          T_C: '1240'
-          quench_statement: &id074
-            text: Samples were quenched by immersing them into water after they had been drawn from the furnace.
-            preservation: not_stated
-            quench_direction: not_stated
-            locator:
-              page: 3
-              pdf_page_index: 2
-              published_page: 2
-              section: Samples and experimental methods
-      regime: quench_equilibration
-      quench_statement: *id074
   Na2O:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_na2o
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id075
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: Na2O
-        note: Table 1 row P9, column Na2O.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id076
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id075
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id075
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Na2O
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: Na2O
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: Na2O
-          row_as_printed: P9
-          value_as_published: '6.61'
-          value: '6.61'
-          point_conditions: *id076
     - observation_id: volovetsky_2010_table1_p9_n2_na2o
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -1701,108 +1013,8 @@ species:
               section: Samples and experimental methods
       regime: quench_equilibration
       quench_statement: *id082
-    - observation_id: volovetsky_2010_table1_i2_n15_na2o
-      experiment: volo2010_table1_i2_n15
-      type: equilibrium_phase_composition
-      locator: &id083
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: I2-N15
-        column: Na2O
-        note: Table 1 row I2-N15, column Na2O.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id084
-        T_C:
-          state:
-            tag: value
-            value: '1240'
-          locator: *id083
-        fO2_log:
-          state:
-            tag: value
-            value: '-7.0'
-          locator: *id083
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Na2O
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: Na2O
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: I2-N15
-          sample_material_as_published: glass sample
-          species_as_printed: Na2O
-          row_as_printed: I2-N15
-          value_as_published: '3.76'
-          value: '3.76'
-          point_conditions: *id084
-          T_C: '1240'
-          quench_statement: &id085
-            text: Samples were quenched by immersing them into water after they had been drawn from the furnace.
-            preservation: not_stated
-            quench_direction: not_stated
-            locator:
-              page: 3
-              pdf_page_index: 2
-              published_page: 2
-              section: Samples and experimental methods
-      regime: quench_equilibration
-      quench_statement: *id085
   K2O:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_k2o
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id086
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: K2O
-        note: Table 1 row P9, column K2O.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id087
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id086
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id086
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: K2O
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: K2O
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: K2O
-          row_as_printed: P9
-          value_as_published: '4.17'
-          value: '4.17'
-          point_conditions: *id087
     - observation_id: volovetsky_2010_table1_p9_n2_k2o
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -1915,108 +1127,8 @@ species:
               section: Samples and experimental methods
       regime: quench_equilibration
       quench_statement: *id093
-    - observation_id: volovetsky_2010_table1_i2_n15_k2o
-      experiment: volo2010_table1_i2_n15
-      type: equilibrium_phase_composition
-      locator: &id094
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: I2-N15
-        column: K2O
-        note: Table 1 row I2-N15, column K2O.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id095
-        T_C:
-          state:
-            tag: value
-            value: '1240'
-          locator: *id094
-        fO2_log:
-          state:
-            tag: value
-            value: '-7.0'
-          locator: *id094
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: K2O
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: K2O
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: I2-N15
-          sample_material_as_published: glass sample
-          species_as_printed: K2O
-          row_as_printed: I2-N15
-          value_as_published: '3.87'
-          value: '3.87'
-          point_conditions: *id095
-          T_C: '1240'
-          quench_statement: &id096
-            text: Samples were quenched by immersing them into water after they had been drawn from the furnace.
-            preservation: not_stated
-            quench_direction: not_stated
-            locator:
-              page: 3
-              pdf_page_index: 2
-              published_page: 2
-              section: Samples and experimental methods
-      regime: quench_equilibration
-      quench_statement: *id096
   Cl:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_cl
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id097
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: Cl
-        note: Table 1 row P9, column Cl.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id098
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id097
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id097
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Cl
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: Cl
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: Cl
-          row_as_printed: P9
-          value_as_published: '0.81'
-          value: '0.81'
-          point_conditions: *id098
     - observation_id: volovetsky_2010_table1_p9_n2_cl
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -2131,50 +1243,6 @@ species:
       quench_statement: *id104
   ZrO2:
     observations:
-    - observation_id: volovetsky_2010_table1_p9_zro2
-      experiment: volo2010_table1_p9
-      type: equilibrium_phase_composition
-      locator: &id105
-        page: 3
-        pdf_page_index: 2
-        published_page: 2
-        table: '1'
-        row: P9
-        column: ZrO2
-        note: Table 1 row P9, column ZrO2.
-      phase: glass
-      units: '%'
-      uncertainty:
-        note: No component uncertainty is printed.
-      point_conditions: &id106
-        T_C:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no temperature.
-          locator: *id105
-        fO2_log:
-          state:
-            tag: unknown
-            reason: Table 1 marks this row as the initial sample and prints no oxygen fugacity.
-          locator: *id105
-          units: bar
-          note: The article reports oxygen fugacity in bars; the table prints log(fO2).
-      values:
-        quantity: equilibrium_phase_composition
-        formula: ZrO2
-        basis_as_published: Chemical composition, percent; the table does not state mass or mole basis.
-        component_as_published: ZrO2
-        method_class: measured_direct
-        admission_status: admitted
-        method_as_printed: Electron microprobe analysis of starting materials and obtained samples.
-        points:
-        - sample: P9
-          sample_material_as_published: pantellerite glass, initial sample
-          species_as_printed: ZrO2
-          row_as_printed: P9
-          value_as_published: '0.33'
-          value: '0.33'
-          point_conditions: *id106
     - observation_id: volovetsky_2010_table1_p9_n2_zro2
       experiment: volo2010_table1_p9_n2
       type: equilibrium_phase_composition
@@ -2359,6 +1427,57 @@ species:
           CaO: '1.55'
           Na2O: '2.06'
           K2O: '3.77'
+    - observation_id: volovetsky_2010_table1_p9_composition_repeated_in_2012
+      type: context_only
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2
+        table: '1'
+        row: P9
+      units: '%'
+      values:
+        quantity_as_printed: electron-microprobe chemical composition
+        method_class: measured_direct
+        duplicate_of_observation_id: volo12_p9_initial_fe_redox
+        note: The initial composition is already carried by the published 2012 observation; retain this 2010 locator without
+          scoring the same analysis twice.
+        components_as_printed:
+          SiO2: '68.28'
+          TiO2: '0.36'
+          Al2O3: '7.39'
+          FeO: '7.82'
+          MnO: '0.31'
+          MgO: '0.07'
+          CaO: '0.34'
+          Na2O: '6.61'
+          K2O: '4.17'
+          Cl: '0.81'
+          ZrO2: '0.33'
+    - observation_id: volovetsky_2010_table1_i2_n15_composition_repeated_in_2012
+      type: context_only
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2
+        table: '1'
+        row: I2-N15
+      units: '%'
+      values:
+        quantity_as_printed: electron-microprobe chemical composition
+        method_class: measured_direct
+        duplicate_of_observation_id: volo12_i2_granite_table1
+        note: The composition is already carried by the published 2012 observation; retain this 2010 locator without
+          scoring the same analysis twice.
+        components_as_printed:
+          SiO2: '73.53'
+          TiO2: '0.06'
+          Al2O3: '14.15'
+          FeO: '2.98'
+          MgO: '0.14'
+          CaO: '1.62'
+          Na2O: '3.76'
+          K2O: '3.87'
     - observation_id: volovetsky_2010_figure1_mossbauer_spectrum_deferred
       type: figure_only
       locator:
