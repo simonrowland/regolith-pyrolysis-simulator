@@ -30,6 +30,7 @@ from simulator.chemistry.kernel import (
     ProviderRegistry,
 )
 from simulator.condensation import KnudsenRegimeRefusal
+from simulator.environment import feedstock_body, feedstock_surface_pressure_mbar
 from simulator.config import load_config_bundle
 from simulator.core import PoisonedHourError, PoisonedHourState
 from simulator.recipe_errors import MalformedRecipeError
@@ -71,7 +72,11 @@ from simulator.optimize.results_store import (
     _json_load,
     _serialize_run_reference,
 )
-from simulator.pumping_cost import MARS_DATUM_AMBIENT_PA, estimate_subambient_pump_cost
+from simulator.pumping_cost import estimate_subambient_pump_cost
+
+MARS_SITE_PRESSURE_PA = feedstock_surface_pressure_mbar(
+    load_config_bundle().feedstocks['mars_global_mgs1']
+) * 100.0
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
 from simulator.runner import RunnerError, _force_builtin_vapor_pressure
@@ -167,6 +172,9 @@ class FakeExecutor:
             raise self.exc
         assert self.execution is not None
         self.config = config
+        fs = config.feedstocks[config.feedstock_id]
+        self.execution.simulator.melt.body = feedstock_body(fs)
+        self.execution.simulator.melt.ambient_pressure_mbar = feedstock_surface_pressure_mbar(fs)
         return self.execution
 
 
@@ -245,7 +253,7 @@ class _Sim:
             total_hours=1,
         )
         self.energy_electrical_plus_evaporation_cumulative_kWh = 44.0
-        self.melt = SimpleNamespace(hour=1)
+        self.melt = SimpleNamespace(hour=1, body="", ambient_pressure_mbar=0.0)
         self._last_backend_diagnostics = backend_diagnostics or {}
         self._freeze_curve = freeze_curve
         self.kernel_curve_requests: list[dict[str, object]] = []
@@ -504,7 +512,7 @@ def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal() -> None:
         target_pressure_pa=1.0e-4,  # 1e-9 bar deep-vacuum point
         offgas_mol_per_s=0.02,
         duration_s=7.0 * 3600.0,
-        ambient_pressure_pa=MARS_DATUM_AMBIENT_PA,
+        ambient_pressure_pa=MARS_SITE_PRESSURE_PA,
         gas_temperature_K=1500.0,
     )
     execution.simulator.record.cost_rollup = {
@@ -513,7 +521,7 @@ def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal() -> None:
             "status": "pumping_feasibility_unresolved",
             "feedstock_id": "mars_global_mgs1",
             "body": "mars",
-            "ambient_pressure_pa": MARS_DATUM_AMBIENT_PA,
+            "ambient_pressure_pa": MARS_SITE_PRESSURE_PA,
             "pumping_electrical_kWh": deep.energy_kWh,
             "feasible": None,
             "rows": [
@@ -555,7 +563,7 @@ def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal() -> None:
     assert proposal["requires_full_recipe_species_re_evaluation"] is True
     assert proposal["rows"][0]["requested_target_pressure_pa"] == pytest.approx(1.0e-4)
     assert proposal["rows"][0]["proposed_target_pressure_pa"] == pytest.approx(
-        MARS_DATUM_AMBIENT_PA
+        MARS_SITE_PRESSURE_PA
     )
     assert proposal["rows"][0]["pumping_cost_evidence"]["regime"] == "vent-free"
     assert proposal["rows"][0]["pumping_cost_evidence"]["energy_kWh"] == 0.0
@@ -565,7 +573,7 @@ def test_sc67_pressure_proposal_reports_mixed_failing_rows_as_partial() -> None:
     proposal = evaluate_module._pumping_pressure_proposal(
         {
             "body": "mars",
-            "ambient_pressure_pa": MARS_DATUM_AMBIENT_PA,
+            "ambient_pressure_pa": MARS_SITE_PRESSURE_PA,
             "rows": [
                 {
                     "hour": 1,
@@ -656,12 +664,23 @@ def test_missing_pumping_rollup_recomputes_and_refuses_subambient_flow() -> None
     margin = result.feasibility_margins["pumping_feasibility"]
     evidence = margin.status_payload["pumping_cost_evidence"]
     assert evidence["evidence_source"] == "evaluate-recomputed-missing-rollup"
-    assert evidence["status"] == "pumping_feasibility_unresolved"
-    assert evidence["rows"][0]["target_pressure_pa"] == pytest.approx(1.0e-4)
+    assert evidence["status"] == "refused"
+    assert evidence["reason"] == "missing-process-pressure"
 
 
 def test_missing_pumping_rollup_certified_energy_reaches_objective() -> None:
+    from simulator.pumping_cost import process_pressure_state
+    pumping = dict(inlet_temperature_K=300.0, max_pump_speed_m3_s=100.0,
+                   validated_line_conductance_m3_s=1.0)
+    pressure = process_pressure_state(
+        requested_pressure_pa=500.0, ambient_pressure_pa=MARS_SITE_PRESSURE_PA,
+        chamber_mol_per_s=0.02, chamber_temperature_K=500.0, pumping=pumping,
+    )
+    # This synthetic test specifies a steady flow, unlike hourly run samples.
+    pressure.pop('transient_feasibility')
+    pressure.update(pumping=pumping, device_mol_per_s=0.01)
     pumping_snapshot = SimpleNamespace(
+        oxygen_reservoir={"process_pressure": pressure},
         hour=1,
         temperature_C=300.0,
         overhead=SimpleNamespace(
@@ -683,8 +702,9 @@ def test_missing_pumping_rollup_certified_energy_reaches_objective() -> None:
         target_pressure_pa=500.0,
         offgas_mol_per_s=0.01,
         duration_s=3600.0,
-        ambient_pressure_pa=MARS_DATUM_AMBIENT_PA,
+        ambient_pressure_pa=MARS_SITE_PRESSURE_PA,
         gas_temperature_K=300.0,
+        max_pump_speed_m3_s=100.0,
         validated_line_conductance_m3_s=1.0,
     )
 
@@ -702,6 +722,22 @@ def test_missing_pumping_rollup_certified_energy_reaches_objective() -> None:
         ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
     ] == pytest.approx(44.0 + expected.energy_kWh)
     assert not hasattr(execution.simulator.record, "cost_rollup")
+
+
+@pytest.mark.parametrize('device_rate', [0.0, 0.01])
+def test_pumping_recheck_retains_hardware_and_independent_chamber_load(device_rate):
+    from simulator.cost_ledger import run_pumping_input_cost
+    _, diagnostic = run_pumping_input_cost({
+        'status': 'ok', 'body': 'mars', 'ambient_pressure_pa': 600.0,
+        'rows': [{
+            'hour': 1, 'target_pressure_pa': 500.0, 'duration_s': 3600.0,
+            'offgas_mol_per_s': device_rate, 'gas_temperature_K': 300.0,
+            'chamber_mol_per_s': 0.02, 'chamber_temperature_K': 1800.0,
+            'max_pump_speed_m3_s': 1000.0,
+            'validated_line_conductance_m3_s': 1000.0,
+        }],
+    })
+    assert evaluate_module._pumping_diagnostic_is_certified_pass(diagnostic)
 
 
 def test_malformed_ok_pumping_diagnostic_fails_closed() -> None:
@@ -731,7 +767,7 @@ def test_malformed_ok_pumping_diagnostic_fails_closed() -> None:
             "pumping_diagnostic": {
                 "feedstock_id": "mars_global_mgs1",
                 "body": "mars",
-                "ambient_pressure_pa": MARS_DATUM_AMBIENT_PA,
+                "ambient_pressure_pa": MARS_SITE_PRESSURE_PA,
                 **diagnostic,
             }
         }

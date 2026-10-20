@@ -151,7 +151,7 @@ class EquilibriumMixin:
             declaration = str(getattr(self.melt, 'ambient_atmosphere', '') or '')
             total_bar = float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0) / 1000.0
             if normalize_body_name(getattr(self.melt, 'body', '')) == 'mars':
-                total_bar = max(total_bar, self._vacuum_floor_bar())
+                total_bar = float(self.melt.p_total_mbar) / 1000.0
         partials = cover_gas_partial_pressures(declaration, total_bar)
         oxygen_bar = float(ledger_pO2_bar) + partials.get('O2', 0.0)
         co2_bar = partials.get('CO2', 0.0)

@@ -102,9 +102,11 @@ class CampaignPressureSetpointRefusal(ValueError):
     """
 
     reason = C2A_STAGED_PN2_BAND_REFUSAL_REASON
+    terminal_refusal = True
 
     def __init__(self, diagnostic: Mapping[str, object]):
         self.diagnostic = dict(diagnostic)
+        self.reason = str(self.diagnostic.get('reason') or self.reason)
         detail = self.diagnostic.get('detail')
         super().__init__(
             f'{self.reason}: {detail}' if detail else self.reason

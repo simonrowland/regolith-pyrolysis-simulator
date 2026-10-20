@@ -17,7 +17,6 @@ from simulator.pumping_cost import (
     estimate_subambient_pump_cost,
     pumping_context_from_sim,
     pumping_cost_parameters,
-    pumping_environment_for_feedstock,
 )
 
 
@@ -34,60 +33,17 @@ def test_moon_vent_free_zero_cost():
     assert r.feasible is True
 
 
-@pytest.mark.parametrize(
-    ("feedstock_id", "body", "ambient_pressure_pa"),
-    (
-        ("lunar_mare_low_ti", "moon", MOON_AMBIENT_PA),
-        ("s_type_asteroid_silicate", "asteroid", ASTEROID_AMBIENT_PA),
-        ("mars_global_mgs1", "mars", MARS_DATUM_AMBIENT_PA),
-    ),
-)
-def test_pumping_feedstock_map_resolves_body_and_ambient(
-    feedstock_id,
-    body,
-    ambient_pressure_pa,
-):
-    environment = pumping_environment_for_feedstock(feedstock_id)
-    assert environment["status"] == "ok"
-    assert environment["body"] == body
-    assert environment["ambient_pressure_pa"] == pytest.approx(ambient_pressure_pa)
-
-    context = pumping_context_from_sim(
-        SimpleNamespace(
-            record=SimpleNamespace(feedstock_key=feedstock_id),
-            # The pumping-only feedstock map is authoritative; it does not
-            # mutate the chemistry environment on melt.
-            melt=SimpleNamespace(body="", ambient_pressure_mbar=0.0),
-        ),
-        (),
-    )
+@pytest.mark.parametrize("feedstock_id", ["mars_basalt", "unmapped_future_feedstock"])
+def test_pumping_uses_resolved_environment_instead_of_origin(feedstock_id):
+    context = pumping_context_from_sim(SimpleNamespace(
+        record=SimpleNamespace(feedstock_key=feedstock_id),
+        melt=SimpleNamespace(body="moon", ambient_pressure_mbar=0.0),
+    ), ())
     assert context["status"] == "ok"
-    assert context["body"] == body
-    assert context["ambient_pressure_pa"] == pytest.approx(ambient_pressure_pa)
-    assert context["ambient_pressure_source"].startswith("pumping-feedstock-map-v1:")
+    assert context["body"] == "moon"
+    assert context["ambient_pressure_pa"] == 0.0
+    assert context["ambient_pressure_source"] == "melt.ambient_pressure_mbar"
 
-
-def test_pumping_feedstock_map_refuses_unknown_feedstock():
-    context = pumping_context_from_sim(
-        SimpleNamespace(
-            record=SimpleNamespace(feedstock_key="unmapped_future_feedstock"),
-            melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
-        ),
-        (),
-    )
-    assert context["status"] == "refused"
-    assert context["reason"] == "unsupported-feedstock"
-    assert context["feedstock_id"] == "unmapped_future_feedstock"
-
-
-def test_pumping_feedstock_map_covers_every_configured_feedstock():
-    feedstocks = load_config_bundle().feedstocks
-    refused = [
-        feedstock_id
-        for feedstock_id in feedstocks
-        if pumping_environment_for_feedstock(feedstock_id)["status"] != "ok"
-    ]
-    assert refused == []
 
 
 def test_mars_at_or_above_ambient_is_free():
@@ -430,165 +386,42 @@ def test_pumping_context_refuses_missing_ambient_pressure_instead_of_body_defaul
     assert context["rows"] == ()
 
 
-def test_pumping_context_refuses_missing_target_pressure():
-    context = pumping_context_from_sim(
-        SimpleNamespace(
-            melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
-        ),
-        (
-            SimpleNamespace(
-                hour=7,
-                temperature_C=500.0,
-                overhead=SimpleNamespace(headspace_temperature_K=773.15),
-                O2_vented_mol_hr=2.0,
-                melt_offgas_O2_mol_hr=10.0,
-                mre_anode_O2_mol_hr=4.0,
-            ),
-        ),
-    )
-
+@pytest.mark.parametrize("vented", [0.0, 2.0, -1.0, None])
+def test_pumping_context_needs_total_process_load_even_without_vented_o2(vented):
+    context = pumping_context_from_sim(SimpleNamespace(
+        melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
+    ), (SimpleNamespace(hour=7, O2_vented_mol_hr=vented),))
     assert context["status"] == "refused"
-    assert context["reason"] == "missing-target-pressure"
-    assert context["hour"] == 7
+    assert context["reason"] == "missing-process-pressure"
     assert context["rows"] == ()
 
 
-def test_pumping_context_skips_missing_target_when_vented_flow_is_zero():
-    context = pumping_context_from_sim(
-        SimpleNamespace(
-            melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
-        ),
-        (
-            SimpleNamespace(
-                hour=8,
-                overhead=SimpleNamespace(headspace_temperature_K=773.15),
-                O2_vented_mol_hr=0.0,
-            ),
-        ),
+def test_pumping_context_prices_device_stream_at_declared_inlet_temperature():
+    from simulator.pumping_cost import process_pressure_state
+    pumping = dict(inlet_temperature_K=300.0, max_pump_speed_m3_s=1000.0,
+                   validated_line_conductance_m3_s=1000.0)
+    pressure = process_pressure_state(
+        requested_pressure_pa=100.0, ambient_pressure_pa=610.0,
+        chamber_mol_per_s=0.02, chamber_temperature_K=1800.0, pumping=pumping,
     )
-
-    assert context["status"] == "ok"
-    assert context["rows"] == ()
-
-
-def test_pumping_context_refuses_negative_vented_flow_before_target_pressure():
-    context = pumping_context_from_sim(
-        SimpleNamespace(
-            melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
-        ),
-        (
-            SimpleNamespace(
-                hour=9,
-                overhead=SimpleNamespace(headspace_temperature_K=773.15),
-                O2_vented_mol_hr=-1.0,
-            ),
-        ),
+    pressure.update(pumping=pumping, device_mol_per_s=0.01)
+    context = pumping_context_from_sim(SimpleNamespace(
+        melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
+    ), (SimpleNamespace(hour=1, oxygen_reservoir={"process_pressure": pressure}),))
+    row = context["rows"][0]
+    assert row["gas_temperature_K"] == 300.0
+    assert row["chamber_temperature_K"] == 1800.0
+    assert row["offgas_mol_per_s"] == 0.01
+    assert row["chamber_mol_per_s"] == 0.02
+    assert row["max_pump_speed_m3_s"] == 1000.0
+    cost, diagnostic = run_pumping_input_cost(context)
+    assert diagnostic["feasible"] is None
+    expected = estimate_subambient_pump_cost(
+        100.0, 0.01, 3600.0, ambient_pressure_pa=610.0,
+        gas_temperature_K=300.0, max_pump_speed_m3_s=1000.0,
+        validated_line_conductance_m3_s=1000.0,
     )
-
-    assert context["status"] == "refused"
-    assert context["reason"] == "invalid-o2-vented-flow"
-    assert context["hour"] == 9
-
-
-def test_pumping_context_refuses_a_snapshot_missing_the_vented_flow_field():
-    """An ABSENT field is not a zero flow.
-
-    The sibling above covers an invalid VALUE. This covers a missing FIELD,
-    which used to default to 0.0 and was therefore indistinguishable from a
-    genuine zero: the row was skipped silently and the recipe's pumping load --
-    a number the optimizer ranks by -- came out understated. The old code was
-    careful about a bad value and careless about a missing field.
-
-    The reason is asserted BY NAME on purpose. Checking only that the status is
-    not ok would also pass on missing-ambient-pressure and
-    missing-target-pressure, which are different honest refusals reachable from
-    this same call, so the test would survive the defect it names.
-    """
-    context = pumping_context_from_sim(
-        SimpleNamespace(
-            melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
-        ),
-        (
-            SimpleNamespace(
-                hour=9,
-                overhead=SimpleNamespace(headspace_temperature_K=773.15),
-                # O2_vented_mol_hr deliberately absent -- a carrier that is not
-                # a real HourSnapshot, which declares it as a typed float.
-            ),
-        ),
-    )
-
-    assert context["status"] == "refused"
-    assert context["reason"] == "missing-o2-vented-flow"
-    assert context["ambient_pressure_pa"] == pytest.approx(610.0)
-
-
-def test_pumping_context_only_costs_o2_not_already_compressed_by_turbine():
-    snapshot = SimpleNamespace(
-        hour=1,
-        temperature_C=300.0,
-        overhead=SimpleNamespace(
-            pressure_mbar=1.0,
-            headspace_temperature_K=300.0,
-        ),
-        # Melt/offgas O2 takes the turbine path; MRE-anode O2 is credited
-        # directly to its terminal store. Only vented melt/offgas O2 bypasses
-        # turbine compression and belongs in the Mars back-pressure sidecar.
-        melt_offgas_O2_mol_hr=10.0,
-        mre_anode_O2_mol_hr=4.0,
-        O2_vented_mol_hr=2.0,
-    )
-
-    context = pumping_context_from_sim(
-        SimpleNamespace(
-            melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
-        ),
-        (snapshot,),
-    )
-
-    assert context["status"] == "ok"
-    assert context["energy_accounting_policy"] == (
-        "uncompressed_o2_only; turbine-compressed_o2_is_already_charged"
-    )
-    assert len(context["rows"]) == 1
-    assert context["rows"][0]["offgas_mol_per_s"] == pytest.approx(2.0 / 3600.0)
-
-    snapshot.O2_vented_mol_hr = 0.0
-    context = pumping_context_from_sim(
-        SimpleNamespace(
-            melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1),
-        ),
-        (snapshot,),
-    )
-    assert context["rows"] == ()
-
-
-def test_pumping_context_forwards_only_explicit_validated_line_conductance():
-    snapshot = SimpleNamespace(
-        hour=1,
-        temperature_C=300.0,
-        overhead=SimpleNamespace(
-            pressure_mbar=1.0,
-            headspace_temperature_K=300.0,
-            validated_line_conductance_m3_s=1000.0,
-            pipe_conductance_kg_hr=50.0,
-        ),
-        O2_vented_mol_hr=2.0,
-    )
-    context = pumping_context_from_sim(
-        SimpleNamespace(
-            record=SimpleNamespace(feedstock_key="mars_global_mgs1"),
-            melt=SimpleNamespace(body="", ambient_pressure_mbar=0.0),
-        ),
-        (snapshot,),
-    )
-
-    assert context["ambient_pressure_pa"] == pytest.approx(MARS_DATUM_AMBIENT_PA)
-    assert context["rows"][0]["validated_line_conductance_m3_s"] == 1000.0
-    _, diagnostic = run_pumping_input_cost(context)
-    assert diagnostic["status"] == "ok"
-    assert diagnostic["feasible"] is True
-    assert diagnostic["pumping_electrical_kWh"] > 0.0
+    assert cost.electrical_kWh == expected.energy_kWh
 
 
 # --- b-259: a missing offgas rate is not a proven zero -----------------------
