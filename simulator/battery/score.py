@@ -671,27 +671,46 @@ SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE = (
 )
 
 
+def crystalline_sample_detail(
+    phase: Phase | None,
+    *,
+    quantity: Quantity,
+    reason: str,
+) -> dict[str, object] | None:
+    """Detail when ``phase`` is a typed crystal. Otherwise None.
+
+    One owner for both rails. The caller names which phase it read and
+    which reason the refusal carries. Liquid, glass, supercooled liquid,
+    gas, aqueous, and an untyped phase stay on the path.
+    """
+
+    if phase is not Phase.CR:
+        return None
+    return {
+        "reason": reason,
+        "sample_phase": phase.value,
+        "quantity": quantity.value,
+    }
+
+
 def melt_activity_sample_phase_refusal(
     identity: Identity,
 ) -> dict[str, object] | None:
     """Detail when a crystalline sample is not a melt-activity observable.
 
-    ``Phase.CR`` is the solid-solution sample. Unknown, not-applicable,
-    liquid, glass, supercooled liquid, gas, and aqueous are not that
-    statement. ``None`` means score it.
+    ``Phase.CR`` is the solid-solution sample, read from the activity
+    species. Unknown, not-applicable, liquid, glass, supercooled liquid,
+    gas, and aqueous are not that statement. ``None`` means score it.
     """
 
     quantity = quantity_token(identity)
     if quantity not in MELT_ACTIVITY_QUANTITIES:
         return None
-    phase = phase_token(identity.species)
-    if phase is not Phase.CR:
-        return None
-    return {
-        "reason": SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE,
-        "sample_phase": phase.value,
-        "quantity": quantity.value,
-    }
+    return crystalline_sample_detail(
+        phase_token(identity.species),
+        quantity=quantity,
+        reason=SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE,
+    )
 
 
 def _sample_phase_not_observable_prediction(
