@@ -13,6 +13,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import (
     ElectrolysisModel,
     MRECurrentPartitionRefusal,
+    MREElectrolysisInvalidInput,
     MREElectrolysisRefusal,
     MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
@@ -330,16 +331,18 @@ def test_step_hour_zero_current_and_voltage_remain_idle():
 
 
 def test_step_hour_refuses_nonfinite_faraday_extent():
-    result = _legacy_model().step_hour(
-        MeltState(composition_kg={"FeO": 1.0}),
-        voltage_V=5.0,
-        current_A=1e308,
-        T_C=1600.0,
-    )
+    with pytest.raises(MREElectrolysisInvalidInput) as refusal:
+        _legacy_model().step_hour(
+            MeltState(composition_kg={"FeO": 1.0}),
+            voltage_V=5.0,
+            current_A=1e308,
+            T_C=1600.0,
+        )
 
-    assert result.get("reason_refused") == MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
-    assert "oxides_reduced_kg" not in result
-    assert "energy_kWh" not in result
+    assert isinstance(refusal.value, MREElectrolysisRefusal)
+    assert isinstance(refusal.value, ValueError)
+    assert refusal.value.reason == MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+    assert "current_A" in refusal.value.diagnostic["invalid_controls"]
 
 
 @pytest.mark.parametrize(
