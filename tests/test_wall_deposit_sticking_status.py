@@ -793,15 +793,16 @@ def test_runner_lifespan_report_propagates_empty_deposit_refusal() -> None:
     report = _wall_fouling_lifespan_report(
         per_campaign_by_segment_species_kg={},
         existing_by_segment_species_kg={},
-        wall_deposit_sticking_authority=authority,
+        authority=authority,
     )
 
     assert report["wall_deposit_kg_per_campaign"] is None
     assert report["campaigns_to_resinter"] is None
     assert report["nominal_verdict"] is None
     assert report["authoritative_for_resinter"] is False
-    assert report["status_bearing_refusal_count"] == 1
-    assert report["status_reason"] == authority["message"]
+    assert report["refusal"]["reason"] == authority["message"]
+    assert report["refusal"]["authority"] == authority
+    assert report["refusal"]["count"] == 1
 
 
 def test_web_coating_readout_preserves_empty_deposit_refusal_details() -> None:
@@ -826,6 +827,9 @@ def test_web_coating_readout_preserves_empty_deposit_refusal_details() -> None:
         authority["message"] + " (status-bearing refusals: 1)"
     )
     assert readout["status_bearing_refusal_count"] == 1
+    assert readout["refusal"]["reason"] == authority["message"]
+    assert readout["refusal"]["authority"] == authority
+    assert readout["refusal"]["count"] == 1
 
 
 def test_positive_wall_deposit_still_reaches_the_species_bearing_branch():

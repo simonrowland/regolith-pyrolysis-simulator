@@ -149,6 +149,12 @@ def test_harness_keeps_refused_empty_deposit_lifetime_unavailable() -> None:
     total = result.campaigns_to_resinter_total
     assert total.value is None
     assert total.authoritative_for_resinter is False
+    assert total.refusal is not None
+    assert total.refusal["reason"]
+    assert total.refusal["count"] == 1
+    assert total.refusal["authority"]["code"] == (
+        "wall_deposit_saturation_pressure_refused"
+    )
     assert total.notices[-1]["status_bearing_refusal_count"] == 1
     assert total.notices[-1]["wall_saturation_pressure_refused_species"] == (
         "Mg",
