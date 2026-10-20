@@ -10,7 +10,7 @@ The 2002 Doklady paper is a sibling report of the same solid-phase campaign (sam
 
 ## Scored observations
 
-Figure 3 at 1900 K, partial pressures, figure_only. SiO 12 points, Al 11, AlO 6, O 9. Figure 2 panel (b), Al, caption symbol 1 (open squares, 1.19 mol% Al2O3): 6 points.
+Figure 3 at 1900 K, partial pressures, figure_only. SiO 12 points, Al 11, AlO 6, O 9. Figure 2 panel (b), Al: caption symbol 1 (open squares, 1.19 mol% Al2O3) 6 points; caption symbol 2 (filled upright triangle, 3.31 mol% Al2O3) 1 point; caption symbol 4 (filled inverted triangle, 12.84 mol% Al2O3) 1 point.
 
 Figure 3 calibration, labelled ticks only, 600 dpi PDF page 5. The 9.0 tick is the solid stub at y=1367-1371 (five rows of gray 0 across x=2802-2830; the rows above and below are white). Centre y=1369. The 9.5 baseline is the axis stroke at y=1612-1615. Centre y=1613.5. Scale (1613.5-1369)/0.5 = 489 px per log unit. Lower segment: -log = 9.0 + (y-1369)/489. Example: the oxygen marker at mean y=1052.7 reads 9.0+(1052.7-1369)/489 = 8.353, and that is the stored value. Upper segment: the dotted 4.0 line is darkest at y=685, and the same 489 px per log unit is anchored there, -log = 4.0 + (y-685)/489. Example: SiO point 1 at y=733.6 reads 4.099. That is the fidelity pin. The 9.0 data guide at y=1383-1384 is 14 px below the tick and was not used. The horizontal bar at y=1106-1109 is an oxygen-marker cross through the 8.5 label, not a free tick. The 489-scale position of 8.5 is y=1124.5, which is bare axis. That bar was not an anchor. X ticks: y-axis x=2799.5 is 0 mol%, stub x=3230.5 is 20 mol%, so left mol% = (x-2799.5)/21.55. Stub x=3619.5 is 60 mol% and stub x=4347.5 is 100 mol%, so right mol% = 60+(x-3619.5)/18.20. The 80 stub at x=3986.5 is 3 px (0.16 mol%) off that line, inside the half-marker width. Read uncertainty is 16 px = 0.033 dex, or 22 px = 0.045 dex where two markers touch. The old extra 0.03 dex is not applied.
 
@@ -70,6 +70,8 @@ Figure 2 (published p. 1040, PDF page 4), 1200 dpi. Panel frames: x-axes at y=31
 | shornikov_2003_f2b_al_04 | (5682.5, 2914.0) | shornikov_2003_fig2b_al_symbol1 | read: T=1817.5 K, -log 10.123, 1.19 mol% Al2O3, p=7.533556e-11 atm |
 | shornikov_2003_f2b_al_05 | (5805.6, 2767.5) | shornikov_2003_fig2b_al_symbol1 | read: T=1833.0 K, -log 9.832, 1.19 mol% Al2O3, p=1.472313e-10 atm |
 | shornikov_2003_f2b_al_06 | (6581.3, 2165.9) | shornikov_2003_fig2b_al_symbol1 | read: T=1930.5 K, -log 8.638, 1.19 mol% Al2O3, p=2.301442e-09 atm |
+| shornikov_2003_f2b_al_07 | (6618.8, 2259.4) | shornikov_2003_fig2b_al_symbol2 | read: T=1935.3 K, -log 8.824, 3.31 mol% Al2O3, p=1.499685e-09 atm |
+| shornikov_2003_f2b_al_08 | (6746.1, 2302.4) | shornikov_2003_fig2b_al_symbol4 | read: T=1951.3 K, -log 8.909, 12.84 mol% Al2O3, p=1.233105e-09 atm |
 | shornikov_2003_f3_al_01 | (2870.3, 1267.1) | shornikov_2003_fig3_al_1900k | read: T=1900 K, -log 8.792, 3.29 mol% Al2O3, p=1.614359e-09 atm |
 | shornikov_2003_f3_al_02 | (2891.3, 1419.1) | shornikov_2003_fig3_al_1900k | read: T=1900 K, -log 9.102, 4.26 mol% Al2O3, p=7.906786e-10 atm |
 | shornikov_2003_f3_al_03 | (2976.4, 1328.9) | shornikov_2003_fig3_al_1900k | read: T=1900 K, -log 8.918, 8.21 mol% Al2O3, p=1.207814e-09 atm |
@@ -523,4 +525,116 @@ The six read squares are in the stored-point table (shornikov_2003_f2b_al_01 thr
 | H | (5919.7, 10041.9) | 29x30 n=654 | deferred: overlapping, arc-fit needed (t-1380) |
 | H | (5834.6, 10095.6) | 32x32 n=829 | refused: closed interior only (32x32 px, n=829). Symbol class was not confirmed as one legend symbol clear of other ink, so no value was stored. |
 
-Checked against the 600 dpi renders of PDF pages 2, 3, 4, 5, and 6, and against the 1200 dpi render of PDF page 4. Hand corrections are the tick-mark scale (489 px per log unit), the added Al triangle, and the six panel-(b) squares.
+### 2003 Figure 2 filled symbols
+
+Filled components, not the white interiors above. Census on the 1200 dpi page: gray below 90, 8-connected, bbox 14-90 px, area 350-2800, inside the eight panels, enclosed bright hole at most 60 px. That leaves 105 components. Open symbols stay in the interior tables. A component is a legend glyph when it sits in a right-hand stack at x>=7800, in the repeated left-edge bitmap near x=4960-4980, or in an interior key beside the numerals (panel a x≈4213, panel c x≈4186, panel e x≈4153, panel g x≈4680). Solidity below 0.82 is not a plain triangle, diamond, or square. The two panel-(b) triangles are the only filled reads. Their scale is the labelled pair already used for the open squares: 8 at y=1844.5 and 10 at y=2852.0 (503.75 px per log unit), 1800 at x=5543.5 and 2000 at x=7133.5 (7.950 px/K).
+
+| kind | panel | pixel | size | decision |
+|---|---|---|---|---|
+| F | a | (4288.0, 1204.9) | tri_down 60x48 n=1880 sol=1.01 | deferred: overlapping, arc-fit needed (t-1380). A crop of x=4000-4600, y=1080-1500 shows this filled triangle bunched with an open square, open triangles, and a diamond. y=1204 is also 188 px above the labelled 3 tick at y=1392. |
+| F | a | (4214.3, 2018.8) | tri_up 57x50 n=1795 sol=0.99 | refused: legend glyph. Centroid (4214.3, 2018.8) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | a | (2999.5, 2162.2) | tri_up 56x55 n=2014 sol=1.01 | refused: filled upright triangle, area 2014, solidity 1.01. A 72 px crop shows a separate vertical stroke on the left edge, and the temperature numerals were not tied to the bracketing stubs, so no pressure was stored. |
+| F | a | (4978.3, 2214.2) | other 68x60 n=1286 sol=0.42 | refused: legend glyph. Centroid (4978.3, 2214.2) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | a | (4213.0, 2370.7) | tri_down 59x51 n=1904 sol=1.00 | refused: legend glyph. Centroid (4213.0, 2370.7) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | b | (7416.0, 1625.0) | tri_down 60x51 n=1975 sol=1.01 | deferred: overlapping, arc-fit needed (t-1380). The 72 px crop shows the fit line touching the lower-right corner of the triangle. |
+| F | b | (7966.6, 1924.9) | tri_up 60x46 n=1597 sol=1.02 | refused: legend glyph. Centroid (7966.6, 1924.9) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | b | (6618.8, 2259.4) | tri_up 57x50 n=1690 sol=1.03 | read: panel (b) filled upright triangle, caption symbol 2, 3.31 mol% Al2O3. T=1935.3 K, -log 8.824, p=1.499685e-09 atm. See shornikov_2003_f2b_al_07. |
+| F | b | (6746.1, 2302.4) | tri_down 61x52 n=1975 sol=0.99 | read: panel (b) filled inverted triangle, caption symbol 4, 12.84 mol% Al2O3. T=1951.3 K, -log 8.909, p=1.233105e-09 atm. See shornikov_2003_f2b_al_08. |
+| F | b | (7966.3, 2303.5) | tri_down 61x50 n=1935 sol=1.01 | refused: legend glyph. Centroid (7966.3, 2303.5) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | c | (3103.7, 3556.5) | other 64x78 n=1641 sol=0.42 | refused: solidity 0.42, area 1641, bbox 64x78. Not a plain triangle, diamond, or square. |
+| F | c | (4227.7, 3682.7) | tri_down 59x48 n=1868 sol=1.01 | refused: filled inverted triangle, area 1868, solidity 1.01. It sits beside the interior legend column at x≈4186, and was not confirmed as a data marker clear of that key. |
+| F | c | (3990.5, 3917.6) | other 83x57 n=381 sol=0.77 | refused: solidity 0.77, area 381, bbox 83x57. Not a plain triangle, diamond, or square. |
+| F | c | (4186.4, 4486.9) | tri_up 59x50 n=1826 sol=1.00 | refused: legend glyph. Centroid (4186.4, 4486.9) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | c | (4978.3, 4681.2) | other 68x60 n=1286 sol=0.42 | refused: legend glyph. Centroid (4978.3, 4681.2) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | c | (4185.5, 4867.7) | tri_down 61x51 n=1926 sol=1.00 | refused: legend glyph. Centroid (4185.5, 4867.7) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | c | (2092.1, 5088.1) | tri_up 60x51 n=1776 sol=0.98 | refused: filled upright triangle, area 1776, solidity 0.98. It sits left of the first well-cropped temperature stub, and that stub's numeral was not read, so no pressure was stored. |
+| F | d | (7674.4, 3883.3) | tri_down 54x51 n=1844 sol=1.03 | deferred: overlapping, arc-fit needed (t-1380). The 72 px crop shows a second mark in the corner of the inverted triangle. |
+| F | d | (7560.1, 4187.7) | diamond 54x56 n=1601 sol=0.82 | refused: solidity 0.82 on a 54x56 component. Not a clean filled diamond. Symbol 7 (60.00 mol%) is a mullite-alumina sample, and this is a silica-mullite panel. |
+| F | d | (6791.4, 4382.1) | tri_down 61x51 n=2029 sol=0.99 | refused: filled inverted triangle, area 2029, solidity 0.99, 393 px from the next filled component. The temperature numerals on this panel were not read on a single-tick crop, so no pressure was stored. |
+| F | d | (7931.0, 4420.3) | tri_up 59x48 n=1673 sol=0.99 | refused: legend glyph. Centroid (7931.0, 4420.3) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | d | (6482.8, 4625.8) | tri_up 60x62 n=2510 sol=1.00 | refused: blunt rounded top, area 2510 on a 60x62 bbox. A plain caption triangle on this page is about 1600-2000 px. Not symbol 2. |
+| F | d | (7931.3, 4777.1) | tri_down 59x52 n=1920 sol=1.00 | refused: legend glyph. Centroid (7931.3, 4777.1) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | d | (5767.4, 5301.4) | tri_down 59x48 n=1911 sol=1.00 | refused: filled inverted triangle, area 1911, solidity 1.00. y=5301 is 95 px below the labelled 10 tick at y=5206, toward the axis, so a pressure would leave the labelled segment. |
+| F | e | (4221.8, 6087.5) | tri_down 56x50 n=1802 sol=1.01 | refused: filled tri_down, area 1802, solidity 1.01, nearest other filled component 75.5 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | e | (4249.9, 6157.5) | tri_up 57x50 n=1637 sol=0.98 | refused: filled tri_up, area 1637, solidity 0.98, nearest other filled component 75.5 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | e | (3807.9, 6339.9) | diamond 61x54 n=2028 sol=1.02 | refused: filled diamond, area 2028, solidity 1.02, nearest other filled component 312.4 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | e | (3510.9, 6436.6) | diamond 58x57 n=2048 sol=1.01 | refused: filled diamond, area 2048, solidity 1.01, nearest other filled component 312.4 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | e | (3318.4, 6736.6) | diamond 59x54 n=1939 sol=1.02 | refused: filled diamond, area 1939, solidity 1.02, nearest other filled component 356.5 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | e | (4153.5, 6771.1) | tri_up 57x50 n=1694 sol=1.01 | refused: legend glyph. Centroid (4153.5, 6771.1) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | e | (4153.7, 6949.8) | tri_down 57x51 n=1835 sol=1.02 | refused: legend glyph. Centroid (4153.7, 6949.8) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | e | (4983.3, 7002.2) | other 68x60 n=1286 sol=0.42 | refused: legend glyph. Centroid (4983.3, 7002.2) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | e | (2908.6, 7049.4) | square 42x44 n=1775 sol=1.08 | refused: filled square, area 1775, solidity 1.08, nearest other filled component 515.5 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | e | (4983.3, 7085.2) | other 68x60 n=1286 sol=0.42 | refused: legend glyph. Centroid (4983.3, 7085.2) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | e | (4153.6, 7300.1) | diamond 57x54 n=1834 sol=1.01 | refused: legend glyph. Centroid (4153.6, 7300.1) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | e | (2442.0, 7419.8) | square 48x46 n=1825 sol=1.04 | refused: filled square, area 1825, solidity 1.04, nearest other filled component 178.1 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | e | (4152.4, 7474.7) | square 49x46 n=1798 sol=1.03 | refused: legend glyph. Centroid (4152.4, 7474.7) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | e | (2314.8, 7544.5) | diamond 60x55 n=1957 sol=0.99 | refused: filled diamond, area 1957, solidity 0.99, nearest other filled component 178.1 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | e | (1905.6, 7689.3) | diamond 57x56 n=1976 sol=1.01 | refused: filled diamond, area 1976, solidity 1.01, nearest other filled component 434.0 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | e | (4150.3, 7825.9) | square 47x42 n=1868 sol=1.02 | refused: legend glyph. Centroid (4150.3, 7825.9) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | f | (8382.8, 6082.9) | square 44x44 n=1754 sol=1.00 | refused: legend glyph. Centroid (8382.8, 6082.9) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | f | (8380.8, 6538.3) | tri_up 56x46 n=1577 sol=1.01 | refused: legend glyph. Centroid (8380.8, 6538.3) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | f | (8381.0, 6702.5) | tri_down 56x50 n=1884 sol=1.00 | refused: legend glyph. Centroid (8381.0, 6702.5) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | f | (8382.0, 7029.6) | diamond 56x57 n=2025 sol=1.00 | refused: legend glyph. Centroid (8382.0, 7029.6) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | f | (7411.2, 7090.1) | square 56x57 n=2283 sol=0.77 | refused: solidity 0.77, area 2283, bbox 56x57. Not a plain triangle, diamond, or square. |
+| F | f | (8380.4, 7189.4) | square 46x46 n=1663 sol=1.02 | refused: legend glyph. Centroid (8380.4, 7189.4) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | f | (7151.7, 7242.8) | square 58x56 n=2303 sol=0.76 | refused: solidity 0.76, area 2303, bbox 58x56. Not a plain triangle, diamond, or square. |
+| F | f | (6162.0, 7266.0) | diamond 54x61 n=2266 sol=0.75 | refused: solidity 0.75, area 2266, bbox 54x61. Not a plain triangle, diamond, or square. |
+| F | f | (6674.1, 7283.0) | diamond 57x56 n=1939 sol=1.01 | refused: filled diamond, area 1939, solidity 1.01, nearest other filled component 163.6 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | f | (6776.4, 7410.6) | square 56x57 n=2363 sol=0.79 | refused: solidity 0.79, area 2363, bbox 56x57. Not a plain triangle, diamond, or square. |
+| F | f | (6172.0, 7438.6) | diamond 54x54 n=1819 sol=0.99 | refused: filled diamond, area 1819, solidity 0.99, nearest other filled component 172.9 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | f | (5901.4, 7458.4) | square 54x61 n=2274 sol=0.75 | refused: solidity 0.75, area 2274, bbox 54x61. Not a plain triangle, diamond, or square. |
+| F | f | (8380.4, 7512.2) | square 46x45 n=2033 sol=1.04 | refused: legend glyph. Centroid (8380.4, 7512.2) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | f | (6425.9, 7623.2) | square 59x61 n=2372 sol=0.75 | refused: solidity 0.75, area 2372, bbox 59x61. Not a plain triangle, diamond, or square. |
+| F | f | (5982.5, 7746.2) | diamond 57x56 n=1936 sol=1.01 | refused: filled diamond, area 1936, solidity 1.01, nearest other filled component 265.0 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | f | (5717.8, 7760.3) | square 48x44 n=2007 sol=1.03 | refused: filled square, area 2007, solidity 1.03, nearest other filled component 265.0 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | f | (8380.2, 7842.9) | square 56x55 n=2151 sol=0.76 | refused: legend glyph. Centroid (8380.2, 7842.9) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | f | (5336.2, 7853.3) | square 55x56 n=2227 sol=0.78 | refused: solidity 0.78, area 2227, bbox 55x56. Not a plain triangle, diamond, or square. |
+| F | f | (5336.6, 7930.1) | square 55x52 n=2421 sol=0.88 | refused: filled square, area 2421, solidity 0.88, nearest other filled component 76.8 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | f | (8379.3, 8009.1) | square 56x61 n=2317 sol=0.75 | refused: legend glyph. Centroid (8379.3, 8009.1) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | g | (4682.2, 8896.9) | tri_up 58x47 n=1615 sol=0.97 | refused: legend glyph. Centroid (4682.2, 8896.9) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | g | (4682.3, 9075.4) | tri_down 58x48 n=1903 sol=1.01 | refused: legend glyph. Centroid (4682.3, 9075.4) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | g | (4506.7, 9119.7) | square 55x56 n=2342 sol=0.80 | refused: solidity 0.80, area 2342, bbox 55x56. Not a plain triangle, diamond, or square. |
+| F | g | (3764.3, 9130.6) | square 46x46 n=2012 sol=1.03 | refused: filled square, area 2012, solidity 1.03, nearest other filled component 288.6 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | g | (3509.1, 9265.4) | diamond 52x48 n=1909 sol=1.02 | refused: filled diamond, area 1909, solidity 1.02, nearest other filled component 288.6 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | g | (4301.3, 9288.6) | square 58x56 n=2323 sol=0.77 | refused: solidity 0.77, area 2323, bbox 58x56. Not a plain triangle, diamond, or square. |
+| F | g | (3180.5, 9321.1) | square 42x45 n=1876 sol=1.07 | refused: filled square, area 1876, solidity 1.07, nearest other filled component 103.6 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | g | (3093.5, 9377.4) | square 44x42 n=1816 sol=1.04 | refused: filled square, area 1816, solidity 1.04, nearest other filled component 103.6 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | g | (4681.8, 9428.2) | diamond 60x53 n=1976 sol=1.01 | refused: legend glyph. Centroid (4681.8, 9428.2) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | g | (3067.8, 9548.1) | square 50x48 n=2000 sol=1.03 | refused: filled square, area 2000, solidity 1.03, nearest other filled component 172.7 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | g | (4679.3, 9601.9) | square 50x48 n=1825 sol=1.01 | refused: legend glyph. Centroid (4679.3, 9601.9) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | g | (4961.3, 9670.2) | other 68x60 n=1286 sol=0.42 | refused: legend glyph. Centroid (4961.3, 9670.2) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | g | (3806.4, 9682.0) | square 59x57 n=2435 sol=0.78 | refused: solidity 0.78, area 2435, bbox 59x57. Not a plain triangle, diamond, or square. |
+| F | g | (4961.3, 9753.2) | other 68x60 n=1286 sol=0.42 | refused: legend glyph. Centroid (4961.3, 9753.2) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | g | (2748.6, 9755.6) | diamond 57x54 n=1895 sol=1.01 | refused: filled diamond, area 1895, solidity 1.01, nearest other filled component 334.2 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | g | (2414.5, 9762.7) | square 45x46 n=1965 sol=1.04 | refused: filled square, area 1965, solidity 1.04, nearest other filled component 334.2 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | g | (3610.9, 9822.5) | square 58x58 n=2329 sol=0.76 | refused: solidity 0.76, area 2329, bbox 58x58. Not a plain triangle, diamond, or square. |
+| F | g | (3518.8, 9842.3) | square 54x59 n=2360 sol=0.78 | refused: solidity 0.78, area 2360, bbox 54x59. Not a plain triangle, diamond, or square. |
+| F | g | (4679.4, 9953.0) | square 42x45 n=1797 sol=1.03 | refused: legend glyph. Centroid (4679.4, 9953.0) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | g | (3296.7, 10074.1) | square 56x56 n=2245 sol=0.78 | refused: solidity 0.78, area 2245, bbox 56x56. Not a plain triangle, diamond, or square. |
+| F | g | (1831.0, 10305.5) | square 47x44 n=2040 sol=1.04 | refused: filled square, area 2040, solidity 1.04, nearest other filled component 623.5 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | g | (4678.5, 10306.8) | diamond 58x54 n=2193 sol=0.74 | refused: legend glyph. Centroid (4678.5, 10306.8) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | g | (2836.9, 10431.3) | square 61x58 n=2439 sol=0.76 | refused: solidity 0.76, area 2439, bbox 61x58. Not a plain triangle, diamond, or square. |
+| F | g | (4676.7, 10486.1) | square 58x59 n=2345 sol=0.74 | refused: legend glyph. Centroid (4676.7, 10486.1) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | g | (2409.7, 10537.5) | square 55x61 n=2457 sol=0.78 | refused: solidity 0.78, area 2457, bbox 55x61. Not a plain triangle, diamond, or square. |
+| F | h | (8547.4, 8636.1) | tri_up 61x48 n=1727 sol=1.01 | refused: legend glyph. Centroid (8547.4, 8636.1) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | h | (8547.7, 8904.5) | tri_down 59x50 n=1902 sol=0.99 | refused: legend glyph. Centroid (8547.7, 8904.5) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | h | (8298.0, 9054.8) | square 57x57 n=2268 sol=0.76 | refused: legend glyph. Centroid (8298.0, 9054.8) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | h | (8118.3, 9132.4) | square 59x56 n=2333 sol=0.77 | refused: legend glyph. Centroid (8118.3, 9132.4) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | h | (7522.1, 9253.1) | square 57x60 n=2404 sol=0.74 | refused: solidity 0.74, area 2404, bbox 57x60. Not a plain triangle, diamond, or square. |
+| F | h | (8548.5, 9313.8) | diamond 61x52 n=1933 sol=1.00 | refused: legend glyph. Centroid (8548.5, 9313.8) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | h | (7693.8, 9358.6) | square 55x56 n=2241 sol=0.80 | refused: solidity 0.80, area 2241, bbox 55x56. Not a plain triangle, diamond, or square. |
+| F | h | (7036.3, 9425.6) | square 50x50 n=2009 sol=1.03 | refused: filled square, area 2009, solidity 1.03, nearest other filled component 214.6 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | h | (7250.8, 9430.5) | square 61x55 n=2401 sol=0.78 | refused: solidity 0.78, area 2401, bbox 61x55. Not a plain triangle, diamond, or square. |
+| F | h | (8547.3, 9446.6) | diamond 51x48 n=1849 sol=1.01 | refused: legend glyph. Centroid (8547.3, 9446.6) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | h | (7443.0, 9500.9) | square 58x61 n=2334 sol=0.73 | refused: solidity 0.73, area 2334, bbox 58x61. Not a plain triangle, diamond, or square. |
+| F | h | (7952.4, 9555.9) | square 56x61 n=2344 sol=0.75 | refused: legend glyph. Centroid (7952.4, 9555.9) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | h | (7234.3, 9619.9) | square 56x58 n=2335 sol=0.77 | refused: solidity 0.77, area 2335, bbox 56x58. Not a plain triangle, diamond, or square. |
+| F | h | (6855.6, 9646.9) | square 60x59 n=2489 sol=0.75 | refused: solidity 0.75, area 2489, bbox 60x59. Not a plain triangle, diamond, or square. |
+| F | h | (6779.5, 9669.1) | diamond 57x60 n=1817 sol=0.83 | refused: filled diamond, area 1817, solidity 0.83, nearest other filled component 79.3 px. Not confirmed on a tight crop as one caption symbol clear of the fit line and of open symbols, so no pressure was stored. |
+| F | h | (8547.2, 9722.6) | square 42x42 n=1726 sol=1.05 | refused: legend glyph. Centroid (8547.2, 9722.6) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | h | (8549.5, 9993.0) | square 61x56 n=2273 sol=0.71 | refused: legend glyph. Centroid (8549.5, 9993.0) sits in the symbol column beside the printed numerals, off the data trend. |
+| F | h | (6209.9, 10014.4) | square 56x54 n=2367 sol=0.82 | refused: solidity 0.82, area 2367, bbox 56x54. Not a plain triangle, diamond, or square. |
+| F | h | (6210.7, 10079.5) | diamond 58x63 n=2337 sol=0.72 | refused: solidity 0.72, area 2337, bbox 58x63. Not a plain triangle, diamond, or square. |
+| F | h | (8549.3, 10129.8) | square 61x55 n=2299 sol=0.75 | refused: legend glyph. Centroid (8549.3, 10129.8) sits in the symbol column beside the printed numerals, off the data trend. |
+
+Checked against the 600 dpi renders of PDF pages 2, 3, 4, 5, and 6, and against the 1200 dpi render of PDF page 4. Hand corrections are the tick-mark scale (489 px per log unit), the added Al triangle, the six panel-(b) squares, and the two panel-(b) filled triangles. The other 103 filled components are refused or deferred in the filled-symbol table.
