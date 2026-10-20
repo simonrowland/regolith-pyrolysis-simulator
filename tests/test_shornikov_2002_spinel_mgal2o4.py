@@ -2,7 +2,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.migrate import Migrator
+from tests.battery.factories import migrate_one_extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,12 +11,12 @@ EXTRACT = ROOT / "data/literature/extracts/shornikov-2002-spinel-mgal2o4.yaml"
 
 def test_shornikov_2002_spinel_migrates_and_pins_printed_estimates():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    migrator = Migrator(
-        root=ROOT,
+    migrator = migrate_one_extract(
+        ROOT,
+        EXTRACT,
         index={document["source_id"]: dict(document["source"])},
         aliases={},
     )
-    migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
     assert migrator.result.validation is not None

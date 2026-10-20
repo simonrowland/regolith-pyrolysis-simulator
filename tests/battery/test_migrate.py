@@ -1491,8 +1491,7 @@ def test_kor_sulfur_tables_are_typed_refusals_and_keep_24_hour_footnote() -> Non
     assert xxiii["rows"][-1][0] == "8800^2"
     assert xxiii["rows"][-1][-1] == 24
 
-    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
-    migrator._migrate_extract(extract)
+    migrator = F.migrate_one_extract(REPO_ROOT, extract, index=None, aliases={})
     migrator.finalize()
     observations = migrator.result.observations.values()
     table_rows = [obs for obs in observations if "::rows:" in obs.observation_id]
