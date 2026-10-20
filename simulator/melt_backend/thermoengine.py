@@ -328,6 +328,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             Mapping[str, Mapping[str, float]]
         ] = None,
         species_formula_registry: Optional[Mapping[str, object]] = None,
+        redox_mode: Optional[str] = None,
     ) -> EquilibriumResult:
         return super().equilibrate(
             temperature_C=temperature_C,
@@ -337,6 +338,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             composition_mol=composition_mol,
             composition_mol_by_account=composition_mol_by_account,
             species_formula_registry=species_formula_registry,
+            redox_mode=redox_mode,
         )
 
     def _equilibrate_prepared(
