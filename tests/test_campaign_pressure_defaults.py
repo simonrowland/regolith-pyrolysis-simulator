@@ -96,16 +96,24 @@ def test_configure_campaign_pressure_defaults_match_legacy_constants(
     assert melt.atmosphere is atmosphere
 
 
-def test_c4_default_applies_declared_n2_engineering_band():
+@pytest.mark.parametrize(
+    ("campaign", "campaign_name"),
+    [(CampaignPhase.C4, "C4"), (CampaignPhase.C6, "C6")],
+    ids=["C4", "C6"],
+)
+def test_campaign_default_applies_declared_n2_engineering_band(
+    campaign: CampaignPhase,
+    campaign_name: str,
+):
     setpoints = _setpoints()
-    c4 = setpoints["campaigns"]["C4"]
-    bounds = c4["continuum_pressure_bounds"]
+    config = setpoints["campaigns"][campaign_name]
+    bounds = config["continuum_pressure_bounds"]
     melt = MeltState()
 
-    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C4)
+    CampaignManager(setpoints).configure_campaign(melt, campaign)
 
     assert melt.atmosphere is Atmosphere.CONTROLLED_O2
-    assert melt.pO2_mbar == pytest.approx(c4["pO2_mbar_default"])
+    assert melt.pO2_mbar == pytest.approx(config["pO2_mbar_default"])
     assert melt.background_gas_species == bounds["carrier_gas"]
     pN2_mbar = melt.p_total_mbar - melt.pO2_mbar
     minimum_pN2_mbar, maximum_pN2_mbar = bounds["pN2_mbar"]
