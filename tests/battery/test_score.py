@@ -5892,6 +5892,44 @@ def test_crystalline_sample_activity_is_refused_not_a_melt_miss(
         assert direct.execution.call_evidence is None
 
 
+def test_crystalline_malformed_composition_is_invalid_source() -> None:
+    """A malformed activity print stays INVALID_SOURCE on a crystal sample.
+
+    ``run_validity_gates`` does not read that composition. The activity
+    contract does, and its source refusal wins over the phase refusal.
+    The predictor is still not called.
+    """
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        Phase.CR,
+        observation_id="crystal-malformed-composition",
+    )
+    reference = replace(
+        reference,
+        point_conditions={
+            **(reference.point_conditions or {}),
+            "composition": Located(State.unknown("malformed declared amount")),
+        },
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == []
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.INVALID_SOURCE
+    assert residual.refusal.detail["reason"] == RefusalReason.INVALID_SOURCE.value
+    assert residual.refusal.detail.get("reason") != _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+    (gap,) = residual.refusal.detail["gaps"]
+    assert gap["waypoint"] == "normalized_composition"
+    assert gap["reason"] == "unsupported_print_form"
+    assert gap["missing"] == [
+        f"observation[{reference.observation_id}].point_conditions.composition"
+    ]
+
+
 @pytest.mark.parametrize(
     "phase",
     (Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L),
