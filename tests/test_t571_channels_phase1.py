@@ -179,6 +179,22 @@ _T_GRID_K = (1400.0, 1600.0, 1800.0, 2000.0, 2200.0)
 _PO2_GRID_BAR = (1.0e-35, 1.0e-12, 1.0e-9, 1.0e-6, 1.0e-3, 1.0e-1, 1.0, 1.0e3)
 
 
+def test_b984_oxygen_evaluation_consolidation_pin(production_catalog):
+    """Pin the reviewed evaluator before consolidating its oxygen projections."""
+
+    evaluator = production_catalog.evaluator_for("SiO")
+    assert tuple(
+        evaluator.evaluate(1873.15, source_activity=1.0, pO2_bar=oxygen).pressure_pa.hex()
+        for oxygen in (1e-31, 1e-30, 1e-29, 100.0, 1000.0)
+    ) == (
+        "0x1.4b3935311084ep+36",
+        "0x1.4b3935311084ep+36",
+        "0x1.a2f7dddea5af0p+34",
+        "0x1.2a56ee89ef987p-17",
+        "0x1.2a56ee89ef987p-17",
+    )
+
+
 def test_catalog_o2_channel_bit_identity_differential(production_catalog):
     """Every O2-dependent compiled evaluator: legacy kwargs == typed inputs."""
 
