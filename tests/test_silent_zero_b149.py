@@ -628,6 +628,7 @@ def test_internal_analytical_full_catalog_dispatches_active_nasa9_rows() -> None
         composition_wt_pct={"P2O5": 100.0},
         vapor_pressures=VAPOR_PRESSURE_DATA,
     )
+    sim.melt.campaign = SimpleNamespace(name="C0")
 
     result = EquilibriumMixin._internal_analytical_equilibrium(sim)
 
