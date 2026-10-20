@@ -609,7 +609,18 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
     assert all(record["authority_level"] == "extrapolated" for record in records.values())
 
 
-def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None:
+def test_coating_diagnostic_default_output_is_byte_identical_to_golden(
+    monkeypatch, tmp_path
+) -> None:
+    from simulator import engine_local_config
+
+    # This golden covers the runner default without machine-local engine paths.
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: tmp_path / "engines.local.toml",
+    )
+
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
