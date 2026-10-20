@@ -1,0 +1,644 @@
+schema_version: literature_extract.v1
+source_id: rb86-capobianco-navrotsky-1982
+source:
+  citation: >-
+    Capobianco, C. and Navrotsky, A. (1982). Calorimetric evidence for ideal
+    mixing of silicon and germanium in glasses and crystals of sodium feldspar
+    composition. American Mineralogist 67, 718–724.
+  year: 1982
+  doi: null
+  corpus_asset: raw/rb86-capobianco-navrotsky-1982/rb86-capobianco-navrotsky-1982.pdf
+extraction:
+  method: >-
+    MinerU table drafts and emitted Table 1 density cells; all table cells
+    transcribed or reconciled against 600 dpi renders. Table 1 densities are
+    retained in context because the printed g/cm3 unit has no supported
+    conversion to the density token's canonical kg/m3. Tables 2 and 3 are
+    context-only because no store token represents unit-cell lengths/angles or
+    enthalpy of solution. Figures 1–4 are deferred without numeric points.
+  date: '2026-10-19'
+  worker: codex-resume-38721-1792451527
+  provenance_path: text/rb86-capobianco-navrotsky-1982/pdftotext-layout.txt
+  source_note: >-
+    Table 1 is measured glass density, with quoted endmember values. Candidate
+    token: density. The token's canonical unit is kg/m3; the paper prints
+    g/cm3, and the current migrator has no density unit conversion. The
+    source also does not print the density measurement temperature or total
+    pressure. Table 2 reports crystallographic cell lengths and angles, for
+    which no store quantity token fits. Table 3 reports enthalpy of solution;
+    candidate tokens H_minus_H298, delta_fH, partial_molar_enthalpy, and
+    heat_of_fusion do not represent solution enthalpy. Figure 1 repeats Table
+    3 data; Figure 2 plots calculated molar volumes, Figure 3 plots quoted
+    logarithmic viscosity data, and Figure 4 is a calculated phase diagram.
+    No figure points were digitized. The printed melting points and quoted
+    NaAlSi3O8 heat of fusion in the text are typed observations. The
+    calculated NaAlGe3O8 heat of fusion and Kp remain model context because
+    their inputs are not stored as observations.
+review_status: draft
+fidelity_samples:
+  - species: NaAlGe3O8
+    observation_id: rb86_capobianco_1982_ge_albite_melting_point_quoted
+    field: T_C
+    value: '1068'
+    locator:
+      page: 4
+      pdf_page_index: 3
+      published_page: 721
+      section: Experimental comparison of endmember melt viscosities
+  - species: NaAlSi3O8
+    observation_id: rb86_capobianco_1982_si_albite_melting_point_quoted
+    field: T_C
+    value: '1100'
+    locator:
+      page: 4
+      pdf_page_index: 3
+      published_page: 721
+      section: Experimental comparison of endmember melt viscosities
+  - species: NaAlSi3O8
+    observation_id: rb86_capobianco_1982_si_albite_heat_fusion_quoted
+    field: value
+    value: '15.700'
+    locator:
+      page: 5
+      pdf_page_index: 4
+      published_page: 722
+      section: Geochemical implications and conclusions
+species:
+  'NaAl(Ge,Si)3O8':
+    observations: []
+    context:
+      - observation_id: rb86_capobianco_1982_table1_glass_density_context
+        type: measured_table_context
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 719
+          table: '1'
+        phase: glass
+        units: g/cm3
+        values:
+          table_disposition: context-no-token
+          candidate_tokens_considered:
+            - density
+          schema_gap: >-
+            The density token's canonical unit is kg/m3; the printed g/cm3
+            values cannot be migrated without a unit conversion, and no
+            conversion is added in this extraction.
+          method_class: mixed_measured_and_quoted
+          composition_axis_as_printed: mol % NaAlGe3O8
+          system_as_printed: NaAlGe3O8–NaAlSi3O8
+          density_measurement_temperature: not stated
+          density_measurement_pressure: not stated
+          estimated_error_as_printed: ±0.002
+          confidence_level: not stated
+          rows:
+            - sample_id: '0†'
+              mol_percent_NaAlGe3O8: '0'
+              density_g_cm3_as_printed: '2.382'
+              evidence_class: quoted_attributed
+              attribution: Robie et al. (1979)
+            - sample_id: '23.6'
+              mol_percent_NaAlGe3O8: '23.6'
+              density_g_cm3_as_printed: '2.625'
+              evidence_class: measured_direct
+            - sample_id: '49.2'
+              mol_percent_NaAlGe3O8: '49.2'
+              density_g_cm3_as_printed: '2.896'
+              evidence_class: measured_direct
+            - sample_id: '76.0'
+              mol_percent_NaAlGe3O8: '76.0'
+              density_g_cm3_as_printed: '3.143'
+              evidence_class: measured_direct
+            - sample_id: '100.0††'
+              mol_percent_NaAlGe3O8: '100.0'
+              density_g_cm3_as_printed: '3.368'
+              evidence_class: quoted_attributed
+              attribution: Riebling (1966)
+      - observation_id: rb86_capobianco_1982_table2_unit_cell_context
+        type: measured_table_context
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 719
+          table: '2'
+        phase: high-albite solid solution crystals
+        units: a0, b0, c0 in Å; alpha, beta, gamma in degrees
+        values:
+          table_disposition: context-no-token
+          candidate_tokens_considered:
+            - density
+          schema_gap: >-
+            The table reports crystallographic cell lengths and angles; no
+            store token represents these parameters or their derived molar
+            volume.
+          uncertainty_notation: Number in parentheses is the standard error of the last digit.
+          pure_albite_attribution: Borg and Smith (1969)
+          rows:
+            - sample_id: '99.5'
+              mol_percent_NaAlGe3O8: '99.5'
+              a0_A_as_printed: '8.417(3)*'
+              b0_A_as_printed: '13.290(3)'
+              c0_A_as_printed: '7.343(2)'
+              alpha_deg_as_printed: '94.35(2)'
+              beta_deg_as_printed: '116.24(2)'
+              gamma_deg_as_printed: '90.93(2)'
+              evidence_class: measured_direct
+            - sample_id: '74.0'
+              mol_percent_NaAlGe3O8: '74.0'
+              a0_A_as_printed: '8.341(7)'
+              b0_A_as_printed: '13.169(7)'
+              c0_A_as_printed: '7.278(5)'
+              alpha_deg_as_printed: '94.37(7)'
+              beta_deg_as_printed: '116.26(5)'
+              gamma_deg_as_printed: '90.60(5)'
+              evidence_class: measured_direct
+            - sample_id: '47.4'
+              mol_percent_NaAlGe3O8: '47.4'
+              a0_A_as_printed: '8.282(5)'
+              b0_A_as_printed: '13.128(19)'
+              c0_A_as_printed: '7.215(6)'
+              alpha_deg_as_printed: '93.93(15)'
+              beta_deg_as_printed: '116.21(5)'
+              gamma_deg_as_printed: '90.73(8)'
+              evidence_class: measured_direct
+            - sample_id: '23'
+              mol_percent_NaAlGe3O8: '23'
+              a0_A_as_printed: '8.209(1)'
+              b0_A_as_printed: '12.942(1)'
+              c0_A_as_printed: '7.145(1)'
+              alpha_deg_as_printed: '93.67(3)'
+              beta_deg_as_printed: '116.16(2)'
+              gamma_deg_as_printed: '90.21(2)'
+              evidence_class: measured_direct
+            - sample_id: '0*'
+              mol_percent_NaAlGe3O8: '0'
+              a0_A_as_printed: '8.149'
+              b0_A_as_printed: '12.880'
+              c0_A_as_printed: '7.106'
+              alpha_deg_as_printed: '93.37'
+              beta_deg_as_printed: '116.30'
+              gamma_deg_as_printed: '90.28'
+              evidence_class: quoted_attributed
+              attribution: Borg and Smith (1969)
+      - observation_id: rb86_capobianco_1982_table3_enthalpy_solution_context
+        type: measured_table_context
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 720
+          table: '3'
+        phase: glasses and crystals
+        units: kcal/mol
+        values:
+          table_disposition: context-no-token
+          candidate_tokens_considered:
+            - H_minus_H298
+            - delta_fH
+            - partial_molar_enthalpy
+            - heat_of_fusion
+          schema_gap: >-
+            The printed observable is enthalpy of solution in 2PbO·B2O3 at
+            708°C. It is not an enthalpy increment, formation enthalpy,
+            partial molar enthalpy, or heat of fusion.
+          temperature_as_printed: 708°C
+          solvent_as_printed: 2PbO·B2O3
+          error_as_printed: two standard deviations of the mean
+          parenthetical_count_as_printed: number of successful runs
+          composition_axis_as_printed: mol% NaAlGe3O8
+          system_as_printed: NaAlGe3O8–NaAlSi3O8
+          rows:
+            - block: Glasses
+              sample_id: '99.5†'
+              composition_as_printed: 99.5 mol% NaAlGe3O8; silica comprises the remainder
+              delta_H_sol_kcal_mol_as_printed: '−8.497'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.995'
+              successful_runs: 4
+            - block: Glasses
+              sample_id: '84.1'
+              composition_as_printed: 84.1 mol% NaAlGe3O8
+              delta_H_sol_kcal_mol_as_printed: '−6.293'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.360'
+              successful_runs: 5
+            - block: Glasses
+              sample_id: '66.2'
+              composition_as_printed: 66.2 mol% NaAlGe3O8
+              delta_H_sol_kcal_mol_as_printed: '−3.888'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.262'
+              successful_runs: 4
+            - block: Glasses
+              sample_id: '48.2'
+              composition_as_printed: 48.2 mol% NaAlGe3O8
+              delta_H_sol_kcal_mol_as_printed: '−1.538'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.342'
+              successful_runs: 4
+            - block: Glasses
+              sample_id: '30.4'
+              composition_as_printed: 30.4 mol% NaAlGe3O8
+              delta_H_sol_kcal_mol_as_printed: '1.596'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.382'
+              successful_runs: 5
+            - block: Glasses
+              sample_id: '19.8'
+              composition_as_printed: 19.8 mol% NaAlGe3O8
+              delta_H_sol_kcal_mol_as_printed: '3.249'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.488'
+              successful_runs: 4
+            - block: Glasses
+              sample_id: '10.0'
+              composition_as_printed: 10.0 mol% NaAlGe3O8
+              delta_H_sol_kcal_mol_as_printed: '4.289'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.286'
+              successful_runs: 3
+            - block: Glasses
+              sample_id: '0.0'
+              composition_as_printed: 0.0 mol% NaAlGe3O8
+              delta_H_sol_kcal_mol_as_printed: '5.418'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.110'
+              successful_runs: 4
+            - block: Crystals
+              sample_id: '99.5†'
+              composition_as_printed: 99.5 mol% NaAlGe3O8; silica comprises the remainder
+              delta_H_sol_kcal_mol_as_printed: '4.229'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.206'
+              successful_runs: 5
+            - block: Crystals
+              sample_id: '74.0'
+              composition_as_printed: 74.0 mol% NaAlGe3O8
+              delta_H_sol_kcal_mol_as_printed: '7.433'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.158'
+              successful_runs: 5
+            - block: Crystals
+              sample_id: '47.4'
+              composition_as_printed: 47.4 mol% NaAlGe3O8
+              delta_H_sol_kcal_mol_as_printed: '11.006'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.340'
+              successful_runs: 4
+            - block: Crystals
+              sample_id: '23.6'
+              composition_as_printed: 23.6 mol% NaAlGe3O8
+              delta_H_sol_kcal_mol_as_printed: '14.548'
+              uncertainty_two_sd_kcal_mol_as_printed: '0.156'
+              successful_runs: 4
+      - observation_id: rb86_capobianco_1982_table1_figure1_deferred
+        type: figure_record
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 720
+          figure: '1'
+        panel: whole_figure
+        attribution: Authors' glass and crystal solution calorimetry; ideal-mixing lines.
+        units: kcal/mol
+        phase: glasses and crystals
+        values:
+          quantity: unavailable
+          quantity_as_printed: enthalpy of solution
+          species:
+            - NaAlGe3O8
+            - NaAlSi3O8
+          temperature_as_printed: 981 K
+          axes_as_printed:
+            x: mol% NaAlSi3O8
+            y: ΔHsol (kcal/mol)
+          caption: >-
+            Enthalpies of solution of crystals and glasses on the join
+            NaAlGe3O8–NaAlSi3O8 at 981 K. Solid lines represent ideal mixing of
+            endmembers.
+          series:
+            - name: glass enthalpy-of-solution markers
+              marker: triangle
+              marker_count: 8
+              evidence_class: measured_direct
+            - name: crystal enthalpy-of-solution markers
+              marker: circle
+              marker_count: 4
+              evidence_class: measured_direct
+            - name: glass ideal-mixing line
+              marker: line
+              marker_count: 0
+              evidence_class: model_derived
+            - name: crystal ideal-mixing line
+              marker: line
+              marker_count: 0
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
+          schema_gap: No store quantity token represents enthalpy of solution.
+      - observation_id: rb86_capobianco_1982_table2_figure2_deferred
+        type: figure_record
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 720
+          figure: '2'
+        panel: whole_figure
+        attribution: Authors' cell-parameter and heavy-liquid measurements; pure albite from Borg and Smith (1969).
+        units: cm3 as plotted
+        phase: glass and crystals
+        values:
+          quantity: unavailable
+          quantity_as_printed: molar volume
+          species:
+            - NaAlGe3O8
+            - NaAlSi3O8
+          temperature_as_printed: not stated
+          axes_as_printed:
+            x: mol% NaAlGe3O8
+            y: V (cm3)
+          caption: >-
+            Molar volumes of crystals and glasses calculated from X-ray powder
+            diffraction unit-cell refinement and heavy-liquid density
+            measurements, respectively. Solid lines represent ideal mixing of
+            endmembers. Pure albite is from Borg and Smith (1969).
+          series:
+            - name: crystal molar-volume markers
+              marker: circle
+              marker_count: 5
+              evidence_class: measured_reduced
+            - name: glass molar-volume markers
+              marker: square
+              marker_count: 5
+              evidence_class: measured_reduced
+            - name: crystal ideal-mixing line
+              marker: line
+              marker_count: 0
+              evidence_class: model_derived
+            - name: glass ideal-mixing line
+              marker: line
+              marker_count: 0
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
+          schema_gap: No store quantity token represents molar volume.
+      - observation_id: rb86_capobianco_1982_figure3_deferred
+        type: figure_record
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 721
+          figure: '3'
+        panel: whole_figure
+        attribution: Cranmer and Uhlmann (1981); Riebling (1965).
+        units: log10 eta as printed; viscosity units not stated in the figure.
+        phase: network melts
+        values:
+          quantity: viscosity
+          species:
+            - SiO2
+            - GeO2
+            - NaAlSi3O8
+            - NaAlGe3O8
+          temperature_as_printed: reduced temperature Tg/T
+          axes_as_printed:
+            x: Tg/T
+            y: log10 eta
+          caption: >-
+            Viscosity of network materials as a logarithmic function of a
+            reduced temperature parameter. Tg is glass transition temperature
+            for each material. Data for SiO2 (a and b), GeO2, and Si-albite
+            are from Cranmer and Uhlmann (1981); Ge-albite data are from
+            Riebling (1965).
+          series:
+            - name: SiO2 (a)
+              marker: open triangle
+              marker_count: 12
+              attribution: Cranmer and Uhlmann (1981)
+            - name: SiO2 (b)
+              marker: open circle
+              marker_count: 8
+              attribution: Cranmer and Uhlmann (1981)
+            - name: GeO2
+              marker: filled triangle
+              marker_count: 9
+              attribution: Cranmer and Uhlmann (1981)
+            - name: Si-albite
+              marker: square
+              marker_count: 2
+              attribution: Cranmer and Uhlmann (1981)
+            - name: Ge-albite
+              marker: dotted curve
+              marker_count: 0
+              attribution: Riebling (1965)
+          digitisation: deferred to a figure pass
+      - observation_id: rb86_capobianco_1982_figure4_deferred
+        type: figure_record
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 722
+          figure: '4'
+        panel: whole_figure
+        attribution: Authors' calculation using equations (4) and (5).
+        units: °C and atm
+        phase: solid and liquid
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          species:
+            - NaAlGe3O8
+            - NaAlSi3O8
+          total_pressure_as_printed: 1 atm
+          temperature_as_printed: 1070–1100 °C chart ticks; text gives 1068–1100 °C endmembers
+          axes_as_printed:
+            x: X NaAlSi3O8
+            y: T (°C)
+          caption: >-
+            Calculated 1 atm phase diagram of the two-component system
+            NaAlGe3O8–NaAlSi3O8.
+          series:
+            - name: liquidus
+              marker: line
+              marker_count: 0
+              evidence_class: model_derived
+            - name: solidus
+              marker: line
+              marker_count: 0
+              evidence_class: model_derived
+          digitisation: deferred to a figure pass
+      - observation_id: rb86_capobianco_1982_table3_results_text_context
+        type: text_statement_context
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 720
+          section: Results and discussion
+        units: kcal/mol and cal/mol as printed
+        values:
+          method_class: measured_and_quoted_text
+          candidate_tokens_considered:
+            - heat_of_fusion
+            - H_minus_H298
+            - partial_molar_enthalpy
+          schema_gap: >-
+            Enthalpy of vitrification and enthalpy of solution are not
+            represented by these quantity tokens.
+          reported_enthalpy_of_vitrification_albite_kcal_mol: '12.181'
+          prior_enthalpy_of_vitrification_albite_kcal_mol: '12.402'
+          prior_enthalpy_of_vitrification_attribution: Navrotsky et al. (1980)
+          si_albite_glass_prior_heat_of_solution_cal_mol: '4778'
+          si_albite_glass_prior_heat_of_solution_attribution: Navrotsky et al. (1980)
+          present_si_albite_glass_solution_heat_difference_as_printed: about 650 cal/mol higher
+          source_says: >-
+            Glass solution enthalpy varies linearly with mol fraction, implying
+            zero heat of mixing within experimental error; a regular-solution
+            fit gives an interaction parameter smaller than experimental
+            error.
+      - observation_id: rb86_capobianco_1982_viscosity_text_context
+        type: text_statement_context
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 721
+          section: Viscosity comparison
+        units: logarithmic viscosity; unit not stated in this passage
+        values:
+          method_class: quoted_attributed_and_fit
+          candidate_tokens_considered:
+            - viscosity
+          schema_gap: >-
+            The printed values are log10 eta and the passage does not state
+            the viscosity unit. The viscosity token has no logarithmic form.
+          fitted_relation_as_printed: log10 eta = -5.3053 + 12002/T(K)
+          fitted_relation_temperature_range_as_printed: 1240–1460 °C
+          log10_eta_ge_albite_at_1068_C: '3.64'
+          log10_eta_ge_albite_attribution: Riebling (1965)
+          log10_eta_si_albite_at_1100_C: '8.1'
+          log10_eta_si_albite_attribution: Cranmer and Uhlmann (1981)
+      - observation_id: rb86_capobianco_1982_activation_and_bond_energies_context
+        type: text_statement_context
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 721
+          section: Viscosity comparison
+        units: kcal/mol
+        values:
+          method_class: quoted_attributed
+          candidate_tokens_considered:
+            - viscosity
+          schema_gap: No store quantity token represents activation or bond energy.
+          activation_energy_SiO2_range: '120–130'
+          activation_energy_Si_albite: '95'
+          activation_energy_Si_albite_attribution: Cranmer and Uhlmann (1981)
+          activation_energy_Ge_albite_approximate: '~55'
+          activation_energy_Ge_albite_attribution: Riebling (1965)
+          activation_energy_GeO2: '70'
+          activation_energy_GeO2_attribution: Fontana and Plummer (1966)
+          Ge_O_bond_energy: '108'
+          Si_O_bond_energy: '106'
+          Ge_O_and_Si_O_bond_energy_attribution: Kingery et al. (1976)
+      - observation_id: rb86_capobianco_1982_ge_albite_heat_fusion_model_context
+        type: model_result_context
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 722
+          section: Geochemical implications and conclusions
+        phase: NaAlGe3O8 crystal to supercooled liquid
+        units: kcal/mol
+        values:
+          method_class: model_derived
+          candidate_tokens_considered:
+            - heat_of_fusion
+          value_as_printed: '15.820'
+          temperature_as_printed: 1068°C
+          assumption: Difference in heat capacity between liquid and crystal is assumed equal for albite and germanium albite.
+          input_summary: Present-work crystal-to-amorphous transformation enthalpy and Navrotsky et al. (1980) albite heat-of-fusion temperature dependence.
+          schema_gap: Model inputs are not stored as numeric observations in this extract.
+      - observation_id: rb86_capobianco_1982_partition_coefficient_model_context
+        type: model_result_context
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 723
+          section: Geochemical implications and conclusions
+        units: dimensionless and kcal/mol
+        values:
+          method_class: model_derived
+          candidate_tokens_considered:
+            - interaction_parameter
+          schema_gap: No store token represents the Ge/Si crystal-liquid partition coefficient Kp.
+          Kp_as_printed: '0.87 ± 0.05'
+          approximated_equal_heat_of_fusion_as_printed: '~15.76 kcal/mol'
+          sensitivity_as_printed: Assuming ΔCp is 50% greater for Ge-albite lowers Kp by 0.01.
+  NaAlGe3O8:
+    observations:
+      - observation_id: rb86_capobianco_1982_ge_albite_melting_point_quoted
+        type: transition_point
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 721
+          section: Viscosity comparison
+          paragraph: melting points of the crystalline phases
+        phase: cr
+        units: °C
+        point_conditions:
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 721
+              section: Viscosity comparison
+        values:
+          quantity: transition_temperature
+          property_kind: melting_point
+          T_C: '1068'
+          method_class: quoted_attributed
+          attribution: Goldsmith (1950)
+  NaAlSi3O8:
+    observations:
+      - observation_id: rb86_capobianco_1982_si_albite_melting_point_quoted
+        type: transition_point
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 721
+          section: Viscosity comparison
+          paragraph: melting points of the crystalline phases
+        phase: cr
+        units: °C
+        point_conditions:
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 721
+              section: Viscosity comparison
+        values:
+          quantity: transition_temperature
+          property_kind: melting_point
+          T_C: '1100'
+          method_class: quoted_attributed
+          attribution: Boettcher et al. (1982)
+      - observation_id: rb86_capobianco_1982_si_albite_heat_fusion_quoted
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 722
+          section: Geochemical implications and conclusions
+          paragraph: temperature dependence of the heat of fusion
+        phase: cr
+        units: kcal/mol
+        point_conditions:
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 5
+              pdf_page_index: 4
+              published_page: 722
+              section: Geochemical implications and conclusions
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          value: '15.700'
+          T_C: '1100'
+          attribution: Navrotsky et al. (1980)
+          standard_state: Heat of fusion at the printed NaAlSi3O8 melting point.
