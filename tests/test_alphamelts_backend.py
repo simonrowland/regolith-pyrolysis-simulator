@@ -10261,6 +10261,22 @@ def test_live_transport_refuses_below_active_environment_floor(backend_cls, monk
         )
 
 
+def test_core_direct_alphamelts_dispatch_keeps_isothermal(monkeypatch):
+    from functools import wraps
+
+    calls = []
+    equilibrate = AlphaMELTSBackend.equilibrate
+
+    @wraps(equilibrate)
+    def record_call(self, *args, **kwargs):
+        calls.append(kwargs.get('subprocess_run_mode'))
+        return equilibrate(self, *args, **kwargs)
+
+    monkeypatch.setattr(AlphaMELTSBackend, 'equilibrate', record_call)
+    test_live_lunar_transport_input_reaches_vaporock(AlphaMELTSBackend, monkeypatch)
+    assert calls == ['isothermal', None]
+
+
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 @pytest.mark.parametrize('gas_bar', [0.0, -1.0, float('nan'), float('inf')])
 def test_live_transport_refuses_nonpositive_or_nonfinite_oxygen(
