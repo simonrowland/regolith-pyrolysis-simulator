@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import copy
-import os
-import subprocess
 from decimal import Decimal
 from pathlib import Path
 
@@ -61,26 +59,6 @@ def _context_grid(document: dict, observation_id: str, columns: tuple[str, ...])
         tuple(str(row[column]) for column in columns)
         for row in observation["values"]["rows"]
     )
-
-
-def _source_page(page: int) -> str:
-    corpus_root = Path(
-        os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-    )
-    pdf = corpus_root / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
-    if not pdf.is_file():
-        pytest.skip(f"source PDF is absent: {pdf}")
-    result = subprocess.run(
-        ["pdftotext", "-f", str(page), "-l", str(page), "-layout", str(pdf), "-"],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return result.stdout
-
-
-def test_shared_source_page_reader_matches_existing_reader() -> None:
-    assert source_page_text(SOURCE_ID, 3) == _source_page(3)
 
 
 def test_render_transcription_binds_both_printed_tables_and_mutations() -> None:
@@ -166,15 +144,15 @@ def test_isolated_migration_preserves_species_and_every_printed_condition() -> N
 
 
 def test_source_pages_match_each_table_measurement_and_figure_locator() -> None:
-    page3 = _source_page(3)
+    page3 = source_page_text(SOURCE_ID, 3)
     assert "Table 1" in page3 and "Table 2" in page3
-    page4 = _source_page(4)
+    page4 = source_page_text(SOURCE_ID, 4)
     assert "760 ± 25" in page4 and "2433 ± 39" in page4
     assert "quenched in the reduced S-bearing atmosphere" in page4
     for page, figure_numbers in (
         (5, (1, 2)), (6, (3,)), (7, (4,)), (8, (5,)),
         (9, (6,)), (10, (7,)), (11, (8,)), (12, (9,)),
     ):
-        text = _source_page(page)
+        text = source_page_text(SOURCE_ID, page)
         for figure_number in figure_numbers:
             assert f"Fig. {figure_number}" in text
