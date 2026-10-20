@@ -1,0 +1,395 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2023-silica-phosphate-melts
+source:
+  citation: >-
+    Shornikov, S. I., and Slobodov, A. A. (2023). Thermodynamic properties of the
+    SiO2–P4O10 melts. Experiment in Geosciences, 29(1), 57–60.
+  year: 2023
+  corpus_asset: raw/shornikov-2023-silica-phosphate-melts/shornikov-2023-silica-phosphate-melts.pdf
+  corpus_sha256: 4ade54421c85b2dd4c6da588544b0c75c4ff747ad91ef8a1b7c665d0d0051eb5
+extraction:
+  method: >-
+    The PDF is a journal excerpt. This extract is only the SiO2–P4O10 article on
+    published pages 57–60 (PDF pages 3–6). The CaO–P4O10 ending on published page 57
+    and the MgO–P4O10 opening on published page 60 are excluded. No numeric table is
+    printed. Figures were inspected at 600 dpi. Calculated curves have no discrete
+    markers of this study, so no coordinates were read. Cited experimental symbols
+    were not read.
+  date: '2026-10-20'
+  worker: t1372-w2-w6-t1
+review_status: draft
+fidelity_samples:
+  - species: SiO2
+    observable: activity_coefficient
+    observation_id: shornikov_2023_sio2_fig2_curve_1
+    field: method_class
+    value: figure_only
+    locator:
+      page: 5
+      published_page: 59
+      pdf_page_index: 4
+      figure: '2'
+      note: Curve 1 is the calculated SiO2 activity at 1100 K. No point was digitized.
+  - species: SiO2
+    observable: thermodynamic_example
+    observation_id: shornikov_2023_sio2_mixing_minimum_1100
+    field: mixing_energy_kJ_mol
+    value: '-35'
+    locator:
+      page: 5
+      published_page: 59
+      pdf_page_index: 4
+      note: Prose minimum for the SiP2O7 composition.
+experiments:
+  - experiment_id: shornikov-2023-sio2-model
+    kind: thermodynamic_model
+    locator: {page: 4, pdf_page_index: 3, published_page: 58, section: Abstract}
+    method: >-
+      Semi-empirical model, 700–2000 K, described in Shornikov (2019). Oxide
+      activities, mixing energies and partial pressures are calculated. Parents
+      are the cited ΔG° compilations, not printed per point.
+  - experiment_id: shornikov-2023-sio2-cited-points
+    kind: literature
+    locator: {page: 6, pdf_page_index: 5, published_page: 60, figure: '5'}
+    method: >-
+      Symbols on Figs. 4 and 5 are Lopatin and Semenov (1995), Shornikov et al.
+      (1996) and Stolyarova et al. (1990). Rahman et al. (2013) is a compared
+      calculation. They are not measurements of this article.
+species:
+  SiO2:
+    observations:
+    - observation_id: shornikov_2023_sio2_fig2_curve_1
+      type: activity_coefficient
+      experiment: shornikov-2023-sio2-model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 59
+        figure: '2'
+        note: Curve 1. Calculated lg a(SiO2) at 1100 K.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity
+        reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1100'}}
+          locator: {page: 5, pdf_page_index: 4, published_page: 59, figure: '2'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no single mole percent is printed for this line.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 59, figure: '2'}
+      values:
+        quantity: activity
+        T_K: '1100'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+        component: SiO2
+        curve_number: '1'
+        attribution: the present study
+    - observation_id: shornikov_2023_sio2_fig3_curve_1
+      type: activity_coefficient
+      experiment: shornikov-2023-sio2-model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 59
+        figure: '3'
+        panel: A
+        note: Curve 1. Calculated lg a(SiO2) at 1873 K.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity
+        reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1873'}}
+          locator: {page: 5, pdf_page_index: 4, published_page: 59, figure: '3'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no single mole percent is printed for this line.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 59, figure: '3'}
+      values:
+        quantity: activity
+        T_K: '1873'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+        component: SiO2
+        curve_number: '1'
+        attribution: the present study
+    - observation_id: shornikov_2023_sio2_fig5_curve_3
+      type: activity_coefficient
+      experiment: shornikov-2023-sio2-model
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 60
+        figure: '5'
+        panel: A
+        note: Curve 3. Calculated lg a(SiO2) at 2000 K. The blue line has no discrete markers.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity
+        reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '2000'}}
+          locator: {page: 6, pdf_page_index: 5, published_page: 60, figure: '5'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no single mole percent is printed for this line.'}
+          locator: {page: 6, pdf_page_index: 5, published_page: 60, figure: '5'}
+      values:
+        quantity: activity
+        T_K: '2000'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Continuous calculated curve. Color separation at 600 dpi shows no marker
+          on the blue line thicker than the line itself. No numeric points are sampled.
+        component: SiO2
+        curve_number: '3'
+        attribution: the present study
+    context:
+    - observation_id: shornikov_2023_sio2_mixing_minimum_1100
+      type: thermodynamic_example
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 59
+        section: Results
+        figure: '2'
+      values:
+        quantity: minimum mixing energy
+        method_class: quoted_attributed
+        temperature_K: 1100
+        composition: SiP2O7 (2SiO2 · P4O10), as printed
+        mixing_energy_kJ_mol: '-35'
+        sentence_as_published: >-
+          In this case, the minimum mixing energy value for the SiP2O7 composition
+          is reached, equal to –35 kJ/mol.
+        reference_phase: >-
+          Mixing energy in the melt. The article gives ΔG° of SiO2 and P4O10 in both
+          the crystalline and liquid state as model inputs. The reference phase is not stated.
+    - observation_id: shornikov_2023_sio2_mixing_minimum_1873
+      type: thermodynamic_example
+      units: kJ/mol
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 59
+        section: Results
+        figure: '3'
+      values:
+        quantity: minimum mixing energy
+        method_class: quoted_attributed
+        temperature_K: 1873
+        composition: >-
+          The sentence says the position of the minimum is maintained, which is the SiP2O7 composition of the previous sentence.
+        mixing_energy_kJ_mol: '-33'
+        sentence_as_published: >-
+          With an increase in temperature, the position of the minimum mixing energy
+          in the melt is maintained with an increase in the ΔGm value to –33 kJ/mol
+          at 1873 K (Fig. 3).
+        reference_phase: >-
+          Mixing energy in the melt. The reference phase is not stated.
+    - observation_id: shornikov_2023_sio2_fig2_fig3_mixing_curves
+      type: thermodynamic_example
+      units: kJ/mol on Fig. 3B; Fig. 2 also prints a ΔG/RT scale
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 59
+        figure: '2'
+      values:
+        admission_status: refused
+        reason: >-
+          Fig. 2 curves 3 and 4 and Fig. 3B curves 5 and 6 are mixing energies.
+          Curves 3 and 5 are calculated in this study and have no discrete markers.
+          Curves 4 and 6 are Rahman et al. (2013). Fig. 2 prints lg a and a ΔG/RT
+          quantity on one axis, so a kJ/mol reading of curve 3 would not be the
+          printed scale. The prose minima are the stored numbers.
+    - observation_id: shornikov_2023_sio2_fig1_phase_diagram
+      type: thermodynamic_example
+      units: not an activity
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 58
+        figure: '1'
+      values:
+        admission_status: refused
+        reason: >-
+          Fig. 1 is the phase diagram according to Rahman et al. (2013) and Jantzen
+          et al. (2019). Transition temperatures 1380 K, 1480 K and 1561 K are cited
+          from Baret et al. (1991). The 1392 K dissociation is cited from Jantzen et
+          al. (2019). None of these is a measurement of this article. The named
+          silica fields on that diagram are not the activity reference.
+    - observation_id: shornikov_2023_sio2_fig5_cited_series
+      type: thermodynamic_example
+      units: not an SiO2 measurement
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 60
+        figure: '5'
+      values:
+        admission_status: refused
+        reason: >-
+          Fig. 5A curves 1 and 4 and Fig. 5B curve 7, with their red circles, are the
+          ZnO–P4O10 melts at 1300 K from Shornikov et al. (1996). Curves 2, 5 and 8,
+          with their black circles, are the GeO2–P4O10 melts at 1423 K from
+          Stolyarova et al. (1990). Blue curves 3, 6 and 9 are this calculation at
+          2000 K and are continuous. Coordinates were not read.
+    - observation_id: shornikov_2023_sio2_vapor_species
+      type: thermodynamic_example
+      units: not printed as a pressure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 58
+        section: Results
+      values:
+        species_as_printed: >-
+          Si, Si2, Si3, SiO, SiO2, Si2O2, P, P2, P3, P4, PO, PO2, P2O3, P2O4, P2O5,
+          P3O6, P4O6, P4O7, P4O8, P4O9, P4O10, O, O2, O3, O4
+        reason: >-
+          The list is the vapor set used in the equilibrium calculation. No numerical
+          partial pressure is printed in the text.
+  P4O10:
+    observations:
+    - observation_id: shornikov_2023_sio2_fig2_p4o10_curve_2
+      type: activity_coefficient
+      experiment: shornikov-2023-sio2-model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 59
+        figure: '2'
+        note: Curve 2. Calculated lg a(P4O10) at 1100 K.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity
+        reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1100'}}
+          locator: {page: 5, pdf_page_index: 4, published_page: 59, figure: '2'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no single mole percent is printed for this line.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 59, figure: '2'}
+      values:
+        quantity: activity
+        T_K: '1100'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+        component: P4O10
+        curve_number: '2'
+        attribution: the present study
+    - observation_id: shornikov_2023_sio2_fig3_p4o10_curve_3
+      type: activity_coefficient
+      experiment: shornikov-2023-sio2-model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 59
+        figure: '3'
+        panel: A
+        note: Curve 3. Calculated lg a(P4O10) at 1873 K. Curve 4 on the same panel is Rahman et al. (2013).
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity
+        reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1873'}}
+          locator: {page: 5, pdf_page_index: 4, published_page: 59, figure: '3'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no single mole percent is printed for this line.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 59, figure: '3'}
+      values:
+        quantity: activity
+        T_K: '1873'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Curve 3 is a continuous calculated line. Curve 4 is Rahman et al. (2013),
+          also continuous. No numeric points are sampled.
+        component: P4O10
+        curve_number: '3'
+        attribution: the present study for curve 3; Rahman et al. (2013) for curve 4
+    - observation_id: shornikov_2023_sio2_fig5_p4o10_curve_6
+      type: activity_coefficient
+      experiment: shornikov-2023-sio2-model
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 60
+        figure: '5'
+        panel: A
+        note: Curve 6. Calculated lg a(P4O10) in the SiO2–P4O10 melt at 2000 K.
+      phase: l
+      units: dimensionless activity; P4O10 mol% as printed
+      standard_state: >-
+        Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity
+        reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '2000'}}
+          locator: {page: 6, pdf_page_index: 5, published_page: 60, figure: '5'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no single mole percent is printed for this line.'}
+          locator: {page: 6, pdf_page_index: 5, published_page: 60, figure: '5'}
+      values:
+        quantity: activity
+        T_K: '2000'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Blue curve 6 is continuous. The open circles near it are the red series 4
+          and the black series 5, which the caption assigns to Shornikov et al. (1996)
+          and Stolyarova et al. (1990). Those circles were not read.
+        component: P4O10
+        curve_number: '6'
+        attribution: the present study
+    - observation_id: shornikov_2023_sio2_fig4_partial_pressures
+      type: partial_pressure
+      experiment: shornikov-2023-sio2-model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 59
+        figure: '4'
+        note: >-
+          Lines 1, 2 and 4–8 are calculated partial pressures over SiP2O7.
+          Symbol 3 is the Knudsen series of Lopatin and Semenov (1995).
+      phase: g
+      units: atm, as printed on the figure
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: 'Fig. 4 spans about 1300–1500 K. The cited Knudsen range in the text is 1400–1484 K.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 59, figure: '4'}
+        composition:
+          state: {tag: unknown, reason: 'The panel is the compound SiP2O7, not a composition series.'}
+          locator: {page: 5, pdf_page_index: 4, published_page: 59, figure: '4'}
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Lines 1, 2 and 4–8 are continuous calculated curves. Symbol 3 is four
+          overlapping open circles and one error bar on a short line, assigned by
+          the caption to Lopatin and Semenov (1995). No pressure was read.
+        attribution: the present study for lines 1, 2, 4–8; Lopatin and Semenov (1995) for symbol 3
