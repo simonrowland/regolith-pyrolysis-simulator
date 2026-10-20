@@ -1,0 +1,232 @@
+schema_version: literature_extract.v1
+source_id: tranell-1999-unsw-thesis
+source:
+  citation: Tranell, G. M. (1999), Thermodynamics of Slags Containing Titanium, PhD thesis, University of New South Wales.
+  year: 1999
+  corpus_asset: raw/tranell-1999-unsw-thesis/tranell-1999-unsw-thesis.pdf
+extraction:
+  method: MinerU table draft with manual 600 dpi render checks; text checks used pdftotext -layout.
+  date: '2026-10-20'
+  worker: fam22-1020
+review_status: draft
+fidelity_samples:
+- path: species.Si.observations[tranell_1999_table4_2_sample1_gamma_si].values.gamma
+  value: '0.0079'
+  locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: '1'}
+species:
+  Si:
+    observations:
+    - observation_id: tranell_1999_table4_2_si_in_copper_sample1
+      type: equilibrium_phase_composition
+      phase: l
+      phase_as_printed: liquid copper
+      locator:
+        page: 118
+        pdf_page_index: 117
+        published_page: 108
+        table: '4.2'
+        row: '1'
+        column: 'Mole fraction Si, XSi (ppm)'
+      units: mole-fraction ppm as printed
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        basis_as_published: mole fraction of Si in liquid copper, reported in ppm
+        method_as_printed: Silicon was measured in the copper phase after equilibration with pure solid SiO2; the thesis does not state the Table 4.2 assay method.
+        points:
+        - sample: '1'
+          value: '1051'
+          value_as_printed: '1051'
+          T_K: '1873'
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1873'}
+              locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: conditions}
+            oxygen_partial_pressure:
+              value: 10^-12
+              units: atm
+              state: {tag: value, value: 10^-12}
+              locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: conditions}
+          locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: '1', column: 'Mole fraction Si, XSi (ppm)'}
+    - observation_id: tranell_1999_table4_2_si_in_copper_sample2
+      type: equilibrium_phase_composition
+      phase: l
+      phase_as_printed: liquid copper
+      locator:
+        page: 118
+        pdf_page_index: 117
+        published_page: 108
+        table: '4.2'
+        row: '2'
+        column: 'Mole fraction Si, XSi (ppm)'
+      units: mole-fraction ppm as printed
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        basis_as_published: mole fraction of Si in liquid copper, reported in ppm
+        method_as_printed: Silicon was measured in the copper phase after equilibration with pure solid SiO2; the thesis does not state the Table 4.2 assay method.
+        points:
+        - sample: '2'
+          value: '1602'
+          value_as_printed: '1602'
+          T_K: '1873'
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1873'}
+              locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: conditions}
+            oxygen_partial_pressure:
+              value: 10^-12
+              units: atm
+              state: {tag: value, value: 10^-12}
+              locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: conditions}
+          locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: '2', column: 'Mole fraction Si, XSi (ppm)'}
+    - observation_id: tranell_1999_table4_2_sample1_gamma_si
+      type: activity_coefficient
+      phase: l
+      phase_as_printed: liquid copper
+      locator:
+        page: 118
+        pdf_page_index: 117
+        published_page: 108
+        table: '4.2'
+        row: '1'
+        column: gamma Si
+        note: Table 4.2; pure solid SiO2 was equilibrated with liquid copper at the printed conditions.
+      units: dimensionless activity coefficient
+      standard_state:
+        state:
+          tag: unknown
+          reason: The thesis denotes gamma Si with a superscript circle but does not name a Raoultian or Henrian concentration basis.
+        inferred: false
+        locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2'}
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1873'}
+          locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: conditions}
+        oxygen_partial_pressure:
+          value: 10^-12
+          units: atm
+          state: {tag: value, value: 10^-12}
+          locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: conditions}
+        composition:
+          state: {tag: unknown, reason: The table reports Si concentration in liquid copper but no complete alloy composition.}
+          locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: '1'}
+      values:
+        quantity: activity_coefficient
+        T_K: '1873'
+        gamma: '0.0079'
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        method_as_printed: Silicon activity coefficient calculated from measured silicon in copper using thermodynamic data for Eq. (4.10), with pure solid SiO2 equilibrated against liquid copper.
+        standard_state_as_printed: gamma Si with a superscript circle; concentration reference basis not specified.
+        derived_from: [tranell_1999_table4_2_si_in_copper_sample1]
+        derivation:
+          relation: Calculated from the measured silicon mole fraction in liquid copper and thermodynamic data for Eq. (4.10) under the stated pure-solid SiO2 and oxygen-pressure conditions.
+          inputs: [tranell_1999_table4_2_si_in_copper_sample1]
+          output_unit: dimensionless activity coefficient
+        sample_as_printed: '1'
+        silicon_mole_fraction_ppm_as_printed: '1051'
+        composition_as_printed: liquid copper with measured silicon; pure solid SiO2 reference phase
+    - observation_id: tranell_1999_table4_2_sample2_gamma_si
+      type: activity_coefficient
+      phase: l
+      phase_as_printed: liquid copper
+      locator:
+        page: 118
+        pdf_page_index: 117
+        published_page: 108
+        table: '4.2'
+        row: '2'
+        column: gamma Si
+        note: Table 4.2; pure solid SiO2 was equilibrated with liquid copper at the printed conditions.
+      units: dimensionless activity coefficient
+      standard_state:
+        state:
+          tag: unknown
+          reason: The thesis denotes gamma Si with a superscript circle but does not name a Raoultian or Henrian concentration basis.
+        inferred: false
+        locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2'}
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1873'}
+          locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: conditions}
+        oxygen_partial_pressure:
+          value: 10^-12
+          units: atm
+          state: {tag: value, value: 10^-12}
+          locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: conditions}
+        composition:
+          state: {tag: unknown, reason: The table reports Si concentration in liquid copper but no complete alloy composition.}
+          locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2', row: '2'}
+      values:
+        quantity: activity_coefficient
+        T_K: '1873'
+        gamma: '0.0148'
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        method_as_printed: Silicon activity coefficient calculated from measured silicon in copper using thermodynamic data for Eq. (4.10), with pure solid SiO2 equilibrated against liquid copper.
+        standard_state_as_printed: gamma Si with a superscript circle; concentration reference basis not specified.
+        derived_from: [tranell_1999_table4_2_si_in_copper_sample2]
+        derivation:
+          relation: Calculated from the measured silicon mole fraction in liquid copper and thermodynamic data for Eq. (4.10) under the stated pure-solid SiO2 and oxygen-pressure conditions.
+          inputs: [tranell_1999_table4_2_si_in_copper_sample2]
+          output_unit: dimensionless activity coefficient
+        sample_as_printed: '2'
+        silicon_mole_fraction_ppm_as_printed: '1602'
+        composition_as_printed: liquid copper with measured silicon; pure solid SiO2 reference phase
+  Ti:
+    observations: []
+    context:
+    - observation_id: tranell_1999_appendix_a6_a8_duplicate_of_tranell_2000_tables_ii_iv
+      type: source_table_note
+      units: not applicable; duplicate locators only
+      locator:
+        page: 204
+        pdf_page_index: 203
+        published_page: 194
+        table: A6
+        note: Tables A6-A8 in the thesis reproduce the data in Tranell et al. (2000), Tables II-IV, published pages 5-7 (physical PDF pages 17-19); do not create second observations.
+      values:
+        quantity: duplicate_table_record
+        duplicate_source_id: tranell-2000-silica-activity-titanium
+        duplicate_locators:
+        - {page: 17, pdf_page_index: 16, published_page: 5, table: II}
+        - {page: 18, pdf_page_index: 17, published_page: 6, table: III}
+        - {page: 19, pdf_page_index: 18, published_page: 7, table: IV}
+        printed_tables: A6, A7, A8
+        reason: Matching sample rows, printed pO2, temperature, metal analyses, silica activities, and Ti3+/Ti4+ values are already extracted once from the published paper.
+    - observation_id: tranell_1999_appendix_a9_calculated_vapor_pressures_context
+      type: model_derived_table_record
+      units: partial pressures in atm with printed column factors; SiO2 activity is dimensionless
+      locator: {page: 208, pdf_page_index: 207, published_page: 198, table: A9}
+      values:
+        quantity: partial_pressure
+        species: SiO(g), O(g)
+        temperature_K: '1850'
+        rows_as_printed: |-
+          Slag | SiO p (I) x10^5 atm | SiO p (II) x10^5 atm | O p (II) x10^9 atm | aSiO2
+          CST6 | 0.463 | 0.283 | 1.14 | 0.07
+          CST7 | 0.701 | 0.690 | 1.71 | 0.15
+          CST8 | 0.830 | 0.878 | 2.60 | 0.27
+          CST9 | 0.368 | 0.299 | 1.04 | 0.05
+          CST10 | 0.537 | 0.716 | 1.94 | 0.13
+          CST11 | 1.020 | 1.490 | 2.11 | 0.27
+          CST12 | 1.830 | 2.770 | 3.67 | 0.84
+        evidence_class: model_derived
+        reason: The table labels both pressure methods and silica activities as calculated; the table reports results of calculation methods, not measured partial-pressure cells.
+    - observation_id: tranell_1999_appendix_a10_pressure_fit_context
+      type: model_derived_table_record
+      units: A in K; B dimensionless in the printed log-pressure equation; pressure in atm
+      locator: {page: 208, pdf_page_index: 207, published_page: 198, table: A10}
+      values:
+        quantity: partial_pressure_temperature_fit
+        equation_as_printed: log p_i = -A/T + B (atm)
+        rows_as_printed: |-
+          Species | T interval K | A | B
+          SiO | 1805-1995 | 27525±833 | 10.53±0.43
+          O | 1805-1995 | 26972±971 | 5.62±0.43
+          SiO2 | 1833-1995 | 30710±510 | 8.46±0.47
+        evidence_class: model_derived
+        reason: Table A10 prints fitted coefficients for a log-pressure equation, not point pressures; retain the printed fit in context.
