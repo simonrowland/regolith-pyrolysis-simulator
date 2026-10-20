@@ -25,6 +25,7 @@ from simulator.battery.enums import (
     AdmissionStatus,
     BenchIdentityBasis,
     AssetRole,
+    CONDENSED_PHASES,
     EvidenceClass,
     Engine,
     ExecutionState,
@@ -10964,6 +10965,33 @@ def _load_store_if_needle(path: Path, needle: bytes, summary: dict[str, dict]) -
         return None
     stored = yaml.load(raw.decode("utf-8"), Loader=_YAML_LOADER)
     return stored if isinstance(stored, dict) else {}
+
+
+def test_store_condensed_phase_densities_are_at_least_100_kg_per_m3() -> None:
+    for directory in ("extracts-v2", "observations-v2"):
+        assert (REPO_ROOT / "data" / "literature" / directory).is_dir(), directory
+    _, _, observations = load_migrated_store(REPO_ROOT)
+    assert observations, "migrated store contains no observations"
+
+    below_floor = []
+    for observation in observations.values():
+        if quantity_token(observation.identity) is not Quantity.DENSITY:
+            continue
+        phase = observation.identity.species.phase
+        if not phase.is_value or phase.value not in CONDENSED_PHASES:
+            continue
+        if (
+            observation.value.kind is ValueKind.POINT
+            and observation.value.point < as_decimal("100")
+        ):
+            below_floor.append(
+                f"{observation.observation_id} ({observation.source_id}): "
+                f"{observation.value.point} kg/m3"
+            )
+
+    assert not below_floor, (
+        "condensed-phase density below 100 kg/m3:\n" + "\n".join(sorted(below_floor))
+    )
 
 
 def test_l04_store_never_lifts_log10_psat_as_pressure() -> None:
