@@ -9,8 +9,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:fujisawa-1990-cao-al2o3-activities
+      role: pdf
+      path: raw/fujisawa-1990-cao-al2o3-activities/fujisawa-1990-cao-al2o3-activities.pdf
+      sha256:
+        tag: value
+        value: 9da85446adffd9ebea28de168fa2ad1d73685b8bf95619749615fb0ac0c66125
+    - asset_id: pdftotext:fujisawa-1990-cao-al2o3-activities
+      role: pdftotext
+      path: text/fujisawa-1990-cao-al2o3-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:fujisawa-1990-cao-al2o3-activities
+      role: table_csv
+      path: tables/fujisawa-1990-cao-al2o3-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:fujisawa-1990-cao-al2o3-activities
       role: pdftotext
       path: unknown

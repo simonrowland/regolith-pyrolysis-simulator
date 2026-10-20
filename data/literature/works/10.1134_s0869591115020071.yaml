@@ -1,0 +1,201 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0869591115020071
+  citation: Nazarov, M. A., Shornikov, S. I. & Demidova, S. I. (2015), "Origin of Native Silicon and Iron Silicides in the
+    Dhofar 280 Lunar Meteorite", Petrology 23(2), 168–175.
+  source_ids:
+  - nazarov-2015-dhofar-silicides
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:nazarov-2015-dhofar-silicides
+      role: pdf
+      path: raw/nazarov-2015-dhofar-silicides/nazarov-2015-dhofar-silicides.pdf
+      sha256:
+        tag: value
+        value: 896e517d2111bcf80b356a34d8789d8ec597920d373a0d4a28365f661aba3b35
+    - asset_id: pdftotext:nazarov-2015-dhofar-silicides
+      role: pdftotext
+      path: text/nazarov-2015-dhofar-silicides
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:nazarov-2015-dhofar-silicides
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0869591115020071
+experiments:
+- experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure around 10^-10 atm, not the in-cell total pressure.
+      locator:
+        published_page: 168
+        pdf_page_index: 0
+        section: Methods
+        note: Residual chamber pressure is not the total vapor pressure in the Knudsen cell.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 168
+        pdf_page_index: 0
+        section: Methods
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The paper does not identify the molecular, transitional, or viscous flow regime.
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The approximate residual pressure is printed in atm; no base pressure in Pa is stated.
+        locator:
+          published_page: 168
+          pdf_page_index: 0
+          section: Methods
+          note: 'Source wording: under vacuum at residual pressure around 10^-10 atm.'
+  work_id: 10.1134/s0869591115020071
+  locator:
+    published_page: 168
+    pdf_page_index: 0
+    section: Methods
+    note: Partial pressures above a melt of synthetic anorthite were measured in a molybdenum cell.
+  bench_id: 10.1134/s0869591115020071::bench::nazarov-2015-mo-knudsen-cell
+benches:
+- id: 10.1134/s0869591115020071::bench::nazarov-2015-mo-knudsen-cell
+  work_id: 10.1134/s0869591115020071
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      published_page: 168
+      pdf_page_index: 0
+      section: Methods
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 168
+      pdf_page_index: 0
+      section: Methods
+  other_facts: []
+context:
+- observation_id: nazarov_2015_moo2_cell_contaminant_context
+  type: apparatus
+  locator:
+    published_page: 171
+    pdf_page_index: 3
+    section: Vaporization of an Anorthitic Melt
+  units: as described
+  values:
+    context_kind: molybdenum_cell_contamination_species
+    species_as_printed: MoO2
+    pressure_in_table2: not_tabulated
+    flag: cell_contamination
+  context_id: nazarov-2015-dhofar-silicides::context::nazarov_2015_moo2_cell_contaminant_context
+  work_id: 10.1134/s0869591115020071
+  source_id: nazarov-2015-dhofar-silicides
+  species: MoO2
+- observation_id: nazarov_2015_moo3_cell_contaminant_context
+  type: apparatus
+  locator:
+    published_page: 171
+    pdf_page_index: 3
+    section: Vaporization of an Anorthitic Melt
+  units: as described
+  values:
+    context_kind: molybdenum_cell_contamination_species
+    species_as_printed: MoO3
+    pressure_in_table2: not_tabulated
+    flag: cell_contamination
+  context_id: nazarov-2015-dhofar-silicides::context::nazarov_2015_moo3_cell_contaminant_context
+  work_id: 10.1134/s0869591115020071
+  source_id: nazarov-2015-dhofar-silicides
+  species: MoO3
+- observation_id: nazarov_2015_table1_meteorite_compositions_context
+  type: characterization
+  locator:
+    table: '1'
+    published_page: 170
+    pdf_page_index: 2
+    note: Context only; meteorite Si0 objects and Fe silicides, not a vaporization rail.
+  units: wt % as printed
+  values:
+    context_kind: meteorite_native_silicon_and_iron_silicide_composition
+    row_count: 16
+    column_headers:
+    - element
+    - Si0_objects_mean
+    - Si0_objects_limits
+    - Si0_objects_number_of_analyses
+    - Fe2.83Si
+    - Fe2.00Si#
+    - Fe4.86Si3
+    - Fe1.00Si
+    - Fe0.97Si
+    - Fe0.93Si
+    - Fe0.87Si#
+    - Fe2.99Si7
+    rows_as_printed: 'Si | 57.6 | 50.9–68.4 | 24 | 14.8 | 18.8 | 23.0 | 33.1 | 33.3 | 33.7 | 35.9 | 53.7
+
+      Ti | 0.02 | <0.24 | 24 | b.d.l. | b.d.l. | 0.35 | 0.02 | 0.09 | b.d.l. | 1.40 | b.d.l.
+
+      Al | 0.96 | 0.03–5.39 | 23 | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d.
+
+      Cr | 0.04 | <0.14 | 24 | b.d.l. | 0.26 | 9.30 | 0.15 | 0.54 | 0.05 | 2.60 | 1.94
+
+      Fe | 4.85 | 0.54–11.3 | 24 | 81.0 | 66.9 | 65.3 | 62.0 | 61.9 | 59.1 | 57.65 | 43.7
+
+      Mn | 0.17 | <0.40 | 24 | b.d.l. | b.d.l. | 0.16 | b.d.l. | 0.32 | 0.03 | 0.82 | 0.47
+
+      Mg | 0.15 | <0.70 | 16 | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d.
+
+      Ca | 0.26 | 0.05–2.13 | 16 | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d.
+
+      Na | 0.03 | <0.09 | 16 | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d.
+
+      K | 0.02 | <0.12 | 16 | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d.
+
+      Ni | 0.53 | <1.76 | 24 | 2.92 | 12.2 | 0.16 | 4.14 | 3.47 | 5.80 | 0.82 | 0.02
+
+      Co | n.d. | n.d. | n.d. | 0.14 | 0.18 | b.d.l. | 0.22 | 0.05 | 0.22 | b.d.l. | b.d.l.
+
+      Cu | n.d. | n.d. | n.d. | n.d. | 0.16 | n.d. | b.d.l. | n.d. | n.d. | b.d.l. | n.d.
+
+      P | 0.24 | 0.11–0.45 | 8 | 0.07 | 1.04 | 0.58 | 0.26 | 0.92 | 1.27 | 0.67 | 0.81
+
+      S | 0.16 | <0.51 | 13 | b.d.l. | b.d.l. | b.d.l. | b.d.l. | b.d.l. | b.d.l. | b.d.l. | b.d.l.
+
+      Total | 65.0 | 60–73 |  | 98.9 | 99.6 | 98.8 | 99.9 | 100.6 | 100.2 | 100.0 | 100.6
+
+      '
+    footnotes_as_printed: '* Formula coefficients, in addition to Fe, take into account all other cations, as well as phosphorus
+      with Si. # Analyses from work (Nazarov et al., 2012a), (b.d.l.) content below detection limit; (n.d.) not determined.'
+  context_id: nazarov-2015-dhofar-silicides::context::nazarov_2015_table1_meteorite_compositions_context
+  work_id: 10.1134/s0869591115020071
+  source_id: nazarov-2015-dhofar-silicides
+  species: Si

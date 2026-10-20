@@ -37,6 +37,13 @@ source:
   url: "https://…"                       # optional
   version: null                          # database / edition version when applicable
   year: 2015                             # optional
+  method_uncertainty:                     # optional source-level method uncertainty
+    value: 0.10
+    meaning: one_sigma                    # one_sigma | two_sigma | range_half_width
+    quantity: activity                    # Quantity enum value
+    basis: log10_dex                      # log10_dex | absolute | relative_percent
+    quantity_basis: "log10 activity in dex" # printed description, retained verbatim
+    locator: { page: 12, note: "Quoted sentence from the source, retained verbatim." }
 extraction:
   method: manual_from_draft              # required free text
   date: "2026-08-01"                     # ISO YYYY-MM-DD required
@@ -62,6 +69,15 @@ fidelity_samples:
   #   locator: { record: costa_jacobson_2015_fe_olivine_kems }
 species: {}                              # map: canonical U0 / manifest id → species block
 ```
+
+`source.method_uncertainty` applies only to rows from this source that do not
+state their own uncertainty. `quantity` is a `Quantity` enum value and selects
+the only rows the field can band. `basis` records the printed width basis:
+`log10_dex`, `absolute`, or `relative_percent`. `meaning` records the printed
+convention; `quantity_basis` retains the printed description without being
+matched to infer a quantity or unit. `locator.page` and `locator.note` give the
+page and exact quoted sentence. No value or meaning is inferred when this field
+is absent.
 
 ### `review_status`
 
@@ -122,6 +138,35 @@ A parameterized checked-in test
 (`tests/test_literature_extracts.py::test_fidelity_sample_matches_extract`)
 resolves every sample against the extract and asserts equality. Mutating a
 pinned extract value in memory must go RED.
+
+### Valence ratios from printed mass-fraction pairs
+
+Keep both source cells as printed in `values.points`, including their printed
+column labels and units. The migrator may emit a separate `valence_ratio`
+observation whose `identity.valence_basis` records the ratio and its printed
+input form:
+
+```yaml
+valence_basis:
+  numerator_oxidation_states: [3]
+  denominator_kind: total_element
+  denominator_oxidation_state: null
+  value_form: fraction
+  printed_form: mass_fraction_pair
+  mass_fraction_basis: [element, element]
+```
+
+`mass_fraction_basis` names the numerator and denominator bases in order. Use
+`element` when the printed values are element-equivalent, or the explicit
+printed formula (such as `Fe2O3`) when the source gives an oxide basis. The
+migrator reduces each cell to moles of the named element using its molar mass
+and cation count per formula unit, then forms the identity's valence ratio.
+The two stored source-cell observations must both appear in `derived_from` and
+the derivation's `inputs`; retain both printed values with their locators in
+the derivation parameters. A stoichiometric re-expression of measured cells is
+`measured_reduced`; if either input is estimated, use the weaker input's class.
+Propagate uncertainty only when the source prints per-cell uncertainty;
+otherwise leave the uncertainty band absent.
 
 **YAML alias note:** sample `value:` must be an **independent literal**, never a
 YAML alias (`*id`) into the observation body at the root or any nested depth.
@@ -228,6 +273,15 @@ Exactly one of:
 | `gas_speciation` | Vapour/atmosphere/condensate composition: which gas-bearing species, how much, as published |
 | `sulfur_solubility_and_sulfate_capacity_series` | Measured sulfur solubility / sulfate capacity series, including ratio-conditioned variants |
 | `composition_series` | Measured composition series across runs/samples (per-sample rows as payload) |
+| `equilibrium_phase_composition` | Measured composition of an equilibrium gas or condensed phase at stated temperature and conditions; preserve the printed basis on `values.basis_as_published` and identify the phase on the row |
+
+The battery quantity token `equilibrium_phase_composition` uses
+`units: subtype_defined`: units and basis are those printed (for example,
+O/Fe atom ratio, wt% O, or x in Fe(1-x)O). Migration stores that printed
+basis as the quantity subtype. No conversion between composition bases is
+implicit. For gas-phase ratios, state numerator and denominator species in the
+printed basis and retain coexisting phases in `point_conditions`. Until an engine predicts this quantity, scoring retains the row and
+returns the typed `quantity_not_predicted` refusal.
 
 **Verbatim only.** Extracts store published numbers (and arithmetic that merely
 converts units with the conversion shown). No Antoine/refit coefficients invented
@@ -303,6 +357,28 @@ Rules:
 - Pointer / bound-not-point / competing-observation rows must carry explicit
   structured content (e.g. `semantics: bound_not_point_ordering`,
   `semantics: competing_observation_do_not_average`).
+
+### Observation point conditions
+
+An observation may carry `point_conditions` alongside its identity and value.
+Each entry uses the Located `{state, locator}` form. Quench statements are
+closed typed values and require their own source locator:
+
+```yaml
+point_conditions:
+  quench_state:
+    state: {tag: value, value: asserted_preserved} # or asserted_altered / not_stated
+    locator: {page: 12, table: '3'}
+  quench_direction:
+    state: {tag: value, value: oxidising}
+    locator: {page: 12, paragraph: 'The glass aliquot was quenched in air'}
+```
+
+`quench_state` records what the source says about preservation during quench;
+omission is reported by the scorer as `not_stated`. `quench_direction` is
+optional and records only a source-stated direction. For Cr glass valence
+fractions, an oxidising direction is reported as a notice and does not gate
+scoring.
 
 ### Uncertainty (first-class)
 
@@ -451,6 +527,24 @@ at `pressure_environment.pumping.base_pressure_Pa`; it is not run pressure.
 `pressure_environment.sweep_gas.state.value` uses the battery `SweepGas`
 field list below. The migrator and per-file validator share its parser and
 store validation rules. Existing single-species records serialize unchanged.
+
+An optional `fO2_control.gas_ratio` preserves a printed gas ratio without
+deriving oxygen fugacity:
+
+```yaml
+fO2_control:
+  channel: {tag: value, value: gas_mix}
+  gas_ratio:
+    numerator_species: CO2
+    denominator_species: CO
+    value: {state: {tag: value, value: 1.4}, locator: {published_page: 800, table: I}}
+    basis: mole
+```
+
+`value` is a Located printed scalar, and `basis` is exactly `volume`, `mole`,
+or `partial_pressure`; `buffer` remains the source's verbatim printed description for buffer
+systems. A commanded pure-O2 atmosphere uses `channel: gas_mix` and the
+printed `oxygen_partial_pressure_Pa` instead of `gas_ratio`.
 
 | SweepGas field | Meaning |
 |---|---|

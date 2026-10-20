@@ -1,0 +1,246 @@
+"""Redox predictor inputs are projected from their printed source rows."""
+
+from __future__ import annotations
+
+from decimal import Decimal
+from pathlib import Path
+
+from simulator.battery.enums import NoticeKind
+from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
+
+REPO = Path(__file__).resolve().parents[2]
+SOSS = REPO / "data/literature/extracts/sossi-2020-magma-ocean-redox.yaml"
+AITHALA = REPO / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
+AITHALA_ALLF_RUNS = {
+    "aithala-2026-1800-30",
+    "aithala-2026-1900-30",
+    "aithala-2026-2000-10",
+    "aithala-2026-2000-30",
+    "aithala-2026-2000-120",
+    "aithala-2026-2100-30",
+}
+
+
+def _migrate(path: Path):
+    migrator = Migrator(root=REPO)
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    return migrator.result
+
+
+def _composition(observation):
+    state = observation.identity.composition
+    assert state is not None and state.is_value
+    return state.value
+
+
+def test_sossi_redox_row_projects_its_printed_glass_analysis() -> None:
+    result = _migrate(SOSS)
+    observation = result.observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    printed = {
+        "SiO2": Decimal("47.04"),
+        "Al2O3": Decimal("4.34"),
+        "FeOT": Decimal("8.38"),
+        "MgO": Decimal("37.61"),
+        "CaO": Decimal("2.02"),
+        "Na2O": Decimal("0.01"),
+        "K2O": Decimal("0.00"),
+        "SO2": Decimal("0.00"),
+        "Total": Decimal("99.39"),
+    }
+    expected = wt_pct_to_mole_fraction(printed)
+    assert _composition(observation) == expected
+    point = observation.point_conditions["composition"]
+    assert point.state.is_value and point.state.value == expected
+    f_o2 = observation.point_conditions["fO2_log"]
+    assert f_o2.state.is_value and f_o2.state.value == Decimal("0.00")
+    redox_rows = [
+        row
+        for row in result.observations.values()
+        if row.source_id == "sossi-2020-magma-ocean-redox"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+    ]
+    assert len(redox_rows) == 12
+    assert all(_composition(row) is not None for row in redox_rows)
+    assert all(
+        row.identity.temperature_K is not None and row.identity.temperature_K.is_value
+        for row in redox_rows
+    )
+    assert all(
+        row.point_conditions["temperature_K"].state.is_value for row in redox_rows
+    )
+    printed_logs = {
+        "sossi_2020_per_f_o2_1_xanes": Decimal("0.00"),
+        "sossi_2020_per_f_o2_2_xanes": Decimal("-2.49"),
+        "sossi_2020_per_f_o2_3_xanes": Decimal("-2.53"),
+        "sossi_2020_per_f_o2_6_xanes": Decimal("-2.58"),
+        "sossi_2020_per_ts1_xanes": Decimal("-2.72"),
+        "sossi_2020_per_f_o2_7_xanes": Decimal("-2.72"),
+        "sossi_2020_per_ts2_xanes": Decimal("-2.72"),
+        "sossi_2020_per_f_o2_8_xanes": Decimal("-3.00"),
+        "sossi_2020_per_f_o2_9_xanes": Decimal("-3.92"),
+        "sossi_2020_per_f_o2_10_xanes": Decimal("-5.32"),
+        "sossi_2020_per_f_o2_11_xanes": Decimal("-6.74"),
+        "sossi_2020_per_f_o2_12_xanes": Decimal("-7.86"),
+    }
+    assert len(printed_logs) == len(redox_rows) == 12
+    for row in redox_rows:
+        row_id = row.observation_id.rsplit("::", 1)[-1]
+        f_o2 = row.point_conditions["fO2_log"]
+        assert f_o2.state.is_value
+        assert f_o2.state.value == printed_logs[row_id]
+
+
+def test_aithala_redox_row_projects_experiment_glass_analysis_and_f_o2() -> None:
+    result = _migrate(AITHALA)
+    observation = result.observations[
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes"
+    ]
+    printed = {
+        "SiO2": Decimal("47.24"),
+        "TiO2": Decimal("0.53"),
+        "Al2O3": Decimal("11.32"),
+        "FeOT": Decimal("16.04"),
+        "MgO": Decimal("12.54"),
+        "CaO": Decimal("7.88"),
+        "Na2O": Decimal("1.98"),
+        "K2O": Decimal("0.029"),
+        "P2O5": Decimal("0.13"),
+    }
+    expected = wt_pct_to_mole_fraction(printed)
+    assert _composition(observation) == expected
+    point = observation.point_conditions["composition"]
+    assert point.state.is_value and point.state.value == expected
+    f_o2 = observation.point_conditions["fO2_log"]
+    assert f_o2.state.is_value and f_o2.state.value == Decimal("0.0")
+    redox_rows = [
+        row
+        for row in result.observations.values()
+        if row.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
+        and row.experiment_id.rsplit("::", 1)[-1] in AITHALA_ALLF_RUNS
+        and row.observation_id.rsplit("::", 1)[-1].endswith("_xanes")
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+    ]
+    assert len(redox_rows) == 6
+    assert all(_composition(row) is not None for row in redox_rows)
+    assert {row.identity.temperature_K.value for row in redox_rows} == {
+        Decimal(value) for value in ("2073.15", "2173.15", "2273.15", "2373.15")
+    }
+    assert all(
+        row.point_conditions["temperature_K"].state.is_value for row in redox_rows
+    )
+    assert all("fO2_log" in (row.point_conditions or {}) for row in redox_rows)
+
+
+def test_aithala_composition_join_uses_the_printed_sample_id(tmp_path: Path) -> None:
+    extract = AITHALA.read_text(encoding="utf-8")
+    extract = extract.replace(
+        "        quantity: fe3_fe2_ratio\n        sample_id: 1800-30\n",
+        "        quantity: fe3_fe2_ratio\n        sample_id: unmatched-run\n",
+        1,
+    )
+    path = tmp_path / AITHALA.name
+    path.write_text(extract, encoding="utf-8")
+
+    result = _migrate(path)
+    observation = result.observations[
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes"
+    ]
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+
+
+def test_aithala_row_printed_f_o2_overrides_experiment_value(tmp_path: Path) -> None:
+    extract = AITHALA.read_text(encoding="utf-8")
+    extract = extract.replace(
+        "        quantity: fe3_fe2_ratio\n        sample_id: 1800-30\n",
+        "        quantity: fe3_fe2_ratio\n        sample_id: 1800-30\n        log_fO2: -5.0\n",
+        1,
+    )
+    path = tmp_path / AITHALA.name
+    path.write_text(extract, encoding="utf-8")
+
+    result = _migrate(path)
+    observation = result.observations[
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes"
+    ]
+    f_o2 = observation.point_conditions["fO2_log"]
+    assert f_o2.state.is_value and f_o2.state.value == Decimal("-5.0")
+
+
+def test_aithala_rejected_row_f_o2_refuses_experiment_fallback(tmp_path: Path) -> None:
+    extract = AITHALA.read_text(encoding="utf-8")
+    extract = extract.replace(
+        "        quantity: fe3_fe2_ratio\n        sample_id: 1800-30\n",
+        "        quantity: fe3_fe2_ratio\n        sample_id: 1800-30\n        log_fO2: '< -5'\n",
+        1,
+    )
+    path = tmp_path / AITHALA.name
+    path.write_text(extract, encoding="utf-8")
+
+    result = _migrate(path)
+    observation = result.observations[
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes"
+    ]
+    f_o2 = observation.point_conditions["fO2_log"]
+    assert f_o2.state.is_unknown
+    assert "bounded or not absolute" in f_o2.state.reason
+
+
+def test_feot_notice_follows_row_local_and_joined_compositions() -> None:
+    aithala = _migrate(AITHALA)
+    aithala_rows = [
+        row
+        for row in aithala.observations.values()
+        if row.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
+    ]
+    feot_rows = [
+        row
+        for row in aithala_rows
+        if (composition := (row.point_conditions or {}).get("composition"))
+        is not None
+        and composition.inference is not None
+        and any(
+            "FeOT (total iron) treated as FeO" in item
+            for item in composition.inference.inputs
+        )
+    ]
+    assert len(aithala_rows) == 28
+    assert len(feot_rows) == 18
+    projected_redox_rows = [
+        row
+        for row in feot_rows
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+    ]
+    assert len(projected_redox_rows) == 6
+    missing_aithala_notice = [
+        row.observation_id
+        for row in projected_redox_rows
+        if not any(
+            notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+            for notice in row.notices
+        )
+    ]
+    assert not missing_aithala_notice
+
+    sossi = _migrate(SOSS)
+    sossi_rows = [
+        row
+        for row in sossi.observations.values()
+        if row.source_id == "sossi-2020-magma-ocean-redox"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+    ]
+    assert len(sossi_rows) == 12
+    assert all(
+        any(
+            notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+            for notice in row.notices
+        )
+        for row in sossi_rows
+    )

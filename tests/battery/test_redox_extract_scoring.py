@@ -1,4 +1,6 @@
+import hashlib
 import json
+import math
 import shutil
 import subprocess
 import sys
@@ -12,7 +14,11 @@ import simulator.battery.score as score_module
 from simulator.battery.enums import (
     Authority,
     Engine,
+    MetricOperation,
     NoticeKind,
+    Phase,
+    Quantity,
+    QuenchState,
     Rail,
     RefusalReason,
     ResidualStatus,
@@ -25,8 +31,272 @@ from simulator.battery.score import (
     score_store,
     SCORE_ENGINE_SET,
 )
-from simulator.battery.records import State, Value
+from simulator.battery.records import Located, Locator, State, Value
 from simulator.battery.score import headline_payload_records, residual_to_plain
+
+
+_AITHALA_REDOX_EXPERIMENTS = {
+    "aithala-2026-1800-30",
+    "aithala-2026-1900-30",
+    "aithala-2026-2000-10",
+    "aithala-2026-2000-30",
+    "aithala-2026-2000-120",
+    "aithala-2026-2100-30",
+}
+
+
+def _sossi_aithala_redox_context():
+    root = Path(__file__).resolve().parents[2]
+    source_paths = (
+        root / "data/literature/extracts/sossi-2020-magma-ocean-redox.yaml",
+        root / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml",
+    )
+    migrator = Migrator(root)
+    for path in source_paths:
+        migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    observations = {
+        observation_id: observation
+        for observation_id, observation in result.observations.items()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value.value == "fe3_fe2_ratio"
+        and (
+            observation.source_id == "sossi-2020-magma-ocean-redox"
+            or (
+                observation.source_id
+                == "aithala-2026-magmatic-iron-redox-to-2100c"
+                and observation.experiment_id.rsplit("::", 1)[-1]
+                in _AITHALA_REDOX_EXPERIMENTS
+            )
+        )
+    }
+    assert len(observations) == 18
+    origins = {
+        observation_id: next(
+            path.name
+            for path in source_paths
+            if observation_id.startswith(f"{path.stem}::")
+        )
+        for observation_id in observations
+    }
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        observations,
+        origins=origins,
+        benches=result.benches,
+    )
+    return context, observations
+
+
+def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    context, observations = _sossi_aithala_redox_context()
+    observation_id = (
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    )
+    observation = observations[observation_id]
+    calls = []
+    original_evaluate_redox = openimcc.evaluate_redox
+
+    def capture_redox_call(*args, **kwargs):
+        calls.append((args, kwargs))
+        return original_evaluate_redox(*args, **kwargs)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_call)
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.refusal_reason is None
+    assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
+    assert prediction.authority is Authority.BRIDGE
+    assert len(calls) == 1
+    args, kwargs = calls[0]
+    assert args[0]["Fe"] > 0.0
+    assert args[0]["Mg"] > 0.0
+    assert args[2] == "imposed"
+    assert args[1] == float(observation.identity.temperature_K.value)
+    assert kwargs["lambda_imposed"] == pytest.approx(
+        float(observation.point_conditions["fO2_log"].state.value) * math.log(10.0),
+        rel=1e-15,
+    )
+    direct = original_evaluate_redox(*args, **kwargs)
+    direct_ratio = direct.ferric_fe_mol / direct.ferrous_fe_mol
+    assert abs(float(prediction.value) / direct_ratio - 1.0) <= 1e-9
+
+    row_context = replace(
+        context,
+        observations={observation_id: observation},
+        origins={observation_id: context.origins[observation_id]},
+    )
+    residuals, _ = score_store(
+        row_context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
+    )
+    assert len(residuals) == 1
+    assert residuals[0].numeric is not None
+    assert residuals[0].numeric.operation is MetricOperation.DEX
+    assert residuals[0].status is ResidualStatus.NO_BAND
+    assert residuals[0].refusal is not None
+    assert residuals[0].refusal.reason is RefusalReason.DECISION_RULE_MISSING
+
+
+def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    _context, observations = _sossi_aithala_redox_context()
+    results = []
+    original_evaluate_redox = openimcc.evaluate_redox
+
+    def capture_redox_result(*args, **kwargs):
+        result = original_evaluate_redox(*args, **kwargs)
+        results.append(result)
+        return result
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_result)
+    total_flags = 0
+    for observation_id, observation in sorted(observations.items()):
+        calls_before = len(results)
+        prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+        assert prediction.value is not None, (observation_id, prediction.refusal_detail)
+        assert prediction.authority is Authority.BRIDGE
+        assert len(results) == calls_before + 1
+        flags = tuple(results[-1].flags)
+        flag_notices = tuple(
+            notice
+            for notice in prediction.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        )
+        assert flags
+        assert tuple(notice.reason for notice in flag_notices) == flags
+        assert all(
+            notice.origin == "openimcc.evaluate_redox"
+            and notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
+            for notice in flag_notices
+        )
+        assert not any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            for notice in prediction.notices
+        )
+        total_flags += len(flags)
+
+    assert len(results) == 18
+    assert total_flags == 130
+
+
+def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
+    pytest.importorskip("openimcc")
+    context, _observations = _sossi_aithala_redox_context()
+    residuals, _ = score_store(
+        context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
+    )
+    values = [
+        float(residual.numeric.value).hex()
+        for residual in residuals
+        if residual.numeric is not None
+    ]
+    assert len(values) == 18
+    encoded = json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()
+    # Recorded OpenIMCC pin e1423d82237486f58dc8ffbb1f8c295f54f169c0.
+    # The previous digest 12100581851275f0... was e975edd229b7653ceac5dbac9558d0156e51c2f6.
+    # Measured inputs are unchanged. Two residuals move by one ulp:
+    # aithala_2026_2000_30_xanes 0.01757368426967503 -> 0.01757368426967494
+    # sossi_2020_per_ts2_xanes -0.08377464894838026 -> -0.08377464894838044
+    assert hashlib.sha256(encoded).hexdigest() == (
+        "c79971dce81ac423bf34a04525b3da956a437f83e6dbe1fa601d24c1627b8f44"
+    )
+    for backlog in (
+        score_module.notice_backlog(residuals),
+        score_module.notice_backlog_payloads(
+            [residual_to_plain(residual) for residual in residuals]
+        ),
+    ):
+        assert backlog.get(NoticeKind.SOURCE_DISAGREEMENT.value, 0) == 0
+        assert backlog["engine_model_caveat"] == 130
+        assert backlog["admission_defaulted"] == 18
+        assert backlog["total_iron_reported_as_feo"] == 18
+    assert all(
+        not score_module.flagged_strata(residual.notices) for residual in residuals
+    )
+    assert not any(residual.score_eligible for residual in residuals)
+
+
+def test_openimcc_redox_without_printed_fo2_still_refuses():
+    pytest.importorskip("openimcc")
+    _context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    conditions = dict(observation.point_conditions or {})
+    conditions.pop("fO2_log", None)
+    conditions.pop("fO2_Pa", None)
+    missing_fo2 = replace(
+        observation,
+        point_conditions=conditions,
+        identity=replace(observation.identity, fO2_Pa=None),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, missing_fo2)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "printed_fO2",
+    }
+
+
+def test_openimcc_redox_predicts_and_flags_temperature_extrapolation():
+    pytest.importorskip("openimcc")
+    _context, observations = _sossi_aithala_redox_context()
+    observation = observations[
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
+    ]
+    low_temperature = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.of(Decimal("1600")),
+        ),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, low_temperature)
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.authority is Authority.EXTRAPOLATED
+    notice = next(
+        item
+        for item in prediction.notices
+        if item.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert "FeO(l)" in notice.reason
+
+
+def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical():
+    context, _observations = _sossi_aithala_redox_context()
+    residuals, _ = score_store(
+        context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
+    )
+    encoded = json.dumps(
+        [residual_to_plain(residual) for residual in residuals],
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode()
+
+    # Combined-base pin. The payload still includes t-1279's six joined-Aithala
+    # FeOT notices. Quench4 adds quench_state not_stated and the glass-to-melt
+    # identity compare, so the identity_equal conjunct passes. Printed
+    # uncertainty with an unmapped unit is printed_uncertainty_unit_unmapped
+    # and carries the source unit text.
+    assert hashlib.sha256(encoded).hexdigest() == (
+        "690007627c3e104224bad710c8c406dc6c7c12548f044f6bb0f309952e5f42de"
+    )
 
 
 def test_borisov_2018_rows_reach_redox_scoring_population():
@@ -87,6 +357,43 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert abs(prediction155.value - Decimal("3.277000246")) < Decimal("1e-9")
     assert prediction4.refusal_reason is None
     assert prediction155.refusal_reason is None
+
+    glass_row = replace(
+        row4,
+        observation_id="borisov_2018_glass_fe3_fe2_fixture",
+        identity=replace(
+            row4.identity,
+            species=replace(row4.identity.species, phase=Phase.GLASS),
+        ),
+        point_conditions={
+            **(row4.point_conditions or {}),
+            "quench_state": Located(
+                State.of(QuenchState.ASSERTED_PRESERVED),
+                locator=row4.locator or Locator(page=2),
+            ),
+        },
+    )
+    glass_context = replace(
+        context,
+        observations={glass_row.observation_id: glass_row},
+        origins={glass_row.observation_id: extract.name},
+    )
+    glass_residuals, glass_candidates = score_store(
+        glass_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    assert len(glass_residuals) == 1
+    glass_residual = glass_residuals[0]
+    assert glass_residual.numeric is not None
+    assert glass_residual.refusal is None
+    assert glass_residual.quench_state is QuenchState.ASSERTED_PRESERVED
+    assert glass_residual.candidate in glass_candidates
+    assert (
+        glass_candidates[glass_residual.candidate].identity.species.phase.value
+        is Phase.L
+    )
+
     out_of_band_source = next(
         row for row in source_rows if float(row["values"]["T_C"]) > 1630.0
     )
@@ -524,7 +831,7 @@ def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, 
     assert residuals[0].refusal.reason is RefusalReason.IDENTITY_MISMATCH
 
 
-def test_existing_sixteen_redox_rows_are_refused_for_unprinted_composition():
+def test_aithala_redox_rows_score_only_when_composition_is_printed():
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
     migrator = Migrator(root)
@@ -538,6 +845,13 @@ def test_existing_sixteen_redox_rows_are_refused_for_unprinted_composition():
         and row.identity.quantity.value.value == "fe3_fe2_ratio"
     ]
     assert len(redox_rows) == 16
+    projected_ids = {
+        row.observation_id
+        for row in redox_rows
+        if row.experiment_id.rsplit("::", 1)[-1]
+        in _AITHALA_REDOX_EXPERIMENTS
+    }
+    assert len(projected_ids) == 6
     context = ScoreContext(
         result.works,
         result.experiments,
@@ -548,15 +862,26 @@ def test_existing_sixteen_redox_rows_are_refused_for_unprinted_composition():
     residuals, _ = score_store(context, engines=SCORE_ENGINE_SET, rail=Rail.REDOX)
     assert len(residuals) == 16 * len(SCORE_ENGINE_SET)
     for residual in residuals:
-        assert residual.numeric is None
-        assert residual.refusal is not None
-        if residual.key.endswith("internal-analytical"):
-            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+        observation_id = residual.key.split(":T=", 1)[0]
+        engine = residual.key.rsplit("::", 1)[-1]
+        if observation_id in projected_ids and engine in {
+            "internal-analytical",
+            "openimcc",
+        }:
+            assert residual.numeric is not None
+            assert residual.refusal is not None
+            assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+        elif engine in {"internal-analytical", "openimcc"}:
+            assert residual.numeric is None
+            assert residual.refusal is not None
             assert residual.refusal.detail == {
                 "reason": "missing_input",
                 "input": "composition",
             }
+            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
         else:
+            assert residual.numeric is None
+            assert residual.refusal is not None
             assert (
                 residual.refusal.reason
                 is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX

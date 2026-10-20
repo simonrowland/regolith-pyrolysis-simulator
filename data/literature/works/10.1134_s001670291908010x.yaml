@@ -1,0 +1,218 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s001670291908010x
+  citation: Shornikov, S. I. (2019), “Thermodynamic modeling of evaporation processes of lunar and meteorite substance,” Geochemistry
+    International 57(8), 865–872.
+  source_ids:
+  - shornikov-2019-lunar-meteorite-evaporation-model
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:shornikov-2019-lunar-meteorite-evaporation-model
+      role: pdf
+      path: raw/shornikov-2019-lunar-meteorite-evaporation-model/shornikov-2019-lunar-meteorite-evaporation-model.pdf
+      sha256:
+        tag: value
+        value: 2f62bf35889668d88c445826dc0d103c9f7939e2fe667bfe10020682af3013f1
+    - asset_id: pdftotext:shornikov-2019-lunar-meteorite-evaporation-model
+      role: pdftotext
+      path: text/shornikov-2019-lunar-meteorite-evaporation-model
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2019-lunar-meteorite-evaporation-model
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s001670291908010x
+experiments:
+- experiment_id: 10.1134/s001670291908010x::shornikov-2019-lunar-meteorite-evaporation-model
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s001670291908010x
+  locator:
+    page: 4
+    published_page: 868
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 printed body row 1, solid phase column.
+context:
+- observation_id: shornikov_2019_table2_starting_composition_r01
+  type: composition
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 869
+    table: '2'
+    note: Table 2 printed body row 1; sample label additionally identified in page 5; Table 2 setup and Fig. 2 discussion.
+  units: mol % and K as printed
+  values:
+    quantity: model_starting_melt_composition
+    method_class: quoted_attributed
+    sample_label_as_printed_in_discussion_or_caption: 5aN-3
+    evaporation_temperature_as_printed: '2173'
+    temperature_unit: K
+    oxide_concentration_mol_pct_as_printed:
+      CaO: '14.43'
+      MgO: '25.60'
+      Al2O3: '23.83'
+      SiO2: '36.14'
+    oxide_cells_printed_as_dash:
+    - FeO
+    - TiO2
+    attribution_as_printed: Ivanova et al., 2018
+    note: Initial model composition, not a measured residual composition. The table’s mol% is preserved as printed and is
+      not converted to fractions.
+  context_id: shornikov-2019-lunar-meteorite-evaporation-model::context::shornikov_2019_table2_starting_composition_r01
+  work_id: 10.1134/s001670291908010x
+  source_id: shornikov-2019-lunar-meteorite-evaporation-model
+  species: CaO
+- observation_id: shornikov_2019_table2_starting_composition_r02
+  type: composition
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 869
+    table: '2'
+    note: Table 2 printed body row 2; sample label additionally identified in page 5; Table 2 setup and Fig. 2 discussion.
+  units: mol % and K as printed
+  values:
+    quantity: model_starting_melt_composition
+    method_class: quoted_attributed
+    sample_label_as_printed_in_discussion_or_caption: CAI 4
+    evaporation_temperature_as_printed: '2173'
+    temperature_unit: K
+    oxide_concentration_mol_pct_as_printed:
+      CaO: '24.10'
+      MgO: '24.32'
+      Al2O3: '15.52'
+      SiO2: '36.06'
+    oxide_cells_printed_as_dash:
+    - FeO
+    - TiO2
+    attribution_as_printed: Mendybaev and Richter, 2016
+    note: Initial model composition, not a measured residual composition. The table’s mol% is preserved as printed and is
+      not converted to fractions.
+  context_id: shornikov-2019-lunar-meteorite-evaporation-model::context::shornikov_2019_table2_starting_composition_r02
+  work_id: 10.1134/s001670291908010x
+  source_id: shornikov-2019-lunar-meteorite-evaporation-model
+  species: CaO
+- observation_id: shornikov_2019_table2_starting_composition_r03
+  type: composition
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 869
+    table: '2'
+    note: Table 2 printed body row 3; sample label additionally identified in page 5; Table 2 setup and Fig. 2 discussion.
+  units: mol % and K as printed
+  values:
+    quantity: model_starting_melt_composition
+    method_class: quoted_attributed
+    sample_label_as_printed_in_discussion_or_caption: CAI B
+    evaporation_temperature_as_printed: '2173'
+    temperature_unit: K
+    oxide_concentration_mol_pct_as_printed:
+      CaO: '26.76'
+      MgO: '17.05'
+      Al2O3: '11.41'
+      SiO2: '44.78'
+    oxide_cells_printed_as_dash:
+    - FeO
+    - TiO2
+    attribution_as_printed: Richter et al., 2007
+    note: Initial model composition, not a measured residual composition. The table’s mol% is preserved as printed and is
+      not converted to fractions.
+  context_id: shornikov-2019-lunar-meteorite-evaporation-model::context::shornikov_2019_table2_starting_composition_r03
+  work_id: 10.1134/s001670291908010x
+  source_id: shornikov-2019-lunar-meteorite-evaporation-model
+  species: CaO
+- observation_id: shornikov_2019_table2_starting_composition_r04
+  type: composition
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 869
+    table: '2'
+    note: Table 2 printed body row 4; sample label additionally identified in page 6; Table 2 setup and Fig. 3 caption.
+  units: mol % and K as printed
+  values:
+    quantity: model_starting_melt_composition
+    method_class: quoted_attributed
+    sample_label_as_printed_in_discussion_or_caption: lunar aluminous basalt
+    evaporation_temperature_as_printed: 1850-2400
+    temperature_unit: K
+    oxide_concentration_mol_pct_as_printed:
+      CaO: '19.44'
+      MgO: '7.26'
+      FeO: '3.98'
+      Al2O3: '18.72'
+      TiO2: '0.25'
+      SiO2: '50.35'
+    oxide_cells_printed_as_dash: []
+    attribution_as_printed: Markova et al., 1986
+    note: Initial model composition, not a measured residual composition. The table’s mol% is preserved as printed and is
+      not converted to fractions.
+  context_id: shornikov-2019-lunar-meteorite-evaporation-model::context::shornikov_2019_table2_starting_composition_r04
+  work_id: 10.1134/s001670291908010x
+  source_id: shornikov-2019-lunar-meteorite-evaporation-model
+  species: CaO
+- observation_id: shornikov_2019_table2_starting_composition_r05
+  type: composition
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 869
+    table: '2'
+    note: Table 2 printed body row 5; sample label additionally identified in page 6; Table 2 setup and Fig. 3 caption.
+  units: mol % and K as printed
+  values:
+    quantity: model_starting_melt_composition
+    method_class: quoted_attributed
+    sample_label_as_printed_in_discussion_or_caption: synthetic oxide material of solar elemental composition
+    evaporation_temperature_as_printed: 1700-2300
+    temperature_unit: K
+    oxide_concentration_mol_pct_as_printed:
+      CaO: '2.08'
+      MgO: '35.15'
+      FeO: '29.18'
+      Al2O3: '1.38'
+      TiO2: '0.08'
+      SiO2: '32.13'
+    oxide_cells_printed_as_dash: []
+    attribution_as_printed: Wang et al., 2001
+    note: Initial model composition, not a measured residual composition. The table’s mol% is preserved as printed and is
+      not converted to fractions.
+  context_id: shornikov-2019-lunar-meteorite-evaporation-model::context::shornikov_2019_table2_starting_composition_r05
+  work_id: 10.1134/s001670291908010x
+  source_id: shornikov-2019-lunar-meteorite-evaporation-model
+  species: CaO

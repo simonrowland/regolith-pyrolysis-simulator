@@ -53,6 +53,8 @@ from simulator.battery.enums import (
     Polymorph,
     PolymorphRejectionKind,
     PURE_STANDARD_THERMO,
+    QuenchDirection,
+    QuenchState,
     Quantity,
     ReferenceStateConvention,
     Rail,
@@ -60,6 +62,8 @@ from simulator.battery.enums import (
     ResidualStatus,
     SourceRelation,
     UncertaintyKind,
+    ValenceDenominatorKind,
+    ValenceValueForm,
     VAPORIZATION_ENTHALPIES,
     ValueKind,
     residual_status_token,
@@ -70,6 +74,7 @@ from simulator.battery.identity import (
     PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
     identity_equal,
+    _identity_equal,
     _same_row_redox_identity_equal,
     log10K_from_delta_fG_kJ_mol,
     profile_for,
@@ -275,6 +280,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.EVOLVED_GAS_YIELD: MetricOperation.RELATIVE,
     Quantity.ISOTOPE_DELTA: MetricOperation.ABSOLUTE,
     Quantity.RESIDUE_COMPONENT_COMPOSITION: MetricOperation.ABSOLUTE,
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: MetricOperation.ABSOLUTE,
 }
 
 # The ticket line uses the two-sided normal percentile p=95. 1.95996398454 is
@@ -289,6 +295,7 @@ DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.y
 # Minimum n for a descriptive residual bias/scatter ratio; it does not gate bands.
 MIN_RESIDUAL_SUMMARY_N = 10
 _ALIGNMENT_AXES = (
+    "valence_basis",
     "subtype",
     "per",
     "temperature_K",
@@ -399,6 +406,7 @@ FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
+FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
@@ -406,6 +414,7 @@ FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
+FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
 
 
 @dataclass(frozen=True)
@@ -449,6 +458,7 @@ class _PrintedBandResolution:
     band: DecisionBand | None = None
     refusal: Mapping[str, object] | None = None
     notice: Notice | None = None
+    standard_uncertainty_dex: Decimal | None = None
 
 
 @dataclass(frozen=True)
@@ -624,7 +634,7 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         return Rail.THERMOCHEMISTRY
     if quantity is Quantity.WALL_DEPOSIT_MASS:
         return Rail.WALL_DEPOSITION
-    if quantity is Quantity.FE3_FE2_RATIO:
+    if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
         return Rail.REDOX
     if quantity in {
         Quantity.YIELD_FRACTION,
@@ -694,8 +704,23 @@ def metric_operation(quantity: Quantity | None) -> MetricOperation | None:
 
 
 def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
-    """Select the stored residue metric from its measured subtype."""
+    """Select an identity-aware metric when the quantity's form requires it."""
     quantity = quantity_token(identity)
+    if quantity is Quantity.VALENCE_RATIO:
+        basis = identity.valence_basis
+        if basis is None or not basis.is_value:
+            return None
+        if basis.value.value_form in {
+            ValenceValueForm.FRACTION,
+            ValenceValueForm.RATIO,
+        }:
+            return MetricOperation.DEX
+        if basis.value.value_form in {
+            ValenceValueForm.LOG10_RATIO,
+            ValenceValueForm.AVERAGE_OXIDATION_STATE,
+        }:
+            return MetricOperation.ABSOLUTE
+        return None
     if quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
         return metric_operation(quantity)
     subtype = identity.subtype.value if identity.subtype.is_value else None
@@ -1211,7 +1236,16 @@ def _classify_flagged_notice_facts(
     if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     if any(
-        kind == NoticeKind.FIGURE_ONLY.value and reason == "figure_only"
+        isinstance(reason, str)
+        and reason.startswith(
+            f"{FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE}:"
+        )
+        for _kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE)
+    if any(
+        kind == NoticeKind.FIGURE_ONLY.value
+        and (reason == "figure_only" or reason.startswith("figure_only:"))
         for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
@@ -1223,6 +1257,8 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
     if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
+    if NoticeKind.QUENCH_ALTERED.value in kinds:
+        strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
     return tuple(strata)
 
 
@@ -1252,6 +1288,12 @@ def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
     return source_polymorph.rejection_kind is PolymorphRejectionKind.OMITTED
 
 
+def _rt_ln_10_j_per_mol_K(temperature_K: Decimal) -> Decimal:
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    return JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
+
+
 def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
     return (
         source_polymorph is not None
@@ -1261,6 +1303,226 @@ def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
             PolymorphRejectionKind.UNRECOGNISED,
             PolymorphRejectionKind.CONTRADICTS_FORMULA,
         )
+    )
+
+
+def _fusion_energy_when_polymorph_absent(
+    reference: Observation,
+    formula: str,
+    temperature_K: Decimal,
+) -> tuple[Observation, object, Notice | None, Notice | None]:
+    """JANAF fusion for a pure-solid identity that never named a polymorph.
+
+    A migrated source that omits the polymorph is ``PolymorphRejectionKind.OMITTED``
+    and is refused before this runs (d-165). ``polymorph is None`` is the
+    melt-activity benchmark's pure-solid standard: the stable JANAF crystal at
+    T supplies the fusion pair, and a stability-bound notice records the
+    inference. Returns ``(reference, fusion, refusal, inference)``. A refusal
+    notice means the value must stay on the solid number.
+    """
+
+    from simulator.battery.generators.janaf import (
+        _JANAF_POLYMORPH_BY_TABLE,
+        JANAF_R_J_PER_MOL_K,
+        JANAFFusionPolymorphUnavailable,
+        _janaf_eligible_pure_crystal_tables,
+        _janaf_fusion_energy_for_pair,
+        _janaf_stable_crystal_set,
+        janaf_fusion_energy,
+    )
+
+    fusion = janaf_fusion_energy(formula, temperature_K)
+    expected_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(fusion.crystal_table)
+    observed_polymorph = None
+    identity = reference.identity
+    if isinstance(identity, Identity) and identity.reference_state is not None:
+        observed_polymorph = polymorph_token(identity.reference_state.value.endmember)
+    if expected_polymorph is None or observed_polymorph is expected_polymorph:
+        return reference, fusion, None, None
+
+    inferred_reference_notice: Notice | None = None
+    unique_unknown_polymorph_table = False
+    try:
+        eligible_solid_tables = _janaf_eligible_pure_crystal_tables(
+            formula, temperature_K
+        )
+        stability = None
+        if len(eligible_solid_tables) > 1:
+            stability = _janaf_stable_crystal_set(
+                formula, temperature_K, eligible_solid_tables
+            )
+    except JANAFFusionPolymorphUnavailable as exc:
+        return (
+            reference,
+            fusion,
+            Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"fusion conversion missing input for {formula}: "
+                    f"incomplete JANAF stability candidate set: {exc}"
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF stability data for {formula}: {exc}",
+            ),
+            None,
+        )
+
+    if len(eligible_solid_tables) == 1:
+        unique_unknown_polymorph_table = (
+            eligible_solid_tables[0][0] == fusion.crystal_table
+        )
+    elif len(eligible_solid_tables) > 1:
+        assert stability is not None
+        stable_table = stability.selected.table_id
+        stable_polymorph = stability.selected.polymorph
+        stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
+        alternatives = tuple(
+            (item.table_id, item.polymorph, item.gibbs_kJ_per_mol)
+            for item in stability.alternatives
+        )
+        if alternatives:
+            # Equal chemical potential: changing the pure-solid standard shifts
+            # activity by exp(dG/RT), so d log10(a) = dG / (R T ln 10).
+            bound_by_alternative = tuple(
+                (
+                    abs(gibbs_kJ_per_mol - stable_gibbs_kJ_per_mol)
+                    * Decimal(1000)
+                    / (
+                        JANAF_R_J_PER_MOL_K
+                        * temperature_K
+                        * Decimal(10).ln()
+                    ),
+                    table_id,
+                    polymorph,
+                    gibbs_kJ_per_mol,
+                )
+                for table_id, polymorph, gibbs_kJ_per_mol in alternatives
+            )
+            bound_dex, max_table, max_polymorph, _max_gibbs = max(
+                bound_by_alternative, key=lambda item: item[0]
+            )
+            assert reference.value.point is not None
+            row_band = _printed_uncertainty_band(
+                Quantity.ACTIVITY,
+                reference.uncertainty,
+                reference.value.point,
+                source_observation=reference,
+            )
+            if row_band.notice is not None:
+                reference = replace(
+                    reference,
+                    notices=union_notices(reference.notices, (row_band.notice,)),
+                )
+            bound_exceeds_row_band = (
+                None
+                if row_band.band is None
+                else bound_dex > row_band.band.value
+            )
+            inference_detail = {
+                "oxide": formula,
+                "temperature_K": str(temperature_K),
+                "chosen_polymorph": stable_polymorph.value,
+                "chosen_table": stable_table,
+                "alternatives": [
+                    {"polymorph": polymorph.value, "table": table_id}
+                    for table_id, polymorph, _gibbs in alternatives
+                ],
+                "bound_dex": str(bound_dex),
+                "maximum_alternative": {
+                    "polymorph": max_polymorph.value,
+                    "table": max_table,
+                },
+                "row_decision_band_dex": (
+                    None if row_band.band is None else str(row_band.band.value)
+                ),
+                "row_decision_band_refusal": (
+                    None if row_band.refusal is None else dict(row_band.refusal)
+                ),
+                "bound_exceeds_row_band": bound_exceeds_row_band,
+                "authority": Authority.CERTIFIED.value,
+            }
+            inferred_reference_notice = Notice(
+                kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "reference_polymorph_inferred_from_stability: "
+                    + json.dumps(inference_detail, sort_keys=True)
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF stability bound {bound_dex} dex",
+                authority=Authority.CERTIFIED,
+                certification=(
+                    "NIST-JANAF solid formation Gibbs energies compared at T"
+                ),
+            )
+        unique_unknown_polymorph_table = True
+        if stable_table != fusion.crystal_table:
+            fusion = _janaf_fusion_energy_for_pair(
+                formula, stable_table, fusion.liquid_table, temperature_K
+            )
+
+    if not unique_unknown_polymorph_table:
+        observed = (
+            "unknown" if observed_polymorph is None else observed_polymorph.value
+        )
+        return (
+            reference,
+            fusion,
+            Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "fusion conversion missing input: JANAF solid table "
+                    f"{fusion.crystal_table} represents polymorph "
+                    f"{expected_polymorph.value}, but measured reference polymorph "
+                    f"is {observed}"
+                ),
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF {fusion.crystal_table} requires "
+                    f"{expected_polymorph.value} solid reference"
+                ),
+            ),
+            inferred_reference_notice,
+        )
+    return reference, fusion, None, inferred_reference_notice
+
+
+def _janaf_fusion_energy_for_reference(
+    reference: Observation,
+    temperature_K: Decimal,
+):
+    """Resolve the JANAF pair for the phase named by the source reference."""
+
+    from simulator.battery.generators.janaf import (
+        _fusion_table_pair,
+        _janaf_fusion_energy_for_pair,
+        JANAFFusionPolymorphUnavailable,
+    )
+
+    identity = reference.identity
+    if not isinstance(identity, Identity) or identity.reference_state is None:
+        raise JANAFFusionPolymorphUnavailable(
+            "source reference polymorph is not stated"
+        )
+    standard_state = identity.reference_state.value
+    polymorph = polymorph_token(standard_state.endmember)
+    if polymorph is None:
+        raise JANAFFusionPolymorphUnavailable(
+            "source reference polymorph is not stated"
+        )
+    formula = standard_state.endmember.formula
+    # JANAF has no tridymite table. The existing B1259 correction moves that
+    # named reference to cristobalite before this JANAF fusion pair is used.
+    janaf_polymorph = (
+        Polymorph.CRISTOBALITE_HIGH
+        if formula == "SiO2" and polymorph is Polymorph.TRIDYMITE
+        else polymorph
+    )
+    solid_table, liquid_table = _fusion_table_pair(formula, janaf_polymorph)
+    return _janaf_fusion_energy_for_pair(
+        formula, solid_table, liquid_table, temperature_K
     )
 
 
@@ -1424,10 +1686,489 @@ def _b1259_tridymite_cristobalite_delta_g(
     return delta_h - temperature_K * delta_s, lower, upper, extrapolated
 
 
+# Holzheid 1997 p. 30 eq. (9), J/mol. Printed comparison only: it is not the
+# conversion. d/dT of a + b T - c T ln T is b - c (ln T + 1).
+_HOLZHEID_EQ9_J = (Decimal("-244118"), Decimal("115.559"), Decimal("8.474"))
+_HOLZHEID_EQ9_SLOPE_AT_K = Decimal("1673.15")
+# Holzheid 1997 pp. 30–31 printed γ_stoich/γ_wüstite. Comparison only.
+_HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
+_HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
+_FEO_WUSTITE_FORMULA = "Fe(1-x)O"
+_FEO_STOICHIOMETRIC_FORMULA = "FeO"
+_KELVIN_FROM_CELSIUS = Decimal("273.15")
+_IRON_SATURATED_FEO_MISSING_INPUT = "iron-saturated FeO conversion missing input:"
+# Cold and hot ends of the Holzheid and Distin rows this conversion scores.
+_FEO_SCORED_SPAN_K = (Decimal("1578"), Decimal("2233.15"))
+
+
+@dataclass(frozen=True)
+class _IronSaturatedFeOCalibration:
+    temperatures_K: tuple[Decimal, ...]
+    intercept_J: Decimal
+    slope_J_per_mol_K: Decimal
+    fusion_tm_K: Decimal
+    fusion_h_J: Decimal
+    fusion_s_J_per_mol_K: Decimal
+    window_low_K: Decimal
+    window_high_K: Decimal
+    comparison_text: str
+
+
+def _display_decimal(value: Decimal, quantum: str) -> str:
+    return format(value.quantize(Decimal(quantum)), "f")
+
+
+def _least_squares_line(
+    xs: tuple[Decimal, ...], ys: tuple[Decimal, ...]
+) -> tuple[Decimal, Decimal]:
+    """Exact least squares y = intercept + slope x for Decimal inputs."""
+
+    count = Decimal(len(xs))
+    sum_x = sum(xs, Decimal(0))
+    sum_y = sum(ys, Decimal(0))
+    sum_xx = sum((x * x for x in xs), Decimal(0))
+    sum_xy = sum((x * y for x, y in zip(xs, ys)), Decimal(0))
+    denominator = count * sum_xx - sum_x * sum_x
+    slope = (count * sum_xy - sum_x * sum_y) / denominator
+    intercept = (sum_y - slope * sum_x) / count
+    return intercept, slope
+
+
+def _janaf_formation_gibbs_J(table_id: str, temperature_K: Decimal) -> Decimal:
+    """Formation Gibbs energy in J/mol from the production JANAF interpolator."""
+
+    from simulator.battery.generators.janaf import (
+        _fusion_table_points,
+        _interpolate_formation_gibbs,
+    )
+
+    points, _digest = _fusion_table_points(table_id)
+    return _interpolate_formation_gibbs(points, temperature_K) * Decimal(1000)
+
+
+def _darken_gurry_iron_boundary_ratios() -> tuple[tuple[Decimal, Decimal], ...]:
+    """Stored Table III B rows: (T/K, pCO2/pCO) on the iron–liquid-oxide boundary."""
+
+    path = (
+        REPO_ROOT
+        / "data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml"
+    )
+    document = load_yaml(path)
+    if not isinstance(document, Mapping):
+        raise ValueError("Darken & Gurry extract is not a mapping")
+    species = document.get("species")
+    if not isinstance(species, Mapping):
+        raise ValueError("Darken & Gurry extract has no species map")
+    rows: list[tuple[Decimal, Decimal]] = []
+    for block in species.values():
+        if not isinstance(block, Mapping):
+            continue
+        observations = block.get("observations")
+        if not isinstance(observations, list):
+            continue
+        for obs in observations:
+            if not isinstance(obs, Mapping):
+                continue
+            values = obs.get("values")
+            if not isinstance(values, Mapping) or "pCO2_over_pCO_as_printed" not in values:
+                continue
+            conditions = obs.get("point_conditions")
+            boundary = None
+            if isinstance(conditions, Mapping):
+                raw_boundary = conditions.get("equilibrium_boundary")
+                if isinstance(raw_boundary, Mapping):
+                    state = raw_boundary.get("state")
+                    if isinstance(state, Mapping):
+                        boundary = state.get("value")
+            if boundary != "iron and liquid oxide":
+                continue
+            temperature_K = Decimal(str(values["T_C"])) + _KELVIN_FROM_CELSIUS
+            ratio = Decimal(str(values["pCO2_over_pCO_as_printed"]))
+            if ratio <= 0:
+                raise ValueError(
+                    f"Darken & Gurry iron-boundary ratio is not positive: {ratio}"
+                )
+            rows.append((temperature_K, ratio))
+    rows.sort()
+    if len(rows) != 3:
+        raise ValueError(
+            "expected 3 Darken & Gurry iron-boundary gas ratios, "
+            f"found {len(rows)}"
+        )
+    return tuple(rows)
+
+
+def _iron_fusion_from_janaf() -> tuple[Decimal, Decimal, Decimal]:
+    """ΔH_fus (J/mol), ΔS_fus (J/mol/K) and Tm (K) from the unparsed Fe-003 lines.
+
+    The 1809 K DELTA <-> LIQUID and TRANSITION rows fail the 8-column parser,
+    so enthalpy and entropy are read from the stored raw_line. Columns match
+    every parsed neighbour: T, Cp, S, -[G-H]/T, H-H(Tr), label.
+    """
+
+    from simulator.battery.generators.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / "Fe-003.yaml")
+    table = document.get("table") if isinstance(document, Mapping) else None
+    ambiguities = table.get("parse_ambiguities") if isinstance(table, Mapping) else None
+    if not isinstance(ambiguities, list):
+        raise ValueError("Fe-003 parse_ambiguities are missing")
+    solid: tuple[Decimal, Decimal] | None = None
+    liquid: tuple[Decimal, Decimal] | None = None
+    melting_K: Decimal | None = None
+    for item in ambiguities:
+        if not isinstance(item, Mapping):
+            continue
+        parts = str(item.get("raw_line") or "").split("\t")
+        if len(parts) < 6:
+            continue
+        temperature = Decimal(parts[0])
+        if temperature != Decimal("1809"):
+            continue
+        entropy = Decimal(parts[2])
+        enthalpy_kJ = Decimal(parts[4])
+        label = parts[5]
+        melting_K = temperature
+        if "DELTA" in label and "LIQUID" in label:
+            solid = (entropy, enthalpy_kJ)
+        elif label.startswith("TRANSITION"):
+            liquid = (entropy, enthalpy_kJ)
+    if solid is None or liquid is None or melting_K is None:
+        raise ValueError("Fe-003 is missing the 1809 K DELTA <-> LIQUID pair")
+    return (
+        (liquid[1] - solid[1]) * Decimal(1000),
+        liquid[0] - solid[0],
+        melting_K,
+    )
+
+
+def _holzheid_eq9_slope_J_per_mol_K(temperature_K: Decimal) -> Decimal:
+    """Temperature derivative of Holzheid eq. (9). Comparison only."""
+
+    _intercept, slope, log_coefficient = _HOLZHEID_EQ9_J
+    return slope - log_coefficient * (temperature_K.ln() + 1)
+
+
+def _feo_reference_delta_g_J(
+    intercept_J: Decimal,
+    slope_J_per_mol_K: Decimal,
+    temperature_K: Decimal,
+    fusion_tm_K: Decimal,
+    fusion_h_J: Decimal,
+    fusion_s_J_per_mol_K: Decimal,
+) -> Decimal:
+    """Iron-boundary ΔG versus the stable iron phase, in J/mol.
+
+    Premise: at iron saturation a_Fe = 1, so the measured gas ratio fixes
+    mu_FeO = mu_Fe + mu_O of the FeO component in the saturated liquid.
+    Algebra: ΔG_w,vs_solid = R T ln(pCO2/pCO) + ΔfG(CO2) - ΔfG(CO), fitted
+    as intercept + slope T. Above the iron melting point the stable element
+    phase is liquid, so subtract ΔG_fus(Fe) = ΔH_fus - T ΔS_fus. At exactly
+    Tm the solid branch is kept.
+    Units: R is J/(mol K), the JANAF formation values are converted from
+    kJ/mol to J/mol, and ΔH_fus is J/mol. The ratio ln(factor) is then
+    (ΔG_w,vs_stable - ΔfG(FeO,l)) / (R T), dimensionless.
+    Sanity: the fitted anchors display as 1.841, 1.724 and 1.627; the factor
+    stays above 1 from 1578 K through 2233.15 K; omitting the fusion shift
+    drops the 1960 °C factor through 1, so the shift is applied only for
+    T > 1809 K.
+    """
+
+    delta_g = intercept_J + slope_J_per_mol_K * temperature_K
+    if temperature_K > fusion_tm_K:
+        delta_g -= fusion_h_J - temperature_K * fusion_s_J_per_mol_K
+    return delta_g
+
+
+def _feo_reference_factor(
+    calibration: _IronSaturatedFeOCalibration,
+    temperature_K: Decimal,
+    *,
+    intercept_J: Decimal | None = None,
+    slope_J_per_mol_K: Decimal | None = None,
+) -> Decimal:
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    intercept = calibration.intercept_J if intercept_J is None else intercept_J
+    slope = (
+        calibration.slope_J_per_mol_K
+        if slope_J_per_mol_K is None
+        else slope_J_per_mol_K
+    )
+    delta_g = _feo_reference_delta_g_J(
+        intercept,
+        slope,
+        temperature_K,
+        calibration.fusion_tm_K,
+        calibration.fusion_h_J,
+        calibration.fusion_s_J_per_mol_K,
+    )
+    delta_f_g = _janaf_formation_gibbs_J("Fe-019", temperature_K)
+    return (
+        (delta_g - delta_f_g) / (JANAF_R_J_PER_MOL_K * temperature_K)
+    ).exp()
+
+
+def _feo_jackknife_factors(
+    calibration: _IronSaturatedFeOCalibration,
+    temperature_K: Decimal,
+    delta_g_w_J: tuple[Decimal, ...],
+) -> tuple[Decimal, Decimal]:
+    """Min and max factor from the three pair-fits. A sensitivity, not a CI."""
+
+    factors: list[Decimal] = []
+    temperatures = calibration.temperatures_K
+    for left in range(len(temperatures)):
+        for right in range(left + 1, len(temperatures)):
+            intercept, slope = _least_squares_line(
+                (temperatures[left], temperatures[right]),
+                (delta_g_w_J[left], delta_g_w_J[right]),
+            )
+            factors.append(
+                _feo_reference_factor(
+                    calibration,
+                    temperature_K,
+                    intercept_J=intercept,
+                    slope_J_per_mol_K=slope,
+                )
+            )
+    return min(factors), max(factors)
+
+
+@lru_cache(maxsize=1)
+def _iron_saturated_feo_calibration() -> tuple[
+    _IronSaturatedFeOCalibration, tuple[Decimal, ...]
+]:
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    ratios = _darken_gurry_iron_boundary_ratios()
+    temperatures = tuple(temperature for temperature, _ratio in ratios)
+    delta_g_w = tuple(
+        JANAF_R_J_PER_MOL_K * temperature * ratio.ln()
+        + _janaf_formation_gibbs_J("C-095", temperature)
+        - _janaf_formation_gibbs_J("C-093", temperature)
+        for temperature, ratio in ratios
+    )
+    intercept, slope = _least_squares_line(temperatures, delta_g_w)
+    fusion_h, fusion_s, fusion_tm = _iron_fusion_from_janaf()
+    calibration = _IronSaturatedFeOCalibration(
+        temperatures_K=temperatures,
+        intercept_J=intercept,
+        slope_J_per_mol_K=slope,
+        fusion_tm_K=fusion_tm,
+        fusion_h_J=fusion_h,
+        fusion_s_J_per_mol_K=fusion_s,
+        window_low_K=min(temperatures),
+        window_high_K=max(temperatures),
+        comparison_text="",
+    )
+    checked = (
+        temperatures
+        + _FEO_SCORED_SPAN_K
+        + (fusion_tm, Decimal("1673.15"), Decimal("1873.15"))
+    )
+    for temperature in checked:
+        if _feo_reference_factor(calibration, temperature) <= 1:
+            raise ValueError(
+                "iron-saturated FeO factor is not above 1 at "
+                f"{temperature} K"
+            )
+    at_melting = _feo_reference_delta_g_J(
+        intercept, slope, fusion_tm, fusion_tm, fusion_h, fusion_s
+    )
+    if at_melting != intercept + slope * fusion_tm:
+        raise ValueError("iron-fusion shift applied at the iron melting point")
+    above = fusion_tm + 1
+    shifted = _feo_reference_delta_g_J(
+        intercept, slope, above, fusion_tm, fusion_h, fusion_s
+    )
+    if not shifted > intercept + slope * above:
+        raise ValueError("iron-fusion shift missing above 1809 K")
+    factor_1400 = _feo_reference_factor(calibration, Decimal("1673.15"))
+    factor_1600 = _feo_reference_factor(calibration, Decimal("1873.15"))
+    eq9_slope = _holzheid_eq9_slope_J_per_mol_K(_HOLZHEID_EQ9_SLOPE_AT_K)
+    comparison = (
+        "Holzheid printed comparison at 1400 C: "
+        f"{_display_decimal(factor_1400, '0.001')} vs "
+        f"{_HOLZHEID_PRINTED_FACTOR_1400_C}; at 1600 C: "
+        f"{_display_decimal(factor_1600, '0.001')} vs "
+        f"{_HOLZHEID_PRINTED_FACTOR_1600_C}; equation (9) slope "
+        f"{_display_decimal(eq9_slope, '0')} vs "
+        f"{_display_decimal(slope, '0.0')} J/mol/K"
+    )
+    calibration = replace(calibration, comparison_text=comparison)
+    return calibration, delta_g_w
+
+
+def _iron_saturated_feo_comparison(
+    reference: Observation, *, engine: Engine | None
+) -> Observation | None:
+    """Retag iron-saturated Fe(1-x)O(l) onto stoichiometric FeO(l).
+
+    The standard-state change is the FeO component's chemical potential,
+    mu_FeO = mu_Fe + mu_O, in the iron-saturated liquid. a_Fe = 1 fixes
+    mu_Fe. Distin's dissolved-oxygen bound is a factor 0.972–0.985 on that
+    activity; it is not applied, and it sits inside the jackknife envelope.
+    No mole fraction redefines the reported activity or activity coefficient.
+
+    Both ΔG_w and JANAF ΔfG(FeO,l) use O2 at the same standard pressure
+    (1 bar), so that pressure cancels. The extracts' 1.01325 bar is the
+    condensed-phase standard state. V dP is about 0.01 J/mol and is not
+    applied. The gas ratios are Darken & Gurry's direct Table III B
+    iron-and-liquid-oxide measurements. Page 801 states
+    N_O/N_Fe = (3r−1)/(2r); that identity fixes composition and does not
+    multiply this partial. Distin p. 75 converts to the stoichiometric oxide
+    by an earlier procedure and prints no factor.
+
+    Supercooled liquid FeO(l) is the comparison convention for a melt
+    component below the oxide's melting marker. Rows outside the measured
+    gas window are scored and flagged, not refused.
+    """
+
+    identity = reference.identity
+    if (
+        reference.admission.status is not AdmissionStatus.ADMITTED
+        or not isinstance(identity, Identity)
+        or identity.reference_state is None
+        or not identity.reference_state.is_value
+        or not isinstance(identity.reference_state.value, StandardState)
+    ):
+        return None
+    quantity = quantity_token(identity)
+    if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        return None
+    standard_state = identity.reference_state.value
+    if (
+        identity.species.formula != _FEO_STOICHIOMETRIC_FORMULA
+        or standard_state.endmember.formula != _FEO_WUSTITE_FORMULA
+        or standard_state.component_basis != _FEO_WUSTITE_FORMULA
+        or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        or phase_token(standard_state.endmember) is not Phase.L
+        or reference.value.kind is not ValueKind.POINT
+        or reference.value.point is None
+        or reference.value.point <= 0
+    ):
+        return None
+    if engine is not None:
+        from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
+
+        if engine.value not in MELT_ACTIVITY_ENGINES:
+            return None
+    temperature_K = temperature_of(identity)
+    if temperature_K is None:
+        if engine is None:
+            return None
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(quantity,),
+            reason=(
+                f"{_IRON_SATURATED_FEO_MISSING_INPUT} activity observation "
+                "has no temperature_K"
+            ),
+            origin=reference.observation_id,
+            band="Darken & Gurry iron-boundary conversion requires temperature_K",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    try:
+        calibration, delta_g_w = _iron_saturated_feo_calibration()
+        factor = _feo_reference_factor(calibration, temperature_K)
+        jackknife_low, jackknife_high = _feo_jackknife_factors(
+            calibration, temperature_K, delta_g_w
+        )
+    except ValueError as exc:
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(quantity,),
+            reason=f"{_IRON_SATURATED_FEO_MISSING_INPUT} {exc}",
+            origin=reference.observation_id,
+            band=f"Darken & Gurry / JANAF FeO reference: {exc}",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    converted = reference.value.point * factor
+    log_f_spread_dex = (
+        Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C) / Decimal("1.792")
+    ).log10()
+    stoichiometric = replace(
+        standard_state,
+        endmember=replace(
+            standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
+        ),
+        component_basis=_FEO_STOICHIOMETRIC_FORMULA,
+    )
+    iron_phase = "liquid" if temperature_K > calibration.fusion_tm_K else "solid"
+    conversion_notice = Notice(
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+        affected_quantities=(quantity,),
+        reason=(
+            "source_flagged_less_reliable: basis=Darken & Gurry 1946 "
+            "(JACS 68:798-816), Table III B, p. 803 direct Fe/wustite "
+            "pCO2/pCO ratios, which the authors flag as less reliable on "
+            "p. 811; uncertainty ±0.035 dex in log f centred on 1.792, "
+            "reaching Holzheid/Barin 1.94 at 1400 C; credible-route "
+            "log-f spread log10(1.94/1.792) = "
+            f"{_display_decimal(log_f_spread_dex, '0.0001')} dex; "
+            "IW shift Δlog10(fO2) = 2 Δlog10(f) = "
+            f"{_display_decimal(2 * log_f_spread_dex, '0.001')} dex; "
+            "Masson 1965 Temkin estimate 0.936 is EXCLUDED from the band "
+            "(stated validity N_Fe2+ 0.7-0.9; this case lies outside it); "
+            "iron-saturated Fe(1-x)O(l) reference converted to stoichiometric "
+            f"FeO(l); source_value={reference.value.point}; "
+            f"converted_value={converted}; "
+            f"factor={_display_decimal(factor, '0.001')}; "
+            "jackknife sensitivity factor "
+            f"[{_display_decimal(jackknife_low, '0.001')}, "
+            f"{_display_decimal(jackknife_high, '0.001')}] "
+            "is not a confidence interval; "
+            f"T={temperature_K} K; iron_phase={iron_phase}; "
+            f"{calibration.comparison_text}"
+        ),
+        origin=reference.observation_id,
+    )
+    notices: tuple[Notice, ...] = (conversion_notice,)
+    if (
+        temperature_K < calibration.window_low_K
+        or temperature_K > calibration.window_high_K
+    ):
+        notices += (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason="D&G iron-boundary line extrapolated",
+                origin=reference.observation_id,
+                band=(
+                    f"{calibration.window_low_K}-{calibration.window_high_K} K"
+                ),
+            ),
+        )
+    row_band = _printed_uncertainty_band(
+        quantity,
+        reference.uncertainty,
+        reference.value.point,
+        source_observation=reference,
+    )
+    if row_band.notice is not None:
+        notices += (row_band.notice,)
+    return replace(
+        reference,
+        identity=replace(identity, reference_state=State.of(stoichiometric)),
+        value=replace(reference.value, point=converted),
+        notices=union_notices(reference.notices, notices),
+    )
+
+
 def fusion_comparison_reference(
     reference: Observation, *, engine: Engine | None = None
 ) -> Observation:
-    """Single owner of solid/liquid reference selection for both the battery scorer and melt-activity benchmark."""
+    """Single owner of reference-state selection for the scorer and the melt benchmark.
+
+    Crystal activities move onto the liquid endmember by the JANAF fusion
+    energy. Iron-saturated Fe(1-x)O(l) activities and activity coefficients
+    move onto stoichiometric FeO(l) by the Darken & Gurry oxygen potential.
+    """
+
+    iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
+    if iron_saturated is not None:
+        return iron_saturated
 
     identity = reference.identity
     if (
@@ -1441,15 +2182,36 @@ def fusion_comparison_reference(
         return reference
     standard_state = identity.reference_state.value
     formula = standard_state.endmember.formula
+    observed_reference_phase = phase_token(standard_state.endmember)
+    magemin_native_reference = any(
+        notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        and notice.reason.startswith("MAGEMin native solid-reference conversion;")
+        for notice in reference.notices
+    )
+    magemin_native_formula = False
+    if engine is Engine.MAGEMIN:
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        magemin_native_formula = formula in MAGEMIN_NATIVE_MELT_ACTIVITIES
     if (
         identity.species.formula != formula
         or standard_state.component_basis != formula
         or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
-        or phase_token(standard_state.endmember) is not Phase.CR
+        or (
+            observed_reference_phase is not Phase.CR
+            and not (
+                engine is Engine.MAGEMIN
+                and magemin_native_formula
+                and observed_reference_phase is Phase.L
+            )
+        )
         or reference.value.kind is not ValueKind.POINT
         or reference.value.point is None
         or reference.value.point <= 0
     ):
+        return reference
+
+    if _source_polymorph_is_rejected(standard_state.endmember.polymorph):
         return reference
 
     if engine is not None:
@@ -1492,7 +2254,6 @@ def fusion_comparison_reference(
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
-        _JANAF_POLYMORPH_BY_TABLE,
         JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
         _janaf_eligible_pure_crystal_tables,
@@ -1501,11 +2262,44 @@ def fusion_comparison_reference(
         janaf_fusion_energy,
     )
 
+    # d-165: a source that records the solid but not its polymorph stays on the
+    # printed number. polymorph is None is not that record — the melt-activity
+    # benchmark's pure-solid identity never set the axis, and the stable JANAF
+    # crystal still converts it onto the liquid basis.
+    if (
+        observed_reference_phase is Phase.CR
+        and standard_state.endmember.polymorph is not None
+        and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
+    ):
+        notice = Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason="fusion_source_reference_phase_unprinted",
+            origin=reference.observation_id,
+            band="JANAF fusion conversion requires the source-named solid polymorph",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+    magemin_target_polymorph: Polymorph | None = None
+    magemin_source_polymorph: Polymorph | None = None
+    if engine is Engine.MAGEMIN:
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        native = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(formula)
+        if native is None:
+            return reference
+        magemin_target_polymorph = Polymorph(native[1])
+        magemin_source_polymorph = polymorph_token(standard_state.endmember)
+        if magemin_source_polymorph is magemin_target_polymorph:
+            # Guo's MgO measurement is already on the periclase standard.
+            return reference
+
     def fusion_missing_input_notice(reason: str) -> Notice | None:
         if not any(
             expected in reason
             for expected in (
                 f"no JANAF fusion table pair for {formula}",
+                "no unique JANAF solid table",
                 "JANAF crystal/liquid tables do not overlap",
                 "JANAF tables have fewer than two complete overlap nodes",
                 "expected one JANAF cr/l crossing",
@@ -1529,8 +2323,33 @@ def fusion_comparison_reference(
             band=f"JANAF fusion data for {formula}: {reason}",
         )
 
+    inferred_reference_notice: Notice | None = None
     try:
-        fusion = janaf_fusion_energy(formula, temperature_K)
+        if engine is Engine.MAGEMIN:
+            # The MAGEMin adapter resolves the source and target crystal
+            # tables itself and reads only this oxide's liquid table. A liquid
+            # reference names no crystal polymorph, so the source-named lookup
+            # cannot supply that table.
+            fusion = janaf_fusion_energy(formula, temperature_K)
+        elif standard_state.endmember.polymorph is None:
+            (
+                reference,
+                fusion,
+                absent_polymorph_refusal,
+                inferred_reference_notice,
+            ) = _fusion_energy_when_polymorph_absent(
+                reference, formula, temperature_K
+            )
+            if absent_polymorph_refusal is not None:
+                extra = (absent_polymorph_refusal,)
+                if inferred_reference_notice is not None:
+                    extra = (inferred_reference_notice, absent_polymorph_refusal)
+                return replace(
+                    reference,
+                    notices=union_notices(reference.notices, extra),
+                )
+        else:
+            fusion = _janaf_fusion_energy_for_reference(reference, temperature_K)
     except ValueError as exc:
         reason = str(exc)
         notice = fusion_missing_input_notice(reason)
@@ -1538,216 +2357,168 @@ def fusion_comparison_reference(
             raise
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
+    if engine is Engine.MAGEMIN:
+        assert magemin_target_polymorph is not None
+        source_polymorph = magemin_source_polymorph
+        target_polymorph = magemin_target_polymorph
+
+        try:
+            eligible = _janaf_eligible_pure_crystal_tables(formula, temperature_K)
+            target_tables = tuple(
+                table for table, polymorph in eligible
+                if polymorph is target_polymorph
+            )
+            if len(target_tables) != 1:
+                raise ValueError(
+                    f"expected one JANAF table for MAGEMin {target_polymorph.value}, "
+                    f"got {[table for table in target_tables]}"
+                )
+            if observed_reference_phase is Phase.L:
+                source_table = fusion.liquid_table
+                source_label = "liquid"
+                inferred_source = False
+                source_pair = None
+            elif source_polymorph is None or _source_polymorph_is_unspecified(
+                standard_state.endmember.polymorph
+            ):
+                stability = _janaf_stable_crystal_set(
+                    formula, temperature_K, eligible
+                )
+                source_table = stability.selected.table_id
+                source_polymorph = stability.selected.polymorph
+                source_label = source_polymorph.value
+                inferred_source = True
+                source_pair = _janaf_fusion_energy_for_pair(
+                    formula, source_table, fusion.liquid_table, temperature_K
+                )
+            else:
+                source_tables = tuple(
+                    table for table, polymorph in eligible
+                    if polymorph is source_polymorph
+                )
+                if len(source_tables) != 1:
+                    raise ValueError(
+                        f"expected one JANAF table for observed "
+                        f"{source_polymorph.value}, got {list(source_tables)}"
+                    )
+                source_table = source_tables[0]
+                source_label = source_polymorph.value
+                inferred_source = False
+                source_pair = _janaf_fusion_energy_for_pair(
+                    formula, source_table, fusion.liquid_table, temperature_K
+                )
+            target_pair = _janaf_fusion_energy_for_pair(
+                formula, target_tables[0], fusion.liquid_table, temperature_K
+            )
+        except (ValueError, JANAFFusionPolymorphUnavailable) as exc:
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"fusion conversion missing input for {formula}: MAGEMin "
+                    f"native reference could not be resolved: {exc}"
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF solid-reference pair for MAGEMin {formula}: {exc}",
+            )
+            return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+        # MAGEMin's native ig activities use periclase for MgO and quartz for
+        # SiO2 (the low-pressure basis used by this scorer; the official API
+        # also names coesite at high pressure). At equal chemical potential,
+        # mu=G°+RT ln(a), so a_target=a_source*exp((G_source-G_target)/RT).
+        # With ΔG_fus=G_liquid-G_crystal, G_source-G_target is
+        # ΔG_fus(target)-ΔG_fus(source), fixing the conversion sign. The
+        # JANAF kJ/mol difference is multiplied by 1000 J/kJ and divided by
+        # R[J/(mol K)]*T[K], so the exponent is dimensionless. Pure-limit
+        # check: when source and target are the same pure polymorph, ΔG=0 and
+        # activity 1 remains 1.
+        delta_g_source_minus_target_J_per_mol = (
+            target_pair.delta_g_fus_kJ_per_mol
+            if source_pair is None
+            else target_pair.delta_g_fus_kJ_per_mol
+            - source_pair.delta_g_fus_kJ_per_mol
+        ) * Decimal(1000)
+        converted_activity = reference.value.point * (
+            delta_g_source_minus_target_J_per_mol
+            / (JANAF_R_J_PER_MOL_K * temperature_K)
+        ).exp()
+        native_endmember = replace(
+            standard_state.endmember,
+            phase=Phase.CR,
+            polymorph=State.of(target_polymorph),
+        )
+        native_state = replace(standard_state, endmember=native_endmember)
+        native_identity = replace(identity, reference_state=State.of(native_state))
+        conversion_notice = Notice(
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                "MAGEMin native solid-reference conversion; "
+                f"formula={formula}; source_reference={source_label}; "
+                f"target_polymorph={target_polymorph.value}; "
+                f"source_activity={reference.value.point}; "
+                f"target_activity={converted_activity}; "
+                f"delta_g_source_minus_target={delta_g_source_minus_target_J_per_mol} J/mol; "
+                f"source_table={source_table}; target_table={target_tables[0]}; "
+                f"inferred_source_polymorph={inferred_source}"
+            ),
+            origin=reference.observation_id,
+            band=f"JANAF reference {source_label} to {target_polymorph.value}",
+            authority=Authority.CERTIFIED,
+            certification="NIST-JANAF crystal Gibbs energies compared at T",
+        )
+        return replace(
+            reference,
+            value=replace(reference.value, point=converted_activity),
+            identity=native_identity,
+            notices=union_notices(reference.notices, (conversion_notice,)),
+        )
+
+    if engine is not Engine.MAGEMIN and magemin_native_reference:
+        # The prior MAGEMin conversion explicitly established a quartz solid
+        # basis. Resolve that same JANAF table when the next owner request is
+        # for a liquid-reference engine; the generic stable-solid choice can
+        # be a different SiO2 polymorph at this temperature.
+        source_polymorph = polymorph_token(standard_state.endmember)
+        try:
+            eligible = _janaf_eligible_pure_crystal_tables(formula, temperature_K)
+            source_tables = tuple(
+                table for table, polymorph in eligible
+                if polymorph is source_polymorph
+            )
+            if len(source_tables) != 1:
+                raise ValueError(
+                    f"expected one JANAF table for MAGEMin source "
+                    f"{source_polymorph}, got {list(source_tables)}"
+                )
+            fusion = _janaf_fusion_energy_for_pair(
+                formula, source_tables[0], fusion.liquid_table, temperature_K
+            )
+        except (ValueError, JANAFFusionPolymorphUnavailable) as exc:
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"fusion conversion missing input for {formula}: MAGEMin "
+                    f"source reference could not be resolved for liquid basis: {exc}"
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF MAGEMin source/liquid pair for {formula}: {exc}",
+            )
+            return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
     # JANAF Mg-008 (MgO(cr), periclase) and Mg-009 (MgO(l)) give, by node
     # interpolation at 1873 K, G_s°=-345.91812 and G_l°=-317.44751 kJ/mol.
     # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
     # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
     # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
-    expected_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
     tridymite_to_cristobalite = (
         formula == "SiO2"
         and fusion.crystal_table == "O-035"
         and observed_polymorph is Polymorph.TRIDYMITE
     )
-    source_polymorph = standard_state.endmember.polymorph
-    source_polymorph_is_unknown = (
-        source_polymorph is not None
-        and _source_polymorph_is_unspecified(source_polymorph)
-    )
-    source_polymorph_is_unspecified = _source_polymorph_is_unspecified(
-        source_polymorph
-    )
-    unique_unknown_polymorph_table = False
-    inferred_reference_notice: Notice | None = None
-    eligible_solid_tables: tuple[tuple[str, Polymorph | None], ...] = ()
-    if (
-        expected_polymorph is not None
-        and observed_polymorph is not expected_polymorph
-        and source_polymorph_is_unspecified
-    ):
-        stability = None
-        try:
-            eligible_solid_tables = _janaf_eligible_pure_crystal_tables(
-                formula, temperature_K
-            )
-            if len(eligible_solid_tables) > 1:
-                stability = _janaf_stable_crystal_set(
-                    formula,
-                    temperature_K,
-                    eligible_solid_tables,
-                )
-        except JANAFFusionPolymorphUnavailable as exc:
-            notice = fusion_missing_input_notice(str(exc))
-            if notice is None:
-                notice = Notice(
-                    kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-                    affected_quantities=(Quantity.ACTIVITY,),
-                    reason=(
-                        f"fusion conversion missing input for {formula}: "
-                        f"incomplete JANAF stability candidate set: {exc}"
-                    ),
-                    origin=reference.observation_id,
-                    band=f"JANAF stability data for {formula}: {exc}",
-                )
-            return replace(
-                reference,
-                notices=union_notices(reference.notices, (notice,)),
-            )
-        if len(eligible_solid_tables) == 1:
-            unique_unknown_polymorph_table = eligible_solid_tables[0][0] == (
-                fusion.crystal_table
-            )
-        elif len(eligible_solid_tables) > 1:
-            assert stability is not None
-            stable_table = stability.selected.table_id
-            stable_polymorph = stability.selected.polymorph
-            stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
-            alternatives = tuple(
-                (item.table_id, item.polymorph, item.gibbs_kJ_per_mol)
-                for item in stability.alternatives
-            )
-            if alternatives:
-                # For equal chemical potential, changing the pure-solid
-                    # standard state shifts activity by exp(dG/RT). Therefore
-                    # d log10(a) = dG / (R T ln 10); J/mol divided by
-                    # (J/mol/K) K is dimensionless, and ln(10) converts ln to
-                    # log10. JANAF gives the quartz alternative to cristobalite
-                    # as 0.038716 dex at 1823 K and 0.039634 dex at 1873 K.
-                    # Its Al2O3 delta/gamma/kappa alternatives give a maximum
-                    # 0.209434 dex at 1823 K and 0.188226 dex at 1873 K. Those
-                    # transition aluminas are metastable relative to corundum
-                    # at these temperatures, so this is an upper bound over
-                    # tabulated phases, not a claim that experiments used them.
-                    # Tridymite is absent from these JANAF tables, so the SiO2
-                    # bound does not cover tridymite.
-                    bound_by_alternative = tuple(
-                        (
-                            abs(gibbs_kJ_per_mol - stable_gibbs_kJ_per_mol)
-                            * Decimal(1000)
-                            / (
-                                JANAF_R_J_PER_MOL_K
-                                * temperature_K
-                                * Decimal(10).ln()
-                            ),
-                            table_id,
-                            polymorph,
-                            gibbs_kJ_per_mol,
-                        )
-                        for table_id, polymorph, gibbs_kJ_per_mol in alternatives
-                    )
-                    bound_dex, max_table, max_polymorph, _max_gibbs = max(
-                        bound_by_alternative, key=lambda item: item[0]
-                    )
-                    row_band = _printed_uncertainty_band(
-                        Quantity.ACTIVITY,
-                        reference.uncertainty,
-                        reference.value.point,
-                        source_observation=reference,
-                    )
-                    if row_band.notice is not None:
-                        reference = replace(
-                            reference,
-                            notices=union_notices(
-                                reference.notices, (row_band.notice,)
-                            ),
-                        )
-                    bound_exceeds_row_band = (
-                        None
-                        if row_band.band is None
-                        else bound_dex > row_band.band.value
-                    )
-                    inference_detail = {
-                        "oxide": formula,
-                        "temperature_K": str(temperature_K),
-                        "chosen_polymorph": stable_polymorph.value,
-                        "chosen_table": stable_table,
-                        "alternatives": [
-                            {"polymorph": polymorph.value, "table": table_id}
-                            for table_id, polymorph, _gibbs in alternatives
-                        ],
-                        "bound_dex": str(bound_dex),
-                        "maximum_alternative": {
-                            "polymorph": max_polymorph.value,
-                            "table": max_table,
-                        },
-                        "row_decision_band_dex": (
-                            None
-                            if row_band.band is None
-                            else str(row_band.band.value)
-                        ),
-                        "row_decision_band_refusal": (
-                            None
-                            if row_band.refusal is None
-                            else dict(row_band.refusal)
-                        ),
-                        "bound_exceeds_row_band": bound_exceeds_row_band,
-                        "authority": Authority.CERTIFIED.value,
-                    }
-                    inferred_reference_notice = Notice(
-                        kind=NoticeKind.DERIVATION_USES_COMPILATION,
-                        affected_quantities=(Quantity.ACTIVITY,),
-                        reason=(
-                            "reference_polymorph_inferred_from_stability: "
-                            + json.dumps(inference_detail, sort_keys=True)
-                        ),
-                        origin=reference.observation_id,
-                        band=f"JANAF stability bound {bound_dex} dex",
-                        authority=Authority.CERTIFIED,
-                        certification=(
-                            "NIST-JANAF solid formation Gibbs energies compared at T"
-                        ),
-                    )
-                    unique_unknown_polymorph_table = True
-                    if stable_table != fusion.crystal_table:
-                        try:
-                            fusion = _janaf_fusion_energy_for_pair(
-                                formula,
-                                stable_table,
-                                fusion.liquid_table,
-                                temperature_K,
-                            )
-                        except ValueError as exc:
-                            notice = fusion_missing_input_notice(str(exc))
-                            if notice is None:
-                                raise
-                            notices = (notice,)
-                            if inferred_reference_notice is not None:
-                                notices = (inferred_reference_notice, notice)
-                            return replace(
-                                reference,
-                                notices=union_notices(reference.notices, notices),
-                            )
-    if (
-        expected_polymorph is not None
-        and observed_polymorph is not expected_polymorph
-        and not tridymite_to_cristobalite
-        and not unique_unknown_polymorph_table
-    ):
-        observed = "unknown" if observed_polymorph is None else observed_polymorph.value
-        notice = Notice(
-            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason=(
-                "fusion conversion missing input: JANAF solid table "
-                f"{fusion.crystal_table} represents polymorph "
-                f"{expected_polymorph.value}, but measured reference polymorph "
-                f"is {observed}"
-            ),
-            origin=reference.observation_id,
-            band=(
-                f"JANAF {fusion.crystal_table} requires "
-                f"{expected_polymorph.value} solid reference"
-            ),
-        )
-        return replace(reference, notices=union_notices(reference.notices, (notice,)))
-
-    if inferred_reference_notice is not None:
-        reference = replace(
-            reference,
-            notices=union_notices(reference.notices, (inferred_reference_notice,)),
-        )
-
     tridymite_notice: Notice | None = None
     tridymite_offset_dex = Decimal(0)
     if tridymite_to_cristobalite:
@@ -1756,8 +2527,8 @@ def fusion_comparison_reference(
         )
         # At equal chemical potential, G_cr + RT ln(a_cr) =
         # G_tr + RT ln(a_tr), so ln(a_cr/a_tr) = -ΔG_tr/(RT).
-        tridymite_offset_dex = -delta_g_tr_J_per_mol / (
-            JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
+        tridymite_offset_dex = -delta_g_tr_J_per_mol / _rt_ln_10_j_per_mol_K(
+            temperature_K
         )
         authority = Authority.EXTRAPOLATED if extrapolated else Authority.CERTIFIED
         band = f"B1259 common printed H/S band [{band_lo}, {band_hi}] K"
@@ -1783,9 +2554,7 @@ def fusion_comparison_reference(
         )
 
     delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
-    offset_dex = delta_g_fus_J_per_mol / (
-        JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
-    )
+    offset_dex = delta_g_fus_J_per_mol / _rt_ln_10_j_per_mol_K(temperature_K)
     liquid_endmember = replace(
         standard_state.endmember,
         phase=Phase.L,
@@ -1832,35 +2601,45 @@ def fusion_comparison_reference(
     # move it to liquid. Since μ=G°+RT ln(a), each step multiplies activity
     # by exp(−ΔG/RT). B1259's common printed H/S grid ends at 2000 K; its edge
     # H/S are held beyond that limit (dCp=0) and the notice marks extrapolation.
-    above_crossing_notice: Notice | None = None
+    magemin_above_crossing_notice: Notice | None = None
     if (
         temperature_K >= fusion.melting_temperature_K
         and not tridymite_to_cristobalite
     ):
-        inferred_conversion = inferred_reference_notice is not None
-        domain_notice = Notice(
-            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason=(
-                f"solid reference recorded at T={temperature_K} K >= "
-                f"JANAF T_fus={fusion.melting_temperature_K} K; "
-                + (
-                    "inferred solid-reference activity converted numerically; "
+        if magemin_native_reference:
+            # The engine already named its solid standard. Convert that known
+            # reference; do not invent a polymorph for an unprinted source.
+            magemin_above_crossing_notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"solid reference recorded at T={temperature_K} K >= "
+                    f"JANAF T_fus={fusion.melting_temperature_K} K; "
+                    "MAGEMin native solid-reference activity converted numerically; "
+                    "its explicit polymorph table supplies the source standard; "
                     "liquid is natural"
-                    if inferred_conversion
-                    else "no numeric reference-state conversion applied because "
-                    "liquid is natural"
-                )
-            ),
-            origin=reference.observation_id,
-            band=(
-                f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
-                f"tables={fusion.crystal_table}/{fusion.liquid_table}"
-            ),
-        )
-        if inferred_conversion:
-            above_crossing_notice = domain_notice
+                ),
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                    f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+                ),
+            )
         else:
+            domain_notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"solid reference recorded at T={temperature_K} K >= "
+                    f"JANAF T_fus={fusion.melting_temperature_K} K; "
+                    "no numeric reference-state conversion applied because liquid is natural"
+                ),
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                    f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+                ),
+            )
             notices = (domain_notice,) if melts_notice is None else (
                 domain_notice,
                 melts_notice,
@@ -1903,7 +2682,6 @@ def fusion_comparison_reference(
         affected_quantities=(Quantity.ACTIVITY,),
         reason=(
             f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION}; "
-            f"{'source polymorph is unknown; ' if source_polymorph_is_unknown else ''}"
             "reference-state conversion (not model error); "
             f"oxide={formula}; source_activity_solid={reference.value.point}; "
             f"converted_activity_liquid={converted_activity}; "
@@ -1919,8 +2697,10 @@ def fusion_comparison_reference(
         origin=reference.observation_id,
     )
     notices = (notice,)
-    if above_crossing_notice is not None:
-        notices = (above_crossing_notice,) + notices
+    if inferred_reference_notice is not None:
+        notices = (inferred_reference_notice,) + notices
+    if magemin_above_crossing_notice is not None:
+        notices = (magemin_above_crossing_notice,) + notices
     if melts_notice is not None:
         notices += (melts_notice,)
     if tridymite_notice is not None:
@@ -2538,6 +3318,14 @@ _UNCERTAINTY_PAIR_RE = re.compile(
     re.IGNORECASE,
 )
 _UNCERTAINTY_SCALAR_RE = re.compile(_UNCERTAINTY_NUMBER)
+_LOG10_ACTIVITY_STANDARD_DEVIATION_RE = re.compile(
+    r"\bstandard\s+deviation\s+(?:of|in)\s+log\s*10\s*(?:\(\s*a\s*\)|a\b|activity\b)",
+    re.IGNORECASE,
+)
+
+
+def _is_log10_activity_standard_deviation(text: str) -> bool:
+    return _LOG10_ACTIVITY_STANDARD_DEVIATION_RE.search(text) is not None
 
 
 def _uncertainty_original(uncertainty: Uncertainty) -> str:
@@ -2579,7 +3367,26 @@ def _uncertainty_scope_covers_cell(uncertainty: Uncertainty, observation: object
 
 def _mapping_uncertainty_value(
     mapping: Mapping[str, object],
+    *,
+    exact_fields: Sequence[str] = (),
 ) -> tuple[object | None, str | None]:
+    for field_name in exact_fields:
+        if field_name not in mapping:
+            continue
+        value = mapping[field_name]
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            return value, "range"
+        try:
+            as_decimal(value)
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            if isinstance(value, str):
+                scalar = _uncertainty_scalar_from_text(value)
+                if scalar is not None:
+                    unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
+                    return scalar, unit
+            return None, None
+        else:
+            return value, None
     for key, value in mapping.items():
         if str(key).casefold() in {"value", "amount", "error_value", "uncertainty_value"}:
             if isinstance(value, (tuple, list)) and len(value) == 2:
@@ -2658,6 +3465,8 @@ def _uncertainty_scalar_from_text(raw: str) -> str | None:
 
 def _printed_uncertainty_source(
     uncertainty: Uncertainty,
+    *,
+    exact_fields: Sequence[str] = (),
 ) -> tuple[Decimal | tuple[Decimal, Decimal] | None, str, str | None]:
     raw = uncertainty.verbatim
     basis = uncertainty.basis or ""
@@ -2671,7 +3480,9 @@ def _printed_uncertainty_source(
     if isinstance(value, tuple):
         shape = "range"
     if value is None and isinstance(raw, Mapping):
-        value, mapped_unit = _mapping_uncertainty_value(raw)
+        value, mapped_unit = _mapping_uncertainty_value(
+            raw, exact_fields=exact_fields
+        )
         if mapped_unit == "range":
             shape = "range"
         elif mapped_unit is not None:
@@ -2721,6 +3532,60 @@ def _printed_uncertainty_source(
     if not parsed.is_finite():
         return None, shape, unit
     return parsed, shape, unit
+
+
+def _temperature_envelope_value(
+    uncertainty: Uncertainty,
+    observation: Observation | None,
+) -> tuple[Decimal | None, dict[str, object] | None, bool]:
+    raw = uncertainty.verbatim
+    if not isinstance(raw, Mapping) or not isinstance(
+        raw.get("log10_a_envelope"), Mapping
+    ):
+        return None, None, False
+    envelope = raw["log10_a_envelope"]
+    temperature = None
+    if observation is not None:
+        state = observation.identity.temperature_K
+        if isinstance(state, State) and state.is_value:
+            try:
+                temperature = as_decimal(state.value)
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                pass
+    available = [str(key) for key in envelope]
+    if temperature is None:
+        return None, {
+            "reason": "printed_uncertainty_temperature_missing",
+            "available_temperatures": available,
+        }, True
+    for key, value in envelope.items():
+        match = re.fullmatch(
+            r"\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))_([CK])\s*", str(key)
+        )
+        if match is None:
+            continue
+        try:
+            keyed_temperature = Decimal(match.group(1))
+            if match.group(2) == "C":
+                keyed_temperature += Decimal("273.15")
+            if keyed_temperature == temperature:
+                try:
+                    parsed = abs(as_decimal(value))
+                except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                    return None, {
+                        "reason": "unparseable_printed_uncertainty",
+                        "temperature_K": str(temperature),
+                        "available_temperatures": available,
+                    }, True
+                if parsed.is_finite():
+                    return parsed, None, True
+        except InvalidOperation:
+            continue
+    return None, {
+        "reason": "printed_uncertainty_temperature_unavailable",
+        "temperature_K": str(temperature),
+        "available_temperatures": available,
+    }, True
 
 
 def _uncertainty_unit(
@@ -2875,7 +3740,10 @@ def _confidence_level_notice(
         if isinstance(uncertainty.verbatim, Mapping)
         else "not_stated"
     )
-    if confidence_level != "not_stated":
+    if confidence_level != "not_stated" or (
+        quantity is Quantity.ACTIVITY
+        and _is_log10_activity_standard_deviation(_uncertainty_original(uncertainty))
+    ):
         return None
     source_fields = (
         [
@@ -2913,6 +3781,7 @@ def _printed_uncertainty_band(
     *,
     source_observation: Observation | None = None,
     method: MethodToken | None = None,
+    band_basis: str = "row_printed",
 ) -> _PrintedBandResolution:
     if uncertainty is None or uncertainty.kind is not UncertaintyKind.PRINTED:
         return _PrintedBandResolution()
@@ -2934,7 +3803,43 @@ def _printed_uncertainty_band(
         if isinstance(uncertainty.verbatim, Mapping)
         else "not_stated"
     )
-    source_value, shape, mapped_unit = _printed_uncertainty_source(uncertainty)
+    log10_activity_sigma = (
+        band_basis == "row_printed"
+        and quantity is Quantity.ACTIVITY
+        and _is_log10_activity_standard_deviation(raw_text)
+    )
+    if log10_activity_sigma:
+        confidence_level = "one_sigma"
+    exact_fields: list[str] = []
+    if source_observation is not None:
+        derivation = source_observation.derivation
+        if derivation is not None:
+            # Parameter names are optional. A derivation that only names
+            # output_unit contributes no original_ fields.
+            parameters = getattr(derivation, "parameters", ())
+            exact_fields.extend(
+                name.removeprefix("original_")
+                for name, _ in parameters
+                if name.startswith("original_")
+            )
+        identity = getattr(source_observation, "identity", None)
+        if isinstance(identity, Identity):
+            subtype = identity.subtype
+            if isinstance(subtype, State) and subtype.is_value and subtype.value:
+                exact_fields.append(str(subtype.value))
+    exact_fields.append(quantity.value)
+    source_value, shape, mapped_unit = _printed_uncertainty_source(
+        uncertainty, exact_fields=exact_fields
+    )
+    envelope_value, envelope_refusal, is_temperature_envelope = (
+        _temperature_envelope_value(uncertainty, source_observation)
+    )
+    if envelope_refusal is not None:
+        return _PrintedBandResolution(refusal=envelope_refusal)
+    if is_temperature_envelope:
+        source_value = envelope_value
+        shape = "scalar"
+        mapped_unit = "dex"
     if source_value is None:
         return _PrintedBandResolution(
             refusal={
@@ -2948,13 +3853,19 @@ def _printed_uncertainty_band(
         return _PrintedBandResolution(
             refusal={"reason": "uncertainty_metric_missing", "original": raw_text}
         )
-    source_unit = _uncertainty_unit(
-        quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
+    source_unit = (
+        "dex"
+        if log10_activity_sigma
+        else _uncertainty_unit(
+            quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
+        )
     )
     if confidence_level in {"two_sigma", "ci95"}:
         kind = "printed_2sigma"
     elif confidence_level == "one_sigma":
         kind = "printed_1sigma"
+    elif confidence_level == "range_half_width":
+        kind = "printed_range"
     elif re.search(
         r"\b(?:range|limits?|maximum error|maximum deviation|bounding)\b",
         raw_text,
@@ -3007,7 +3918,17 @@ def _printed_uncertainty_band(
     notice = _confidence_level_notice(
         quantity, uncertainty, source_observation, source_value
     )
-    return _PrintedBandResolution(DecisionBand(ticket, unit, rule), notice=notice)
+    standard_uncertainty_dex = None
+    if operation is MetricOperation.DEX:
+        if confidence_level in {"one_sigma", "ci95"}:
+            standard_uncertainty_dex = ticket / NORMAL_95_TICKET_MULTIPLIER
+        elif confidence_level == "two_sigma":
+            standard_uncertainty_dex = ticket / Decimal(2)
+    return _PrintedBandResolution(
+        DecisionBand(ticket, unit, rule, band_basis=band_basis),
+        notice=notice,
+        standard_uncertainty_dex=standard_uncertainty_dex,
+    )
 
 
 def _axis_alignment_value(identity: Identity, name: str, profile: object) -> object | None:
@@ -3452,6 +4373,7 @@ def cell_notices(
     cell: object,
 ) -> tuple[Notice, ...]:
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        AUTHORITY_EXTRAPOLATED,
         AUTHORITY_FALLBACK,
         _FLOOR_INVERSION_REASON,
     )
@@ -3463,13 +4385,37 @@ def cell_notices(
             continue
         kind = str(row.get("kind") or "")
         if _row_out_of_certified_band(kind, row):
+            raw_band = row.get("certified_band") or row.get("band")
+            band = str(raw_band or "")
+            if kind == "openimcc_temperature_extrapolated" and isinstance(
+                raw_band, Mapping
+            ):
+                intervals = _interval_certified_band(raw_band)
+                temperature_band = (
+                    None if intervals is None else intervals.get("temperature_K")
+                )
+                if temperature_band is not None:
+                    band = (
+                        f"[{temperature_band[0]:g}, {temperature_band[1]:g}] K"
+                    )
+            reason = row.get("gate_reason")
+            if reason is None:
+                reason = row.get("reason")
+            if reason is None:
+                reason = kind
             notices.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                     affected_quantities=(quantity,),
-                    reason=str(row.get("gate_reason") or row.get("reason") or kind),
+                    reason=str(reason),
                     origin=f"engine:{engine.value}",
-                    band=str(row.get("certified_band") or row.get("band") or ""),
+                    band=band,
+                    authority=(
+                        Authority.EXTRAPOLATED
+                        if kind == "openimcc_temperature_extrapolated"
+                        and row.get("authority") == AUTHORITY_EXTRAPOLATED
+                        else None
+                    ),
                 )
             )
         elif kind == "floor_inversion":
@@ -3531,10 +4477,10 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
-        elif kind == "openimcc_notice":
+        elif kind in {"openimcc_flag", "openimcc_notice"}:
             notices.append(
                 Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                     affected_quantities=(quantity,),
                     reason=str(row.get("reason") or kind),
                     origin=f"engine:{engine.value}",
@@ -3549,7 +4495,8 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
-        elif kind in {"openimcc_flag", "openimcc_gas_unavailable"}:
+        elif kind == "openimcc_gas_unavailable":
+            # No existing kind represents an unavailable engine channel.
             notices.append(
                 Notice(
                     kind=NoticeKind.SOURCE_DISAGREEMENT,
@@ -3947,6 +4894,180 @@ def _solved_effusion_po2_bar(prediction: EnginePrediction) -> float | None:
     return None
 
 
+def _is_glass_valence_identity(identity: object) -> bool:
+    return (
+        isinstance(identity, Identity)
+        and quantity_token(identity)
+        in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
+        and phase_token(identity.species) is Phase.GLASS
+    )
+
+
+def _melt_identity_for_valence(identity: Identity) -> Identity:
+    """Use the run melt as the prediction state for a quenched glass assay."""
+
+    if not _is_glass_valence_identity(identity):
+        return identity
+    return replace(identity, species=replace(identity.species, phase=Phase.L))
+
+
+def _melt_prediction_reference(reference: Observation) -> Observation:
+    if not isinstance(reference.identity, Identity):
+        return reference
+    identity = _melt_identity_for_valence(reference.identity)
+    return reference if identity is reference.identity else replace(reference, identity=identity)
+
+
+def _residual_quench_state(reference: Observation) -> QuenchState | None:
+    return reference.quench_state if _is_glass_valence_identity(reference.identity) else None
+
+
+def _quench_notices(reference: Observation) -> tuple[Notice, ...]:
+    identity = reference.identity
+    if not _is_glass_valence_identity(identity):
+        return ()
+    quantity = quantity_token(identity)
+    assert quantity is not None
+    notices: list[Notice] = []
+    if reference.quench_state is QuenchState.ASSERTED_ALTERED:
+        notices.append(
+            Notice(
+                kind=NoticeKind.QUENCH_ALTERED,
+                affected_quantities=(quantity,),
+                reason="source asserts that quenching altered the measured valence",
+                origin=reference.observation_id,
+            )
+        )
+    basis = (
+        identity.valence_basis.value
+        if quantity is Quantity.VALENCE_RATIO
+        and identity.valence_basis is not None
+        and identity.valence_basis.is_value
+        else None
+    )
+    if (
+        reference.quench_direction is QuenchDirection.OXIDISING
+        and quantity is Quantity.VALENCE_RATIO
+        and identity.species.formula == "Cr"
+        and basis is not None
+        and basis.numerator_oxidation_states == (2,)
+        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+        and basis.value_form is ValenceValueForm.FRACTION
+    ):
+        notices.append(
+            Notice(
+                kind=NoticeKind.QUENCH_OXIDISING,
+                affected_quantities=(quantity,),
+                reason=(
+                    "oxidising quench re-oxidises Cr2+; quenched Cr2+/SumCr "
+                    "is a lower bound"
+                ),
+                origin=reference.observation_id,
+            )
+        )
+    return tuple(notices)
+
+
+def paired_quench_diagnostics(
+    context: ScoreContext,
+) -> tuple[dict[str, object], ...]:
+    """Pair same-run in-situ and glass valence ratios for the score report."""
+
+    by_experiment_source: dict[
+        tuple[str, str], list[Observation]
+    ] = defaultdict(list)
+    for observation in comparison_candidates(context):
+        identity = observation.identity
+        if not isinstance(identity, Identity):
+            continue
+        quantity = quantity_token(identity)
+        phase = phase_token(identity.species)
+        if quantity not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+            continue
+        if phase not in {Phase.L, Phase.GLASS}:
+            continue
+        if not observation.source_id:
+            continue
+        if quantity is Quantity.VALENCE_RATIO:
+            basis = identity.valence_basis
+            if (
+                basis is None
+                or not basis.is_value
+                or basis.value.value_form
+                not in {ValenceValueForm.FRACTION, ValenceValueForm.RATIO}
+            ):
+                continue
+        ratio = point_magnitude(observation.value)
+        if ratio is not None and ratio.is_finite() and ratio > 0:
+            by_experiment_source[
+                (observation.experiment_id, observation.source_id)
+            ].append(observation)
+
+    pairs: list[dict[str, object]] = []
+    for (experiment_id, _source_id), observations in sorted(
+        by_experiment_source.items()
+    ):
+        glasses = [
+            row for row in observations
+            if phase_token(row.identity.species) is Phase.GLASS
+        ]
+        in_situ_rows = [
+            row for row in observations
+            if phase_token(row.identity.species) is Phase.L
+        ]
+        for glass in glasses:
+            glass_identity = _melt_identity_for_valence(glass.identity)
+            in_situ_matches = [
+                row for row in in_situ_rows
+                if identity_equal(
+                    glass_identity,
+                    _melt_identity_for_valence(row.identity),
+                ).kind is IdentityEqualKind.EQUAL
+            ]
+            if len(in_situ_matches) != 1:
+                continue
+            in_situ = in_situ_matches[0]
+            glass_matches = [
+                row for row in glasses
+                if identity_equal(
+                    _melt_identity_for_valence(row.identity),
+                    _melt_identity_for_valence(in_situ.identity),
+                ).kind is IdentityEqualKind.EQUAL
+            ]
+            if len(glass_matches) != 1:
+                continue
+            glass_ratio = point_magnitude(glass.value)
+            in_situ_ratio = point_magnitude(in_situ.value)
+            if glass_ratio is None or in_situ_ratio is None:
+                continue
+            # Premise: these are the same run and valence identity, observed
+            # once in the melt and once after quenching.
+            # Algebra: log10(glass) - log10(melt) = log10(glass / melt).
+            # Units: both ratios are dimensionless, so the difference is dex.
+            # Sanity: identical ratios give log10(1) = 0.
+            delta_log10 = glass_ratio.log10() - in_situ_ratio.log10()
+            pairs.append(
+                {
+                    "experiment_id": experiment_id,
+                    "in_situ_observation": in_situ.observation_id,
+                    "glass_observation": glass.observation_id,
+                    "in_situ_ratio": in_situ_ratio,
+                    "glass_ratio": glass_ratio,
+                    "quench_state": glass.quench_state,
+                    "delta_log10": delta_log10,
+                }
+            )
+    return tuple(
+        sorted(
+            pairs,
+            key=lambda row: (
+                str(row["experiment_id"]),
+                str(row["glass_observation"]),
+            ),
+        )
+    )
+
+
 def _comparison_identity(
     identity: Identity,
     reference: Observation,
@@ -3964,7 +5085,11 @@ def _comparison_identity(
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
-    redox = quantity_token(identity) is Quantity.FE3_FE2_RATIO
+    melt_identity = _melt_identity_for_valence(identity)
+    redox = quantity_token(identity) in {
+        Quantity.FE3_FE2_RATIO,
+        Quantity.VALENCE_RATIO,
+    }
     fusion_polymorph_flag = (
         quantity_token(identity) in FUSION_QUANTITIES
         and any(
@@ -3980,10 +5105,13 @@ def _comparison_identity(
         not solved_oxygen_balance
         and not comparison_activity
         and not redox
+        and melt_identity is identity
         and not fusion_polymorph_flag
     ):
         return identity
     updates: dict[str, State] = {}
+    if melt_identity is not identity:
+        updates["species"] = melt_identity.species
     if redox and isinstance(prediction.identity, Identity):
         # Redox predictions consume the row's printed composition and oxygen
         # condition; compare both sides at those exact point conditions.
@@ -4058,7 +5186,7 @@ def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
 def _predict_fe_redox(
     engine: Engine, observation: Observation, identity: Identity, channel: str
 ) -> EnginePrediction:
-    """Predict Fe3+/Fe2+ with the production Kress91 melt-redox split."""
+    """Predict Fe3+/Fe2+ with the production model selected by the engine."""
 
     from simulator.fe_redox import (
         KRESS91_LIQUID_CALIBRATION_MAX_T_C,
@@ -4071,7 +5199,7 @@ def _predict_fe_redox(
     )
 
     sources = ("Kress and Carmichael 1991, doi:10.1007/BF00307328",)
-    if engine is not Engine.INTERNAL_ANALYTICAL:
+    if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -4086,6 +5214,9 @@ def _predict_fe_redox(
             },
             identity=identity,
         )
+
+    if engine is Engine.OPENIMCC:
+        sources = ()
 
     def refused(reason: RefusalReason, detail: Mapping[str, object]) -> EnginePrediction:
         return EnginePrediction(
@@ -4113,26 +5244,202 @@ def _predict_fe_redox(
         except (TypeError, ValueError):
             return None
 
-    temperature = temperature_of(identity) or point_value("temperature_K")
-    if temperature is None or not temperature.is_finite() or temperature <= 0:
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "temperature_K"},
+    def temperature_input() -> tuple[Decimal | None, EnginePrediction | None]:
+        temperature = temperature_of(identity) or point_value("temperature_K")
+        if temperature is None or not temperature.is_finite() or temperature <= 0:
+            return None, refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "temperature_K"},
+            )
+        return temperature, None
+
+    def composition_input() -> tuple[
+        State[Composition] | None,
+        Composition | None,
+        EnginePrediction | None,
+    ]:
+        composition_state = identity.composition
+        if composition_state is None or not composition_state.is_value:
+            composition_state = _printed_point_composition(observation)
+        if (
+            composition_state is None
+            or not composition_state.is_value
+            or not isinstance(composition_state.value, Composition)
+        ):
+            return None, None, refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "composition"},
+            )
+        return composition_state, composition_state.value, None
+
+    def composition_weight_percent(composition: Composition) -> dict[str, float] | None:
+        return (
+            {oxide: float(amount) for oxide, amount in composition.components}
+            if composition.amount_basis is AmountBasis.MASS_PERCENT
+            else composition_wt_pct(composition)
         )
 
-    composition_state = identity.composition
-    if composition_state is None or not composition_state.is_value:
-        composition_state = _printed_point_composition(observation)
-    if (
-        composition_state is None
-        or not composition_state.is_value
-        or not isinstance(composition_state.value, Composition)
-    ):
+    def printed_fo2_input() -> tuple[Decimal | None, EnginePrediction | None]:
+        fO2_log = point_value("fO2_log")
+        if fO2_log is None:
+            if _derived_fo2_condition(observation):
+                return None, refused(
+                    RefusalReason.IDENTITY_INCOMPLETE,
+                    {"reason": "missing_input", "input": "printed_fO2"},
+                )
+            oxygen_pa = identity.fO2_Pa
+            point_oxygen = (observation.point_conditions or {}).get("fO2_Pa")
+            if (
+                (oxygen_pa is None or not oxygen_pa.is_value or oxygen_pa.value is None)
+                and isinstance(point_oxygen, Located)
+                and point_oxygen.inference is None
+                and point_oxygen.state.is_value
+                and point_oxygen.state.value is not None
+            ):
+                oxygen_pa = point_oxygen.state
+            if oxygen_pa is not None and oxygen_pa.is_value and oxygen_pa.value is not None:
+                oxygen_value = float(oxygen_pa.value)
+                if oxygen_value > 0.0 and math.isfinite(oxygen_value):
+                    fO2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
+        if fO2_log is None or not fO2_log.is_finite():
+            return None, refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "printed_fO2"},
+            )
+        return fO2_log, None
+
+    temperature, input_refusal = temperature_input()
+    if input_refusal is not None:
+        return input_refusal
+    composition_state, composition, input_refusal = composition_input()
+    if input_refusal is not None:
+        return input_refusal
+
+    try:
+        composition_wt = composition_weight_percent(composition)
+        if composition_wt is None:
+            raise ValueError("composition cannot be converted to oxide weights")
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "composition"},
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_redox_composition", "detail": str(exc)},
         )
-    composition = composition_state.value
+
+    if engine is Engine.OPENIMCC:
+        fO2_log, input_refusal = printed_fo2_input()
+        if input_refusal is not None:
+            return input_refusal
+        try:
+            from simulator.accounting.formulas import parse_formula
+
+            inventory: dict[str, float] = {}
+            for oxide, weight_percent in composition_wt.items():
+                formula = parse_formula(oxide, species=oxide)
+                oxide_moles = weight_percent / formula.molar_mass_g_mol
+                for element, atom_moles in formula.atom_moles(oxide_moles).items():
+                    inventory[element] = (
+                        inventory.get(element, 0.0) + atom_moles
+                    )
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            return refused(
+                RefusalReason.INVALID_IDENTITY,
+                {"reason": "invalid_redox_composition", "detail": str(exc)},
+            )
+        if inventory.get("Fe", 0.0) <= 0.0:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "total_iron"},
+            )
+        try:
+            import openimcc
+        except ImportError as exc:
+            return refused(
+                RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+                {
+                    "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
+                    "detail": str(exc),
+                },
+            )
+        try:
+            result = openimcc.evaluate_redox(
+                inventory,
+                float(temperature),
+                "imposed",
+                lambda_imposed=float(fO2_log) * math.log(10.0),
+            )
+        except openimcc.ImccRefusal as exc:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "openimcc_redox_refused", "detail": str(exc)},
+            )
+        prediction_value = result.ferric_fe_mol / result.ferrous_fe_mol
+        if not math.isfinite(prediction_value) or prediction_value <= 0.0:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
+            )
+
+        extrapolated_rows = tuple(result.extrapolated_redox_rows)
+        authority = (
+            Authority.EXTRAPOLATED if extrapolated_rows else Authority.BRIDGE
+        )
+        band = tuple(
+            Decimal(str(value))
+            for value in result.active_row_band_intersection_K
+        )
+        notices: tuple[Notice, ...] = ()
+        if extrapolated_rows:
+            band_text = f"[{band[0]:g}, {band[1]:g}] K"
+            notices = (
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                    reason=(
+                        "openimcc_redox_pack_extrapolation; rows="
+                        f"{', '.join(extrapolated_rows)}; "
+                        f"flags={', '.join(result.flags)}"
+                    ),
+                    origin="openimcc.evaluate_redox",
+                    band=band_text,
+                    authority=authority,
+                ),
+            )
+        notices += tuple(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                reason=str(flag),
+                origin="openimcc.evaluate_redox",
+            )
+            for flag in result.flags
+        )
+        prediction_identity = replace(
+            identity,
+            composition=composition_state,
+            fO2_Pa=State.of(
+                Decimal(str(100000.0 * 10.0 ** float(fO2_log)))
+            ),
+        )
+        sources = (
+            f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="openimcc.evaluate_redox",
+            ),
+            value=as_decimal(str(prediction_value)),
+            unit="dimensionless",
+            authority=authority,
+            notices=notices,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            certified_band={"temperature_K": band},
+            identity=prediction_identity,
+            version="openimcc-redox",
+        )
 
     # Premise: Borisov stores mole fractions of oxide formula units and the
     # combined iron key is single-cation. Algebra: x_i -> w_i ∝ x_i M_i, then
@@ -4141,13 +5448,6 @@ def _predict_fe_redox(
     # mole fraction. Sanity: no measured redox split is used, and the printed
     # six-significant-figure composition remains closed after the FeOt rename.
     try:
-        composition_wt = (
-            {oxide: float(amount) for oxide, amount in composition.components}
-            if composition.amount_basis is AmountBasis.MASS_PERCENT
-            else composition_wt_pct(composition)
-        )
-        if composition_wt is None:
-            raise ValueError("composition cannot be converted to oxide weights")
         dropped_components, dropped_mass_fraction = kress91_dropped_components(
             composition_wt
         )
@@ -4163,32 +5463,9 @@ def _predict_fe_redox(
             {"reason": "missing_input", "input": "total_iron"},
         )
 
-    fO2_log = point_value("fO2_log")
-    if fO2_log is None:
-        if _derived_fo2_condition(observation):
-            return refused(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {"reason": "missing_input", "input": "printed_fO2"},
-            )
-        oxygen_pa = identity.fO2_Pa
-        point_oxygen = (observation.point_conditions or {}).get("fO2_Pa")
-        if (
-            (oxygen_pa is None or not oxygen_pa.is_value or oxygen_pa.value is None)
-            and isinstance(point_oxygen, Located)
-            and point_oxygen.inference is None
-            and point_oxygen.state.is_value
-            and point_oxygen.state.value is not None
-        ):
-            oxygen_pa = point_oxygen.state
-        if oxygen_pa is not None and oxygen_pa.is_value and oxygen_pa.value is not None:
-            oxygen_value = float(oxygen_pa.value)
-            if oxygen_value > 0.0 and math.isfinite(oxygen_value):
-                fO2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
-    if fO2_log is None or not fO2_log.is_finite():
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "printed_fO2"},
-        )
+    fO2_log, input_refusal = printed_fo2_input()
+    if input_refusal is not None:
+        return input_refusal
     # The extract labels this column log10 fO2; its air rows are about -0.68,
     # i.e. log10(0.21 bar), matching the simulator's log10(bar) convention.
     # For identity comparison, fO2(Pa) = 10**log10(fO2/bar) * 1e5 Pa/bar;
@@ -5188,6 +6465,29 @@ def predict_with_engine(
             )
         )
 
+    if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY and wt is not None:
+        from engines.magemin.domain import MAGEMinDomainGate
+
+        valid, warnings, gate_reason = MAGEMinDomainGate.validate_with_reason(wt)
+        if not valid:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                authority=Authority.REFUSED,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.METRIC_DOMAIN,
+                refusal_detail={
+                    "reason": "out_of_domain",
+                    "out_of_domain_reason": gate_reason,
+                    "gate": "magemin_composition_validity",
+                    "warnings": warnings,
+                },
+                identity=identity,
+                requested_composition=requested,
+            )
+
     if composition_value is None and wt is None:
         return EnginePrediction(
             engine=engine,
@@ -5199,7 +6499,6 @@ def predict_with_engine(
             refusal_detail={"reason": "quantity_has_no_engine_pot", "quantity": quantity.value},
             identity=identity,
         )
-
     pressure_bar: float | None = None
     if activity_payload is None:
         pressure_bar, pressure_notice, pressure_invalid = total_pressure_bar_for_score(
@@ -5456,6 +6755,21 @@ def predict_with_engine(
     extra_notices: list[Notice] = list(input_notices)
     authority = Authority.BRIDGE
     certified_band = None
+    if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
+        extra_notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "MAGEMin ig melt_activity validation band is not established; "
+                    "native activity is predicted outside a certified temperature band"
+                ),
+                origin="engine:magemin",
+                band="MAGEMin ig melt_activity validation band not established",
+                authority=Authority.EXTRAPOLATED,
+            )
+        )
+        authority = Authority.EXTRAPOLATED
     if name in MELTS_FAMILY_ENGINES:
         gate = assess_qualification_gate(wt, float(T))
         if not gate.get("valid"):
@@ -5468,6 +6782,16 @@ def predict_with_engine(
     use_isolated = isolated
     if use_isolated is None:
         use_isolated = qualification and name in MELTS_FAMILY_ENGINES
+    # MAGEMin's existing warm-worker hard wall is 15 s; the scorer's 20 s
+    # cell timeout remains a secondary bound. call_timeout_s carries the
+    # remaining cell budget into the worker, whose 15 s pool limit kills the
+    # observed >50 s non-finite Gamma loop. Expiry maps below to
+    # engine_not_converged with this cell's elapsed wall time.
+    native_activity_formula = (
+        formula
+        if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY
+        else None
+    )
     if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION and engine in {
         Engine.VAPOROCK,
         Engine.ALPHAMELTS,
@@ -5486,6 +6810,7 @@ def predict_with_engine(
                 isolated=use_isolated,
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
+                native_activity_formula=native_activity_formula,
             )
 
         try:
@@ -5562,6 +6887,7 @@ def predict_with_engine(
                 isolated=use_isolated,
                 arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
                 physical_pressure_bar=pressure_bar,
+                native_activity_formula=native_activity_formula,
             )
     else:
         cell = equilibrate_cell(
@@ -5573,6 +6899,7 @@ def predict_with_engine(
             isolated=use_isolated,
             arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
             physical_pressure_bar=pressure_bar,
+            native_activity_formula=native_activity_formula,
         )
     notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
@@ -5590,6 +6917,44 @@ def predict_with_engine(
     if status != "ok":
         typed = str(refusal or status or "unavailable")
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
+        if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
+            cell_status = str(getattr(cell, "engine_status", "") or "")
+            if typed in {"out_of_domain", "out_of_basis"} or cell_status == "out_of_domain":
+                refusal_reason = RefusalReason.METRIC_DOMAIN
+                typed_reason = "out_of_domain"
+            else:
+                refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+                if typed == REFUSAL_TIMEOUT:
+                    typed_reason = "engine_timeout"
+                elif typed == "no_liquid":
+                    typed_reason = "no_liquid"
+                elif cell_status == "RuntimeError":
+                    typed_reason = "runtime_error"
+                else:
+                    typed_reason = "engine_not_converged"
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                    call_evidence=call_evidence,
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=refusal_reason,
+                refusal_detail={
+                    "reason": typed_reason,
+                    "elapsed_s": float(getattr(cell, "wall_s", 0.0) or 0.0),
+                    "cell_refusal_reason": typed,
+                    "engine_status": cell_status,
+                    "engine_reason": engine_side_reason,
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
         openimcc_outside_species = engine is Engine.OPENIMCC and any(
             token in f"{typed} {engine_side_reason}"
             for token in (
@@ -5938,6 +7303,36 @@ def predict_with_engine(
             requested_composition=requested,
             version=engine_version,
         )
+    if (
+        engine is Engine.THERMOENGINE
+        and quantity is Quantity.ACTIVITY
+        and qualification
+    ):
+        # The shared MELTS commissioning gate owns the 1073.15-1700 K /
+        # 30-80 wt% SiO2 band. A numeric ThermoEngine gamma outside it is
+        # retained as extrapolated, with the gamma-domain notice used by this
+        # activity rail rather than the generic commissioning notice.
+        qualification_notice = qualification_battery_notice(
+            quantity, engine, gate
+        )
+        notices = tuple(
+            notice
+            for notice in notices
+            if not (
+                notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.origin == f"engine:{engine.value}"
+            )
+        )
+        notices = union_notices(
+            notices,
+            (
+                replace(
+                    qualification_notice,
+                    kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                    authority=Authority.EXTRAPOLATED,
+                ),
+            ),
+        )
     expanded = expand_coefficient_sources(sources)
     return EnginePrediction(
         engine=engine,
@@ -6011,6 +7406,32 @@ _HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
 def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
     """A single slow cell is transient infrastructure, not a cohort refusal."""
     return str(reason).startswith(("engine_timeout:", "engine_transport_error:"))
+
+
+def _hashimoto_engine_floor_inversion_notices(
+    engine: Engine, diagnostics: object
+) -> tuple[Notice, ...]:
+    if not isinstance(diagnostics, Sequence) or isinstance(diagnostics, (str, bytes)):
+        return ()
+    notices: list[Notice] = []
+    for row in diagnostics:
+        if not isinstance(row, Mapping) or row.get("kind") != "floor_inversion":
+            continue
+        original = row.get("original")
+        band = row.get("band")
+        if original is None or band is None:
+            continue
+        notices.append(
+            Notice(
+                kind=NoticeKind.FLOOR_INVERSION,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=f"{row.get('reason') or 'floor_inversion'}:{row.get('species')}",
+                origin=f"engine:{engine.value}",
+                original=as_decimal(original),
+                band=json.dumps(band, sort_keys=True, default=str),
+            )
+        )
+    return tuple(notices)
 
 
 def _hashimoto_residue_prediction(
@@ -6164,6 +7585,37 @@ def _hashimoto_residue_prediction(
                 band="1973-2273 K; engine tip 191960ce8",
             )
         ]
+        notices.extend(
+            _hashimoto_engine_floor_inversion_notices(
+                engine,
+                primary_provenance.get("engine_floor_inversion_diagnostics"),
+            )
+        )
+        surface_floor = primary_provenance.get("surface_pO2_balance_floor")
+        if isinstance(surface_floor, Mapping):
+            floor_steps = int(surface_floor.get("steps_at_floor") or 0)
+            floor_pO2 = surface_floor.get("pO2_bar")
+            if floor_steps > 0 and floor_pO2 is not None:
+                floor_first_step = surface_floor.get("first_step")
+                floor_fraction = float(
+                    surface_floor.get("fraction_of_time_at_floor") or 0.0
+                )
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.FLOOR_INVERSION,
+                        affected_quantities=(
+                            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                        ),
+                        reason="surface_pO2_at_balance_floor",
+                        origin="residue-oxygen-balance",
+                        original=as_decimal(floor_pO2),
+                        band=(
+                            f"steps_at_floor={floor_steps}; "
+                            f"first_step={floor_first_step}; "
+                            f"fraction_of_time_at_floor={floor_fraction:.17g}"
+                        ),
+                    )
+                )
         integration = primary.provenance.get("integration") or {}
         if integration.get("refinement_status") == "unconverged_at_cap":
             notices.append(
@@ -6216,6 +7668,19 @@ def _hashimoto_residue_prediction(
         }
         if getattr(exc, "detail", None):
             detail["detail"] = str(exc.detail)
+        engine_floor_diagnostics: object = ()
+        if getattr(exc, "reason", None) == "hashimoto_internal_analytical_channels_missing":
+            try:
+                refusal_detail = json.loads(str(exc.detail))
+            except (TypeError, ValueError):
+                refusal_detail = {}
+            if isinstance(refusal_detail, Mapping):
+                engine_floor_diagnostics = refusal_detail.get(
+                    "engine_floor_inversion_diagnostics", ()
+                )
+        notices = _hashimoto_engine_floor_inversion_notices(
+            engine, engine_floor_diagnostics
+        )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -6227,6 +7692,7 @@ def _hashimoto_residue_prediction(
                 )
             ),
             coefficient_sources=sources,
+            notices=notices,
             refusal_reason=(
                 RefusalReason.ATTEMPTED_UNAVAILABLE
                 if infrastructure_failure
@@ -6616,7 +8082,12 @@ def compile_residual(
     )
     if non_measured_comparison:
         evidence_class_notices = (_evidence_class_notice(quantity, source_reference),)
-    notices = union_notices(reference.notices, flagged_notices, evidence_class_notices)
+    notices = union_notices(
+        reference.notices,
+        flagged_notices,
+        evidence_class_notices,
+        _quench_notices(reference),
+    )
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -6658,6 +8129,7 @@ def compile_residual(
                 ),
                 numeric=None,
                 refusal=ResidualRefusal(reason, dict(detail), check_refs=_check_refs(gates, reason)),
+                quench_state=_residual_quench_state(reference),
             ),
             candidate,
         )
@@ -6804,17 +8276,62 @@ def compile_residual(
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
         )
 
+    unprinted_reference_phase = next(
+        (
+            notice
+            for notice in notices
+            if notice.reason == "fusion_source_reference_phase_unprinted"
+        ),
+        None,
+    )
+    if (
+        unprinted_reference_phase is not None
+        and engine is Engine.INTERNAL_ANALYTICAL
+    ):
+        if experiment is not None and experiment.method.is_unknown:
+            return _refused(
+                RefusalReason.METHOD_UNKNOWN,
+                {
+                    "reason": RefusalReason.METHOD_UNKNOWN.value,
+                    "method_reason": experiment.method.reason,
+                    "secondary_reasons": [unprinted_reference_phase.reason],
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                exclusions=("experiment_method_known", "source_polymorph_printed"),
+            )
+        return _refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {
+                "reason": unprinted_reference_phase.reason,
+                "formula": formula,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("source_reference_polymorph_printed",),
+        )
+
     missing_fusion_input = next(
         (
             notice
             for notice in notices
             if notice.reason.startswith("fusion conversion missing input:")
             or notice.reason.startswith("fusion conversion missing input for ")
+            or notice.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT)
         ),
         None,
     )
     if missing_fusion_input is not None:
-        if "JANAF solid table " in missing_fusion_input.reason:
+        native_pair_failure = (
+            engine is Engine.MAGEMIN
+            and "MAGEMin native reference could not be resolved:"
+            in missing_fusion_input.reason
+        )
+        if missing_fusion_input.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT):
+            missing_input = (
+                "Darken & Gurry iron-boundary ratios and JANAF formation rows"
+            )
+        elif native_pair_failure:
+            missing_input = "JANAF source/target tables for MAGEMin native reference"
+        elif "JANAF solid table " in missing_fusion_input.reason:
             missing_input = "JANAF solid polymorph matching the selected table"
         elif "no temperature_K" in missing_fusion_input.reason:
             missing_input = "activity observation temperature_K"
@@ -6823,7 +8340,9 @@ def compile_residual(
         return _refused(
             RefusalReason.IDENTITY_INCOMPLETE,
             {
-                "reason": "solid_liquid_reference_conversion_missing_input",
+                "reason": "magemin_native_reference_conversion_missing_input"
+                if native_pair_failure
+                else "solid_liquid_reference_conversion_missing_input",
                 "missing_input": missing_input,
                 "notice": missing_fusion_input.reason,
             },
@@ -6848,7 +8367,7 @@ def compile_residual(
                 predictor_kwargs["bench"] = recorded
         prediction = predictor(
             engine,
-            implied_alpha_reference or reference,
+            _melt_prediction_reference(implied_alpha_reference or reference),
             **predictor_kwargs,
         )
 
@@ -7020,6 +8539,7 @@ def compile_residual(
     candidate = candidate_observation(reference, prediction)
     compared_reference = reference.identity
     compared_candidate = candidate.identity
+    source_identity = source_reference.identity
     if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
         compared_reference = _comparison_identity(
             compared_reference, reference, prediction
@@ -7027,11 +8547,28 @@ def compile_residual(
         compared_candidate = _comparison_identity(
             compared_candidate, reference, prediction
         )
-    equal = (
-        _same_row_redox_identity_equal(compared_reference, compared_candidate)
-        if quantity is Quantity.FE3_FE2_RATIO
-        else identity_equal(compared_reference, compared_candidate)
+    source_phase_missing = (
+        quantity is Quantity.ACTIVITY
+        and isinstance(source_identity, Identity)
+        and source_identity.reference_state is not None
+        and source_identity.reference_state.is_value
+        and isinstance(source_identity.reference_state.value, StandardState)
+        and _source_polymorph_is_unspecified(
+            source_identity.reference_state.value.endmember.polymorph
+        )
     )
+    if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+        equal = _same_row_redox_identity_equal(
+            compared_reference, compared_candidate
+        )
+    elif source_phase_missing:
+        equal = _identity_equal(
+            compared_reference,
+            compared_candidate,
+            allow_unknown_species_polymorph=True,
+        )
+    else:
+        equal = identity_equal(compared_reference, compared_candidate)
     if equal.kind is not IdentityEqualKind.EQUAL:
         reason = (
             RefusalReason.IDENTITY_MISMATCH
@@ -7050,26 +8587,200 @@ def compile_residual(
             exclusions=("identity_equal",),
         )
 
+    if (
+        quantity is Quantity.VALENCE_RATIO
+        and isinstance(identity, Identity)
+        and identity.valence_basis is not None
+        and identity.valence_basis.is_value
+    ):
+        basis = identity.valence_basis.value
+        range_excess = basis._physical_range_excess(prediction.value)
+        if range_excess is not None:
+            lower, upper, excess = range_excess
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.PREDICTION_OUTSIDE_PHYSICAL_RANGE,
+                        affected_quantities=(Quantity.VALENCE_RATIO,),
+                        reason=(
+                            f"prediction fraction valence value {prediction.value} "
+                            f"is outside physical range [{lower}, {upper}] by {excess}"
+                        ),
+                        origin=prediction.engine.value,
+                        original=prediction.value,
+                    ),
+                ),
+            )
+
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
     printed = _PrintedBandResolution()
+    fusion_band_refusal: Mapping[str, object] | None = None
     if implied_alpha:
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
         row_operation = _residual_metric_operation(quantity, reference)
-        printed = _printed_uncertainty_band(
-            quantity,
-            reference.uncertainty,
-            ref_point,
-            source_observation=reference,
-            method=(
-                experiment.method.value
-                if experiment is not None and experiment.method.is_value
-                else None
-            ),
-        )
+        band_uncertainty = source_reference.uncertainty
+        band_basis = None
+        if band_uncertainty.kind is UncertaintyKind.PRINTED:
+            band_basis = "row_printed"
+        elif band_uncertainty.kind is UncertaintyKind.NONE and experiment is not None:
+            work = context.works.get(experiment.work_id or "")
+            method_uncertainties = (
+                None if work is None else work.source_method_uncertainties
+            )
+            source_method_uncertainty = (
+                None
+                if method_uncertainties is None or source_reference.source_id is None
+                else method_uncertainties.get(source_reference.source_id)
+            )
+            if (
+                source_method_uncertainty is not None
+                and (
+                    quantity is None
+                    or source_method_uncertainty.quantity is not quantity
+                )
+            ):
+                source_method_uncertainty = None
+            if source_method_uncertainty is not None:
+                band_basis = "source_method"
+                if source_method_uncertainty.basis not in {
+                    "log10_dex", "absolute", "relative_percent"
+                }:
+                    printed = _PrintedBandResolution(
+                        refusal={
+                            "reason": "source_method_uncertainty_basis_unmapped",
+                            "basis": source_method_uncertainty.basis,
+                        }
+                    )
+                elif source_method_uncertainty.value <= 0:
+                    printed = _PrintedBandResolution(
+                        refusal={
+                            "reason": "source_method_uncertainty_value_nonpositive",
+                            "value": str(source_method_uncertainty.value),
+                        }
+                    )
+                else:
+                    printed_unit = {
+                        "log10_dex": "dex",
+                        "absolute": QUANTITY_UNITS[quantity],
+                        "relative_percent": "%",
+                    }[source_method_uncertainty.basis]
+                    band_uncertainty = Uncertainty(
+                        kind=UncertaintyKind.PRINTED,
+                        verbatim={
+                            "value": source_method_uncertainty.value,
+                            "unit": printed_unit,
+                            "confidence_level": source_method_uncertainty.meaning,
+                            "note": source_method_uncertainty.locator.note,
+                        },
+                        value=source_method_uncertainty.value,
+                        basis=printed_unit,
+                    )
+        if printed.refusal is None:
+            printed = _printed_uncertainty_band(
+                quantity,
+                band_uncertainty,
+                ref_point,
+                source_observation=source_reference,
+                method=(
+                    experiment.method.value
+                    if experiment is not None and experiment.method.is_value
+                    else None
+                ),
+                band_basis=band_basis or "row_printed",
+            )
         if printed.notice is not None:
             notices = union_notices(notices, (printed.notice,))
+
+        source_phase_missing = any(
+            notice.reason == "fusion_source_reference_phase_unprinted"
+            for notice in reference.notices
+        )
+        fusion_conversion = any(
+            _is_fusion_conversion_notice(notice) for notice in reference.notices
+        )
+        if source_phase_missing:
+            fusion_band_refusal = {
+                "reason": "fusion_source_reference_phase_unprinted"
+            }
+        elif fusion_conversion:
+            assert T is not None
+            fusion_energy = _janaf_fusion_energy_for_reference(source_reference, T)
+            if fusion_energy.sigma_delta_g_fus_kJ_per_mol is None:
+                fusion_band_refusal = {
+                    "reason": "conversion_uncertainty_unprinted",
+                    "crystal_table": fusion_energy.crystal_table,
+                }
+            elif printed.refusal is not None:
+                fusion_band_refusal = dict(printed.refusal)
+            elif printed.standard_uncertainty_dex is None:
+                fusion_band_refusal = {
+                    "reason": "fusion_measurement_uncertainty_unprinted_or_not_1sigma"
+                }
+            else:
+                sigma_delta_g = fusion_energy.sigma_delta_g_fus_kJ_per_mol
+                assert sigma_delta_g is not None
+                # Treat the printed row/method sigma and JANAF conversion sigma
+                # as independent standard uncertainties (GUM quadrature).
+                # From dG_fus = R*T*ln(10)*delta(log10(a)),
+                # sigma_conv = sigma_dG_fus/(R*T*ln(10)); J/mol divided by
+                # J/(mol K)*K is dimensionless dex. This code consumes sigma_dG_fus.
+                # If sigma_dH_fus is 10% of 9.6 kJ/mol, then
+                # sigma_dG_fus = sigma_dH_fus*(1 - 1703/1996) ~= 0.14 kJ/mol,
+                # giving 0.14*1000 J/kJ / (8.31441 J/(mol K)*1703 K*ln(10))
+                # ~= 0.004 dex. Taking 10% of dH_fus directly would instead
+                # give sigma_dG_fus=0.96 kJ/mol and ~= 0.029 dex.
+                sigma_conversion_dex = (
+                    sigma_delta_g
+                    * Decimal(1000)
+                    / _rt_ln_10_j_per_mol_K(T)
+                )
+                sigma_total_dex = (
+                    printed.standard_uncertainty_dex**2
+                    + sigma_conversion_dex**2
+                ).sqrt()
+                combined_basis = (
+                    "fusion_combined_source_method"
+                    if band_basis == "source_method"
+                    else "fusion_combined_row_printed"
+                )
+                printed = replace(
+                    printed,
+                    band=DecisionBand(
+                        NORMAL_95_TICKET_MULTIPLIER * sigma_total_dex,
+                        "dimensionless",
+                        (
+                            "fusion_combined_1sigma: independent printed reading "
+                            "and JANAF conversion uncertainties; GUM quadrature"
+                        ),
+                        band_basis=combined_basis,
+                    ),
+                    standard_uncertainty_dex=sigma_total_dex,
+                )
+        if fusion_band_refusal is not None:
+            reason = str(fusion_band_refusal["reason"])
+            printed = replace(
+                printed,
+                band=None,
+                refusal=fusion_band_refusal,
+                standard_uncertainty_dex=None,
+            )
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.INPUT_OMITTED,
+                        affected_quantities=(quantity,),
+                        reason=reason,
+                        origin="decision-band",
+                        band=json.dumps(
+                            dict(fusion_band_refusal), sort_keys=True
+                        ),
+                    ),
+                ),
+            )
         if (
             derived_band_reason is not None
             and printed.band is None
@@ -7114,8 +8825,8 @@ def compile_residual(
                 ),
             )
         printed_applies = (
-            reference.uncertainty.kind is UncertaintyKind.PRINTED
-            and _uncertainty_scope_covers_cell(reference.uncertainty, reference)
+            band_uncertainty.kind is UncertaintyKind.PRINTED
+            and _uncertainty_scope_covers_cell(band_uncertainty, source_reference)
         )
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
@@ -7123,7 +8834,7 @@ def compile_residual(
             reference=ref_point,
             source_relation=source_relation,
             metric_uncertainty=(
-                reference.uncertainty
+                band_uncertainty
                 if printed_applies
                 else None
             ),
@@ -7133,6 +8844,17 @@ def compile_residual(
             operation_override=row_operation,
             band_operation=row_operation,
         )
+        if (
+            numeric is None
+            and metric_reason is RefusalReason.METRIC_DOMAIN
+            and row_operation is MetricOperation.DEX
+            and ref_point <= 0
+        ):
+            metric_detail = {
+                **metric_detail,
+                "reason": "observed_value_outside_metric_domain",
+                "observed_value": str(ref_point),
+            }
     if numeric is None:
         return _refused(
             metric_reason or RefusalReason.METRIC_DOMAIN,
@@ -7159,7 +8881,7 @@ def compile_residual(
         band_preserving_kinds.add(NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG)
     has_no_band_flag = any(
         notice.kind not in band_preserving_kinds for notice in flagged_notices
-    ) or any(_is_fusion_conversion_notice(notice) for notice in notices)
+    ) or fusion_band_refusal is not None
     if has_no_band_flag:
         numeric = replace(numeric, decision_band=None)
     if implied_alpha:
@@ -7219,6 +8941,7 @@ def compile_residual(
                     dict(printed.refusal),
                 )
             ),
+            quench_state=_residual_quench_state(reference),
         ),
         candidate,
     )
@@ -7340,6 +9063,9 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
     Compilation-assessed and compilation-thermo rows stay on their compilation
     scoring route. Other admitted/pending rows outside internal ledgers use the
     comparison route and carry a typed label notice when residuals are compiled.
+
+    Quoted valence ratios are on that route so unsupported engine attempts
+    remain counted refusals while the quoted evidence class stays unchanged.
     """
 
     out: list[Observation] = []
@@ -11019,7 +12745,7 @@ def render_score_report(
     studio_hostname: str | None = None,
     root: Path | None = None,
 ) -> str:
-    return _render_score_report_from_payloads_legacy(
+    report = _render_score_report_from_payloads_legacy(
         _ResidualRowsPayloadView(residuals, context),
         context=context,
         engines=engines,
@@ -11029,6 +12755,33 @@ def render_score_report(
         studio_hostname=studio_hostname,
         store_stamp=derive_store_stamp(root or REPO_ROOT),
     )
+    return _append_quench_pair_diagnostics(
+        report, paired_quench_diagnostics(context)
+    )
+
+
+def _append_quench_pair_diagnostics(
+    report: str, diagnostics: Sequence[Mapping[str, object]]
+) -> str:
+    if not diagnostics:
+        return report
+    lines = [
+        "## Paired in-situ / quenched valence diagnostics",
+        "",
+        "Δlog10 is the dimensionless glass-to-melt ratio difference in dex.",
+        "",
+        "| experiment | in-situ observation | glass observation | in-situ ratio | glass ratio | quench_state | Δlog10 (dex) |",
+        "|---|---|---|---:|---:|---|---:|",
+    ]
+    for row in diagnostics:
+        lines.append(
+            f"| {row['experiment_id']} | {row['in_situ_observation']} | "
+            f"{row['glass_observation']} | {row['in_situ_ratio']} | "
+            f"{row['glass_ratio']} | {row['quench_state']} | "
+            f"{row['delta_log10']} |"
+        )
+    section = "\n".join(lines)
+    return f"{report.rstrip()}\n\n{section}\n"
 
 
 def _append_nasa9_fit_comparison_stratum(
@@ -12114,7 +13867,10 @@ def headline_payload_records(
                 continue
             band_data = numeric.get("decision_band")
             band = None if not isinstance(band_data, Mapping) else DecisionBand(
-                as_decimal(band_data["value"]), str(band_data["unit"]), str(band_data["rule"])
+                as_decimal(band_data["value"]),
+                str(band_data["unit"]),
+                str(band_data["rule"]),
+                str(band_data.get("band_basis") or "derived_scatter"),
             )
             flagged = bool(_flagged_payload_strata(row))
             if flagged:
@@ -13194,7 +14950,13 @@ def render_score_report_from_payloads(
     else:
         lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
     lines.append("")
-    return "\n".join(lines)
+    report = "\n".join(lines)
+    if observations is None:
+        return report
+    pair_context = ScoreContext({}, {}, observations, origins or {})
+    return _append_quench_pair_diagnostics(
+        report, paired_quench_diagnostics(pair_context)
+    )
 
 
 def _legacy_bucket(row: Mapping[str, object]) -> str:

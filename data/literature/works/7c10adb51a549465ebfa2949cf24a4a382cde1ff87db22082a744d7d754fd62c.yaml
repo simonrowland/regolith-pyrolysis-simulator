@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
     - asset_id: pdf:ostrovski-2000-cao-tio2-sio2
       role: pdf
@@ -18,6 +18,18 @@ work:
       sha256:
         tag: value
         value: f01fca197a605af01888a51c60a193f440a67d6fc0006d24ec3998d9a357aac6
+    - asset_id: pdftotext:ostrovski-2000-cao-tio2-sio2
+      role: pdftotext
+      path: text/ostrovski-2000-cao-tio2-sio2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ostrovski-2000-cao-tio2-sio2
+      role: table_csv
+      path: tables/ostrovski-2000-cao-tio2-sio2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:ostrovski-2000-cao-tio2-sio2
       role: pdftotext
       path: unknown

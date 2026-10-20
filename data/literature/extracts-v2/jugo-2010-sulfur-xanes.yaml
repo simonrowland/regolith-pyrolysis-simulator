@@ -1,0 +1,1816 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/jugo-2010-sulfur-xanes.yaml
+observations:
+- observation_id: jugo-2010-sulfur-xanes::jugo_2010_eq10_sulfate_fraction_vs_delta_fmq_fit
+  experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'S6plus_over_sum_S_vs_delta_FMQ_function'
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'S6plus_over_sum_S_vs_delta_FMQ_function'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: schema_gap_function_valued_fit
+    decided_by:
+      worker: rdxw2-s10
+      date: '2026-10-16'
+      evidence:
+        published_page: 5935
+        pdf_page_index: 9
+        equation: '10'
+  notices: []
+  source_id: jugo-2010-sulfur-xanes
+  locator:
+    published_page: 5935
+    pdf_page_index: 9
+    equation: '10'
+  read_from: pdf:jugo-2010-sulfur-xanes
+  derived_from:
+  - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
+  - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=7a57577814c0
+  - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=83ac5b5b305b
+  - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=497365d87119
+  - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=1d140014b00c
+  - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=c65599bd2d30
+  - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=2d2636f52b02
+  derivation:
+    relation: 'Equation 10 fit to the seven stored synthetic S6+/ΣS rows against ΔFMQ: S6+/ΣS = 1 / (1 + 10^(A - BΔFMQ));
+      slope B is fixed at 2 and A is fitted.'
+    inputs:
+    - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
+    - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=7a57577814c0
+    - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=83ac5b5b305b
+    - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=497365d87119
+    - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=1d140014b00c
+    - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=c65599bd2d30
+    - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=2d2636f52b02
+    parameters:
+    - - A
+      - state:
+          tag: value
+          value: '2.1'
+        locator:
+          published_page: 5935
+          pdf_page_index: 9
+          equation: '10'
+    - - A_uncertainty
+      - state:
+          tag: value
+          value: '0.1'
+        locator:
+          published_page: 5935
+          pdf_page_index: 9
+          equation: '10'
+    - - B
+      - state:
+          tag: value
+          value: '2'
+        locator:
+          published_page: 5935
+          pdf_page_index: 9
+          equation: '10'
+    output_unit: fraction
+- observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=1d140014b00c
+  experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.515023695412166641063538003'
+        - - TiO2
+          - '0.01440671694931600567359840485'
+        - - Al2O3
+          - '0.1040187043491318098612306772'
+        - - FeO
+          - '0.09006166804172188354380335442'
+        - - MnO
+          - '0.001717402205159650002779005902'
+        - - MgO
+          - '0.09202482634012436229228762269'
+        - - CaO
+          - '0.124436128797797303281308281'
+        - - Na2O
+          - '0.03636432246608432390035686763'
+        - - K2O
+          - '0.01350827305044216409676960566'
+        - - P2O5
+          - '0.002527178652339838852414812235'
+        - - S
+          - '0.005911083735716017431913365546'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: buffer-relative fO2 (FMQ+0.9) requires a temperature-dependent buffer model; no fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '200000000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.4041'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed for the Table 4 S6+/ΣS estimates.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: rdxw2-s10
+      date: '2026-10-16'
+      evidence:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+  notices: []
+  source_id: jugo-2010-sulfur-xanes
+  locator:
+    published_page: 5933
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:jugo-2010-sulfur-xanes
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        output_unit: K
+    fO2_control:
+      state:
+        tag: value
+        value: FMQ+0.9
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    pressure_MPa:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2: '45.72'
+          TiO2: '1.7'
+          Al2O3: '15.67'
+          FeO: '9.56'
+          MnO: '0.18'
+          MgO: '5.48'
+          CaO: '10.31'
+          Na2O: '3.33'
+          K2O: '1.88'
+          P2O5: '0.53'
+          S: '0.28'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '3'
+  derivation:
+    relation: Eq. 3 calibration of XANES peak-integral ratio against mixtures of SB-5 and SB-41 endpoint spectra
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '40.41'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '40.41'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          output_unit: dimensionless
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        figure: '8'
+        note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
+- observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=2d2636f52b02
+  experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5534583152625324504714973808'
+        - - TiO2
+          - '0.01709922935885093888481830416'
+        - - Al2O3
+          - '0.1182323263207007634266223485'
+        - - FeO
+          - '0.07670848968817527062008795568'
+        - - MnO
+          - '0.001661279254559124097325836204'
+        - - MgO
+          - '0.06329457324965086738317380562'
+        - - CaO
+          - '0.097658292605848411361773567'
+        - - Na2O
+          - '0.04787064125061479749057814782'
+        - - K2O
+          - '0.01898698016546078770690268678'
+        - - P2O5
+          - '0.003516306961549719989361462775'
+        - - S
+          - '0.001513565882056868567858504047'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: buffer-relative fO2 (FMQ-1.4) requires a temperature-dependent buffer model; no fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '200000000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '-0.0024'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed for the Table 4 S6+/ΣS estimates.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: rdxw2-s10
+      date: '2026-10-16'
+      evidence:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+  notices:
+  - kind: source_value_outside_physical_range
+    affected_quantities:
+    - valence_ratio
+    reason: fraction valence value -0.0024 is outside physical range [0, 1] by 0.0024
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=2d2636f52b02
+    original: '-0.0024'
+  source_id: jugo-2010-sulfur-xanes
+  locator:
+    published_page: 5933
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:jugo-2010-sulfur-xanes
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        output_unit: K
+    fO2_control:
+      state:
+        tag: value
+        value: FMQ-1.4
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    pressure_MPa:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2: '47.97'
+          TiO2: '1.97'
+          Al2O3: '17.39'
+          FeO: '7.95'
+          MnO: '0.17'
+          MgO: '3.68'
+          CaO: '7.9'
+          Na2O: '4.28'
+          K2O: '2.58'
+          P2O5: '0.72'
+          S: '0.07'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '3'
+  derivation:
+    relation: Eq. 3 calibration of XANES peak-integral ratio against mixtures of SB-5 and SB-41 endpoint spectra
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '-0.24'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '-0.24'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          output_unit: dimensionless
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        figure: '8'
+        note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
+- observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=497365d87119
+  experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5141527237529686338820667181'
+        - - TiO2
+          - '0.01433548986003507419472909314'
+        - - Al2O3
+          - '0.1023380318389257857671520953'
+        - - FeO
+          - '0.09256222653586681360389108645'
+        - - MnO
+          - '0.001159740227479339885594275644'
+        - - MgO
+          - '0.09185402092936774054662128791'
+        - - CaO
+          - '0.1238446460690367268486440708'
+        - - Na2O
+          - '0.03539657240788477098541866032'
+        - - K2O
+          - '0.01331904344858355511265048991'
+        - - P2O5
+          - '0.002270062932148945207829852522'
+        - - S
+          - '0.008767441997702613965402370554'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: buffer-relative fO2 (FMQ+1.3) requires a temperature-dependent buffer model; no fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '200000000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.7187'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed for the Table 4 S6+/ΣS estimates.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: rdxw2-s10
+      date: '2026-10-16'
+      evidence:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+  notices: []
+  source_id: jugo-2010-sulfur-xanes
+  locator:
+    published_page: 5933
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:jugo-2010-sulfur-xanes
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        output_unit: K
+    fO2_control:
+      state:
+        tag: value
+        value: FMQ+1.3
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    pressure_MPa:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2: '45.06'
+          TiO2: '1.67'
+          Al2O3: '15.22'
+          FeO: '9.7'
+          MnO: '0.12'
+          MgO: '5.4'
+          CaO: '10.13'
+          Na2O: '3.2'
+          K2O: '1.83'
+          P2O5: '0.47'
+          S: '0.41'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '3'
+  derivation:
+    relation: Eq. 3 calibration of XANES peak-integral ratio against mixtures of SB-5 and SB-41 endpoint spectra
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '71.87'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '71.87'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          output_unit: dimensionless
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        figure: '8'
+        note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
+- observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=7a57577814c0
+  experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5126766794044343214524082582'
+        - - TiO2
+          - '0.01428169469849501736347711838'
+        - - Al2O3
+          - '0.104123343219863965420826207'
+        - - FeO
+          - '0.08886897445716196033223683002'
+        - - MnO
+          - '0.001332000797321895257727584795'
+        - - MgO
+          - '0.08942164257983888071455891313'
+        - - CaO
+          - '0.1233640531856068015876761611'
+        - - Na2O
+          - '0.03702432263929485776793374483'
+        - - K2O
+          - '0.01361358541000632843599191038'
+        - - P2O5
+          - '0.002662717176152823187418193178'
+        - - S
+          - '0.01263098643182314847974507922'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: buffer-relative fO2 (FMQ+1.8) requires a temperature-dependent buffer model; no fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '200000000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.9444'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed for the Table 4 S6+/ΣS estimates.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: rdxw2-s10
+      date: '2026-10-16'
+      evidence:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+  notices: []
+  source_id: jugo-2010-sulfur-xanes
+  locator:
+    published_page: 5933
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:jugo-2010-sulfur-xanes
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        output_unit: K
+    fO2_control:
+      state:
+        tag: value
+        value: FMQ+1.8
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    pressure_MPa:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2: '45.64'
+          TiO2: '1.69'
+          Al2O3: '15.73'
+          FeO: '9.46'
+          MnO: '0.14'
+          MgO: '5.34'
+          CaO: '10.25'
+          Na2O: '3.4'
+          K2O: '1.9'
+          P2O5: '0.56'
+          S: '0.6'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '3'
+  derivation:
+    relation: Eq. 3 calibration of XANES peak-integral ratio against mixtures of SB-5 and SB-41 endpoint spectra
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '94.44'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '94.44'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          output_unit: dimensionless
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        figure: '8'
+        note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
+- observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=83ac5b5b305b
+  experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5128567274499188067477295592'
+        - - TiO2
+          - '0.01452900183276649874866842587'
+        - - Al2O3
+          - '0.1024246831665796780740135621'
+        - - FeO
+          - '0.09350629613514120248979838012'
+        - - MnO
+          - '0.001626192667118481112027745091'
+        - - MgO
+          - '0.08771739734825269997072140572'
+        - - CaO
+          - '0.1228223590583524892086792205'
+        - - Na2O
+          - '0.03755337315786941716011491637'
+        - - K2O
+          - '0.01361530427885212700392670061'
+        - - P2O5
+          - '0.002342500653281191887226001463'
+        - - S
+          - '0.0110061642518674075970940815'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: buffer-relative fO2 (FMQ+1.6) requires a temperature-dependent buffer model; no fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '200000000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.9133'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed for the Table 4 S6+/ΣS estimates.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: rdxw2-s10
+      date: '2026-10-16'
+      evidence:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+  notices: []
+  source_id: jugo-2010-sulfur-xanes
+  locator:
+    published_page: 5933
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:jugo-2010-sulfur-xanes
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        output_unit: K
+    fO2_control:
+      state:
+        tag: value
+        value: FMQ+1.6
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    pressure_MPa:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2: '45.41'
+          TiO2: '1.71'
+          Al2O3: '15.39'
+          FeO: '9.9'
+          MnO: '0.17'
+          MgO: '5.21'
+          CaO: '10.15'
+          Na2O: '3.43'
+          K2O: '1.89'
+          P2O5: '0.49'
+          S: '0.52'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '3'
+  derivation:
+    relation: Eq. 3 calibration of XANES peak-integral ratio against mixtures of SB-5 and SB-41 endpoint spectra
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '91.33'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '91.33'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          output_unit: dimensionless
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        figure: '8'
+        note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
+- observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
+  experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5290439504186092648778565784'
+        - - TiO2
+          - '0.01349590559425287906684636828'
+        - - Al2O3
+          - '0.1084707242250195547893283709'
+        - - FeO
+          - '0.07361549534214701967031149535'
+        - - MnO
+          - '0.000188751129924576412054547869'
+        - - MgO
+          - '0.09036149366600225946632992215'
+        - - CaO
+          - '0.1181906373060639701226569146'
+        - - Na2O
+          - '0.03769786432803698939735266959'
+        - - K2O
+          - '0.01385915162523160188235300032'
+        - - P2O5
+          - '0.002546911696736781111595480184'
+        - - S
+          - '0.01252911466797510320331465308'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: buffer-relative fO2 (FMQ+2.7) requires a temperature-dependent buffer model; no fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '200000000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '1.0083'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed for the Table 4 S6+/ΣS estimates.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: rdxw2-s10
+      date: '2026-10-16'
+      evidence:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+  notices:
+  - kind: source_value_outside_physical_range
+    affected_quantities:
+    - valence_ratio
+    reason: fraction valence value 1.0083 is outside physical range [0, 1] by 0.0083
+    origin: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
+    original: '1.0083'
+  source_id: jugo-2010-sulfur-xanes
+  locator:
+    published_page: 5933
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:jugo-2010-sulfur-xanes
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        output_unit: K
+    fO2_control:
+      state:
+        tag: value
+        value: FMQ+2.7
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    pressure_MPa:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2: '47.48'
+          TiO2: '1.61'
+          Al2O3: '16.52'
+          FeO: '7.9'
+          MnO: '0.02'
+          MgO: '5.44'
+          CaO: '9.9'
+          Na2O: '3.49'
+          K2O: '1.95'
+          P2O5: '0.54'
+          S: '0.6'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '3'
+  derivation:
+    relation: Eq. 3 calibration of XANES peak-integral ratio against mixtures of SB-5 and SB-41 endpoint spectra
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '100.83'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '100.83'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          output_unit: dimensionless
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        figure: '8'
+        note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.
+- observation_id: jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=c65599bd2d30
+  experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: S
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5232711863872447250437231805'
+        - - TiO2
+          - '0.01458967095271972802241533342'
+        - - Al2O3
+          - '0.1067297519905365656117181804'
+        - - FeO
+          - '0.08089957235347961123037978663'
+        - - MnO
+          - '0.001271050999872581687381624903'
+        - - MgO
+          - '0.09275414499718804072929635444'
+        - - CaO
+          - '0.1247955518724160341805239773'
+        - - Na2O
+          - '0.03715262154795618984951296281'
+        - - K2O
+          - '0.01310636012505936683972700142'
+        - - P2O5
+          - '0.00283405439459711251668823087'
+        - - S
+          - '0.002596034378930044288633367355'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: buffer-relative fO2 (FMQ-0.1) requires a temperature-dependent buffer model; no fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '200000000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.0019'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed for the Table 4 S6+/ΣS estimates.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: rdxw2-s10
+      date: '2026-10-16'
+      evidence:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+  notices: []
+  source_id: jugo-2010-sulfur-xanes
+  locator:
+    published_page: 5933
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:jugo-2010-sulfur-xanes
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        table: '4'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5933
+              pdf_page_index: 7
+              table: '4'
+        output_unit: K
+    fO2_control:
+      state:
+        tag: value
+        value: FMQ-0.1
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    pressure_MPa:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2: '45.33'
+          TiO2: '1.68'
+          Al2O3: '15.69'
+          FeO: '8.38'
+          MnO: '0.13'
+          MgO: '5.39'
+          CaO: '10.09'
+          Na2O: '3.32'
+          K2O: '1.78'
+          P2O5: '0.58'
+          S: '0.12'
+      locator:
+        published_page: 5928
+        pdf_page_index: 2
+        table: '3'
+  derivation:
+    relation: Eq. 3 calibration of XANES peak-integral ratio against mixtures of SB-5 and SB-41 endpoint spectra
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.19'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.19'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 5933
+                pdf_page_index: 7
+                table: '4'
+          output_unit: dimensionless
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5933
+        pdf_page_index: 7
+        figure: '8'
+        note: Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed.

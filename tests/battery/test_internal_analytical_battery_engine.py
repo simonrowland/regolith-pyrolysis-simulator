@@ -219,12 +219,34 @@ def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
 
 
 def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:
-    _assert_internal_activity_residual_matches_production(
-        source_id="cho-suito-1994-cas-slag-activities",
-        observation_id=(
-            "cho-suito-1994-cas-slag-activities::"
-            "cho_suito_1994_t5_acs2_sio2_cn"
-        ),
+    # d-165: the paper prints SiO2(s) but leaves its polymorph unstated. The
+    # old internal-activity residual was 0.3319086250579114; do not score it
+    # by selecting a JANAF crystal from temperature alone.
+    root = Path(__file__).resolve().parents[2]
+    context = battery_score.load_score_context(
+        root, sources=("cho-suito-1994-cas-slag-activities",)
+    )
+    observation_id = (
+        "cho-suito-1994-cas-slag-activities::"
+        "cho_suito_1994_t5_acs2_sio2_cn"
+    )
+    residual, _ = battery_score.compile_residual(
+        context.observations[observation_id],
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={observation_id},
+    )
+    assert residual.execution.state is ExecutionState.NOT_PROBED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "fusion_source_reference_phase_unprinted"
+    )
+    assert any(
+        notice.reason == "fusion_source_reference_phase_unprinted"
+        for notice in residual.notices
     )
 
 

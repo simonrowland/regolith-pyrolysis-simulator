@@ -1,0 +1,6158 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/nazarov-2015-dhofar-silicides.yaml
+observations:
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_sio_pressure_temperature_relation
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1833, 2033]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: no mapped numeric p_partial selected; temperature_range_K [1833, 2033] is a temperature domain, not
+      the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± widths on A and B; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 171
+    pdf_page_index: 3
+    section: Vaporization of an Anorthitic Melt
+    equation: '1'
+    note: Equation (1) gives the SiO pressure-temperature fit.
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  provenance:
+    pressure_temperature_relation:
+      relation_as_printed: log p_SiO (atm) = −(21 250 ± 1265)/T + (7.414 ± 0.655)
+      pressure_unit_as_printed: atm
+      temperature_unit_as_printed: K
+      A_as_printed: 21 250 ± 1265
+      A: 21250
+      sigma_A: 1265
+      A_unit: K
+      B_as_printed: 7.414 ± 0.655
+      B: '7.414'
+      sigma_B: '0.655'
+      B_unit: dimensionless
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_al::T=1833:h=de5462c431d3
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00013476225'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=Al
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: Al row, 1833 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Al row, 1833 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Al row, 1833 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000133'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Al row, 1833 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Al row, 1833 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_al::T=1883:h=b66bc9a8367e
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1883'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00033335925'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=Al
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: Al row, 1883 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1883'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Al row, 1883 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Al row, 1883 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000329'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Al row, 1883 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Al row, 1883 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_al::T=1933:h=3c6e94658fbf
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00076095075'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=Al
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: Al row, 1933 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Al row, 1933 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Al row, 1933 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000751'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Al row, 1933 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Al row, 1933 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_al::T=1983:h=77b1beb28b5e
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.003019485'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=Al
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: Al row, 1983 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Al row, 1983 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Al row, 1983 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000298'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Al row, 1983 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Al row, 1983 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_al::T=2033:h=bc004912e664
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0061504275'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=Al
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: Al row, 2033 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Al row, 2033 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Al row, 2033 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000607'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Al row, 2033 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Al row, 2033 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_alo::T=1933:h=af36732c3815
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0001195635'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=AlO
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: AlO row, 1933 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: AlO row, 1933 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: AlO row, 1933 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000118'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: AlO row, 1933 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: AlO row, 1933 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_alo::T=1983:h=b2f814c24129
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00056843325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=AlO
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: AlO row, 1983 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: AlO row, 1983 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: AlO row, 1983 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000561'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: AlO row, 1983 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: AlO row, 1983 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_alo::T=2033:h=17a7e1537c71
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0023203425'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=AlO
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: AlO row, 2033 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: AlO row, 2033 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: AlO row, 2033 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000229'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: AlO row, 2033 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: AlO row, 2033 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_ca::T=1833:h=7d5014510192
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00019555725'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=Ca
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: Ca row, 1833 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Ca row, 1833 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Ca row, 1833 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000193'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Ca row, 1833 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Ca row, 1833 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_ca::T=1883:h=8a04f234c7a7
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1883'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00061909575'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=Ca
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: Ca row, 1883 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1883'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Ca row, 1883 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Ca row, 1883 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000611'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Ca row, 1883 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Ca row, 1883 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_ca::T=1933:h=0cf57b6a7acd
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0019150425'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=Ca
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: Ca row, 1933 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Ca row, 1933 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Ca row, 1933 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000189'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Ca row, 1933 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Ca row, 1933 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_ca::T=1983:h=1279ea7ad400
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0059477775'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=Ca
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: Ca row, 1983 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Ca row, 1983 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Ca row, 1983 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000587'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Ca row, 1983 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Ca row, 1983 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_ca::T=2033:h=25a01771e78e
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.01155105'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=Ca
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: Ca row, 2033 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Ca row, 2033 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Ca row, 2033 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000114'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Ca row, 2033 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: Ca row, 2033 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_o2_calculated::T=1833:h=6f6c51bdca9d
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000003708495'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated from the printed O2 = 2O equilibrium; no individual pressure uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=O2**
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: O2** row, 1833 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O2** row, 1833 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O2** row, 1833 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: O2** calculated from the equilibrium printed in Table 2 footnote **.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000000366'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O2** row, 1833 K column
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000000000366'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O2** row, 1833 K column
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O2** row, 1833 K column
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O2** row, 1833 K column
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Footnote ** states the equilibrium used for O2**; numerical raw inputs are not tabulated.
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_o2_calculated::T=1883:h=b2eac849cc91
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1883'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00000129696'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated from the printed O2 = 2O equilibrium; no individual pressure uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=O2**
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: O2** row, 1883 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1883'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O2** row, 1883 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O2** row, 1883 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: O2** calculated from the equilibrium printed in Table 2 footnote **.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000000128'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O2** row, 1883 K column
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000000128'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O2** row, 1883 K column
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O2** row, 1883 K column
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O2** row, 1883 K column
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Footnote ** states the equilibrium used for O2**; numerical raw inputs are not tabulated.
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_o2_calculated::T=1933:h=0c4f920e9cf3
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00000453936'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated from the printed O2 = 2O equilibrium; no individual pressure uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=O2**
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: O2** row, 1933 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O2** row, 1933 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O2** row, 1933 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: O2** calculated from the equilibrium printed in Table 2 footnote **.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000000448'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O2** row, 1933 K column
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000000448'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O2** row, 1933 K column
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O2** row, 1933 K column
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O2** row, 1933 K column
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Footnote ** states the equilibrium used for O2**; numerical raw inputs are not tabulated.
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_o2_calculated::T=1983:h=0f428948a13b
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000074068575'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated from the printed O2 = 2O equilibrium; no individual pressure uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=O2**
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: O2** row, 1983 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O2** row, 1983 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O2** row, 1983 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: O2** calculated from the equilibrium printed in Table 2 footnote **.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000000731'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O2** row, 1983 K column
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000000731'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O2** row, 1983 K column
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O2** row, 1983 K column
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O2** row, 1983 K column
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Footnote ** states the equilibrium used for O2**; numerical raw inputs are not tabulated.
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_o2_calculated::T=2033:h=25d9ecaf4334
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000271551'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated from the printed O2 = 2O equilibrium; no individual pressure uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=O2**
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: O2** row, 2033 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O2** row, 2033 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O2** row, 2033 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: O2** calculated from the equilibrium printed in Table 2 footnote **.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000268'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O2** row, 2033 K column
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000000268'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O2** row, 2033 K column
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O2** row, 2033 K column
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O2** row, 2033 K column
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Footnote ** states the equilibrium used for O2**; numerical raw inputs are not tabulated.
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_o_calculated::T=1833:h=24024273bbf1
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000320187'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated from the printed gas-phase equilibria; no individual pressure uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=O*
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: O* row, 1833 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O* row, 1833 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O* row, 1833 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: O* calculated from the equilibria printed in Table 2 footnote *.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000316'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O* row, 1833 K column
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000000316'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O* row, 1833 K column
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O* row, 1833 K column
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O* row, 1833 K column
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Footnote * states the equilibria used for O*; numerical raw inputs are not tabulated.
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_o_calculated::T=1883:h=7bf18235f96e
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1883'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000093219'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated from the printed gas-phase equilibria; no individual pressure uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=O*
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: O* row, 1883 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1883'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O* row, 1883 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O* row, 1883 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: O* calculated from the equilibria printed in Table 2 footnote *.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000092'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O* row, 1883 K column
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000000092'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O* row, 1883 K column
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O* row, 1883 K column
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O* row, 1883 K column
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Footnote * states the equilibria used for O*; numerical raw inputs are not tabulated.
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_o_calculated::T=1933:h=d2fba8fa8a26
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00026648475'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated from the printed gas-phase equilibria; no individual pressure uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=O*
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: O* row, 1933 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O* row, 1933 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O* row, 1933 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: O* calculated from the equilibria printed in Table 2 footnote *.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000263'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O* row, 1933 K column
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000000263'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O* row, 1933 K column
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O* row, 1933 K column
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O* row, 1933 K column
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Footnote * states the equilibria used for O*; numerical raw inputs are not tabulated.
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_o_calculated::T=1983:h=0a4a9d3a998c
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000506625'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated from the printed gas-phase equilibria; no individual pressure uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=O*
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: O* row, 1983 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O* row, 1983 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O* row, 1983 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: O* calculated from the equilibria printed in Table 2 footnote *.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000005'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O* row, 1983 K column
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000005'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O* row, 1983 K column
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O* row, 1983 K column
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O* row, 1983 K column
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Footnote * states the equilibria used for O*; numerical raw inputs are not tabulated.
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_o_calculated::T=2033:h=44c8d7602144
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00141855'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated from the printed gas-phase equilibria; no individual pressure uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=O*
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: O* row, 2033 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O* row, 2033 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O* row, 2033 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: O* calculated from the equilibria printed in Table 2 footnote *.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000014'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O* row, 2033 K column
+        inference:
+          relation: atm_to_Pa
+          inputs:
+          - P_Pa = P_atm × 101325
+          - original_unit=atm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000014'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O* row, 2033 K column
+          - - factor
+            - state:
+                tag: value
+                value: '101325'
+              locator:
+                published_page: 172
+                pdf_page_index: 4
+                table: '2'
+                note: O* row, 2033 K column
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: O* row, 2033 K column
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Footnote * states the equilibria used for O*; numerical raw inputs are not tabulated.
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio2::T=1833:h=677f0952267b
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.001600935'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=SiO2
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: SiO2 row, 1833 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO2 row, 1833 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO2 row, 1833 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000158'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO2 row, 1833 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO2 row, 1833 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio2::T=1883:h=787815d4dbbb
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1883'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.003992205'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=SiO2
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: SiO2 row, 1883 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1883'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO2 row, 1883 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO2 row, 1883 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000394'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO2 row, 1883 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO2 row, 1883 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio2::T=1933:h=1b55a8dc2302
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00899766'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=SiO2
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: SiO2 row, 1933 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO2 row, 1933 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO2 row, 1933 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000888'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO2 row, 1933 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO2 row, 1933 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio2::T=1983:h=8aad8012f120
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0210756'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=SiO2
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: SiO2 row, 1983 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO2 row, 1983 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO2 row, 1983 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000208'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO2 row, 1983 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO2 row, 1983 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio2::T=2033:h=a2072b438414
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.044886975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual pressure uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=SiO2
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: SiO2 row, 2033 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO2 row, 2033 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO2 row, 2033 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000443'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO2 row, 2033 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO2 row, 2033 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio::T=1833:h=d2752f80345e
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '7.0420875'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 does not state per-point pressure uncertainty; Equation (1) reports fit-coefficient uncertainties on the
+        separate SiO relation row.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=SiO
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: SiO row, 1833 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row, 1833 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row, 1833 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000695'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO row, 1833 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO row, 1833 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio::T=1883:h=231a10c081a0
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1883'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '13.3749'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 does not state per-point pressure uncertainty; Equation (1) reports fit-coefficient uncertainties on the
+        separate SiO relation row.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=SiO
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: SiO row, 1883 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1883'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row, 1883 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row, 1883 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000132'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO row, 1883 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO row, 1883 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio::T=1933:h=6772db8f8799
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '23.1021'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 does not state per-point pressure uncertainty; Equation (1) reports fit-coefficient uncertainties on the
+        separate SiO relation row.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=SiO
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: SiO row, 1933 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row, 1933 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row, 1933 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000228'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO row, 1933 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO row, 1933 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio::T=1983:h=9247ea89652d
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '58.464525'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 does not state per-point pressure uncertainty; Equation (1) reports fit-coefficient uncertainties on the
+        separate SiO relation row.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=SiO
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: SiO row, 1983 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row, 1983 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row, 1983 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000577'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO row, 1983 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO row, 1983 K column
+    output_unit: Pa
+- observation_id: nazarov-2015-dhofar-silicides::nazarov_2015_table2_sio::T=2033:h=686900ce3773
+  experiment_id: 10.1134/s0869591115020071::experiment::nazarov-2015-synthetic-anorthite-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: formula_derived_from_synthetic_anorthite
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '89.875275'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 does not state per-point pressure uncertainty; Equation (1) reports fit-coefficient uncertainties on the
+        separate SiO relation row.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: wave3b-naz15
+      date: '2026-10-16'
+      evidence:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: row=SiO
+  notices: []
+  source_id: nazarov-2015-dhofar-silicides
+  locator:
+    published_page: 172
+    pdf_page_index: 4
+    table: '2'
+    note: SiO row, 2033 K column
+  read_from: pdf:nazarov-2015-dhofar-silicides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row, 2033 K column
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula_derived_from_synthetic_anorthite
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row, 2033 K column
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure, not in-cell total pressure.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 does not print in-cell total pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state fO2 as an experimental condition.
+      locator:
+        published_page: 172
+        pdf_page_index: 4
+        table: '2'
+        note: O and O2 are vapor species, not a stated fO2 condition.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:nazarov-2015-dhofar-silicides
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000887'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO row, 2033 K column
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 172
+          pdf_page_index: 4
+          table: '2'
+          note: SiO row, 2033 K column
+    output_unit: Pa

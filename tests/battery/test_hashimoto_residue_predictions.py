@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import math
 from decimal import Decimal
 from pathlib import Path
@@ -22,6 +23,16 @@ SOURCE = ROOT / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
 STORE = ROOT / "data/literature/extracts-v2/kems-015-hashimoto-1983.yaml"
 PRIMARY_TABLE3_PREFIX = "::hashimoto_1983_table3_residue_composition_series::"
 OXIDES = ("FeO", "MgO", "SiO2", "CaO", "Al2O3")
+
+
+def _no_pO2_balance_floor() -> dict[str, float | int | None]:
+    return {
+        "steps_at_floor": 0,
+        "first_step": None,
+        "fraction_of_time_at_floor": 0.0,
+        "time_at_floor_s": 0.0,
+        "pO2_bar": None,
+    }
 
 
 @pytest.fixture(autouse=True)
@@ -305,7 +316,14 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         shift = 0.8 / steps
         values["FeO"] += shift
         values["MgO"] -= shift
-        return values, (0.1,), (), None, {"Fe": 0.0, "O": 0.0}
+        return (
+            values,
+            (0.1,),
+            (),
+            None,
+            {"Fe": 0.0, "O": 0.0},
+            _no_pO2_balance_floor(),
+        )
 
     monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate_at_steps)
     experiments, measured_rows, preform_dimensions_mm = _source_data()
@@ -386,6 +404,9 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         "oxygen_boundary",
         "total_pressure_Pa",
         "surface_pO2_bar_range_by_geometry",
+        "surface_pO2_balance_floor",
+        "surface_pO2_balance_floor_by_geometry",
+        "engine_floor_inversion_diagnostics",
         "liquid_rows_used",
         "d060_pending",
         "datapack_version",
@@ -484,6 +505,16 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
             ) < 1.0e-12
         assert provenance["oxygen_model"].startswith("R1a engine-consistent")
         assert provenance["oxygen_boundary"] == "unbuffered vacuum; fO2 control none"
+        assert set(provenance["surface_pO2_balance_floor_by_geometry"]) == set(
+            _HASHIMOTO_GEOMETRIES
+        )
+        assert provenance["surface_pO2_balance_floor"] == {
+            "steps_at_floor": 0,
+            "first_step": None,
+            "fraction_of_time_at_floor": 0.0,
+            "time_at_floor_s": 0.0,
+            "pO2_bar": None,
+        }
         assert set(provenance["geometry_policies"]) == set(_HASHIMOTO_GEOMETRIES)
         flags = provenance["assumption_flags"]
         assert flags["area_assumed_sphere_constant"] is True
@@ -543,7 +574,14 @@ def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(
         shift = 0.8 / steps
         values["FeO"] += shift
         values["MgO"] -= shift
-        return values, (0.1,), (), None, {"Fe": 0.0, "O": 0.0}
+        return (
+            values,
+            (0.1,),
+            (),
+            None,
+            {"Fe": 0.0, "O": 0.0},
+            _no_pO2_balance_floor(),
+        )
 
     monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate_at_steps)
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
@@ -560,6 +598,60 @@ def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(
     provenance = predictions[0].provenance
     assert provenance["datapack_version"] is None
     assert provenance["openimcc_model_id"] is None
+
+
+def test_hashimoto_internal_probe_diagnostic_does_not_survive_channel_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers import binary_pot_battery
+    import simulator.battery.residue as residue
+
+    detail = {
+        "reason": "melt_dissociation_pO2_floor_inverted_through_mass_action",
+        "pO2_bar_used": 0.25,
+        "certified_band": {"pO2_bar": [0.1, 1.0]},
+    }
+    diagnostic_calls = []
+
+    def report_floor_diagnostic(**kwargs):
+        diagnostic_calls.append(kwargs)
+        return SimpleNamespace(
+            vapor_pressures_Pa={},
+            diagnostics={
+                "vapor_pressure_diagnostic": {
+                    "pO2_floor_inversion_notices_by_species": {"Mg": detail}
+                }
+            },
+        )
+
+    monkeypatch.setattr(
+        binary_pot_battery, "_new_internal_analytical_core", lambda: object()
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_internal_analytical_vapor_pressure_adapter",
+        report_floor_diagnostic,
+    )
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+
+    with pytest.raises(residue.ResidueInventoryRefusal) as exc_info:
+        residue._predict_hashimoto_residue_cohort(
+            experiments[:1],
+            catalog,
+            preform_dimensions_mm=preform_dimensions_mm,
+            code_revision="floor-diagnostic-test",
+            engine="internal-analytical",
+            _allow_partial_cohort_for_test=True,
+        )
+
+    assert exc_info.value.reason == "hashimoto_internal_analytical_channels_missing"
+    assert diagnostic_calls
+    assert all(call["include_diagnostic_shadows"] is False for call in diagnostic_calls)
+    refusal_detail = json.loads(exc_info.value.detail)
+    assert refusal_detail["engine_floor_inversion_diagnostics"] == []
 
 
 def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
@@ -623,7 +715,14 @@ def test_hashimoto_refinement_flags_the_finest_run_at_the_step_cap(
         shift = steps / 1000.0
         values["FeO"] += shift
         values["MgO"] -= shift
-        return values, (0.1,), (), None, {"Fe": 0.0, "O": 0.0}
+        return (
+            values,
+            (0.1,),
+            (),
+            None,
+            {"Fe": 0.0, "O": 0.0},
+            _no_pO2_balance_floor(),
+        )
 
     monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", never_converges)
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
@@ -693,6 +792,12 @@ def test_hashimoto_engine_refusal_flags_one_run_and_keeps_cohort_moving(
             residue_mol=dict(inventory),
             evaporated_mol={},
             pO2_bar_by_step=(None,),
+            pO2_balance_bracket_boundary_by_step=(None,),
+            pO2_balance_floor_steps=0,
+            pO2_balance_floor_first_step=None,
+            pO2_balance_floor_time_fraction=0.0,
+            pO2_balance_floor_time_s=0.0,
+            pO2_balance_floor_pO2_bar=None,
             atom_closure_mol={},
         )
 
@@ -783,7 +888,14 @@ def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
             refusal = exc
         else:
             refusal = None
-        return residue._hashimoto_project_oxide_wt_pct(inventory), (), (), refusal, {}
+        return (
+            residue._hashimoto_project_oxide_wt_pct(inventory),
+            (),
+            (),
+            refusal,
+            {},
+            _no_pO2_balance_floor(),
+        )
 
     monkeypatch.setattr(
         residue, "_hashimoto_integrate_geometry", integrate_with_engine_call

@@ -1,0 +1,76 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2010.07.022
+  citation: 'Jugo, P. J., Wilke, M. & Botcharnikov, R. E. (2010). Sulfur K-edge XANES analysis of natural and synthetic basaltic
+    glasses: Implications for S speciation and S content as function of oxygen fugacity. Geochimica et Cosmochimica Acta 74,
+    5926-5938.'
+  source_ids:
+  - jugo-2010-sulfur-xanes
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:jugo-2010-sulfur-xanes
+      role: pdf
+      path: raw/jugo-2010-sulfur-xanes/jugo-2010-sulfur-xanes.pdf
+      sha256:
+        tag: value
+        value: f66f629d0430e98487a1cd239ad3e8f3e630987cec49529475f4b2fd0b91e2ea
+    - asset_id: pdftotext:jugo-2010-sulfur-xanes
+      role: pdftotext
+      path: text/jugo-2010-sulfur-xanes
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:jugo-2010-sulfur-xanes
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.gca.2010.07.022
+experiments:
+- experiment_id: 10.1016/j.gca.2010.07.022::jugo-2010-sulfur-xanes
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2010.07.022
+  locator:
+    published_page: 5933
+    pdf_page_index: 7
+    table: '4'
+  apparatus:
+    calibration:
+      calibration:
+        state:
+          tag: value
+          value: Eq. 3; XANES peak-integral calibration against SB-5 (100%) and SB-41 (0%)
+        locator:
+          published_page: 5933
+          pdf_page_index: 7
+          table: '4'

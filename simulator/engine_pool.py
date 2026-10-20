@@ -125,9 +125,16 @@ class EngineWorkerDied(RuntimeError):
     Other exceptions are not rewritten into this type.
     """
 
-    def __init__(self, phase: str, detail: str) -> None:
+    def __init__(
+        self,
+        phase: str,
+        detail: str,
+        *,
+        returncode: Optional[int] = None,
+    ) -> None:
         self.phase = phase
         self.detail = str(detail)
+        self.returncode = None if returncode is None else int(returncode)
         super().__init__(self.detail)
 
 
@@ -451,6 +458,7 @@ class WarmEngineWorker:
             raise EngineWorkerDied(
                 'start',
                 f'{type(exc).__name__}: {exc}',
+                returncode=getattr(process, 'exitcode', None),
             ) from exc
         if message[0] == 'timeout':
             self._discard_current(
@@ -522,7 +530,9 @@ class WarmEngineWorker:
             except EngineWorkerDied as exc:
                 # Construction and this restart share start(); the phase
                 # records which caller observed the pre-ready death.
-                raise EngineWorkerDied('restart', exc.detail) from exc.__cause__
+                raise EngineWorkerDied(
+                    'restart', exc.detail, returncode=exc.returncode
+                ) from exc.__cause__
             _pool_debug(
                 f'{self.name}: cold start ok in '
                 f'{time.monotonic() - t_start:.2f}s pid='
@@ -569,6 +579,7 @@ class WarmEngineWorker:
                     raise EngineWorkerDied(
                         'call',
                         f'{self.name} worker exited without a result',
+                        returncode=getattr(process, 'exitcode', None),
                     )
                 poll_remaining = deadline - time.monotonic()
                 if poll_remaining <= 0.0:
@@ -605,6 +616,7 @@ class WarmEngineWorker:
             raise EngineWorkerDied(
                 'call',
                 f'{self.name} worker exited without a result',
+                returncode=getattr(process, 'exitcode', None),
             ) from exc
         with self._state_lock:
             current = (
@@ -618,6 +630,7 @@ class WarmEngineWorker:
             raise EngineWorkerDied(
                 'call',
                 f'{self.name} worker exited without a result',
+                returncode=getattr(process, 'exitcode', None),
             )
         if message[0] == 'ok':
             return message[1]
@@ -687,30 +700,32 @@ class WarmEngineWorker:
             pid = _process_pid(process)
             if pid is None:
                 pass
-            elif cleanup_group and process is not None and not process.is_alive():
-                try:
-                    os.killpg(pid, signal.SIGKILL)
-                except (AttributeError, OSError):
-                    pass
-            elif process is not None and process.is_alive():
-                if diagnostic:
+            else:
+                if process is not None and process.is_alive() and diagnostic:
                     try:
                         os.kill(pid, self.diagnostic_signal)
                     except OSError:
                         pass
                     time.sleep(self.watchdog_grace_s)
-                if process.is_alive():
+
+                # The diagnostic signal may have killed the leader while its
+                # descendants remain in the session. Reap the group regardless
+                # of the leader's liveness before falling back to Process.kill.
+                if cleanup_group or (
+                    process is not None and process.is_alive()
+                ):
                     try:
                         os.killpg(pid, signal.SIGKILL)
                         process.join(timeout=0.1)
                     except (AttributeError, OSError):
                         pass
-                if process.is_alive():
+                if process is not None and process.is_alive():
                     try:
                         process.kill()
                     except OSError:
                         pass
-                process.join(timeout=1.0)
+                if process is not None:
+                    process.join(timeout=1.0)
         finally:
             if connection is not None:
                 try:

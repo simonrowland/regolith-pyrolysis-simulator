@@ -7169,6 +7169,225 @@ observations:
     note: Table I Na rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4311471091931851005512625625'
+          - - TiO2
+            - '0.0931387200602371283425576716'
+          - - Al2O3
+            - '0.05058895877492316107811212988'
+          - - FeO
+            - '0.1752439414041254084196055855'
+          - - MnO
+            - '0.001970060031040465601226515821'
+          - - MgO
+            - '0.1205710800811418883677677291'
+          - - CaO
+            - '0.1195081584536437715237347561'
+          - - Na2O
+            - '0.005227074752535481915639870165'
+          - - K2O
+            - '0.002023114693417819469680283369'
+          - - P2O5
+            - '0.0005817825557497747304128963893'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 10017 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.78'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '11.71'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.12'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '19.82'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.22'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.65'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.51'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -7335,6 +7554,225 @@ observations:
     note: Table I Na rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4311471091931851005512625625'
+          - - TiO2
+            - '0.0931387200602371283425576716'
+          - - Al2O3
+            - '0.05058895877492316107811212988'
+          - - FeO
+            - '0.1752439414041254084196055855'
+          - - MnO
+            - '0.001970060031040465601226515821'
+          - - MgO
+            - '0.1205710800811418883677677291'
+          - - CaO
+            - '0.1195081584536437715237347561'
+          - - Na2O
+            - '0.005227074752535481915639870165'
+          - - K2O
+            - '0.002023114693417819469680283369'
+          - - P2O5
+            - '0.0005817825557497747304128963893'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 10017 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.78'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '11.71'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.12'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '19.82'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.22'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.65'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.51'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -7499,6 +7937,205 @@ observations:
     note: Table I Na rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4276962562759165078431124469'
+          - - TiO2
+            - '0.02432811158893445609474737032'
+          - - Al2O3
+            - '0.09220708776029153323414621159'
+          - - FeO
+            - '0.148306989269107509425075919'
+          - - MnO
+            - '0.001148612310222625661546886446'
+          - - MgO
+            - '0.1710597119356819918304513602'
+          - - CaO
+            - '0.1285334811441748981775147172'
+          - - Na2O
+            - '0.005056288830734401053425412828'
+          - - K2O
+            - '0.001663460884936076679979674698'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 12073 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '17'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -7663,6 +8300,205 @@ observations:
     note: Table I Na rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4276962562759165078431124469'
+          - - TiO2
+            - '0.02432811158893445609474737032'
+          - - Al2O3
+            - '0.09220708776029153323414621159'
+          - - FeO
+            - '0.148306989269107509425075919'
+          - - MnO
+            - '0.001148612310222625661546886446'
+          - - MgO
+            - '0.1710597119356819918304513602'
+          - - CaO
+            - '0.1285334811441748981775147172'
+          - - Na2O
+            - '0.005056288830734401053425412828'
+          - - K2O
+            - '0.001663460884936076679979674698'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 12073 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '17'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -10168,6 +11004,225 @@ observations:
     note: Table I TiO rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4311471091931851005512625625'
+          - - TiO2
+            - '0.0931387200602371283425576716'
+          - - Al2O3
+            - '0.05058895877492316107811212988'
+          - - FeO
+            - '0.1752439414041254084196055855'
+          - - MnO
+            - '0.001970060031040465601226515821'
+          - - MgO
+            - '0.1205710800811418883677677291'
+          - - CaO
+            - '0.1195081584536437715237347561'
+          - - Na2O
+            - '0.005227074752535481915639870165'
+          - - K2O
+            - '0.002023114693417819469680283369'
+          - - P2O5
+            - '0.0005817825557497747304128963893'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 10017 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.78'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '11.71'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.12'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '19.82'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.22'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.65'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.51'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -10334,6 +11389,225 @@ observations:
     note: Table I TiO rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4311471091931851005512625625'
+          - - TiO2
+            - '0.0931387200602371283425576716'
+          - - Al2O3
+            - '0.05058895877492316107811212988'
+          - - FeO
+            - '0.1752439414041254084196055855'
+          - - MnO
+            - '0.001970060031040465601226515821'
+          - - MgO
+            - '0.1205710800811418883677677291'
+          - - CaO
+            - '0.1195081584536437715237347561'
+          - - Na2O
+            - '0.005227074752535481915639870165'
+          - - K2O
+            - '0.002023114693417819469680283369'
+          - - P2O5
+            - '0.0005817825557497747304128963893'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 10017 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.78'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '11.71'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.12'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '19.82'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.22'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.65'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.51'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -10498,6 +11772,205 @@ observations:
     note: Table I TiO rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4276962562759165078431124469'
+          - - TiO2
+            - '0.02432811158893445609474737032'
+          - - Al2O3
+            - '0.09220708776029153323414621159'
+          - - FeO
+            - '0.148306989269107509425075919'
+          - - MnO
+            - '0.001148612310222625661546886446'
+          - - MgO
+            - '0.1710597119356819918304513602'
+          - - CaO
+            - '0.1285334811441748981775147172'
+          - - Na2O
+            - '0.005056288830734401053425412828'
+          - - K2O
+            - '0.001663460884936076679979674698'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 12073 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '17'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -10662,6 +12135,205 @@ observations:
     note: Table I TiO rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4276962562759165078431124469'
+          - - TiO2
+            - '0.02432811158893445609474737032'
+          - - Al2O3
+            - '0.09220708776029153323414621159'
+          - - FeO
+            - '0.148306989269107509425075919'
+          - - MnO
+            - '0.001148612310222625661546886446'
+          - - MgO
+            - '0.1710597119356819918304513602'
+          - - CaO
+            - '0.1285334811441748981775147172'
+          - - Na2O
+            - '0.005056288830734401053425412828'
+          - - K2O
+            - '0.001663460884936076679979674698'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 12073 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '17'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value

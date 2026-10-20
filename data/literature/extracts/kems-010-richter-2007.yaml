@@ -57257,6 +57257,875 @@ species:
         numeric_rate_status: not_reported_qualitative_bound_only
       supersedes: richter_2007_al_non_loss_until_mg_exhausted
       regime: langmuir_free_evaporation
+  SiO2:
+    observations:
+    - observation_id: richter_2007_residue_table1_r3-12
+      experiment: cai-r3-12
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R3-12}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '7.9'}, locator: {published_page: 5549, table: '1', row: R3-12}}
+        initial_area_mm2: {state: {tag: value, value: '22.4'}, locator: {published_page: 5549, table: '1', row: R3-12}}
+        final_area_mm2: {state: {tag: value, value: '21.3'}, locator: {published_page: 5549, table: '1', row: R3-12}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-12, sample: R3-12, T_C: '1900', t_min: '0', MgO_wt_pct: '11.37', SiO2_wt_pct: '44.53', Al2O3_wt_pct: '19.26', CaO_wt_pct: '24.84'}
+    - observation_id: richter_2007_residue_table1_r3-10
+      experiment: cai-r3-10
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R3-10}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '32.0'}, locator: {published_page: 5549, table: '1', row: R3-10}}
+        initial_area_mm2: {state: {tag: value, value: '24.0'}, locator: {published_page: 5549, table: '1', row: R3-10}}
+        final_area_mm2: {state: {tag: value, value: '18.9'}, locator: {published_page: 5549, table: '1', row: R3-10}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-10, sample: R3-10, T_C: '1900', t_min: '15', MgO_wt_pct: '9.13', SiO2_wt_pct: '31.52', Al2O3_wt_pct: '26.86', CaO_wt_pct: '32.48'}
+    - observation_id: richter_2007_residue_table1_r3-11
+      experiment: cai-r3-11
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R3-11}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '43.8'}, locator: {published_page: 5549, table: '1', row: R3-11}}
+        initial_area_mm2: {state: {tag: value, value: '20.9'}, locator: {published_page: 5549, table: '1', row: R3-11}}
+        final_area_mm2: {state: {tag: value, value: '15.9'}, locator: {published_page: 5549, table: '1', row: R3-11}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-11, sample: R3-11, T_C: '1900', t_min: '20', MgO_wt_pct: '3.33', SiO2_wt_pct: '25.24', Al2O3_wt_pct: '32.35', CaO_wt_pct: '39.09'}
+    - observation_id: richter_2007_residue_table1_r3-13
+      experiment: cai-r3-13
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R3-13}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '50.6'}, locator: {published_page: 5549, table: '1', row: R3-13}}
+        initial_area_mm2: {state: {tag: value, value: '21.3'}, locator: {published_page: 5549, table: '1', row: R3-13}}
+        final_area_mm2: {state: {tag: value, value: '15.4'}, locator: {published_page: 5549, table: '1', row: R3-13}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-13, sample: R3-13, T_C: '1900', t_min: '25', MgO_wt_pct: '0.09', SiO2_wt_pct: '17.76', Al2O3_wt_pct: '37.08', CaO_wt_pct: '45.05'}
+    - observation_id: richter_2007_residue_table1_r3-15
+      experiment: cai-r3-15
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R3-15}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '47.3'}, locator: {published_page: 5549, table: '1', row: R3-15}}
+        initial_area_mm2: {state: {tag: value, value: '21.7'}, locator: {published_page: 5549, table: '1', row: R3-15}}
+        final_area_mm2: {state: {tag: value, value: '15.8'}, locator: {published_page: 5549, table: '1', row: R3-15}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-15, sample: R3-15, T_C: '1900', t_min: '25', MgO_wt_pct: '0.80', SiO2_wt_pct: '21.10', Al2O3_wt_pct: '35.10', CaO_wt_pct: '43.10'}
+    - observation_id: richter_2007_residue_table1_r3-9
+      experiment: cai-r3-9
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R3-9}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '48.3'}, locator: {published_page: 5549, table: '1', row: R3-9}}
+        initial_area_mm2: {state: {tag: value, value: '26.4'}, locator: {published_page: 5549, table: '1', row: R3-9}}
+        final_area_mm2: {state: {tag: value, value: '18.2'}, locator: {published_page: 5549, table: '1', row: R3-9}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-9, sample: R3-9, T_C: '1900', t_min: '30', MgO_wt_pct: '1.04', SiO2_wt_pct: '21.81', Al2O3_wt_pct: '35.06', CaO_wt_pct: '42.08'}
+    - observation_id: richter_2007_residue_table1_r-16
+      experiment: cai-r-16
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-16}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '2.4'}, locator: {published_page: 5549, table: '1', row: R-16}}
+        initial_area_mm2: {state: {tag: value, value: '5.9'}, locator: {published_page: 5549, table: '1', row: R-16}}
+        final_area_mm2: {state: {tag: value, value: '5.8'}, locator: {published_page: 5549, table: '1', row: R-16}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-16, sample: R-16, T_C: '1800', t_min: '0', MgO_wt_pct: '11.77', SiO2_wt_pct: '44.44', Al2O3_wt_pct: '20.01', CaO_wt_pct: '23.78'}
+    - observation_id: richter_2007_residue_table1_r-14
+      experiment: cai-r-14
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-14}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '31.7'}, locator: {published_page: 5549, table: '1', row: R-14}}
+        initial_area_mm2: {state: {tag: value, value: '5.8'}, locator: {published_page: 5549, table: '1', row: R-14}}
+        final_area_mm2: {state: {tag: value, value: '5.0'}, locator: {published_page: 5549, table: '1', row: R-14}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-14, sample: R-14, T_C: '1800', t_min: '30', MgO_wt_pct: '7.03', SiO2_wt_pct: '29.63', Al2O3_wt_pct: '29.03', CaO_wt_pct: '34.31'}
+    - observation_id: richter_2007_residue_table1_r-15
+      experiment: cai-r-15
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-15}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '42.2'}, locator: {published_page: 5549, table: '1', row: R-15}}
+        initial_area_mm2: {state: {tag: value, value: '6.0'}, locator: {published_page: 5549, table: '1', row: R-15}}
+        final_area_mm2: {state: {tag: value, value: '4.7'}, locator: {published_page: 5549, table: '1', row: R-15}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-15, sample: R-15, T_C: '1800', t_min: '45', MgO_wt_pct: '2.91', SiO2_wt_pct: '25.40', Al2O3_wt_pct: '32.87', CaO_wt_pct: '38.82'}
+    - observation_id: richter_2007_residue_table1_r-17
+      experiment: cai-r-17
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-17}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '50.0'}, locator: {published_page: 5549, table: '1', row: R-17}}
+        initial_area_mm2: {state: {tag: value, value: '6.0'}, locator: {published_page: 5549, table: '1', row: R-17}}
+        final_area_mm2: {state: {tag: value, value: '4.2'}, locator: {published_page: 5549, table: '1', row: R-17}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-17, sample: R-17, T_C: '1800', t_min: '60', MgO_wt_pct: '0.09', SiO2_wt_pct: '18.49', Al2O3_wt_pct: '37.39', CaO_wt_pct: '44.03'}
+    - observation_id: richter_2007_residue_table1_r-6
+      experiment: cai-r-6
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-6}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '2.4'}, locator: {published_page: 5549, table: '1', row: R-6}}
+        initial_area_mm2: {state: {tag: value, value: '20.0'}, locator: {published_page: 5549, table: '1', row: R-6}}
+        final_area_mm2: {state: {tag: value, value: '19.7'}, locator: {published_page: 5549, table: '1', row: R-6}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-6, sample: R-6, T_C: '1800', t_min: '0', MgO_wt_pct: '11.66', SiO2_wt_pct: '45.34', Al2O3_wt_pct: '19.64', CaO_wt_pct: '23.36'}
+    - observation_id: richter_2007_residue_table1_r-3
+      experiment: cai-r-3
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-3}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '14.3'}, locator: {published_page: 5549, table: '1', row: R-3}}
+        initial_area_mm2: {state: {tag: value, value: '21.5'}, locator: {published_page: 5549, table: '1', row: R-3}}
+        final_area_mm2: {state: {tag: value, value: '19.5'}, locator: {published_page: 5549, table: '1', row: R-3}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-3, sample: R-3, T_C: '1800', t_min: '30', MgO_wt_pct: '11.82', SiO2_wt_pct: '38.87', Al2O3_wt_pct: '22.55', CaO_wt_pct: '26.76'}
+    - observation_id: richter_2007_residue_table1_r-2
+      experiment: cai-r-2
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-2}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '26.2'}, locator: {published_page: 5549, table: '1', row: R-2}}
+        initial_area_mm2: {state: {tag: value, value: '22.8'}, locator: {published_page: 5549, table: '1', row: R-2}}
+        final_area_mm2: {state: {tag: value, value: '18.9'}, locator: {published_page: 5549, table: '1', row: R-2}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-2, sample: R-2, T_C: '1800', t_min: '60', MgO_wt_pct: '10.07', SiO2_wt_pct: '33.58', Al2O3_wt_pct: '25.72', CaO_wt_pct: '30.63'}
+    - observation_id: richter_2007_residue_table1_r-18
+      experiment: cai-r-18
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-18}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '36.1'}, locator: {published_page: 5549, table: '1', row: R-18}}
+        initial_area_mm2: {state: {tag: value, value: '27.4'}, locator: {published_page: 5549, table: '1', row: R-18}}
+        final_area_mm2: {state: {tag: value, value: '21.8'}, locator: {published_page: 5549, table: '1', row: R-18}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-18, sample: R-18, T_C: '1800', t_min: '90', MgO_wt_pct: '5.20', SiO2_wt_pct: '28.05', Al2O3_wt_pct: '30.51', CaO_wt_pct: '36.24'}
+    - observation_id: richter_2007_residue_table1_r-4
+      experiment: cai-r-4
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-4}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '38.3'}, locator: {published_page: 5549, table: '1', row: R-4}}
+        initial_area_mm2: {state: {tag: value, value: '20.6'}, locator: {published_page: 5549, table: '1', row: R-4}}
+        final_area_mm2: {state: {tag: value, value: '16.3'}, locator: {published_page: 5549, table: '1', row: R-4}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-4, sample: R-4, T_C: '1800', t_min: '90', MgO_wt_pct: '4.61', SiO2_wt_pct: '27.45', Al2O3_wt_pct: '31.07', CaO_wt_pct: '36.87'}
+    - observation_id: richter_2007_residue_table1_r3-14
+      experiment: cai-r3-14
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R3-14}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '40.9'}, locator: {published_page: 5549, table: '1', row: R3-14}}
+        initial_area_mm2: {state: {tag: value, value: '23.5'}, locator: {published_page: 5549, table: '1', row: R3-14}}
+        final_area_mm2: {state: {tag: value, value: '17.4'}, locator: {published_page: 5549, table: '1', row: R3-14}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-14, sample: R3-14, T_C: '1800', t_min: '100', MgO_wt_pct: '3.12', SiO2_wt_pct: '26.13', Al2O3_wt_pct: '31.76', CaO_wt_pct: '38.98'}
+    - observation_id: richter_2007_residue_table1_r2-1
+      experiment: cai-r2-1
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-1}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '49.2'}, locator: {published_page: 5549, table: '1', row: R2-1}}
+        initial_area_mm2: {state: {tag: value, value: '21.7'}, locator: {published_page: 5549, table: '1', row: R2-1}}
+        final_area_mm2: {state: {tag: value, value: '15.6'}, locator: {published_page: 5549, table: '1', row: R2-1}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-1, sample: R2-1, T_C: '1800', t_min: '105', MgO_wt_pct: '0.19', SiO2_wt_pct: '19.91', Al2O3_wt_pct: '36.53', CaO_wt_pct: '43.38'}
+    - observation_id: richter_2007_residue_table1_r-7
+      experiment: cai-r-7
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-7}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '31.9'}, locator: {published_page: 5549, table: '1', row: R-7}}
+        initial_area_mm2: {state: {tag: value, value: '27.8'}, locator: {published_page: 5549, table: '1', row: R-7}}
+        final_area_mm2: {state: {tag: value, value: '24.4'}, locator: {published_page: 5549, table: '1', row: R-7}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-7, sample: R-7, T_C: '1800', t_min: '60', MgO_wt_pct: '7.67', SiO2_wt_pct: '30.45', Al2O3_wt_pct: '28.23', CaO_wt_pct: '33.65'}
+    - observation_id: richter_2007_residue_table1_r-13
+      experiment: cai-r-13
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-13}
+      point_conditions:
+        mass_loss_pct: {state: {tag: unknown, reason: blank_in_table}, locator: {published_page: 5549, table: '1', row: R-13}}
+        initial_area_mm2: {state: {tag: unknown, reason: blank_in_table}, locator: {published_page: 5549, table: '1', row: R-13}}
+        final_area_mm2: {state: {tag: unknown, reason: blank_in_table}, locator: {published_page: 5549, table: '1', row: R-13}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-13, sample: R-13, T_C: '1800', t_min: '0', MgO_wt_pct: '11.64', SiO2_wt_pct: '45.48', Al2O3_wt_pct: '19.58', CaO_wt_pct: '23.31'}
+    - observation_id: richter_2007_residue_table1_r-8
+      experiment: cai-r-8
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-8}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '11.1'}, locator: {published_page: 5549, table: '1', row: R-8}}
+        initial_area_mm2: {state: {tag: value, value: '87.5'}, locator: {published_page: 5549, table: '1', row: R-8}}
+        final_area_mm2: {state: {tag: value, value: '83.4'}, locator: {published_page: 5549, table: '1', row: R-8}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-8, sample: R-8, T_C: '1800', t_min: '30', MgO_wt_pct: '11.94', SiO2_wt_pct: '40.59', Al2O3_wt_pct: '21.69', CaO_wt_pct: '25.77'}
+    - observation_id: richter_2007_residue_table1_r-9
+      experiment: cai-r-9
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-9}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '20.6'}, locator: {published_page: 5549, table: '1', row: R-9}}
+        initial_area_mm2: {state: {tag: value, value: '82.6'}, locator: {published_page: 5549, table: '1', row: R-9}}
+        final_area_mm2: {state: {tag: value, value: '76.6'}, locator: {published_page: 5549, table: '1', row: R-9}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-9, sample: R-9, T_C: '1800', t_min: '60', MgO_wt_pct: '11.08', SiO2_wt_pct: '35.70', Al2O3_wt_pct: '24.31', CaO_wt_pct: '28.91'}
+    - observation_id: richter_2007_residue_table1_r-11
+      experiment: cai-r-11
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R-11}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '27.8'}, locator: {published_page: 5549, table: '1', row: R-11}}
+        initial_area_mm2: {state: {tag: value, value: '91.3'}, locator: {published_page: 5549, table: '1', row: R-11}}
+        final_area_mm2: {state: {tag: value, value: '80.0'}, locator: {published_page: 5549, table: '1', row: R-11}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R-11, sample: R-11, T_C: '1800', t_min: '90', MgO_wt_pct: '9.16', SiO2_wt_pct: '32.36', Al2O3_wt_pct: '26.78', CaO_wt_pct: '31.70'}
+    - observation_id: richter_2007_residue_table1_r2-4
+      experiment: cai-r2-4
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-4}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '37.0'}, locator: {published_page: 5549, table: '1', row: R2-4}}
+        initial_area_mm2: {state: {tag: value, value: '88.5'}, locator: {published_page: 5549, table: '1', row: R2-4}}
+        final_area_mm2: {state: {tag: value, value: '75.5'}, locator: {published_page: 5549, table: '1', row: R2-4}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-4, sample: R2-4, T_C: '1800', t_min: '120', MgO_wt_pct: '4.92', SiO2_wt_pct: '28.11', Al2O3_wt_pct: '30.57', CaO_wt_pct: '36.40'}
+    - observation_id: richter_2007_residue_table1_r2-5
+      experiment: cai-r2-5
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-5}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '49.8'}, locator: {published_page: 5549, table: '1', row: R2-5}}
+        initial_area_mm2: {state: {tag: value, value: '90.4'}, locator: {published_page: 5549, table: '1', row: R2-5}}
+        final_area_mm2: {state: {tag: value, value: '72.5'}, locator: {published_page: 5549, table: '1', row: R2-5}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-5, sample: R2-5, T_C: '1800', t_min: '180', MgO_wt_pct: '0.06', SiO2_wt_pct: '18.69', Al2O3_wt_pct: '37.47', CaO_wt_pct: '43.79'}
+    - observation_id: richter_2007_residue_table1_r2-21
+      experiment: cai-r2-21
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-21}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '11.1'}, locator: {published_page: 5549, table: '1', row: R2-21}}
+        initial_area_mm2: {state: {tag: value, value: '3.9'}, locator: {published_page: 5549, table: '1', row: R2-21}}
+        final_area_mm2: {state: {tag: value, value: '3.7'}, locator: {published_page: 5549, table: '1', row: R2-21}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-21, sample: R2-21, T_C: '1700', t_min: '0', MgO_wt_pct: '11.42', SiO2_wt_pct: '45.80', Al2O3_wt_pct: '19.56', CaO_wt_pct: '23.23'}
+    - observation_id: richter_2007_residue_table1_r2-20
+      experiment: cai-r2-20
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-20}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '35.0'}, locator: {published_page: 5549, table: '1', row: R2-20}}
+        initial_area_mm2: {state: {tag: value, value: '4.2'}, locator: {published_page: 5549, table: '1', row: R2-20}}
+        final_area_mm2: {state: {tag: value, value: '3.4'}, locator: {published_page: 5549, table: '1', row: R2-20}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-20, sample: R2-20, T_C: '1700', t_min: '90', MgO_wt_pct: '3.61', SiO2_wt_pct: '26.55', Al2O3_wt_pct: '30.20', CaO_wt_pct: '39.64'}
+    - observation_id: richter_2007_residue_table1_r2-18
+      experiment: cai-r2-18
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-18}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '36.0'}, locator: {published_page: 5549, table: '1', row: R2-18}}
+        initial_area_mm2: {state: {tag: value, value: '4.7'}, locator: {published_page: 5549, table: '1', row: R2-18}}
+        final_area_mm2: {state: {tag: value, value: '3.6'}, locator: {published_page: 5549, table: '1', row: R2-18}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-18, sample: R2-18, T_C: '1700', t_min: '120', MgO_wt_pct: '5.29', SiO2_wt_pct: '29.15', Al2O3_wt_pct: '29.75', CaO_wt_pct: '35.81'}
+    - observation_id: richter_2007_residue_table1_r2-19
+      experiment: cai-r2-19
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-19}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '35.3'}, locator: {published_page: 5549, table: '1', row: R2-19}}
+        initial_area_mm2: {state: {tag: value, value: '5.4'}, locator: {published_page: 5549, table: '1', row: R2-19}}
+        final_area_mm2: {state: {tag: value, value: '4.3'}, locator: {published_page: 5549, table: '1', row: R2-19}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-19, sample: R2-19, T_C: '1700', t_min: '150', MgO_wt_pct: '4.62', SiO2_wt_pct: '28.17', Al2O3_wt_pct: '30.95', CaO_wt_pct: '36.27'}
+    - observation_id: richter_2007_residue_table1_r2-17
+      experiment: cai-r2-17
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-17}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '46.4'}, locator: {published_page: 5549, table: '1', row: R2-17}}
+        initial_area_mm2: {state: {tag: value, value: '5.1'}, locator: {published_page: 5549, table: '1', row: R2-17}}
+        final_area_mm2: {state: {tag: value, value: '3.5'}, locator: {published_page: 5549, table: '1', row: R2-17}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-17, sample: R2-17, T_C: '1700', t_min: '180', MgO_wt_pct: '0.26', SiO2_wt_pct: '22.75', Al2O3_wt_pct: '36.88', CaO_wt_pct: '40.12'}
+    - observation_id: richter_2007_residue_table1_r2-7
+      experiment: cai-r2-7
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-7}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '45.9'}, locator: {published_page: 5549, table: '1', row: R2-7}}
+        initial_area_mm2: {state: {tag: value, value: '5.6'}, locator: {published_page: 5549, table: '1', row: R2-7}}
+        final_area_mm2: {state: {tag: value, value: '4.0'}, locator: {published_page: 5549, table: '1', row: R2-7}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-7, sample: R2-7, T_C: '1700', t_min: '270', MgO_wt_pct: '0.02', SiO2_wt_pct: '19.26', Al2O3_wt_pct: '36.86', CaO_wt_pct: '43.86'}
+    - observation_id: richter_2007_residue_table1_r2-3
+      experiment: cai-r2-3
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-3}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '28.4'}, locator: {published_page: 5549, table: '1', row: R2-3}}
+        initial_area_mm2: {state: {tag: value, value: '17.9'}, locator: {published_page: 5549, table: '1', row: R2-3}}
+        final_area_mm2: {state: {tag: value, value: '15.6'}, locator: {published_page: 5549, table: '1', row: R2-3}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-3, sample: R2-3, T_C: '1700', t_min: '180', MgO_wt_pct: '8.76', SiO2_wt_pct: '32.67', Al2O3_wt_pct: '26.80', CaO_wt_pct: '31.77'}
+    - observation_id: richter_2007_residue_table1_r2-10
+      experiment: cai-r2-10
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-10}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '26.0'}, locator: {published_page: 5549, table: '1', row: R2-10}}
+        initial_area_mm2: {state: {tag: value, value: '22.2'}, locator: {published_page: 5549, table: '1', row: R2-10}}
+        final_area_mm2: {state: {tag: value, value: '18.5'}, locator: {published_page: 5549, table: '1', row: R2-10}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-10, sample: R2-10, T_C: '1700', t_min: '240', MgO_wt_pct: '9.50', SiO2_wt_pct: '33.72', Al2O3_wt_pct: '25.85', CaO_wt_pct: '30.91'}
+    - observation_id: richter_2007_residue_table1_r2-16
+      experiment: cai-r2-16
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-16}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '44.4'}, locator: {published_page: 5549, table: '1', row: R2-16}}
+        initial_area_mm2: {state: {tag: value, value: '18.4'}, locator: {published_page: 5549, table: '1', row: R2-16}}
+        final_area_mm2: {state: {tag: value, value: '14.8'}, locator: {published_page: 5549, table: '1', row: R2-16}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-16, sample: R2-16, T_C: '1700', t_min: '330', MgO_wt_pct: '0.94', SiO2_wt_pct: '23.78', Al2O3_wt_pct: '34.46', CaO_wt_pct: '40.83'}
+    - observation_id: richter_2007_residue_table1_r2-11
+      experiment: cai-r2-11
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-11}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '36.2'}, locator: {published_page: 5549, table: '1', row: R2-11}}
+        initial_area_mm2: {state: {tag: value, value: '24.0'}, locator: {published_page: 5549, table: '1', row: R2-11}}
+        final_area_mm2: {state: {tag: value, value: '18.2'}, locator: {published_page: 5549, table: '1', row: R2-11}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-11, sample: R2-11, T_C: '1700', t_min: '420', MgO_wt_pct: '4.92', SiO2_wt_pct: '28.99', Al2O3_wt_pct: '30.19', CaO_wt_pct: '35.89'}
+    - observation_id: richter_2007_residue_table1_r2-12
+      experiment: cai-r2-12
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-12}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '45.5'}, locator: {published_page: 5549, table: '1', row: R2-12}}
+        initial_area_mm2: {state: {tag: value, value: '25.2'}, locator: {published_page: 5549, table: '1', row: R2-12}}
+        final_area_mm2: {state: {tag: value, value: '17.7'}, locator: {published_page: 5549, table: '1', row: R2-12}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-12, sample: R2-12, T_C: '1700', t_min: '480', MgO_wt_pct: '1.33', SiO2_wt_pct: '24.56', Al2O3_wt_pct: '33.77', CaO_wt_pct: '40.36'}
+    - observation_id: richter_2007_residue_table1_r2-2
+      experiment: cai-r2-2
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5549, table: '1', row: R2-2}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '53.7'}, locator: {published_page: 5549, table: '1', row: R2-2}}
+        initial_area_mm2: {state: {tag: value, value: '19.7'}, locator: {published_page: 5549, table: '1', row: R2-2}}
+        final_area_mm2: {state: {tag: value, value: '14.4'}, locator: {published_page: 5549, table: '1', row: R2-2}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-2, sample: R2-2, T_C: '1700', t_min: '540', MgO_wt_pct: '0.02', SiO2_wt_pct: '11.04', Al2O3_wt_pct: '41.39', CaO_wt_pct: '47.55'}
+    - observation_id: richter_2007_residue_table1_r2-13
+      experiment: cai-r2-13
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R2-13}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '36.7'}, locator: {published_page: 5550, table: '1', row: R2-13}}
+        initial_area_mm2: {state: {tag: value, value: '5.2'}, locator: {published_page: 5550, table: '1', row: R2-13}}
+        final_area_mm2: {state: {tag: value, value: '3.9'}, locator: {published_page: 5550, table: '1', row: R2-13}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-13, sample: R2-13, T_C: '1600', t_min: '900', MgO_wt_pct: '4.55', SiO2_wt_pct: '29.40', Al2O3_wt_pct: '30.21', CaO_wt_pct: '35.84'}
+    - observation_id: richter_2007_residue_table1_r2-15
+      experiment: cai-r2-15
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R2-15}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '34.9'}, locator: {published_page: 5550, table: '1', row: R2-15}}
+        initial_area_mm2: {state: {tag: value, value: '5.9'}, locator: {published_page: 5550, table: '1', row: R2-15}}
+        final_area_mm2: {state: {tag: value, value: '4.9'}, locator: {published_page: 5550, table: '1', row: R2-15}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-15, sample: R2-15, T_C: '1600', t_min: '1200', MgO_wt_pct: '5.24', SiO2_wt_pct: '30.16', Al2O3_wt_pct: '29.53', CaO_wt_pct: '35.11'}
+    - observation_id: richter_2007_residue_table1_r2-14
+      experiment: cai-r2-14
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R2-14}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '45.6'}, locator: {published_page: 5550, table: '1', row: R2-14}}
+        initial_area_mm2: {state: {tag: value, value: '5.4'}, locator: {published_page: 5550, table: '1', row: R2-14}}
+        final_area_mm2: {state: {tag: value, value: '3.8'}, locator: {published_page: 5550, table: '1', row: R2-14}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-14, sample: R2-14, T_C: '1600', t_min: '1500', MgO_wt_pct: '0.04', SiO2_wt_pct: '20.86', Al2O3_wt_pct: '36.10', CaO_wt_pct: '43.00'}
+    - observation_id: richter_2007_residue_table1_r2-9
+      experiment: cai-r2-9
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R2-9}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '50.0'}, locator: {published_page: 5550, table: '1', row: R2-9}}
+        initial_area_mm2: {state: {tag: value, value: '6.0'}, locator: {published_page: 5550, table: '1', row: R2-9}}
+        final_area_mm2: {state: {tag: value, value: '4.1'}, locator: {published_page: 5550, table: '1', row: R2-9}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-9, sample: R2-9, T_C: '1600', t_min: '1800', MgO_wt_pct: '0.02', SiO2_wt_pct: '16.29', Al2O3_wt_pct: '39.28', CaO_wt_pct: '44.41'}
+    - observation_id: richter_2007_residue_table1_r2-8
+      experiment: cai-r2-8
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R2-8}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '59.3'}, locator: {published_page: 5550, table: '1', row: R2-8}}
+        initial_area_mm2: {state: {tag: value, value: '4.9'}, locator: {published_page: 5550, table: '1', row: R2-8}}
+        final_area_mm2: {state: {tag: value, value: '3.1'}, locator: {published_page: 5550, table: '1', row: R2-8}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R2-8, sample: R2-8, T_C: '1600', t_min: '2250', MgO_wt_pct: '0.03', SiO2_wt_pct: '8.54', Al2O3_wt_pct: '45.21', CaO_wt_pct: '46.22'}
+    - observation_id: richter_2007_residue_table1_r3-2
+      experiment: cai-r3-2
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R3-2}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '0.0'}, locator: {published_page: 5550, table: '1', row: R3-2}}
+        initial_area_mm2: {state: {tag: value, value: '22.1'}, locator: {published_page: 5550, table: '1', row: R3-2}}
+        final_area_mm2: {state: {tag: value, value: '21.9'}, locator: {published_page: 5550, table: '1', row: R3-2}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-2, sample: R3-2, T_C: '1600', t_min: '0', MgO_wt_pct: '12.22', SiO2_wt_pct: '46.36', Al2O3_wt_pct: '19.31', CaO_wt_pct: '22.11'}
+    - observation_id: richter_2007_residue_table1_r3-1
+      experiment: cai-r3-1
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R3-1}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '26.5'}, locator: {published_page: 5550, table: '1', row: R3-1}}
+        initial_area_mm2: {state: {tag: value, value: '22.3'}, locator: {published_page: 5550, table: '1', row: R3-1}}
+        final_area_mm2: {state: {tag: value, value: '18.5'}, locator: {published_page: 5550, table: '1', row: R3-1}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-1, sample: R3-1, T_C: '1600', t_min: '1800', MgO_wt_pct: '9.62', SiO2_wt_pct: '33.93', Al2O3_wt_pct: '26.24', CaO_wt_pct: '30.21'}
+    - observation_id: richter_2007_residue_table1_r3-20
+      experiment: cai-r3-20
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R3-20}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '34.0'}, locator: {published_page: 5550, table: '1', row: R3-20}}
+        initial_area_mm2: {state: {tag: value, value: '22.2'}, locator: {published_page: 5550, table: '1', row: R3-20}}
+        final_area_mm2: {state: {tag: value, value: '17.6'}, locator: {published_page: 5550, table: '1', row: R3-20}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-20, sample: R3-20, T_C: '1600', t_min: '2400', MgO_wt_pct: '6.43', SiO2_wt_pct: '31.01', Al2O3_wt_pct: '29.11', CaO_wt_pct: '33.45'}
+    - observation_id: richter_2007_residue_table1_r3-21
+      experiment: cai-r3-21
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R3-21}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '26.7'}, locator: {published_page: 5550, table: '1', row: R3-21}}
+        initial_area_mm2: {state: {tag: value, value: '25.4'}, locator: {published_page: 5550, table: '1', row: R3-21}}
+        final_area_mm2: {state: {tag: value, value: '21.0'}, locator: {published_page: 5550, table: '1', row: R3-21}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-21, sample: R3-21, T_C: '1600', t_min: '2400', MgO_wt_pct: '9.44', SiO2_wt_pct: '33.69', Al2O3_wt_pct: '26.32', CaO_wt_pct: '30.54'}
+    - observation_id: richter_2007_residue_table1_r3-4
+      experiment: cai-r3-4
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R3-4}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '33.3'}, locator: {published_page: 5550, table: '1', row: R3-4}}
+        initial_area_mm2: {state: {tag: value, value: '20.6'}, locator: {published_page: 5550, table: '1', row: R3-4}}
+        final_area_mm2: {state: {tag: value, value: '16.7'}, locator: {published_page: 5550, table: '1', row: R3-4}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-4, sample: R3-4, T_C: '1600', t_min: '2700', MgO_wt_pct: '4.60', SiO2_wt_pct: '30.84', Al2O3_wt_pct: '30.20', CaO_wt_pct: '34.36'}
+    - observation_id: richter_2007_residue_table1_r3-7
+      experiment: cai-r3-7
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R3-7}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '45.5'}, locator: {published_page: 5550, table: '1', row: R3-7}}
+        initial_area_mm2: {state: {tag: value, value: '20.4'}, locator: {published_page: 5550, table: '1', row: R3-7}}
+        final_area_mm2: {state: {tag: value, value: '15.5'}, locator: {published_page: 5550, table: '1', row: R3-7}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-7, sample: R3-7, T_C: '1600', t_min: '2998', MgO_wt_pct: '0.20', SiO2_wt_pct: '22.40', Al2O3_wt_pct: '36.01', CaO_wt_pct: '41.39'}
+    - observation_id: richter_2007_residue_table1_r3-19
+      experiment: cai-r3-19
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R3-19}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '32.8'}, locator: {published_page: 5550, table: '1', row: R3-19}}
+        initial_area_mm2: {state: {tag: value, value: '25.1'}, locator: {published_page: 5550, table: '1', row: R3-19}}
+        final_area_mm2: {state: {tag: value, value: '19.6'}, locator: {published_page: 5550, table: '1', row: R3-19}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-19, sample: R3-19, T_C: '1600', t_min: '3000', MgO_wt_pct: '6.70', SiO2_wt_pct: '31.34', Al2O3_wt_pct: '28.86', CaO_wt_pct: '33.11'}
+    - observation_id: richter_2007_residue_table1_r3-18
+      experiment: cai-r3-18
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R3-18}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '37.5'}, locator: {published_page: 5550, table: '1', row: R3-18}}
+        initial_area_mm2: {state: {tag: value, value: '21.8'}, locator: {published_page: 5550, table: '1', row: R3-18}}
+        final_area_mm2: {state: {tag: value, value: '16.9'}, locator: {published_page: 5550, table: '1', row: R3-18}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-18, sample: R3-18, T_C: '1600', t_min: '3000', MgO_wt_pct: '4.34', SiO2_wt_pct: '29.39', Al2O3_wt_pct: '30.81', CaO_wt_pct: '35.46'}
+    - observation_id: richter_2007_residue_table1_r3-8
+      experiment: cai-r3-8
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R3-8}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '41.4'}, locator: {published_page: 5550, table: '1', row: R3-8}}
+        initial_area_mm2: {state: {tag: value, value: '21.2'}, locator: {published_page: 5550, table: '1', row: R3-8}}
+        final_area_mm2: {state: {tag: value, value: '16.1'}, locator: {published_page: 5550, table: '1', row: R3-8}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-8, sample: R3-8, T_C: '1600', t_min: '3600', MgO_wt_pct: '1.65', SiO2_wt_pct: '26.73', Al2O3_wt_pct: '33.21', CaO_wt_pct: '38.40'}
+    - observation_id: richter_2007_residue_table1_r3-5
+      experiment: cai-r3-5
+      type: rate_series
+      regime: langmuir_free_evaporation
+      phase: l
+      units: wt percent as published
+      locator: {published_page: 5550, table: '1', row: R3-5}
+      point_conditions:
+        mass_loss_pct: {state: {tag: value, value: '48.5'}, locator: {published_page: 5550, table: '1', row: R3-5}}
+        initial_area_mm2: {state: {tag: value, value: '20.9'}, locator: {published_page: 5550, table: '1', row: R3-5}}
+        final_area_mm2: {state: {tag: value, value: '15.3'}, locator: {published_page: 5550, table: '1', row: R3-5}}
+        geometry_class: {state: {tag: unknown, reason: 'The paper reports aliquots loaded on 0.25 mm iridium wire loops, partially melted at 1400 °C before each run, and residues quenched to glass; it does not classify residue geometry.'}, locator: {published_page: 5548, section: '3.1 Starting materials and experimental procedure'}}
+      values:
+        quantity: open_furnace_residue_composition_vs_time
+        method_class: measured_direct
+        series:
+        - {run_id: R3-5, sample: R3-5, T_C: '1600', t_min: '4285', MgO_wt_pct: '0.12', SiO2_wt_pct: '17.74', Al2O3_wt_pct: '38.36', CaO_wt_pct: '43.78'}
 fidelity_samples:
 - species: Mg
   observable: alpha

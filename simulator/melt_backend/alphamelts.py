@@ -1444,6 +1444,7 @@ class _MELTSBackendSupport(MeltBackend):
                     species_formula_registry: Optional[Mapping[str, object]] = None,
                     redox_mode: Optional[str] = None,
                     subprocess_run_mode: AlphaMELTSSubprocessRunMode | str | None = None,
+                    call_timeout_s: Optional[float] = None,
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium.
@@ -1580,17 +1581,20 @@ class _MELTSBackendSupport(MeltBackend):
         warnings = list(self._last_normalization_warnings)
         warnings.extend(commissioning_warnings)
 
-        return self._equilibrate_prepared(
-            temperature_C=temperature_C,
-            comp_wt=comp_wt,
-            fO2_log=fO2_log,
-            pressure_bar=pressure_bar,
-            warnings=warnings,
-            total_input_kg=total_input_kg,
-            crash_diagnostics=crash_diagnostics,
-            redox_mode=redox_mode,
-            subprocess_run_mode=subprocess_run_mode,
-        )
+        prepared_kwargs: dict[str, Any] = {
+            'temperature_C': temperature_C,
+            'comp_wt': comp_wt,
+            'fO2_log': fO2_log,
+            'pressure_bar': pressure_bar,
+            'warnings': warnings,
+            'total_input_kg': total_input_kg,
+            'crash_diagnostics': crash_diagnostics,
+            'subprocess_run_mode': subprocess_run_mode,
+            'redox_mode': redox_mode,
+        }
+        if call_timeout_s is not None and self.backend_name == 'thermoengine':
+            prepared_kwargs['call_timeout_s'] = float(call_timeout_s)
+        return self._equilibrate_prepared(**prepared_kwargs)
 
     def _equilibrate_prepared(
         self,

@@ -8,8 +8,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:mathieu-2009-sodium-solubility-thesis
+      role: pdf
+      path: raw/mathieu-2009-sodium-solubility-thesis/mathieu-2009-sodium-solubility-thesis.pdf
+      sha256:
+        tag: value
+        value: e7da842f1bfb4bbdde97e4f9e46c5328d491996e978f2c9ca83d65129a116d71
+    - asset_id: pdftotext:mathieu-2009-sodium-solubility-thesis
+      role: pdftotext
+      path: text/mathieu-2009-sodium-solubility-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:mathieu-2009-sodium-solubility-thesis
+      role: table_csv
+      path: tables/mathieu-2009-sodium-solubility-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:mathieu-2009-sodium-solubility-thesis
       role: pdftotext
       path: unknown

@@ -1,0 +1,1088 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2017-spinel-evaporation
+source:
+  citation: >-
+    Shornikov, S. I. (2017). Mass Spectrometric Study of the Evaporation of MgAl2O4 Spinel.
+    Russian Journal of Physical Chemistry A, 91(1), 10–16.
+  doi: 10.1134/S0036024417010241
+  year: 2017
+  corpus_asset: raw/shornikov-2017-spinel-evaporation/shornikov-2017-spinel-evaporation.pdf
+extraction:
+  method: >-
+    Transcribed from the born-digital pdftotext layout and MinerU table blocks.
+    Tables 1–3 were checked against renders of physical PDF pages 2 and 4.
+  date: '2026-10-16'
+  worker: wave3b-shsp17
+review_status: draft
+source_locators:
+  table_1: &table_1
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    table: '1'
+  table_2: &table_2
+    page: 4
+    published_page: 13
+    pdf_page_index: 3
+    table: '2'
+  table_3: &table_3
+    page: 4
+    published_page: 13
+    pdf_page_index: 3
+    table: '3'
+  experimental: &experimental
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    section: EXPERIMENTAL
+  spinel_point_conditions: &spinel_point_conditions
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          amount_basis: mole_fraction
+          components:
+            - [MgO, '0.5']
+            - [Al2O3, '0.5']
+      locator:
+        <<: *experimental
+        note: 'Stoichiometric MgAl2O4 charge; 50 mol% MgO and 50 mol% Al2O3.'
+    fO2_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        <<: *table_2
+        note: 'No numeric oxygen fugacity is printed for the Table 2 pressure points.'
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        <<: *table_2
+        note: 'No numeric in-cell total pressure is printed for these pressure points.'
+benches:
+  - id: shornikov_2017_spinel_mo_kems
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: 'MI-1201 serial mass spectrometer with modified high-temperature ion source'}
+      locator: *experimental
+    cell_materials:
+      - state: {tag: value, value: Mo}
+        locator: *experimental
+    cell_material_and_liner:
+      state: {tag: value, value: 'molybdenum Knudsen effusion container'}
+      locator: *experimental
+experiments:
+  - experiment_id: shornikov_2017_spinel_molybdenum_series
+    bench_id: shornikov_2017_spinel_mo_kems
+    method: knudsen_effusion
+    locator: *experimental
+    sample:
+      form:
+        state: {tag: value, value: 'solid stoichiometric MgAl2O4 spinel'}
+        locator: *experimental
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+            amount_basis: mole_fraction
+            components:
+              - [MgO, '0.5']
+              - [Al2O3, '0.5']
+        locator:
+          <<: *experimental
+          note: 'The source describes a stoichiometric MgAl2O4 charge; 50 mol% MgO.'
+      characterization:
+        state: {tag: value, value: 'X-ray diffraction and chemical analysis'}
+        locator: *experimental
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          <<: *experimental
+          note: 'The paper does not print a numeric chamber or background pressure.'
+      sweep_gas:
+        state: {tag: unknown, reason: not_published}
+        locator: *experimental
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+fidelity_samples:
+  - path: species.Mg.observations[shornikov_2017_table2_mg_partial_pressure].values.points[0].pressure_atm
+    value: '4.68e-7'
+    locator:
+      page: 4
+      published_page: 13
+      pdf_page_index: 3
+      table: '2'
+      note: 'Table 2 row 1 pMg cell confirmed on the render.'
+  - path: species.MgAlO.observations[shornikov_2017_table2_mgalo_partial_pressure].values.points[2].pressure_atm
+    value: '8.89e-10'
+    locator:
+      page: 4
+      published_page: 13
+      pdf_page_index: 3
+      table: '2'
+      note: 'Table 2 row 12 pMgAlO cell confirmed on the render.'
+  - path: species.O.observations[shornikov_2017_table3_o_pressure_eq14].values.points[2].pressure_atm
+    value: '4.12e-8'
+    locator:
+      page: 4
+      published_page: 13
+      pdf_page_index: 3
+      table: '3'
+      note: 'Table 3 row 3 Eq. (14) cell confirmed on the render.'
+species:
+  MgAl2O4:
+    observations: []
+    context:
+      - observation_id: shornikov_2017_table1_row_1
+        type: literature_summary
+        locator: {<<: *table_1, note: 'Table 1 row 1.'}
+        units: as printed
+        values:
+          quantity: prior_spinel_evaporation_study_metadata
+          method_class: quoted_attributed
+          research_method_as_printed: 'High-temperature furnace (Knudsen)'
+          container_or_suspension_material_as_printed: 'Al2O3'
+          T_range_K_as_printed: '2023–2273'
+          T_K_min_as_printed: '2023'
+          T_K_max_as_printed: '2273'
+          MgO_mol_percent_as_printed: '50'
+          gas_phase_component_as_printed: 'Mg'
+          basic_results_as_printed: 'pMg'
+          reference_as_printed: '[13]'
+      - observation_id: shornikov_2017_table1_row_2
+        type: literature_summary
+        locator: {<<: *table_1, note: 'Table 1 row 2.'}
+        units: as printed
+        values:
+          quantity: prior_spinel_evaporation_study_metadata
+          method_class: quoted_attributed
+          research_method_as_printed: 'High-temperature furnace (Langmuir)'
+          container_or_suspension_material_as_printed: 'W'
+          T_range_K_as_printed: '1973–2273'
+          T_K_min_as_printed: '1973'
+          T_K_max_as_printed: '2273'
+          MgO_mol_percent_as_printed: '50'
+          gas_phase_component_as_printed: '-'
+          basic_results_as_printed: 'p_tot'
+          reference_as_printed: '[14, 15]'
+      - observation_id: shornikov_2017_table1_row_3
+        type: literature_summary
+        locator: {<<: *table_1, note: 'Table 1 row 3.'}
+        units: as printed
+        values:
+          quantity: prior_spinel_evaporation_study_metadata
+          method_class: quoted_attributed
+          research_method_as_printed: 'High-temperature furnace (Langmuir) in a helium environment'
+          container_or_suspension_material_as_printed: 'W'
+          T_range_K_as_printed: '2273–2573'
+          T_K_min_as_printed: '2273'
+          T_K_max_as_printed: '2573'
+          MgO_mol_percent_as_printed: '50'
+          gas_phase_component_as_printed: '-'
+          basic_results_as_printed: 'p_tot'
+          reference_as_printed: '[14, 15]'
+      - observation_id: shornikov_2017_table1_row_4
+        type: literature_summary
+        locator: {<<: *table_1, note: 'Table 1 row 4.'}
+        units: as printed
+        values:
+          quantity: prior_spinel_evaporation_study_metadata
+          method_class: quoted_attributed
+          research_method_as_printed: 'High-temperature furnace (Langmuir)'
+          container_or_suspension_material_as_printed: 'W'
+          T_range_K_as_printed: '1833–2093'
+          T_K_min_as_printed: '1833'
+          T_K_max_as_printed: '2093'
+          MgO_mol_percent_as_printed: '50'
+          gas_phase_component_as_printed: 'Mg'
+          basic_results_as_printed: 'p_tot'
+          reference_as_printed: '[16–18]'
+      - observation_id: shornikov_2017_table1_row_5
+        type: literature_summary
+        locator: {<<: *table_1, note: 'Table 1 row 5.'}
+        units: as printed
+        values:
+          quantity: prior_spinel_evaporation_study_metadata
+          method_class: quoted_attributed
+          research_method_as_printed: 'Knudsen effusion mass spectrometry'
+          container_or_suspension_material_as_printed: 'Al2O3'
+          T_range_K_as_printed: '2038–2048'
+          T_K_min_as_printed: '2038'
+          T_K_max_as_printed: '2048'
+          MgO_mol_percent_as_printed: '50'
+          gas_phase_component_as_printed: 'Mg, O2'
+          basic_results_as_printed: 'pMg'
+          reference_as_printed: '[16, 17]'
+      - observation_id: shornikov_2017_table1_row_6
+        type: literature_summary
+        locator: {<<: *table_1, note: 'Table 1 row 6.'}
+        units: as printed
+        values:
+          quantity: prior_spinel_evaporation_study_metadata
+          method_class: quoted_attributed
+          research_method_as_printed: 'High-temperature furnace (Langmuir)'
+          container_or_suspension_material_as_printed: 'W'
+          T_range_K_as_printed: '1973–2173'
+          T_K_min_as_printed: '1973'
+          T_K_max_as_printed: '2173'
+          MgO_mol_percent_as_printed: '26, 50, 53'
+          gas_phase_component_as_printed: 'Mg, O2'
+          basic_results_as_printed: 'p_tot'
+          reference_as_printed: '[19, 20]'
+      - observation_id: shornikov_2017_table1_row_7
+        type: literature_summary
+        locator: {<<: *table_1, note: 'Table 1 row 7.'}
+        units: as printed
+        values:
+          quantity: prior_spinel_evaporation_study_metadata
+          method_class: quoted_attributed
+          research_method_as_printed: 'Knudsen effusion mass spectrometry'
+          container_or_suspension_material_as_printed: 'W'
+          T_range_K_as_printed: '1850–2300'
+          T_K_min_as_printed: '1850'
+          T_K_max_as_printed: '2300'
+          MgO_mol_percent_as_printed: '26, 33, 50'
+          gas_phase_component_as_printed: 'Mg, O2'
+          basic_results_as_printed: 'pMg, αMgAl2O4'
+          reference_as_printed: '[21]'
+      - observation_id: shornikov_2017_table1_row_8
+        type: literature_summary
+        locator: {<<: *table_1, note: 'Table 1 row 8.'}
+        units: as printed
+        values:
+          quantity: prior_spinel_evaporation_study_metadata
+          method_class: quoted_attributed
+          research_method_as_printed: 'Knudsen effusion mass spectrometry'
+          container_or_suspension_material_as_printed: 'Ir, Al2O3'
+          T_range_K_as_printed: '1773'
+          T_K_min_as_printed: '1773'
+          T_K_max_as_printed: '1773'
+          MgO_mol_percent_as_printed: '0–10'
+          gas_phase_component_as_printed: 'Mg, O2'
+          basic_results_as_printed: 'pMg, pO2'
+          reference_as_printed: '[22]'
+  Mg:
+    observations:
+    - observation_id: shornikov_2017_table2_mg_partial_pressure
+      type: partial_pressure
+      locator: *table_2
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      uncertainty: &table_2_relative_uncertainty
+        form: relative_bound
+        bound_operator: '<='
+        bound_value: '8%'
+        as_printed: 'with an error not exceeding 8%'
+        confidence_level: not_stated
+        notice: 'confidence level not stated'
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: Mg
+        formula: Mg
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of Mg(g)'
+        method_as_printed: 'Knudsen effusion mass spectrometry'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '4.68e-7', pressure_as_printed: '4.68 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '5.20e-7', pressure_as_printed: '5.20 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '1.25e-6', pressure_as_printed: '1.25 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '1.82e-6', pressure_as_printed: '1.82 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '2.23e-6', pressure_as_printed: '2.23 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '2.29e-6', pressure_as_printed: '2.29 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '4.38e-6', pressure_as_printed: '4.38 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '5.29e-6', pressure_as_printed: '5.29 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '9.19e-6', pressure_as_printed: '9.19 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '9.15e-6', pressure_as_printed: '9.15 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '9.55e-6', pressure_as_printed: '9.55 × 10−6', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '1.67e-5', pressure_as_printed: '1.67 × 10−5', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+  MgO:
+    observations:
+    - observation_id: shornikov_2017_table2_mgo_partial_pressure
+      type: partial_pressure
+      locator: *table_2
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgO
+        formula: MgO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgO(g)'
+        method_as_printed: 'Knudsen effusion mass spectrometry'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '9.85e-10', pressure_as_printed: '9.85 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '1.21e-9', pressure_as_printed: '1.21 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '4.45e-9', pressure_as_printed: '4.45 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '6.66e-9', pressure_as_printed: '6.66 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '9.53e-9', pressure_as_printed: '9.53 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '9.67e-9', pressure_as_printed: '9.67 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '2.25e-8', pressure_as_printed: '2.25 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '2.68e-8', pressure_as_printed: '2.68 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '6.07e-8', pressure_as_printed: '6.07 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '6.07e-8', pressure_as_printed: '6.07 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '6.44e-8', pressure_as_printed: '6.44 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '1.57e-7', pressure_as_printed: '1.57 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+  Al:
+    observations:
+    - observation_id: shornikov_2017_table2_al_partial_pressure
+      type: partial_pressure
+      locator: *table_2
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: Al
+        formula: Al
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of Al(g)'
+        method_as_printed: 'Knudsen effusion mass spectrometry'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '4.47e-11', pressure_as_printed: '4.47 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '5.26e-11', pressure_as_printed: '5.26 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '1.93e-10', pressure_as_printed: '1.93 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '3.21e-10', pressure_as_printed: '3.21 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '4.44e-10', pressure_as_printed: '4.44 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '4.41e-10', pressure_as_printed: '4.41 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.10e-9', pressure_as_printed: '1.10 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.42e-9', pressure_as_printed: '1.42 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.22e-9', pressure_as_printed: '3.22 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.36e-9', pressure_as_printed: '3.36 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.39e-9', pressure_as_printed: '3.39 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '7.65e-9', pressure_as_printed: '7.65 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+  AlO:
+    observations:
+    - observation_id: shornikov_2017_table2_alo_partial_pressure
+      type: partial_pressure
+      locator: *table_2
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: AlO
+        formula: AlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of AlO(g)'
+        method_as_printed: 'Knudsen effusion mass spectrometry'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '1.60e-10', pressure_as_printed: '1.60 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '2.07e-10', pressure_as_printed: '2.07 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '6.44e-10', pressure_as_printed: '6.44 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '1.31e-9', pressure_as_printed: '1.31 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '1.67e-9', pressure_as_printed: '1.67 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '1.38e-9', pressure_as_printed: '1.38 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '3.95e-9', pressure_as_printed: '3.95 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '4.71e-9', pressure_as_printed: '4.71 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '1.41e-8', pressure_as_printed: '1.41 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '1.45e-8', pressure_as_printed: '1.45 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '1.40e-8', pressure_as_printed: '1.40 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '3.37e-8', pressure_as_printed: '3.37 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+  Al2O:
+    observations:
+    - observation_id: shornikov_2017_table2_al2o_partial_pressure
+      type: partial_pressure
+      locator: *table_2
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: Al2O
+        formula: Al2O
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of Al2O(g)'
+        method_as_printed: 'Knudsen effusion mass spectrometry'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '2.54e-11', pressure_as_printed: '2.54 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '4.40e-11', pressure_as_printed: '4.40 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '6.19e-11', pressure_as_printed: '6.19 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '6.84e-11', pressure_as_printed: '6.84 × 10−11', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '2.31e-10', pressure_as_printed: '2.31 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '3.35e-10', pressure_as_printed: '3.35 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '8.01e-10', pressure_as_printed: '8.01 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '8.88e-10', pressure_as_printed: '8.88 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '9.17e-10', pressure_as_printed: '9.17 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '2.48e-9', pressure_as_printed: '2.48 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+    - observation_id: shornikov_2017_table2_al2o_not_detected_1851
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 1 column pAl2O prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1851
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1851}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: Al2O
+        formula: Al2O
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of Al2O(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+    - observation_id: shornikov_2017_table2_al2o_not_detected_1859
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 2 column pAl2O prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1859
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1859}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: Al2O
+        formula: Al2O
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of Al2O(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+  O2:
+    observations:
+    - observation_id: shornikov_2017_table2_o2_partial_pressure
+      type: partial_pressure
+      locator: *table_2
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: O2
+        formula: O2
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of O2(g)'
+        method_as_printed: 'Knudsen effusion mass spectrometry'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '3.25e-9', pressure_as_printed: '3.25 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_2}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '5.29e-9', pressure_as_printed: '5.29 × 10−9', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_2}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '1.70e-8', pressure_as_printed: '1.70 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_2}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '1.88e-8', pressure_as_printed: '1.88 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '3.17e-8', pressure_as_printed: '3.17 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '3.00e-8', pressure_as_printed: '3.00 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_2}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '4.82e-8', pressure_as_printed: '4.82 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_2}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '6.09e-8', pressure_as_printed: '6.09 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_2}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '1.07e-7', pressure_as_printed: '1.07 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '1.75e-7', pressure_as_printed: '1.75 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '1.62e-7', pressure_as_printed: '1.62 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '2.60e-7', pressure_as_printed: '2.60 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+  MgAlO:
+    observations:
+    - observation_id: shornikov_2017_table2_mgalo_partial_pressure
+      type: partial_pressure
+      locator: *table_2
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgAlO
+        formula: MgAlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgAlO(g)'
+        method_as_printed: 'Knudsen effusion mass spectrometry'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '2.44e-10', pressure_as_printed: '2.44 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.05e-10', pressure_as_printed: '3.05 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_2}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '8.89e-10', pressure_as_printed: '8.89 × 10−10', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_2}}}
+    - observation_id: shornikov_2017_table2_mgalo_not_detected_1851
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 1 column pMgAlO prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1851
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1851}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgAlO
+        formula: MgAlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgAlO(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+    - observation_id: shornikov_2017_table2_mgalo_not_detected_1859
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 2 column pMgAlO prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1859
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1859}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgAlO
+        formula: MgAlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgAlO(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+    - observation_id: shornikov_2017_table2_mgalo_not_detected_1914
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 3 column pMgAlO prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1914
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1914}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgAlO
+        formula: MgAlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgAlO(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+    - observation_id: shornikov_2017_table2_mgalo_not_detected_1938
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 4 column pMgAlO prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1938
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1938}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgAlO
+        formula: MgAlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgAlO(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+    - observation_id: shornikov_2017_table2_mgalo_not_detected_row_5
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 5 column pMgAlO prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1950
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1950}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgAlO
+        formula: MgAlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgAlO(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+    - observation_id: shornikov_2017_table2_mgalo_not_detected_row_6
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 6 column pMgAlO prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1950
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1950}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgAlO
+        formula: MgAlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgAlO(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+    - observation_id: shornikov_2017_table2_mgalo_not_detected_1992
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 7 column pMgAlO prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1992
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1992}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgAlO
+        formula: MgAlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgAlO(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+    - observation_id: shornikov_2017_table2_mgalo_not_detected_2005
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 8 column pMgAlO prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 2005
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 2005}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgAlO
+        formula: MgAlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgAlO(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+    - observation_id: shornikov_2017_table2_mgalo_not_detected_2044
+      type: partial_pressure
+      locator: {<<: *table_2, note: 'Table 2 row 9 column pMgAlO prints ''-'' for not detected. Pressure is unavailable and is not zero.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 2044
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 2044}
+          locator: *table_2
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        gas_species: MgAlO
+        formula: MgAlO
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of MgAlO(g)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+  O:
+    observations:
+    - observation_id: shornikov_2017_table3_o_pressure_eq8_9
+      type: partial_pressure
+      locator: {<<: *table_3, equation: '(8), (9)'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
+      derivation:
+        relation: 'KEMS pressure reduction using Eqs. (8) and (9).'
+        output_unit: atm
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {<<: *table_3, note: 'The raw q_i, elapsed time and apparatus constants are not tabulated.'}
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        admission_status: admitted
+        gas_species: O
+        formula: O
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of atomic O(g)'
+        method_as_printed: 'KEMS pressure reduction'
+        equation_as_printed: '(8), (9)'
+        thermochemical_data_reference_as_printed: '[10]'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '1.21e-8', pressure_as_printed: '1.21 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '1.43e-8', pressure_as_printed: '1.43 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '3.87e-8', pressure_as_printed: '3.87 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '6.07e-8', pressure_as_printed: '6.07 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.10e-8', pressure_as_printed: '7.10 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.09e-8', pressure_as_printed: '7.09 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.43e-7', pressure_as_printed: '1.43 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.78e-7', pressure_as_printed: '1.78 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.30e-7', pressure_as_printed: '3.30 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.49e-7', pressure_as_printed: '3.49 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.50e-7', pressure_as_printed: '3.50 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '6.75e-7', pressure_as_printed: '6.75 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
+    - observation_id: shornikov_2017_table3_o_pressure_eq14
+      type: partial_pressure
+      locator: {<<: *table_3, equation: '(14)'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      derived_from:
+        - shornikov_2017_table2_mgo_partial_pressure
+        - shornikov_2017_table2_mg_partial_pressure
+      derivation:
+        relation: 'Atomic oxygen partial pressure calculated by Eq. (14).'
+        output_unit: atm
+        inputs:
+          - 'Table 2 mgo pressure series at matching temperature.'
+          - 'Table 2 mg pressure series at matching temperature.'
+          - 'K10(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: O
+        formula: O
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of atomic O(g)'
+        method_as_printed: 'thermochemical equilibrium calculation'
+        equation_as_printed: '(14)'
+        thermochemical_data_reference_as_printed: '[10]'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '1.14e-8', pressure_as_printed: '1.14 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '1.39e-8', pressure_as_printed: '1.39 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '4.12e-8', pressure_as_printed: '4.12 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '5.58e-8', pressure_as_printed: '5.58 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.48e-8', pressure_as_printed: '7.48 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.39e-8', pressure_as_printed: '7.39 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.42e-7', pressure_as_printed: '1.42 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.61e-7', pressure_as_printed: '1.61 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.16e-7', pressure_as_printed: '3.16 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.27e-7', pressure_as_printed: '3.27 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.33e-7', pressure_as_printed: '3.33 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '7.05e-7', pressure_as_printed: '7.05 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
+    - observation_id: shornikov_2017_table3_o_pressure_eq15
+      type: partial_pressure
+      locator: {<<: *table_3, equation: '(15)'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      derived_from:
+        - shornikov_2017_table2_alo_partial_pressure
+        - shornikov_2017_table2_al_partial_pressure
+      derivation:
+        relation: 'Atomic oxygen partial pressure calculated by Eq. (15).'
+        output_unit: atm
+        inputs:
+          - 'Table 2 alo pressure series at matching temperature.'
+          - 'Table 2 al pressure series at matching temperature.'
+          - 'K11(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: O
+        formula: O
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of atomic O(g)'
+        method_as_printed: 'thermochemical equilibrium calculation'
+        equation_as_printed: '(15)'
+        thermochemical_data_reference_as_printed: '[10]'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '1.24e-8', pressure_as_printed: '1.24 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '1.57e-8', pressure_as_printed: '1.57 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '3.49e-8', pressure_as_printed: '3.49 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '6.40e-8', pressure_as_printed: '6.40 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.17e-8', pressure_as_printed: '7.17 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '5.96e-8', pressure_as_printed: '5.96 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.34e-7', pressure_as_printed: '1.34 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.52e-7', pressure_as_printed: '1.52 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.61e-7', pressure_as_printed: '3.61 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.74e-7', pressure_as_printed: '3.74 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.58e-7', pressure_as_printed: '3.58 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '7.03e-7', pressure_as_printed: '7.03 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
+    - observation_id: shornikov_2017_table3_o_pressure_eq16
+      type: partial_pressure
+      locator: {<<: *table_3, equation: '(16)'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      derived_from:
+        - shornikov_2017_table2_al2o_partial_pressure
+        - shornikov_2017_table2_al_partial_pressure
+      derivation:
+        relation: 'Atomic oxygen partial pressure calculated by Eq. (16).'
+        output_unit: atm
+        inputs:
+          - 'Table 2 al2o pressure series at matching temperature.'
+          - 'Table 2 al pressure series at matching temperature.'
+          - 'K12(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: O
+        formula: O
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of atomic O(g)'
+        method_as_printed: 'thermochemical equilibrium calculation'
+        equation_as_printed: '(16)'
+        thermochemical_data_reference_as_printed: '[10]'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '3.93e-8', pressure_as_printed: '3.93 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '5.61e-8', pressure_as_printed: '5.61 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '6.16e-8', pressure_as_printed: '6.16 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '6.89e-8', pressure_as_printed: '6.89 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.47e-7', pressure_as_printed: '1.47 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.96e-7', pressure_as_printed: '1.96 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.03e-7', pressure_as_printed: '3.03 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.40e-7', pressure_as_printed: '3.40 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.44e-7', pressure_as_printed: '3.44 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '6.37e-7', pressure_as_printed: '6.37 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
+    - observation_id: shornikov_2017_table3_o_pressure_eq17
+      type: partial_pressure
+      locator: {<<: *table_3, equation: '(17)'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_range_K: [1851.0, 2089.0]
+      point_conditions: *spinel_point_conditions
+      derived_from:
+        - shornikov_2017_table2_o2_partial_pressure
+      derivation:
+        relation: 'Atomic oxygen partial pressure calculated by Eq. (17).'
+        output_unit: atm
+        inputs:
+          - 'Table 2 o2 pressure series at matching temperature.'
+          - 'K13(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: O
+        formula: O
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of atomic O(g)'
+        method_as_printed: 'thermochemical equilibrium calculation'
+        equation_as_printed: '(17)'
+        thermochemical_data_reference_as_printed: '[10]'
+        cell_material_as_printed: molybdenum
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        points:
+          - {T_K_as_printed: '1851', T_K: 1851, pressure_atm: '1.11e-8', pressure_as_printed: '1.11 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1851}, locator: *table_3}}}
+          - {T_K_as_printed: '1859', T_K: 1859, pressure_atm: '1.52e-8', pressure_as_printed: '1.52 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1859}, locator: *table_3}}}
+          - {T_K_as_printed: '1914', T_K: 1914, pressure_atm: '4.37e-8', pressure_as_printed: '4.37 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1914}, locator: *table_3}}}
+          - {T_K_as_printed: '1938', T_K: 1938, pressure_atm: '5.60e-8', pressure_as_printed: '5.60 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1938}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '8.02e-8', pressure_as_printed: '8.02 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1950', T_K: 1950, pressure_atm: '7.80e-8', pressure_as_printed: '7.80 × 10−8', point_conditions: {temperature_K: {state: {tag: value, value: 1950}, locator: *table_3}}}
+          - {T_K_as_printed: '1992', T_K: 1992, pressure_atm: '1.38e-7', pressure_as_printed: '1.38 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 1992}, locator: *table_3}}}
+          - {T_K_as_printed: '2005', T_K: 2005, pressure_atm: '1.71e-7', pressure_as_printed: '1.71 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2005}, locator: *table_3}}}
+          - {T_K_as_printed: '2044', T_K: 2044, pressure_atm: '3.04e-7', pressure_as_printed: '3.04 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2044}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.97e-7', pressure_as_printed: '3.97 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2047', T_K: 2047, pressure_atm: '3.82e-7', pressure_as_printed: '3.82 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2047}, locator: *table_3}}}
+          - {T_K_as_printed: '2089', T_K: 2089, pressure_atm: '6.53e-7', pressure_as_printed: '6.53 × 10−7', point_conditions: {temperature_K: {state: {tag: value, value: 2089}, locator: *table_3}}}
+    - observation_id: shornikov_2017_table3_o_pressure_eq16_not_reported_1851
+      type: partial_pressure
+      locator: {<<: *table_3, note: 'Table 3 row 1 Eq. (16) prints ''-''; no pressure value is reported. The corresponding pAl2O input is also not detected in Table 2.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1851
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1851}
+          locator: *table_3
+      derived_from:
+        - shornikov_2017_table2_al2o_not_detected_1851
+        - shornikov_2017_table2_al_partial_pressure
+      derivation:
+        relation: 'Eq. (16) has no numeric output at 1851 K because the required pAl2O input is not detected.'
+        output_unit: atm
+        inputs:
+          - 'Table 2 input series shornikov_2017_table2_al2o_not_detected_1851.'
+          - 'Table 2 input series shornikov_2017_table2_al_partial_pressure.'
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: O
+        formula: O
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of O(g)'
+        equation_as_printed: '(16)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'
+    - observation_id: shornikov_2017_table3_o_pressure_eq16_not_reported_1859
+      type: partial_pressure
+      locator: {<<: *table_3, note: 'Table 3 row 2 Eq. (16) prints ''-''; no pressure value is reported. The corresponding pAl2O input is also not detected in Table 2.'}
+      phase: gas
+      condensed_form: solid
+      experiment: shornikov_2017_spinel_molybdenum_series
+      regime: knudsen_effusion
+      units: atm
+      T_K: 1859
+      point_conditions:
+        <<: *spinel_point_conditions
+        temperature_K:
+          state: {tag: value, value: 1859}
+          locator: *table_3
+      derived_from:
+        - shornikov_2017_table2_al2o_not_detected_1859
+        - shornikov_2017_table2_al_partial_pressure
+      derivation:
+        relation: 'Eq. (16) has no numeric output at 1859 K because the required pAl2O input is not detected.'
+        output_unit: atm
+        inputs:
+          - 'Table 2 input series shornikov_2017_table2_al2o_not_detected_1859.'
+          - 'Table 2 input series shornikov_2017_table2_al_partial_pressure.'
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: O
+        formula: O
+        reservoir_formula: MgAl2O4
+        standard_state: 'partial pressure of O(g)'
+        equation_as_printed: '(16)'
+        composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
+        pressure_atm: null
+        pressure_as_printed: '-'

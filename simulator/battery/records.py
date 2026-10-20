@@ -47,6 +47,8 @@ from simulator.battery.enums import (
     Polymorph,
     PolymorphRejectionKind,
     Quantity,
+    QuenchDirection,
+    QuenchState,
     RawInputStatus,
     Rail,
     ReferenceStateConvention,
@@ -154,6 +156,30 @@ class Located(Generic[T]):
     state: State[T]
     locator: Locator | None = None
     inference: Derivation | None = None
+
+
+def _typed_quench_condition(
+    value: object,
+    *,
+    key: str,
+    token_type: type[QuenchState] | type[QuenchDirection],
+) -> Located[Any]:
+    if not isinstance(value, Located) or not isinstance(value.state, State):
+        raise TypeError(f"Observation.point_conditions.{key} must be a Located State")
+    if value.locator is None:
+        raise ValueError(f"Observation.point_conditions.{key} requires a source locator")
+    if not value.state.is_value:
+        raise ValueError(f"Observation.point_conditions.{key} must be a typed value")
+    try:
+        token = token_type(value.state.value)
+    except (TypeError, ValueError) as exc:
+        choices = ", ".join(item.value for item in token_type)
+        raise ValueError(
+            f"Observation.point_conditions.{key} must be one of: {choices}"
+        ) from exc
+    return Located(
+        State.of(token), locator=value.locator, inference=value.inference
+    )
 
 
 _CHARGE_SUFFIX_RE = re.compile(r"([+-])$")
@@ -675,6 +701,7 @@ class Uncertainty:
     value: Decimal | tuple[Decimal, Decimal] | None = None
     basis: str | None = None
     derivation: Derivation | None = None
+    locator: Locator | None = None
 
     def __post_init__(self) -> None:
         if self.kind is UncertaintyKind.PRINTED and self.verbatim is None:
@@ -689,6 +716,19 @@ class Uncertainty:
             )
         elif self.value is not None:
             object.__setattr__(self, "value", as_decimal(self.value))
+
+
+@dataclass(frozen=True)
+class SourceMethodUncertainty:
+    value: Decimal
+    meaning: str
+    quantity: Quantity
+    basis: str
+    quantity_basis: str
+    locator: Locator
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "value", as_decimal(self.value))
 
 
 @dataclass(frozen=True)
@@ -724,6 +764,7 @@ class Work:
     source_ids: tuple[str, ...]
     source_files: SourceFiles
     doi: str | None = None
+    source_method_uncertainties: Mapping[str, SourceMethodUncertainty] | None = None
 
     def __post_init__(self) -> None:
         if not self.work_id:
@@ -732,6 +773,12 @@ class Work:
             raise ValueError("Work.citation is required")
         if not self.source_ids:
             raise ValueError("Work.source_ids is required")
+        uncertainties = dict(self.source_method_uncertainties or {})
+        if not set(uncertainties).issubset(self.source_ids):
+            raise ValueError("source method uncertainty must name a source_id on the Work")
+        object.__setattr__(
+            self, "source_method_uncertainties", uncertainties or None
+        )
 
 
 @dataclass(frozen=True)
@@ -956,10 +1003,28 @@ class ThermalSchedule:
 
 
 @dataclass(frozen=True)
+class GasRatio:
+    numerator_species: str
+    denominator_species: str
+    value: Located[Value]
+    basis: str
+
+    def __post_init__(self) -> None:
+        if not self.numerator_species.strip() or not self.denominator_species.strip():
+            raise ValueError("gas ratio species must be nonempty")
+        if self.numerator_species == self.denominator_species:
+            raise ValueError("gas ratio species must differ")
+        if self.basis not in {"volume", "mole", "partial_pressure"}:
+            raise ValueError("gas ratio basis must be volume, mole, or partial_pressure")
+        object.__setattr__(self, "value", _located_value(self.value))
+
+
+@dataclass(frozen=True)
 class FO2Control:
     channel: State[FO2Channel]
     buffer: Located[str] | None = None
     oxygen_partial_pressure_Pa: Located[Value] | None = None
+    gas_ratio: GasRatio | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1122,6 +1187,17 @@ class Observation:
             raise ValueError("Observation.observation_id is required")
         if not self.experiment_id:
             raise ValueError("Observation.experiment_id is required")
+        if self.point_conditions is not None:
+            point_conditions = dict(self.point_conditions)
+            for key, token_type in (
+                ("quench_state", QuenchState),
+                ("quench_direction", QuenchDirection),
+            ):
+                if key in point_conditions:
+                    point_conditions[key] = _typed_quench_condition(
+                        point_conditions[key], key=key, token_type=token_type
+                    )
+            object.__setattr__(self, "point_conditions", point_conditions)
         if self.certified_band is not None:
             object.__setattr__(
                 self,
@@ -1131,6 +1207,18 @@ class Observation:
                     for k, (lo, hi) in self.certified_band.items()
                 },
             )
+
+    @property
+    def quench_state(self) -> QuenchState:
+        condition = (self.point_conditions or {}).get("quench_state")
+        if condition is None:
+            return QuenchState.NOT_STATED
+        return condition.state.value
+
+    @property
+    def quench_direction(self) -> QuenchDirection | None:
+        condition = (self.point_conditions or {}).get("quench_direction")
+        return None if condition is None else condition.state.value
 
 
 @dataclass(frozen=True)
@@ -1152,11 +1240,20 @@ class DecisionBand:
     value: Decimal
     unit: str
     rule: str
+    band_basis: str = "derived_scatter"
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "value", as_decimal(self.value))
         if not self.unit or not self.rule:
             raise ValueError("DecisionBand requires unit and rule")
+        if self.band_basis not in {
+            "row_printed",
+            "source_method",
+            "fusion_combined_row_printed",
+            "fusion_combined_source_method",
+            "derived_scatter",
+        }:
+            raise ValueError(f"unsupported DecisionBand.band_basis {self.band_basis!r}")
 
 
 @dataclass(frozen=True)
@@ -1196,6 +1293,7 @@ class Residual:
     candidate_request: CandidateRequest | None = None
     numeric: ResidualNumeric | None = None
     refusal: ResidualRefusal | None = None
+    quench_state: QuenchState | None = None
 
     def __post_init__(self) -> None:
         if not self.key:

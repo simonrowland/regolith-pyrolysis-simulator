@@ -59,7 +59,7 @@ class Rail(StrEnum):
 
 
 class Quantity(StrEnum):
-    """Complete storage enum (v2.1 quantity_units)."""
+    """Complete v2.1 storage enum; equilibrium composition preserves the printed gas or condensed phase basis."""
 
     P_SAT = "p_sat"
     P_PARTIAL = "p_partial"
@@ -77,6 +77,7 @@ class Quantity(StrEnum):
     YIELD_FRACTION = "yield_fraction"
     O2_YIELD = "o2_yield"
     FE3_FE2_RATIO = "fe3_fe2_ratio"
+    VALENCE_RATIO = "valence_ratio"
     ION_INTENSITY_RATIO = "ion_intensity_ratio"
     DELTA_FH = "delta_fH"
     DELTA_FG = "delta_fG"
@@ -102,6 +103,23 @@ class Quantity(StrEnum):
     ION_INTENSITY = "ion_intensity"
     INTERACTION_PARAMETER = "interaction_parameter"
     RESIDUE_COMPONENT_COMPOSITION = "residue_component_composition"
+    EQUILIBRIUM_PHASE_COMPOSITION = "equilibrium_phase_composition"
+
+
+class ValenceDenominatorKind(StrEnum):
+    TOTAL_ELEMENT = "total_element"
+    OXIDATION_STATE = "oxidation_state"
+
+
+class ValenceValueForm(StrEnum):
+    FRACTION = "fraction"
+    RATIO = "ratio"
+    LOG10_RATIO = "log10_ratio"
+    AVERAGE_OXIDATION_STATE = "average_oxidation_state"
+
+
+class ValencePrintedForm(StrEnum):
+    MASS_FRACTION_PAIR = "mass_fraction_pair"
 
 
 class EvidenceClass(StrEnum):
@@ -206,11 +224,17 @@ class NoticeKind(StrEnum):
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
     SOURCE_DISAGREEMENT = "source_disagreement"
+    # An engine-reported limitation of its own model at an in-domain prediction.
+    # The engine text is carried verbatim; it is nonblocking, adds no stratum,
+    # and does not change authority.
+    ENGINE_MODEL_CAVEAT = "engine_model_caveat"
     # An input was left out because this row does not take it. The reason
     # says which input and why. Not a blocking qualification.
     INPUT_OMITTED = "input_omitted"
     COMPARISON_METHOD_CELL_CONSTANT_CANCELS = "comparison_method_cell_constant_cancels"
     PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"
+    PREDICTION_OUTSIDE_PHYSICAL_RANGE = "prediction_outside_physical_range"
+    SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE = "source_value_outside_physical_range"
     UNVERIFIED_APPARATUS = "unverified_apparatus"
     CELL_MATERIAL_INFERRED = "cell_material_inferred"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
@@ -223,6 +247,8 @@ class NoticeKind(StrEnum):
     # t-1123a: printed point sits between printed liquidus positions; scored as
     # liquid, flagged (all-numeric line only). Reason carries the stated liquidus.
     LIQUIDUS_POSITION_CONTESTED = "liquidus_position_contested"
+    QUENCH_ALTERED = "quench_altered"
+    QUENCH_OXIDISING = "quench_oxidising"
 
 
 class ReferenceStateConvention(StrEnum):
@@ -241,6 +267,16 @@ class Phase(StrEnum):
     AQ = "aq"
     GLASS = "glass"
     SUPERCOOLED_L = "supercooled_l"
+
+
+class QuenchState(StrEnum):
+    ASSERTED_PRESERVED = "asserted_preserved"
+    ASSERTED_ALTERED = "asserted_altered"
+    NOT_STATED = "not_stated"
+
+
+class QuenchDirection(StrEnum):
+    OXIDISING = "oxidising"
 
 
 class Polymorph(StrEnum):
@@ -491,6 +527,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.YIELD_FRACTION: "dimensionless",
     Quantity.O2_YIELD: "dimensionless",
     Quantity.FE3_FE2_RATIO: "dimensionless",
+    Quantity.VALENCE_RATIO: "dimensionless",
     Quantity.ION_INTENSITY_RATIO: "dimensionless",
     Quantity.DELTA_FH: "kJ_per_declared_mol_basis",
     Quantity.DELTA_FG: "kJ_per_declared_mol_basis",
@@ -517,6 +554,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.ION_INTENSITY: "subtype_defined",
     Quantity.INTERACTION_PARAMETER: "subtype_defined",
     Quantity.RESIDUE_COMPONENT_COMPOSITION: "subtype_defined",
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: "subtype_defined",
 }
 
 MEASURED_EVIDENCE = frozenset(

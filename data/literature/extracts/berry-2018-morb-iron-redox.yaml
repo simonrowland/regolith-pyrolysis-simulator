@@ -1,0 +1,705 @@
+schema_version: literature_extract.v1
+source_id: berry-2018-morb-iron-redox
+source:
+  citation: "Berry, A. J., Stewart, G. A., O'Neill, H. St. C., Mallmann, G. & Mosselmans, J. F. W. (2018), A re-assessment of the oxidation state of iron in MORB glasses, Earth and Planetary Science Letters 483, 114-123."
+  doi: 10.1016/j.epsl.2017.11.032
+  year: 2018
+extraction:
+  method: Born-digital pdftotext-layout and MinerU table HTML transcribed to the printed tables and prose calibration results; Table 1 and Table 2 layouts checked against page renders. Numeric-cell audit and MinerU comparison are committed under data/literature/audits/berry-2018-morb-iron-redox/.
+  date: '2026-10-17'
+  worker: wave3b-berry18
+review_status: draft
+experiments:
+  - experiment_id: berry_2018_synthetic_morb_table2_runs
+    series: Synthetic MORB glass standards equilibrated at 1400 C and quenched; Table 2
+    locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}
+  - experiment_id: berry_2018_natural_morb_calibrations
+    series: Natural MORB and basaltic glass standards reduced by XANES calibrations
+    locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}
+fidelity_samples:
+  - path: species.Fe.observations[berry_2018_table2_mossbauer_295K_fe3_sumfe].values.points[0].value_as_published
+    value: '(1)'
+    locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2', note: Table 2 row 1 rendered fixed end-member value}
+  - path: species.Fe.observations[berry_2018_table2_mossbauer_77p5K_fe3_sumfe].values.points[0].value_as_published
+    value: '(1)'
+    locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2', note: Table 2 row 1 rendered 77.5 K fixed end-member text}
+  - path: species.Fe.observations[berry_2018_table2_mossbauer_295K_fe3_sumfe].values.points[1].value
+    value: 0.773
+    locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2', note: Table 2 row 2 rendered 295 K fraction}
+  - path: species.Fe.observations[berry_2018_table2_mossbauer_77p5K_fe3_sumfe].values.points[1].value
+    value: 0.769
+    locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2', note: Table 2 row 2 rendered 77.5 K fraction}
+  - path: species.Fe.observations[berry_2018_table2_mossbauer_295K_fe3_sumfe].values.points[11].value_as_published
+    value: '(0)'
+    locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2', note: Table 2 row 12 rendered fixed end-member value}
+  - path: species.Fe.observations[berry_2018_table2_mossbauer_295K_fe3_sumfe].values.points[12].value_as_published
+    value: '(0)'
+    locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2', note: Table 2 row 13 rendered 295 K fixed end-member text}
+  - path: species.Fe.observations[berry_2018_table2_mossbauer_77p5K_fe3_sumfe].values.points[12].value_as_published
+    value: '(0)'
+    locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2', note: Table 2 row 13 rendered 77.5 K fixed end-member text}
+  - path: species.Fe.observations[berry_2018_table2_fit_fe3_sumfe].values.points[2].value
+    value: 0.670
+    locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2', note: Table 2 row 3 fitted fraction}
+  - path: species.Fe.observations[berry_2018_table2_model_a_fe3_sumfe].values.points[12].value
+    value: 0.006
+    locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2', note: Table 2 row 13 model result}
+species:
+  Fe:
+    observations:
+      - observation_id: berry_2018_table2_mossbauer_295K_fe3_sumfe
+        experiment: berry_2018_synthetic_morb_table2_runs
+        type: concentration_series
+        locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}
+        phase: glass
+        units: fraction of total Fe (Fe3+/SumFe)
+        uncertainty:
+          note: Table 2 caption gives ±0.01 for Mössbauer fractions.
+          confidence_level: one_sigma
+        values:
+          quantity: Fe3plus_over_total_Fe
+          method_class: measured_direct
+          admission_status: admitted
+          composition_wt_pct: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}
+          points:
+            - &berry_2018_table2_row_1
+              row: 1
+              value: null
+              value_as_published: '(1)'
+              T_C: 1400
+              fO2_log_as_published: '4.8(5)'
+              fO2_log_uncertainty: 0.5
+              delta_QFM_as_published: '11.2(5)'
+              delta_QFM_uncertainty: 0.5
+              total_pressure_Pa: 1000000000
+              point_conditions:
+                quench_state: &berry_2018_quench_state
+                  state: {tag: value, value: not_stated}
+                  locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: 4.8}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: 11.2}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 1000000000}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_2
+              row: 2
+              value: 0.773
+              sigma: 0.01
+              value_as_published: '0.773'
+              T_C: 1400
+              fO2_log_as_published: '0.00(1)'
+              fO2_log_uncertainty: 0.01
+              delta_QFM_as_published: '6.38(1)'
+              delta_QFM_uncertainty: 0.01
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: 0.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: 6.38}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_3
+              row: 3
+              value: 0.661
+              sigma: 0.01
+              value_as_published: '0.661'
+              T_C: 1400
+              fO2_log_as_published: '-1.00(1)'
+              fO2_log_uncertainty: 0.01
+              delta_QFM_as_published: '5.40(1)'
+              delta_QFM_uncertainty: 0.01
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -1.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: 5.40}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_4
+              row: 4
+              value: 0.537
+              sigma: 0.01
+              value_as_published: '0.537'
+              T_C: 1400
+              fO2_log_as_published: '-2.00(2)'
+              fO2_log_uncertainty: 0.02
+              delta_QFM_as_published: '4.40(2)'
+              delta_QFM_uncertainty: 0.02
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -2.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: 4.40}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_5
+              row: 5
+              value: 0.414
+              sigma: 0.01
+              value_as_published: '0.414'
+              T_C: 1400
+              fO2_log_as_published: '-3.07(10)'
+              fO2_log_uncertainty: 0.10
+              delta_QFM_as_published: '3.32(10)'
+              delta_QFM_uncertainty: 0.10
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -3.07}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: 3.32}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_6
+              row: 6
+              value: 0.250
+              sigma: 0.01
+              value_as_published: '0.250'
+              T_C: 1400
+              fO2_log_as_published: '-4.00(4)'
+              fO2_log_uncertainty: 0.04
+              delta_QFM_as_published: '2.39(4)'
+              delta_QFM_uncertainty: 0.04
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -4.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: 2.39}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_7
+              row: 7
+              value: 0.167
+              sigma: 0.01
+              value_as_published: '0.167'
+              T_C: 1400
+              fO2_log_as_published: '-5.00(2)'
+              fO2_log_uncertainty: 0.02
+              delta_QFM_as_published: '1.39(2)'
+              delta_QFM_uncertainty: 0.02
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -5.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: 1.39}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_8
+              row: 8
+              value: 0.103
+              sigma: 0.01
+              value_as_published: '0.103'
+              T_C: 1400
+              fO2_log_as_published: '-6.00(2)'
+              fO2_log_uncertainty: 0.02
+              delta_QFM_as_published: '0.39(2)'
+              delta_QFM_uncertainty: 0.02
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -6.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: 0.39}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_9
+              row: 9
+              value: 0.039
+              sigma: 0.01
+              value_as_published: '0.039'
+              T_C: 1400
+              fO2_log_as_published: '-7.00(3)'
+              fO2_log_uncertainty: 0.03
+              delta_QFM_as_published: '-0.61(3)'
+              delta_QFM_uncertainty: 0.03
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -7.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: -0.61}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_10
+              row: 10
+              value: 0.024
+              sigma: 0.01
+              value_as_published: '0.024'
+              T_C: 1400
+              fO2_log_as_published: '-8.00(2)'
+              fO2_log_uncertainty: 0.02
+              delta_QFM_as_published: '-1.61(2)'
+              delta_QFM_uncertainty: 0.02
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -8.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: -1.61}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_11
+              row: 11
+              value: 0.017
+              sigma: 0.01
+              value_as_published: '0.017'
+              T_C: 1400
+              fO2_log_as_published: '-9.00(2)'
+              fO2_log_uncertainty: 0.02
+              delta_QFM_as_published: '-2.61(2)'
+              delta_QFM_uncertainty: 0.02
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -9.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: -2.61}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_12
+              row: 12
+              value: null
+              value_as_published: '(0)'
+              T_C: 1400
+              fO2_log_as_published: '-10.00(3)'
+              fO2_log_uncertainty: 0.03
+              delta_QFM_as_published: '-3.61(3)'
+              delta_QFM_uncertainty: 0.03
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -10.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: -3.61}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+            - &berry_2018_table2_row_13
+              row: 13
+              value: null
+              value_as_published: '(0)'
+              T_C: 1400
+              fO2_log_as_published: '-11.00(2)'
+              fO2_log_uncertainty: 0.02
+              delta_QFM_as_published: '-4.61(2)'
+              delta_QFM_uncertainty: 0.02
+              total_pressure_Pa: 101325
+              point_conditions:
+                quench_state: *berry_2018_quench_state
+                T_C: {state: {tag: value, value: 1400}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                fO2_log: {state: {tag: value, value: -11.00}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                delta_QFM: {state: {tag: value, value: -4.61}, locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}}
+                total_pressure_Pa: {state: {tag: value, value: 101325}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+                composition: {amount_basis: mass_percent, components: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}, locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}}
+      - observation_id: berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+        experiment: berry_2018_synthetic_morb_table2_runs
+        type: concentration_series
+        locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}
+        phase: glass
+        units: fraction of total Fe (Fe3+/SumFe)
+        uncertainty:
+          note: Table 2 caption gives ±0.01 for Mössbauer fractions.
+          confidence_level: one_sigma
+        values:
+          quantity: Fe3plus_over_total_Fe
+          method_class: measured_direct
+          admission_status: admitted
+          composition_wt_pct: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}
+          points:
+            - {<<: *berry_2018_table2_row_1, value: null, value_as_published: '(1)'}
+            - {<<: *berry_2018_table2_row_2, value: 0.769, value_as_published: '0.769'}
+            - {<<: *berry_2018_table2_row_3, value: null, sigma: null, value_as_published: '–'}
+            - {<<: *berry_2018_table2_row_4, value: 0.537, value_as_published: '0.537'}
+            - {<<: *berry_2018_table2_row_5, value: null, sigma: null, value_as_published: '–'}
+            - {<<: *berry_2018_table2_row_6, value: 0.241, value_as_published: '0.241'}
+            - {<<: *berry_2018_table2_row_7, value: null, sigma: null, value_as_published: '–'}
+            - {<<: *berry_2018_table2_row_8, value: 0.077, value_as_published: '0.077'}
+            - {<<: *berry_2018_table2_row_9, value: 0.041, value_as_published: '0.041'}
+            - {<<: *berry_2018_table2_row_10, value: null, sigma: null, value_as_published: '–'}
+            - {<<: *berry_2018_table2_row_11, value: null, sigma: null, value_as_published: '–'}
+            - {<<: *berry_2018_table2_row_12, value: null, sigma: null, value_as_published: '–'}
+            - {<<: *berry_2018_table2_row_13, value: null, value_as_published: '(0)'}
+      - observation_id: berry_2018_table2_fit_fe3_sumfe
+        experiment: berry_2018_synthetic_morb_table2_runs
+        type: concentration_series
+        locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}
+        phase: glass
+        units: fraction of total Fe (Fe3+/SumFe)
+        values:
+          quantity: Fe3plus_over_total_Fe
+          method_class: model_derived
+          admission_status: admitted
+          composition_wt_pct: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}
+          points:
+            - {<<: *berry_2018_table2_row_1, value: 0.983, sigma: null, value_as_published: '0.983'}
+            - {<<: *berry_2018_table2_row_2, value: 0.783, sigma: null, value_as_published: '0.783'}
+            - {<<: *berry_2018_table2_row_3, value: 0.670, sigma: null, value_as_published: '0.670'}
+            - {<<: *berry_2018_table2_row_4, value: 0.533, sigma: null, value_as_published: '0.533'}
+            - {<<: *berry_2018_table2_row_5, value: 0.382, sigma: null, value_as_published: '0.382'}
+            - {<<: *berry_2018_table2_row_6, value: 0.266, sigma: null, value_as_published: '0.266'}
+            - {<<: *berry_2018_table2_row_7, value: 0.169, sigma: null, value_as_published: '0.169'}
+            - {<<: *berry_2018_table2_row_8, value: 0.103, sigma: null, value_as_published: '0.103'}
+            - {<<: *berry_2018_table2_row_9, value: 0.060, sigma: null, value_as_published: '0.060'}
+            - {<<: *berry_2018_table2_row_10, value: 0.035, sigma: null, value_as_published: '0.035'}
+            - {<<: *berry_2018_table2_row_11, value: 0.020, sigma: null, value_as_published: '0.020'}
+            - {<<: *berry_2018_table2_row_12, value: 0.011, sigma: null, value_as_published: '0.011'}
+            - {<<: *berry_2018_table2_row_13, value: 0.006, sigma: null, value_as_published: '0.006'}
+        derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+        derivation:
+          relation: Fit of the 295 K results to equation (1), as described in the Table 2 caption.
+          inputs: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+          output_unit: fraction of total Fe
+      - observation_id: berry_2018_table2_model_a_fe3_sumfe
+        experiment: berry_2018_synthetic_morb_table2_runs
+        type: concentration_series
+        locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}
+        phase: glass
+        units: fraction of total Fe (Fe3+/SumFe)
+        uncertainty: {confidence_level: one_sigma}
+        values:
+          quantity: Fe3plus_over_total_Fe
+          method_class: quoted_attributed
+          admission_status: admitted
+          attribution: Table 2 model^a; results of fitting all data simultaneously.
+          composition_wt_pct: {SiO2: 52.0, Al2O3: 16.1, CaO: 12.4, FeO: 10.0, MgO: 8.2, TiO2: 1.3}
+          points:
+            - {<<: *berry_2018_table2_row_1, value: 0.982, sigma: 0.008, value_as_published: '0.982(8)'}
+            - {<<: *berry_2018_table2_row_2, value: 0.775, sigma: 0.010, value_as_published: '0.775(10)'}
+            - {<<: *berry_2018_table2_row_3, value: 0.662, sigma: 0.010, value_as_published: '0.662(10)'}
+            - {<<: *berry_2018_table2_row_4, value: 0.524, sigma: 0.010, value_as_published: '0.524(10)'}
+            - {<<: *berry_2018_table2_row_5, value: 0.404, sigma: 0.020, value_as_published: '0.404(20)'}
+            - {<<: *berry_2018_table2_row_6, value: 0.251, sigma: 0.007, value_as_published: '0.251(7)'}
+            - {<<: *berry_2018_table2_row_7, value: 0.162, sigma: 0.006, value_as_published: '0.162(6)'}
+            - {<<: *berry_2018_table2_row_8, value: 0.098, sigma: 0.005, value_as_published: '0.098(5)'}
+            - {<<: *berry_2018_table2_row_9, value: 0.059, sigma: 0.004, value_as_published: '0.059(4)'}
+            - {<<: *berry_2018_table2_row_10, value: 0.034, sigma: 0.003, value_as_published: '0.034(3)'}
+            - {<<: *berry_2018_table2_row_11, value: 0.019, sigma: 0.002, value_as_published: '0.019(2)'}
+            - {<<: *berry_2018_table2_row_12, value: 0.011, sigma: 0.001, value_as_published: '0.011(1)'}
+            - {<<: *berry_2018_table2_row_13, value: 0.006, sigma: 0.001, value_as_published: '0.006(1)'}
+      - observation_id: berry_2018_natural_morb_centroid_mean_n42_fe3_sumfe
+        experiment: berry_2018_natural_morb_calibrations
+        type: concentration_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}
+        phase: glass
+        units: fraction of total Fe (Fe3+/SumFe)
+        uncertainty: {confidence_level: one_sigma}
+        values:
+          quantity: Fe3plus_over_total_Fe
+          method_class: measured_reduced
+          admission_status: admitted
+          method: Linear centroid calibration against Mössbauer-calibrated standards.
+          points:
+            - row: centroid_mean_n42
+              T_C: null
+              fO2_log_as_published: null
+              total_pressure_Pa: null
+              point_conditions: &berry_2018_natural_conditions
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}}
+                T_C: {state: {tag: unknown, reason: temperature_not_stated_for_natural_glass_result}, locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}}
+                fO2_log: {state: {tag: unknown, reason: fO2_not_stated_for_natural_glass_result}, locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}}
+                total_pressure_Pa: {state: {tag: unknown, reason: pressure_not_stated_for_natural_glass_result}, locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}}
+                composition: {state: {tag: unknown, reason: composition_not_stated_for_natural_glass_mean}, locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}}
+              sample: 'n=42 natural MORB glasses, centroid calibration'
+              n: 42
+              value: 0.11
+              sigma: 0.02
+              value_as_published: '0.11(2)'
+        derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+        derivation:
+          relation: Natural-glass Fe3+/SumFe reduced from the measured XANES centroid using the calibration against Mössbauer standards.
+          inputs: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+          output_unit: fraction of total Fe
+      - observation_id: berry_2018_natural_morb_polynomial_mean_n42_fe3_sumfe
+        experiment: berry_2018_natural_morb_calibrations
+        type: concentration_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}
+        phase: glass
+        units: fraction of total Fe (Fe3+/SumFe)
+        uncertainty: {confidence_level: one_sigma}
+        values:
+          quantity: Fe3plus_over_total_Fe
+          method_class: measured_reduced
+          admission_status: admitted
+          method: Polynomial centroid calibration.
+          points:
+            - {T_C: null, fO2_log_as_published: null, total_pressure_Pa: null, point_conditions: *berry_2018_natural_conditions, row: polynomial_mean_n42, sample: 'n=42 natural MORB glasses, polynomial calibration', n: 42, value: 0.10, sigma: 0.02, value_as_published: '0.10(2)'}
+        derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+        derivation:
+          relation: Natural-glass Fe3+/SumFe reduced from the measured XANES centroid using the polynomial calibration against Mössbauer standards.
+          inputs: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+          output_unit: fraction of total Fe
+      - observation_id: berry_2018_natural_glass_vg2_fe3_sumfe
+        experiment: berry_2018_natural_morb_calibrations
+        type: concentration_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}
+        phase: glass
+        units: fraction of total Fe (Fe3+/SumFe)
+        uncertainty: {confidence_level: one_sigma}
+        values:
+          quantity: Fe3plus_over_total_Fe
+          method_class: measured_reduced
+          admission_status: admitted
+          method: Linear centroid calibration against Mössbauer-calibrated standards.
+          points:
+            - {T_C: null, fO2_log_as_published: null, total_pressure_Pa: null, point_conditions: *berry_2018_natural_conditions, row: standard_VG2, sample: VG2, value: 0.11, sigma: 0.01, value_as_published: '0.11(1)'}
+        derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+        derivation:
+          relation: VG2 Fe3+/SumFe reduced from its measured XANES centroid using the calibration against Mössbauer standards.
+          inputs: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+          output_unit: fraction of total Fe
+      - observation_id: berry_2018_natural_glass_jdf_d2_fe3_sumfe
+        experiment: berry_2018_natural_morb_calibrations
+        type: concentration_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}
+        phase: glass
+        units: fraction of total Fe (Fe3+/SumFe)
+        uncertainty: {confidence_level: one_sigma}
+        values:
+          quantity: Fe3plus_over_total_Fe
+          method_class: measured_reduced
+          admission_status: admitted
+          method: Linear centroid calibration against Mössbauer-calibrated standards.
+          points:
+            - {T_C: null, fO2_log_as_published: null, total_pressure_Pa: null, point_conditions: *berry_2018_natural_conditions, row: standard_JDF_D2, sample: JDF-D2, value: 0.124, sigma: 0.010, value_as_published: '0.124(10)'}
+        derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+        derivation:
+          relation: JDF-D2 Fe3+/SumFe reduced from its measured XANES centroid using the calibration against Mössbauer standards.
+          inputs: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+          output_unit: fraction of total Fe
+      - observation_id: berry_2018_natural_morb_edge_mean_n19_fe3_sumfe
+        experiment: berry_2018_natural_morb_calibrations
+        type: concentration_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}
+        phase: glass
+        units: fraction of total Fe (Fe3+/SumFe)
+        uncertainty: {confidence_level: one_sigma}
+        values:
+          quantity: Fe3plus_over_total_Fe
+          method_class: measured_reduced
+          admission_status: admitted
+          method: Linear absorption-edge calibration against Mössbauer-calibrated standards.
+          points:
+            - {T_C: null, fO2_log_as_published: null, total_pressure_Pa: null, point_conditions: *berry_2018_natural_conditions, row: edge_mean_n19, sample: 'n=19 natural MORB glasses, edge calibration', n: 19, value: 0.138, sigma: 0.014, value_as_published: '0.138(14)'}
+        derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+        derivation:
+          relation: Natural-glass Fe3+/SumFe reduced from the measured XANES edge using the calibration against Mössbauer standards.
+          inputs: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+          output_unit: fraction of total Fe
+      - observation_id: berry_2018_natural_morb_centroid_mean_n19_fe3_sumfe
+        experiment: berry_2018_natural_morb_calibrations
+        type: concentration_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}
+        phase: glass
+        units: fraction of total Fe (Fe3+/SumFe)
+        uncertainty: {confidence_level: one_sigma}
+        values:
+          quantity: Fe3plus_over_total_Fe
+          method_class: measured_reduced
+          admission_status: admitted
+          method: Linear centroid calibration against Mössbauer-calibrated standards.
+          points:
+            - {T_C: null, fO2_log_as_published: null, total_pressure_Pa: null, point_conditions: *berry_2018_natural_conditions, row: centroid_mean_n19, sample: 'n=19 natural MORB glasses, centroid calibration', n: 19, value: 0.124, sigma: 0.016, value_as_published: '0.124(16)'}
+        derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+        derivation:
+          relation: Natural-glass Fe3+/SumFe reduced from the measured XANES centroid using the calibration against Mössbauer standards.
+          inputs: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
+          output_unit: fraction of total Fe
+    context:
+      - observation_id: berry_2018_synthetic_morb_experimental_conditions
+        type: laboratory_conditions
+        locator: {page: 2, pdf_page_index: 1, published_page: 115, section: Experimental}
+        units: wt.% composition; temperature in C; pressure in Pa.
+        values:
+          quantity: Synthetic MORB standard preparation and run conditions
+          nominal_composition_wt_pct:
+            SiO2: 52.0
+            Al2O3: 16.1
+            CaO: 12.4
+            FeO: 10.0
+            MgO: 8.2
+            TiO2: 1.3
+          nominal_composition_note: Reagent-grade starting materials; CaCO3 reported as CaO and Fe2O3 reported as FeO; no Na, K, or P were included.
+          equilibration_temperature_C: 1400
+          equilibration_temperature_uncertainty_C: 2
+          gas_mixing_furnace_pressure_Pa: 101325
+          gas_mixing_furnace_pressure_as_published: 1 atm
+          oxidized_sample_pressure_Pa: 1000000000
+          oxidized_sample_pressure_as_published: 1.0 GPa in a sealed Pt capsule with PtO2.
+          gas_control_as_published: CO/CO2 or O2/CO2 mixtures; gas ratios are not reported per sample.
+          quench_statement: The gas-furnace melts were quenched in water after approximately 24 h. The separate 1.0 GPa sample was held for approximately 4 h; its quench procedure is not detailed separately. The source does not state whether Fe valence is preserved or altered by quenching.
+      - observation_id: berry_2018_table1_mossbauer_hyperfine_parameters
+        type: characterization
+        locator: {page: 4, pdf_page_index: 3, published_page: 117, table: '1'}
+        units: Fraction in percent; isomer shift and quadrupole splitting in mm/s; correlation angle in degrees.
+        values:
+          quantity: Table 1 Gaussian Mössbauer hyperfine fit parameters
+          printed_body_rows: 9
+          fit_conditions:
+            - row: 1
+              log_fO2: 4.8
+              delta_QFM: 11.2
+              fit: null
+              component: D1
+              fraction_percent: 77.9
+              delta_mm_s: 0.288
+              sigma_delta_mm_s: 0.021
+              quadrupole_splitting_mm_s: 1.244
+              sigma_quadrupole_splitting_mm_s: 0.459
+              theta_deg: -1.5
+            - row: 2
+              log_fO2: null
+              delta_QFM: null
+              fit: null
+              component: D2
+              fraction_percent: 22.1
+              delta_mm_s: 0.311
+              sigma_delta_mm_s: 0.014
+              quadrupole_splitting_mm_s: 1.882
+              sigma_quadrupole_splitting_mm_s: 0.534
+              theta_deg: null
+            - row: 3
+              log_fO2: null
+              delta_QFM: null
+              fit: null
+              component: Average
+              delta_mm_s: 0.293
+              delta_as_published: '0.293(2)'
+              delta_uncertainty: 0.002
+              sigma_delta_mm_s: 0.019
+              sigma_delta_as_published: '0.019(5)'
+              sigma_delta_uncertainty: 0.005
+              quadrupole_splitting_mm_s: 1.39
+              quadrupole_as_published: '1.39(5)'
+              quadrupole_uncertainty: 0.05
+              sigma_quadrupole_splitting_mm_s: 0.48
+              sigma_quadrupole_as_published: '0.48(3)'
+              sigma_quadrupole_uncertainty: 0.03
+              theta_deg: null
+            - row: 4
+              log_fO2: -11.0
+              delta_QFM: -4.6
+              fit: A
+              component: D1
+              fraction_percent: 89.4
+              delta_mm_s: 1.077
+              sigma_delta_mm_s: 0.159
+              quadrupole_splitting_mm_s: 1.897
+              sigma_quadrupole_splitting_mm_s: 0.414
+              theta_deg: 5
+            - row: 5
+              log_fO2: null
+              delta_QFM: null
+              fit: null
+              component: D2
+              fraction_percent: 10.6
+              delta_mm_s: 0.650
+              sigma_delta_mm_s: 0.031
+              quadrupole_splitting_mm_s: 1.445
+              sigma_quadrupole_splitting_mm_s: 0.354
+              theta_deg: null
+            - row: 6
+              log_fO2: null
+              delta_QFM: null
+              fit: null
+              component: Average
+              delta_mm_s: 1.03
+              delta_as_published: '1.03(2)'
+              delta_uncertainty: 0.02
+              sigma_delta_mm_s: 0.15
+              sigma_delta_as_published: '0.15(1)'
+              sigma_delta_uncertainty: 0.01
+              quadrupole_splitting_mm_s: 1.85
+              quadrupole_as_published: '1.85(4)'
+              quadrupole_uncertainty: 0.04
+              sigma_quadrupole_splitting_mm_s: 0.41
+              sigma_quadrupole_as_published: '0.41(1)'
+              sigma_quadrupole_uncertainty: 0.01
+              theta_deg: null
+            - row: 7
+              log_fO2: null
+              delta_QFM: null
+              fit: B
+              component: D1
+              fraction_percent: 89.5
+              delta_mm_s: 1.047
+              sigma_delta_mm_s: 0.100
+              quadrupole_splitting_mm_s: 1.955
+              sigma_quadrupole_splitting_mm_s: 0.459
+              theta_deg: 5
+            - row: 8
+              log_fO2: null
+              delta_QFM: null
+              fit: null
+              component: D2
+              fraction_percent: 10.5
+              delta_mm_s: 0.888
+              sigma_delta_mm_s: 0.030
+              quadrupole_splitting_mm_s: 0.956
+              sigma_quadrupole_splitting_mm_s: 0.349
+              theta_deg: null
+            - row: 9
+              log_fO2: null
+              delta_QFM: null
+              fit: null
+              component: Average
+              delta_mm_s: 1.03
+              delta_as_published: '1.03(2)'
+              delta_uncertainty: 0.02
+              sigma_delta_mm_s: 0.10
+              sigma_delta_as_published: '0.10(1)'
+              sigma_delta_uncertainty: 0.01
+              quadrupole_splitting_mm_s: 1.85
+              quadrupole_as_published: '1.85(4)'
+              quadrupole_uncertainty: 0.04
+              sigma_quadrupole_splitting_mm_s: 0.45
+              sigma_quadrupole_as_published: '0.45(1)'
+              sigma_quadrupole_uncertainty: 0.01
+              theta_deg: null
+          notes:
+            - Empty cells remain null; Table 1's visually grouped fO2 and delta-QFM labels were not promoted to following component or average rows.
+            - Table 1 is unscored Mössbauer fit context, not redox rail observations.
+      - observation_id: berry_2018_table2_xanes_centroid_and_edge
+        type: characterization
+        locator: {page: 6, pdf_page_index: 5, published_page: 119, table: '2'}
+        units: centroid and edge in eV.
+        values:
+          quantity: Table 2 XANES pre-edge centroid and absorption-edge energies
+          printed_body_rows: 13
+          centroid_uncertainty_eV: 0.022
+          edge_uncertainty_eV: 0.05
+          centroid_edge_rows:
+            - {row: 1, centroid_eV: 7114.566, edge_eV: 7126.529}
+            - {row: 2, centroid_eV: 7114.414, edge_eV: 7125.336}
+            - {row: 3, centroid_eV: 7114.295, edge_eV: 7124.603}
+            - {row: 4, centroid_eV: 7114.103, edge_eV: 7123.971}
+            - {row: 5, centroid_eV: 7113.862, edge_eV: 7123.347}
+            - {row: 6, centroid_eV: 7113.509, edge_eV: null, edge_as_published: '–'}
+            - {row: 7, centroid_eV: 7113.319, edge_eV: 7121.950}
+            - {row: 8, centroid_eV: 7113.170, edge_eV: 7121.581}
+            - {row: 9, centroid_eV: 7113.101, edge_eV: 7121.355}
+            - {row: 10, centroid_eV: 7113.040, edge_eV: 7121.185}
+            - {row: 11, centroid_eV: 7112.992, edge_eV: 7121.094}
+            - {row: 12, centroid_eV: 7112.977, edge_eV: 7121.033}
+            - {row: 13, centroid_eV: 7112.958, edge_eV: 7121.036}
+          mean_glass_composition_wt_pct_n_50:
+            SiO2: {value: 52.10, uncertainty: 0.40, as_published: '52.10(40)'}
+            Al2O3: {value: 15.87, uncertainty: 0.22, as_published: '15.87(22)'}
+            CaO: {value: 12.33, uncertainty: 0.17, as_published: '12.33(17)'}
+            FeOTotal: {value: 9.40, uncertainty: 0.22, as_published: '9.40(22)'}
+            MgO: {value: 7.77, uncertainty: 0.09, as_published: '7.77(9)'}
+            TiO2: {value: 1.27, uncertainty: 0.03, as_published: '1.27(3)'}
+          model_a_footnote_as_published:
+            centroid_eV: '7112.935 + 2.687 (Fe3+/SumFe) − 1.000 (Fe3+/SumFe)^2'
+            edge_eV: '7120.998 + 5.613 (Fe3+/SumFe)'
+            centroid_uncertainty_eV: 0.022
+            edge_uncertainty_eV: 0.05
+            coefficient_uncertainties: highly correlated; source reports errors for the value rather than individual terms.
+          notes:
+            - Table 2 reports mean analysed glass composition as characterization; row conditions use the nominal synthetic MORB recipe reported in the experimental section.
+            - The mean glass composition is retained as printed; no missing oxide is inferred or normalized.
+            - The prose-printed natural-glass centroid and polynomial means, VG2 and JDF-D2 standards, and n=19 edge and centroid means are stored as measured_reduced; their unstated fO2, pressure, temperature, and composition axes remain unknown.
+            - Individual natural-glass values from Supplementary Table 1 are not invented or transcribed. Values found only in Figures 1 and 7 remain unextracted figure-read candidates.

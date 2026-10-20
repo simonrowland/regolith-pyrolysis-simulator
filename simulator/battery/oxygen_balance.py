@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from typing import Literal
 
 from scipy.optimize import brentq
 
@@ -22,6 +23,7 @@ OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
     }
 )
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
+OxygenBalanceBracketBoundary = Literal["lower", "upper"]
 _OXYGEN_GAS_ALPHA = 1.0
 _OXYGEN_GAS_ALPHA_SOURCE = (
     "declared common-unity sensitivity alpha=1.0 for O/O2 free-molecular gas escape; "
@@ -46,6 +48,7 @@ class _VacuumOxygenChannel:
 @dataclass(frozen=True)
 class _VacuumOxygenBalance:
     pO2_bar: float
+    bracket_boundary: OxygenBalanceBracketBoundary | None
     pressures_Pa: Mapping[str, float]
     channel_fluxes_mol_m2_s: Mapping[str, float]
     oxygen_atom_flux_mol_m2_s: float
@@ -60,6 +63,7 @@ def _solve_vacuum_oxygen_balance(
     *,
     temperature_K: float,
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
+    on_accepted_evaluation: Callable[[float], None] | None = None,
 ) -> _VacuumOxygenBalance:
     """Solve an alpha-weighted, engine-supplied vacuum pressure model.
 
@@ -160,14 +164,22 @@ def _solve_vacuum_oxygen_balance(
 
     f_low = evaluate(low)[0]
     f_high = evaluate(high)[0]
+    bracket_boundary: OxygenBalanceBracketBoundary | None = None
     if f_low == 0.0:
         root = low
+        bracket_boundary = "lower"
     elif f_high == 0.0:
         root = high
-    elif f_low * f_high > 0.0:
-        raise ValueError(
-            "vacuum oxygen balance has no root in the declared pO2 bracket"
-        )
+        bracket_boundary = "upper"
+    elif f_low > 0.0 and f_high > 0.0:
+        # The residual is oxygen flux minus parent-oxygen demand and increases
+        # with pO2. Positive values at both endpoints put the root below the
+        # bracket (for example, a root at -40 gives positive residuals at -30
+        # and 0), so only this same-sign case holds the lower floor.
+        root = low
+        bracket_boundary = "lower"
+    elif f_low < 0.0 and f_high < 0.0:
+        raise ValueError("vacuum oxygen balance has no root in the declared pO2 bracket")
     else:
         root = brentq(
             lambda value: evaluate(value)[0],
@@ -179,26 +191,31 @@ def _solve_vacuum_oxygen_balance(
         )
 
     residual, pressures, oxygen_flux, parent_flux = evaluate(root)
-    lower_pressures = evaluate(root - 0.1)[1]
-    upper_pressures = evaluate(root + 0.1)[1]
-    for channel in active_channels:
-        pressure = pressures[channel.species]
-        if pressure <= 1.0e-300:
-            continue
-        lower_pressure = lower_pressures[channel.species]
-        upper_pressure = upper_pressures[channel.species]
-        if lower_pressure <= 0.0 or upper_pressure <= 0.0:
-            raise ValueError(
-                f"pressure law for {channel.species!r} is not positive around the root"
-            )
-        observed_exponent = (
-            math.log10(upper_pressure) - math.log10(lower_pressure)
-        ) / 0.2
-        if abs(observed_exponent - channel.pO2_exponent) > 1.0e-6:
-            raise ValueError(
-                f"pressure law exponent mismatch for {channel.species!r}: "
-                f"declared {channel.pO2_exponent}, observed {observed_exponent}"
-            )
+    if bracket_boundary != "lower":
+        probe_low = max(low, root - 0.1)
+        probe_high = root + 0.1
+        lower_pressures = evaluate(probe_low)[1]
+        upper_pressures = evaluate(root + 0.1)[1]
+        for channel in active_channels:
+            pressure = pressures[channel.species]
+            if pressure <= 1.0e-300:
+                continue
+            lower_pressure = lower_pressures[channel.species]
+            upper_pressure = upper_pressures[channel.species]
+            if lower_pressure <= 0.0 or upper_pressure <= 0.0:
+                raise ValueError(
+                    f"pressure law for {channel.species!r} is not positive around the root"
+                )
+            observed_exponent = (
+                math.log10(upper_pressure) - math.log10(lower_pressure)
+            ) / (probe_high - probe_low)
+            if abs(observed_exponent - channel.pO2_exponent) > 1.0e-6:
+                raise ValueError(
+                    f"pressure law exponent mismatch for {channel.species!r}: "
+                    f"declared {channel.pO2_exponent}, observed {observed_exponent}"
+                )
+    if on_accepted_evaluation is not None:
+        on_accepted_evaluation(root)
 
     relative_residual = abs(residual) / max(oxygen_flux, parent_flux, 1.0e-300)
     fluxes = {
@@ -210,6 +227,7 @@ def _solve_vacuum_oxygen_balance(
     }
     return _VacuumOxygenBalance(
         pO2_bar=10.0**root,
+        bracket_boundary=bracket_boundary,
         pressures_Pa=pressures,
         channel_fluxes_mol_m2_s=fluxes,
         oxygen_atom_flux_mol_m2_s=oxygen_flux,

@@ -24,7 +24,13 @@ from typing import Any
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
+from simulator.battery.enums import (
+    EvidenceClass,
+    IdentityEqualKind,
+    Quantity,
+    ValueKind,
+)
+from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
     Migrator,
@@ -383,6 +389,235 @@ def test_redox_row_log_overrides_series_oxygen_and_inherits_when_absent(
     assert len(rows) == 2
     assert rows[0].identity.fO2_Pa.value == Decimal("0.01")
     assert rows[1].identity.fO2_Pa.value == Decimal("0.001")
+
+
+def test_valence_rows_stamp_printed_po2_and_absolute_log(tmp_path: Path) -> None:
+    path = _fixture_extract(tmp_path, [
+        {
+            "observation_id": "fixture_valence_po2_1",
+            "experiment": "aithala-2026-vf271",
+            "T_range_K": None,
+            "phase": "glass",
+            "values": {
+                "method_class": "measured_direct",
+                "quantity": "average_oxidation_state",
+                "admission_status": "admitted",
+                "series": [{
+                    "T_C": 1250,
+                    "value": "2.5",
+                    "oxygen_partial_pressure": {"value": "1e-8", "units": "atm"},
+                }],
+            },
+        },
+        {
+            "observation_id": "fixture_valence_po2_2",
+            "experiment": "aithala-2026-vf271",
+            "T_range_K": None,
+            "phase": "glass",
+            "values": {
+                "method_class": "measured_direct",
+                "quantity": "average_oxidation_state",
+                "admission_status": "admitted",
+                "series": [{
+                    "T_C": 1250,
+                    "value": "2.5",
+                    "oxygen_partial_pressure": {"value": "1e-9", "units": "atm"},
+                }],
+            },
+        },
+        {
+            "observation_id": "fixture_valence_log",
+            "experiment": "aithala-2026-vf271",
+            "T_range_K": None,
+            "phase": "glass",
+            "values": {
+                "method_class": "measured_direct",
+                "quantity": "average_oxidation_state",
+                "admission_status": "admitted",
+                "series": [{
+                    "T_C": 1250,
+                    "value": "2.5",
+                    "log_fO2": {"value": "-8", "units": "log10(atm)"},
+                }],
+            },
+        },
+        {
+            "observation_id": "fixture_valence_delta_iw",
+            "experiment": "aithala-2026-vf271",
+            "T_range_K": None,
+            "phase": "glass",
+            "values": {
+                "method_class": "measured_direct",
+                "quantity": "average_oxidation_state",
+                "admission_status": "admitted",
+                "series": [{
+                    "T_C": 1250,
+                    "value": "2.5",
+                    "log_fO2": {"value": "-1", "units": "log10(IW)"},
+                    "point_conditions": {
+                        "fO2_control": {
+                            "state": {"tag": "value", "value": "delta-IW"},
+                            "locator": {"published_page": 1},
+                        }
+                    },
+                }],
+            },
+        },
+    ])
+    result = _migrate(path)
+    rows = {
+        obs.observation_id.split("::", 1)[1].split("::", 1)[0]: obs
+        for obs in result.observations.values()
+        if "fixture_valence_" in obs.observation_id
+    }
+
+    first = rows["fixture_valence_po2_1"]
+    second = rows["fixture_valence_po2_2"]
+    logged = rows["fixture_valence_log"]
+    delta_iw = rows["fixture_valence_delta_iw"]
+    assert first.identity.quantity.value is Quantity.VALENCE_RATIO
+    assert first.identity.fO2_Pa.value == Decimal("0.00101325")
+    assert first.point_conditions["fO2_Pa"].state.value.point == Decimal("0.00101325")
+    assert second.identity.fO2_Pa.value == Decimal("0.000101325")
+    assert logged.identity.fO2_Pa.value == Decimal("0.00101325")
+    outcome = identity_equal(first.identity, second.identity)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert "fO2_Pa" in outcome.fields
+    assert delta_iw.identity.fO2_Pa.is_unknown
+    assert "buffer-relative fO2" in delta_iw.identity.fO2_Pa.reason
+    assert "delta-IW" in delta_iw.identity.fO2_Pa.reason
+    assert delta_iw.point_conditions["fO2_control"].state.value == "delta-IW"
+
+
+def test_valence_rows_stamp_printed_pressure_and_keep_missing_unknown(
+    tmp_path: Path,
+) -> None:
+    source_experiment = "aithala-2026-vf271"
+    fixture_experiment = "aithala-2026-vf271-no-pressure-fixture"
+    base_point = {
+        "T_C": 1250,
+        "value": "2.5",
+        "log_fO2": {"value": "-8", "units": "log10(bar)"},
+        "composition_mol": {"SiO2": "0.5", "MgO": "0.5"},
+    }
+    rows = []
+    for suffix, pressure in (
+        ("1gpa", "1000000000"),
+        ("2gpa", "2000000000"),
+        ("no_pressure", None),
+    ):
+        point = copy.deepcopy(base_point)
+        if pressure is not None:
+            point["point_conditions"] = {
+                "total_pressure_Pa": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"kind": "point", "point": pressure},
+                    },
+                    "locator": {"page": 13, "table": "3"},
+                }
+            }
+        rows.append(
+            {
+                "observation_id": f"fixture_valence_pressure_{suffix}",
+                "experiment": fixture_experiment,
+                "T_range_K": None,
+                "phase": "glass",
+                "values": {
+                    "method_class": "measured_direct",
+                    "quantity": "average_oxidation_state",
+                    "admission_status": "admitted",
+                    "series": [point],
+                },
+            }
+        )
+
+    path = _fixture_extract(tmp_path, rows)
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    fixture = copy.deepcopy(
+        next(
+            experiment
+            for experiment in document["experiments"]
+            if experiment["experiment_id"] == source_experiment
+        )
+    )
+    fixture["experiment_id"] = fixture_experiment
+    fixture["pressure_environment"]["total_pressure_Pa"]["state"] = {
+        "tag": "unknown",
+        "reason": "not_published",
+    }
+    document["experiments"].append(fixture)
+    path.write_text(
+        yaml.safe_dump(document, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+
+    migrated = _migrate(path)
+    stamped = {
+        observation.observation_id.split("::", 2)[1]: observation
+        for observation in migrated.observations.values()
+        if "fixture_valence_pressure_" in observation.observation_id
+    }
+    one_gpa = stamped["fixture_valence_pressure_1gpa"]
+    two_gpa = stamped["fixture_valence_pressure_2gpa"]
+    no_pressure = stamped["fixture_valence_pressure_no_pressure"]
+
+    assert len(stamped) == 3
+    assert all(
+        observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == Decimal("1523.15")
+        for observation in stamped.values()
+    )
+    assert one_gpa.identity.quantity.value is Quantity.VALENCE_RATIO
+    assert one_gpa.identity.total_pressure_Pa.is_value
+    assert one_gpa.identity.total_pressure_Pa.value == Decimal("1000000000")
+    pressure_condition = one_gpa.point_conditions["total_pressure_Pa"]
+    assert pressure_condition.state.value.kind is ValueKind.POINT
+    assert pressure_condition.state.value.point == Decimal("1000000000")
+    assert pressure_condition.locator is not None
+    assert pressure_condition.locator.table == "3"
+    assert two_gpa.identity.total_pressure_Pa.is_value
+    assert two_gpa.identity.total_pressure_Pa.value == Decimal("2000000000")
+    assert one_gpa.identity.composition is not None
+    assert one_gpa.identity.composition.is_value
+    assert dict(one_gpa.identity.composition.value.components) == {
+        "SiO2": Decimal("0.5"),
+        "MgO": Decimal("0.5"),
+    }
+    composition_condition = one_gpa.point_conditions["composition"]
+    assert composition_condition.state == one_gpa.identity.composition
+    pressure_difference = identity_equal(one_gpa.identity, two_gpa.identity)
+    assert pressure_difference.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert "total_pressure_Pa" in pressure_difference.fields
+    assert no_pressure.identity.total_pressure_Pa.is_unknown
+    assert no_pressure.identity.total_pressure_Pa.reason == (
+        "no total_pressure_Pa mapped from source"
+    )
+
+
+def test_fe_ratio_identity_uses_printed_absolute_po2(tmp_path: Path) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_fe_row_po2",
+        "experiment": "aithala-2026-vf271",
+        "T_range_K": None,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "admission_status": "admitted",
+            "series": [{
+                "T_C": 1250,
+                "Fe3_over_FeT": 0.5,
+                "oxygen_partial_pressure": {"value": "1e-8", "units": "atm"},
+            }],
+        },
+    }])
+    obs = next(
+        obs for obs in _migrate(path).observations.values()
+        if "fixture_fe_row_po2::" in obs.observation_id
+    )
+
+    assert obs.identity.quantity.value is Quantity.FE3_FE2_RATIO
+    assert obs.identity.fO2_Pa.value == Decimal("0.00101325")
 
 
 @pytest.mark.parametrize(

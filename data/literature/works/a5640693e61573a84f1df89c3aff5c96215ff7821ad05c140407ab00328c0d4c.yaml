@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:di-donato-granati-2000
+      role: pdf
+      path: raw/di-donato-granati-2000/di-donato-granati-2000.pdf
+      sha256:
+        tag: value
+        value: 78dd1d4d3b37bbbe4306527130db925d48c7fa1e004cba52c4644b08fb28d825
+    - asset_id: tables:di-donato-granati-2000
+      role: table_csv
+      path: tables/di-donato-granati-2000
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:di-donato-granati-2000
       role: pdftotext
       path: unknown
