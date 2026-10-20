@@ -7278,10 +7278,16 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
 def diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
     """Compilation, ledger, and SF04 rows scored through diagnostic paths."""
 
+    from simulator.battery.compilation_tier import is_compilation_evidence
+
     out: list[Observation] = []
     for obs in context.observations.values():
         origin = context.origins.get(obs.observation_id)
-        if is_internal_consistency(origin) or is_compilation_source(obs.source_id, origin):
+        if (
+            is_internal_consistency(origin)
+            or is_compilation_evidence(obs)
+            or is_compilation_source(obs.source_id, origin)
+        ):
             out.append(obs)
             continue
         if is_sf04_workbook(obs):
