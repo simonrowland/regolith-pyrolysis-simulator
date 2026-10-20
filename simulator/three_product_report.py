@@ -558,7 +558,16 @@ def _terminal_rump_by_class_kg(
         _raise_if_rump_class_total_mismatches_total(values, rump_kg_by_species)
         return values
 
-    for species, kg in rump_kg_by_species.items():
+    values = _terminal_rump_classes_from_species(rump_kg_by_species)
+    _raise_if_rump_class_total_mismatches_total(values, rump_kg_by_species)
+    return values
+
+
+def _terminal_rump_classes_from_species(
+    species_kg: Mapping[str, float],
+) -> dict[str, float]:
+    classes = {key: 0.0 for key in TERMINAL_RUMP_REPORT_CLASSES}
+    for species, kg in species_kg.items():
         if species in TERMINAL_RUMP_REFRACTORY_OXIDES:
             key = 'refractory_oxides'
         elif species in TERMINAL_RUMP_SILICATE_RESIDUAL:
@@ -567,9 +576,8 @@ def _terminal_rump_by_class_kg(
             key = 'unextracted_metals'
         else:
             key = 'other'
-        values[key] += float(kg)
-    _raise_if_rump_class_total_mismatches_total(values, rump_kg_by_species)
-    return values
+        classes[key] += float(kg)
+    return classes
 
 
 def _raise_if_rump_class_total_mismatches_total(

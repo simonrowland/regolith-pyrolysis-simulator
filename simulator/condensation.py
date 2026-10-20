@@ -252,9 +252,8 @@ def _carrier_lennard_jones_params(species: str) -> tuple[float, float, float]:
 # Chapman-Enskog Lennard-Jones parameters (vapor species + carrier gas).
 # Species: collision diameter (Angstrom), ε/k_B (K), molecular mass (g/mol).
 # Primary source: Bird/Stewart/Lightfoot "Transport Phenomena" 2nd ed.
-# Table E.1 supplies carrier-gas rows; Na, Si and SiO use Svehla 1962
-# (NASA TR R-132). The retained K row has unknown source and remains a proxy.
-# Remaining vapor species use the Svehla or Hirschfelder/Curtiss/Bird estimates.
+# Table E.1 for noble gases + Na/K/Ca; remaining species use the Svehla
+# 1962 (NASA TR R-132) or Hirschfelder/Curtiss/Bird canonical estimates.
 # Vapor-phase Fe/Cr/Mn/Al/Ti are proxy estimates because direct kinetic-
 # theory measurements for transition-metal vapor are sparse. Their exact
 # derivation is not established here: in particular, the stored epsilon/k_B
@@ -263,8 +262,10 @@ def _carrier_lennard_jones_params(species: str) -> tuple[float, float, float]:
 # ~constant in the high-T limit, D_AB ∝ 1/σ_AB²) and weakly sensitive
 # to ε (collision integral Ω_D varies <30% across the simulator's T
 # range). At the typical C2A operating point (10 mbar = 1000 Pa,
-# 1973.15 K) ``_chapman_enskog_d_ab_m2_s('SiO', ...)`` returns about
-# 0.0417 m²/s vs the legacy 0.01 constant (about 4×).
+# 1973.15 K) ``_chapman_enskog_d_ab_m2_s('SiO', ...)`` returns
+# 0.0491 m²/s vs the legacy 0.01 constant (about 5×). The previously
+# quoted ~0.042 m²/s is the same formula at 1773 K (1500 C), not at
+# 1973 K.
 _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     # (sigma Angstrom, eps/k_B K, M g/mol)
     # N2 sigma derives from N2_COLLISION_DIAMETER_M (one grounded source, BUG-013)
@@ -275,8 +276,7 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     'O2':  _carrier_lennard_jones_params('O2'),  # BSL Table E.1
     'He':  _carrier_lennard_jones_params('He'),  # BSL Table E.1
     'Na':  (3.567, 1375.0, 22.990),  # Svehla 1962 vapor
-    'K':   (3.987, 1305.0, 39.098),  # Legacy attribution; absent from Svehla Table I(a)
-    'Si':  (2.910, 3036.0, 28.085),  # Svehla 1962 NASA TR R-132 Table I
+    'K':   (3.987, 1305.0, 39.098),  # Svehla 1962 vapor
     'Ca':  (3.880, 1224.0, 40.078),  # BSL extension
     'Fe':  (2.940, 6026.0, 55.845),  # Estimated (transition-metal vapor)
     'Mg':  (3.060, 1614.0, 24.305),  # Estimated
@@ -284,7 +284,7 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     'Cr':  (2.880, 6000.0, 51.996),  # Estimated
     'Al':  (2.940, 3093.0, 26.982),  # Estimated
     'Ti':  (2.890, 6000.0, 47.867),  # Estimated
-    'SiO': (3.374, 569.0,  44.085),  # Svehla 1962 NASA TR R-132 Table I
+    'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
 }
 
 _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
@@ -316,13 +316,9 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
         'status': 'sourced',
         'source': 'Svehla 1962 vapor transport table',
     },
-    'Si': {
-        'status': 'sourced',
-        'source': 'Svehla 1962 NASA TR R-132 Table I',
-    },
     'K': {
-        'status': 'proxy',
-        'source': 'legacy vapor Lennard-Jones row; source unknown (absent from Svehla Table I)',
+        'status': 'sourced',
+        'source': 'Svehla 1962 vapor transport table',
     },
     'Ca': {
         'status': 'proxy',
@@ -353,14 +349,14 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
         'source': 'estimated transition-metal vapor Lennard-Jones row',
     },
     'SiO': {
-        'status': 'sourced',
-        'source': 'Svehla 1962 NASA TR R-132 Table I',
+        'status': 'proxy',
+        'source': 'estimated sparse-data SiO vapor Lennard-Jones row',
     },
     # CrO2 deliberately has NO provenance row: condensation/deposition transport
     # for CrO2 uses the documented DEFAULT_BINARY_DIFFUSION_M2_S fallback (pinned
     # by test_cro2_condensation_transport_uses_documented_default_fallback). The
     # SiO-based CLASS-PROXY exists only on the evaporation path
-    # (engines/builtin/evaporation_flux.py::_EVAPORATION_LJ_PROXY_MOLAR_MASSES); a row
+    # (engines/builtin/evaporation_flux.py::_EVAPORATION_LJ_PROXY_PARAMS); a row
     # here would falsely report proxy authority for deposition transport.
 }
 

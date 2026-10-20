@@ -79,7 +79,7 @@ DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
     "disabled:missing-species-state-dependent-melt-transfer-inputs"
 )
 # EVAPORATION-only class proxies: systematically composed refractory carriers borrow
-# the sourced SiO collision parameters because direct high-temperature transport
+# the stored SiO collision parameters because direct high-temperature transport
 # data are absent, but each retains its formula molar mass. Their collision pair is
 # read from simulator.condensation; this table stores only each formula mass.
 # Sanity: SiO itself is the closest measured rail carrier; this proxy affects

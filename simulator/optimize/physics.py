@@ -790,17 +790,13 @@ class PhysicsConstraintSet:
             for target in self.target_species:
                 threshold = self._extraction_threshold_for_target(str(target))
                 result = by_target[str(target)]
-                unavailable = evaporation_quantity_unavailability(
-                    trace,
-                    str(target),
-                )
-                if unavailable:
-                    return _unavailable_gate(
-                        "extraction_completeness",
-                        threshold,
-                        unavailable["reason"],
-                    )
                 if result.completeness_fraction is None:
+                    if result.reason.startswith("unavailable: "):
+                        return _unavailable_gate(
+                            "extraction_completeness",
+                            threshold,
+                            result.reason.removeprefix("unavailable: "),
+                        )
                     detail = _extraction_completeness_fail_closed_detail(result)
                     if detail.startswith("not-applicable:"):
                         return _not_applicable(
@@ -953,6 +949,11 @@ class PhysicsConstraintSet:
 def _extraction_completeness_fail_closed_detail(
     result: TargetExtractionCompleteness,
 ) -> str:
+    if result.reason.startswith("unavailable: "):
+        return (
+            f"{result.target_species}: "
+            f"{result.reason.removeprefix('unavailable: ')}"
+        )
     if result.reason.startswith("not-applicable:"):
         return result.reason
     if result.reason == "no target-equivalent mol evidence":
@@ -1087,7 +1088,7 @@ def _extraction_completeness_by_target_for_trace(
                 None,
                 None,
                 None,
-                unavailable["reason"],
+                f"unavailable: {unavailable['reason']}",
             )
     provenance_results = _provenance_extraction_results_from_trace(
         trace,

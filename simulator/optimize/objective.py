@@ -4859,6 +4859,11 @@ def _nested_float(root: Mapping[str, Any], path: tuple[str, ...]) -> float:
 
 
 def _oxygen_partition_value(sim: Any, key: str) -> float:
+    refusal = evaporation_quantity_unavailability(sim, "O2")
+    if refusal:
+        raise ObjectiveComputationError(
+            f"oxygen_{key}_kg is unavailable: {refusal['reason']}"
+        )
     partition_method = getattr(sim, "_oxygen_terminal_partition_kg", None)
     if callable(partition_method):
         partition = partition_method()

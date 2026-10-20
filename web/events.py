@@ -97,7 +97,11 @@ from simulator.session import (
     normalize_mre_policy,
 )
 from simulator.state import MOLAR_MASS
-from simulator.three_product_report import METAL_PRODUCT_SPECIES, classify_products
+from simulator.three_product_report import (
+    METAL_PRODUCT_SPECIES,
+    _terminal_rump_classes_from_species,
+    classify_products,
+)
 from simulator.trace import PhysicsTrace
 from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
 # Goal #18 ``JSON-RUNNER-HARNESS``: the SocketIO stream and the CLI
@@ -2475,6 +2479,8 @@ def _product_story_account_kg(sim):
 
 
 def _product_story_extracted_projection(sim, *, account_kg):
+    # Keep the raw extraction-evidence projection available when the canonical
+    # classifier fails; product-story classes below come from classify_products.
     metal_ingots = {}
     glass = {}
     captured_volatiles = {}
@@ -2594,10 +2600,16 @@ def _completion_payload(sim):
         sim,
         account_kg=product_story_account_kg,
     )
+    extracted_product_kg = _extracted_product_kg(
+        extracted_product_projection
+    )
     try:
+        classification = classify_products(sim)
         product_story = _product_story_payload(
             sim,
-            terminal_rump_by_species=terminal_rump_by_species,
+            classification=classification,
+            account_kg=product_story_account_kg,
+            extracted_projection=extracted_product_projection,
         )
         product_story_status = _product_story_soundness(product_story)
     except Exception as exc:  # noqa: BLE001 -- optional presentation boundary
@@ -2628,9 +2640,7 @@ def _completion_payload(sim):
             final_snapshot.inventory.stage0_mass_balance_delta_kg, 3),
         'products': {k: round(v, 2)
                      for k, v in sim.product_ledger().items()},
-        'extracted_product_kg': _extracted_product_kg(
-            extracted_product_projection
-        ),
+        'extracted_product_kg': extracted_product_kg,
         'product_story': product_story,
         'product_story_status': product_story_status,
         'terminal_slag_kg': round(sim._terminal_slag_kg(), 2),
@@ -2704,16 +2714,18 @@ def _product_story_bucket(species_kg, **details):
     }
 
 
-def _product_story_payload(sim, *, terminal_rump_by_species):
-    classification = classify_products(sim)
-    account_kg = _product_story_account_kg(sim)
-    extracted_projection = _product_story_extracted_projection(
-        sim,
-        account_kg=account_kg,
+def _product_story_payload(
+    sim,
+    *,
+    classification,
+    account_kg,
+    extracted_projection,
+):
+    metal_ingots = dict(classification['ingots_metals']['species_kg'])
+    glass = dict(classification['glass']['species_kg'])
+    captured_volatiles = dict(
+        classification['captured_volatiles']['kg_by_species']
     )
-    metal_ingots = dict(extracted_projection['metal_ingots'])
-    glass = dict(extracted_projection['glass'])
-    captured_volatiles = dict(extracted_projection['captured_volatiles'])
     escaped_to_vacuum = {}
     unrecovered_process_inventory = {}
     unclassified = {}
@@ -2762,15 +2774,17 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
         for species, mass in sim.atom_ledger.project_account_kg(account).items():
             _merge_product_story_mass(wall_deposits, species, mass)
 
-    refractory_ceramic = {}
-    terminal_residue = {}
-    for species, mass in terminal_rump_by_species.items():
-        target = (
-            refractory_ceramic
-            if species in TERMINAL_RUMP_REFRACTORY_OXIDES
-            else terminal_residue
-        )
-        _merge_product_story_mass(target, species, mass)
+    refractory_rump = classification['refractory_ceramic_rump']
+    refractory_ceramic = {
+        species: mass
+        for species, mass in refractory_rump['rump_kg_by_species'].items()
+        if species in TERMINAL_RUMP_REFRACTORY_OXIDES
+    }
+    terminal_residue = {
+        species: mass
+        for species, mass in refractory_rump['rump_kg_by_species'].items()
+        if species not in TERMINAL_RUMP_REFRACTORY_OXIDES
+    }
 
     oxygen = _product_story_bucket(extracted_projection['oxygen'])
     oxygen['partition_kg'] = {
@@ -2828,12 +2842,12 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
         'off_spec_condensate': _product_story_bucket(off_spec_condensate),
         'unclassified': _product_story_bucket(unclassified),
     }
-    for name, source_name, species_key in (
-        ('metal_ingots', 'ingots_metals', 'species_kg'),
-        ('glass', 'glass', 'species_kg'),
-        ('oxygen', 'oxygen', None),
-        ('captured_volatiles', 'captured_volatiles', 'kg_by_species'),
-        ('refractory_ceramic', 'refractory_ceramic_rump', 'rump_kg_by_species'),
+    for name, source_name in (
+        ('metal_ingots', 'ingots_metals'),
+        ('glass', 'glass'),
+        ('oxygen', 'oxygen'),
+        ('captured_volatiles', 'captured_volatiles'),
+        ('refractory_ceramic', 'refractory_ceramic_rump'),
     ):
         source = classification[source_name]
         if source.get('class_total_kg') is None:
@@ -2843,12 +2857,10 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
                 source.get('flag')
                 or classification['pure_silica_glass'].get('flag')
             )
-            known_species = source.get(species_key, {}) if species_key else {}
-            bucket['species_kg'] = {
-                species: mass
-                for species, mass in bucket['species_kg'].items()
-                if species in known_species
-            }
+        elif name != 'oxygen':
+            story[name]['class_total_kg'] = round(
+                float(source['class_total_kg']), 2
+            )
     if story['oxygen']['class_total_kg'] is None:
         story['oxygen']['partition_kg'] = dict.fromkeys(
             story['oxygen']['partition_kg']
@@ -2863,26 +2875,6 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
             story['terminal_residue']['class_total_kg'] = None
             story['terminal_residue']['flag'] = rump['flag']
     return story
-
-
-def _terminal_rump_classes_from_species(species_kg):
-    classes = {
-        'refractory_oxides': 0.0,
-        'silicate_residual': 0.0,
-        'unextracted_metals': 0.0,
-        'other': 0.0,
-    }
-    for species, mass in species_kg.items():
-        if species in TERMINAL_RUMP_REFRACTORY_OXIDES:
-            key = 'refractory_oxides'
-        elif species in TERMINAL_RUMP_SILICATE_RESIDUAL:
-            key = 'silicate_residual'
-        elif species in TERMINAL_RUMP_UNEXTRACTED_METALS:
-            key = 'unextracted_metals'
-        else:
-            key = 'other'
-        classes[key] += float(mass)
-    return classes
 
 
 def _knudsen_regime_diagnostic_from_sim(sim):
