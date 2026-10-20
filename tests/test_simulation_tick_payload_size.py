@@ -436,9 +436,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         active_sids = set(_simulations) - before
         assert len(active_sids) == 1
         state = _simulations[next(iter(active_sids))]
-        rounds = 0
-        while len(tick_samples) < 12 and rounds < 11:
-            rounds += 1
+        while len(tick_samples) < 12:
             assert captured_tasks, tick_samples
             target = captured_tasks.pop(0)
             target()
