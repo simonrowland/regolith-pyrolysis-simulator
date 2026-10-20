@@ -3896,7 +3896,10 @@ def _wall_fouling_report(
         refusal = availability.refusal
         refusal_authority = refusal["authority"]
         report["refusal"] = {
-            "reason": refusal["reason"],
+            "reason": (
+                "Zero wall deposition cannot be certified from "
+                "non-authoritative wall-routing evidence."
+            ),
             "code": refusal_authority["code"],
             "authoritative": refusal_authority["authoritative"],
             "authoritative_for_deposit_mass": (
