@@ -197,11 +197,21 @@ def test_table1_post_run_p2o5_and_sample_weights_match_render() -> None:
         assert values["P2O5_wt_pct"] == p2o5
         assert values["standard_deviation_wt_pct_as_printed"] == sd
         assert sample_weights[(sample, duration, temp)] == weight
+        mass_condition = item["point_conditions"]["sample_mass_kg"]
+        assert Decimal(mass_condition["state"]["value"]) == (
+            Decimal(weight) * Decimal("0.000001")
+        )
+        assert mass_condition["locator"]["row"] == row
+        assert mass_condition["locator"]["column"] == "Sample weight (mg)"
         if sample.startswith("DAP"):
             assert values["method_class"] == "quoted_attributed"
             assert values["attribution"] == "Borisov, unpublished data"
             assert item["point_conditions"]["fO2_control"]["state"]["value"] == "approximately IW"
-            assert item["point_conditions"]["total_pressure_Pa"]["state"]["tag"] == "unknown"
+            assert item["point_conditions"]["total_pressure_Pa"]["state"]["value"] == "101325"
+            assert item["point_conditions"]["composition"]["state"]["tag"] == "unknown"
+            assert "unreported oxide components" in item["point_conditions"][
+                "composition"
+            ]["state"]["reason"]
         else:
             assert values["method_class"] == "measured_direct"
             assert item["point_conditions"]["total_pressure_Pa"]["state"]["value"] == "101325"
@@ -264,6 +274,41 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
     )
     assert all(r.point_conditions["T_C"].locator is not None for r in phosphorus)
     assert all(r.identity.temperature_K.is_value for r in phosphorus)
+    for record in phosphorus:
+        conditions = record.point_conditions
+        assert conditions["total_pressure_Pa"].state.value == Decimal("101325")
+        assert conditions["total_pressure_Pa"].locator is not None
+        assert record.identity.total_pressure_Pa.is_value
+        assert record.identity.total_pressure_Pa.value == Decimal("101325")
+        duration = conditions["duration_h"]
+        assert duration.state.is_value and duration.locator is not None
+        exposure = record.identity.exposure
+        assert exposure.is_value
+        assert exposure.value.duration_s.is_value
+        assert exposure.value.duration_s.value == duration.state.value * Decimal("3600")
+        assert exposure.value.area_m2.is_unknown
+        assert exposure.value.area_m2.reason
+        sample_mass = conditions["sample_mass_kg"]
+        assert sample_mass.state.is_value and sample_mass.locator is not None
+        assert record.identity.sample_mass_kg.is_value
+        assert record.identity.sample_mass_kg.value == sample_mass.state.value
+        composition = conditions["composition"]
+        assert composition.state.is_unknown and composition.state.reason
+        assert composition.locator is not None
+        assert record.identity.composition.is_unknown
+        assert record.identity.composition.reason
+        oxygen = conditions["fO2_log"]
+        assert oxygen.state.is_unknown and oxygen.state.reason
+        assert oxygen.locator is not None
+        assert record.identity.fO2_Pa.is_unknown
+        assert record.identity.fO2_Pa.reason
+        atmosphere = conditions["atmosphere"]
+        assert atmosphere.state.is_value and atmosphere.locator is not None
+        if "dafp10_air" in record.observation_id:
+            assert atmosphere.state.value == "air"
+        else:
+            assert "CO/CO2" in atmosphere.state.value
+            assert "approximately IW" in atmosphere.state.value
 
     for record in records:
         conditions = record.point_conditions
@@ -349,9 +394,11 @@ def test_cited_table_pages_are_the_physical_pdf_pages() -> None:
     assert "withdraw" in pages[3].lower()
     assert "Table 1" in pages[4]
     assert "P2O5" in pages[4]
+    assert "Sample" in pages[4] and "weight (mg)" in pages[4]
     assert "1.47 ± 0.08" in pages[4]
     assert "1.60 ± 0.11" in pages[4]
     assert "Table 2" in pages[5]
+    assert "DAP initial" in pages[5]
     assert "ferric/ferrous ratios" in pages[5]
     for figure, page in ((1, 6), (2, 6), (3, 7), (4, 7), (5, 8), (6, 8), (7, 10), (8, 10), (9, 11), (10, 12), (11, 13)):
         assert f"Fig. {figure}" in pages[page]

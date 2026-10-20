@@ -15268,6 +15268,28 @@ class Migrator:
                         atmosphere_note, fo2_locator
                     )
             point_conditions = residue_conditions or None
+            if isinstance(point_conditions, Mapping):
+                for name in ("composition", "total_pressure_Pa", "sample_mass_kg"):
+                    condition = point_conditions.get(name)
+                    if isinstance(condition, Located):
+                        ident_kwargs[name] = condition.state
+                duration = point_conditions.get("duration_h")
+                if isinstance(duration, Located):
+                    duration_state = duration.state
+                    if duration_state.is_value:
+                        duration_state = State.of(
+                            duration_state.value * Decimal("3600")
+                        )
+                    elif duration_state.is_unknown:
+                        duration_state = State.unknown(
+                            duration_state.reason or "source duration is unknown"
+                        )
+                    ident_kwargs["exposure"] = State.of(
+                        Exposure(
+                            area_m2=State.unknown("source does not state exposed area"),
+                            duration_s=duration_state,
+                        )
+                    )
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,

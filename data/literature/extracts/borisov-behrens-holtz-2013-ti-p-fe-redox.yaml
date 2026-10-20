@@ -6088,6 +6088,18 @@ species:
             table: '1'
             row: '2'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000108'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '2'
+            column: Sample weight (mg)
+            note: Printed 10.8 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -6190,6 +6202,18 @@ species:
             table: '1'
             row: '7'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000152'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '7'
+            column: Sample weight (mg)
+            note: Printed 15.2 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -6292,6 +6316,18 @@ species:
             table: '1'
             row: '17.2'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000139'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '17.2'
+            column: Sample weight (mg)
+            note: Printed 13.9 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -6394,6 +6430,18 @@ species:
             table: '1'
             row: '2'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000122'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '2'
+            column: Sample weight (mg)
+            note: Printed 12.2 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -6496,6 +6544,18 @@ species:
             table: '1'
             row: '7'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000136'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '7'
+            column: Sample weight (mg)
+            note: Printed 13.6 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -6598,6 +6658,18 @@ species:
             table: '1'
             row: '15.5'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000131'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '15.5'
+            column: Sample weight (mg)
+            note: Printed 13.1 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -6700,6 +6772,18 @@ species:
             table: '1'
             row: '66'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000150'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '66'
+            column: Sample weight (mg)
+            note: Printed 15.0 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -6803,6 +6887,18 @@ species:
             table: '1'
             row: '3'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000152'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '3'
+            column: Sample weight (mg)
+            note: Printed 15.2 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -6840,26 +6936,20 @@ species:
             column: atmosphere
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The cited unpublished DAP series pressure is not stated in this paper.
-          locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '3'
-            column: pressure
+            tag: value
+            value: '101325'
+          locator: *id003
         composition:
           state:
             tag: unknown
-            reason: Table 1 gives only the P2O5 component, not a complete glass composition.
+            reason: Table 2 DAP initial composition has unreported oxide components; no composition is reconstructed.
           locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '3'
-            column: composition
+            page: 5
+            published_page: 1581
+            pdf_page_index: 4
+            table: '2'
+            row: DAP initial
+            column: oxide composition
         quench_state:
           state:
             tag: value
@@ -6924,6 +7014,18 @@ species:
             table: '1'
             row: '8'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000126'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '8'
+            column: Sample weight (mg)
+            note: Printed 12.6 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -6961,26 +7063,20 @@ species:
             column: atmosphere
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The cited unpublished DAP series pressure is not stated in this paper.
-          locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '8'
-            column: pressure
+            tag: value
+            value: '101325'
+          locator: *id003
         composition:
           state:
             tag: unknown
-            reason: Table 1 gives only the P2O5 component, not a complete glass composition.
+            reason: Table 2 DAP initial composition has unreported oxide components; no composition is reconstructed.
           locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '8'
-            column: composition
+            page: 5
+            published_page: 1581
+            pdf_page_index: 4
+            table: '2'
+            row: DAP initial
+            column: oxide composition
         quench_state:
           state:
             tag: value
@@ -7045,6 +7141,18 @@ species:
             table: '1'
             row: '15'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000126'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '15'
+            column: Sample weight (mg)
+            note: Printed 12.6 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -7082,26 +7190,20 @@ species:
             column: atmosphere
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The cited unpublished DAP series pressure is not stated in this paper.
-          locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '15'
-            column: pressure
+            tag: value
+            value: '101325'
+          locator: *id003
         composition:
           state:
             tag: unknown
-            reason: Table 1 gives only the P2O5 component, not a complete glass composition.
+            reason: Table 2 DAP initial composition has unreported oxide components; no composition is reconstructed.
           locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '15'
-            column: composition
+            page: 5
+            published_page: 1581
+            pdf_page_index: 4
+            table: '2'
+            row: DAP initial
+            column: oxide composition
         quench_state:
           state:
             tag: value
@@ -7166,6 +7268,18 @@ species:
             table: '1'
             row: '24'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000181'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '24'
+            column: Sample weight (mg)
+            note: Printed 18.1 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -7203,26 +7317,20 @@ species:
             column: atmosphere
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The cited unpublished DAP series pressure is not stated in this paper.
-          locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '24'
-            column: pressure
+            tag: value
+            value: '101325'
+          locator: *id003
         composition:
           state:
             tag: unknown
-            reason: Table 1 gives only the P2O5 component, not a complete glass composition.
+            reason: Table 2 DAP initial composition has unreported oxide components; no composition is reconstructed.
           locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '24'
-            column: composition
+            page: 5
+            published_page: 1581
+            pdf_page_index: 4
+            table: '2'
+            row: DAP initial
+            column: oxide composition
         quench_state:
           state:
             tag: value
@@ -7287,6 +7395,18 @@ species:
             table: '1'
             row: '53'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000162'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '53'
+            column: Sample weight (mg)
+            note: Printed 16.2 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -7324,26 +7444,20 @@ species:
             column: atmosphere
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The cited unpublished DAP series pressure is not stated in this paper.
-          locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '53'
-            column: pressure
+            tag: value
+            value: '101325'
+          locator: *id003
         composition:
           state:
             tag: unknown
-            reason: Table 1 gives only the P2O5 component, not a complete glass composition.
+            reason: Table 2 DAP initial composition has unreported oxide components; no composition is reconstructed.
           locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '53'
-            column: composition
+            page: 5
+            published_page: 1581
+            pdf_page_index: 4
+            table: '2'
+            row: DAP initial
+            column: oxide composition
         quench_state:
           state:
             tag: value
@@ -7408,6 +7522,18 @@ species:
             table: '1'
             row: '71'
             column: Duration (h)
+        sample_mass_kg:
+          state:
+            tag: value
+            value: '0.0000172'
+          locator:
+            page: 4
+            published_page: 1580
+            pdf_page_index: 3
+            table: '1'
+            row: '71'
+            column: Sample weight (mg)
+            note: Printed 17.2 mg converted to kg for the identity mass axis.
         fO2_log:
           state:
             tag: unknown
@@ -7445,26 +7571,20 @@ species:
             column: atmosphere
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The cited unpublished DAP series pressure is not stated in this paper.
-          locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '71'
-            column: pressure
+            tag: value
+            value: '101325'
+          locator: *id003
         composition:
           state:
             tag: unknown
-            reason: Table 1 gives only the P2O5 component, not a complete glass composition.
+            reason: Table 2 DAP initial composition has unreported oxide components; no composition is reconstructed.
           locator:
-            page: 4
-            published_page: 1580
-            pdf_page_index: 3
-            table: '1'
-            row: '71'
-            column: composition
+            page: 5
+            published_page: 1581
+            pdf_page_index: 4
+            table: '2'
+            row: DAP initial
+            column: oxide composition
         quench_state:
           state:
             tag: value
