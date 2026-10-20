@@ -21,21 +21,30 @@ HARDWARE = dict(inlet_temperature_K=300.0, max_pump_speed_m3_s=50.0,
     CampaignPhase.C2A, CampaignPhase.C2A_STAGED,
     CampaignPhase.C3_NA, CampaignPhase.C3_K, CampaignPhase.C4,
 ])
-@pytest.mark.parametrize('body,configured,override,expected', [
-    ('mars', 'pN2', None, 'Ar'),
-    ('mars', 'pCO2', None, 'CO2'), ('mars', 'pN2', 'pCO2', 'CO2'),
-    ('mars', 'pN2', 'pN2', 'N2'),
+@pytest.mark.parametrize('body,configured,expected', [
+    ('mars', 'pN2', 'Ar'), ('mars', 'pCO2', 'CO2'),
 ])
-def test_mars_carrier_default_and_operator_choice(campaign, body, configured, override, expected):
+def test_mars_carrier_default_and_operator_choice(campaign, body, configured, expected):
     setpoints = deepcopy(load_config_bundle().setpoints)
     key = CampaignManager(setpoints)._campaign_config_key(campaign)
     setpoints['campaigns'][key]['carrier_gas'] = configured
     manager = CampaignManager(setpoints)
-    if override is not None:
-        manager.overrides[campaign.name] = {'carrier_gas': override}
     melt = MeltState(body=body)
     manager.configure_campaign(melt, campaign)
     assert melt.background_gas_species == expected
+
+
+def test_explicit_co2_campaign_declaration_reaches_session_carrier():
+    from simulator.runner import PyrolysisRun
+    from simulator.session import SimSession
+
+    run = PyrolysisRun(
+        feedstock_id='mars_basalt', campaign='C2A', hours=0, additives_kg={'C': 30.0},
+        setpoints_patch={'campaigns': {'C2A_continuous': {'carrier_gas': 'CO2'}}},
+    )
+    session = SimSession()
+    session.start(run._session_config())
+    assert session.simulator._resolve_condensation_carrier_gas() == 'CO2'
 
 
 def mars_sim(*, pressure_mbar=6.0, pumping=None):

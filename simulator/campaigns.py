@@ -350,7 +350,6 @@ class CampaignManager:
         'runtime_override',
     })
     _COMMON_OVERRIDE_FIELDS = frozenset({
-        'carrier_gas',
         'condenser_geometry',
         'duration_h',
         'freeze_gate',
@@ -1282,15 +1281,12 @@ class CampaignManager:
 
     def _campaign_carrier(self, campaign: CampaignPhase, melt: MeltState) -> str:
         cfg = self._campaign_config(campaign)
-        override = self._campaign_overrides(campaign)
-        if 'carrier_gas' in override:
-            return _canonical_carrier_gas_key(str(override['carrier_gas']))
         carrier = _canonical_carrier_gas_key(
             str(cfg.get('carrier_gas', 'pN2') or 'pN2')
             if isinstance(cfg, Mapping) else 'pN2'
         )
         # The shipped pN2 declaration is the cross-body legacy default.
-        # Mars uses Ar; an explicit CO2 config or operator carrier wins.
+        # Mars uses Ar; an explicit CO2 campaign declaration wins.
         return 'Ar' if melt.body == 'mars' and carrier == 'N2' else carrier
 
     def apply_c2a_staged_gas_controls(
@@ -1564,12 +1560,10 @@ class CampaignManager:
 
         # Apply runtime overrides (pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
-        if 'carrier_gas' in ovr or (
-            melt.body == 'mars' and campaign not in {
-                CampaignPhase.C0, CampaignPhase.C0B,
-                CampaignPhase.C5, CampaignPhase.MRE_BASELINE,
-            }
-        ):
+        if melt.body == 'mars' and campaign not in {
+            CampaignPhase.C0, CampaignPhase.C0B,
+            CampaignPhase.C5, CampaignPhase.MRE_BASELINE,
+        }:
             melt.background_gas_species = self._campaign_carrier(campaign, melt)
         if 'pO2_mbar' in ovr:
             # 0.5.4 W5 milestone-review P1 (codex /challenge
