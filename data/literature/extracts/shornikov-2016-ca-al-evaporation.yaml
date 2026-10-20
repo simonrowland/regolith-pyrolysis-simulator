@@ -1,0 +1,57 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2016-ca-al-evaporation
+source:
+  citation: >-
+    Yakovlev, O. I., and Shornikov, S. I. (2016). The evaporation peculiarities
+    of Ca–Al–Inclusions of chondrites. Experiment in Geosciences, 22(1), p. 14
+    (supplied fragment; the sentence ends in the middle of the activity
+    discussion and the continuation is not in this PDF).
+  year: 2016
+  corpus_asset: raw/shornikov-2016-ca-al-evaporation/shornikov-2016-ca-al-evaporation.pdf
+  corpus_sha256: d991c7b4f1c46578baf3d8f5553e129852e2cd364bc6f1f93a1e0858efce8794
+extraction:
+  method: >-
+    Manual review of the Yakovlev and Shornikov fragment on PDF page 3
+    (published page 14). MinerU found no table in that article. The neighbouring
+    Shornikov forsterite abstract on the same PDF was not extracted. The
+    fragment prints no activity, pressure, Gibbs energy, or evaporation
+    coefficient.
+  date: '2026-10-20'
+  worker: t1372-w2-w10-t1
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: yakovlev_shornikov_2016_cai_fragment_cutoff
+        type: fragment_scope
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 14
+          section: The evaporation peculiarities of Ca–Al–Inclusions of chondrites
+          note: >-
+            The last printed sentence stops at "the inversion in the activity
+            values of SiO2 and".
+        units: not applicable; the fragment prints no numeric target quantity
+        values:
+          method_class: model_derived
+          system_as_printed: CaO–MgO–Al2O3–SiO2 CAI melts
+          model_as_printed: >-
+            Korzhinsky acid-base interaction, as cited. The activity
+            calculation is attributed to Rein and Chipman (1965) and Shornikov
+            (2008) and is cut off before a value.
+          temperature: not printed
+          composition: not printed
+          measured_table: none in this article
+          numeric_activities_pressures_or_coefficients: none printed
+          excluded_neighbor: >-
+            The left column of the same PDF page, and the preceding pages, are
+            Shornikov, Thermodynamics of forsterite evaporation, Experiment in
+            Geosciences 22(1), ending on published page 13. That article was
+            not extracted here.
+          reason: >-
+            No oxide activity, activity coefficient, partial pressure, vapour
+            species, partial Gibbs energy, or evaporation coefficient is
+            printed with a temperature and a composition. The continuation of
+            the fragment is absent.
