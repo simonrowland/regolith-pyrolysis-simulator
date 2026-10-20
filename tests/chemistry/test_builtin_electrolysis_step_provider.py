@@ -60,6 +60,7 @@ from simulator.electrolysis import (
     DECOMP_VOLTAGES,
     ELECTRONS_PER_OXIDE,
     ElectrolysisModel,
+    MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
     MRE_CERTIFICATION_DENYLIST_REASON,
     MRE_CERTIFICATION_EVIDENCE_CLASS,
     MRE_FIXED_REDUCIBLE_OXIDES,
@@ -67,6 +68,8 @@ from simulator.electrolysis import (
     MRE_OPTIONAL_BANNER,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
+    MREElectrolysisInvalidInput,
+    MREElectrolysisRefusal,
     current_efficiency,
     min_decomposition_voltage,
 )
@@ -157,6 +160,7 @@ def _dispatch_single_control_value(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    control_overrides: dict[str, float] | None = None,
 ):
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -181,6 +185,8 @@ def _dispatch_single_control_value(
         "pO2_bar": 1.0,
         "allowed_oxides": ["SiO2"],
     }
+    if control_overrides:
+        controls.update(control_overrides)
     controls[control_name] = value
     return BuiltinElectrolysisStepProvider().dispatch(
         IntentRequest(
@@ -744,17 +750,100 @@ def test_legacy_step_hour_predicts_and_flags_finite_controls_outside_certified_b
 
 
 def test_legacy_step_hour_refuses_binary64_overflow_before_empty_melt_energy():
-    result = ElectrolysisModel().step_hour(
-        MeltState(composition_kg={}),
-        voltage_V=1e308,
-        current_A=100.0,
-        T_C=1600.0,
+    with pytest.raises(MREElectrolysisInvalidInput) as refusal:
+        ElectrolysisModel().step_hour(
+            MeltState(composition_kg={}),
+            voltage_V=1e308,
+            current_A=100.0,
+            T_C=1600.0,
+        )
+
+    assert isinstance(refusal.value, MREElectrolysisRefusal)
+    assert isinstance(refusal.value, ValueError)
+    assert refusal.value.reason == MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+    assert "voltage_V" in refusal.value.diagnostic["invalid_controls"]
+    assert "binary64" in refusal.value.diagnostic["invalid_controls"]["voltage_V"]
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "invalid_control"),
+    [
+        (
+            {"voltage_V": 3.0, "current_A": -100.0, "T_C": 1600.0},
+            "current_A",
+        ),
+        (
+            {"voltage_V": -3.0, "current_A": 100.0, "T_C": 1600.0},
+            "voltage_V",
+        ),
+        (
+            {
+                "voltage_V": 3.0,
+                "current_A": 100.0,
+                "T_C": 1600.0,
+                "pO2_bar": 0.0,
+            },
+            "pO2_bar",
+        ),
+        (
+            {"voltage_V": math.nan, "current_A": 100.0, "T_C": 1600.0},
+            "voltage_V",
+        ),
+        (
+            {"voltage_V": 3.0, "current_A": math.inf, "T_C": 1600.0},
+            "current_A",
+        ),
+        (
+            {
+                "voltage_V": 3.0,
+                "current_A": 100.0,
+                "T_C": 1600.0,
+                "pO2_bar": math.nan,
+            },
+            "pO2_bar",
+        ),
+    ],
+    ids=[
+        "negative-current", "negative-voltage", "zero-pO2",
+        "nan-voltage", "infinite-current", "nan-pO2",
+    ],
+)
+def test_legacy_step_hour_invalid_controls_raise_typed_value_error(
+    kwargs,
+    invalid_control,
+):
+    with pytest.raises(MREElectrolysisInvalidInput) as refusal:
+        ElectrolysisModel().step_hour(
+            MeltState(composition_kg={}),
+            **kwargs,
+        )
+
+    assert isinstance(refusal.value, MREElectrolysisRefusal)
+    assert isinstance(refusal.value, ValueError)
+    assert invalid_control in refusal.value.diagnostic["invalid_controls"]
+
+
+def test_provider_refuses_nonfinite_energy_intermediate(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    result = _dispatch_single_control_value(
+        control_name="voltage_V",
+        value=5.992310449541053e307,
+        control_overrides={"current_A": 3.0, "dt_hr": 0.01},
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
     )
 
-    assert result["reason_refused"] == "electrolysis_control_out_of_domain"
-    assert "voltage_V" in result["invalid_controls"]
-    assert "binary64" in result["invalid_controls"]["voltage_V"]
-    assert "energy_kWh" not in result
+    assert result.status == "refused", result.diagnostic
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == (
+        MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+    )
+    assert "voltage_V" in result.diagnostic["invalid_controls"]
+    assert "binary64" in result.diagnostic["invalid_controls"]["voltage_V"]
 
 
 @pytest.mark.parametrize(

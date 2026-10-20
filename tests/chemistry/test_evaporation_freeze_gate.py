@@ -4304,10 +4304,6 @@ def test_c5_partial_commit_poison_refuses_same_hour_replay(
     )
     sim._establish_melt_redox_gate_authority_for_current_hour()
     sim._apply_fe_redox_respeciation()
-    # The synthetic overhead O2 load above supports the Fe respeciation
-    # transition. Pin the electrolysis pressure at its admitted upper bound so
-    # this test reaches the partial-commit poison path it is meant to cover.
-    monkeypatch.setattr(sim, '_commanded_pO2_bar', lambda: 1.0)
 
     balances_before = sim.atom_ledger.mol_by_account()
     transitions_before = Counter(
