@@ -837,6 +837,37 @@ def beskok_karniadakis_civan_conductance_m3_s(
     )
 
 
+def _minimum_pressure_pa_for_knudsen(
+    temperature_K: float,
+    collision_diameter_m: float,
+    characteristic_length_m: float,
+    knudsen_ceiling: float,
+) -> float:
+    """Invert the hard-sphere mean-free-path limit in its existing order."""
+    return BOLTZMANN_CONSTANT_J_K * temperature_K / (
+        math.sqrt(2.0)
+        * math.pi
+        * collision_diameter_m ** 2
+        * characteristic_length_m
+        * knudsen_ceiling
+    )
+
+
+def _single_species_mean_free_path_m_unchecked(
+    pressure_pa: float,
+    temperature_K: float,
+    collision_diameter_m: float,
+) -> float:
+    """Apply the mean-free-path arithmetic after caller-specific guards."""
+    denominator = (
+        math.sqrt(2.0)
+        * math.pi
+        * collision_diameter_m ** 2
+        * pressure_pa
+    )
+    return BOLTZMANN_CONSTANT_J_K * temperature_K / denominator
+
+
 def single_species_mean_free_path_m(
     pressure_pa: float,
     temperature_K: float,
@@ -868,13 +899,11 @@ def single_species_mean_free_path_m(
         # Continuity check: 1e-9 Pa -> 4.25e7 m, 1e-12 Pa -> 4.25e10 m, monotonic
         # increase by the same factor as the pressure decrease.
         return math.inf
-    denominator = (
-        math.sqrt(2.0)
-        * math.pi
-        * collision_diameter_m ** 2
-        * pressure_pa
+    return _single_species_mean_free_path_m_unchecked(
+        pressure_pa,
+        temperature_K,
+        collision_diameter_m,
     )
-    return BOLTZMANN_CONSTANT_J_K * temperature_K / denominator
 
 
 def single_species_mean_free_path(
