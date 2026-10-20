@@ -65,6 +65,7 @@ from simulator.battery.migrate import (
     compilation_family_from_store_path,
     convert_area_to_m2,
     convert_areal_mass_to_kg_per_m2,
+    convert_density_to_kg_per_m3,
     convert_mass_to_kg,
     convert_pressure_to_pa,
     convert_temperature_to_k,
@@ -76,6 +77,7 @@ from simulator.battery.migrate import (
     load_migrated_context,
     map_phase,
     map_quantity,
+    select_declared_source,
     parse_quantity_suffix,
     split_qualified_quantity,
     QUANTITY_ALIASES,
@@ -5590,6 +5592,65 @@ def test_g03_blank_pressure_unit_is_unknown() -> None:
     assert area is None and why_a is not None
     mass, why_m = convert_mass_to_kg(1, "")
     assert mass is None and why_m is not None
+
+
+def test_density_unit_conversion_and_declared_field_fallback() -> None:
+    for units in ("g/cm3", "g/cm3 as printed", "g cm^-3", "g cm-3"):
+        converted, trail = convert_density_to_kg_per_m3(Decimal("2"), units)
+        assert converted == Decimal("2000")
+        assert trail == "g_per_cm3_to_kg_per_m3"
+
+    for units in ("kg/m3", "kg/m^3", "kg/m³", "kg_per_m3"):
+        converted, trail = convert_density_to_kg_per_m3(Decimal("2500"), units)
+        assert converted == Decimal("2500")
+        assert trail == "as_published"
+
+    converted, reason = convert_density_to_kg_per_m3(Decimal("2"), "stones/litre")
+    assert converted is None
+    assert reason == "unmapped density unit 'stones/litre'"
+
+    fallback = select_declared_source(
+        Quantity.DENSITY,
+        "unknown density unit",
+        {
+            "density_g_cm3": "3.03",
+            "density_kg_m3_also_printed": "3030",
+        },
+    )
+    assert fallback.available
+    assert fallback.amount == Decimal("3030")
+    assert fallback.field_name == "density_kg_m3_also_printed"
+    assert fallback.unit_trail == "as_published"
+
+    decorated = select_declared_source(
+        Quantity.DENSITY,
+        "g/cm3",
+        {"density_other": "3"},
+    )
+    assert decorated.available
+    assert decorated.amount == Decimal("3000")
+    assert decorated.unit_trail == "g_per_cm3_to_kg_per_m3"
+
+
+def test_shaw_quoted_density_migrates_with_canonical_unit_derivation() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/sublimation-kinetics-2023-minerals.yaml"
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.endswith("::shaw_2023_lms1_quoted_spec_density")
+    )
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("3030")
+    assert observation.derivation is not None
+    assert observation.derivation.output_unit == "kg_per_m3"
+    assert observation.derivation.relation == "g_per_cm3_to_kg_per_m3"
+    parameters = dict(observation.derivation.parameters)
+    assert parameters["original"].state.value == Decimal("3.03")
+    assert parameters["factor"].state.value == Decimal("1000")
 
 
 def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
