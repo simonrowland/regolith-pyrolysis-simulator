@@ -6,6 +6,7 @@ import pytest
 
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import parse_lab_geometry
+from simulator.material_densities import resolve_melt_density_kg_m3
 
 
 def _designer(**geometry):
@@ -32,10 +33,30 @@ def test_crucible_design_baseline_before_density_owner_change():
     )
 
 
+def test_crucible_design_uses_owner_reference_density(monkeypatch):
+    def reference_density(engine_density):
+        assert engine_density is None
+        return 2000.0, "test_reference_density"
+
+    monkeypatch.setattr(
+        "simulator.equipment.resolve_melt_density_kg_m3", reference_density
+    )
+    crucible = EquipmentDesigner().size_crucible(100.0)
+
+    # The fixture's 100 kg occupies 50 litres, plus 10 litres freeboard.
+    assert crucible.volume_m3 == pytest.approx(0.06)
+    assert crucible.design_density_kg_m3 == 2000.0
+    assert crucible.design_density_basis == "reference melt density, owner fallback"
+    assert crucible.design_density_provenance == "test_reference_density"
+
+
 def test_batch_headspace_counts_freeboard_once_and_includes_pipe_volume():
     design = EquipmentDesigner().design_for_batch(1000.0, {})
 
-    melt_volume_m3 = 1000.0 / EquipmentDesigner.MELT_DENSITY_KG_M3
+    density, provenance = resolve_melt_density_kg_m3(None)
+    assert design.crucible.design_density_kg_m3 == density
+    assert design.crucible.design_density_provenance == provenance
+    melt_volume_m3 = 1000.0 / density
     freeboard_m3 = design.crucible.volume_m3 - melt_volume_m3
     pipe_volume_m3 = (
         math.pi * (design.pipe.diameter_m / 2.0) ** 2 * design.pipe.length_m
@@ -86,7 +107,10 @@ def test_lab_headspace_includes_each_declared_pipe_segment_volume():
         math.pi * (0.04 / 2.0) ** 2 * 0.20
         + math.pi * (0.01 / 2.0) ** 2 * 0.30
     )
-    melt_volume_m3 = 0.01 / EquipmentDesigner.MELT_DENSITY_KG_M3
+    density, provenance = resolve_melt_density_kg_m3(None)
+    assert design.crucible.design_density_kg_m3 == density
+    assert design.crucible.design_density_provenance == provenance
+    melt_volume_m3 = 0.01 / density
     freeboard_m3 = design.crucible.volume_m3 - melt_volume_m3
 
     assert design.headspace_volume_m3 == pytest.approx(

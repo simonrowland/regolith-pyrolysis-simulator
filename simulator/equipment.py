@@ -48,6 +48,7 @@ from simulator.lab_geometry import (
     require_lab_pipe_length,
 )
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
+from simulator.material_densities import resolve_melt_density_kg_m3
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
@@ -59,6 +60,9 @@ class CrucibleSpec:
     height_m: float = 0.0
     melt_surface_area_m2: float = 0.0
     freeboard_pct: float = 20.0
+    design_density_kg_m3: float = 0.0
+    design_density_basis: str = ""
+    design_density_provenance: str = ""
 
 
 @dataclass
@@ -158,7 +162,6 @@ class EquipmentDesigner:
     """
 
     # Melt physical properties
-    MELT_DENSITY_KG_M3 = 2700.0     # Basaltic melt ~2500-2900
     MELT_CP_J_KG_K = 1200.0          # Heat capacity of silicate melt
     # provenance: melt emissivity — REF-047 coefficient_note; engineering default for hot silicates.
     MELT_EMISSIVITY = 0.85            # Radiative emissivity
@@ -308,7 +311,14 @@ class EquipmentDesigner:
         Geometry: height = 1.5 × diameter (cylindrical)
         Add 20% freeboard for bubbling/stirring
         """
-        V_melt = mass_kg / self.MELT_DENSITY_KG_M3
+        # Fixed hardware uses the reference melt density, not a live engine EOS.
+        density, provenance = resolve_melt_density_kg_m3(None)
+        # Capacity = 1.2*m/rho_design; kg/(kg/m3) = m3. At a real melt
+        # density of 2500 kg/m3 and reference 2700 kg/m3, the fill fraction is
+        # (m/2500)/(1.2*m/2700) = 2700/(1.2*2500) = 0.90: the 20% freeboard
+        # absorbs the 8% volume increase. As live density approaches the
+        # reference, fill approaches 1/1.2; hardware dimensions stay fixed.
+        V_melt = mass_kg / density
         V_total = V_melt * 1.20  # 20% freeboard
 
         # Cylinder: V = π/4 × d² × h, with h = 1.5d
@@ -322,6 +332,9 @@ class EquipmentDesigner:
             height_m=h,
             melt_surface_area_m2=math.pi * (d/2)**2,
             freeboard_pct=20.0,
+            design_density_kg_m3=density,
+            design_density_basis="reference melt density, owner fallback",
+            design_density_provenance=provenance,
         )
 
     def size_solar_concentrator(self, mass_kg: float,
