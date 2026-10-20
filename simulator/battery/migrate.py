@@ -17399,7 +17399,7 @@ class Migrator:
                     locator=point_locator,
                 ),
             }
-        if q_token_point is Quantity.VALENCE_RATIO and (
+        if q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY} and (
             identity.composition is None or not identity.composition.is_value
         ):
             located_composition = (point_conditions or {}).get("composition")

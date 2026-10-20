@@ -172,6 +172,18 @@ def test_table_1_grid_migrates_all_render_pinned_points_and_conditions() -> None
         expected = [Decimal(value.replace(",", ".")) / Decimal("100") for _, _, value in grid]
         assert sorted(actual) == sorted(expected)
 
+    for element, grid in DENSITY_GRID.items():
+        key = element.lower()
+        actual = [
+            row.value.point
+            for row in observations
+            if row.observation_id.split("::")[1].endswith(f"_{key}_density")
+        ]
+        expected = [Decimal(value.replace(",", ".")) * Decimal("1000") for _, _, value in grid]
+        assert sorted(actual) == sorted(expected)
+    mn_density = next(row for row in observations if "_mn_density::" in row.observation_id)
+    assert mn_density.value.point == Decimal("2042")
+
     for row in observations:
         observation_key = row.observation_id.split("::")[1]
         density = observation_key.endswith("_density")
@@ -189,6 +201,9 @@ def test_table_1_grid_migrates_all_render_pinned_points_and_conditions() -> None
             assert row.identity.species.formula == "unknown"
             assert row.point_conditions["T_C"].state.is_unknown
             assert "room temperature" in row.point_conditions["T_C"].state.reason
+            assert row.identity.temperature_K.is_unknown
+            assert row.identity.total_pressure_Pa.is_unknown
+            assert row.identity.composition == row.point_conditions["composition"].state
         else:
             element = observation_key.split("_table1_")[1].split("_ratio")[0]
             expected_species = "Cr" if element.lower().startswith("cr") else element.title()
