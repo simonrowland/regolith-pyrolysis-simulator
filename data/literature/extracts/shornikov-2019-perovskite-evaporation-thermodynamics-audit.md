@@ -1,6 +1,6 @@
 # Audit — shornikov-2019-perovskite-evaporation-thermodynamics
 
-Fix round 2 on t1372-w4-fix1-t5. PDF page 2 render `eg-p2-2.png`, 4961×7016 px at 600 dpi.
+Fix round 3 on t1372-w4-fix1-t5, stacked on the round-2 recalibration. PDF page 2 render `eg-p2-2.png`, 4961×7016 px at 600 dpi.
 
 ## Duplicate verdict
 
@@ -40,7 +40,7 @@ Re-read against the labelled ticks, stored value minus the formula, all within 0
 - Fig. 2b y=2569.0 (label −6 at 2559.5), stored −6.057
 - Fig. 2b y=2728.0 (label −7 at 2733), stored −6.969
 - Fig. 2b y=2902.0 (label −8 at 2907), stored −7.968
-- Fig. 2b y=3085.6 (label −9 at 3082), stored −9.022
+- Fig. 2b y=3096.0 (label −9 at 3082), stored −9.082. The former point at y=3085.6 was the series-3 label, not a triangle, and is not stored.
 - Fig. 2b y=3242.0 (label −10 at 3256), stored −9.920
 
 T and mol% calibrations are unchanged. Fig. 2a T is piecewise between 1800 K at x=944, 1900 at 1317, 2000 at 1653.5, 2100 at 1958, 2200 at 2235. Fig. 2b mol% = −60.4091 + 0.038890·x. Fig. 3a and Fig. 3b ordinates are unchanged.
@@ -51,24 +51,20 @@ The Lewis-ratio sentence does not say that p° was measured, or tabulated, at th
 
 ## Counts
 
-Fig. 2 partial pressures in the table below include the 17 markers added this round: one Fig. 2a TiO2 disk, twelve Fig. 2b TiO2 triangles, two Ti triangles, and two O2 triangles. Fig. 3a activities are unchanged. Fig. 3b mixing energies stay context.
+Fig. 2 partial pressures in the table below include the round-2 markers (one Fig. 2a TiO2 disk, twelve Fig. 2b TiO2 triangles, two Ti triangles, and two O2 triangles) and the round-3 reads: one Fig. 2a Ti disk, the Fig. 2a O2 centre moved in y only, one Fig. 2b CaO arc, one Fig. 2b O2 tip, the Ti triangle moved from (4050.0, 3085.6) to (4024.0, 3096.0), and seven series-6 O triangles. Fig. 3a activities are unchanged in value. Fig. 3b mixing energies stay context.
 
 ## Refusals, one marker at a time
 
-A marker is a column-thickness peak as thick as a stored marker of that series. A 6–8 px stroke is not a centre.
+A marker is a centre, or an assignable exposed arc or tip, inside a stated uncertainty. The uncertainty is wider when only an arc or a tip is visible. A 6–8 px connecting stroke is not a centre. Column thickness is not the test. The decision table below has one row for every this-work marker, read or refused.
 
-- Fig. 2a red at x=1387: red thickness 8 px. The first closed red disk is the stored series-2 marker at (1459, 3278), thickness 36 px. Not stored.
-- Fig. 2a red at x=1739: red thickness 8 px. The disk starts at the stored marker (1771, 3120), thickness 14 px. Not stored.
-- Fig. 2a black at x=1958 and x=2186: black thickness 6 px and 9 px. No separate black disk beside the stored series. Not stored.
-- Fig. 2a green at x=2186: stored. Green thickness 18 px at y=2346, the series-5 disk (2183.9, 2349.0).
-- Fig. 2a Ti at x=2186: the blue thickness peak is one disk at y=2886, the stored series-7 O2 marker. No second blue centre. Not stored.
-- Fig. 2b green at x=3174, 3266, 3323, 3386, 3475, 3557, 3639, 3745, 3842, 3936, 4023, 4125: stored. Each is a green thickness peak of 22–25 px. The peak at x=3610 is the left side of the same triangle as x=3639, split by the top frame. The ink at x=4077, thickness 34 px, is the frame.
-- Fig. 2b red at x=3475: red thickness 4 px. The next red disk is the stored circle at x=3556, thickness 14 px. Not stored.
-- Fig. 2b O2 at x=2970 and x=3174: stored. Blue thickness peaks at (2977, 2709) and at the two strokes x=3161 and x=3182, y=2701. x=3386 stays a 7–8 px stroke between the stored markers at x=3324 and x=3475. Not stored.
-- Fig. 2b Ti at x=2646 and x=4023: stored at the thickness peaks (2655, 3363) and (4050, 3086). The thickness-51 peak at x=4079 is the right frame.
-- Fig. 2b series 6 at x=2712, 3174, 3266, 3324, 3386, 3475, 3556, 3640, 4124: purple thickness is 5–13 px and sits on the series-4 diamond, or the ink is the right-hand label. The magenta column has one peak per station and that peak is the stored series-4 diamond. Secondary magenta peaks about 15 px to the side are the diamond's shoulder, at the same y. Not stored.
-- Fig. 2b x=2780 and x=2839: the black series-1 disks are at y=2499 and y=2520. The magenta peaks are at y=2618 and y=2586, 80 to 120 px below those disks. The purple at x=2849, y=2506, thickness 13 px, is the edge of the black disk. Neither black disk covers a second magenta centre. Not stored.
-- Fig. 3a near x=1119, y=4632: the black ink is the series line crossing the blue CaTiO3 disk at (1119.5, 4597.9). A real series-1 disk is black fraction 1.0 and RGB (16, 16, 16). This patch is black fraction 0.78 and mean RGB (58, 58, 88). Not stored.
+- Fig. 2a red at x=1387 and x=1739: the red ink is the series line, not a closed disk. The first closed red disk is the stored marker at (1459, 3278). Refused.
+- Fig. 2a black at x=1958 and x=2186: no separate black disk beside the stored series. Refused. Sol upholds both.
+- Fig. 2a Ti at x=2186: stored at (2187.3, 2875.0), the bright-blue disk. The navy disk below it is series 7, now stored at (2186.5, 2900.0). The old O2 centre (2186.5, 2886.6) was the overlap.
+- Fig. 2b red at x=3475: stored at (3474.5, 3105.0) from the exposed lower arc. The clean circle at (3556, 3121) fixes the 9 px offset from the arc bottom.
+- Fig. 2b navy at x=3386: stored at (3386.0, 2686.0) from the tip at (3386, 2702). The clean triangle at (3324, 2691) fixes the 16 px offset.
+- Fig. 2b Ti at x=4023: stored at (4024.0, 3096.0). The apex is y=3080-3084. Sibling triangles place the centre 16 px below the first apex row. The purple diamond crosses the body. The blue glyph near (4070, 3056) is the series label 3. The old centre (4050.0, 3085.6) is blank page.
+- Fig. 2b series 6. The clean triangle at (2646, 2475) has its one-pixel tip 8 px below the stored centre, so a new centre is tip y minus 8. Stored tips: (3266, 2521), (3323, 2519), (3386, 2516), (3474, 2512), (3557, 2510), (3640, 2507), (4125, 2502). Refused: x=2709, two offset clumps and the one-pixel pixel at (2707, 2490) is not on the body axis; x=2780, 13 scattered pixels and no tip; x=2839, a flat band at y=2500-2510 whose right edge is the series line; x=3174, the lowest ink is x=3158-3164, 13 px left of the station, and it is not a tip. Series 4 is not used as the comparison.
+- Fig. 3a near x=1119, y=4632: the black ink is the series line crossing the blue CaTiO3 disk at (1119.5, 4597.9). Not stored.
 - Fig. 3a series 3 and 5 are Banon et al. 1981. Fig. 3b series 2–4 are other papers. Fig. 1 is Gong et al. 2018.
 
 ## This-work markers
@@ -162,7 +158,7 @@ A marker is a column-thickness peak as thick as a stored marker of that series. 
 | b/3 open triangle | Ti | 3843.0 | 3097.0 | log10_p=-9.088 | read |
 | b/3 open triangle | Ti | 3937.0 | 3096.0 | log10_p=-9.082 | read |
 | b/3 open triangle | Ti | 2655.0 | 3363.2 | log10_p=-10.616 | read |
-| b/3 open triangle | Ti | 4050.0 | 3085.6 | log10_p=-9.022 | read |
+| b/3 open triangle | Ti | 4024.0 | 3096.0 | log10_p=-9.082 | read |
 | a/4 filled circle | TiO | 1116.5 | 2951.5 | log10_p=-9.279 | read |
 | a/4 filled circle | TiO | 1227.2 | 2894.2 | log10_p=-8.950 | read |
 | a/4 filled circle | TiO | 1387.2 | 2809.5 | log10_p=-8.464 | read |
@@ -268,7 +264,7 @@ A marker is a column-thickness peak as thick as a stored marker of that series. 
 | a/7 filled circle | O2 | 1769.1 | 3072.7 | log10_p=-9.975 | read |
 | a/7 filled circle | O2 | 1812.2 | 3054.2 | log10_p=-9.869 | read |
 | a/7 filled circle | O2 | 1958.9 | 2991.9 | log10_p=-9.511 | read |
-| a/7 filled circle | O2 | 2186.5 | 2886.6 | log10_p=-8.907 | read |
+| a/7 filled circle | O2 | 2186.5 | 2900.0 | log10_p=-8.984 | read |
 | b/7 open triangle | O2 | 2646.0 | 2620.0 | log10_p=-6.349 | read |
 | b/7 open triangle | O2 | 2712.0 | 2650.0 | log10_p=-6.522 | read |
 | b/7 open triangle | O2 | 2780.0 | 2679.0 | log10_p=-6.688 | read |
@@ -341,3 +337,23 @@ A marker is a column-thickness peak as thick as a stored marker of that series. 
 | b/1 filled circle | CaO-TiO2 | 4197.7 | 4634.7 | axis_delta_G_m_kJ_per_mol=-20.03 | read |
 | b/1 filled circle | CaO-TiO2 | 4287.8 | 4440.9 | axis_delta_G_m_kJ_per_mol=-12.57 | read |
 | b/1 filled circle | CaO-TiO2 | 4323.0 | 4363.0 | axis_delta_G_m_kJ_per_mol=-9.57 | read |
+| a/3 filled circle | Ti | 2187.3 | 2875.0 | log10_p=-8.840 | read |
+| b/2 open circle | CaO | 3474.5 | 3105.0 | log10_p=-9.134 | read |
+| b/7 open triangle | O2 | 3386.0 | 2686.0 | log10_p=-6.728 | read |
+| b/6 filled triangle | O | 3266.0 | 2513.0 | log10_p=-5.735 | read |
+| b/6 filled triangle | O | 3323.0 | 2511.0 | log10_p=-5.724 | read |
+| b/6 filled triangle | O | 3386.0 | 2508.0 | log10_p=-5.706 | read |
+| b/6 filled triangle | O | 3474.5 | 2504.0 | log10_p=-5.683 | read |
+| b/6 filled triangle | O | 3557.0 | 2502.0 | log10_p=-5.672 | read |
+| b/6 filled triangle | O | 3640.0 | 2499.0 | log10_p=-5.655 | read |
+| b/6 filled triangle | O | 4125.0 | 2494.0 | log10_p=-5.626 | read |
+| a/2 red stroke | CaO | 1387 | — | — | refused: series line, not a closed disk |
+| a/2 red stroke | CaO | 1739 | — | — | refused: series line, not a closed disk |
+| a/1 black stroke | Ca | 1958 | — | — | refused: no separate black disk |
+| a/1 black stroke | Ca | 2186 | — | — | refused: no separate black disk |
+| b/3 label | Ti | 4070 | 3056 | — | refused: series label 3, not a triangle |
+| b/6 purple ink | O | 2709 | 2490 | — | refused: two offset clumps, no one tip on an axis |
+| b/6 purple ink | O | 2780 | — | — | refused: 13 scattered pixels, no tip |
+| b/6 purple ink | O | 2839 | 2505 | — | refused: flat band y=2500-2510, no tip |
+| b/6 purple ink | O | 3174 | 2514 | — | refused: lowest ink at x=3158-3164, not a tip on the station |
+| a/4 black patch | CaTiO3 | 1119 | 4632 | — | refused: series line across the blue disk at (1119.5, 4597.9) |

@@ -2389,6 +2389,55 @@ species:
 
         page_pixel_x: '3386.0'
         page_pixel_y: '3086.0'
+    - observation_id: shornikov_2019_eg_fig2b_CaO_x74_71
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2b-2300k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: b
+        series: '2'
+        marker_symbol: open circle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 2, open circle, CaO. Page pixel (3474.5, 3105.0). Read lg p = -9.134 ± 0.05; TiO2 = 74.71 mol%. Lower arc of the open circle, exposed under the blue Ti triangle. Saturated red (r>160, g<80, b<80), left of the connecting stroke: y=3111 spans x=3467-3482, and the bottom row y=3114 spans x=3473-3476, midpoint x=3474.5. The clean circle at (3556, 3121) has its stroke bottom 9 px below the stored centre. Centre y = 3114 - 9. The upper half is under the blue triangle, so the uncertainty is widened."
+      T_range_K: [2300, 2300]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.05'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.05 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Lower arc of the open circle, exposed under the blue Ti triangle. Saturated red (r>160, g<80, b<80), left of the connecting stroke: y=3111 spans x=3467-3482, and the bottom row y=3114 spans x=3473-3476, midpoint x=3474.5. The clean circle at (3556, 3121) has its stroke bottom 9 px below the stored centre. Centre y = 3114 - 9. The upper half is under the blue triangle, so the uncertainty is widened."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: b
+            note: The Fig. 2b caption states 2300 K.
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2300'
+        temperature_K: 2300
+        pressure_atm: '7.345139e-10'
+        log10_p: '-9.134'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '0.747142'
+          CaO: '0.252858'
+        page_pixel_x: '3474.5'
+        page_pixel_y: '3105.0'
     - observation_id: shornikov_2019_eg_fig2b_CaO_x77_88
       type: partial_pressure
       experiment: shornikov-2019-eg-fig2b-2300k
@@ -3865,6 +3914,54 @@ species:
 
         page_pixel_x: '1957.3'
         page_pixel_y: '3021.4'
+    - observation_id: shornikov_2019_eg_fig2a_Ti_2182_8
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2a-perovskite
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: a
+        series: '3'
+        marker_symbol: filled circle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2a lg p labelled ticks only, least-squares residual at most 0.0028: -6 at y=2380.0, -7 at y=2555.0, -8 at y=2729.0, -9 at y=2902.5, -10 at y=3076.5, -11 at y=3251.5. lg p = 7.667841 - 0.00574193*y, 174.16 px per decade. The unlabelled ticks between those labels are half-decades (y=2467, 2642, 2816, 2990, 3164.5) and were not assigned integer values. T ticks are uneven: 1800 K at x=944.0, 1900 at x=1317.0, 2000 at x=1653.5, 2100 at x=1958.0, 2200 at x=2235.0. T is piecewise linear between those centres. 1 px is 0.00574 in lg p. Series 3, filled circle, Ti. Page pixel (2187.3, 2875.0). Read lg p = -8.840 ± 0.04; T = 2182.8 K. Saturated blue (b>200, r<40, g<50). Rows y=2872-2878 have a stable right edge at x=2203 and midpoints 2186.5-2188.5, so the centre is (2187.3, 2875.0). The navy disk below, centre (2186.5, 2900.0), is series 7 O2. The two disks meet near y=2884, and a diagonal series line crosses the upper right."
+      T_range_K: [2182.8, 2182.8]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.04'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.04 in lg p and ±2 K. The paper prints no error bar on this marker. The bright-blue disk touches the navy O2 disk near y=2884."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2182.8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: a
+            note: "Fig. 2a is partial pressure over perovskite versus T. This T is the piecewise reading of the x axis."
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2182.8'
+        temperature_K: 2182.8
+        pressure_atm: '1.445440e-09'
+        log10_p: '-8.840'
+        composition_mol:
+          basis: pure_oxide_system
+          CaTiO3: '1'
+        page_pixel_x: '2187.3'
+        page_pixel_y: '2875.0'
     - observation_id: shornikov_2019_eg_fig2b_Ti_x45_06
       type: partial_pressure
       experiment: shornikov-2019-eg-fig2b-2300k
@@ -4614,7 +4711,7 @@ species:
           CaO: '0.571562'
         page_pixel_x: '2655.0'
         page_pixel_y: '3363.2'
-    - observation_id: shornikov_2019_eg_fig2b_Ti_x97_10
+    - observation_id: shornikov_2019_eg_fig2b_Ti_x96_08
       type: partial_pressure
       experiment: shornikov-2019-eg-fig2b-2300k
       locator:
@@ -4625,16 +4722,16 @@ species:
         panel: b
         series: '3'
         marker_symbol: open triangle
-        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 3, open triangle, Ti. Page pixel (4050.0, 3085.6). Read lg p = -9.022 ± 0.03; TiO2 = 97.10 mol%. Upward open-triangle centre from the blue column-thickness peak (16 px). The station grid is 4023; the thickening is at x=4050, 27 px to the right. Uncertainty widened by that offset."
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 3, open triangle, Ti. Page pixel (4024.0, 3096.0). Read lg p = -9.082 ± 0.06; TiO2 = 96.08 mol%. Upward triangle. The exposed apex is the saturated-blue pixels at y=3080-3084, x midpoint 4024. Sibling Ti triangles place the stored centre 16 px below the first apex row (3556: 3083 to 3100; 3640: 3082 to 3098; 3745: 3081 to 3097; 3937: 3081 to 3096). Centre y = 3080 + 16. The purple diamond crosses the body, so the uncertainty is widened. The blue glyph centred near (4070, 3056), tall and narrow, is the series label 3, not a triangle. The old centre (4050.0, 3085.6) is blank page between the label and the series line."
       T_range_K: [2300, 2300]
       phase: gas
       units: atm
       uncertainty:
-        value: '0.03'
+        value: '0.06'
         unit: log10 atm
         basis: visual read uncertainty
         confidence_level: not_stated
-        note: Read uncertainty is ±0.03 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Upward open-triangle centre from the blue column-thickness peak (16 px). The station grid is 4023; the thickening is at x=4050, 27 px to the right. Uncertainty widened by that offset.
+        note: "Read uncertainty is ±0.06 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Upward triangle. The exposed apex is the saturated-blue pixels at y=3080-3084, x midpoint 4024. Sibling Ti triangles place the stored centre 16 px below the first apex row (3556: 3083 to 3100; 3640: 3082 to 3098; 3745: 3081 to 3097; 3937: 3081 to 3096). Centre y = 3080 + 16. The purple diamond crosses the body, so the uncertainty is widened. The blue glyph centred near (4070, 3056), tall and narrow, is the series label 3, not a triangle. The old centre (4050.0, 3085.6) is blank page between the label and the series line."
       point_conditions:
         temperature_K:
           state:
@@ -4655,15 +4752,14 @@ species:
         admission_status: admitted
         T_K: '2300'
         temperature_K: 2300
-        pressure_atm: '9.497119e-10'
-        log10_p: '-9.022'
+        pressure_atm: '8.279422e-10'
+        log10_p: '-9.082'
         composition_mol:
           basis: printed_mole_fraction
-          TiO2: '0.970954'
-          CaO: '0.029046'
-        page_pixel_x: '4050.0'
-        page_pixel_y: '3085.6'
-
+          TiO2: '0.960843'
+          CaO: '0.039157'
+        page_pixel_x: '4024.0'
+        page_pixel_y: '3096.0'
   TiO:
     observations:
     - observation_id: shornikov_2019_eg_fig2a_TiO_1846_2
@@ -9401,6 +9497,349 @@ species:
 
         page_pixel_x: '4023.0'
         page_pixel_y: '2494.0'
+    - observation_id: shornikov_2019_eg_fig2b_O_x66_61
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2b-2300k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: b
+        series: '6'
+        marker_symbol: filled triangle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 6, filled triangle, O. Page pixel (3266.0, 2513.0). Read lg p = -5.735 ± 0.05; TiO2 = 66.61 mol%. Saturated purple (r 70-190, g<45, b>170). Tip (3266, 2521), one pixel. The base at y=2500-2502 is the series line. The stroke between them is faint. Centre y = 2521 - 8."
+      T_range_K: [2300, 2300]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.05'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.05 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Saturated purple (r 70-190, g<45, b>170). Tip (3266, 2521), one pixel. The base at y=2500-2502 is the series line. The stroke between them is faint. Centre y = 2521 - 8."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: b
+            note: The Fig. 2b caption states 2300 K.
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2300'
+        temperature_K: 2300
+        pressure_atm: '1.840772e-06'
+        log10_p: '-5.735'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '0.666056'
+          CaO: '0.333944'
+        page_pixel_x: '3266.0'
+        page_pixel_y: '2513.0'
+    - observation_id: shornikov_2019_eg_fig2b_O_x68_82
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2b-2300k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: b
+        series: '6'
+        marker_symbol: filled triangle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 6, filled triangle, O. Page pixel (3323.0, 2511.0). Read lg p = -5.724 ± 0.06; TiO2 = 68.82 mol%. Saturated purple (r 70-190, g<45, b>170). Tip (3323, 2519), one pixel, tapering from an 8 px stroke at y=2513. The body above the tip is not in the purple mask. Centre y = 2519 - 8."
+      T_range_K: [2300, 2300]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.06'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.06 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Saturated purple (r 70-190, g<45, b>170). Tip (3323, 2519), one pixel, tapering from an 8 px stroke at y=2513. The body above the tip is not in the purple mask. Centre y = 2519 - 8."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: b
+            note: The Fig. 2b caption states 2300 K.
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2300'
+        temperature_K: 2300
+        pressure_atm: '1.887991e-06'
+        log10_p: '-5.724'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '0.688224'
+          CaO: '0.311776'
+        page_pixel_x: '3323.0'
+        page_pixel_y: '2511.0'
+    - observation_id: shornikov_2019_eg_fig2b_O_x71_27
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2b-2300k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: b
+        series: '6'
+        marker_symbol: filled triangle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 6, filled triangle, O. Page pixel (3386.0, 2508.0). Read lg p = -5.706 ± 0.06; TiO2 = 71.27 mol%. Saturated purple (r 70-190, g<45, b>170). Tip (3386, 2516), one pixel, tapering from x=3383-3389 at y=2509. Ink at other x in this window is the line or a neighbour, not this tip. Centre y = 2516 - 8."
+      T_range_K: [2300, 2300]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.06'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.06 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Saturated purple (r 70-190, g<45, b>170). Tip (3386, 2516), one pixel, tapering from x=3383-3389 at y=2509. Ink at other x in this window is the line or a neighbour, not this tip. Centre y = 2516 - 8."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: b
+            note: The Fig. 2b caption states 2300 K.
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2300'
+        temperature_K: 2300
+        pressure_atm: '1.967886e-06'
+        log10_p: '-5.706'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '0.712724'
+          CaO: '0.287276'
+        page_pixel_x: '3386.0'
+        page_pixel_y: '2508.0'
+    - observation_id: shornikov_2019_eg_fig2b_O_x74_71
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2b-2300k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: b
+        series: '6'
+        marker_symbol: filled triangle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 6, filled triangle, O. Page pixel (3474.5, 2504.0). Read lg p = -5.683 ± 0.05; TiO2 = 74.71 mol%. Saturated purple (r 70-190, g<45, b>170). Tip (3474, 2512), three pixels wide, tapering from x=3470-3480 at y=2504. The purple at x=3490-3502 is the series line, not this triangle. Centre y = 2512 - 8."
+      T_range_K: [2300, 2300]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.05'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.05 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Saturated purple (r 70-190, g<45, b>170). Tip (3474, 2512), three pixels wide, tapering from x=3470-3480 at y=2504. The purple at x=3490-3502 is the series line, not this triangle. Centre y = 2512 - 8."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: b
+            note: The Fig. 2b caption states 2300 K.
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2300'
+        temperature_K: 2300
+        pressure_atm: '2.074914e-06'
+        log10_p: '-5.683'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '0.747142'
+          CaO: '0.252858'
+        page_pixel_x: '3474.5'
+        page_pixel_y: '2504.0'
+    - observation_id: shornikov_2019_eg_fig2b_O_x77_92
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2b-2300k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: b
+        series: '6'
+        marker_symbol: filled triangle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 6, filled triangle, O. Page pixel (3557.0, 2502.0). Read lg p = -5.672 ± 0.04; TiO2 = 77.92 mol%. Saturated purple (r 70-190, g<45, b>170). Tip (3557, 2510), one pixel, tapering from x=3550-3562 at y=2500. The purple extending to x=3583 at y=2494-2498 is the series line. Centre y = 2510 - 8."
+      T_range_K: [2300, 2300]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.04'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.04 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Saturated purple (r 70-190, g<45, b>170). Tip (3557, 2510), one pixel, tapering from x=3550-3562 at y=2500. The purple extending to x=3583 at y=2494-2498 is the series line. Centre y = 2510 - 8."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: b
+            note: The Fig. 2b caption states 2300 K.
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2300'
+        temperature_K: 2300
+        pressure_atm: '2.128139e-06'
+        log10_p: '-5.672'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '0.779226'
+          CaO: '0.220774'
+        page_pixel_x: '3557.0'
+        page_pixel_y: '2502.0'
+    - observation_id: shornikov_2019_eg_fig2b_O_x81_15
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2b-2300k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: b
+        series: '6'
+        marker_symbol: filled triangle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 6, filled triangle, O. Page pixel (3640.0, 2499.0). Read lg p = -5.655 ± 0.04; TiO2 = 81.15 mol%. Saturated purple (r 70-190, g<45, b>170). Tip (3640, 2507), three pixels wide, tapering from x=3635-3645 at y=2500. The purple extending to x=3667 is the series line. Centre y = 2507 - 8."
+      T_range_K: [2300, 2300]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.04'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.04 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Saturated purple (r 70-190, g<45, b>170). Tip (3640, 2507), three pixels wide, tapering from x=3635-3645 at y=2500. The purple extending to x=3667 is the series line. Centre y = 2507 - 8."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: b
+            note: The Fig. 2b caption states 2300 K.
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2300'
+        temperature_K: 2300
+        pressure_atm: '2.213095e-06'
+        log10_p: '-5.655'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '0.811505'
+          CaO: '0.188495'
+        page_pixel_x: '3640.0'
+        page_pixel_y: '2499.0'
+    - observation_id: shornikov_2019_eg_fig2b_O_x100_01
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2b-2300k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: b
+        series: '6'
+        marker_symbol: filled triangle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 6, filled triangle, O. Page pixel (4125.0, 2494.0). Read lg p = -5.626 ± 0.04; TiO2 = 100.01 mol%. Saturated purple (r 70-190, g<45, b>170). Tip (4125, 2502), one pixel, tapering from x=4118-4131 at y=2490. The right frame clips the line at x=4132. Centre y = 2502 - 8. The axis formula at x=4125.0 is 100.01 mol%, 0.5 px past the 100 tick at x=4124.5. That overshoot is inside the ±0.5 mol% station uncertainty, so the stored fractions are clipped to TiO2 1 and CaO 0."
+      T_range_K: [2300, 2300]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.04'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.04 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Saturated purple (r 70-190, g<45, b>170). Tip (4125, 2502), one pixel, tapering from x=4118-4131 at y=2490. The right frame clips the line at x=4132. Centre y = 2502 - 8. The axis formula at x=4125.0 is 100.01 mol%, 0.5 px past the 100 tick at x=4124.5. That overshoot is inside the ±0.5 mol% station uncertainty, so the stored fractions are clipped to TiO2 1 and CaO 0."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: b
+            note: The Fig. 2b caption states 2300 K.
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2300'
+        temperature_K: 2300
+        pressure_atm: '2.365920e-06'
+        log10_p: '-5.626'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '1.000000'
+          CaO: '0.000000'
+        page_pixel_x: '4125.0'
+        page_pixel_y: '2494.0'
   O2:
     observations:
     - observation_id: shornikov_2019_eg_fig2a_O2_1875_9
@@ -9904,7 +10343,7 @@ species:
         panel: a
         series: '7'
         marker_symbol: filled circle
-        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2a lg p labelled ticks only, least-squares residual at most 0.0028: -6 at y=2380.0, -7 at y=2555.0, -8 at y=2729.0, -9 at y=2902.5, -10 at y=3076.5, -11 at y=3251.5. lg p = 7.667841 - 0.00574193*y, 174.16 px per decade. The unlabelled ticks between those labels are half-decades (y=2467, 2642, 2816, 2990, 3164.5) and were not assigned integer values. T ticks are uneven: 1800 K at x=944.0, 1900 at x=1317.0, 2000 at x=1653.5, 2100 at x=1958.0, 2200 at x=2235.0. T is piecewise linear between those centres. 1 px is 0.00574 in lg p. Series 7, filled circle, O2. Page pixel (2186.5, 2886.6). Read lg p = -8.907 ± 0.04; T = 2182.5 K. Local scale 2.77 px/K. The core shares a neighbourhood with another series, so the read uncertainty is widened."
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2a lg p labelled ticks only, least-squares residual at most 0.0028: -6 at y=2380.0, -7 at y=2555.0, -8 at y=2729.0, -9 at y=2902.5, -10 at y=3076.5, -11 at y=3251.5. lg p = 7.667841 - 0.00574193*y, 174.16 px per decade. The unlabelled ticks between those labels are half-decades (y=2467, 2642, 2816, 2990, 3164.5) and were not assigned integer values. T ticks are uneven: 1800 K at x=944.0, 1900 at x=1317.0, 2000 at x=1653.5, 2100 at x=1958.0, 2200 at x=2235.0. T is piecewise linear between those centres. 1 px is 0.00574 in lg p. Series 7, filled circle, O2. Page pixel (2186.5, 2900.0). Read lg p = -8.984 ± 0.04; T = 2182.5 K. Navy ink (b 80-185, r<35, g<35). The widest rows that are not the diagonal series line are y=2897-2903, midpoint x=2186.5, so the centre is (2186.5, 2900.0). The bright-blue disk above, centre (2187.3, 2875.0), is series 3 Ti and is stored separately. The previous centre (2186.5, 2886.6) sat in the overlap of the two disks."
       T_range_K: [2182.5, 2182.5]
       phase: gas
       units: atm
@@ -9934,14 +10373,14 @@ species:
         admission_status: admitted
         T_K: '2182.5'
         temperature_K: 2182.5
-        pressure_atm: '1.239327e-09'
-        log10_p: '-8.907'
+        pressure_atm: '1.037528e-09'
+        log10_p: '-8.984'
         composition_mol:
           basis: pure_oxide_system
           CaTiO3: '1'
 
         page_pixel_x: '2186.5'
-        page_pixel_y: '2886.6'
+        page_pixel_y: '2900.0'
     - observation_id: shornikov_2019_eg_fig2b_O2_x42_49
       type: partial_pressure
       experiment: shornikov-2019-eg-fig2b-2300k
@@ -10242,6 +10681,55 @@ species:
 
         page_pixel_x: '3324.0'
         page_pixel_y: '2691.0'
+    - observation_id: shornikov_2019_eg_fig2b_O2_x71_27
+      type: partial_pressure
+      experiment: shornikov-2019-eg-fig2b-2300k
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 39
+        figure: '2'
+        panel: b
+        series: '7'
+        marker_symbol: open triangle
+        note: "600 dpi PDF page 2 (published p. 39), 4961 by 7016 px. Fig. 2b lg p labelled ticks only, least-squares residual at most 0.0029: -5 at y=2385.0, -6 at y=2559.5, -7 at y=2733.0, -8 at y=2907.0, -9 at y=3082.0, -10 at y=3256.0. lg p = 8.691991 - 0.00574099*y, 174.19 px per decade. The unlabelled ticks between those labels are half-decades and were not assigned integer values. TiO2 mol% ticks, residual at most 0.03 mol%: 50 at x=2839.5, 60 at x=3095.5, 70 at x=3353.0, 80 at x=3611.0, 90 at x=3868.0, 95 at x=3996.0, 100 at x=4124.5. mol% = -60.4091 + 0.038890*x, 25.71 px per mol%. The left spine is near 41 mol%, not a labelled 40. The caption states 2300 K. 1 px is 0.00574 in lg p and 0.039 mol%. Series 7, open triangle, O2. Page pixel (3386.0, 2686.0). Read lg p = -6.728 ± 0.05; TiO2 = 71.27 mol%. Downward navy tip below the black disk. Navy ink tapers from x=3383-3389 at y=2696 to a one-pixel tip at (3386, 2702). The clean series-7 triangle at (3324, 2691) has its lowest pixel 16 px below the stored centre. Centre y = 2702 - 16. The upper part of the triangle is under the black disk, so the uncertainty is widened."
+      T_range_K: [2300, 2300]
+      phase: gas
+      units: atm
+      uncertainty:
+        value: '0.05'
+        unit: log10 atm
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: "Read uncertainty is ±0.05 in lg p and ±0.5 mol% TiO2. The paper prints no error bar on this marker. Downward navy tip below the black disk. Navy ink tapers from x=3383-3389 at y=2696 to a one-pixel tip at (3386, 2702). The clean series-7 triangle at (3324, 2691) has its lowest pixel 16 px below the stored centre. Centre y = 2702 - 16. The upper part of the triangle is under the black disk, so the uncertainty is widened."
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 39
+            figure: '2'
+            panel: b
+            note: The Fig. 2b caption states 2300 K.
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '2300'
+        temperature_K: 2300
+        pressure_atm: '1.870682e-07'
+        log10_p: '-6.728'
+        composition_mol:
+          basis: printed_mole_fraction
+          TiO2: '0.712724'
+          CaO: '0.287276'
+        page_pixel_x: '3386.0'
+        page_pixel_y: '2686.0'
     - observation_id: shornikov_2019_eg_fig2b_O2_x74_73
       type: partial_pressure
       experiment: shornikov-2019-eg-fig2b-2300k
