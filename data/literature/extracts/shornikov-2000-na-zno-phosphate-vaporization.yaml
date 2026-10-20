@@ -44,16 +44,16 @@ fidelity_samples:
       note: Series 1 filled square near 40 mol% ZnO.
   - species: P2O5
     observable: activity_coefficient
-    observation_id: shornikov_2000_fig1c_p2o5_x67
-    field: activity
-    value: '1.972423e-05'
+    observation_id: shornikov_2000_fig1c_p2o5_x40
+    field: log10_activity
+    value: '-5.534'
     locator:
       page: 3
       published_page: 60
       pdf_page_index: 2
       figure: '1'
       panel: c
-      note: Series 3 triangle on the Zn2P2O7 frame. Linear activity is 10 to the power of the log10 read.
+      note: Series 3 filled triangle near 40 mol% ZnO.
   - species: Na4P2O7-Zn2P2O7
     observable: thermodynamic_example
     observation_id: shornikov_2000_fig3_series1_x0
@@ -112,7 +112,7 @@ species:
       phase: l
       units: dimensionless activity; x(ZnO) mol% as read on the axis
       standard_state: >-
-        Fig. 1 caption, published page 60: activities of pure oxides in the present study at 1100 K, series 2 is ZnO. The zinc-oxide activities were determined taking into account the equilibrium constant of reaction (1), printed [ZnO] = (Zn) + (O). The paper says the square brackets indicate the solid. The standard state is pure solid ZnO.
+        Published page 61 (PDF page 4): Taking the pure oxides which form the ternary system as the standard states the Gibbs-Duhem equation could be written as. Fig. 1 caption, published page 60, series 2 is ZnO in the present study at 1100 K. Reaction (1) is printed [ZnO] = (Zn) + (O). The paper says the square brackets indicate the solid. The standard state is pure solid ZnO.
       uncertainty:
         value: '0.03'
         unit: log10(activity)
@@ -143,6 +143,11 @@ species:
         log10_activity: '-4.143'
         component: ZnO
         ZnO_mol_percent: 33.20
+        composition_mol:
+          ZnO: '0.3320'
+          Na2O: '0.3346666667'
+          P2O5: '0.3333333333'
+          basis: printed_mole_fraction
         section_as_published: Na4P2O7-Zn2P2O7
         page_pixel_x: '3497.00'
         page_pixel_y: '6498.48'
@@ -160,12 +165,12 @@ species:
         marker_symbol: filled circle
         note: >-
           600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 2, filled circle. Circle fit rms 1.31 px, radius 46.9 px, 155 inlier boundary pixels. Thresholds 70 to 160 leave the centre unchanged. Page pixel (3778.43, 6403.12).
-          Read log10(a) = -3.723; x(ZnO) = 39.72 mol%.
+          Read log10(a) = -3.723; x(ZnO) = 39.72 mol%. In-frame extrapolation: the marker centre y=6403.12 sits above the top labelled log10(a) tick, which is -4 at y=6469, and still inside the frame. The unlabelled minor near y=6246 was not used. The read uses the labelled-tick line.
       T_range_K: [1100, 1100]
       phase: l
       units: dimensionless activity; x(ZnO) mol% as read on the axis
       standard_state: >-
-        Fig. 1 caption, published page 60: activities of pure oxides in the present study at 1100 K, series 2 is ZnO. The zinc-oxide activities were determined taking into account the equilibrium constant of reaction (1), printed [ZnO] = (Zn) + (O). The paper says the square brackets indicate the solid. The standard state is pure solid ZnO.
+        Published page 61 (PDF page 4): Taking the pure oxides which form the ternary system as the standard states the Gibbs-Duhem equation could be written as. Fig. 1 caption, published page 60, series 2 is ZnO in the present study at 1100 K. Reaction (1) is printed [ZnO] = (Zn) + (O). The paper says the square brackets indicate the solid. The standard state is pure solid ZnO.
       uncertainty:
         value: '0.03'
         unit: log10(activity)
@@ -196,62 +201,14 @@ species:
         log10_activity: '-3.723'
         component: ZnO
         ZnO_mol_percent: 39.72
+        composition_mol:
+          ZnO: '0.3972'
+          Na2O: '0.2694666667'
+          P2O5: '0.3333333333'
+          basis: printed_mole_fraction
         section_as_published: Na4P2O7-Zn2P2O7
         page_pixel_x: '3778.43'
         page_pixel_y: '6403.12'
-        dpi: 600
-    - observation_id: shornikov_2000_fig1c_zno_x67
-      type: activity_coefficient
-      experiment: shornikov-2000-fig1c
-      locator:
-        page: 3
-        pdf_page_index: 2
-        published_page: 60
-        figure: '1'
-        panel: c
-        series: '2'
-        marker_symbol: filled circle
-        note: >-
-          600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 2, filled circle on the right frame of panel c. Circle fit rms 1.30 px, radius 52.1 px, 144 inliers. The vertical frame passes through the marker. A refit with that vertical strip removed moves the centre by under 2 px. Page pixel (4950.96, 6177.44).
-          Read log10(a) = -2.729; x(ZnO) = 66.91 mol%.
-      T_range_K: [1100, 1100]
-      phase: l
-      units: dimensionless activity; x(ZnO) mol% as read on the axis
-      standard_state: >-
-        Fig. 1 caption, published page 60: activities of pure oxides in the present study at 1100 K, series 2 is ZnO. The zinc-oxide activities were determined taking into account the equilibrium constant of reaction (1), printed [ZnO] = (Zn) + (O). The paper says the square brackets indicate the solid. The standard state is pure solid ZnO.
-      uncertainty:
-        value: '0.03'
-        unit: log10(activity)
-        basis: visual read uncertainty
-        confidence_level: not_stated
-        note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no error bar.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1100'
-          locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 60
-            figure: '1'
-            panel: c
-            note: Caption states panel (c) is the present study at 1100 K.
-      values:
-        quantity: activity
-        method_class: figure_only
-        admission_status: admitted
-        T_K: '1100'
-        temperature_K: 1100
-        activity: '1.866380e-03'
-        log10_activity: '-2.729'
-        component: ZnO
-        ZnO_mol_percent: 66.91
-        section_as_published: Na4P2O7-Zn2P2O7
-        page_pixel_x: '4950.96'
-        page_pixel_y: '6177.44'
         dpi: 600
     - observation_id: shornikov_2000_fig1d_zno
       type: activity_coefficient
@@ -290,7 +247,7 @@ species:
         T_K: '1300'
         component: ZnO
         reason: >-
-          Caption assigns panel (d), series 2, to previous data [13] at 1300 K. Coordinates were not read.
+          Caption assigns panel (d), series 2, to previous data [13] at 1300 K. Five filled circles were censused at 600 dpi and were not read: the shared-frame marker at page pixel (4942, 6175), and four off that frame at (6683, 7021), (6974, 7020), (7259, 7018) and (7547, 6991). The shared-frame circle is not a panel (c) point. Panel (c)'s circle series ends below it.
         attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
     - observation_id: shornikov_2000_fig1c_legend_glyphs
       type: activity_coefficient
@@ -302,9 +259,7 @@ species:
         figure: '1'
         panel: c
         note: >-
-          Legend glyphs inside panel c, not data. Square at page pixel (4457, 8518),
-          circle at (4463, 8767), triangle at (4464, 9014), beside the numerals 1, 2 and 3.
-          A second glyph stack near page x = 5250 is the panel (d) legend.
+          Legend glyphs, not data. Panel (c): square (4458, 8510) beside 1, circle (4463, 8767) beside 2, upright triangle (4465, 9014) beside 3. Panel (d): circle (5245, 8512) beside 2, upright triangle (5247, 8763) beside 3, inverted triangle (5250, 9007) beside 4.
       phase: l
       units: dimensionless activity
       standard_state: >-
@@ -328,8 +283,7 @@ species:
         admission_status: typed_refusal
         T_K: '1100'
         reason: >-
-          These three symbols sit with the numerals 1, 2 and 3 and are not on the data curves.
-          They are the legend. Coordinates were not stored as activities.
+          Panel (c) legend glyphs sit with the numerals and are not on the data curves: square (4458, 8510) beside 1, circle (4463, 8767) beside 2, upright triangle (4465, 9014) beside 3. Panel (d) legend glyphs, also not on the curves: circle (5245, 8512) beside 2, upright triangle (5247, 8763) beside 3, inverted triangle (5250, 9007) beside 4. Coordinates were not stored as activities.
     context:
     - observation_id: shornikov_2000_apparatus
       type: thermodynamic_example
@@ -432,7 +386,7 @@ species:
       phase: l
       units: dimensionless activity; x(ZnO) mol% as read on the axis
       standard_state: >-
-        Equation (10) prints [Na2O] = 2(Na) + (O). The paper says the square brackets indicate the solid. The Na2O activities were calculated with the equilibrium constant of that reaction. The standard state is pure solid Na2O.
+        Published page 61 (PDF page 4): Taking the pure oxides which form the ternary system as the standard states the Gibbs-Duhem equation could be written as. Equation (10) prints [Na2O] = 2(Na) + (O). The paper says the square brackets indicate the solid. The standard state is pure solid Na2O.
       uncertainty:
         value: '0.03'
         unit: log10(activity)
@@ -463,6 +417,11 @@ species:
         log10_activity: '-14.186'
         component: Na2O
         ZnO_mol_percent: 33.24
+        composition_mol:
+          ZnO: '0.3324'
+          Na2O: '0.3342666667'
+          P2O5: '0.3333333333'
+          basis: printed_mole_fraction
         section_as_published: Na4P2O7-Zn2P2O7
         page_pixel_x: '3499.1'
         page_pixel_y: '8777.6'
@@ -485,7 +444,7 @@ species:
       phase: l
       units: dimensionless activity; x(ZnO) mol% as read on the axis
       standard_state: >-
-        Equation (10) prints [Na2O] = 2(Na) + (O). The paper says the square brackets indicate the solid. The Na2O activities were calculated with the equilibrium constant of that reaction. The standard state is pure solid Na2O.
+        Published page 61 (PDF page 4): Taking the pure oxides which form the ternary system as the standard states the Gibbs-Duhem equation could be written as. Equation (10) prints [Na2O] = 2(Na) + (O). The paper says the square brackets indicate the solid. The standard state is pure solid Na2O.
       uncertainty:
         value: '0.03'
         unit: log10(activity)
@@ -516,6 +475,11 @@ species:
         log10_activity: '-14.313'
         component: Na2O
         ZnO_mol_percent: 39.93
+        composition_mol:
+          ZnO: '0.3993'
+          Na2O: '0.2673666667'
+          P2O5: '0.3333333333'
+          basis: printed_mole_fraction
         section_as_published: Na4P2O7-Zn2P2O7
         page_pixel_x: '3787.3'
         page_pixel_y: '8806.3'
@@ -557,7 +521,7 @@ species:
         T_K: '1300'
         component: Na2O
         reason: >-
-          Caption assigns panel (d), series 1, to previous data [13] at 1300 K. The Na2O series on panel (d) is the SnO-ZnO-P2O5 join, not a measurement of this article. Coordinates were not read.
+          Panel (d) is the Sn2P2O7-Zn2P2O7 join at 1300 K, previous data [13]. Its legend shows symbols 2, 3 and 4. No Na2O square was found on panel (d). The two panel (c) squares stay on that panel.
         attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
   P2O5:
     observations:
@@ -579,7 +543,7 @@ species:
       phase: l
       units: dimensionless activity; x(ZnO) mol% as read on the axis
       standard_state: >-
-        Fig. 1 caption calls series 3 the activity of P2O5. Equations (12) and (13) define a(P2O5) from the heterogeneous equilibrium constants of reactions (2) and (11). Reaction (11) is printed [P4O10] + 2(PO) = 6(PO2), and the paper says the square brackets indicate the solid. Equation (14) sets ln a(P2O5) equal to ln a*(P2O5) minus the Gibbs-Duhem integrals, where a* is the component activity in the corresponding phase of the binary system at x*. A single pure P2O5 reference phase is not stated.
+        Published page 61 (PDF page 4): Taking the pure oxides which form the ternary system as the standard states the Gibbs-Duhem equation could be written as. Equation (14) integrates from a* at x*; that x* is an integration anchor, not a different standard state. Equations (12) and (13) define a(P2O5) from reactions (2) and (11). Reaction (11) is printed [P4O10] + 2(PO) = 6(PO2), and the paper says the square brackets indicate the solid. The plotted component is P2O5 and the bracketed solid is P4O10, so this row is not stored as a(P4O10). The activity reference phase is not stated.
       uncertainty:
         value: '0.03'
         unit: log10(activity)
@@ -610,6 +574,11 @@ species:
         log10_activity: '-5.886'
         component: P2O5
         ZnO_mol_percent: 33.20
+        composition_mol:
+          ZnO: '0.3320'
+          Na2O: '0.3346666667'
+          P2O5: '0.3333333333'
+          basis: printed_mole_fraction
         section_as_published: Na4P2O7-Zn2P2O7
         page_pixel_x: '3497.0'
         page_pixel_y: '6894.0'
@@ -632,7 +601,7 @@ species:
       phase: l
       units: dimensionless activity; x(ZnO) mol% as read on the axis
       standard_state: >-
-        Fig. 1 caption calls series 3 the activity of P2O5. Equations (12) and (13) define a(P2O5) from the heterogeneous equilibrium constants of reactions (2) and (11). Reaction (11) is printed [P4O10] + 2(PO) = 6(PO2), and the paper says the square brackets indicate the solid. Equation (14) sets ln a(P2O5) equal to ln a*(P2O5) minus the Gibbs-Duhem integrals, where a* is the component activity in the corresponding phase of the binary system at x*. A single pure P2O5 reference phase is not stated.
+        Published page 61 (PDF page 4): Taking the pure oxides which form the ternary system as the standard states the Gibbs-Duhem equation could be written as. Equation (14) integrates from a* at x*; that x* is an integration anchor, not a different standard state. Equations (12) and (13) define a(P2O5) from reactions (2) and (11). Reaction (11) is printed [P4O10] + 2(PO) = 6(PO2), and the paper says the square brackets indicate the solid. The plotted component is P2O5 and the bracketed solid is P4O10, so this row is not stored as a(P4O10). The activity reference phase is not stated.
       uncertainty:
         value: '0.03'
         unit: log10(activity)
@@ -663,62 +632,14 @@ species:
         log10_activity: '-5.534'
         component: P2O5
         ZnO_mol_percent: 39.85
+        composition_mol:
+          ZnO: '0.3985'
+          Na2O: '0.2681666667'
+          P2O5: '0.3333333333'
+          basis: printed_mole_fraction
         section_as_published: Na4P2O7-Zn2P2O7
         page_pixel_x: '3783.8'
         page_pixel_y: '6814.0'
-        dpi: 600
-    - observation_id: shornikov_2000_fig1c_p2o5_x67
-      type: activity_coefficient
-      experiment: shornikov-2000-fig1c
-      locator:
-        page: 3
-        pdf_page_index: 2
-        published_page: 60
-        figure: '1'
-        panel: c
-        series: '3'
-        marker_symbol: filled triangle
-        note: >-
-          600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 3, filled triangle on the right frame of panel c. The vertical frame passes through the marker. Core-centroid y moves by 3 px between distance fractions 0.45 and 0.75. Page pixel (4943.9, 6625.9).
-          Read log10(a) = -4.705; x(ZnO) = 66.74 mol%.
-      T_range_K: [1100, 1100]
-      phase: l
-      units: dimensionless activity; x(ZnO) mol% as read on the axis
-      standard_state: >-
-        Fig. 1 caption calls series 3 the activity of P2O5. Equations (12) and (13) define a(P2O5) from the heterogeneous equilibrium constants of reactions (2) and (11). Reaction (11) is printed [P4O10] + 2(PO) = 6(PO2), and the paper says the square brackets indicate the solid. Equation (14) sets ln a(P2O5) equal to ln a*(P2O5) minus the Gibbs-Duhem integrals, where a* is the component activity in the corresponding phase of the binary system at x*. A single pure P2O5 reference phase is not stated.
-      uncertainty:
-        value: '0.03'
-        unit: log10(activity)
-        basis: visual read uncertainty
-        confidence_level: not_stated
-        note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no error bar.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1100'
-          locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 60
-            figure: '1'
-            panel: c
-            note: Caption states panel (c) is the present study at 1100 K.
-      values:
-        quantity: activity
-        method_class: figure_only
-        admission_status: admitted
-        T_K: '1100'
-        temperature_K: 1100
-        activity: '1.972423e-05'
-        log10_activity: '-4.705'
-        component: P2O5
-        ZnO_mol_percent: 66.74
-        section_as_published: Na4P2O7-Zn2P2O7
-        page_pixel_x: '4943.9'
-        page_pixel_y: '6625.9'
         dpi: 600
     - observation_id: shornikov_2000_fig1d_p2o5
       type: activity_coefficient
@@ -757,7 +678,7 @@ species:
         T_K: '1300'
         component: P2O5
         reason: >-
-          Caption assigns panel (d), series 3, to previous data [13] at 1300 K. Coordinates were not read.
+          Caption assigns panel (d), series 3, to previous data [13] at 1300 K. Five upright triangles were censused at 600 dpi and were not read: the shared-frame marker at page pixel (4945, 6626), and four off that frame at (6690, 8763), (6980, 8670), (7267, 8569) and (7554, 8288). The shared-frame triangle is not a panel (c) point. Panel (c)'s triangle series ends below it.
         attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
   SnO:
     observations:
@@ -798,7 +719,7 @@ species:
         T_K: '1300'
         component: SnO
         reason: >-
-          Caption assigns panel (d), series 4, to SnO activities from previous data [13] at 1300 K. Coordinates were not read.
+          Caption assigns panel (d), series 4, to SnO activities from previous data [13] at 1300 K. Five inverted triangles off the shared frame were censused at 600 dpi and were not read: page pixels (6684, 6881), (6976, 6738), (7260, 6688), (7550, 6583) and (7837, 6536).
         attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
   Na4P2O7-Zn2P2O7:
     observations: []
