@@ -1,0 +1,34 @@
+schema_version: literature_extract.v1
+source_id: oishi-1986-cu2o-cao-activities
+source:
+  citation: >-
+    Oishi T, Kondo Y, Ono K (1986). A Thermodynamic Study of Cu2O-CaO Melts
+    in Equilibrium with Liquid Copper. Transactions of the Japan Institute
+    of Metals 27(12):976-980.
+  doi: 10.2320/matertrans1960.27.976
+  year: 1986
+extraction:
+  method: >-
+    WIP: MinerU draft and 600 dpi Table 1 render inspected. Extraction paused
+    at the reference-aware printed log pO2 condition encoding question.
+  date: '2026-10-20'
+  worker: fam26-1020
+review_status: draft
+species:
+  Cu:
+    observations: []
+    context:
+      - observation_id: oishi_1986_table1_pending_reference_aware_conditions
+        type: context_record
+        locator: {page: 2, published_page: 977, pdf_page_index: 1, table: '1'}
+        units: 'mass% and log(pO2/p°) as printed'
+        candidate_quantities: [equilibrium_phase_composition, partial_pressure]
+        reason: >-
+          Table 1's printed log(pO2/p°) uses p°=101325 Pa. The current canonical
+          point_conditions.fO2_log reader interprets its value relative to bar;
+          the extraction needs a reference-aware representation to preserve the
+          printed condition without changing its value or silently relabelling
+          the reference. No table cells are typed in this WIP record.
+        values:
+          table_as_printed: Experimental Data at 1573 K; 12 runs with emf,
+            log(pO2/p°), and chemical analysis of quenched oxide samples.
