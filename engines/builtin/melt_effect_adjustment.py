@@ -29,6 +29,8 @@ from simulator.chemistry.kernel import (
     BACKEND_STATUS_PRECEDENCE,
     select_backend_status,
 )
+from simulator.scalar_boundary import finite_float
+
 _OXIDE_SET = frozenset(OXIDE_SPECIES)
 
 
@@ -1011,16 +1013,6 @@ def _lookup_result_value(result: Mapping[str, Any] | Any | None, key: str) -> An
     return getattr(result, key, None)
 
 
-def _finite_float(value: Any) -> float | None:
-    try:
-        numeric = float(value)
-    except (TypeError, ValueError):
-        return None
-    if numeric != numeric or numeric in (float("inf"), float("-inf")):
-        return None
-    return numeric
-
-
 def _phase_modes_as_fractions(
     melts_result: Mapping[str, Any] | Any | None,
 ) -> dict[str, float]:
@@ -1030,7 +1022,7 @@ def _phase_modes_as_fractions(
     if isinstance(modes, Mapping) and modes:
         out: dict[str, float] = {}
         for name, value in modes.items():
-            numeric = _finite_float(value)
+            numeric = finite_float(value)
             if numeric is not None and numeric > 0.0:
                 out[str(name)] = numeric / 100.0
         return out
@@ -1039,7 +1031,7 @@ def _phase_modes_as_fractions(
     if isinstance(masses, Mapping) and masses:
         positive: dict[str, float] = {}
         for name, value in masses.items():
-            numeric = _finite_float(value)
+            numeric = finite_float(value)
             if numeric is not None and numeric > 0.0:
                 positive[str(name)] = numeric
         total = sum(positive.values())
@@ -1156,7 +1148,7 @@ def _bulk_sum_closure_perturbation(
 
     dropped: dict[str, float] = {}
     for oxide in MAGEMIN_IG_IGAD_BULK_SUM_DROPPED_OXIDES:
-        value = _finite_float(cleaned_oxide_wt_pct.get(oxide))
+        value = finite_float(cleaned_oxide_wt_pct.get(oxide))
         if value is not None and value > 0.0:
             dropped[oxide] = value
     dropped_wt_pct = sum(dropped.values())
