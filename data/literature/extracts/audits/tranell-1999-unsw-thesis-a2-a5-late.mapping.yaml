@@ -1,0 +1,205 @@
+source_id: tranell-1999-unsw-thesis
+source:
+  citation: "Tranell, G. M. (1999), Thermodynamics of Slags Containing Titanium, PhD thesis, University of New South Wales."
+extraction:
+  method: MinerU table draft emit; source table cells checked against pdftotext and 600 dpi page renders
+  date: '2026-10-20'
+  worker: fam22-1020
+review_status: draft
+tables:
+  - page: 201
+    table_index: 1
+    type: concentration_series
+    quantity: Ti3plus_over_Ti4plus
+    unit: dimensionless ratio as printed
+    evidence_class: measured_direct
+    phase: l
+    regime: quench_equilibration
+    rows: all
+    published_page: 191
+    temperature:
+      as_printed: '1873'
+      unit: K
+      locator: {page: 201, pdf_page_index: 200, published_page: 191, table: A2g, row: conditions, column: temperature}
+    values: &paired_readings
+      - {column: 3, species: Ti, quantity: Ti3plus_over_total_Ti, unit: '%', evidence_class: measured_direct}
+      - {column: 4, species: Ti, quantity: Ti3plus_over_total_Ti, unit: '%', evidence_class: measured_direct}
+      - {column: 5, species: Ti, quantity: Ti3plus_over_Ti4plus, unit: dimensionless ratio as printed, evidence_class: measured_direct}
+      - {column: 6, species: Ti, quantity: Ti3plus_over_Ti4plus, unit: dimensionless ratio as printed, evidence_class: measured_direct}
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-9}
+        locator: {page: 201, pdf_page_index: 200, published_page: 191, table: A2g, row: conditions, column: pO2}
+  - page: 201
+    table_index: 2
+    type: concentration_series
+    quantity: Ti3plus_over_Ti4plus
+    unit: dimensionless ratio as printed
+    evidence_class: measured_direct
+    phase: l
+    regime: quench_equilibration
+    rows: all
+    published_page: 191
+    temperature:
+      as_printed: '1903'
+      unit: K
+      locator: {page: 201, pdf_page_index: 200, published_page: 191, table: A2h, row: conditions, column: temperature}
+    values: *paired_readings
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-9}
+        locator: {page: 201, pdf_page_index: 200, published_page: 191, table: A2h, row: conditions, column: pO2}
+  - page: 201
+    table_index: 3
+    type: concentration_series
+    quantity: Ti3plus_over_Ti4plus
+    unit: dimensionless ratio as printed
+    evidence_class: measured_direct
+    phase: l
+    regime: quench_equilibration
+    rows: all
+    published_page: 191
+    temperature:
+      as_printed: '1843'
+      unit: K
+      locator: {page: 201, pdf_page_index: 200, published_page: 191, table: A2i, row: conditions, column: temperature}
+    values: *paired_readings
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-10}
+        locator: {page: 201, pdf_page_index: 200, published_page: 191, table: A2i, row: conditions, column: pO2}
+  - page: 201
+    table_index: 4
+    type: concentration_series
+    quantity: Ti3plus_over_Ti4plus
+    unit: dimensionless ratio as printed
+    evidence_class: measured_direct
+    phase: l
+    regime: quench_equilibration
+    rows: all
+    published_page: 191
+    temperature:
+      as_printed: '1873'
+      unit: K
+      locator: {page: 201, pdf_page_index: 200, published_page: 191, table: A2j, row: conditions, column: temperature}
+    values: *paired_readings
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-12}
+        locator: {page: 201, pdf_page_index: 200, published_page: 191, table: A2j, row: conditions, column: pO2}
+  - page: 202
+    table_index: 6
+    type: concentration_series
+    quantity: Ti3plus_over_Ti4plus
+    unit: dimensionless ratio as printed
+    evidence_class: measured_direct
+    phase: l
+    regime: quench_equilibration
+    rows: all
+    published_page: 192
+    temperature:
+      as_printed: '1843'
+      unit: K
+      locator: {page: 202, pdf_page_index: 201, published_page: 192, table: A3a, row: conditions, column: temperature}
+    values: &kinetic_readings
+      - {column: 2, species: Ti, quantity: Ti3plus_over_total_Ti, unit: '%', evidence_class: measured_direct}
+      - {column: 3, species: Ti, quantity: Ti3plus_over_Ti4plus, unit: dimensionless ratio as printed, evidence_class: measured_direct}
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-9}
+        locator: {page: 202, pdf_page_index: 201, published_page: 192, table: A3a, row: conditions, column: pO2}
+  - page: 202
+    table_index: 7
+    type: concentration_series
+    quantity: Ti3plus_over_Ti4plus
+    unit: dimensionless ratio as printed
+    evidence_class: measured_direct
+    phase: l
+    regime: quench_equilibration
+    rows: all
+    published_page: 192
+    temperature:
+      as_printed: '1873'
+      unit: K
+      locator: {page: 202, pdf_page_index: 201, published_page: 192, table: A3b, row: conditions, column: temperature}
+    values: *kinetic_readings
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-12}
+        locator: {page: 202, pdf_page_index: 201, published_page: 192, table: A3b, row: conditions, column: pO2}
+  - page: 202
+    table_index: 8
+    type: concentration_series
+    quantity: Ti3plus_over_Ti4plus
+    unit: dimensionless ratio as printed
+    evidence_class: measured_direct
+    phase: l
+    regime: quench_equilibration
+    rows: all
+    published_page: 192
+    temperature:
+      as_printed: '1843'
+      unit: K
+      locator: {page: 202, pdf_page_index: 201, published_page: 192, table: A4a, row: conditions, column: temperature}
+    values: *paired_readings
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-9}
+        locator: {page: 202, pdf_page_index: 201, published_page: 192, table: A4a, row: conditions, column: pO2}
+  - page: 202
+    table_index: 9
+    type: concentration_series
+    quantity: Ti3plus_over_Ti4plus
+    unit: dimensionless ratio as printed
+    evidence_class: measured_direct
+    phase: l
+    regime: quench_equilibration
+    rows: all
+    published_page: 192
+    temperature:
+      as_printed: '1873'
+      unit: K
+      locator: {page: 202, pdf_page_index: 201, published_page: 192, table: A4b, row: conditions, column: temperature}
+    values: *paired_readings
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-12}
+        locator: {page: 202, pdf_page_index: 201, published_page: 192, table: A4b, row: conditions, column: pO2}
+  - page: 203
+    table_index: 10
+    type: concentration_series
+    quantity: Ti3plus_over_Ti4plus
+    unit: dimensionless ratio as printed
+    evidence_class: measured_direct
+    phase: l
+    regime: quench_equilibration
+    rows: all
+    published_page: 193
+    temperature:
+      as_printed: '1843'
+      unit: K
+      locator: {page: 203, pdf_page_index: 202, published_page: 193, table: A5a, row: conditions, column: temperature}
+    values: *paired_readings
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-9}
+        locator: {page: 203, pdf_page_index: 202, published_page: 193, table: A5a, row: conditions, column: pO2}
+  - page: 203
+    table_index: 11
+    type: concentration_series
+    quantity: Ti3plus_over_Ti4plus
+    unit: dimensionless ratio as printed
+    evidence_class: measured_direct
+    phase: l
+    regime: quench_equilibration
+    rows: all
+    published_page: 193
+    temperature:
+      as_printed: '1873'
+      unit: K
+      locator: {page: 203, pdf_page_index: 202, published_page: 193, table: A5b, row: conditions, column: temperature}
+    values: *paired_readings
+    conditions:
+      - key: oxygen_partial_pressure
+        state: {tag: value, value: 10^-12}
+        locator: {page: 203, pdf_page_index: 202, published_page: 193, table: A5b, row: conditions, column: pO2}
