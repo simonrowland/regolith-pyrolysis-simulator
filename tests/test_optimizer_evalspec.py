@@ -15,6 +15,7 @@ import pytest
 from simulator.config import load_config_bundle
 from simulator.corpus_version import current_corpus_version
 from simulator.electrolysis import min_decomposition_voltage
+from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.lab_schedule import (
     LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
     LabScheduleValidationError,
@@ -2849,6 +2850,53 @@ def test_c2a_profile_window_uses_setpoints_furnace_ceiling_when_constraint_unset
             _c2a_window_profile(1350.0, 1450.0, 18),
             RecipeSchema(),
         )
+
+
+@pytest.mark.parametrize(
+    "requested_ceiling_C",
+    [
+        pytest.param(2200.0, id="explicit-cap-above-material-rating"),
+        pytest.param(None, id="inherited-material-rating"),
+        pytest.param(1600.0, id="explicit-cap-below-material-rating"),
+    ],
+)
+def test_c2a_profile_window_respects_selected_material_applied_ceiling(
+    monkeypatch: pytest.MonkeyPatch,
+    requested_ceiling_C: float | None,
+) -> None:
+    material_id = "dense_alumina_continuous"
+    bundle = load_config_bundle()
+    setpoints = copy.deepcopy(bundle.setpoints)
+    setpoints["furnace_material"] = material_id
+    setpoints["furnace_max_T_C"] = requested_ceiling_C
+    monkeypatch.setattr(
+        evaluate_module,
+        "load_config_bundle",
+        lambda *args, **kwargs: replace(bundle, setpoints=setpoints),
+    )
+
+    material_ceiling_C = resolve_furnace_max_T_C(material_id)
+    applied_ceiling_C = resolve_furnace_max_T_C(
+        material_id,
+        requested_ceiling_C,
+    )
+    if requested_ceiling_C is None or requested_ceiling_C >= material_ceiling_C:
+        expected_bound = (
+            f"furnace_material[{material_id}].effective_applied_ceiling_T_C"
+        )
+    else:
+        expected_bound = "profile_default_furnace_max_T_C"
+
+    with pytest.raises(EvaluationInputError) as exc:
+        evaluate_module._build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            _c2a_window_profile(1600.0, 1800.0, 18),
+            RecipeSchema(),
+        )
+
+    assert f"{expected_bound} {applied_ceiling_C:g} C" in str(exc.value)
 
 
 def test_lab_schedule_uses_setpoints_furnace_ceiling_when_constraint_unset(
