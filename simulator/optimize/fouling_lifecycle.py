@@ -156,9 +156,24 @@ class FoulingLifecycleHarness:
                 resinter_threshold_kg=self._resinter_threshold_kg,
             )
             authority = wall_deposit_sticking_authority_status(
-                snapshot.wall_deposit_by_segment_species_kg,
-                snapshot.wall_deposit_sticking_authority,
+                cumulative.wall_deposit_by_segment_species_kg,
+                cumulative.wall_deposit_sticking_authority,
             )
+            cumulative_availability = wall_deposit_figure_availability(
+                has_positive_deposit=bool(
+                    authority.get("deposited_species")
+                ),
+                authority=authority,
+                refusal=total.refusal,
+            )
+            if cumulative_availability.status == "refused":
+                total = replace(
+                    total,
+                    value=None,
+                    authoritative_for_resinter=False,
+                    refusal=cumulative_availability.refusal,
+                    measured_empty_deposit=False,
+                )
             if not authority["authoritative_for_resinter"]:
                 snapshots_authoritative = False
                 snapshot_notices.append(authority)
