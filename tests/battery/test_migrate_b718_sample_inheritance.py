@@ -7,8 +7,8 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.migrate import migrate
-from simulator.battery.records import as_decimal
+from simulator.battery.migrate import _initial_compositions_conflict, migrate
+from simulator.battery.records import INITIAL_CHARGE_ONLY_PROXY_FLAG, as_decimal
 from simulator.battery.waypoints import normalized_composition
 from tests.battery.test_migrate import (
     FIXTURE_EXTRACT,
@@ -507,5 +507,63 @@ def test_real_hashimoto_class_b1_geometry_rows_share_declared_start() -> None:
         assert norm.selected is not None
         assert norm.selected.route == "normalized_printed_composition", (
             local_id,
+            norm.selected.route,
+        )
+
+
+def test_real_hashimoto_table5_points_resolve_declared_series_start() -> None:
+    """Table 5 initial rates are measured on the FCMAS starting charge.
+
+    They belong on the declared series, as the class-B1 geometry rows do.
+    The DOI-level experiment must not carry that charge: the residue and
+    stage-IV rows share it and would inherit the start.
+    """
+
+    result = _migrate_real("kems-015-hashimoto-1983")
+    for local_id in (
+        "hashimoto_1983_cao_al2o3_residue_enrichment",
+        "hashimoto_1983_stage_iv_cao_relative_volatility",
+    ):
+        observation = result.observations[f"kems-015-hashimoto-1983::{local_id}"]
+        assert not observation.experiment_id.endswith(
+            "::experiment::fcmas-free-evap-series"
+        ), (local_id, observation.experiment_id)
+        experiment = result.experiments[observation.experiment_id]
+        norm = normalized_composition(experiment, None, observation)
+        assert norm.selected is None, (
+            local_id,
+            None if norm.selected is None else norm.selected.route,
+        )
+
+    points = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if "::hashimoto_1983_table5_initial_vaporization_rate_F::T=" in observation_id
+    ]
+    assert len(points) == 4
+    assert {
+        observation.observation_id.split("::T=", 1)[1].split(":h=", 1)[0]
+        for observation in points
+    } == {"1973.15", "2073.15", "2173.15", "2273.15"}
+    expected = {"SiO2": "35.43", "Al2O3": "3.16", "FeO": "35.04", "MgO": "23.84", "CaO": "2.53"}
+    for observation in points:
+        assert observation.experiment_id.endswith(
+            "::experiment::fcmas-free-evap-series"
+        ), observation.experiment_id
+        experiment = result.experiments[observation.experiment_id]
+        printed = experiment.sample.printed_composition
+        assert printed is not None and printed.state.is_value
+        assert {k: str(as_decimal(v)) for k, v in printed.state.value.items()} == expected
+        point = (observation.point_conditions or {}).get("composition")
+        assert point is not None and point.state.is_value
+        assert point.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        initial = experiment.sample.initial_composition
+        assert initial is not None and initial.state.is_value
+        assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        assert not _initial_compositions_conflict(initial, point)
+        norm = normalized_composition(experiment, None, observation)
+        assert norm.selected is not None
+        assert norm.selected.route == "normalized_printed_composition", (
+            observation.observation_id,
             norm.selected.route,
         )
