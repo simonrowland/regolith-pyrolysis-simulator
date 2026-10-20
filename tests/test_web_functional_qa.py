@@ -1000,7 +1000,7 @@ def test_completion_payload_marks_story_incomplete_without_builder_exception(
     assert payload["product_story_status"] == "incomplete"
 
 
-def test_product_story_requires_designated_stage_provenance(monkeypatch):
+def test_product_story_requires_designated_stage_provenance():
     balances = {
         "process.condensation_train": {
             "SiO": 1.0,
@@ -1033,11 +1033,28 @@ def test_product_story_requires_designated_stage_provenance(monkeypatch):
             ("process.condensation_train", 4, "Ca"): 6.0,
         },
     )
-    monkeypatch.setattr(web_events, "classify_products", lambda _sim: {})
-
+    classification = {
+        "ingots_metals": {"species_kg": {}, "class_total_kg": 0.0},
+        "glass": {"species_kg": {}, "class_total_kg": 0.0},
+        "oxygen": {"class_total_kg": 0.0},
+        "captured_volatiles": {"kg_by_species": {}, "class_total_kg": 0.0},
+        "refractory_ceramic_rump": {
+            "rump_kg_by_species": {},
+            "class_total_kg": 0.0,
+            "rump_silicate_residual_kg": 0.0,
+            "rump_unextracted_metals_kg": 0.0,
+        },
+    }
+    account_kg = web_events._product_story_account_kg(sim)
     story = web_events._product_story_payload(
         sim,
         terminal_rump_by_species={},
+        classification=classification,
+        account_kg=account_kg,
+        extracted_projection=web_events._product_story_extracted_projection(
+            sim,
+            account_kg=account_kg,
+        ),
     )
 
     assert story["glass"]["class_total_kg"] == 0.0
