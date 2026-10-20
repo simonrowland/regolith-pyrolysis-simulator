@@ -349,6 +349,23 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
     assert http.get("/").status_code == 200
     client = app_module.socketio.test_client(app, flask_test_client=http)
     assert client.is_connected()
+    original_get_received = client.get_received
+    deferred_decisions = []
+
+    def defer_decision_event_for_one_poll():
+        received = original_get_received()
+        if deferred_decisions:
+            received.extend(deferred_decisions)
+            deferred_decisions.clear()
+        current_decisions = [
+            event for event in received if event["name"] == "decision_required"
+        ]
+        deferred_decisions.extend(current_decisions)
+        return [
+            event for event in received if event["name"] != "decision_required"
+        ]
+
+    monkeypatch.setattr(client, "get_received", defer_decision_event_for_one_poll)
     client.get_received()
     before = set(_simulations)
     try:
