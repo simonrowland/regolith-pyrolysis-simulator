@@ -1,0 +1,3163 @@
+schema_version: literature_extract.v1
+source_id: lee-bruckner-1986-borate-redox-series
+source:
+  citation: Lee, Jeong-Hoon and Brückner, Rolf (1986), “The electrochemical series of the 3d transition metal ions
+    in alkali borate glasses”, Glastechnische Berichte 59(9), 233–251.
+  year: 1986
+extraction:
+  method: MinerU table draft supplemented by page-text transcription; Table 1 values and discrete markers in Figures
+    6–8 and 11 checked against 600 dpi physical-page renders.
+  date: '2026-10-20'
+  worker: fam28-1020
+review_status: draft
+experiments:
+- experiment_id: single-oxide-redox-series
+  series: Single transition-metal redox pairs in sodium and cesium borate glasses.
+  locator: &id001
+    page: 2
+    pdf_page_index: 1
+    published_page: 234
+    section: 2. Sample preparation and experimental procedure
+- experiment_id: mixed-oxide-redox-series
+  series: Mixed transition-metal pairs in sodium borate glasses.
+  locator: *id001
+fidelity_samples:
+- path: species.Mn.observations[lee_bruckner_1986_table1_mn_ratio].values.points[0].value
+  value: '0.045'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 236
+    table: '1'
+    row: 90 B2O3, 10 Na2O
+- path: species.Cu.observations[lee_bruckner_1986_table1_cu_density].values.points[0].density_g_cm3
+  value: '2.057'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 236
+    table: '1'
+    row: 90 B2O3, 10 Na2O
+species:
+  Mn:
+    observations:
+    - observation_id: lee_bruckner_1986_table1_mn_ratio
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: &id002
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 4
+        pdf_page_index: 3
+        published_page: 236
+        table: '1'
+      phase: glass
+      units: '% of total Mn'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        printed_form: Mn3+/ΣMn
+        method_as_printed: Wet chemical titration and spectrophotometric methods after melting in air at 1000 °C.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% MnO added
+          value: '0.045'
+          value_as_published: 4,5
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% MnO added
+          added_oxide_as_printed: 0,5 wt% MnO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% MnO added
+          value: '0.1325'
+          value_as_published: 13,25
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% MnO added
+          added_oxide_as_printed: 0,5 wt% MnO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% MnO added
+          value: '0.20'
+          value_as_published: 20,00
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% MnO added
+          added_oxide_as_printed: 0,5 wt% MnO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+        - sample: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% MnO added
+          value: '0.265'
+          value_as_published: 26,5
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% MnO added
+          added_oxide_as_printed: 0,5 wt% MnO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Cs2O
+                    - '20'
+              locator: *id002
+        - sample: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% MnO added
+          value: '0.404'
+          value_as_published: 40,4
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% MnO added
+          added_oxide_as_printed: 0,5 wt% MnO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Cs2O
+                    - '30'
+              locator: *id002
+      uncertainty:
+        note: No uncertainty is printed.
+    - observation_id: lee_bruckner_1986_table1_mn_density
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: g/cm3
+      values:
+        quantity: density
+        formula: unknown
+        method_class: measured_direct
+        method_as_printed: Archimedes method at room temperature.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% MnO added
+          value: '2.042'
+          value_as_published: 2,042
+          unit: g/cm3
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% MnO added
+          added_oxide_as_printed: 0,5 wt% MnO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+          density_g_cm3: '2.042'
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% MnO added
+          value: '2.189'
+          value_as_published: 2,189
+          unit: g/cm3
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% MnO added
+          added_oxide_as_printed: 0,5 wt% MnO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+          density_g_cm3: '2.189'
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% MnO added
+          value: '2.299'
+          value_as_published: 2,299
+          unit: g/cm3
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% MnO added
+          added_oxide_as_printed: 0,5 wt% MnO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+          density_g_cm3: '2.299'
+        - sample: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% MnO added
+          value: '2.78'
+          value_as_published: 2,78
+          unit: g/cm3
+          composition_as_printed: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% MnO added
+          added_oxide_as_printed: 0,5 wt% MnO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Cs2O
+                    - '20'
+              locator: *id002
+          density_g_cm3: '2.78'
+        - sample: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% MnO added
+          value: '3.29'
+          value_as_published: 3,29
+          unit: g/cm3
+          composition_as_printed: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% MnO added
+          added_oxide_as_printed: 0,5 wt% MnO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Cs2O
+                    - '30'
+              locator: *id002
+          density_g_cm3: '3.29'
+      uncertainty:
+        note: No uncertainty is printed.
+    context: []
+  Cu:
+    observations:
+    - observation_id: lee_bruckner_1986_table1_cu_ratio
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: '% of total Cu'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 2
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        printed_form: Cu2+/ΣCu
+        method_as_printed: Wet chemical titration and spectrophotometric methods after melting in air at 1000 °C.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% CuO added
+          value: '0.758'
+          value_as_published: 75,8
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% CuO added
+          value: '0.804'
+          value_as_published: 80,4
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% CuO added
+          value: '0.802'
+          value_as_published: 80,2
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+        - sample: 90 mol% B2O3, 10 mol% Cs2O; 0,5 wt% CuO added
+          value: '0.7461'
+          value_as_published: 74,61
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 90 mol% B2O3, 10 mol% Cs2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Cs2O
+                    - '10'
+              locator: *id002
+        - sample: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% CuO added
+          value: '0.7256'
+          value_as_published: 72,56
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Cs2O
+                    - '20'
+              locator: *id002
+        - sample: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% CuO added
+          value: '0.661'
+          value_as_published: 66,10
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Cs2O
+                    - '30'
+              locator: *id002
+      uncertainty:
+        note: No uncertainty is printed.
+    - observation_id: lee_bruckner_1986_table1_cu_density
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: g/cm3
+      values:
+        quantity: density
+        formula: unknown
+        method_class: measured_direct
+        method_as_printed: Archimedes method at room temperature.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% CuO added
+          value: '2.057'
+          value_as_published: 2,057
+          unit: g/cm3
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+          density_g_cm3: '2.057'
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% CuO added
+          value: '2.190'
+          value_as_published: 2,190
+          unit: g/cm3
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+          density_g_cm3: '2.190'
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% CuO added
+          value: '2.346'
+          value_as_published: 2,346
+          unit: g/cm3
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+          density_g_cm3: '2.346'
+        - sample: 90 mol% B2O3, 10 mol% Cs2O; 0,5 wt% CuO added
+          value: '2.424'
+          value_as_published: 2,424
+          unit: g/cm3
+          composition_as_printed: 90 mol% B2O3, 10 mol% Cs2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Cs2O
+                    - '10'
+              locator: *id002
+          density_g_cm3: '2.424'
+        - sample: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% CuO added
+          value: '2.816'
+          value_as_published: 2,816
+          unit: g/cm3
+          composition_as_printed: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Cs2O
+                    - '20'
+              locator: *id002
+          density_g_cm3: '2.816'
+        - sample: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% CuO added
+          value: '3.290'
+          value_as_published: 3,290
+          unit: g/cm3
+          composition_as_printed: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% CuO added
+          added_oxide_as_printed: 0,5 wt% CuO
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Cs2O
+                    - '30'
+              locator: *id002
+          density_g_cm3: '3.290'
+      uncertainty:
+        note: No uncertainty is printed.
+    context: []
+  Fe:
+    observations:
+    - observation_id: lee_bruckner_1986_table1_fe_ratio
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: '% of total Fe'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 2
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        printed_form: Fe2+/ΣFe
+        method_as_printed: Wet chemical titration and spectrophotometric methods after melting in air at 1000 °C.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% Fe2O3 added
+          value: '0.048'
+          value_as_published: 4,8
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% Fe2O3 added
+          added_oxide_as_printed: 0,5 wt% Fe2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% Fe2O3 added
+          value: '0.0426'
+          value_as_published: 4,26
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% Fe2O3 added
+          added_oxide_as_printed: 0,5 wt% Fe2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% Fe2O3 added
+          value: '0.0388'
+          value_as_published: 3,88
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% Fe2O3 added
+          added_oxide_as_printed: 0,5 wt% Fe2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+      uncertainty:
+        note: No uncertainty is printed.
+    - observation_id: lee_bruckner_1986_table1_fe_density
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: g/cm3
+      values:
+        quantity: density
+        formula: unknown
+        method_class: measured_direct
+        method_as_printed: Archimedes method at room temperature.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% Fe2O3 added
+          value: '2.054'
+          value_as_published: 2,054
+          unit: g/cm3
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% Fe2O3 added
+          added_oxide_as_printed: 0,5 wt% Fe2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+          density_g_cm3: '2.054'
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% Fe2O3 added
+          value: '2.184'
+          value_as_published: 2,184
+          unit: g/cm3
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% Fe2O3 added
+          added_oxide_as_printed: 0,5 wt% Fe2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+          density_g_cm3: '2.184'
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% Fe2O3 added
+          value: '2.344'
+          value_as_published: 2,344
+          unit: g/cm3
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% Fe2O3 added
+          added_oxide_as_printed: 0,5 wt% Fe2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+          density_g_cm3: '2.344'
+      uncertainty:
+        note: No uncertainty is printed.
+    context: []
+  V:
+    observations:
+    - observation_id: lee_bruckner_1986_table1_v_ratio
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: '% of total V'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 4
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        printed_form: V4+/ΣV
+        method_as_printed: Wet chemical titration and spectrophotometric methods after melting in air at 1000 °C.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% V2O5 added
+          value: '0.0516'
+          value_as_published: 5,16
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% V2O5 added
+          added_oxide_as_printed: 0,5 wt% V2O5
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% V2O5 added
+          value: '0.047'
+          value_as_published: 4,7
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% V2O5 added
+          added_oxide_as_printed: 0,5 wt% V2O5
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% V2O5 added
+          value: '0.044'
+          value_as_published: 4,4
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% V2O5 added
+          added_oxide_as_printed: 0,5 wt% V2O5
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+      uncertainty:
+        note: No uncertainty is printed.
+    - observation_id: lee_bruckner_1986_table1_v_density
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: g/cm3
+      values:
+        quantity: density
+        formula: unknown
+        method_class: measured_direct
+        method_as_printed: Archimedes method at room temperature.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% V2O5 added
+          value: '2.05'
+          value_as_published: 2,05
+          unit: g/cm3
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% V2O5 added
+          added_oxide_as_printed: 0,5 wt% V2O5
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+          density_g_cm3: '2.05'
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% V2O5 added
+          value: '2.181'
+          value_as_published: 2,181
+          unit: g/cm3
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% V2O5 added
+          added_oxide_as_printed: 0,5 wt% V2O5
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+          density_g_cm3: '2.181'
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% V2O5 added
+          value: '2.334'
+          value_as_published: 2,334
+          unit: g/cm3
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% V2O5 added
+          added_oxide_as_printed: 0,5 wt% V2O5
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+          density_g_cm3: '2.334'
+      uncertainty:
+        note: No uncertainty is printed.
+    context: []
+  Cr:
+    observations:
+    - observation_id: lee_bruckner_1986_table1_cr_ratio
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: '% of total Cr'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 6
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        printed_form: Cr6+/ΣCr
+        method_as_printed: Wet chemical titration and spectrophotometric methods after melting in air at 1000 °C.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '0.1345'
+          value_as_published: 13,45
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '0.222'
+          value_as_published: 22,20
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '0.3589'
+          value_as_published: 35,89
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+        - sample: 50 mol% B2O3, 50 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '0.9182'
+          value_as_published: 91,82
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 50 mol% B2O3, 50 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '50'
+                  - - Na2O
+                    - '50'
+              locator: *id002
+      uncertainty:
+        note: No uncertainty is printed.
+    - observation_id: lee_bruckner_1986_table1_cr_density
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: g/cm3
+      values:
+        quantity: density
+        formula: unknown
+        method_class: measured_direct
+        method_as_printed: Archimedes method at room temperature.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '2.046'
+          value_as_published: 2,046
+          unit: g/cm3
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+          density_g_cm3: '2.046'
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '2.184'
+          value_as_published: 2,184
+          unit: g/cm3
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+          density_g_cm3: '2.184'
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '2.335'
+          value_as_published: 2,335
+          unit: g/cm3
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+          density_g_cm3: '2.335'
+      uncertainty:
+        note: No uncertainty is printed.
+    - observation_id: lee_bruckner_1986_table1_cr3_ratio
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: '% of total Cr'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        printed_form: Cr3+/ΣCr
+        method_as_printed: Wet chemical titration and spectrophotometric methods after melting in air at 1000 °C.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '0.8655'
+          value_as_published: 86,55
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+        - sample: 80 mol% B2O3, 20 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '0.778'
+          value_as_published: 77,80
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '80'
+                  - - Na2O
+                    - '20'
+              locator: *id002
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '0.6411'
+          value_as_published: 64,11
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+        - sample: 50 mol% B2O3, 50 mol% Na2O; 0,05 wt% Cr2O3 added
+          value: '0.0812'
+          value_as_published: 8,12
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 50 mol% B2O3, 50 mol% Na2O; 0,05 wt% Cr2O3 added
+          added_oxide_as_printed: 0,05 wt% Cr2O3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '50'
+                  - - Na2O
+                    - '50'
+              locator: *id002
+      uncertainty:
+        note: No uncertainty is printed.
+    context:
+    - observation_id: lee_bruckner_1986_table2_context_no_quantity_token
+      type: context
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 7
+        pdf_page_index: 6
+        published_page: 239
+        table: '2'
+      phase: glass
+      units: as printed in the table
+      values:
+        printed_table_title: Table 2. Optical and ESR character of borate glasses containing 3d TM ions with TiO₂
+        candidate_tokens:
+        - valence_ratio
+        - ion_intensity
+        - density
+        disposition: Qualitative optical/ESR descriptors and g-values; no quantity token represents these measurements.
+        header_and_data_rows:
+        - - glass system
+          - optical/ESR character
+          - intensity change and wavelength shift
+        - - Ti—Fe
+          - 1050 nm ( $Fe^{2+}$ )absorption edge $g = 4,3$  ( $Fe^{3+}$  fine structure line) $g = 1,95$  ( $Ti^{3+}$  hfs)
+          - increasedshift to longer wavelengthsdecreasedvanished completely
+        - - Ti—V
+          - 570 nm ( $V^{4+}$ )1000 nm ( $V^{4+}$ )absorption edge $g = 2,46$  ( $V^{4+}$ ,  $m_{I} = 7/2$ ) $g
+            = 1,95$  ( $Ti^{3+}$  hfs)
+          - increasedincreasedshift to longer wavelengthsincreasedvanished completely
+        - - Ti—Mn
+          - 490 nm ( $Mn^{3+}$ )absorption edge $g = 2,0$  ( $Mn^{2+}$ ,  $m_{I} = 5/2$ ) $g = 1,95$  ( $Ti^{3+}$  hfs)
+          - decreasedshift to longer wavelengthsincreaseddecreased
+        - - Ti—Cr
+          - 360 nm ( $Cr^{6+}$ )630 nm ( $Cr^{3+}$ ) $g = 4,3$  ( $Cr^{3+}$  hfs) $g = 1,98$  ( $Cr^{3+}$  fine
+            structure line) $g = 1,95$  ( $Ti^{3+}$  hfs)
+          - decreasedincreasedincreasedincreaseddecreased
+        - - Ti—Cu
+          - 800 nm ( $Cu^{2+}$ ) $g = 2,51$  ( $Cu^{2+}$ ,  $m_{I} = -3/2$ )
+          - decreaseddecreased
+        - - Ti—Co
+          - similar absorption spectrano ESR signal
+          - no chemical exchange between redox pairs
+    - observation_id: lee_bruckner_1986_table3_context_no_quantity_token
+      type: context
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 7
+        pdf_page_index: 6
+        published_page: 239
+        table: '3'
+      phase: glass
+      units: as printed in the table
+      values:
+        printed_table_title: 'Table 3. Comparison of the amount of mutual interaction of the double redox pair glasses
+          analyzed by optical spectra with respect to chemical analysis of single redox pair glasses as a function
+          of the alkali oxide content (+: oxidation, -: reduction)'
+        candidate_tokens:
+        - valence_ratio
+        - ion_intensity
+        - density
+        disposition: Table 3 reports extinction per thickness and changes in individual ion concentrations; no quantity
+          token represents either printed quantity.
+        header_and_data_rows:
+        - - base composition in mol %
+          - Mn—Fe
+          - Mn—Fe
+          - Mn—V
+          - Mn—V
+          - Cr—Mn
+          - Cr—Mn
+          - Cr—Fe
+          - Cr—Fe
+          - Cr—V
+          - Cr—V
+        - - base composition in mol %
+          - E/d at 490 nm (Mn3+) in cm-1
+          - Δ Mn3+ in mol/l
+          - E/d at 490 nm (Mn3+) in cm-1
+          - Δ Mn3+ in mol/l
+          - E/d at 350 nm (Cr6+) in cm-1
+          - Δ Cr6+ in mol/l
+          - E/d at 650 nm (Cr3+) in cm-1
+          - Δ Cr3+ in mol/l
+          - E/d at 650 nm (Cr3+) in cm-1
+          - Δ Cr3+ in mol/l
+        - - 90 B2O3, 10 Na2O
+          - 0,62
+          - -0,0019
+          - 0,48
+          - -0,0029
+          - 2,6
+          - +0,0016
+          - 0,63
+          - +0,0021
+          - 0,61
+          - +0,0017
+        - - 80 B2O3, 20 Na2O
+          - 1,85
+          - -0,0071
+          - 1,55
+          - -0,0093
+          - 5,5
+          - +0,0024
+          - 0,58
+          - +0,0020
+          - 0,54
+          - +0,0010
+        - - 70 B2O3, 30 Na2O
+          - 6,2
+          - -0,0039
+          - 4,88
+          - -0,0099
+          - 19,9
+          - +0,0010
+          - 0,49
+          - +0,0016
+          - 0,48
+          - +0,0014
+        - - ''
+          - Cu—Mn
+          - Cu—Mn
+          - Cu—Fe
+          - Cu—Fe
+          - Cu—V
+          - Cu—V
+          - Cu—Cr
+          - Cu—Cr
+          - ''
+          - ''
+        - - ''
+          - E/d at 800 nm (Cu2+) in cm-1
+          - Δ Cu2+ in mol/l
+          - E/d at 800 nm (Cu2+) in cm-1
+          - Δ Cu2+ in mol/l
+          - E/d at 800 nm (Cu2+) in cm-1
+          - Δ Cu2+ in mol/l
+          - E/d at 800 nm (Cu2+) in cm-1
+          - Δ Cu2+ in mol/l
+          - ''
+          - ''
+        - - 90 B2O3, 10 Na2O
+          - 2,41
+          - +0,009
+          - 3,09
+          - +0,04
+          - 3,45
+          - +0,055
+          - 2,28
+          - +0,004
+          - ''
+          - ''
+        - - 80 B2O3, 20 Na2O
+          - 3,64
+          - +0,016
+          - 3,22
+          - ≈0
+          - 3,26
+          - ≈0
+          - 3,53
+          - +0,011
+          - ''
+          - ''
+        - - 70 B2O3, 30 Na2O
+          - 5,56
+          - +0,014
+          - 4,70
+          - -0,06
+          - 4,70
+          - -0,006
+          - 5,90
+          - +0,022
+          - ''
+          - ''
+        - - ''
+          - Cu—V
+          - Cu—V
+          - Cu—Fe
+          - Cu—Fe
+          - Cu—Mn
+          - Cu—Mn
+          - ''
+          - ''
+          - ''
+          - ''
+        - - ''
+          - E/d at 800 nm (Cu2+) in cm-1
+          - Δ Cu2+ in mol/l
+          - E/d at 800 nm (Cu2+) in cm-1
+          - Δ Cu2+ in mol/l
+          - E/d at 800 nm (Cu2+) in cm-1
+          - Δ Cu2+ in mol/l
+          - ''
+          - ''
+          - ''
+          - ''
+        - - 90 B2O3, 10 Cs2O
+          - 3,24
+          - -0,014
+          - '-'
+          - '-'
+          - '-'
+          - '-'
+          - ''
+          - ''
+          - ''
+          - ''
+        - - 80 B2O3, 20 Cs2O
+          - 2,99
+          - -0,016
+          - 3,54
+          - -0,005
+          - 4,56
+          - +0,043
+          - ''
+          - ''
+          - ''
+          - ''
+        - - 70 B2O3, 30 Cs2O
+          - 6,37
+          - -0,007
+          - '-'
+          - '-'
+          - '-'
+          - '-'
+          - ''
+          - ''
+          - ''
+          - ''
+    - observation_id: lee_bruckner_1986_table1_untyped_concentrations_and_extinctions
+      type: context
+      locator: *id002
+      phase: glass
+      units: units are in the printed column headers
+      values:
+        printed_columns_without_store_quantity:
+        - species: Mn
+          column_headers_as_printed:
+          - Mn
+          - Mn
+          - Mn
+          rows:
+          - composition_as_printed: '90  $B_2O_3$ , 10  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0065
+            - 0,87
+            - 133,8
+          - composition_as_printed: '80  $B_2O_3$ , 20  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0204
+            - 2,84
+            - 139,2
+          - composition_as_printed: '70  $B_2O_3$ , 30  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0324
+            - 7,04
+            - 217,3
+          - composition_as_printed: '90  $B_2O_3$ , 10  $Cs_2O$ '
+            dopant_as_printed: '-'
+            values_as_printed:
+            - '-'
+            - '-'
+            - '-'
+          - composition_as_printed: '80  $B_2O_3$ , 20  $Cs_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,052
+            - 10,1
+            - 194,6
+          - composition_as_printed: '70  $B_2O_3$ , 30  $Cs_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,094
+            - '-'
+            - '-'
+        - species: Cu
+          column_headers_as_printed:
+          - Cu
+          - Cu
+          - Cu
+          rows:
+          - composition_as_printed: '90  $B_2O_3$ , 10  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,098
+            - 2,2
+            - 22,45
+          - composition_as_printed: '80  $B_2O_3$ , 20  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,111
+            - 3,2
+            - 28,83
+          - composition_as_printed: '70  $B_2O_3$ , 30  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,118
+            - 4,97
+            - 42,12
+          - composition_as_printed: '90  $B_2O_3$ , 10  $Cs_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,114
+            - 3,68
+            - 32,28
+          - composition_as_printed: '80  $B_2O_3$ , 20  $Cs_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,128
+            - 3,41
+            - 26,64
+          - composition_as_printed: '70  $B_2O_3$ , 30  $Cs_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,137
+            - 6,70
+            - 48,90
+        - species: Fe
+          column_headers_as_printed:
+          - Fe
+          - Fe
+          - Fe
+          rows:
+          - composition_as_printed: '90  $B_2O_3$ , 10  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0062
+            - '-'
+            - '-'
+          - composition_as_printed: '80  $B_2O_3$ , 20  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0058
+            - '-'
+            - '-'
+          - composition_as_printed: '70  $B_2O_3$ , 30  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0056
+            - '-'
+            - '-'
+        - species: V
+          column_headers_as_printed:
+          - V
+          - V
+          - V
+          rows:
+          - composition_as_printed: '90  $B_2O_3$ , 10  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0058
+            - '-'
+            - '-'
+          - composition_as_printed: '80  $B_2O_3$ , 20  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0056
+            - '-'
+            - '-'
+          - composition_as_printed: '70  $B_2O_3$ , 30  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0056
+            - '-'
+            - '-'
+        - species: Cr
+          column_headers_as_printed:
+          - Cr
+          - Cr
+          - Cr
+          - Cr
+          - Cr
+          - Cr
+          rows:
+          - composition_as_printed: '90  $B_2O_3$ , 10  $Na_2O$ '
+            dopant_as_printed: 0,05
+            values_as_printed:
+            - 0,0018
+            - 0,0116
+            - 1,38
+            - 0,53
+            - '767'
+            - '46'
+          - composition_as_printed: '80  $B_2O_3$ , 20  $Na_2O$ '
+            dopant_as_printed: 0,05
+            values_as_printed:
+            - 0,0032
+            - 0,0112
+            - 3,14
+            - 0,49
+            - '981'
+            - '44'
+          - composition_as_printed: '70  $B_2O_3$ , 30  $Na_2O$ '
+            dopant_as_printed: 0,05
+            values_as_printed:
+            - 0,0055
+            - 0,0098
+            - 16,84
+            - 0,42
+            - '3062'
+            - '43'
+          - composition_as_printed: '50  $B_2O_3$ , 50  $Na_2O$ '
+            dopant_as_printed: 0,05
+            values_as_printed:
+            - '-'
+            - '-'
+            - '-'
+            - '-'
+            - '-'
+            - '-'
+        - species: Ti
+          column_headers_as_printed:
+          - Ti
+          - Ti
+          - Ti
+          rows:
+          - composition_as_printed: '90  $B_2O_3$ , 10  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0065
+            - 0,51
+            - 78,5
+          - composition_as_printed: '80  $B_2O_3$ , 20  $Na_2O$ '
+            dopant_as_printed: '-'
+            values_as_printed:
+            - '-'
+            - '-'
+            - '-'
+          - composition_as_printed: '70  $B_2O_3$ , 30  $Na_2O$ '
+            dopant_as_printed: 0,5
+            values_as_printed:
+            - 0,0041
+            - 0,4
+            - 97,6
+        candidate_tokens:
+        - valence_ratio
+        - ion_intensity_ratio
+        - ion_intensity
+        - density
+        disposition: Single-ion molar concentrations, E/d extinction values, and extinction coefficients have no
+          matching quantity token. These columns exclude the redox ratios and densities typed as observations.
+    - observation_id: lee_bruckner_1986_figure_1_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 3
+        pdf_page_index: 2
+        published_page: '235'
+        figure: '1'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Ti
+        - V
+        - Cr
+        - Mn
+        - Fe
+        - Co
+        - Cu
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figure 1. Representative X-band ESR spectra of 3d TM ions in sodium borate glasses. All peak-to-peak
+          intensities (a to c) measured in the spectra were roughly proportional to the concentration of individual
+          3d TM ions in the glass.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: Ti ESR
+          marker_count: 0
+        - name: V ESR
+          marker_count: 0
+        - name: Cr ESR
+          marker_count: 0
+        - name: Mn ESR
+          marker_count: 0
+        - name: Fe ESR
+          marker_count: 0
+        - name: Co ESR
+          marker_count: 0
+        - name: Cu ESR
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_2_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 6
+        pdf_page_index: 5
+        published_page: '238'
+        figure: '2'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Ti
+        - Fe
+        - V
+        - Cr
+        - Mn
+        - Cu
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figures 2a to f. Optical spectra of sodium borate glasses containing titanium and other 3d TM ions
+          with respect to the reference glasses with single TM ion redox pairs.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: Ti–Fe
+          marker_count: 0
+        - name: Ti–V
+          marker_count: 0
+        - name: Ti–Cr
+          marker_count: 0
+        - name: Ti–Mn
+          marker_count: 0
+        - name: Ti–Cu
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_3_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 8
+        pdf_page_index: 7
+        published_page: '240'
+        figure: '3'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - V
+        - Cr
+        - Mn
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figures 3a to f. Optical spectra of sodium borate glasses containing two TM ion redox pairs (V–Cr,
+          V–Mn) with respect to their reference glasses with single TM ion redox pairs.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: V–Cr
+          marker_count: 0
+        - name: V–Mn
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_4_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 9
+        pdf_page_index: 8
+        published_page: '241'
+        figure: '4'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - V
+        - Cu
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figures 4a to f. Optical spectra of V–Cu doped sodium and cesium borate glasses with respect to
+          their reference glasses containing single TM ion redox pairs.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: V–Cu reference and mixed glasses
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_5_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 10
+        pdf_page_index: 9
+        published_page: '242'
+        figure: '5'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Cu
+        - Fe
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figures 5a to c. Optical spectra of Cu–Fe doped sodium borate glasses with respect to their reference
+          glasses containing single TM ion redox pairs.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: Cu–Fe reference and mixed glasses
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_6_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 10
+        pdf_page_index: 9
+        published_page: '242'
+        figure: '6'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Cu
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figures 6a and b. Relative ESR intensities of the hfs peak mI = −3/2 of Cu2+ ions in single and
+          in mixed 3d TM ion double redox pair glasses.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: single-pair Cu2+
+          marker_count: 4
+        - name: mixed-pair Cu2+
+          marker_count: 14
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_7_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 11
+        pdf_page_index: 10
+        published_page: '243'
+        figure: '7'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Fe
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figures 7a and b. Relative ESR intensities of the Fe3+ absorption peak at g = 4.3 in single and
+          mixed 3d TM ion double redox pair glasses.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: single-pair Fe3+
+          marker_count: 4
+        - name: mixed-pair Fe3+
+          marker_count: 10
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_8_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 11
+        pdf_page_index: 10
+        published_page: '243'
+        figure: '8'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - V
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figure 8. Relative ESR intensities of the hfs peak mI = 7/2 of V4+ ions in single and mixed 3d
+          TM ion double redox pair glasses.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: single-pair V4+
+          marker_count: 2
+        - name: mixed-pair V4+
+          marker_count: 4
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_9_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 12
+        pdf_page_index: 11
+        published_page: '244'
+        figure: '9'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Fe
+        - V
+        - Cu
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figures 9a to f. Optical spectra of alkali (sodium and cesium) borate glasses containing two TM
+          ion redox pairs (Fe–V, Cu–Fe, Cu–V) with respect to their reference glasses with single TM ion redox pairs.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: Fe–V
+          marker_count: 0
+        - name: Cu–Fe
+          marker_count: 0
+        - name: Cu–V
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_10_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 13
+        pdf_page_index: 12
+        published_page: '245'
+        figure: '10'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Mn
+        - Fe
+        - Cu
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figures 10a to f. Optical spectra of Mn–Fe and Mn–Cu doped sodium borate glasses with respect to
+          their reference glasses containing single TM ion redox pairs.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: Mn–Fe
+          marker_count: 0
+        - name: Mn–Cu
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_11_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 14
+        pdf_page_index: 13
+        published_page: '246'
+        figure: '11'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Mn
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figure 11. Relative ESR intensities of the hfs peak mI = 3/2 of Mn2+ ions in single and mixed 3d
+          TM ion double redox pair glasses.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: single-pair Mn2+
+          marker_count: 1
+        - name: mixed-pair Mn2+
+          marker_count: 4
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_12_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 15
+        pdf_page_index: 14
+        published_page: '247'
+        figure: '12'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Mn
+        - Cr
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figures 12a to d. Optical spectra of Mn–Cr doped sodium borate and silicate glasses (for comparison)
+          with respect to their reference glasses containing single TM ion redox pairs.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: Mn–Cr borate
+          marker_count: 0
+        - name: Mn–Cr silicate comparison
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_13_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 16
+        pdf_page_index: 15
+        published_page: '248'
+        figure: '13'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Cu
+        - Fe
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figures 13c to e. Optical spectra of Cu–Fe doped borate and silicate glasses with respect to their
+          reference glasses containing single TM ion redox pairs.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: Cu–Fe borate
+          marker_count: 0
+        - name: Cu–Fe silicate comparison
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_14_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 17
+        pdf_page_index: 16
+        published_page: '249'
+        figure: '14'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Co
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figure 14. Optical absorption spectra of sodium borate glasses (40 to 70 mol % Na2O) containing
+          CoO and Co2O3.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: CoO
+          marker_count: 0
+        - name: Co2O3
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+    - observation_id: lee_bruckner_1986_figure_15_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/lee-bruckner-1986-borate-redox-series/lee-bruckner-1986-borate-redox-series.pdf
+        page: 18
+        pdf_page_index: 17
+        published_page: '250'
+        figure: '15'
+      phase: glass
+      units: axes as printed
+      values:
+        quantity_as_printed: optical absorption or ESR relative-intensity spectrum
+        species:
+        - Ti
+        - Cu
+        - Fe
+        - V
+        - Cr
+        - Mn
+        - Co
+        temperature_as_printed: melted at 1000 °C; spectra measured after cooling
+        caption: Figure 15. Relative mutual oxidation potentials of the 3d transition metal ions in borate glasses
+          as a function of sodium oxide concentration.
+        panel: whole figure or lettered panels as captioned
+        axes_as_printed:
+          x: wavelength (nm), wavenumber, or alkali oxide mol% as labeled per panel
+          y: optical absorption or relative ESR intensity as labeled per panel
+        series:
+        - name: Ti
+          marker_count: 0
+        - name: Cu
+          marker_count: 0
+        - name: Fe
+          marker_count: 0
+        - name: V
+          marker_count: 0
+        - name: Cr
+          marker_count: 0
+        - name: Mn
+          marker_count: 0
+        - name: Co
+          marker_count: 0
+        attribution_as_printed: Present work; reference glasses and comparison series as stated in caption.
+        digitisation: deferred to a figure pass
+  Ti:
+    observations:
+    - observation_id: lee_bruckner_1986_table1_ti_ratio
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: '% of total Ti'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        printed_form: Ti3+/ΣTi
+        method_as_printed: Wet chemical titration and spectrophotometric methods after melting in air at 1000 °C.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% TiO2 added
+          value: '0.051'
+          value_as_published: 5,1
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% TiO2 added
+          added_oxide_as_printed: 0,5 wt% TiO2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% TiO2 added
+          value: '0.028'
+          value_as_published: 2,8
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% TiO2 added
+          added_oxide_as_printed: 0,5 wt% TiO2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+      uncertainty:
+        note: No uncertainty is printed.
+    - observation_id: lee_bruckner_1986_table1_ti_density
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: g/cm3
+      values:
+        quantity: density
+        formula: unknown
+        method_class: measured_direct
+        method_as_printed: Archimedes method at room temperature.
+        points:
+        - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% TiO2 added
+          value: '2.043'
+          value_as_published: 2,043
+          unit: g/cm3
+          composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% TiO2 added
+          added_oxide_as_printed: 0,5 wt% TiO2
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '90'
+                  - - Na2O
+                    - '10'
+              locator: *id002
+          density_g_cm3: '2.043'
+        - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% TiO2 added
+          value: '2.337'
+          value_as_published: 2,337
+          unit: g/cm3
+          composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% TiO2 added
+          added_oxide_as_printed: 0,5 wt% TiO2
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: Density was measured at room temperature; the numeric temperature is not printed.
+              locator: *id002
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '70'
+                  - - Na2O
+                    - '30'
+              locator: *id002
+          density_g_cm3: '2.337'
+      uncertainty:
+        note: No uncertainty is printed.
+    context: []
+  Co:
+    observations:
+    - observation_id: lee_bruckner_1986_table1_co_ratio
+      experiment: single-oxide-redox-series
+      type: concentration_series
+      locator: *id002
+      phase: glass
+      units: '% of total Co'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        printed_form: Co3+/ΣCo
+        method_as_printed: Wet chemical titration and spectrophotometric methods after melting in air at 1000 °C.
+        points:
+        - sample: 50 mol% B2O3, 50 mol% Na2O; 0,1 wt% Co3O4 added
+          value: '0.013'
+          value_as_published: 1,3
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 50 mol% B2O3, 50 mol% Na2O; 0,1 wt% Co3O4 added
+          added_oxide_as_printed: 0,1 wt% Co3O4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '50'
+                  - - Na2O
+                    - '50'
+              locator: *id002
+        - sample: 40 mol% B2O3, 60 mol% Na2O; 0,1 wt% Co3O4 added
+          value: '0.0205'
+          value_as_published: 2,05
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 40 mol% B2O3, 60 mol% Na2O; 0,1 wt% Co3O4 added
+          added_oxide_as_printed: 0,1 wt% Co3O4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '40'
+                  - - Na2O
+                    - '60'
+              locator: *id002
+        - sample: 30 mol% B2O3, 70 mol% Na2O; 0,1 wt% Co3O4 added
+          value: '0.0573'
+          value_as_published: 5,73
+          unit: '%'
+          T_C: '1000'
+          composition_as_printed: 30 mol% B2O3, 70 mol% Na2O; 0,1 wt% Co3O4 added
+          added_oxide_as_printed: 0,1 wt% Co3O4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1000'
+              locator: *id001
+            atmosphere_as_printed:
+              state:
+                tag: value
+                value: air
+              locator: *id001
+            quench_state:
+              state:
+                tag: value
+                value: not_stated
+                note: The melt was poured into a graphite mould and annealed at Tg; redox preservation on cooling
+                  is not stated.
+              locator: *id001
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed mol% base borate glass; dopant addition retained separately as printed wt%
+                  amount_basis: mol_inventory
+                  components:
+                  - - B2O3
+                    - '30'
+                  - - Na2O
+                    - '70'
+              locator: *id002
+      uncertainty:
+        note: No uncertainty is printed.
+    context: []
+deepening:
+  dispatch_id: fam28-1020
+  date: '2026-10-20'
+  note: This paper studies borate glasses; do not classify these measurements as silicate melts. Table 1 redox fractions
+    and glass densities are typed. Table 2 qualitative optical/ESR descriptors and Table 3 extinction/concentration
+    changes have no compatible store quantity token and remain context. Figures 1–15 are deferred, with no plotted
+    values digitised.
+  looked_for_but_not_found:
+  - numerical redox ratios for mixed-pair glasses outside Table 3
+  - numerical uncertainty estimates
+  vocabulary_gap:
+  - Table 1 single-ion molar concentrations in mol/l and extinction coefficients E/d or epsilon have no matching
+    quantity token.
+  - Table 3 changes in individual-ion concentration and E/d extinction values have no matching quantity token.
