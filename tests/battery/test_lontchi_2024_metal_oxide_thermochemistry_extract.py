@@ -8,6 +8,7 @@ import pytest
 import yaml
 
 import simulator.battery.migrate as migrate_module
+from tests.battery.test_migrate import assert_extract_source_mutation_fails
 
 ROOT = Path(__file__).resolve().parents[2]
 SID = 'lontchi-2024-metal-oxide-thermochemistry-thesis'
@@ -56,10 +57,13 @@ def test_context_only_extract_migrates_without_scored_rows_or_issues():
     assert not [issue for issue in migrator.result.registry_issues if SID in issue.path]
 
 
-def test_numeric_context_pin_fails_if_source_value_is_mutated():
-    doc = _doc()
-    row = doc['species']['V2O5']['context'][0]['values']['printed_rows'][9]
-    assert row[3] == 'ΔHf(0 K)=−476.1'
-    changed = row[3].replace('476.1', '476.0')
-    with pytest.raises(AssertionError):
-        assert changed == 'ΔHf(0 K)=−476.1'
+def test_numeric_context_pin_fails_if_source_value_is_mutated(tmp_path, monkeypatch):
+    _doc()
+    assert_extract_source_mutation_fails(
+        EXTRACT,
+        'ΔHf(0 K)=−476.1',
+        'ΔHf(0 K)=−476.0',
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        assertion=test_computed_metal_oxide_values_and_literature_comparators_are_context,
+    )

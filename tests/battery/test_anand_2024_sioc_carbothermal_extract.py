@@ -8,6 +8,7 @@ import pytest
 import yaml
 
 import simulator.battery.migrate as migrate_module
+from tests.battery.test_migrate import assert_extract_source_mutation_fails
 
 ROOT = Path(__file__).resolve().parents[2]
 SID = 'anand-2024-sioc-carbothermal-stability'
@@ -57,10 +58,13 @@ def test_context_only_extract_migrates_without_scored_rows_or_issues():
     assert not [issue for issue in migrator.result.registry_issues if SID in issue.path]
 
 
-def test_numeric_context_pin_fails_if_source_cell_is_mutated():
-    doc = _doc()
-    row = doc['species']['SiOCH']['context'][1]['values']['printed_rows'][1]
-    assert row['delta_Gf_as_printed'] == '−224.61 kJ·K−1·mol−1'
-    changed = row['delta_Gf_as_printed'].replace('224.61', '224.60')
-    with pytest.raises(AssertionError):
-        assert changed == '−224.61 kJ·K−1·mol−1'
+def test_numeric_context_pin_fails_if_source_cell_is_mutated(tmp_path, monkeypatch):
+    _doc()
+    assert_extract_source_mutation_fails(
+        EXTRACT,
+        'delta_Gf_as_printed: \'−224.61 kJ·K−1·mol−1\'',
+        'delta_Gf_as_printed: \'−224.60 kJ·K−1·mol−1\'',
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        assertion=test_xps_composition_and_computed_thermodynamics_are_preserved_in_context,
+    )
