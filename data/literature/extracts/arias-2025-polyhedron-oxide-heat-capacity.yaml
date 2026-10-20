@@ -1913,10 +1913,10 @@ species:
           at different temperatures.
         series:
         - name: FactSage 8.2 and Berman and Brown [23]
-          marker_count: 0
+          marker_count: not countable (overplotted)
           evidence_class: quoted_attributed
         - name: back-calculated present-work polyhedron-model Cp
-          marker_count: 0
+          marker_count: not countable (overplotted)
           evidence_class: model_derived
         digitisation: deferred to a figure pass
     - observation_id: arias_2025_figure_3_deferred
@@ -1929,7 +1929,8 @@ species:
       panel: whole_figure
       units: dimensionless RMSEN; T in K
       values:
-        quantity: cp
+        quantity: unavailable
+        schema_gap: The store has no quantity token for normalized root-mean-square error (RMSEN).
         method_class: model_derived
         species: compounds in Tables A.1 and B.1
         phase: compound phases as listed in Tables A.1 and B.1
@@ -1942,6 +1943,102 @@ species:
           error throughout the temperature range for each compound.
         series:
         - name: RMSEN by compound
-          marker_count: 85
+          marker_count: not countable (overplotted)
           evidence_class: model_derived
+        digitisation: deferred to a figure pass
+    - observation_id: arias_2025_figure_4_deferred
+      type: figure_record
+      locator: {page: 7, pdf_page_index: 6, published_page: 7, figure: '4'}
+      panel: whole_figure
+      attribution: Comparison between Hinsberg et al. [27] and this work.
+      units: dimensionless SE difference; T in K
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for the temperature-dependent standard-error difference plotted here.
+        species: [Ti-oct, Si-tet, Al-tet, Al-oct, Fe3-oct, Fe-tet, Fe-oct, Mn-tet, Mn-oct, Ca-oct, Ca-multi, Li-tet, Li-oct, Li-multi, Na-multi, K-multi, Zn-multi, Mg-tet, Mg-oct]
+        phase: not applicable; constituent polyhedra
+        temperature_as_printed: 300–1100 K
+        axes_as_printed: {x: 'Temperature (K)', y: 'SE_Hinsberg et al. − SE_this work'}
+        caption: 'Comparison of temperature-dependent SE values for evaluated polyhedra between Hinsberg et al. [27] and the present work.'
+        series:
+        - name: 19 evaluated polyhedron series
+          marker_count: not countable (overplotted)
+          evidence_class: model_derived
+        digitisation: deferred to a figure pass
+    - observation_id: arias_2025_figure_5_deferred
+      type: figure_record
+      locator: {page: 8, pdf_page_index: 7, published_page: 8, figure: '5'}
+      panel: a–e
+      attribution: Experimental points are attributed in the caption to [60,61], and [59] for optimization results.
+      units: 'Cp in J mol−1 K−1; T in K'
+      values:
+        quantity: cp
+        method_class: model_derived
+        species: [K2Si4O9, KAlSi2O6, Li2SiO3, Na4SiO4, Li2Ti3O7]
+        phase: crystalline compound phases as named in the panels
+        temperature_as_printed: approximately 300–1100 K; panel ranges differ
+        axes_as_printed: {x: 'Temperature (K)', y: 'Cp (J mol−1 K−1)'}
+        caption: 'Heat capacity versus temperature, back-calculated using PM, along with the data from NKR, FactSage (FS), experiments [60,61], and optimization [59]: (a) K2Si4O9, (b) KAlSi2O6, (c) Li2SiO3, (d) Na4SiO4, and (e) Li2Ti3O7. PM and NKR stand for polyhedron model and Neumann-Kopp Rule, respectively.'
+        series:
+        - {name: present-work polyhedron model, marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: model_derived}
+        - {name: FactSage, marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: quoted_attributed}
+        - {name: Neumann-Kopp Rule, marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: model_derived}
+        - {name: experimental measurements, marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: quoted_attributed}
+        - {name: 'optimization [59]', marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: quoted_attributed}
+        digitisation: deferred to a figure pass
+    - observation_id: arias_2025_figure_6_deferred
+      type: figure_record
+      locator: {page: 9, pdf_page_index: 8, published_page: 9, figure: '6'}
+      panel: a–d
+      attribution: 'Experimental values are attributed in the caption to [67,68,72]; other cited model series retain their printed references.'
+      units: 'Cp in J mol−1 K−1; T in K'
+      values:
+        quantity: cp
+        method_class: model_derived
+        species: [Fe3Al2Si3O12, KFeSi2O6, Li4SiO4, NaAlSi2O6]
+        phase: crystalline compound phases as named in the panels
+        temperature_as_printed: approximately 300–1100 K; panel ranges differ
+        axes_as_printed: {x: 'Temperature (K)', y: 'Cp (J mol−1 K−1)'}
+        caption: 'Heat capacity versus temperature predicted by PM (this work), NKR, DFT [76], PM from Hinsberg et al. [27] thermodynamic optimization [77], and experimental values [67,68,72] for: (a) Fe3Al2Si3O12, (b) KFeSi2O6, (c) Li4SiO4 and (d) NaAlSi2O6.'
+        series:
+        - {name: present-work polyhedron model, marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: model_derived}
+        - {name: Neumann-Kopp Rule, marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: model_derived}
+        - {name: 'DFT [76]', marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: quoted_attributed}
+        - {name: 'Hinsberg et al. [27]', marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: quoted_attributed}
+        - {name: 'thermodynamic optimization [77]', marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: quoted_attributed}
+        - {name: 'experimental measurements [67,68,72]', marker_count: 'not countable (overplotted; count varies by panel)', evidence_class: quoted_attributed}
+        digitisation: deferred to a figure pass
+    - observation_id: arias_2025_figure_7_deferred
+      type: figure_record
+      locator: {page: 10, pdf_page_index: 9, published_page: 10, figure: '7'}
+      panel: whole_figure
+      attribution: Present-work polyhedron-model estimates.
+      units: 'Cp in J mol−1 K−1; T in K'
+      values:
+        quantity: cp
+        method_class: model_derived
+        species: [Pb2Na2Si4O11, Pb3Na2Si6O16, Pb4Na2Si8O21, Pb2Na2Si3O9, Pb3Na2SiO6, Pb2Na2SiO5]
+        phase: crystalline compounds
+        temperature_as_printed: each estimated to its respective melting temperature
+        axes_as_printed: {x: 'Temperature (K)', y: 'Cp (J mol−1 K−1)'}
+        caption: 'Estimated heat capacity values versus temperature for the Na2O-PbO-SiO2 compounds using the PM developed in this work until their respective melting temperatures.'
+        series:
+        - {name: present-work polyhedron model, marker_count: 'not countable (model curve sampling not specified)', evidence_class: model_derived}
+        digitisation: deferred to a figure pass
+    - observation_id: arias_2025_figure_8_deferred
+      type: figure_record
+      locator: {page: 10, pdf_page_index: 9, published_page: 10, figure: '8'}
+      panel: whole_figure
+      attribution: Present-work polyhedron-model estimates.
+      units: 'Cp in J mol−1 K−1; T in K'
+      values:
+        quantity: cp
+        method_class: model_derived
+        species: [ZnNa2SiO4, ZnNa2Si2O6, ZnNa4Si2O7, Zn2Na4Si3O10]
+        phase: crystalline compounds
+        temperature_as_printed: prediction to 1100 K followed by extrapolation to each compound melting point
+        axes_as_printed: {x: 'Temperature (K)', y: 'Cp (J mol−1 K−1)'}
+        caption: 'Estimated heat capacity values versus temperature for the Na2O-ZnO-SiO2 compounds using the PM developed in this work.'
+        series:
+        - {name: present-work polyhedron model, marker_count: 'not countable (model curve sampling not specified)', evidence_class: model_derived}
         digitisation: deferred to a figure pass
