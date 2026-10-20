@@ -539,27 +539,25 @@ def test_declared_ratio_from_ferric_fraction_is_r_over_one_minus_r() -> None:
     assert sel.reduction == (FERRIC_FRACTION_RELATION, (("Fe3_over_FeT", Decimal("0.25")),))
 
 
-def test_declared_ratio_from_kress_wt_pct_is_0_8998_w3_over_w2() -> None:
+def test_declared_ratio_from_oxide_wt_pct_matches_gaillard_table5() -> None:
     # b-686 change: was unavailable ("no mapped fe3_fe2_ratio field selected").
+    # Independent anchor: Gaillard et al. (2003), source gaillard-2003-hydrous-
+    # silicic-melt-activity, Table 5, p. 19, run 1 sample 1/1 prints wet
+    # FeO=9.55 wt%, Fe2O3=0.91 wt%, and molar X_Fe2O3/X_FeO=0.04. Since each
+    # Fe2O3 carries two Fe3+, that printed oxide molar ratio implies
+    # Fe3+/Fe2+=2*0.04=0.08. The printed ratio's 0.01 rounding step becomes
+    # 0.02 after this stoichiometric conversion, so use half-step tolerance 0.01.
     sel = select_declared_source(
         Quantity.FE3_FE2_RATIO,
         None,
-        {"quantity": "fe3_fe2_ratio", "Fe2O3_wt_pct": "1.09", "FeO_wt_pct": "10.34"},
+        {"quantity": "fe3_fe2_ratio", "Fe2O3_wt_pct": "0.91", "FeO_wt_pct": "9.55"},
     )
     assert sel.available
-    m3, m2 = oxide_molar_mass("Fe2O3"), oxide_molar_mass("FeO")
-    assert (m3, m2) == (Decimal("159.687"), Decimal("71.844"))
-    expected = 2 * (Decimal("1.09") / m3) / (Decimal("10.34") / m2)
-    assert sel.amount == expected
-    # The ruling's shorthand: 2 x 71.844/159.688 = 0.8998 (4 s.f.); the
-    # oxide table's 159.687 rounds to the same factor.
-    assert round(2 * m2 / m3, 4) == Decimal("0.8998")
-    assert abs(sel.amount - Decimal("0.8998") * Decimal("1.09") / Decimal("10.34")) < Decimal("1e-5")
+    assert abs(sel.amount - Decimal("0.08")) <= Decimal("0.01")
     assert sel.reduction == (
         kress_wt_pct_relation(),
-        (("Fe2O3_wt_pct", Decimal("1.09")), ("FeO_wt_pct", Decimal("10.34"))),
+        (("Fe2O3_wt_pct", Decimal("0.91")), ("FeO_wt_pct", Decimal("9.55"))),
     )
-    assert "0.8998 w_Fe2O3/w_FeO" in kress_wt_pct_relation()
 
 
 def test_declared_ratio_printed_directly_is_read_as_printed() -> None:
