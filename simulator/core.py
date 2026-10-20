@@ -1541,6 +1541,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             str(species), self.species_formula_registry
                         )
                     except AccountingError:
+                        if (
+                            isinstance(row, Mapping)
+                            and row.get('molar_mass_g_mol') is None
+                            and MOLAR_MASS.get(str(species)) is None
+                        ):
+                            # Evaporation's accounting path owns this missing-
+                            # mass error; preserve its specific AccountingError.
+                            continue
                         unresolved_species.append(str(species))
             if unresolved_species:
                 from simulator.condensation import DepositionInputRefusal
