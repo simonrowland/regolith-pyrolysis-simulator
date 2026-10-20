@@ -12,15 +12,16 @@ source:
 extraction:
   method: >-
     No MinerU table. The four activities are the numbers printed in the abstract
-    text on PDF page 1, checked against the 600 dpi page. Figs. 1–3 are
-    calculated curves and were not digitized. Mole fractions other than the
-    printed 50 mol% are the arithmetic of the printed MgO/SiO2 ratio.
+    text on PDF page 1, checked against the 600 dpi page. They are model_derived
+    from the ideal associated solutions model cited as Shornikov (2009) [1],
+    and admission_status is rejected. Figs. 1–3 are calculated curves and were
+    not digitized. Mole fractions other than the printed 50 mol% are the
+    arithmetic of the printed MgO/SiO2 ratio, on basis printed_mole_fraction.
   date: '2026-10-20'
   worker: t1372-w5
 review_status: draft
 fidelity_samples:
   - species: SiO2
-    observable: activity_coefficient
     observation_id: shornikov_2017_cms_50cao_sio2_activity
     field: activity
     value: '0.0032'
@@ -29,7 +30,6 @@ fidelity_samples:
       pdf_page_index: 0
       abstract: '1134'
   - species: MgO
-    observable: activity_coefficient
     observation_id: shornikov_2017_cms_50cao_mgo_activity
     field: activity
     value: '0.61'
@@ -38,7 +38,6 @@ fidelity_samples:
       pdf_page_index: 0
       abstract: '1134'
   - species: SiO2
-    observable: activity_coefficient
     observation_id: shornikov_2017_mas_50al2o3_sio2_activity
     field: activity
     value: '0.11'
@@ -47,7 +46,6 @@ fidelity_samples:
       pdf_page_index: 0
       abstract: '1134'
   - species: MgO
-    observable: activity_coefficient
     observation_id: shornikov_2017_mas_50al2o3_mgo_activity
     field: activity
     value: '0.066'
@@ -84,18 +82,33 @@ species:
         values:
           quantity: activity
           activity: '0.0032'
-          method_class: quoted_attributed
+          method_class: model_derived
+          admission_status: rejected
+          derived_from:
+            - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
+          derivation:
+            relation: >-
+              Calculated in this abstract with the ideal associated solutions
+              model. The abstract says that model is the semi-empirical
+              thermodynamic model of oxide evaporation from refractory melts
+              developed in Shornikov (2009), cited as [1]. This abstract does
+              not print the input activities.
+            output_unit: dimensionless
+            inputs:
+              - Shornikov (2009), cited as [1]
           attribution: >-
-            Calculated in this abstract with the ideal associated solutions model.
-            The per-row inputs are not printed, so the value is quoted_attributed
-            rather than model_derived.
+            Calculated in this abstract with the ideal associated solutions
+            model cited as Shornikov (2009) [1].
           system_as_printed: CaO–MgO–SiO2
           composition_as_printed: 50 mol% CaO and MgO/SiO2 = 2/3
           composition_mol:
-            basis: arithmetic from the printed 50 mol% CaO and MgO/SiO2 = 2/3
+            basis: printed_mole_fraction
             CaO: '0.50'
             MgO: '0.20'
             SiO2: '0.30'
+          composition_basis_note: >-
+            Arithmetic from the printed 50 mol% CaO and MgO/SiO2 = 2/3.
+            The 0.20 and 0.30 mole fractions are that arithmetic.
           composition_conversion: >-
             x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = (2/3) * 0.30 = 0.20.
             x(CaO) is the printed 0.50.
@@ -129,18 +142,33 @@ species:
         values:
           quantity: activity
           activity: '0.11'
-          method_class: quoted_attributed
+          method_class: model_derived
+          admission_status: rejected
+          derived_from:
+            - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
+          derivation:
+            relation: >-
+              Calculated in this abstract with the ideal associated solutions
+              model. The abstract says that model is the semi-empirical
+              thermodynamic model of oxide evaporation from refractory melts
+              developed in Shornikov (2009), cited as [1]. This abstract does
+              not print the input activities.
+            output_unit: dimensionless
+            inputs:
+              - Shornikov (2009), cited as [1]
           attribution: >-
-            Calculated in this abstract with the ideal associated solutions model.
-            The per-row inputs are not printed, so the value is quoted_attributed
-            rather than model_derived.
+            Calculated in this abstract with the ideal associated solutions
+            model cited as Shornikov (2009) [1].
           system_as_printed: MgO–Al2O3–SiO2
           composition_as_printed: 50 mol% Al2O3 and MgO/SiO2 = 2/3
           composition_mol:
-            basis: arithmetic from the printed 50 mol% Al2O3 and MgO/SiO2 = 2/3
+            basis: printed_mole_fraction
             Al2O3: '0.50'
             MgO: '0.20'
             SiO2: '0.30'
+          composition_basis_note: >-
+            Arithmetic from the printed 50 mol% Al2O3 and MgO/SiO2 = 2/3.
+            The 0.20 and 0.30 mole fractions are that arithmetic.
           composition_conversion: >-
             x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = (2/3) * 0.30 = 0.20.
             x(Al2O3) is the printed 0.50.
@@ -215,18 +243,33 @@ species:
         values:
           quantity: activity
           activity: '0.61'
-          method_class: quoted_attributed
+          method_class: model_derived
+          admission_status: rejected
+          derived_from:
+            - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
+          derivation:
+            relation: >-
+              Calculated in this abstract with the ideal associated solutions
+              model. The abstract says that model is the semi-empirical
+              thermodynamic model of oxide evaporation from refractory melts
+              developed in Shornikov (2009), cited as [1]. This abstract does
+              not print the input activities.
+            output_unit: dimensionless
+            inputs:
+              - Shornikov (2009), cited as [1]
           attribution: >-
-            Calculated in this abstract with the ideal associated solutions model.
-            The per-row inputs are not printed, so the value is quoted_attributed
-            rather than model_derived.
+            Calculated in this abstract with the ideal associated solutions
+            model cited as Shornikov (2009) [1].
           system_as_printed: CaO–MgO–SiO2
           composition_as_printed: 50 mol% CaO and MgO/SiO2 = 2/3
           composition_mol:
-            basis: arithmetic from the printed 50 mol% CaO and MgO/SiO2 = 2/3
+            basis: printed_mole_fraction
             CaO: '0.50'
             MgO: '0.20'
             SiO2: '0.30'
+          composition_basis_note: >-
+            Arithmetic from the printed 50 mol% CaO and MgO/SiO2 = 2/3.
+            The 0.20 and 0.30 mole fractions are that arithmetic.
           composition_conversion: >-
             x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = (2/3) * 0.30 = 0.20.
             x(CaO) is the printed 0.50.
@@ -260,18 +303,33 @@ species:
         values:
           quantity: activity
           activity: '0.066'
-          method_class: quoted_attributed
+          method_class: model_derived
+          admission_status: rejected
+          derived_from:
+            - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
+          derivation:
+            relation: >-
+              Calculated in this abstract with the ideal associated solutions
+              model. The abstract says that model is the semi-empirical
+              thermodynamic model of oxide evaporation from refractory melts
+              developed in Shornikov (2009), cited as [1]. This abstract does
+              not print the input activities.
+            output_unit: dimensionless
+            inputs:
+              - Shornikov (2009), cited as [1]
           attribution: >-
-            Calculated in this abstract with the ideal associated solutions model.
-            The per-row inputs are not printed, so the value is quoted_attributed
-            rather than model_derived.
+            Calculated in this abstract with the ideal associated solutions
+            model cited as Shornikov (2009) [1].
           system_as_printed: MgO–Al2O3–SiO2
           composition_as_printed: 50 mol% Al2O3 and MgO/SiO2 = 2/3
           composition_mol:
-            basis: arithmetic from the printed 50 mol% Al2O3 and MgO/SiO2 = 2/3
+            basis: printed_mole_fraction
             Al2O3: '0.50'
             MgO: '0.20'
             SiO2: '0.30'
+          composition_basis_note: >-
+            Arithmetic from the printed 50 mol% Al2O3 and MgO/SiO2 = 2/3.
+            The 0.20 and 0.30 mole fractions are that arithmetic.
           composition_conversion: >-
             x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = (2/3) * 0.30 = 0.20.
             x(Al2O3) is the printed 0.50.

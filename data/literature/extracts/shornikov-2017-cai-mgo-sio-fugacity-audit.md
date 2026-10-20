@@ -8,16 +8,16 @@ Source: Shornikov, Yakovlev, and Ivanova (2017), A thermodynamic study of invers
 
 Not a duplicate. The PDF title, LPSC XLVIII, and abstract 1134 are not `shornikov-2018-cai-double-inversion` (LPSC 49, abstract 1845, "Double Inversion", no Ivanova). No extract on this base cites abstract 1134 as its own paper.
 
-## Admitted
+## Stored, admission rejected
 
 Four calculated activities, read from the text on the 600 dpi PDF page 1, not from a curve:
 
 - CaO–MgO–SiO2, 50 mol% CaO, MgO/SiO2 = 2/3, 2300 K: a(SiO2) = 0.0032, a(MgO) = 0.61
 - MgO–Al2O3–SiO2, 50 mol% Al2O3, MgO/SiO2 = 2/3, 2300 K: a(SiO2) = 0.11, a(MgO) = 0.066
 
-`x` beyond the printed 50 mol% is arithmetic: x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = 0.20. The printed constraints are stored beside that result.
+`x` beyond the printed 50 mol% is arithmetic: x(SiO2) = 0.50 / (1 + 2/3) = 0.30 and x(MgO) = 0.20. `composition_mol.basis` is `printed_mole_fraction`. The arithmetic sentence is `composition_basis_note`.
 
-Evidence is `quoted_attributed`. The abstract calculates them with the ideal associated solutions model and does not print per-row inputs, so they are not `model_derived` rows. `type` is `activity_coefficient` because that is the closed observation type used for activity rows; `values.quantity` is `activity` and the number is `values.activity`.
+Evidence is `model_derived`. `derived_from` is the printed citation Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, reference [1], which the abstract names as the ideal associated solutions model. The input activities are not printed here and were not invented. `admission_status` is `rejected`, so these rows are not comparison candidates. `type` is `activity_coefficient` because that is the closed observation type; `values.quantity` is `activity` and the number is `values.activity`. Fidelity samples pin `field: activity` and do not label the observable as `activity_coefficient`.
 
 No numeric fugacity is printed. The title's fugacity is a context row.
 
