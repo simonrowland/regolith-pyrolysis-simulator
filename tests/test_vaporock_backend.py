@@ -2883,6 +2883,17 @@ def test_oxygen_balance_gases_resolve_to_their_parent_oxide(
     assert _parent_oxide_for_vaporock_gas(gas_species) == parent_oxide
 
 
+@pytest.mark.parametrize(
+    ("gas_id", "parent_oxide"),
+    (("FeO_association_gas", "FeO"),),
+)
+def test_vaporock_parent_oxide_output_pin(gas_id, parent_oxide):
+    """Pin the current shared map/catalog parent-oxide output before the guard."""
+    assert repr(vaporock_module._parent_oxide_for_vaporock_gas(gas_id)) == repr(
+        parent_oxide
+    )
+
+
 @pytest.mark.parametrize("gas_species", ("NaOH(g)", "KOH(g)"))
 def test_hydroxide_gases_have_no_dry_cell_parent_oxide(gas_species):
     from simulator.melt_backend.vaporock import _parent_oxide_for_vaporock_gas
