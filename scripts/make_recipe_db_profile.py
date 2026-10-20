@@ -721,14 +721,11 @@ def _format_hours(value: int | float) -> str:
 
 def _thermal_window_preheat_hours(campaign: str, temperature_range: Any) -> int:
     cfg = _setpoint_campaign_config(campaign)
-    try:
-        return resolve_thermal_preheat_interval(
-            temperature_range,
-            cfg.get("preheat_ramp_C_per_hr"),
-            cfg.get("ramp_rate_C_per_hr"),
-        ).hours
-    except ValueError as exc:
-        raise SystemExit(f"{campaign}.temp_range_C preheat interval is invalid: {exc}") from exc
+    return resolve_thermal_preheat_interval(
+        temperature_range,
+        cfg.get("preheat_ramp_C_per_hr"),
+        cfg.get("ramp_rate_C_per_hr"),
+    ).hours
 
 
 def _campaign_window_patch(campaign: str, *, hours: int | float) -> dict[str, Any] | None:
@@ -922,8 +919,8 @@ def _ensure_target_campaign_window(
 
 
 def _numeric_interval(value: Any, *, label: str) -> tuple[float, float]:
-    if not isinstance(value, (list, tuple)) or len(value) < 2:
-        raise SystemExit(f"{label} must contain at least two interval bounds")
+    if not isinstance(value, (list, tuple)) or len(value) != 2:
+        raise ValueError(f"{label} must contain exactly two interval bounds")
     try:
         return float(value[0]), float(value[1])
     except (TypeError, ValueError) as exc:

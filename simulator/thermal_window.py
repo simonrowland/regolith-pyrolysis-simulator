@@ -25,11 +25,11 @@ def resolve_thermal_preheat_interval(
     preheat_ramp_C_per_hr: Any = None,
     ramp_rate_C_per_hr: Any = None,
 ) -> ThermalPreheatInterval:
-    """Resolve a thermal interval and the whole-hour cold-start ramp budget."""
+    """Resolve two ascending bounds (equal is allowed) and a positive ramp."""
     if isinstance(temperature_range, (str, bytes)) or not isinstance(
         temperature_range, Sequence
-    ) or len(temperature_range) < 2:
-        raise ValueError("temperature range must contain at least two bounds")
+    ) or len(temperature_range) != 2:
+        raise ValueError("temperature range must contain exactly two bounds")
     try:
         low_C, high_C = float(temperature_range[0]), float(temperature_range[1])
     except (TypeError, ValueError) as exc:
