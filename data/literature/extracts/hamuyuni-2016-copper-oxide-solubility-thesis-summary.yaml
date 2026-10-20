@@ -513,3 +513,78 @@ species:
           marker: line or model symbol as drawn
           marker_count: not counted; numeric points deferred
         digitisation: deferred to a figure pass
+    - observation_id: hamuyuni_cao_liquid_and_cuo_in_cao_context
+      type: context_only
+      locator:
+        page: 37
+        pdf_page_index: 36
+        published_page: 20
+        note: section 4.2.1 summary
+      units: wt.%
+      values:
+        quantity_as_published: CaO solubility in liquid oxide and Cu2O solubility in CaO
+        printed_values_as_published: CaO in the liquid phase was between 13 and 19 wt.% over the entire temperature
+          range considered; Cu2O solubility in CaO was ≤1 wt.%.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition: printed thesis-summary measured result retained as context; no duplicate scored point
+    - observation_id: hamuyuni_cao_liquid_copper_and_cao_in_cuo_context
+      type: context_only
+      locator:
+        page: 38
+        pdf_page_index: 37
+        published_page: 21
+        note: section 4.2.2 summary
+      units: wt.%
+      values:
+        quantity_as_published: CaO solubility in liquid oxide in equilibrium with copper and CaO solubility in Cu2O
+        printed_values_as_published: CaO in the liquid oxide phase in equilibrium with copper was 4.35 wt.%; CaO
+          solubility in Cu2O was ≤1 wt.%.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition: printed thesis-summary measured result retained as context; no duplicate scored point
+    - observation_id: hamuyuni_cuo_in_solid_phases_context
+      type: context_only
+      locator:
+        page: 41
+        pdf_page_index: 40
+        published_page: 24
+        note: section 4.3.2 summary
+      units: wt.%
+      values:
+        quantity_as_published: Cu2O solubility in calcium aluminates and halite (CaO)
+        printed_values_as_published: Cu2O content in the solid phases ranged from 0.5 to 2.23 wt.%.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition: printed thesis-summary measured result retained as context; no duplicate scored point
+    - observation_id: hamuyuni_cuo_in_calcium_aluminate_phases_context
+      type: context_only
+      locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 25
+        note: section 4.3.2 summary
+      units: wt.%
+      values:
+        quantity_as_published: Cu2O solubility in calcium aluminate phases
+        printed_values_as_published: C12A7, CA2, and CA6 contained 1.0 to 2.5 wt.% Cu2O; CA-3 contained nearly ≥0.5
+          wt.% over the entire temperature range; CA-4 contained ≥1.25 wt.% Cu2O.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition: printed thesis-summary measured result retained as context; no duplicate scored point
+    - observation_id: hamuyuni_liquidus_deviation_context
+      type: context_only
+      locator:
+        page: 43
+        pdf_page_index: 42
+        published_page: 26
+        note: conclusions
+      units: wt.%; °C
+      values:
+        quantity_as_published: Deviation between measured and literature liquidus compositions at triple points
+          1 and 4
+        printed_values_as_published: The largest deviations occurred between 1350 and 1400 °C, where liquid oxide
+          composition deviated by up to 40 wt.%.
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition: printed thesis-summary measured result retained as context; no duplicate scored point
