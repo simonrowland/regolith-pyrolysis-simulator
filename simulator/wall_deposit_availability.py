@@ -32,9 +32,19 @@ def wall_deposit_figure_availability(
 
     authority_payload = _mapping(authority)
     explicit_refusal = _mapping(refusal)
-    pressure_refused = _has_pressure_refusal(authority_payload)
+    explicit_authority = _mapping(explicit_refusal.get("authority"))
+    cumulative_pressure_refused = _has_pressure_refusal(authority_payload)
+    pressure_refused = cumulative_pressure_refused or _has_pressure_refusal(
+        explicit_authority
+    )
     if explicit_refusal or pressure_refused:
-        refusal_authority = _mapping(explicit_refusal.get("authority")) or authority_payload
+        # An authority payload with pressure refusals may already aggregate
+        # earlier campaigns; the explicit refusal can describe only the latest.
+        refusal_authority = (
+            authority_payload
+            if cumulative_pressure_refused
+            else explicit_authority or authority_payload
+        )
         if not refusal_authority:
             refusal_authority = {
                 "code": (
@@ -49,8 +59,8 @@ def wall_deposit_figure_availability(
             status="refused",
             refusal={
                 "reason": (
-                    _string(explicit_refusal.get("reason"))
-                    or _string(refusal_authority.get("message"))
+                    _string(refusal_authority.get("message"))
+                    or _string(explicit_refusal.get("reason"))
                     or _nested_reason(refusal_authority)
                     or "wall saturation pressure refusal"
                 ),
@@ -100,12 +110,17 @@ def _count(
     explicit_refusal: Mapping[str, Any],
     authority: Mapping[str, Any],
 ) -> int:
-    for value in (
-        explicit_refusal.get("count"),
+    counts = [
         authority.get("status_bearing_refusal_count"),
-    ):
-        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
-            return value
+        explicit_refusal.get("count"),
+    ]
+    counts = [
+        value
+        for value in counts
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0
+    ]
+    if counts:
+        return max(counts)
     species = authority.get("wall_saturation_pressure_refused_species")
     if isinstance(species, (list, tuple, set, frozenset)):
         return len(species)
