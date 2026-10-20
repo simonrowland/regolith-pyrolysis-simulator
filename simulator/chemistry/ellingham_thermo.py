@@ -957,48 +957,6 @@ def ellingham_delta_g_kj_per_mol_o2(
     return segment.delta_g_kJ_per_mol_O2(T_K)
 
 
-def _na_liquid_standard_delta_g_kj_per_mol_o2(
-    temperature_K: float,
-) -> float:
-    """Resolve Na's Ellingham dG on the melt activity's liquid-oxide basis."""
-
-    T_K = _finite_temperature_K(temperature_K)
-    segments = ellingham_fit_segments("Na")
-    active = ellingham_segment_for_temperature("Na", T_K)
-
-    # Premise: Na melt activity is referenced to pure-liquid NaO0.5, while
-    # sub-1405.2 K Na rows carry Na2O(beta/alpha); the reaction basis is
-    # 4 Na + O2 -> 2 Na2O = 4 NaO0.5, so its activity term is 4 RT ln(a).
-    # Algebra: with Na(g) on both rows, the liquid-oxide row is the matching
-    # standard dG directly. When the active row uses Na(l), add
-    # dG[Na(g), Na2O(l)] - dG[Na(g), Na2O(beta)]; the common 4 Na(g) + O2
-    # terms cancel, leaving only the beta-to-liquid oxide conversion while
-    # preserving the active row's 4 Na(l) reactant reference.
-    # Unit check: every dG and difference here is kJ/mol O2, matching the
-    # 4 RT ln(a) activity shift. Limiting case: at/above the Na2O melt point,
-    # the active row already carries Na2O(l), so return it unchanged.
-    if "Na2O(l)" in active.phase_basis:
-        return active.delta_g_kJ_per_mol_O2(T_K)
-
-    liquid_oxide = next(
-        segment for segment in segments if "Na2O(l)" in segment.phase_basis
-    )
-    if "Na(g)" in active.phase_basis:
-        return liquid_oxide.delta_g_kJ_per_mol_O2(T_K)
-
-    beta_gas = next(
-        segment
-        for segment in segments
-        if "Na(g)" in segment.phase_basis
-        and "Na2O(beta)" in segment.phase_basis
-    )
-    return (
-        active.delta_g_kJ_per_mol_O2(T_K)
-        + liquid_oxide.delta_g_kJ_per_mol_O2(T_K)
-        - beta_gas.delta_g_kJ_per_mol_O2(T_K)
-    )
-
-
 def ellingham_stoichiometry(species: str) -> tuple[float, float]:
     return _ELLINGHAM_STOICHIOMETRY[str(species)]
 
