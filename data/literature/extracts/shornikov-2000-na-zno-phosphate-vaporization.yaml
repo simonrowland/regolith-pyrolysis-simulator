@@ -1,0 +1,932 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2000-na-zno-phosphate-vaporization
+source:
+  citation: >-
+    Shornikov, S. I., and Archakov, I. Yu. (2000). Mass Spectrometric Study of
+    Thermodynamic Properties and Vaporization Processes in the Na2O–ZnO–P2O5 System.
+    Glastech. Ber. Glass Sci. Technol., 73 C2, 58–65.
+  year: 2000
+  corpus_asset: raw/shornikov-2000-na-zno-phosphate-vaporization/shornikov-2000-na-zno-phosphate-vaporization.pdf
+  corpus_sha256: 235e29ac33be76ba90c1188166f2cf97c4f7ef3770ea0e3dfb157bb84f3ec4bb
+extraction:
+  method: >-
+    No numeric table is printed. Activities on Fig. 1c and melt-formation Gibbs
+    energies on Fig. 3 series 1 were read from the 600 dpi page renders with
+    labelled-tick calibration. MinerU chart tables were ignored. The PDF has no
+    text layer; prose locators follow the OCR markdown checked against the page renders.
+  date: '2026-10-20'
+  worker: t1372-w2-w6-t1
+review_status: draft
+fidelity_samples:
+  - species: ZnO
+    observable: activity_coefficient
+    observation_id: shornikov_2000_fig1c_zno_x33
+    field: log10_activity
+    value: '-4.143'
+    locator:
+      page: 3
+      published_page: 60
+      pdf_page_index: 2
+      figure: '1'
+      panel: c
+      note: Series 2 filled circle near 33 mol% ZnO.
+  - species: Na2O
+    observable: activity_coefficient
+    observation_id: shornikov_2000_fig1c_na2o_x40
+    field: log10_activity
+    value: '-14.313'
+    locator:
+      page: 3
+      published_page: 60
+      pdf_page_index: 2
+      figure: '1'
+      panel: c
+      note: Series 1 filled square near 40 mol% ZnO.
+  - species: P2O5
+    observable: activity_coefficient
+    observation_id: shornikov_2000_fig1c_p2o5_x67
+    field: activity
+    value: '1.972423e-05'
+    locator:
+      page: 3
+      published_page: 60
+      pdf_page_index: 2
+      figure: '1'
+      panel: c
+      note: Series 3 triangle on the Zn2P2O7 frame. Linear activity is 10 to the power of the log10 read.
+  - species: Na4P2O7-Zn2P2O7
+    observable: thermodynamic_example
+    observation_id: shornikov_2000_fig3_series1_x0
+    field: delta_fG_over_RT
+    value: '-31.966'
+    locator:
+      page: 6
+      published_page: 63
+      pdf_page_index: 5
+      figure: '3'
+      note: Series 1 filled circle at x(ZnO) = 0.
+experiments:
+  - experiment_id: shornikov-2000-fig1c
+    kind: kems
+    locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 60
+      figure: '1'
+      panel: c
+    method: >-
+      Knudsen effusion mass spectrometry, this study, 1100 K, along the
+      Na4P2O7-Zn2P2O7 join. Molybdenum cell, MI 1201T, 25.0 ± 0.1 eV.
+  - experiment_id: shilov-1998-fig1d
+    kind: literature
+    locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 60
+      figure: '1'
+      panel: d
+    citation: >-
+      Shilov, A. L., Shornikov, S. I., Archakov, I. Yu., and Ivanova, N. E. (1998).
+      Glass Physics and Chemistry, 24, 400. Reference [13] of this article.
+    method: >-
+      Cited Knudsen effusion mass spectrometry at 1300 K on the Sn2P2O7-Zn2P2O7 join.
+      Not a measurement of this article.
+species:
+  ZnO:
+    observations:
+    - observation_id: shornikov_2000_fig1c_zno_x33
+      type: activity_coefficient
+      experiment: shornikov-2000-fig1c
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: c
+        series: '2'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 2, filled circle. Circle fit rms 1.28 px, radius 48.3 px, 210 inlier boundary pixels. Thresholds 70, 100, 130 and 160 leave the centre unchanged. Page pixel (3497.00, 6498.48).
+          Read log10(a) = -4.143; x(ZnO) = 33.20 mol%.
+      T_range_K: [1100, 1100]
+      phase: l
+      units: dimensionless activity; x(ZnO) mol% as read on the axis
+      standard_state: >-
+        Fig. 1 caption, published page 60: activities of pure oxides in the present study at 1100 K, series 2 is ZnO. The zinc-oxide activities were determined taking into account the equilibrium constant of reaction (1), printed [ZnO] = (Zn) + (O). The paper says the square brackets indicate the solid. The standard state is pure solid ZnO.
+      uncertainty:
+        value: '0.03'
+        unit: log10(activity)
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no error bar.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1100'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: c
+            note: Caption states panel (c) is the present study at 1100 K.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1100'
+        temperature_K: 1100
+        activity: '7.194490e-05'
+        log10_activity: '-4.143'
+        component: ZnO
+        ZnO_mol_percent: 33.20
+        section_as_published: Na4P2O7-Zn2P2O7
+        page_pixel_x: '3497.00'
+        page_pixel_y: '6498.48'
+        dpi: 600
+    - observation_id: shornikov_2000_fig1c_zno_x40
+      type: activity_coefficient
+      experiment: shornikov-2000-fig1c
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: c
+        series: '2'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 2, filled circle. Circle fit rms 1.31 px, radius 46.9 px, 155 inlier boundary pixels. Thresholds 70 to 160 leave the centre unchanged. Page pixel (3778.43, 6403.12).
+          Read log10(a) = -3.723; x(ZnO) = 39.72 mol%.
+      T_range_K: [1100, 1100]
+      phase: l
+      units: dimensionless activity; x(ZnO) mol% as read on the axis
+      standard_state: >-
+        Fig. 1 caption, published page 60: activities of pure oxides in the present study at 1100 K, series 2 is ZnO. The zinc-oxide activities were determined taking into account the equilibrium constant of reaction (1), printed [ZnO] = (Zn) + (O). The paper says the square brackets indicate the solid. The standard state is pure solid ZnO.
+      uncertainty:
+        value: '0.03'
+        unit: log10(activity)
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no error bar.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1100'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: c
+            note: Caption states panel (c) is the present study at 1100 K.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1100'
+        temperature_K: 1100
+        activity: '1.892344e-04'
+        log10_activity: '-3.723'
+        component: ZnO
+        ZnO_mol_percent: 39.72
+        section_as_published: Na4P2O7-Zn2P2O7
+        page_pixel_x: '3778.43'
+        page_pixel_y: '6403.12'
+        dpi: 600
+    - observation_id: shornikov_2000_fig1c_zno_x67
+      type: activity_coefficient
+      experiment: shornikov-2000-fig1c
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: c
+        series: '2'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 2, filled circle on the right frame of panel c. Circle fit rms 1.30 px, radius 52.1 px, 144 inliers. The vertical frame passes through the marker. A refit with that vertical strip removed moves the centre by under 2 px. Page pixel (4950.96, 6177.44).
+          Read log10(a) = -2.729; x(ZnO) = 66.91 mol%.
+      T_range_K: [1100, 1100]
+      phase: l
+      units: dimensionless activity; x(ZnO) mol% as read on the axis
+      standard_state: >-
+        Fig. 1 caption, published page 60: activities of pure oxides in the present study at 1100 K, series 2 is ZnO. The zinc-oxide activities were determined taking into account the equilibrium constant of reaction (1), printed [ZnO] = (Zn) + (O). The paper says the square brackets indicate the solid. The standard state is pure solid ZnO.
+      uncertainty:
+        value: '0.03'
+        unit: log10(activity)
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no error bar.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1100'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: c
+            note: Caption states panel (c) is the present study at 1100 K.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1100'
+        temperature_K: 1100
+        activity: '1.866380e-03'
+        log10_activity: '-2.729'
+        component: ZnO
+        ZnO_mol_percent: 66.91
+        section_as_published: Na4P2O7-Zn2P2O7
+        page_pixel_x: '4950.96'
+        page_pixel_y: '6177.44'
+        dpi: 600
+    - observation_id: shornikov_2000_fig1d_zno
+      type: activity_coefficient
+      experiment: shilov-1998-fig1d
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: d
+        series: '2'
+        marker_symbol: filled circle
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.
+      phase: l
+      units: dimensionless activity
+      standard_state: >-
+        Fig. 1 caption, published page 60: panel (d) is previous data [13] at 1300 K.
+        Reference phase is not stated in this article.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: d
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        T_K: '1300'
+        component: ZnO
+        reason: >-
+          Caption assigns panel (d), series 2, to previous data [13] at 1300 K. Coordinates were not read.
+        attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
+    - observation_id: shornikov_2000_fig1c_legend_glyphs
+      type: activity_coefficient
+      experiment: shornikov-2000-fig1c
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: c
+        note: >-
+          Legend glyphs inside panel c, not data. Square at page pixel (4457, 8518),
+          circle at (4463, 8767), triangle at (4464, 9014), beside the numerals 1, 2 and 3.
+          A second glyph stack near page x = 5250 is the panel (d) legend.
+      phase: l
+      units: dimensionless activity
+      standard_state: >-
+        Legend symbols only. Reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1100'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: c
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        T_K: '1100'
+        reason: >-
+          These three symbols sit with the numerals 1, 2 and 3 and are not on the data curves.
+          They are the legend. Coordinates were not stored as activities.
+    context:
+    - observation_id: shornikov_2000_apparatus
+      type: thermodynamic_example
+      units: as printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 58
+        section: Experimental
+      values:
+        cell: molybdenum effusion cell
+        evaporation_to_effusion_area_ratio: '>500'
+        spectrometer: MI 1201T
+        ionization_energy_eV: '25.0 ± 0.1'
+        temperature_window_K: 950-1550
+        ions: Na+, NaPO2+, NaPO3+, Zn+, P2+, PO+, PO2+
+        sentence_as_published: >-
+          Evaporation from molybdenum effusion cells with the ratio of evaporation to
+          effusion area more than 500, using an MI 1201T mass spectrometer, at an
+          ionization energy of 25.0 ± 0.1 eV.
+    - observation_id: shornikov_2000_partial_pressures_not_tabulated
+      type: thermodynamic_example
+      units: not printed
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 59
+        section: Results
+      values:
+        quantity: partial pressure
+        method_class: quoted_attributed
+        admission_status: refused
+        reason: >-
+          Partial pressures of PO, PO2, P2, Zn, Na and NaPO3 were obtained from the
+          Hertz-Knudsen equation with partial evaporation coefficients taken from
+          references [14] and [15]. No numerical pressure or evaporation coefficient
+          is printed.
+    - observation_id: shornikov_2000_eq14_integration_limits
+      type: thermodynamic_example
+      units: mol% ZnO
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 61
+        equation: '14'
+      values:
+        quantity: Gibbs-Duhem integration limit
+        ZnO_mol_percent_limits: '16.6 ± 0.2 or 56.0 ± 0.2'
+        sentence_as_published: >-
+          The lower integration limit in equation (14) corresponds to 16.6 ± 0.2
+          (or 56.0 ± 0.2) ZnO mole % for different integrating paths. a* is the
+          component activity in the corresponding phase of the binary system at x*.
+    - observation_id: shornikov_2000_fig1_phase_diagrams
+      type: thermodynamic_example
+      units: not an activity
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: a
+      values:
+        admission_status: refused
+        reason: >-
+          Panels (a) and (b) are phase diagrams according to references [1] and [19],
+          not measurements of this article. No activity markers were read from them.
+    - observation_id: shornikov_2000_fig2_evaporation_paths
+      type: thermodynamic_example
+      units: mol%
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 63
+        figure: '2'
+      values:
+        admission_status: refused
+        reason: >-
+          Fig. 2 plots evaporation trajectories of two starting melts in the
+          x(Na2O)-x(ZnO) plane. That quantity is not an oxide activity, activity
+          coefficient, partial pressure, vapour species, partial Gibbs energy, or
+          evaporation coefficient. Markers were not read. The MinerU scatter table
+          was ignored.
+  Na2O:
+    observations:
+    - observation_id: shornikov_2000_fig1c_na2o_x33
+      type: activity_coefficient
+      experiment: shornikov-2000-fig1c
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: c
+        series: '1'
+        marker_symbol: filled square
+        note: >-
+          600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 1, filled square. Core centroid is stable to 0.3 px across distance fractions 0.45 to 0.75. The horizontal curve passes through the square. Page pixel (3499.1, 8777.6).
+          Read log10(a) = -14.186; x(ZnO) = 33.24 mol%.
+      T_range_K: [1100, 1100]
+      phase: l
+      units: dimensionless activity; x(ZnO) mol% as read on the axis
+      standard_state: >-
+        Equation (10) prints [Na2O] = 2(Na) + (O). The paper says the square brackets indicate the solid. The Na2O activities were calculated with the equilibrium constant of that reaction. The standard state is pure solid Na2O.
+      uncertainty:
+        value: '0.03'
+        unit: log10(activity)
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no error bar.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1100'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: c
+            note: Caption states panel (c) is the present study at 1100 K.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1100'
+        temperature_K: 1100
+        activity: '6.516284e-15'
+        log10_activity: '-14.186'
+        component: Na2O
+        ZnO_mol_percent: 33.24
+        section_as_published: Na4P2O7-Zn2P2O7
+        page_pixel_x: '3499.1'
+        page_pixel_y: '8777.6'
+        dpi: 600
+    - observation_id: shornikov_2000_fig1c_na2o_x40
+      type: activity_coefficient
+      experiment: shornikov-2000-fig1c
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: c
+        series: '1'
+        marker_symbol: filled square
+        note: >-
+          600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 1, filled square. Core centroid is stable to 0.4 px across distance fractions 0.45 to 0.75. Page pixel (3787.3, 8806.3).
+          Read log10(a) = -14.313; x(ZnO) = 39.93 mol%.
+      T_range_K: [1100, 1100]
+      phase: l
+      units: dimensionless activity; x(ZnO) mol% as read on the axis
+      standard_state: >-
+        Equation (10) prints [Na2O] = 2(Na) + (O). The paper says the square brackets indicate the solid. The Na2O activities were calculated with the equilibrium constant of that reaction. The standard state is pure solid Na2O.
+      uncertainty:
+        value: '0.03'
+        unit: log10(activity)
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no error bar.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1100'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: c
+            note: Caption states panel (c) is the present study at 1100 K.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1100'
+        temperature_K: 1100
+        activity: '4.864072e-15'
+        log10_activity: '-14.313'
+        component: Na2O
+        ZnO_mol_percent: 39.93
+        section_as_published: Na4P2O7-Zn2P2O7
+        page_pixel_x: '3787.3'
+        page_pixel_y: '8806.3'
+        dpi: 600
+    - observation_id: shornikov_2000_fig1d_na2o
+      type: activity_coefficient
+      experiment: shilov-1998-fig1d
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: d
+        series: '1'
+        marker_symbol: filled square
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.
+      phase: l
+      units: dimensionless activity
+      standard_state: >-
+        Fig. 1 caption, published page 60: panel (d) is previous data [13] at 1300 K.
+        Reference phase is not stated in this article.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: d
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        T_K: '1300'
+        component: Na2O
+        reason: >-
+          Caption assigns panel (d), series 1, to previous data [13] at 1300 K. The Na2O series on panel (d) is the SnO-ZnO-P2O5 join, not a measurement of this article. Coordinates were not read.
+        attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
+  P2O5:
+    observations:
+    - observation_id: shornikov_2000_fig1c_p2o5_x33
+      type: activity_coefficient
+      experiment: shornikov-2000-fig1c
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: c
+        series: '3'
+        marker_symbol: filled triangle
+        note: >-
+          600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 3, filled triangle. Centre is the centroid of the marker core at distance-transform fractions 0.45, 0.60 and 0.75; those centres stay inside 1.5 px. Page pixel (3497.0, 6894.0).
+          Read log10(a) = -5.886; x(ZnO) = 33.20 mol%.
+      T_range_K: [1100, 1100]
+      phase: l
+      units: dimensionless activity; x(ZnO) mol% as read on the axis
+      standard_state: >-
+        Fig. 1 caption calls series 3 the activity of P2O5. Equations (12) and (13) define a(P2O5) from the heterogeneous equilibrium constants of reactions (2) and (11). Reaction (11) is printed [P4O10] + 2(PO) = 6(PO2), and the paper says the square brackets indicate the solid. Equation (14) sets ln a(P2O5) equal to ln a*(P2O5) minus the Gibbs-Duhem integrals, where a* is the component activity in the corresponding phase of the binary system at x*. A single pure P2O5 reference phase is not stated.
+      uncertainty:
+        value: '0.03'
+        unit: log10(activity)
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no error bar.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1100'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: c
+            note: Caption states panel (c) is the present study at 1100 K.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1100'
+        temperature_K: 1100
+        activity: '1.300170e-06'
+        log10_activity: '-5.886'
+        component: P2O5
+        ZnO_mol_percent: 33.20
+        section_as_published: Na4P2O7-Zn2P2O7
+        page_pixel_x: '3497.0'
+        page_pixel_y: '6894.0'
+        dpi: 600
+    - observation_id: shornikov_2000_fig1c_p2o5_x40
+      type: activity_coefficient
+      experiment: shornikov-2000-fig1c
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: c
+        series: '3'
+        marker_symbol: filled triangle
+        note: >-
+          600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 3, filled triangle. Core-centroid spread across distance fractions 0.45 to 0.75 is under 2 px. Page pixel (3783.8, 6814.0).
+          Read log10(a) = -5.534; x(ZnO) = 39.85 mol%.
+      T_range_K: [1100, 1100]
+      phase: l
+      units: dimensionless activity; x(ZnO) mol% as read on the axis
+      standard_state: >-
+        Fig. 1 caption calls series 3 the activity of P2O5. Equations (12) and (13) define a(P2O5) from the heterogeneous equilibrium constants of reactions (2) and (11). Reaction (11) is printed [P4O10] + 2(PO) = 6(PO2), and the paper says the square brackets indicate the solid. Equation (14) sets ln a(P2O5) equal to ln a*(P2O5) minus the Gibbs-Duhem integrals, where a* is the component activity in the corresponding phase of the binary system at x*. A single pure P2O5 reference phase is not stated.
+      uncertainty:
+        value: '0.03'
+        unit: log10(activity)
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no error bar.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1100'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: c
+            note: Caption states panel (c) is the present study at 1100 K.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1100'
+        temperature_K: 1100
+        activity: '2.924152e-06'
+        log10_activity: '-5.534'
+        component: P2O5
+        ZnO_mol_percent: 39.85
+        section_as_published: Na4P2O7-Zn2P2O7
+        page_pixel_x: '3783.8'
+        page_pixel_y: '6814.0'
+        dpi: 600
+    - observation_id: shornikov_2000_fig1c_p2o5_x67
+      type: activity_coefficient
+      experiment: shornikov-2000-fig1c
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: c
+        series: '3'
+        marker_symbol: filled triangle
+        note: >-
+          600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 3, filled triangle on the right frame of panel c. The vertical frame passes through the marker. Core-centroid y moves by 3 px between distance fractions 0.45 and 0.75. Page pixel (4943.9, 6625.9).
+          Read log10(a) = -4.705; x(ZnO) = 66.74 mol%.
+      T_range_K: [1100, 1100]
+      phase: l
+      units: dimensionless activity; x(ZnO) mol% as read on the axis
+      standard_state: >-
+        Fig. 1 caption calls series 3 the activity of P2O5. Equations (12) and (13) define a(P2O5) from the heterogeneous equilibrium constants of reactions (2) and (11). Reaction (11) is printed [P4O10] + 2(PO) = 6(PO2), and the paper says the square brackets indicate the solid. Equation (14) sets ln a(P2O5) equal to ln a*(P2O5) minus the Gibbs-Duhem integrals, where a* is the component activity in the corresponding phase of the binary system at x*. A single pure P2O5 reference phase is not stated.
+      uncertainty:
+        value: '0.03'
+        unit: log10(activity)
+        basis: visual read uncertainty
+        confidence_level: not_stated
+        note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no error bar.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1100'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: c
+            note: Caption states panel (c) is the present study at 1100 K.
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: admitted
+        T_K: '1100'
+        temperature_K: 1100
+        activity: '1.972423e-05'
+        log10_activity: '-4.705'
+        component: P2O5
+        ZnO_mol_percent: 66.74
+        section_as_published: Na4P2O7-Zn2P2O7
+        page_pixel_x: '4943.9'
+        page_pixel_y: '6625.9'
+        dpi: 600
+    - observation_id: shornikov_2000_fig1d_p2o5
+      type: activity_coefficient
+      experiment: shilov-1998-fig1d
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: d
+        series: '3'
+        marker_symbol: filled triangle
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.
+      phase: l
+      units: dimensionless activity
+      standard_state: >-
+        Fig. 1 caption, published page 60: panel (d) is previous data [13] at 1300 K.
+        Reference phase is not stated in this article.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: d
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        T_K: '1300'
+        component: P2O5
+        reason: >-
+          Caption assigns panel (d), series 3, to previous data [13] at 1300 K. Coordinates were not read.
+        attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
+  SnO:
+    observations:
+    - observation_id: shornikov_2000_fig1d_sno
+      type: activity_coefficient
+      experiment: shilov-1998-fig1d
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 60
+        figure: '1'
+        panel: d
+        series: '4'
+        marker_symbol: inverted triangle
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.
+      phase: l
+      units: dimensionless activity
+      standard_state: >-
+        Fig. 1 caption, published page 60: panel (d) is previous data [13] at 1300 K.
+        Reference phase is not stated in this article.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 60
+            figure: '1'
+            panel: d
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        T_K: '1300'
+        component: SnO
+        reason: >-
+          Caption assigns panel (d), series 4, to SnO activities from previous data [13] at 1300 K. Coordinates were not read.
+        attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
+  Na4P2O7-Zn2P2O7:
+    observations: []
+    context:
+    - observation_id: shornikov_2000_fig3_series1_x0
+      type: thermodynamic_example
+      units: dimensionless ΔG_f/RT
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 63
+        figure: '3'
+        series: '1'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi PDF page 6 (published p. 63), 9732 by 15250 px. Labelled ΔG_f/RT ticks are the tick line: -5 at y=7612, -10 at y=8181, -15 at y=8746, -20 at y=9312, -25 at y=9878, -30 at y=10444, -35 at y=11012. ΔG_f/RT = -0.008828346*y + 62.210823. Residuals +0.0095, -0.0139, -0.0019, +0.0013, +0.0044, +0.0076, -0.0069; RMS 0.0077. Unlabelled minor ticks halfway between those labels were not used. Labelled x(ZnO) mol% ticks on the bottom axis: 0 at x=2921, 10 at 3643, 20 at 4374, 30 at 5100, 40 at 5824, 50 at 6550, 60 at 7281. mol% = 0.013763247*x - 40.178795. Residuals +0.024, -0.039, +0.022, +0.014, -0.022, -0.030, +0.031 mol%; RMS 0.027. Read uncertainty is ±0.04 in ΔG_f/RT and ±0.15 mol% ZnO. Filled circle on the y-axis. Circle fit rms 1.12 px, radius 63.5 px, 283 inliers. Page pixel (2918.00, 10667.50).
+          Read ΔG_f/RT = -31.966; x(ZnO) = -0.02 mol%.
+      values:
+        quantity: melt formation Gibbs energy over RT
+        method_class: figure_only
+        admission_status: context_only
+        T_K: '1100'
+        delta_fG_over_RT: '-31.966'
+        ZnO_mol_percent: -0.02
+        page_pixel_x: '2918.00'
+        page_pixel_y: '10667.50'
+        dpi: 600
+        why_not_gibbs_table: >-
+          The axis is ΔG_f/RT, dimensionless. gibbs_table migrates as delta_fG in kJ/mol.
+          These reads stay in context so that unit is not invented.
+    - observation_id: shornikov_2000_fig3_series1_x33
+      type: thermodynamic_example
+      units: dimensionless ΔG_f/RT
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 63
+        figure: '3'
+        series: '1'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi PDF page 6 (published p. 63), 9732 by 15250 px. Labelled ΔG_f/RT ticks are the tick line: -5 at y=7612, -10 at y=8181, -15 at y=8746, -20 at y=9312, -25 at y=9878, -30 at y=10444, -35 at y=11012. ΔG_f/RT = -0.008828346*y + 62.210823. Residuals +0.0095, -0.0139, -0.0019, +0.0013, +0.0044, +0.0076, -0.0069; RMS 0.0077. Unlabelled minor ticks halfway between those labels were not used. Labelled x(ZnO) mol% ticks on the bottom axis: 0 at x=2921, 10 at 3643, 20 at 4374, 30 at 5100, 40 at 5824, 50 at 6550, 60 at 7281. mol% = 0.013763247*x - 40.178795. Residuals +0.024, -0.039, +0.022, +0.014, -0.022, -0.030, +0.031 mol%; RMS 0.027. Read uncertainty is ±0.04 in ΔG_f/RT and ±0.15 mol% ZnO. Filled circle. Circle fit rms 1.25 px, radius 64.4 px, 206 inliers. Page pixel (5332.71, 9145.57).
+          Read ΔG_f/RT = -18.529; x(ZnO) = 33.22 mol%.
+      values:
+        quantity: melt formation Gibbs energy over RT
+        method_class: figure_only
+        admission_status: context_only
+        T_K: '1100'
+        delta_fG_over_RT: '-18.529'
+        ZnO_mol_percent: 33.22
+        page_pixel_x: '5332.71'
+        page_pixel_y: '9145.57'
+        dpi: 600
+        why_not_gibbs_table: >-
+          The axis is ΔG_f/RT, dimensionless. gibbs_table migrates as delta_fG in kJ/mol.
+          These reads stay in context so that unit is not invented.
+    - observation_id: shornikov_2000_fig3_series1_x40
+      type: thermodynamic_example
+      units: dimensionless ΔG_f/RT
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 63
+        figure: '3'
+        series: '1'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi PDF page 6 (published p. 63), 9732 by 15250 px. Labelled ΔG_f/RT ticks are the tick line: -5 at y=7612, -10 at y=8181, -15 at y=8746, -20 at y=9312, -25 at y=9878, -30 at y=10444, -35 at y=11012. ΔG_f/RT = -0.008828346*y + 62.210823. Residuals +0.0095, -0.0139, -0.0019, +0.0013, +0.0044, +0.0076, -0.0069; RMS 0.0077. Unlabelled minor ticks halfway between those labels were not used. Labelled x(ZnO) mol% ticks on the bottom axis: 0 at x=2921, 10 at 3643, 20 at 4374, 30 at 5100, 40 at 5824, 50 at 6550, 60 at 7281. mol% = 0.013763247*x - 40.178795. Residuals +0.024, -0.039, +0.022, +0.014, -0.022, -0.030, +0.031 mol%; RMS 0.027. Read uncertainty is ±0.04 in ΔG_f/RT and ±0.15 mol% ZnO. Filled circle. Circle fit rms 1.18 px, radius 64.5 px, 317 inliers. Page pixel (5816.64, 8902.69).
+          Read ΔG_f/RT = -16.385; x(ZnO) = 39.88 mol%.
+      values:
+        quantity: melt formation Gibbs energy over RT
+        method_class: figure_only
+        admission_status: context_only
+        T_K: '1100'
+        delta_fG_over_RT: '-16.385'
+        ZnO_mol_percent: 39.88
+        page_pixel_x: '5816.64'
+        page_pixel_y: '8902.69'
+        dpi: 600
+        why_not_gibbs_table: >-
+          The axis is ΔG_f/RT, dimensionless. gibbs_table migrates as delta_fG in kJ/mol.
+          These reads stay in context so that unit is not invented.
+    - observation_id: shornikov_2000_fig3_series1_x67
+      type: thermodynamic_example
+      units: dimensionless ΔG_f/RT
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 63
+        figure: '3'
+        series: '1'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi PDF page 6 (published p. 63), 9732 by 15250 px. Labelled ΔG_f/RT ticks are the tick line: -5 at y=7612, -10 at y=8181, -15 at y=8746, -20 at y=9312, -25 at y=9878, -30 at y=10444, -35 at y=11012. ΔG_f/RT = -0.008828346*y + 62.210823. Residuals +0.0095, -0.0139, -0.0019, +0.0013, +0.0044, +0.0076, -0.0069; RMS 0.0077. Unlabelled minor ticks halfway between those labels were not used. Labelled x(ZnO) mol% ticks on the bottom axis: 0 at x=2921, 10 at 3643, 20 at 4374, 30 at 5100, 40 at 5824, 50 at 6550, 60 at 7281. mol% = 0.013763247*x - 40.178795. Residuals +0.024, -0.039, +0.022, +0.014, -0.022, -0.030, +0.031 mol%; RMS 0.027. Read uncertainty is ±0.04 in ΔG_f/RT and ±0.15 mol% ZnO. Filled circle at the Zn2P2O7 end of curve 1. Circle fit rms 1.10 px, radius 64.5 px, 256 inliers. Page pixel (7753.93, 8032.83).
+          Read ΔG_f/RT = -8.706; x(ZnO) = 66.54 mol%.
+      values:
+        quantity: melt formation Gibbs energy over RT
+        method_class: figure_only
+        admission_status: context_only
+        T_K: '1100'
+        delta_fG_over_RT: '-8.706'
+        ZnO_mol_percent: 66.54
+        page_pixel_x: '7753.93'
+        page_pixel_y: '8032.83'
+        dpi: 600
+        why_not_gibbs_table: >-
+          The axis is ΔG_f/RT, dimensionless. gibbs_table migrates as delta_fG in kJ/mol.
+          These reads stay in context so that unit is not invented.
+    - observation_id: shornikov_2000_fig3_series2_open_circles
+      type: thermodynamic_example
+      units: dimensionless ΔG_f/RT
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 63
+        figure: '3'
+        series: '2'
+        marker_symbol: open circle
+        note: >-
+          Five open circles on curve 2. Four enclosed holes lie near x(ZnO) of about
+          7, 13, 20 and 27 mol%. One further open circle sits at the right-hand end,
+          above the filled circle of series 1. Hole centres were not stored.
+      values:
+        quantity: melt formation Gibbs energy over RT
+        method_class: figure_only
+        admission_status: refused
+        reason: >-
+          Caption assigns curve 2 to the Sn2P2O7-Zn2P2O7 melts at 1300 K, reference [13].
+          Five open circles were censused on the 600 dpi page and were not read.
+        marker_census: 5
+        attribution: reference [13], Shilov et al. (1998)
