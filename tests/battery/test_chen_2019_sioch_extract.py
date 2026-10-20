@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 import simulator.battery.migrate as migrate_module
+from tests.battery.test_migrate import assert_extract_source_mutation_fails
 from simulator.battery.enums import ValueKind
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -54,9 +55,35 @@ def test_cp_grid_sample_binding_and_render_pins():
     assert all(o['per'] == 'mol_atom' for o in cp_observations)
     assert len([o for o in observations if o['locator'].get('table') == '4' and o['values'].get('quantity') in {'delta_fH', 'delta_fG', 'S'}]) == 24
     contexts = {o['observation_id']: o for o in doc['species']['SiOCH']['context']}
-    assert contexts['chen2019_table16_context']['locator']['page'] == 12
-    assert contexts['chen2019_table20_context']['locator']['page'] == 15
-    assert contexts['chen2019_table21_context']['locator']['page'] == 15
+    expected_contexts = {
+        'chen2019_table14_context': (14, 'a-SiCH #R337', 10, '14'),
+        'chen2019_table15_context': (15, 'a-SiCH #300', 11, '15'),
+        'chen2019_table16_context': (16, 'a-SiOCH #844', 12, '16'),
+        'chen2019_table17_context': (17, 'a-SiOCH #539', 12, '17'),
+        'chen2019_table18_context': (18, 'a-SiOCH #338', 13, '18'),
+        'chen2019_table18_continued_context': (18, 'a-SiOCH #338', 14, '18'),
+        'chen2019_table19_context': (19, 'a-SiOCH #248', 14, '19'),
+        'chen2019_table20_context': (20, 'a-SiOCH #149', 15, '20'),
+        'chen2019_table21_context': (21, 'a-SiOCH #659', 15, '21'),
+        'chen2019_table21_continued_context': (21, 'a-SiOCH #659', 16, '21 continued'),
+    }
+    for observation_id, (table, sample, page, locator_table) in expected_contexts.items():
+        context = contexts[observation_id]
+        assert context['values']['table_number'] == table
+        assert context['values']['sample_id'] == sample
+        assert context['values']['method_class'] == 'model_derived'
+        assert context['locator']['page'] == page
+        assert context['locator']['pdf_page_index'] == page - 1
+        assert context['locator']['table'] == locator_table
+    assert contexts['chen2019_table18_continued_context']['locator']['note'] == 'Table 18 continued on physical page 14.'
+    assert ['300', '14.436', '13.104', '2.2052', '5.7537'] in contexts['chen2019_table16_context']['values']['printed_rows']
+    assert ['298.15', '12.200', '11.176', '1.8611', '4.9341'] in contexts['chen2019_table17_context']['values']['printed_rows']
+    assert ['300', '12.264', '11.252', '1.8837', '4.9729'] in contexts['chen2019_table17_context']['values']['printed_rows']
+    assert ['300', '12.473', '14.477', '2.1633', '7.2657'] in contexts['chen2019_table20_context']['values']['printed_rows']
+    assert ['1', '$8.584·10^{-4}$', '$8.361·10^{-4}$', '$4.200·10^{-7}$', '$4.161·10^{-4}$'] in contexts['chen2019_table21_context']['values']['printed_rows']
+    table21_cont = contexts['chen2019_table21_continued_context']['values']['printed_rows']
+    assert ['40', '1.5954', '1.0693', '0.02648', '0.40730'] in table21_cont
+    assert ['300', '10.895', '11.838', '1.8010', '5.8345'] in table21_cont
 
 
 def test_every_migrated_cp_value_and_identity():
@@ -98,14 +125,13 @@ def test_every_migrated_cp_value_and_identity():
         assert row.identity.per.value.value == 'mol_atom'
 
 
-def test_extract_numeric_pin_rejects_cell_mutation():
-    doc = _doc()
-    obs = next(o for o in doc['species']['SiOCH']['observations'] if o['values']['sample_id'] == '300')
-    first = obs['values']['series'][0]
-    assert (first['T_K'], first['cp']) == ('1.8416', '4.7419e-4')
-    def assert_render_pin(point):
-        assert (point['T_K'], point['cp']) == ('1.8416', '4.7419e-4')
-    assert_render_pin(first)
-    mutated = dict(first, cp='0')
-    with pytest.raises(AssertionError):
-        assert_render_pin(mutated)
+def test_extract_numeric_pin_rejects_cell_mutation(tmp_path, monkeypatch):
+    _doc()
+    assert_extract_source_mutation_fails(
+        EXTRACT,
+        "sample_id: '300'\n        film_type_as_published: a-SiCH\n        series:\n        - T_K: '1.8416'\n          cp: '4.7419e-4'",
+        "sample_id: '300'\n        film_type_as_published: a-SiCH\n        series:\n        - T_K: '1.8416'\n          cp: '4.7000e-4'",
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        assertion=test_cp_grid_sample_binding_and_render_pins,
+    )

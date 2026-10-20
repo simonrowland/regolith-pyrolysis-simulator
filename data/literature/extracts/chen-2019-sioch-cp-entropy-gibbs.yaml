@@ -10,8 +10,11 @@ extraction:
   method: mineru_table_draft transcription from born-digital tables, checked against pdftotext layout and rendered table layouts
   date: '2026-10-20'
   worker: fam30-1020
-  source_note: Tables 5-12 are measured molar heat-capacity tables; every printed numeric Cp point is retained in its printed
-    unit and precision. Tables 1-3 and residual Table 4 values, plus model-derived Tables 13-21, are retained in context; numeric grids are transcribed in this extract. Figures 1-4 are retained as deferred figure records without numeric points.
+  source_note: >-
+    Tables 5-12 are measured molar heat-capacity tables; every printed numeric Cp point is retained in its printed unit and
+    precision. Tables 1-3 and model-derived Tables 13-21 remain context; Table 4 element-formation values are typed separately.
+    The model grids bind by printed sample to Tables 14-21: #R337, #300, #844, #539, #338, #248, #149, and #659. Figures
+    1-4 are deferred figure records without numeric points.
 review_status: draft
 notes:
 - text: Table 1 identifies eight whole-film samples. Each Cp observation binds values.sample_id to the table sample number;
@@ -2671,8 +2674,7 @@ species:
           - ${11.77} \pm {0.24}$
           - $- {38.17} \pm {0.24}$
           - $- {122.23} \pm {5.23}$
-        schema_gap: The formation functions use Table 3 drop-solution enthalpies, which have no matching store token. Derived
-          formation thermochemistry is pending a corpus table asset (controller, t-1382); source table cells are in .agent-scratch/oxide-thermochemistry-tables/chen-2019-sioch-cp-entropy-gibbs/table-4.csv.
+        schema_gap: Table 3 drop-solution enthalpies have no matching store token. The Table 4 element-formation values are typed in separate observations.
     - observation_id: chen2019_table13_context
       type: printed_table_context
       locator:
@@ -2968,16 +2970,18 @@ species:
           - 45.28–302.38
           - 54.75–302.88
           - 53.03–302.89
-    - observation_id: chen2019_table15_context
+    - observation_id: chen2019_table14_context
       type: printed_table_context
       locator:
-        page: 11
-        pdf_page_index: 10
-        table: '15'
+        page: 10
+        pdf_page_index: 9
+        table: '14'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
-        table_number: 15
+        method_class: model_derived
+        table_number: 14
+        sample_id: 'a-SiCH #R337'
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -3222,18 +3226,18 @@ species:
           - '8.8744'
           - '1.6353'
           - '3.4232'
-    - observation_id: chen2019_table16_context
+    - observation_id: chen2019_table20_context
       type: printed_table_context
       locator:
-        page: 12
-        pdf_page_index: 11
-        table: '16'
+        page: 15
+        pdf_page_index: 14
+        table: '20'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
         method_class: model_derived
-        table_number: 16
-        sample_id: a-SiOCH #844
+        table_number: 20
+        sample_id: 'a-SiOCH #149'
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -3473,16 +3477,18 @@ species:
           - '14.477'
           - '2.1633'
           - '7.2657'
-    - observation_id: chen2019_table17_context
+    - observation_id: chen2019_table15_context
       type: printed_table_context
       locator:
-        page: 12
-        pdf_page_index: 11
-        table: '17'
+        page: 11
+        pdf_page_index: 10
+        table: '15'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
-        table_number: 17
+        method_class: model_derived
+        table_number: 15
+        sample_id: 'a-SiCH #300'
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -3722,16 +3728,18 @@ species:
           - '10.694'
           - '1.7728'
           - '4.7843'
-    - observation_id: chen2019_table18_context
+    - observation_id: chen2019_table16_context
       type: printed_table_context
       locator:
-        page: 13
-        pdf_page_index: 12
-        table: '18'
+        page: 12
+        pdf_page_index: 11
+        table: '16'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
-        table_number: 18
+        method_class: model_derived
+        table_number: 16
+        sample_id: 'a-SiOCH #844'
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -3971,16 +3979,18 @@ species:
           - '13.104'
           - '2.2052'
           - '5.7537'
-    - observation_id: chen2019_table19_context
+    - observation_id: chen2019_table17_context
       type: printed_table_context
       locator:
-        page: 14
-        pdf_page_index: 13
-        table: '19'
+        page: 12
+        pdf_page_index: 11
+        table: '17'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
-        table_number: 19
+        method_class: model_derived
+        table_number: 17
+        sample_id: 'a-SiOCH #539'
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -4210,18 +4220,28 @@ species:
           - '10.842'
           - '1.7628'
           - '4.7634'
-    - observation_id: chen2019_table20_context
+        - - '298.15'
+          - '12.200'
+          - '11.176'
+          - '1.8611'
+          - '4.9341'
+        - - '300'
+          - '12.264'
+          - '11.252'
+          - '1.8837'
+          - '4.9729'
+    - observation_id: chen2019_table19_context
       type: printed_table_context
       locator:
-        page: 15
-        pdf_page_index: 14
-        table: '20'
+        page: 14
+        pdf_page_index: 13
+        table: '19'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
         method_class: model_derived
-        table_number: 20
-        sample_id: a-SiOCH #149
+        table_number: 19
+        sample_id: 'a-SiOCH #248'
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -4461,17 +4481,18 @@ species:
           - '9.7339'
           - '1.6760'
           - '4.1474'
-    - observation_id: chen2019_table21_context
+    - observation_id: chen2019_table18_context
       type: printed_table_context
       locator:
-        page: 15
-        pdf_page_index: 14
-        table: '21'
+        page: 13
+        pdf_page_index: 12
+        table: '18'
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
-        table_number: 21
-        sample_id: a-SiOCH #659
+        method_class: model_derived
+        table_number: 18
+        sample_id: 'a-SiOCH #338'
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -4661,17 +4682,19 @@ species:
           - '13.159'
           - '1.5656'
           - '6.0421'
-    - observation_id: chen2019_table21_continued_context
+    - observation_id: chen2019_table18_continued_context
       type: printed_table_context
       locator:
-        page: 16
-        pdf_page_index: 15
-        table: '21'
+        page: 14
+        pdf_page_index: 13
+        table: '18'
+        note: Table 18 continued on physical page 14.
       units: as printed in table headers
       values:
         quantity: model_derived_table_values
-        table_number: 21
-        sample_id: a-SiOCH #659
+        method_class: model_derived
+        table_number: 18
+        sample_id: 'a-SiOCH #338'
         disposition: context_model
         reason: Fitted or tabulated standard thermodynamic functions derived from fitted heat capacities; model/fit results
           are context. The full printed cells are preserved below.
@@ -4731,6 +4754,276 @@ species:
           - '17.555'
           - '2.7048'
           - '8.5388'
+    - observation_id: chen2019_table21_context
+      type: printed_table_context
+      locator:
+        page: 15
+        pdf_page_index: 14
+        table: '21'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        method_class: model_derived
+        table_number: 21
+        sample_id: 'a-SiOCH #659'
+        disposition: context_model
+        reason: Fitted thermodynamic values are model results and remain context; the full printed table cells are retained.
+        printed_rows:
+        - - 'T/K'
+          - '$C_{p,m}/J·K^{-1}·mol^{-1}$'
+          - '$\Delta^{\text{T}}S_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1}$'
+          - '$\Delta^{\text{T}}H_{\text{m}}^{\text{o}}/kJ·mol^{-1}$'
+          - '$\varphi_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1,b}$'
+        - - '0'
+          - '0'
+          - '0'
+          - '0'
+          - '0'
+        - - '1'
+          - '$8.584·10^{-4}$'
+          - '$8.361·10^{-4}$'
+          - '$4.200·10^{-7}$'
+          - '$4.161·10^{-4}$'
+        - - '2'
+          - '$3.125·10^{-3}$'
+          - '$1.934·10^{-3}$'
+          - '$2.125·10^{-6}$'
+          - '$8.719·10^{-4}$'
+        - - '3'
+          - '0.01065'
+          - '$4.407·10^{-3}$'
+          - '$8.472·10^{-6}$'
+          - '$1.583·10^{-3}$'
+        - - '4'
+          - '0.02459'
+          - '$9.232·10^{-3}$'
+          - '$2.558·10^{-5}$'
+          - '$2.837·10^{-3}$'
+        - - '5'
+          - '0.04412'
+          - '0.01672'
+          - '$5.951·10^{-5}$'
+          - '$4.821·10^{-3}$'
+        - - '6'
+          - '0.06816'
+          - '0.02683'
+          - '$1.153·10^{-4}$'
+          - '$7.611·10^{-3}$'
+        - - '7'
+          - '0.09584'
+          - '0.03937'
+          - '$1.970·10^{-4}$'
+          - '0.01122'
+        - - '8'
+          - '0.12651'
+          - '0.05414'
+          - '$3.080·10^{-4}$'
+          - '0.01564'
+        - - '9'
+          - '0.15973'
+          - '0.07094'
+          - '$4.509·10^{-4}$'
+          - '0.02084'
+        - - '10'
+          - '0.19516'
+          - '0.08958'
+          - '$6.282·10^{-4}$'
+          - '0.02676'
+        - - '15'
+          - '0.39812'
+          - '0.20574'
+          - '$2.095·10^{-3}$'
+          - '0.06609'
+        - - '20'
+          - '0.62213'
+          - '0.35083'
+          - '$4.643·10^{-3}$'
+          - '0.11867'
+        - - '25'
+          - '0.84835'
+          - '0.51391'
+          - '$8.318·10^{-3}$'
+          - '0.18117'
+        - - '30'
+          - '1.0821'
+          - '0.68905'
+          - '0.01314'
+          - '0.25108'
+        - - '35'
+          - '1.3315'
+          - '0.87436'
+          - '0.01917'
+          - '0.32676'
+    - observation_id: chen2019_table21_continued_context
+      type: printed_table_context
+      locator:
+        page: 16
+        pdf_page_index: 15
+        table: '21 continued'
+      units: as printed in table headers
+      values:
+        quantity: model_derived_table_values
+        method_class: model_derived
+        table_number: 21
+        sample_id: 'a-SiOCH #659'
+        disposition: context_model
+        reason: Fitted thermodynamic values are model results and remain context; the full printed table cells are retained.
+        printed_rows:
+        - - 'T/K'
+          - '$C_{p,m}/J·K^{-1}·mol^{-1}$'
+          - '$\Delta^{\text{T}}S_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1}$'
+          - '$\Delta^{\text{T}}H_{\text{m}}^{\text{o}}/kJ·mol^{-1}$'
+          - '$\varphi_{\text{m}}^{\text{o}}/J·K^{-1}·mol^{-1,b}$'
+        - - '40'
+          - '1.5954'
+          - '1.0693'
+          - '0.02648'
+          - '0.40730'
+        - - '45'
+          - '1.8617'
+          - '1.2726'
+          - '0.03512'
+          - '0.49208'
+        - - '50'
+          - '2.1163'
+          - '1.4821'
+          - '0.04508'
+          - '0.58057'
+        - - '60'
+          - '2.6686'
+          - '1.9154'
+          - '0.06893'
+          - '0.76660'
+        - - '70'
+          - '3.1957'
+          - '2.3670'
+          - '0.09829'
+          - '0.96283'
+        - - '80'
+          - '3.6790'
+          - '2.8257'
+          - '0.13270'
+          - '1.1670'
+        - - '90'
+          - '4.1326'
+          - '3.2854'
+          - '0.17177'
+          - '1.3768'
+        - - '100'
+          - '4.5640'
+          - '3.7434'
+          - '0.21527'
+          - '1.5906'
+        - - '110'
+          - '4.9763'
+          - '4.1978'
+          - '0.26299'
+          - '1.8070'
+        - - '120'
+          - '5.3707'
+          - '4.6479'
+          - '0.31474'
+          - '2.0250'
+        - - '130'
+          - '5.7482'
+          - '5.0928'
+          - '0.37035'
+          - '2.2439'
+        - - '140'
+          - '6.1096'
+          - '5.5321'
+          - '0.42965'
+          - '2.4631'
+        - - '150'
+          - '6.4561'
+          - '5.9655'
+          - '0.49249'
+          - '2.6822'
+        - - '160'
+          - '6.7893'
+          - '6.3929'
+          - '0.55873'
+          - '2.9008'
+        - - '170'
+          - '7.1108'
+          - '6.8142'
+          - '0.62824'
+          - '3.1186'
+        - - '180'
+          - '7.4224'
+          - '7.2295'
+          - '0.70091'
+          - '3.3355'
+        - - '190'
+          - '7.7257'
+          - '7.6389'
+          - '0.77666'
+          - '3.5513'
+        - - '200'
+          - '8.0224'
+          - '8.0428'
+          - '0.85540'
+          - '3.7658'
+        - - '210'
+          - '8.3139'
+          - '8.4413'
+          - '0.93709'
+          - '3.9789'
+        - - '220'
+          - '8.6017'
+          - '8.8347'
+          - '1.0217'
+          - '4.1907'
+        - - '230'
+          - '8.8870'
+          - '9.2234'
+          - '1.1091'
+          - '4.4011'
+        - - '240'
+          - '9.1709'
+          - '9.6076'
+          - '1.1994'
+          - '4.6101'
+        - - '250'
+          - '9.4545'
+          - '9.9877'
+          - '1.2925'
+          - '4.8176'
+        - - '260'
+          - '9.7386'
+          - '10.364'
+          - '1.3885'
+          - '5.0237'
+        - - '270'
+          - '10.024'
+          - '10.737'
+          - '1.4873'
+          - '5.2284'
+        - - '273.15'
+          - '10.114'
+          - '10.854'
+          - '1.5190'
+          - '5.2926'
+        - - '280'
+          - '10.312'
+          - '11.107'
+          - '1.5890'
+          - '5.4317'
+        - - '290'
+          - '10.602'
+          - '11.474'
+          - '1.6935'
+          - '5.6337'
+        - - '298.15'
+          - '10.840'
+          - '11.771'
+          - '1.7809'
+          - '5.7974'
+        - - '300'
+          - '10.895'
+          - '11.838'
+          - '1.8010'
+          - '5.8345'
     - observation_id: chen2019_figure1_pxrd
       type: figure_record
       locator:
