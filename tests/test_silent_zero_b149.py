@@ -599,6 +599,148 @@ def test_internal_analytical_out_of_range_oxide_pressure_is_flagged() -> None:
     assert "valid_range_K=[1400, 2273.15]" in detail
 
 
+def test_internal_analytical_full_catalog_skips_absent_non_antoine_species() -> None:
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.equilibrium import EquilibriumMixin
+
+    sim = _internal_analytical_host(
+        temperature_K=1700.0,
+        composition_wt_pct={"Li2O": 100.0},
+        vapor_pressures=VAPOR_PRESSURE_DATA,
+    )
+
+    result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+    assert result.status == "ok"
+    notes = result.diagnostics.get("silent_zero_notes") or []
+    assert not any(
+        n.get("zero_because") == ZeroBecause.MISSING_COEFFICIENT.value
+        for n in notes
+    )
+
+
+def test_internal_analytical_full_catalog_dispatches_active_nasa9_rows() -> None:
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.equilibrium import EquilibriumMixin
+
+    sim = _internal_analytical_host(
+        temperature_K=1700.0,
+        composition_wt_pct={"P2O5": 100.0},
+        vapor_pressures=VAPOR_PRESSURE_DATA,
+    )
+
+    result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+    assert result.status == "ok"
+    assert result.vapor_pressures_Pa["PO"] > 0.0
+    assert result.vapor_pressures_Pa["PO2"] > 0.0
+
+
+def test_internal_analytical_invalid_antoine_coefficients_refuse_all_rails() -> None:
+    from copy import deepcopy
+
+    from engines.builtin.vapor_pressure import GAS_RAIL_STANDARD_REACTION_KEY
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.equilibrium import EquilibriumMixin
+
+    malformed_values = ("missing", None, "", float("nan"), float("inf"))
+    for field in ("B", "C", "A"):
+        for malformed in malformed_values:
+            def coefficients() -> dict:
+                values = {"A": 10.0, "B": 100.0, "C": 0.0}
+                if malformed == "missing":
+                    values.pop(field)
+                else:
+                    values[field] = malformed
+                return values
+
+            iron = deepcopy(VAPOR_PRESSURE_DATA["metals"]["Fe"])
+            iron["pure_component_antoine"] = coefficients()
+            iron["antoine"] = coefficients()
+
+            aluminum = deepcopy(VAPOR_PRESSURE_DATA["metals"]["Al"])
+            aluminum["liquid_oxide_standard_reaction"]["antoine"] = coefficients()
+
+            magnesium = deepcopy(VAPOR_PRESSURE_DATA["metals"]["Mg"])
+            gas_rail = magnesium[GAS_RAIL_STANDARD_REACTION_KEY]
+            for key in ("status", "runtime_disposition", "authority_status"):
+                gas_rail.pop(key, None)
+            gas_rail["authoritative"] = True
+            gas_rail["antoine"] = coefficients()
+
+            silicon_monoxide = deepcopy(
+                VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"]
+            )
+            silicon_monoxide["antoine"] = coefficients()
+
+            sim = _internal_analytical_host(
+                temperature_K=1700.0,
+                composition_wt_pct={
+                    "FeO": 25.0,
+                    "Al2O3": 25.0,
+                    "MgO": 25.0,
+                    "SiO2": 25.0,
+                },
+                vapor_pressures={
+                    "metals": {
+                        "Fe": iron,
+                        "Al": aluminum,
+                        "Mg": magnesium,
+                    },
+                    "oxide_vapors": {"SiO": silicon_monoxide},
+                },
+            )
+
+            result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+            assert result.status == "refused", (field, malformed)
+            notes = result.diagnostics.get("silent_zero_notes") or []
+            refused = {
+                note.get("species")
+                for note in notes
+                if note.get("zero_because") == ZeroBecause.MISSING_COEFFICIENT.value
+                and note.get("doctrine_category") == CATEGORY_REFUSE
+            }
+            assert {"Fe", "Al", "Mg", "SiO"} <= refused, (field, malformed)
+            assert not ({"Fe", "Al", "Mg", "SiO"} & result.vapor_pressures_Pa.keys())
+
+
+def test_internal_analytical_singular_antoine_fit_refuses_without_arithmetic_error() -> None:
+    from copy import deepcopy
+
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.equilibrium import EquilibriumMixin
+
+    cases = (
+        {"A": 10.0, "B": 1.0, "C": -1000.0},
+        {"A": 10.0, "B": 1e308, "C": -999.9999999999999},
+    )
+    for antoine in cases:
+        silicon_monoxide = deepcopy(VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"])
+        silicon_monoxide["antoine"] = antoine
+        silicon_monoxide["valid_range_K"] = [1.0, 2000.0]
+        sim = _internal_analytical_host(
+            temperature_K=1000.0,
+            composition_wt_pct={"SiO2": 100.0},
+            vapor_pressures={
+                "metals": {},
+                "oxide_vapors": {"SiO": silicon_monoxide},
+            },
+        )
+
+        result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+        assert result.status == "refused"
+        assert "SiO" not in result.vapor_pressures_Pa
+        notes = result.diagnostics.get("silent_zero_notes") or []
+        assert any(
+            n.get("species") == "SiO"
+            and n.get("zero_because") == ZeroBecause.MISSING_COEFFICIENT.value
+            and n.get("doctrine_category") == CATEGORY_REFUSE
+            for n in notes
+        )
+
+
 # ---------------------------------------------------------------------------
 # Instance 6: C7 Ca transport missing/non-finite inputs + bounded notes
 # ---------------------------------------------------------------------------
