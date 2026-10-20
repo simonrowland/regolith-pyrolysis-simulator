@@ -445,11 +445,20 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 control_audit=control_audit,
             )
 
-        # Solubility headroom: K2O_max_kg = total_melt * 10% - K2O_current
-        K2O_max_kg = max(
-            0.0,
-            total_kg * self.K2O_SOLUBILITY_WT_PCT / 100.0
-            - composition_kg.get("K2O", 0.0),
+        # For 2 K + FeO -> K2O + Fe, each kg of K2O consumes
+        # r = M_FeO / M_K2O kg of FeO, changing melt mass by (1 - r) kg.
+        # Solving (current_K2O + x) / (total_melt + (1 - r) * x) = L
+        # gives x = (L * total_melt - current_K2O) / (1 - L * (1 - r));
+        # share the Na shuttle's mass-balance helper for this product cap.
+        K2O_max_kg = self._product_cap_kg_for_solubility(
+            total_kg=total_kg,
+            current_product_kg=composition_kg.get("K2O", 0.0),
+            removed_kg=0.0,
+            added_product_kg=0.0,
+            removed_kg_per_product_kg=(
+                molar_mass["FeO"] / molar_mass["K2O"]
+            ),
+            solubility_wt_pct=self.K2O_SOLUBILITY_WT_PCT,
         )
         # Convert K2O capacity to K capacity: 2K / K2O molar ratio.
         K_for_K2O_limit_kg = (
