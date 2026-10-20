@@ -458,17 +458,25 @@ does not resolve an instantaneous local-surface O₂ spike inside the same Mg so
 <!-- impl: §4.4 -> engines/builtin/evaporation_transition.py BuiltinEvaporationTransitionProvider.dispatch:121 — O2 overhead credit -->
 <!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:491 — conductance bleed -->
 
-**How the sweep is represented, and its current limits.** The inert sweep (the 5–15 mbar pN₂ cover) enters
-the model as an *overhead pressure*, not as a commanded *flow rate*. Raising it lowers the Knudsen number
-and shifts the gas-side transport from the ballistic toward the viscous (continuum) limit, raising `r_gas`;
-because it enters no dissociation equilibrium, it changes the rate and the coating pattern but not the
-equilibrium pressure itself. The oxygen dilution above is likewise driven by a pressure-and-conductance
-bleed rather than a sweep flow rate. Two consequences are stated as current limitations in
-[`docs/model-limitations.md`](model-limitations.md): the model has no sweep *rate* or residence-time input,
-so the advective removal of vapor and oxygen that a faster flowing sweep would provide is not resolved
-separately from the static-pressure diffusion resistance; and the co-evolved-oxygen self-poisoning acts
-with a one-step lag (through the headspace ledger) rather than as an instantaneous local-surface balance in
-which the oxygen from the current solve poisons that same solve.
+**How the sweep is represented, and its current limits.** A declared
+`campaigns.<campaign>.sweep_mol_per_s` (including staged gas controls) drives
+the continuous well-mixed mol balance in the overhead transport owner.
+At fixed admitted pressure, inflow plus generation plus initial inventory
+minus integrated outlet determines retained composition and physical pO₂.
+The existing bleed provider validates available molecules and line capacity
+and commits the single transport transition. Missing Mars inert-sweep flow
+refuses; explicit zero is a real control. Non-Mars runs without the field
+retain their legacy pressure-and-conductance boundary.
+
+Total pressure still sets Knudsen number and gas-side resistance. The
+hourly operator split uses committed known sources for the vapor-boundary
+preview and actual residual generation for the final transport balance;
+oxygen from the vapor solve feeds subsequent solves. It does not resolve
+instantaneous local-surface self-poisoning. Pure supplied CO₂ uses the existing
+CO₂/CO/O₂ thermodynamics at fixed final total pressure, with equilibration
+flagged as unverified. Supplied CO plus CO₂ requires a reactive boundary;
+the pure-CO₂ floor is not imposed on that mixture. See
+[`docs/model-limitations.md`](model-limitations.md) for unresolved device and supply inputs.
 <!-- impl: §4.4 -> simulator/campaigns.py CampaignManager._c2a_staged_stage_gas_control:1118 — pN2 band cover -->
 
 ---

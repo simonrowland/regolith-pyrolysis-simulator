@@ -47,10 +47,12 @@ def test_explicit_co2_campaign_declaration_reaches_session_carrier():
     assert session.simulator._resolve_condensation_carrier_gas() == 'CO2'
 
 
-def mars_sim(*, pressure_mbar=6.0, pumping=None):
+def mars_sim(*, pressure_mbar=6.0, pumping=None, sweep=0.0):
     bundle = load_config_bundle()
     setpoints = deepcopy(bundle.setpoints)
     setpoints['campaigns']['C2A_continuous']['p_total_mbar_default'] = pressure_mbar
+    if sweep is not None:
+        setpoints['campaigns']['C2A_continuous']['sweep_mol_per_s'] = sweep
     if pumping is not None:
         setpoints.setdefault('overhead_headspace', {})['pumping'] = pumping
     sim = PyrolysisSimulator(InternalAnalyticalBackend(), setpoints,

@@ -11,12 +11,14 @@ from simulator.chemistry.offgas_fo2 import (
 )
 
 
-def test_1800_K_matches_independent_janaf_formation_gibbs():
+@pytest.mark.parametrize('fixed_pressure', [False, True])
+def test_1800_K_matches_independent_janaf_formation_gibbs(fixed_pressure):
     # NIST-JANAF C-093/C-095, 1800 K: ΔfG(CO)=-269.242 and
     # ΔfG(CO2)=-396.353 kJ/mol; O2 reference formation Gibbs = 0.
     # https://janaf.nist.gov/tables/C-093.html and C-095.html.
     # Independently tabulated ΔrG = 127.111 kJ/mol implies Kd=2.04818e-4.
-    result = co2_dissociation_partials_bar(1800.0, 6.1e-3, 0.0)
+    boundary = {'total_pressure_bar': 6.1e-3} if fixed_pressure else {}
+    result = co2_dissociation_partials_bar(1800.0, 6.1e-3, 0.0, **boundary)
     quotient = result['p_CO_bar'] * math.sqrt(result['p_O2_bar']) / result['p_CO2_bar']
     assert quotient == pytest.approx(2.04818e-4, rel=0.004)
     assert 7.1e-5 < result['p_O2_bar'] < 7.4e-5

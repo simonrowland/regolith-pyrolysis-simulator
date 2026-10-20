@@ -350,6 +350,7 @@ class CampaignManager:
         'runtime_override',
     })
     _COMMON_OVERRIDE_FIELDS = frozenset({
+        'sweep_mol_per_s',
         'condenser_geometry',
         'duration_h',
         'freeze_gate',
@@ -1289,6 +1290,21 @@ class CampaignManager:
         # Mars uses Ar; an explicit CO2 campaign declaration wins.
         return 'Ar' if melt.body == 'mars' and carrier == 'N2' else carrier
 
+    def _campaign_sweep_flow(self, campaign: CampaignPhase, stage=None) -> float | None:
+        raw = self._campaign_overrides(campaign).get(
+            'sweep_mol_per_s', (stage or {}).get(
+                'sweep_mol_per_s', self._campaign_config(campaign).get('sweep_mol_per_s'),
+            ),
+        )
+        if raw is None:
+            return None
+        if not is_declared_real_scalar(raw, allow_numeric_str=True):
+            raise ValueError('sweep_mol_per_s must be numeric')
+        value = float(raw)
+        if not math.isfinite(value) or value < 0.0:
+            raise ValueError('sweep_mol_per_s must be finite and non-negative')
+        return value
+
     def apply_c2a_staged_gas_controls(
             self,
             melt: MeltState,
@@ -1309,6 +1325,7 @@ class CampaignManager:
         stage = self._c2a_staged_active_stage(melt.campaign_hour)
         if not isinstance(stage, Mapping):
             raise ValueError('C2A_staged.stages did not select a stage')
+        melt.sweep_mol_per_s = self._campaign_sweep_flow(active_campaign, stage)
         atmosphere, diagnostic = self._c2a_staged_stage_gas_control(stage)
         melt.atmosphere = atmosphere
         melt.pO2_mbar = float(diagnostic['pO2_mbar'])
@@ -1441,6 +1458,7 @@ class CampaignManager:
         Called when starting a new campaign phase.
         """
         self._reset_stage_background_gas(melt)
+        melt.sweep_mol_per_s = self._campaign_sweep_flow(campaign)
         self._materialized_target_T_C_by_phase.pop(campaign, None)
         materialized_target = self._materialize_target_from_delta(campaign)
         if materialized_target is not None:

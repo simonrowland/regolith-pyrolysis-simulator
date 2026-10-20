@@ -262,6 +262,7 @@ C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS: tuple[KeyPath, ...] = tuple(
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE.values()
 )
 C2A_STAGED_STAGE_GAS_FIELDS: tuple[str, ...] = (
+    "sweep_mol_per_s",
     "pO2_mbar",
     "p_total_mbar",
     "gas_cover_mode",
@@ -467,6 +468,11 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
     prefix = f"campaigns.C2A_staged.stages.{stage_name}"
     return (
         _knob(
+            f"{prefix}.sweep_mol_per_s", low=0.0, units="mol/s",
+            bounds_source="operator_declared: installed carrier-flow envelope required for search",
+            search_enabled=False,
+        ),
+        _knob(
             f"{prefix}.pO2_mbar",
             low=0.0,
             high=15.0,
@@ -590,6 +596,14 @@ class RecipeSchema:
     )
 
     ALLOWLIST: tuple[KnobSpec, ...] = (
+        *tuple(_knob(
+            f"campaigns.{campaign}.sweep_mol_per_s", low=0.0, units="mol/s",
+            bounds_source="operator_declared: installed carrier-flow envelope required for search",
+            search_enabled=False,
+        ) for campaign in (
+            "C0", "C0b_p_cleanup", "C2A_continuous", "C2A_staged", "C2B",
+            "C3", "C4", "C5", "C6", "C7", "mre_baseline",
+        )),
         _knob(
             "furnace_max_T_C",
             low=FURNACE_MAX_T_BOUNDS_C[0],

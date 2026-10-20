@@ -159,6 +159,8 @@ def _mars_sim():
     })
     sim = _sim(feedstocks)
     sim.load_batch('lunar_mare_low_ti', mass_kg=1000.0)
+    from simulator.state import Atmosphere
+    sim.melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
     return sim
 
 
@@ -211,6 +213,7 @@ def test_earth_air_oxygen_is_a_mole_fraction_not_total_pressure():
     sim.melt.body = 'earth'
     sim.melt.ambient_atmosphere = 'air'
     sim.melt.ambient_pressure_mbar = 1000.0
+    sim.melt.p_total_mbar = 1000.0
     assert sim._headspace_transport_pO2_bar_from_ledger(0.01) == pytest.approx(0.22)
 
 
@@ -238,7 +241,7 @@ def test_controlled_lab_co2_uses_existing_residual_background_pressure_owner():
     sim.melt.pO2_mbar = 900.0
     sim.melt.background_gas_species = 'CO2'
     sim.melt.background_gas_mole_fraction = 1.0
-    expected = co2_dissociation_partials_bar(1800.0, 0.1, 0.9)
+    expected = co2_dissociation_partials_bar(1800.0, 0.1, 0.9, total_pressure_bar=1.0)
     assert sim._headspace_transport_pO2_bar_from_ledger(0.0) == expected['p_O2_bar']
     assert sim._headspace_co2_dissociation_diagnostic['p_CO2_bar'] == expected['p_CO2_bar']
 
@@ -254,3 +257,47 @@ def test_unknown_controlled_background_is_not_assumed_inert():
     sim.melt.background_gas_mole_fraction = 1.0
     with pytest.raises(CoverGasCompositionUnavailable, match='cover-gas composition'):
         sim._headspace_transport_pO2_bar_from_ledger(0.0)
+
+
+def test_cold_mars_ambient_co2_keeps_raw_physical_po2_below_guard():
+    sim = _mars_sim()
+    physical = sim._headspace_transport_pO2_bar_from_ledger(0.0)
+    assert 0.0 < physical < sim._oxygen_numerical_floor_bar()
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    assert sim.melt.oxygen_reservoir.headspace_transport_pO2_bar == physical
+    assert sim._vapor_pressure_dispatch_pO2_bar() == sim._oxygen_numerical_floor_bar()
+    result = sim._headspace_co2_dissociation_diagnostic
+    assert sum(result[k] for k in ("p_CO2_bar", "p_CO_bar", "p_O2_bar", "p_inert_bar")) == pytest.approx(0.0061)
+
+
+def test_isolated_mars_chamber_does_not_inherit_ambient_co2():
+    from simulator.state import Atmosphere
+    sim = _mars_sim()
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 0.001
+    assert sim._headspace_transport_pO2_bar_from_ledger(0.0) == 0.0
+
+
+def test_mars_ambient_cleanup_with_co_requires_a_reactive_boundary():
+    from simulator.campaigns import CampaignPressureSetpointRefusal
+    sim = _mars_sim()
+    sim.atom_ledger.load_external_mol("process.overhead_gas", {"CO": 1.0},
+                                    source="actual cleanup gas", material_origin="feedstock")
+    with pytest.raises(CampaignPressureSetpointRefusal, match="reactive CO/CO2"):
+        sim._headspace_transport_pO2_bar_from_ledger(0.0)
+
+
+def test_controlled_co2_keeps_unselected_background_as_inert():
+    from simulator.chemistry.offgas_fo2 import co2_dissociation_partials_bar
+    from simulator.state import Atmosphere
+    sim = _mars_sim()
+    sim.melt.temperature_C = 1800.0 - 273.15
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.p_total_mbar = 1000.0
+    sim.melt.pO2_mbar = 900.0
+    sim.melt.background_gas_species = "CO2"
+    sim.melt.background_gas_mole_fraction = 0.5
+    expected = co2_dissociation_partials_bar(1800.0, 0.05, 0.9,
+        total_pressure_bar=1.0, p_inert_initial_bar=0.05)
+    assert sim._headspace_transport_pO2_bar_from_ledger(0.0) == expected["p_O2_bar"]
+    assert sim._headspace_co2_dissociation_diagnostic["p_inert_bar"] == expected["p_inert_bar"]

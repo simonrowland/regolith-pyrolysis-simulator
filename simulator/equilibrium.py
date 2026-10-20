@@ -151,7 +151,8 @@ class EquilibriumMixin:
             declaration = str(getattr(self.melt, 'ambient_atmosphere', '') or '')
             total_bar = float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0) / 1000.0
             if normalize_body_name(getattr(self.melt, 'body', '')) == 'mars':
-                total_bar = float(self.melt.p_total_mbar) / 1000.0
+                # An isolated pumped chamber has no declared ambient inflow.
+                return float(ledger_pO2_bar)
         partials = cover_gas_partial_pressures(declaration, total_bar)
         oxygen_bar = float(ledger_pO2_bar) + partials.get('O2', 0.0)
         co2_bar = partials.get('CO2', 0.0)
@@ -159,8 +160,29 @@ class EquilibriumMixin:
             return oxygen_bar
         # Same gas-temperature owner as ledger nRT/V and transport conductance:
         # configured melt/lumped model plus the headspace temperature offset.
+        fixed_pressure = {}
+        if normalize_body_name(getattr(self.melt, 'body', '')) == 'mars':
+            if self._overhead_holdup_mol().get('CO', 0.0) > 0.0:
+                from simulator.campaigns import CampaignPressureSetpointRefusal
+                raise CampaignPressureSetpointRefusal({
+                    'status': 'missing_input', 'reason': 'missing_input',
+                    'detail': 'reactive CO/CO2 boundary required for ambient CO2 cleanup',
+                    'requested_pressure_pa': self.melt.p_total_mbar * 100.0,
+                    'achieved_pressure_pa': total_bar * 1e5,
+                })
+            cover_total_bar = total_bar
+            if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
+                cover_total_bar = controlled_background_partial_pressure(
+                    self.melt.p_total_mbar, self.melt.pO2_mbar, 1.0,
+                ) / 1000.0
+            fixed_pressure = {
+                'total_pressure_bar': self.melt.p_total_mbar / 1000.0,
+                # Unspecified cover balance is inert for this pressure-only
+                # projection, never invented as O2 or credited to the ledger.
+                'p_inert_initial_bar': max(0.0, cover_total_bar - sum(partials.values())),
+            }
         diagnostic = co2_dissociation_partials_bar(
-            self._headspace_temperature_K(), co2_bar, oxygen_bar,
+            self._headspace_temperature_K(), co2_bar, oxygen_bar, **fixed_pressure,
         )
         self._headspace_co2_dissociation_diagnostic = diagnostic
         return float(diagnostic['p_O2_bar'])
@@ -193,6 +215,8 @@ class EquilibriumMixin:
         to melt-offgas terminal bins, so this helper sees real carried
         headspace pO₂ instead of a synthetic vacuum-floor setpoint.
         """
+        if self.melt.sweep_mol_per_s is not None:
+            return self._physical_sweep_boundary()['partials_bar'].get('O2', 0.0)
         enabled = getattr(self, '_overhead_headspace_enabled', lambda: False)()
         if enabled:
             diagnostic = getattr(
@@ -213,7 +237,8 @@ class EquilibriumMixin:
             # floor alone.
             if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
                 pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-            return max(self._headspace_equilibrated_pO2_bar(pO2_bar), self._oxygen_numerical_floor_bar())
+            physical = self._headspace_equilibrated_pO2_bar(pO2_bar)
+            return physical if self.melt.body == 'mars' else max(physical, self._oxygen_numerical_floor_bar())
 
         upstream_partials = getattr(
             self,
@@ -226,17 +251,22 @@ class EquilibriumMixin:
         )
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
             pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-        return max(self._headspace_equilibrated_pO2_bar(pO2_bar), self._oxygen_numerical_floor_bar())
+        physical = self._headspace_equilibrated_pO2_bar(pO2_bar)
+        return physical if self.melt.body == 'mars' else max(physical, self._oxygen_numerical_floor_bar())
 
     def _headspace_transport_pO2_bar(self) -> float:
         """O2 transport reservoir pO2 consumed by SiO/vapor transport."""
 
+        if self.melt.sweep_mol_per_s is not None:
+            return self._physical_sweep_boundary()['partials_bar'].get('O2', 0.0)
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         if reservoir is not None:
             pO2_bar = float(
                 getattr(reservoir, 'headspace_transport_pO2_bar', 0.0)
                 or 0.0
             )
+            if self.melt.body == 'mars':
+                return pO2_bar
             if pO2_bar > 0.0:
                 return max(pO2_bar, self._oxygen_numerical_floor_bar())
         return self._commanded_pO2_bar()
@@ -1159,7 +1189,7 @@ class EquilibriumMixin:
 
             # a_M(row basis) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
             dissociation_pO2_bar = (
-                pO2_bar if parent_oxide == 'FeO' else melt_dissociation_pO2_bar
+                max(pO2_bar, vacuum_floor_bar) if parent_oxide == 'FeO' else melt_dissociation_pO2_bar
             )
             # Premise: this fallback solves the melt-supported source pressure;
             # the later surface-flux layer owns overhead species backpressure.
@@ -1335,7 +1365,8 @@ class EquilibriumMixin:
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
                 P_sat = _require_finite_vapor_value(
-                    P_sat * (pO2_bar / pO2_reference_bar) ** pO2_exponent,
+                    P_sat * ((max(pO2_bar, vacuum_floor_bar) if pO2_exponent < 0.0 else pO2_bar)
+                             / pO2_reference_bar) ** pO2_exponent,
                     species=name,
                     field="P_sat_pO2",
                 )

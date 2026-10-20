@@ -74,6 +74,7 @@ from engines.builtin.overhead_bleed import (
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET  # K — Celsius-to-Kelvin offset
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.transport_constants import CARRIER_GAS_PROPERTIES
 
 O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0  # kg/mol — O2 molar mass; g/mol -> kg/mol
 
@@ -161,6 +162,111 @@ _STAGE_AREA_ALIASES = {
 
 class OverheadConfigurationError(ValueError):
     """Invalid overhead configuration input."""
+
+
+def continuous_sweep_balance(
+    initial_species_mol: Mapping[str, float],
+    generated_species_mol: Mapping[str, float],
+    *, carrier: str, sweep_mol_per_s: float, dt_s: float,
+    pressure_bar: float, volume_m3: float, temperature_K: float,
+) -> dict[str, dict[str, float]]:
+    """Integrated well-mixed, constant-pressure overhead balance (mol/step)."""
+    flow = _required_finite_nonnegative_float(sweep_mol_per_s, 'sweep_mol_per_s')
+    duration = _required_finite_nonnegative_float(dt_s, 'dt_s')
+    pressure = _required_positive_finite_float(pressure_bar, 'pressure_bar')
+    volume = _required_positive_finite_float(volume_m3, 'volume_m3')
+    temperature = _required_positive_finite_float(temperature_K, 'temperature_K')
+    if carrier not in CARRIER_GAS_PROPERTIES or carrier == 'O2':
+        raise OverheadConfigurationError('sweep requires a supported carrier and an external-O2 inlet boundary for oxygen feed')
+    initial = {s: _required_finite_nonnegative_float(n, s) for s, n in initial_species_mol.items()}
+    generated = {s: _required_finite_nonnegative_float(n, s) for s, n in generated_species_mol.items()}
+    # Premise: ideal gas at fixed P,V,T, hence N=PV/RT mol. Startup fills
+    # a deficit with carrier or purges excess in the initial composition.
+    # Constant source g_i and carrier F require outlet B=F+sum(g_i).
+    # dn_i/dt=g_i+F*delta_i-B*n_i/N gives
+    # n_i(t)=n_i(0)*exp(-Bt/N)+N*(g_i+F*delta_i)/B*(1-exp(-Bt/N)).
+    # Bt/N is dimensionless; integrated outlet follows I+G+n0-n(t), mol.
+    # B->0 leaves the prepared inventory; pure carrier tends to N as t->inf.
+    target = pressure * 1e5 * volume / (GAS_CONSTANT * temperature)
+    initial_total = sum(initial.values())
+    startup = max(0.0, target - initial_total)
+    inlet = {carrier: startup + flow * duration}
+    prepared = {s: n * min(1.0, target / initial_total) for s, n in initial.items()} if initial_total else {}
+    prepared[carrier] = prepared.get(carrier, 0.0) + startup
+    dose = dict(generated)
+    dose[carrier] = dose.get(carrier, 0.0) + flow * duration
+    total_dose = sum(dose.values())
+    turnover = total_dose / target
+    replaced = -math.expm1(-turnover)
+    survival = math.exp(-turnover)
+    species = initial.keys() | generated.keys() | {carrier}
+    final = {
+        s: prepared.get(s, 0.0) * survival
+        + (target * (dose.get(s, 0.0) / total_dose) * replaced if total_dose else 0.0)
+        for s in species
+    }
+    outlet = {}
+    for s in species:
+        inventory = initial.get(s, 0.0) + generated.get(s, 0.0)
+        delivered = inlet.get(s, 0.0)
+        available = inventory + delivered
+        outflow = max(0.0, delivered + (inventory - final[s]))
+        # The wire carries only integrated outflow. Reconstructing a small
+        # retained inventory as available-outflow can round above its physical
+        # endpoint when many residence volumes pass. Round that subtraction
+        # outward by one ULP, bounded by availability; do not relax P admission.
+        retained = inventory - (outflow - delivered) if outflow >= delivered else inventory + (delivered - outflow)
+        if retained > final[s]:
+            outflow = min(available, math.nextafter(outflow, math.inf))
+        outlet[s] = outflow
+    return {'inlet_species_mol': inlet, 'outflow_species_mol': outlet, 'final_species_mol': final}
+
+
+def sweep_source_split(initial_species_mol, transitions, registry):
+    """Derive surviving carry-in and generation from the committed journal."""
+    initial = dict(initial_species_mol)
+    generated = {}
+    # Chemistry is applied before the transport operator. A chemical debit
+    # consumes a well-mixed share of surviving carry-in and new gas. Tracking
+    # the journal distinguishes replacement (consume 1, generate 1) from no
+    # source, which the net inventory difference cannot do.
+    for transition in transitions:
+        for lot in transition.debits:
+            if lot.account != 'process.overhead_gas':
+                continue
+            for s, n in lot.species_moles_for(registry).items():
+                old, new = initial.get(s, 0.0), generated.get(s, 0.0)
+                fraction = max(0.0, 1.0 - n / (old + new)) if old + new else 0.0
+                initial[s], generated[s] = old * fraction, new * fraction
+        for lot in transition.credits:
+            if lot.account == 'process.overhead_gas':
+                for s, n in lot.species_moles_for(registry).items():
+                    generated[s] = generated.get(s, 0.0) + n
+    return initial, generated
+
+
+def sweep_boundary_partials_bar(species_mol: Mapping[str, float], *, pressure_bar: float,
+                               temperature_K: float) -> dict[str, Any]:
+    """Pressure-only projection; CO2 dissociation never creates product O2."""
+    total = sum(species_mol.values())
+    partials = {s: n / total * pressure_bar for s, n in species_mol.items()} if total else {}
+    notices = []
+    if partials.get('CO2', 0.0) > 0.0 and partials.get('CO', 0.0) > 0.0:
+        raise OverheadConfigurationError('missing_input: reactive CO/CO2 boundary; pure-CO2 dissociation cannot describe supplied CO')
+    if partials.get('CO2', 0.0) > 0.0:
+        from simulator.chemistry.offgas_fo2 import co2_dissociation_partials_bar
+
+        result = co2_dissociation_partials_bar(
+            temperature_K, partials['CO2'], partials.get('O2', 0.0),
+            total_pressure_bar=pressure_bar,
+            p_inert_initial_bar=sum(p for s, p in partials.items() if s not in {'CO2', 'O2'}),
+        )
+        inert_before = sum(p for s, p in partials.items() if s not in {'CO2', 'O2'})
+        for s in partials.keys() - {'CO2', 'O2'}:
+            partials[s] = partials[s] / inert_before * result['p_inert_bar'] if inert_before else 0.0
+        partials.update({s: result[f'p_{s}_bar'] for s in ('CO2', 'CO', 'O2')})
+        notices = result['notices']
+    return {'partials_bar': partials, 'notices': notices}
 
 
 def canonical_stage_area_key(stage: Any) -> str:
@@ -1162,7 +1268,13 @@ class OverheadGasModel:
             gas.composition['O2'] = max(  # mbar — controlled O2 partial pressure floor
                 gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
 
-        if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
+        if melt.sweep_mol_per_s is not None:
+            boundary = self.sweep_boundary(
+                overhead_holdup_mol, volume_m3=gas.headspace_volume_m3,
+                temperature_K=gas.headspace_temperature_K,
+            )
+            gas.composition = {s: p * 1000.0 for s, p in boundary['partials_bar'].items()}
+        elif atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
             for species, partial_mbar in cover_gas_partial_pressures(
                 melt.ambient_atmosphere, melt.p_total_mbar,
             ).items():
@@ -1275,7 +1387,13 @@ class OverheadGasModel:
         })
 
         atmosphere_name = getattr(melt.atmosphere, 'name', '')
-        if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
+        if melt.sweep_mol_per_s is not None:
+            boundary = self.sweep_boundary(
+                overhead_holdup_mol, volume_m3=gas.headspace_volume_m3,
+                temperature_K=gas.headspace_temperature_K,
+            )
+            gas.composition = {s: p * 1000.0 for s, p in boundary['partials_bar'].items()}
+        elif atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — CO2 total pressure floor
             for species, partial_mbar in cover_gas_partial_pressures(
                 melt.ambient_atmosphere, melt.p_total_mbar,
@@ -1614,3 +1732,13 @@ class OverheadGasModel:
             max(0.0, numerator / denominator + p_downstream_Pa**2)
         )
         return pressure_Pa / 100.0  # mbar — Pa -> mbar
+
+    def sweep_boundary(self, species_mol, *, volume_m3, temperature_K):
+        pressure_bar = sum(self._compute_partial_pressures(species_mol, volume_m3, temperature_K).values())
+        boundary = (tuple(sorted(species_mol.items())), pressure_bar, temperature_K)
+        if boundary != getattr(self, '_sweep_boundary_input', None):
+            self._sweep_boundary_result = sweep_boundary_partials_bar(
+                species_mol, pressure_bar=pressure_bar, temperature_K=temperature_K,
+            )
+            self._sweep_boundary_input = boundary
+        return self._sweep_boundary_result

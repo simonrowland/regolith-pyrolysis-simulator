@@ -629,7 +629,7 @@ def test_c2a_staged_max_hold_adjustment_reaches_snapshot_and_runner_diagnostic()
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
         setpoints_patch={
-            "campaigns": {"C2A_staged": {"max_hold_hr": 999}},
+            "campaigns": {"C2A_staged": {"max_hold_hr": 999, "sweep_mol_per_s": 0.0}},
         },
         run_metadata_overrides={
             "started_at_utc": "2026-07-11T00:00:00Z",

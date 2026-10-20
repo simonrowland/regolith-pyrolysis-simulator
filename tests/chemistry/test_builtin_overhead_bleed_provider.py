@@ -27,6 +27,7 @@ def test_provider_declares_overhead_bleed_authority():
     assert profile.declared_accounts == frozenset(
         {
             "process.overhead_gas",
+            "reservoir.reagent.sweep_gas",
             "reservoir.oxygen_cistern_liquid_inventory",
             "terminal.offgas",
             "terminal.oxygen_melt_offgas_stored",
@@ -1007,3 +1008,99 @@ def test_finite_capacity_requires_positive_relief_controls(
     assert (result.diagnostic or {})["reason"] == (
         f"{reason} must be a finite positive number"
     )
+
+
+@pytest.mark.parametrize("carrier", ["Ar", "CO2"])
+def test_integrated_sweep_single_transition_conserves_inlet_and_product_oxygen(
+    vapor_pressure_data, feedstocks_data, setpoints_data, carrier,
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.atom_ledger.load_external_mol("process.overhead_gas", {"O2": 1.0},
+                                    material_origin="feedstock", source="actual generated oxygen")
+    sim.atom_ledger.load_external_mol("reservoir.reagent.sweep_gas", {carrier: 10.0},
+                                    material_origin="reagent", source="delivered carrier")
+    count = len(sim.atom_ledger.transitions)
+    result = sim._dispatch_and_commit(ChemistryIntent.OVERHEAD_BLEED, control_inputs={
+        "sweep_outflow_species_mol": {carrier: 9.0, "O2": 0.5},
+        "force_drain_all": True, "headspace_volume_m3": 1.0, "headspace_temperature_K": 300.0,
+    })
+    assert result.status == "ok"
+    assert len(sim.atom_ledger.transitions) == count + 1
+    assert sim.atom_ledger.mol_by_account("reservoir.reagent.sweep_gas") == {}
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas") == pytest.approx({carrier: 1.0, "O2": 0.5})
+    assert sim.atom_ledger.mol_by_account("terminal.offgas")[carrier] == 9.0
+    assert sim.atom_ledger.mol_by_account("terminal.oxygen_melt_offgas_stored")["O2"] == 0.5
+    assert result.diagnostic["bled_species_mol"] == {carrier: 9.0, "O2": 0.5}
+    assert all(abs(n) < 1e-12 for n in result.transition.atom_balance_proof.values())
+
+
+@pytest.mark.parametrize("outlet,reason", [({"Ar": 2.0}, "available"), ({"Ar": -1.0}, "non-negative"),
+                                         ({"Ar": True}, "non-negative"), ({"Ar": float("nan")}, "non-negative")])
+def test_integrated_sweep_rejects_invalid_outlet(
+    vapor_pressure_data, feedstocks_data, setpoints_data, outlet, reason,
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.atom_ledger.load_external_mol("process.overhead_gas", {"Ar": 1.0},
+                                    material_origin="reagent", source="carrier inventory")
+    result = sim._dispatch_and_commit(ChemistryIntent.OVERHEAD_BLEED, control_inputs={
+        "sweep_outflow_species_mol": outlet, "headspace_volume_m3": 1.0,
+        "headspace_temperature_K": 300.0, "force_drain_all": True,
+    })
+    assert result.status == "unsupported"
+    assert reason in result.diagnostic["reason"]
+    assert result.transition is None
+
+
+def test_integrated_sweep_cannot_bypass_zero_line_conductance(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.atom_ledger.load_external_mol("process.overhead_gas", {"Ar": 1.0},
+                                    material_origin="reagent", source="carrier inventory")
+    result = sim._dispatch_and_commit(ChemistryIntent.OVERHEAD_BLEED, control_inputs={
+        "sweep_outflow_species_mol": {"Ar": 0.5}, "headspace_volume_m3": 1.0,
+        "headspace_temperature_K": 300.0, "bleed_conductance_kg_s": 0.0, "p_total_bar": 0.006,
+    })
+    assert result.status == "unsupported"
+    assert "line capacity" in result.diagnostic["reason"]
+    assert result.diagnostic["achieved_pressure_pa"] > 600.0
+    assert result.transition is None
+
+
+def test_steady_sweep_committed_inventory_does_not_round_up(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.overhead import continuous_sweep_balance
+    from simulator.state import GAS_CONSTANT
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    plan = continuous_sweep_balance({"Ar": 1.0}, {}, carrier="Ar", sweep_mol_per_s=3.6,
+        dt_s=1.0, pressure_bar=GAS_CONSTANT * 300.0 / 1e5, volume_m3=1.0, temperature_K=300.0)
+    sim.atom_ledger.load_external_mol("process.overhead_gas", {"Ar": 1.0},
+                                    material_origin="reagent", source="initial carrier")
+    sim.atom_ledger.load_external_mol("reservoir.reagent.sweep_gas", plan["inlet_species_mol"],
+                                    material_origin="reagent", source="delivered carrier")
+    result = sim._dispatch_and_commit(ChemistryIntent.OVERHEAD_BLEED, control_inputs={
+        "sweep_outflow_species_mol": plan["outflow_species_mol"], "force_drain_all": True,
+        "headspace_volume_m3": 1.0, "headspace_temperature_K": 300.0,
+    })
+    assert result.status == "ok"
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas")["Ar"] == 1.0
+
+
+def test_co2_pressure_projection_does_not_create_product_oxygen(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.overhead import sweep_boundary_partials_bar
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.atom_ledger.load_external_mol("reservoir.reagent.sweep_gas", {"CO2": 10.0},
+                                    source="CO2 delivery", material_origin="reagent")
+    result = sim._dispatch_and_commit(ChemistryIntent.OVERHEAD_BLEED, control_inputs={
+        "sweep_outflow_species_mol": {"CO2": 9.0}, "force_drain_all": True,
+        "headspace_volume_m3": 1.0, "headspace_temperature_K": 1800.0,
+    })
+    assert result.status == "ok"
+    inventory = sim._overhead_holdup_mol()
+    assert inventory == {"CO2": 1.0}
+    assert sweep_boundary_partials_bar(inventory, pressure_bar=0.006,
+                                       temperature_K=1800.0)["partials_bar"]["O2"] > 0.0
+    assert sim.atom_ledger.mol_by_account("terminal.oxygen_melt_offgas_stored") == {}

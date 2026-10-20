@@ -49,6 +49,22 @@ remain distinct: Stage 0, MRE anode, stored melt offgas, and vented melt
 offgas. With the toggle OFF, the legacy drain-each-tick behavior is preserved
 through the same kernel-committed bleed provider.
 
+`campaigns.<campaign>.sweep_mol_per_s` (also accepted in staged gas controls)
+declares a carrier flow in mol/s. Zero is a declared flow; omission is unknown.
+The same campaign owner makes the applied flow available as the condenser-train
+design basis for every body; requirements-generator integration follows
+separately. Non-Mars omission retains today's metering behavior, with no
+separate design-flow knob.
+The overhead transport owner integrates the continuous, well-mixed mol balance
+at the admitted pressure. Its internal `OVERHEAD_BLEED` control
+`sweep_outflow_species_mol` contains mol per species per step; it is never a
+recipe knob. The bleed provider validates availability plus delivered carrier
+from `reservoir.reagent.sweep_gas`, then commits one conserved transition. Carrier O2
+from the CO2 equilibrium pressure projection is not credited as melt product.
+The declared Mars ambient CO2 boundary also uses fixed-final-pressure
+normalization and preserves raw physical pO2. That pressure projection supplies
+no sweep flow. An isolated pumped chamber does not inherit ambient CO2.
+
 ## Stage 0 Preprocessing Contract
 
 Stage 0 is the preprocessing transform between raw feedstock inventory and
