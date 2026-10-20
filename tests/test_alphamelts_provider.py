@@ -266,6 +266,52 @@ def _build_equilibrium_for_basalt(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.parametrize('mode', ['thermoengine', 'python_api', 'subprocess'])
+@pytest.mark.parametrize('gas', [3.7e-7, None])
+def test_equilibrium_forwards_transport_controls_separately_from_redox(mode, gas):
+    backend = _FakeAlphaMELTSBackend(
+        mode=mode, equilibrium=_build_equilibrium_for_basalt(),
+    )
+    calls = []
+
+    def equilibrate(*, vapor_transport_pO2_bar=None,
+                    vapor_transport_floor_bar=None, **kwargs):
+        calls.append((vapor_transport_pO2_bar, vapor_transport_floor_bar, kwargs))
+        return backend._equilibrium
+
+    backend.equilibrate = equilibrate
+    request = _make_request(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        composition_mol=_basalt_species_mol(), fO2_log=-12.0,
+    )
+    if gas is not None:
+        request = replace(request, control_inputs={
+            'pO2_bar': gas, 'vacuum_floor_bar': 1.3e-12,
+        })
+    result = AlphaMELTSProvider(backend).dispatch(request)
+    assert result.status == 'ok'
+    assert result.transition is None
+    sent_gas, sent_floor, kwargs = calls[-1]
+    assert sent_gas == gas
+    assert sent_floor == (None if gas is None else 1.3e-12)
+    assert kwargs['fO2_log'] == -12.0
+
+
+@pytest.mark.parametrize('mode', ['thermoengine', 'python_api', 'subprocess'])
+def test_equilibrium_transport_signature_gate_preserves_legacy_backends(mode):
+    backend = _FakeAlphaMELTSBackend(
+        mode=mode, equilibrium=_build_equilibrium_for_basalt(),
+    )
+    request = replace(_make_request(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        composition_mol=_basalt_species_mol(),
+    ), control_inputs={'pO2_bar': 3.7e-7, 'vacuum_floor_bar': 1.3e-12})
+    result = AlphaMELTSProvider(backend).dispatch(request)
+    assert result.status == 'ok'
+    assert 'vapor_transport_pO2_bar' not in backend.calls[-1]
+    assert 'vapor_transport_floor_bar' not in backend.calls[-1]
+
+
 def test_provider_declares_silicate_intent_set():
     provider = AlphaMELTSProvider(backend=None)
     profile = provider.capability_profile()

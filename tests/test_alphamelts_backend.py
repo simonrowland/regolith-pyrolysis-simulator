@@ -10180,7 +10180,8 @@ def test_live_transport_control_can_cross_simulator_boundary(backend_cls, monkey
 
 
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
-def test_live_lunar_transport_input_reaches_vaporock(backend_cls, monkeypatch):
+@pytest.mark.parametrize('route', ['direct', 'kernel'])
+def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeypatch):
     from simulator.environment import vacuum_floor_bar_for_environment
     from simulator.state import Atmosphere
 
@@ -10210,6 +10211,7 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, monkeypatch):
     assert sim._backend_accepts_kwarg('vapor_transport_floor_bar')
 
     def native_solve(**kwargs):
+        assert kwargs['fO2_log'] == -12.0
         backend._vapor_pressures_via_vaporock_or_antoine(
             T_C=kwargs['temperature_C'],
             solved_melt_wt_pct=kwargs['comp_wt'],
@@ -10218,7 +10220,11 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, monkeypatch):
             pressure_bar=kwargs['pressure_bar'],
             activities={},
         )
-        return EquilibriumResult(status='ok', liquid_fraction=1.0)
+        return EquilibriumResult(
+            status='ok', liquid_fraction=1.0,
+            phase_masses_kg={'liquid': 100.0} if route == 'kernel' else {},
+            vapor_pressures_Pa={'SiO': 777.0},
+        )
 
     monkeypatch.setattr(backend, '_equilibrate_prepared', native_solve)
     melt_mol = {
@@ -10228,6 +10234,26 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, monkeypatch):
     sim._backend_failed = False
     sim.species_formula_registry = {}
     sim._chem_registry = types.SimpleNamespace(authoritative_for=lambda _intent: None)
+    if route == 'kernel':
+        from engines.alphamelts.provider import AlphaMELTSProvider
+        from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+        provider = AlphaMELTSProvider(backend)
+        sim._chem_registry = types.SimpleNamespace(authoritative_for=lambda _intent: provider)
+
+        def dispatch(intent, **kwargs):
+            return provider.dispatch(IntentRequest(
+                intent=intent,
+                account_view=ProviderAccountView(
+                    accounts={'process.cleaned_melt': melt_mol},
+                    species_formula_registry={},
+                ),
+                temperature_C=sim.melt.temperature_C,
+                pressure_bar=sim.melt.p_total_mbar / 1000.0,
+                **kwargs,
+            ))
+
+        monkeypatch.setattr(sim, '_dispatch_only', dispatch)
     monkeypatch.setattr(sim, '_backend_composition_mol', lambda: melt_mol)
     monkeypatch.setattr(sim, '_backend_composition_mol_by_account', lambda: {
         'process.cleaned_melt': melt_mol,
@@ -10235,7 +10261,10 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, monkeypatch):
     monkeypatch.setattr(sim, '_validate_backend_account_scope_support', lambda _view: None)
     monkeypatch.setattr(sim, '_sync_oxygen_reservoir_mirror', lambda: None)
     monkeypatch.setattr(sim, '_record_equilibrium_status', lambda result: result)
-    sim._get_equilibrium()
+    result = sim._get_equilibrium()
+    if route == 'kernel':
+        # Diagnostic MELTS vapour is discarded before the builtin refresh.
+        assert result.vapor_pressures_Pa == {}
     assert helper.calls[-1]['fO2_log'] == pytest.approx(math.log10(floor))
     backend.equilibrate(
         temperature_C=1600.0,

@@ -9613,7 +9613,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
                 kernel_result = self._dispatch_only(
                     ChemistryIntent.SILICATE_EQUILIBRIUM,
-                    control_inputs={},
+                    control_inputs={
+                        'pO2_bar': self._vapor_pressure_dispatch_pO2_bar(),
+                        'vacuum_floor_bar': self._vacuum_floor_bar(),
+                    },
                     fO2_log=intrinsic_fO2_log,
                     fe_redox_policy='intrinsic',
                 )

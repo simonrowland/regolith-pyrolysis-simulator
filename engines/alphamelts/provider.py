@@ -41,6 +41,7 @@ consumer can see the engine ran but didn't enforce the requested controls.
 from __future__ import annotations
 
 from dataclasses import replace
+import inspect
 from typing import Any, Mapping, Optional
 
 from engines.alphamelts.domain import AlphaMELTSDomainGate
@@ -566,6 +567,19 @@ class AlphaMELTSProvider(ChemistryProvider):
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
+        try:
+            parameters = inspect.signature(self._backend.equilibrate).parameters
+        except (TypeError, ValueError):
+            parameters = {}
+        transport_kwargs = {
+            keyword: request.control_inputs[control]
+            for keyword, control in (
+                ('vapor_transport_pO2_bar', 'pO2_bar'),
+                ('vapor_transport_floor_bar', 'vacuum_floor_bar'),
+            )
+            if keyword in parameters
+            and request.control_inputs.get(control) is not None
+        }
 
         def evaluation_pressure(mode: str) -> float:
             return alphamelts_condensed_phase_pressure_bar(
@@ -595,6 +609,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
                 run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+                backend_kwargs=transport_kwargs,
             )
             return completed('subprocess', equilibrium, pressure_bar)
         if not subprocess_required and self._thermoengine_selected():
@@ -615,6 +630,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                 fO2_log=requested_fO2_log,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
+                **transport_kwargs,
             )
             return completed('thermoengine', equilibrium, pressure_bar)
         if not subprocess_required and python_api_available(self._backend):
@@ -626,6 +642,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                 fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
+                backend_kwargs=transport_kwargs,
             )
             return completed('petthermotools', equilibrium, pressure_bar)
         if subprocess_available(self._backend):
@@ -638,6 +655,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
                 run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+                backend_kwargs=transport_kwargs,
             )
             return completed('subprocess', equilibrium, pressure_bar)
         # _backend_available returned True so this branch should never
