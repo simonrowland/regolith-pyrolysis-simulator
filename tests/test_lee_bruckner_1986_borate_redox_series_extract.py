@@ -161,6 +161,7 @@ def test_table_1_grid_migrates_all_render_pinned_points_and_conditions() -> None
     assert not migrator.result.validation.hard_issues
     assert sum(row.value.kind.value == "point" for row in observations) == 52
     assert not any(row.value.kind.value == "unavailable" for row in observations)
+    assert all(row.notices == () for row in observations)
 
     for element, grid in RATIO_GRID.items():
         key = element.lower()
@@ -183,6 +184,8 @@ def test_table_1_grid_migrates_all_render_pinned_points_and_conditions() -> None
         assert sorted(actual) == sorted(expected)
     mn_density = next(row for row in observations if "_mn_density::" in row.observation_id)
     assert mn_density.value.point == Decimal("2042")
+    assert mn_density.derivation is not None
+    assert mn_density.derivation.output_unit == "kg_per_m3"
 
     for row in observations:
         observation_key = row.observation_id.split("::")[1]
@@ -198,6 +201,8 @@ def test_table_1_grid_migrates_all_render_pinned_points_and_conditions() -> None
         assert row.point_conditions["quench_state"].state.value == "not_stated"
         assert row.point_conditions["quench_state"].locator.page == 2
         if density:
+            assert row.derivation is not None
+            assert row.derivation.output_unit == "kg_per_m3"
             assert row.identity.species.formula == "unknown"
             assert row.point_conditions["T_C"].state.is_unknown
             assert "room temperature" in row.point_conditions["T_C"].state.reason

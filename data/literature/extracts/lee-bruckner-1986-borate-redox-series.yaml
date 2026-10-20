@@ -30,8 +30,8 @@ fidelity_samples:
     published_page: 236
     table: '1'
     row: 90 B2O3, 10 Na2O
-- path: species.Cu.observations[lee_bruckner_1986_table1_cu_density].values.points[0].density_kg_m3
-  value: '2057'
+- path: species.Cu.observations[lee_bruckner_1986_table1_cu_density].values.points[0].density_g_cm3
+  value: '2.057'
   locator:
     page: 4
     pdf_page_index: 3
@@ -42,6 +42,7 @@ species:
   Mn:
     observations:
     - observation_id: lee_bruckner_1986_table1_mn_ratio
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: &id002
@@ -252,11 +253,12 @@ species:
       uncertainty:
         note: No uncertainty is printed.
     - observation_id: lee_bruckner_1986_table1_mn_density
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
       phase: glass
-      units: kg/m3
+      units: g/cm3
       values:
         quantity: density
         formula: unknown
@@ -264,7 +266,7 @@ species:
         method_as_printed: Archimedes method at room temperature.
         points:
         - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% MnO added
-          density_kg_m3: '2042'
+          density_g_cm3: '2.042'
           value_as_published: 2,042
           unit: g/cm3
           composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% MnO added
@@ -300,7 +302,7 @@ species:
                     - '10'
               locator: *id002
         - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% MnO added
-          density_kg_m3: '2189'
+          density_g_cm3: '2.189'
           value_as_published: 2,189
           unit: g/cm3
           composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% MnO added
@@ -336,7 +338,7 @@ species:
                     - '20'
               locator: *id002
         - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% MnO added
-          density_kg_m3: '2299'
+          density_g_cm3: '2.299'
           value_as_published: 2,299
           unit: g/cm3
           composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% MnO added
@@ -372,7 +374,7 @@ species:
                     - '30'
               locator: *id002
         - sample: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% MnO added
-          density_kg_m3: '2.78E+3'
+          density_g_cm3: '2.78'
           value_as_published: 2,78
           unit: g/cm3
           composition_as_printed: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% MnO added
@@ -408,7 +410,7 @@ species:
                     - '20'
               locator: *id002
         - sample: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% MnO added
-          density_kg_m3: '3.29E+3'
+          density_g_cm3: '3.29'
           value_as_published: 3,29
           unit: g/cm3
           composition_as_printed: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% MnO added
@@ -449,6 +451,7 @@ species:
   Cu:
     observations:
     - observation_id: lee_bruckner_1986_table1_cu_ratio
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
@@ -691,11 +694,12 @@ species:
       uncertainty:
         note: No uncertainty is printed.
     - observation_id: lee_bruckner_1986_table1_cu_density
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
       phase: glass
-      units: kg/m3
+      units: g/cm3
       values:
         quantity: density
         formula: unknown
@@ -703,7 +707,7 @@ species:
         method_as_printed: Archimedes method at room temperature.
         points:
         - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% CuO added
-          density_kg_m3: '2057'
+          density_g_cm3: '2.057'
           value_as_published: 2,057
           unit: g/cm3
           composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% CuO added
@@ -739,7 +743,7 @@ species:
                     - '10'
               locator: *id002
         - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% CuO added
-          density_kg_m3: '2.19E+3'
+          density_g_cm3: '2.19'
           value_as_published: 2,190
           unit: g/cm3
           composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% CuO added
@@ -775,7 +779,7 @@ species:
                     - '20'
               locator: *id002
         - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% CuO added
-          density_kg_m3: '2346'
+          density_g_cm3: '2.346'
           value_as_published: 2,346
           unit: g/cm3
           composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% CuO added
@@ -811,7 +815,7 @@ species:
                     - '30'
               locator: *id002
         - sample: 90 mol% B2O3, 10 mol% Cs2O; 0,5 wt% CuO added
-          density_kg_m3: '2424'
+          density_g_cm3: '2.424'
           value_as_published: 2,424
           unit: g/cm3
           composition_as_printed: 90 mol% B2O3, 10 mol% Cs2O; 0,5 wt% CuO added
@@ -847,7 +851,7 @@ species:
                     - '10'
               locator: *id002
         - sample: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% CuO added
-          density_kg_m3: '2816'
+          density_g_cm3: '2.816'
           value_as_published: 2,816
           unit: g/cm3
           composition_as_printed: 80 mol% B2O3, 20 mol% Cs2O; 0,5 wt% CuO added
@@ -883,7 +887,7 @@ species:
                     - '20'
               locator: *id002
         - sample: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% CuO added
-          density_kg_m3: '3.29E+3'
+          density_g_cm3: '3.29'
           value_as_published: 3,290
           unit: g/cm3
           composition_as_printed: 70 mol% B2O3, 30 mol% Cs2O; 0,5 wt% CuO added
@@ -924,6 +928,7 @@ species:
   Fe:
     observations:
     - observation_id: lee_bruckner_1986_table1_fe_ratio
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
@@ -1055,11 +1060,12 @@ species:
       uncertainty:
         note: No uncertainty is printed.
     - observation_id: lee_bruckner_1986_table1_fe_density
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
       phase: glass
-      units: kg/m3
+      units: g/cm3
       values:
         quantity: density
         formula: unknown
@@ -1067,7 +1073,7 @@ species:
         method_as_printed: Archimedes method at room temperature.
         points:
         - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% Fe2O3 added
-          density_kg_m3: '2054'
+          density_g_cm3: '2.054'
           value_as_published: 2,054
           unit: g/cm3
           composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% Fe2O3 added
@@ -1103,7 +1109,7 @@ species:
                     - '10'
               locator: *id002
         - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% Fe2O3 added
-          density_kg_m3: '2184'
+          density_g_cm3: '2.184'
           value_as_published: 2,184
           unit: g/cm3
           composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% Fe2O3 added
@@ -1139,7 +1145,7 @@ species:
                     - '20'
               locator: *id002
         - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% Fe2O3 added
-          density_kg_m3: '2344'
+          density_g_cm3: '2.344'
           value_as_published: 2,344
           unit: g/cm3
           composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% Fe2O3 added
@@ -1180,6 +1186,7 @@ species:
   V:
     observations:
     - observation_id: lee_bruckner_1986_table1_v_ratio
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
@@ -1311,11 +1318,12 @@ species:
       uncertainty:
         note: No uncertainty is printed.
     - observation_id: lee_bruckner_1986_table1_v_density
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
       phase: glass
-      units: kg/m3
+      units: g/cm3
       values:
         quantity: density
         formula: unknown
@@ -1323,7 +1331,7 @@ species:
         method_as_printed: Archimedes method at room temperature.
         points:
         - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% V2O5 added
-          density_kg_m3: '2.05E+3'
+          density_g_cm3: '2.05'
           value_as_published: 2,05
           unit: g/cm3
           composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% V2O5 added
@@ -1359,7 +1367,7 @@ species:
                     - '10'
               locator: *id002
         - sample: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% V2O5 added
-          density_kg_m3: '2181'
+          density_g_cm3: '2.181'
           value_as_published: 2,181
           unit: g/cm3
           composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,5 wt% V2O5 added
@@ -1395,7 +1403,7 @@ species:
                     - '20'
               locator: *id002
         - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% V2O5 added
-          density_kg_m3: '2334'
+          density_g_cm3: '2.334'
           value_as_published: 2,334
           unit: g/cm3
           composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% V2O5 added
@@ -1436,6 +1444,7 @@ species:
   Cr:
     observations:
     - observation_id: lee_bruckner_1986_table1_cr_ratio
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
@@ -1604,11 +1613,12 @@ species:
       uncertainty:
         note: No uncertainty is printed.
     - observation_id: lee_bruckner_1986_table1_cr_density
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
       phase: glass
-      units: kg/m3
+      units: g/cm3
       values:
         quantity: density
         formula: unknown
@@ -1616,7 +1626,7 @@ species:
         method_as_printed: Archimedes method at room temperature.
         points:
         - sample: 90 mol% B2O3, 10 mol% Na2O; 0,05 wt% Cr2O3 added
-          density_kg_m3: '2046'
+          density_g_cm3: '2.046'
           value_as_published: 2,046
           unit: g/cm3
           composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,05 wt% Cr2O3 added
@@ -1652,7 +1662,7 @@ species:
                     - '10'
               locator: *id002
         - sample: 80 mol% B2O3, 20 mol% Na2O; 0,05 wt% Cr2O3 added
-          density_kg_m3: '2184'
+          density_g_cm3: '2.184'
           value_as_published: 2,184
           unit: g/cm3
           composition_as_printed: 80 mol% B2O3, 20 mol% Na2O; 0,05 wt% Cr2O3 added
@@ -1688,7 +1698,7 @@ species:
                     - '20'
               locator: *id002
         - sample: 70 mol% B2O3, 30 mol% Na2O; 0,05 wt% Cr2O3 added
-          density_kg_m3: '2335'
+          density_g_cm3: '2.335'
           value_as_published: 2,335
           unit: g/cm3
           composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,05 wt% Cr2O3 added
@@ -1726,6 +1736,7 @@ species:
       uncertainty:
         note: No uncertainty is printed.
     - observation_id: lee_bruckner_1986_table1_cr3_ratio
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
@@ -2811,6 +2822,7 @@ species:
   Ti:
     observations:
     - observation_id: lee_bruckner_1986_table1_ti_ratio
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
@@ -2905,11 +2917,12 @@ species:
       uncertainty:
         note: No uncertainty is printed.
     - observation_id: lee_bruckner_1986_table1_ti_density
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
       phase: glass
-      units: kg/m3
+      units: g/cm3
       values:
         quantity: density
         formula: unknown
@@ -2917,7 +2930,7 @@ species:
         method_as_printed: Archimedes method at room temperature.
         points:
         - sample: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% TiO2 added
-          density_kg_m3: '2043'
+          density_g_cm3: '2.043'
           value_as_published: 2,043
           unit: g/cm3
           composition_as_printed: 90 mol% B2O3, 10 mol% Na2O; 0,5 wt% TiO2 added
@@ -2953,7 +2966,7 @@ species:
                     - '10'
               locator: *id002
         - sample: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% TiO2 added
-          density_kg_m3: '2337'
+          density_g_cm3: '2.337'
           value_as_published: 2,337
           unit: g/cm3
           composition_as_printed: 70 mol% B2O3, 30 mol% Na2O; 0,5 wt% TiO2 added
@@ -2994,6 +3007,7 @@ species:
   Co:
     observations:
     - observation_id: lee_bruckner_1986_table1_co_ratio
+      admission_status: admitted
       experiment: single-oxide-redox-series
       type: concentration_series
       locator: *id002
