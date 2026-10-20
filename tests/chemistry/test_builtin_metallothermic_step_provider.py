@@ -2464,6 +2464,7 @@ def test_provider_short_circuits_on_empty_reagent(
 # C4/C6 expectation re-baseline.
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(3600)
+@pytest.mark.nightly
 @pytest.mark.live_engine
 def test_c6_static_hold_exercises_c6_proceed_decision_path(
     vapor_pressure_data,

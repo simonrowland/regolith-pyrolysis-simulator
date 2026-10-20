@@ -143,6 +143,7 @@ class StepwiseWebDriver:
 # gate-2: 3-surface drive at 301 s under load; ceiling includes slot-wait allowance.
 @pytest.mark.xdist_group("magemin_fullrun_b")
 @pytest.mark.timeout(900)
+@pytest.mark.nightly
 def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     _install_alpha_fallback_fixture(monkeypatch)
     batch = _run_batch(monkeypatch)

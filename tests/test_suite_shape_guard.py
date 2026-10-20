@@ -27,7 +27,11 @@ wall of unattributed multi-hour timeouts (research/2026-07-21-ci-catch-mining).
 from __future__ import annotations
 
 import json
+import os
 import re
+import subprocess
+import sys
+import tempfile
 from importlib import import_module
 from pathlib import Path
 from types import SimpleNamespace
@@ -44,6 +48,7 @@ GLOBAL_TIMEOUT_CEILING_S = 300.0
 # socket/pool contention, not on the native-engine binary.
 HEAVY_GROUP_PATTERN = re.compile(r"^(magemin_fullrun_[a-z]|serial)$")
 DURATION_HINTS_PATH = Path(__file__).with_name("xdist_loadgroup_durations.json")
+FULL_COLLECTION_REPORT_ENV = "REGOLITH_SUITE_SHAPE_COLLECTION_REPORT"
 
 # Shrink-only debt roster: (file, test-function name), parameters stripped.
 HEAVY_ROSTER = frozenset({
@@ -68,9 +73,7 @@ HEAVY_ROSTER = frozenset({
     ("tests/chemistry/test_builtin_metallothermic_step_provider.py",
      "test_full_run_mass_balance_holds_with_kernel_committed_metallothermic"),
     ("tests/test_mass_balance.py",
-     "test_cumulative_transition_mass_closure_bounded"),
-    ("tests/test_run_executor.py",
-     "test_run_executor_partial_path_sets_status_and_decisions"),
+     "test_cumulative_transition_mass_closure_bounded_at_transitional_refusal"),
     ("tests/test_runner_smoke.py",
      "test_runner_records_operator_decision_in_shadow_trace"),
     ("tests/test_sio_tsweep_smoke.py", "test_sio_tsweep_cli_smoke_2x2x2_grid"),
@@ -160,11 +163,14 @@ def _nightly_yield_violations() -> list[str]:
 
 
 def _item_key(item) -> tuple[str, str]:
-    # nodeid, not fspath: fspath is deprecated and empty in collect-only
-    # harnesses. Strip the "[param]" id and the "@group" suffix xdist
-    # appends to nodeids under --dist loadgroup.
-    rel = item.nodeid.split("::", 1)[0]
-    name = item.nodeid.rsplit("::", 1)[-1].split("[", 1)[0].split("@", 1)[0]
+    return _node_key(item.nodeid)
+
+
+def _node_key(nodeid: str) -> tuple[str, str]:
+    # The roster names test functions, so strip parameter IDs and xdist's
+    # --dist loadgroup suffix from collected item IDs.
+    rel = nodeid.split("::", 1)[0]
+    name = nodeid.rsplit("::", 1)[-1].split("[", 1)[0].split("@", 1)[0]
     return (rel, name)
 
 
@@ -186,6 +192,85 @@ def _group_names(item) -> list[str]:
         elif "name" in mark.kwargs:
             names.append(str(mark.kwargs["name"]))
     return sorted(set(names))
+
+
+def pytest_collection_finish(session) -> None:
+    """Write full-collection metadata for the unfiltered guard subprocess."""
+    report_path = os.environ.get(FULL_COLLECTION_REPORT_ENV)
+    if report_path is None:
+        return
+    collected = [
+        {"nodeid": item.nodeid, "timeout_s": _timeout_s(item)}
+        for item in session.items
+    ]
+    Path(report_path).write_text(
+        json.dumps(collected), encoding="utf-8"
+    )
+
+
+def _collect_full_suite_items() -> list[dict[str, object]]:
+    repo_root = Path(__file__).resolve().parents[1]
+    env = os.environ.copy()
+    # CI may pass a marker expression through PYTEST_ADDOPTS or pyproject.
+    env.pop("PYTEST_ADDOPTS", None)
+    with tempfile.TemporaryDirectory(prefix="suite-shape-collection-") as temp_dir:
+        report_path = Path(temp_dir) / "collected-items.json"
+        env[FULL_COLLECTION_REPORT_ENV] = str(report_path)
+        pythonpath = [str(Path(__file__).resolve().parent), str(repo_root)]
+        if env.get("PYTHONPATH"):
+            pythonpath.append(env["PYTHONPATH"])
+        env["PYTHONPATH"] = os.pathsep.join(pythonpath)
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pytest",
+                "--collect-only",
+                "-q",
+                "-o",
+                "addopts=",
+                "-p",
+                "test_suite_shape_guard",
+            ],
+            cwd=repo_root,
+            env=env,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0 or not report_path.is_file():
+            detail = (result.stdout + result.stderr).strip()[-4000:]
+            raise AssertionError(
+                "full pytest collect-only listing failed without mark filters "
+                f"(exit {result.returncode})\n{detail}"
+            )
+        return json.loads(report_path.read_text(encoding="utf-8"))
+
+
+def _full_collection_roster_violations(
+    collected_items: list[dict[str, object]],
+    roster: frozenset[tuple[str, str]],
+) -> list[str]:
+    collected_keys = {
+        _node_key(str(item["nodeid"])) for item in collected_items
+    }
+    violations = [
+        f"roster entry {entry} matches no collected test — "
+        "phantom row (typo or removed test); fix the name or delete the entry"
+        for entry in sorted(roster - collected_keys)
+    ]
+    for item in collected_items:
+        timeout = item["timeout_s"]
+        if timeout is None or float(timeout) <= GLOBAL_TIMEOUT_CEILING_S:
+            continue
+        nodeid = str(item["nodeid"])
+        if _node_key(nodeid) not in roster:
+            violations.append(
+                f"{nodeid}: timeout {float(timeout):g}s but not in the "
+                "shrink-only heavy roster — reduce its cost or demote a "
+                "roster entry (see module docstring)"
+            )
+    return violations
 
 
 def test_suite_shape_roster_drift_is_checked_under_mark_expression(
@@ -218,6 +303,7 @@ def test_suite_shape_roster_drift_is_checked_under_mark_expression(
     assert "test_unrostered_heavy" in message
 
 
+# Keep this guard unmarked so the PR tier's ``-m "not nightly"`` runs it.
 def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
     violations: list[str] = []
     for item in request.session.items:
@@ -248,28 +334,14 @@ def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
     # selection filters. Inspect the yield functions directly so this tiering
     # invariant still sees nodes deselected by ``-m`` or ``-k``.
     violations.extend(_nightly_yield_violations())
-    # Phantom-roster check (2026-07-23 gate-3 catch): a roster row whose
-    # name matches no collected test silently un-rosters the real heavy
-    # test it was meant to cover (a truncated name survived exactly this
-    # way). Only enforceable when the whole suite is collected — under -k
-    # or single-file runs most roster rows are legitimately absent, so
-    # gate on a full-collection heuristic rather than skipping silently.
-    #
-    # Marker expressions (``-m``) also deselect real roster members by
-    # design (CI-tiering: ``@pytest.mark.nightly`` + ``-m "not nightly"``
-    # on the PR tier). Treat those as legitimately absent — do not report
-    # phantom rows when any mark expression is active. The group/duration-
-    # hint invariants still run; they only care about collected items.
+    # Roster membership must see tests excluded by ``-m``, ``-k`` or a
+    # targeted invocation, so compare against a fresh full collection.
+    violations.extend(
+        _full_collection_roster_violations(
+            _collect_full_suite_items(), HEAVY_ROSTER
+        )
+    )
     if len(request.session.items) > 1000:
-        markexpr = (getattr(request.config.option, "markexpr", None) or "").strip()
-        if not markexpr:
-            collected = {_item_key(item) for item in request.session.items}
-            for entry in sorted(HEAVY_ROSTER - collected):
-                violations.append(
-                    f"roster entry {entry} matches no collected test — "
-                    "phantom row (typo or removed test); fix the name or "
-                    "delete the entry"
-                )
         collected_groups = {
             group
             for item in request.session.items

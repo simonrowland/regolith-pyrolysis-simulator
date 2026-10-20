@@ -38,7 +38,8 @@ from simulator.account_ids import (
 # or formula-registry failures a readable first diagnostic. It bounds ONE
 # transition only -- cumulative drift across a many-hundred-transition batch
 # is guarded separately by
-# tests/test_mass_balance.py::test_cumulative_transition_mass_closure_bounded,
+# tests/test_mass_balance.py::
+# test_cumulative_transition_mass_closure_bounded_at_transitional_refusal,
 # which sums abs(debit-credit) over a full C0->C6 run against a tight bound.
 DEFAULT_MASS_TOLERANCE_KG = 2e-2
 DEFAULT_ATOM_TOLERANCE_MOL = 1e-6

@@ -1115,6 +1115,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
 # gate-2: short-run shadow parity exceeded 300 s under 3-chain slot contention.
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(900)
+@pytest.mark.nightly
 def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
     feedstock_key,
     additives_kg,
