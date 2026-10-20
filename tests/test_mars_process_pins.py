@@ -3,6 +3,7 @@
 import pytest
 
 from simulator.core import _feedstock_surface_pressure_mbar
+from simulator.chemistry.offgas_fo2 import co2_dissociation_partials_bar
 from simulator.pumping_cost import estimate_subambient_pump_cost
 
 
@@ -33,3 +34,14 @@ def test_staged_compression_pre_move_pin(pressure, energy, speed):
 ])
 def test_surface_pressure_pre_move_pin(declaration, expected):
     assert _feedstock_surface_pressure_mbar(declaration).hex() == expected.hex()
+
+
+@pytest.mark.parametrize('co2,oxygen,expected', [
+    (0.006, 0.0, ('0x1.7fe015d85ababp-8', '0x1.2ae6bdc9a69efp-13',
+                  '0x1.2ae6bdc9a69efp-14')),
+    (0.00576, 3.7e-7, ('0x1.706a5330e399dp-8', '0x1.224e0de338e44p-13',
+                       '0x1.23db56b691666p-14')),
+])
+def test_co2_fixed_volume_pre_change_pin(co2, oxygen, expected):
+    result = co2_dissociation_partials_bar(1800.0, co2, oxygen)
+    assert tuple(result[k].hex() for k in ('p_CO2_bar', 'p_CO_bar', 'p_O2_bar')) == expected
