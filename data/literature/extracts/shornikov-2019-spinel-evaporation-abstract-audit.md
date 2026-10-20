@@ -36,32 +36,33 @@ Abscissa, labelled tick midline in crop x px, Al2O3 mol %: 431.5 = 20, 647.0 = 3
 
 Glyph centres sit within a few pixels of the tick line. The fit uses the tick line.
 
-Read 1 is the centroid of the core left after a 10 px erosion. That erosion removes the connecting stroke. Read 2 is the bounding-box centre of the high distance-transform core. The stated uncertainty is the root sum of squares of a 1 px floor, the tick-fit rms, and the read-1 versus read-2 disagreement, converted with the fit slopes, then rounded up to 0.01. Where the distance transform has two maxima more than 4 px apart, the floor is half that separation instead of 1 px.
+For a separated circle, read 1 is the centroid of the core left after a 10 px erosion. That erosion removes the connecting stroke. Read 2 is the bounding-box centre of the high distance-transform core. The stated uncertainty is the root sum of squares of a 1 px floor, the tick-fit rms, and the read-1 versus read-2 disagreement, converted with the fit slopes, then rounded up to 0.01.
 
-Erosion at 10 px and at 12 px leaves 14 black circle cores. Those are series 1. No series 1 centre lies outside the labelled-tick rectangle, so none is flagged as extrapolated. The red and blue circles were not measured.
+A 10 px erosion merges the two circles that overlap near the 50 mol % tick, so that pass leaves 14 black cores. A distance transform of the uneroded ink finds 15 circle peaks, radii 17.00 px at crop (1082, 1000) and 16.97 px at crop (1099, 1001), 17 px apart. Each circle is fitted on its own exposed arc, so the table has 15 series 1 rows. The other 13 circles are the erosion reads and are unchanged. No series 1 centre lies outside the labelled-tick rectangle, so none is flagged as extrapolated. The red and blue circles were not measured.
 
 ## Marker decisions
 
 Page px = crop px + (2500, 150). Values are read 1. Temperature is 2200 K, from the Fig. 5 caption. The ordinate is ΔG^m. The abstract derives that mixing energy from oxide activities calculated from partial pressures. The figure read itself is `figure_only`. Quantity has no mixing-energy token, so the reads are context and are not stored as `delta_fG`.
 
-Marker 0 is elongated. Its distance-transform maxima are 17 px apart, so the x uncertainty is ±0.40 mol %. The other markers are ±0.06 mol % and ±0.04 kJ/mol.
+Markers 0 and 1 are that overlapping pair. The boundary is the frame-interior ink with max channel below 55. Pixels are assigned to the nearer peak, kept only when their distance from that peak is within 2.5 px of the seed radius, and the ±65° sector facing the neighbour is dropped. The algebraic circle x² + y² + Dx + Ey + F = 0 is the stored centre. Read 2 is the distance-transform peak. The uncertainty is the root sum of squares of the tick-fit rms and the per-axis combination of the arc rms with the fit-to-peak offset, rounded up to 0.01. Marker 0: 55 pixels, 225°, centre (1081.11, 1000.21), radius 16.78 px, rms 0.50 px, so ±0.06 mol % and ±0.02 kJ/mol. Marker 1: 58 pixels, 224°, centre (1099.43, 1001.34), radius 16.99 px, rms 0.58 px, so ±0.04 mol % and ±0.03 kJ/mol. The combined centroid (1090.33, 1000.71), previously stored as one read of 50.41 mol %, is not a marker and is not stored. Markers 2–14 are the separated circles, ±0.06 mol % and ±0.04 kJ/mol. The fidelity pin is marker 2, the first unsplit circle.
 
 | Series | Decision | Al2O3 mol % | ΔG^m kJ/mol | Crop centre px | Page centre px | dpi | Centre note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| MgO–Al2O3 0 | read | 50.41 ± 0.40 | −23.08 ± 0.04 | (1090.3, 1000.7) | (3590.3, 1150.7) | 600 | two maxima, half-separation 8.5 px in x |
-| MgO–Al2O3 1 | read | 52.61 ± 0.06 | −23.14 ± 0.04 | (1138.0, 1002.8) | (3638.0, 1152.8) | 600 | single maximum |
-| MgO–Al2O3 2 | read | 54.85 ± 0.06 | −23.02 ± 0.04 | (1186.7, 998.6) | (3686.7, 1148.6) | 600 | single maximum |
-| MgO–Al2O3 3 | read | 56.43 ± 0.06 | −22.88 ± 0.04 | (1220.8, 993.6) | (3720.8, 1143.6) | 600 | single maximum |
-| MgO–Al2O3 4 | read | 58.53 ± 0.06 | −22.55 ± 0.04 | (1266.4, 982.4) | (3766.4, 1132.4) | 600 | single maximum |
-| MgO–Al2O3 5 | read | 61.73 ± 0.06 | −21.82 ± 0.04 | (1335.8, 957.4) | (3835.8, 1107.4) | 600 | single maximum |
-| MgO–Al2O3 6 | read | 66.76 ± 0.06 | −20.17 ± 0.04 | (1444.9, 900.8) | (3944.9, 1050.8) | 600 | single maximum |
-| MgO–Al2O3 7 | read | 71.35 ± 0.06 | −18.10 ± 0.04 | (1544.5, 829.6) | (4044.5, 979.6) | 600 | single maximum |
-| MgO–Al2O3 8 | read | 72.75 ± 0.06 | −17.34 ± 0.04 | (1574.7, 803.8) | (4074.7, 953.8) | 600 | single maximum |
-| MgO–Al2O3 9 | read | 75.01 ± 0.06 | −16.10 ± 0.04 | (1623.7, 761.1) | (4123.7, 911.1) | 600 | single maximum |
-| MgO–Al2O3 10 | read | 76.24 ± 0.06 | −15.41 ± 0.04 | (1650.4, 737.6) | (4150.4, 887.6) | 600 | single maximum |
-| MgO–Al2O3 11 | read | 78.50 ± 0.06 | −13.97 ± 0.04 | (1699.4, 688.2) | (4199.4, 838.2) | 600 | single maximum |
-| MgO–Al2O3 12 | read | 81.13 ± 0.06 | −12.26 ± 0.04 | (1756.4, 629.4) | (4256.4, 779.4) | 600 | single maximum |
-| MgO–Al2O3 13 | read | 84.39 ± 0.06 | −10.10 ± 0.04 | (1827.2, 555.4) | (4327.2, 705.4) | 600 | single maximum |
+| MgO–Al2O3 0 | read | 49.98 ± 0.06 | −23.07 ± 0.02 | (1081.1, 1000.2) | (3581.1, 1150.2) | 600 | exposed arc, 55 px, 225°, rms 0.50 px; peak (1082, 1000) |
+| MgO–Al2O3 1 | read | 50.83 ± 0.04 | −23.10 ± 0.03 | (1099.4, 1001.3) | (3599.4, 1151.3) | 600 | exposed arc, 58 px, 224°, rms 0.58 px; peak (1099, 1001) |
+| MgO–Al2O3 2 | read | 52.61 ± 0.06 | −23.14 ± 0.04 | (1138.0, 1002.8) | (3638.0, 1152.8) | 600 | single maximum |
+| MgO–Al2O3 3 | read | 54.85 ± 0.06 | −23.02 ± 0.04 | (1186.7, 998.6) | (3686.7, 1148.6) | 600 | single maximum |
+| MgO–Al2O3 4 | read | 56.43 ± 0.06 | −22.88 ± 0.04 | (1220.8, 993.6) | (3720.8, 1143.6) | 600 | single maximum |
+| MgO–Al2O3 5 | read | 58.53 ± 0.06 | −22.55 ± 0.04 | (1266.4, 982.4) | (3766.4, 1132.4) | 600 | single maximum |
+| MgO–Al2O3 6 | read | 61.73 ± 0.06 | −21.82 ± 0.04 | (1335.8, 957.4) | (3835.8, 1107.4) | 600 | single maximum |
+| MgO–Al2O3 7 | read | 66.76 ± 0.06 | −20.17 ± 0.04 | (1444.9, 900.8) | (3944.9, 1050.8) | 600 | single maximum |
+| MgO–Al2O3 8 | read | 71.35 ± 0.06 | −18.10 ± 0.04 | (1544.5, 829.6) | (4044.5, 979.6) | 600 | single maximum |
+| MgO–Al2O3 9 | read | 72.75 ± 0.06 | −17.34 ± 0.04 | (1574.7, 803.8) | (4074.7, 953.8) | 600 | single maximum |
+| MgO–Al2O3 10 | read | 75.01 ± 0.06 | −16.10 ± 0.04 | (1623.7, 761.1) | (4123.7, 911.1) | 600 | single maximum |
+| MgO–Al2O3 11 | read | 76.24 ± 0.06 | −15.41 ± 0.04 | (1650.4, 737.6) | (4150.4, 887.6) | 600 | single maximum |
+| MgO–Al2O3 12 | read | 78.50 ± 0.06 | −13.97 ± 0.04 | (1699.4, 688.2) | (4199.4, 838.2) | 600 | single maximum |
+| MgO–Al2O3 13 | read | 81.13 ± 0.06 | −12.26 ± 0.04 | (1756.4, 629.4) | (4256.4, 779.4) | 600 | single maximum |
+| MgO–Al2O3 14 | read | 84.39 ± 0.06 | −10.10 ± 0.04 | (1827.2, 555.4) | (4327.2, 705.4) | 600 | single maximum |
 
 Series (1) is the present study, MgO–Al2O3, at 2200 K. Series (2) and (3) are listed under refused rows as cited and not read.
 
@@ -71,4 +72,4 @@ Fig. 5 is not an activity dataset. No `standard_state` is stored. Migration is n
 
 ## Schema gap
 
-`Quantity` has no mixing-energy token. Storing ΔG^m as `delta_fG` would make migration score a formation energy. The 14 series 1 reads stay in `species.MgO-Al2O3.context` with `type: figure_mixing_energy` and `method_class: figure_only`. Scored observations: 0. The abscissa is mol % Al2O3. `AmountBasis` has no mole-percent token, so the mole percent is not stored as a mole fraction.
+`Quantity` has no mixing-energy token. Storing ΔG^m as `delta_fG` would make migration score a formation energy. The 15 series 1 reads stay in `species.MgO-Al2O3.context` with `type: figure_mixing_energy` and `method_class: figure_only`. Scored observations: 0. The abscissa is mol % Al2O3. `AmountBasis` has no mole-percent token, so the mole percent is not stored as a mole fraction.

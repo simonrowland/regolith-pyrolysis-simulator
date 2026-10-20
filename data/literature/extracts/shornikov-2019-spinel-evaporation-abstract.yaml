@@ -13,7 +13,9 @@ extraction:
     Figure 5 on PDF page 2 was read from a 600 dpi render. Both axes are
     linear. Calibration uses labelled tick lines only. Series 1, the black
     filled circles for MgO–Al2O3 at 2200 K, was segmented by colour and the
-    connecting stroke was removed with a 10 px erosion. Series 2 and 3 are
+    connecting stroke was removed with a 10 px erosion. That erosion merges
+    the two circles near 50 mol % Al2O3, so each of those was fitted on its
+    own exposed arc. The merged midpoint is not stored. Series 2 and 3 are
     cited from references [8] and [9] and were not read. The series numerals
     and the dotted heterogeneous-area guides were not read. Thermo numbers
     and Figs. 2–4 repeat the full papers and were not copied. The mixing
@@ -27,8 +29,9 @@ scope_assessment:
   document_type: 2-page LPSC abstract (spinel Knudsen evaporation)
   scored_observations: 0
   note: >-
-    Series 1 of Fig. 5, MgO–Al2O3 mixing energy at 2200 K, is the only
-    numeric read. It is context, not a scored observation. Series 2 and 3
+    Series 1 of Fig. 5, fifteen MgO–Al2O3 mixing-energy markers at 2200 K,
+    is the only numeric read. It is context, not a scored observation.
+    Series 2 and 3
     are cited and were not read. The same PDF's enthalpy, entropy, and
     melting values are already in shornikov-2017-spinel-thermodynamics.
 fidelity_samples:
@@ -36,12 +39,12 @@ fidelity_samples:
   observable: figure_mixing_energy
   observation_id: shornikov_2019_lpsc1722_fig5_mgo_al2o3
   field: pin_delta_Gm_kJ_per_mol
-  value: '-23.08'
+  value: '-23.14'
   locator:
     page: 2
     pdf_page_index: 1
     figure: '5'
-    note: Leftmost black filled circle on Fig. 5, read 1.
+    note: Series 1 marker 2, the first unsplit circle after the overlapping pair, read 1.
 species:
   MgO-Al2O3:
     observations: []
@@ -64,11 +67,11 @@ species:
           1298.0=60, 1515.0=70, 1732.5=80, 1948.5=90. The 431.5 px tick is the left
           spine. Fit mol % = 0.046118*x + 0.1250. Value residuals mol %: -0.0250,
           +0.0365, +0.0058, -0.0250, +0.0135, +0.0058, -0.0250, +0.0135. rms 0.0213 mol
-          % (0.46 px). Read 1 is the centroid of the circle core left after a 10 px
-          erosion, which removes the connecting stroke. Read 2 is the bounding-box
-          centre of the high distance-transform core. A marker whose distance transform
-          has two maxima more than 4 px apart is elongated; its uncertainty uses half
-          that separation.
+          % (0.46 px). For a separated circle, read 1 is the centroid of the core left after a
+          10 px erosion, and read 2 is the bounding-box centre of the high
+          distance-transform core. The overlapping pair at crop x about 1082 and
+          1099 is two exposed-arc fits. Their uncertainty comes from the fit
+          residual. The merged midpoint is not stored.
       units: kJ/mol and mol % as printed
       values:
         quantity_as_printed: "ΔG^m_2200, kJ/mol"
@@ -93,35 +96,65 @@ species:
         composition_schema_gap: >-
           The abscissa is printed as Al2O3, mol %. AmountBasis has no mole-percent
           token, so the read mole percent is not stored as a mole fraction.
-        pin_marker_index: 0
-        pin_x_mol_pct: '50.41'
-        pin_delta_Gm_kJ_per_mol: '-23.08'
+        pin_marker_index: 2
+        pin_x_mol_pct: '52.61'
+        pin_delta_Gm_kJ_per_mol: '-23.14'
         points:
         - marker_index: 0
-          delta_Gm_kJ_per_mol_read: '-23.08'
-          delta_Gm_kJ_per_mol_read_2: '-23.09'
-          read_disagreement_kJ_per_mol: '0.008'
-          read_uncertainty_kJ_per_mol: '0.04'
-          x_mol_pct_read: '50.41'
-          x_mol_pct_read_2: '50.39'
-          read_disagreement_mol_pct: '0.015'
-          read_uncertainty_mol_pct: '0.40'
-          crop_px_read_1: [1090.33, 1000.71]
-          crop_px_read_2: [1090.00, 1001.00]
-          page_600dpi_px_read_1: [3590.33, 1150.71]
-          page_600dpi_px_read_2: [3590.00, 1151.00]
-          inscribed_radius_px: '17.0'
+          delta_Gm_kJ_per_mol_read: '-23.07'
+          delta_Gm_kJ_per_mol_read_2: '-23.06'
+          read_disagreement_kJ_per_mol: '0.006'
+          read_uncertainty_kJ_per_mol: '0.02'
+          x_mol_pct_read: '49.98'
+          x_mol_pct_read_2: '50.02'
+          read_disagreement_mol_pct: '0.041'
+          read_uncertainty_mol_pct: '0.06'
+          crop_px_read_1: [1081.11, 1000.21]
+          crop_px_read_2: [1082.00, 1000.00]
+          page_600dpi_px_read_1: [3581.11, 1150.21]
+          page_600dpi_px_read_2: [3582.00, 1150.00]
+          inscribed_radius_px: '16.78'
           in_frame: true
           extrapolated: false
           T_K: '2200'
           centre_note: >-
-            two distance-transform maxima at (1082, 1000) r 17.0 and (1099, 1001) r
-            17.0; half-separation 8.5 px in x and 1.0 px in y
+            Exposed-arc algebraic fit on 55 boundary pixels spanning 225 degrees,
+            after dropping the 65 degree sector that faces the neighbouring circle.
+            Fit centre (1081.11, 1000.21), radius 16.78 px, rms residual 0.50 px. Read
+            2 is the distance-transform peak at (1082, 1000). The merged midpoint
+            (1090.33, 1000.71) is not stored.
           schema_gap: >-
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
         - marker_index: 1
+          delta_Gm_kJ_per_mol_read: '-23.10'
+          delta_Gm_kJ_per_mol_read_2: '-23.09'
+          read_disagreement_kJ_per_mol: '0.010'
+          read_uncertainty_kJ_per_mol: '0.03'
+          x_mol_pct_read: '50.83'
+          x_mol_pct_read_2: '50.81'
+          read_disagreement_mol_pct: '0.020'
+          read_uncertainty_mol_pct: '0.04'
+          crop_px_read_1: [1099.43, 1001.34]
+          crop_px_read_2: [1099.00, 1001.00]
+          page_600dpi_px_read_1: [3599.43, 1151.34]
+          page_600dpi_px_read_2: [3599.00, 1151.00]
+          inscribed_radius_px: '16.99'
+          in_frame: true
+          extrapolated: false
+          T_K: '2200'
+          centre_note: >-
+            Exposed-arc algebraic fit on 58 boundary pixels spanning 224 degrees,
+            after dropping the 65 degree sector that faces the neighbouring circle.
+            Fit centre (1099.43, 1001.34), radius 16.99 px, rms residual 0.58 px. Read
+            2 is the distance-transform peak at (1099, 1001). The merged midpoint
+            (1090.33, 1000.71) is not stored.
+          schema_gap: >-
+            The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
+            no mixing-energy token, so these reads are context and are not stored as
+            delta_fG.
+        - marker_index: 2
           delta_Gm_kJ_per_mol_read: '-23.14'
           delta_Gm_kJ_per_mol_read_2: '-23.15'
           read_disagreement_kJ_per_mol: '0.007'
@@ -144,7 +177,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 2
+        - marker_index: 3
           delta_Gm_kJ_per_mol_read: '-23.02'
           delta_Gm_kJ_per_mol_read_2: '-23.02'
           read_disagreement_kJ_per_mol: '0.004'
@@ -167,7 +200,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 3
+        - marker_index: 4
           delta_Gm_kJ_per_mol_read: '-22.88'
           delta_Gm_kJ_per_mol_read_2: '-22.87'
           read_disagreement_kJ_per_mol: '0.003'
@@ -190,7 +223,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 4
+        - marker_index: 5
           delta_Gm_kJ_per_mol_read: '-22.55'
           delta_Gm_kJ_per_mol_read_2: '-22.55'
           read_disagreement_kJ_per_mol: '0.002'
@@ -213,7 +246,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 5
+        - marker_index: 6
           delta_Gm_kJ_per_mol_read: '-21.82'
           delta_Gm_kJ_per_mol_read_2: '-21.81'
           read_disagreement_kJ_per_mol: '0.013'
@@ -236,7 +269,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 6
+        - marker_index: 7
           delta_Gm_kJ_per_mol_read: '-20.17'
           delta_Gm_kJ_per_mol_read_2: '-20.18'
           read_disagreement_kJ_per_mol: '0.004'
@@ -259,7 +292,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 7
+        - marker_index: 8
           delta_Gm_kJ_per_mol_read: '-18.10'
           delta_Gm_kJ_per_mol_read_2: '-18.09'
           read_disagreement_kJ_per_mol: '0.004'
@@ -282,7 +315,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 8
+        - marker_index: 9
           delta_Gm_kJ_per_mol_read: '-17.34'
           delta_Gm_kJ_per_mol_read_2: '-17.35'
           read_disagreement_kJ_per_mol: '0.006'
@@ -305,7 +338,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 9
+        - marker_index: 10
           delta_Gm_kJ_per_mol_read: '-16.10'
           delta_Gm_kJ_per_mol_read_2: '-16.10'
           read_disagreement_kJ_per_mol: '0.002'
@@ -328,7 +361,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 10
+        - marker_index: 11
           delta_Gm_kJ_per_mol_read: '-15.41'
           delta_Gm_kJ_per_mol_read_2: '-15.41'
           read_disagreement_kJ_per_mol: '0.003'
@@ -351,7 +384,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 11
+        - marker_index: 12
           delta_Gm_kJ_per_mol_read: '-13.97'
           delta_Gm_kJ_per_mol_read_2: '-13.98'
           read_disagreement_kJ_per_mol: '0.009'
@@ -374,7 +407,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 12
+        - marker_index: 13
           delta_Gm_kJ_per_mol_read: '-12.26'
           delta_Gm_kJ_per_mol_read_2: '-12.26'
           read_disagreement_kJ_per_mol: '0.003'
@@ -397,7 +430,7 @@ species:
             The ordinate is the mixing energy ΔG^m at 2200 K in kJ/mol. Quantity has
             no mixing-energy token, so these reads are context and are not stored as
             delta_fG.
-        - marker_index: 13
+        - marker_index: 14
           delta_Gm_kJ_per_mol_read: '-10.10'
           delta_Gm_kJ_per_mol_read_2: '-10.09'
           read_disagreement_kJ_per_mol: '0.011'
