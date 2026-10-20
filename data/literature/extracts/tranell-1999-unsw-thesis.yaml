@@ -98,9 +98,22 @@ species:
       standard_state:
         state:
           tag: unknown
-          reason: The thesis denotes gamma Si with a superscript circle but does not name a Raoultian or Henrian concentration basis.
+          reason: >-
+            The thesis does not name the concentration standard-state basis for
+            gamma Si in liquid copper. Pure solid SiO2 is the equilibrium
+            reservoir used in the calculation, not itself the Si-in-copper
+            coefficient reference, so that basis remains unknown.
         inferred: false
         locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2'}
+      oxide_saturation_reference:
+        formula: SiO2
+        phase: high cristobalite (cr)
+        inferred: true
+        basis: >-
+          Pure solid SiO2 was equilibrated at 1873 K as stated on physical page
+          118. NIST-JANAF Fourth Edition (Chase, 1998), Table 1755, places high
+          cristobalite between 1079 K and the 1996 K crystal-liquid transition;
+          the reservoir phase at 1873 K is therefore inferred as high cristobalite.
       point_conditions:
         temperature_K:
           state: {tag: value, value: '1873'}
@@ -145,9 +158,22 @@ species:
       standard_state:
         state:
           tag: unknown
-          reason: The thesis denotes gamma Si with a superscript circle but does not name a Raoultian or Henrian concentration basis.
+          reason: >-
+            The thesis does not name the concentration standard-state basis for
+            gamma Si in liquid copper. Pure solid SiO2 is the equilibrium
+            reservoir used in the calculation, not itself the Si-in-copper
+            coefficient reference, so that basis remains unknown.
         inferred: false
         locator: {page: 118, pdf_page_index: 117, published_page: 108, table: '4.2'}
+      oxide_saturation_reference:
+        formula: SiO2
+        phase: high cristobalite (cr)
+        inferred: true
+        basis: >-
+          Pure solid SiO2 was equilibrated at 1873 K as stated on physical page
+          118. NIST-JANAF Fourth Edition (Chase, 1998), Table 1755, places high
+          cristobalite between 1079 K and the 1996 K crystal-liquid transition;
+          the reservoir phase at 1873 K is therefore inferred as high cristobalite.
       point_conditions:
         temperature_K:
           state: {tag: value, value: '1873'}

@@ -60,6 +60,27 @@ def test_table42_grid_is_bound_to_render_and_both_mutations_fail() -> None:
         assert_table42_matches_render(changed_extract, TABLE42_RENDER)
 
 
+def test_table42_keeps_silicon_basis_unknown_and_infers_silica_reservoir_phase() -> None:
+    rows = [
+        row
+        for row in document()["species"]["Si"]["observations"]
+        if row["type"] == "activity_coefficient"
+    ]
+    assert len(rows) == 2
+    for row in rows:
+        standard_state = row["standard_state"]
+        assert standard_state["state"]["tag"] == "unknown"
+        assert standard_state["inferred"] is False
+        assert "not itself the Si-in-copper coefficient reference" in standard_state["state"]["reason"]
+
+        oxide_reference = row["oxide_saturation_reference"]
+        assert oxide_reference["formula"] == "SiO2"
+        assert oxide_reference["phase"] == "high cristobalite (cr)"
+        assert oxide_reference["inferred"] is True
+        assert "NIST-JANAF Fourth Edition" in oxide_reference["basis"]
+        assert "1873 K" in oxide_reference["basis"]
+
+
 def test_table42_source_locator_is_present_on_physical_page() -> None:
     corpus_root = Path(
         os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
