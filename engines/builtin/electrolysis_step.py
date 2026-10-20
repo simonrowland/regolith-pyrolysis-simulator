@@ -1176,11 +1176,13 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         melt_fO2_log: float | None,
     ) -> dict[str, Any]:
         from simulator.fe_redox import (
+            KRESS91_MOL_FRACTION_OXIDES,
             feot_equivalent_wt_pct,
             floor_vacuum_pressure_bar,
             kress91_split,
             melt_mol_fractions_for_kress91,
         )
+        from simulator.accounting.formulas import project_oxide_composition
         pressure_control = floor_vacuum_pressure_bar(pressure_bar)
 
         base: dict[str, Any] = {
@@ -1239,25 +1241,17 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         fe3 = min(1.0, max(0.0, float(split["fe3"])))
         x_fe2o3 = float(split["x_fe2o3"])
         x_feo = float(split["x_feo"])
-        weighted_total = (
-            mol_fractions.get("SiO2", 0.0) * 60.0843
-            + mol_fractions.get("TiO2", 0.0) * 79.8788
-            + mol_fractions.get("Al2O3", 0.0) * 101.961
-            + mol_fractions.get("MnO", 0.0) * 70.9375
-            + mol_fractions.get("MgO", 0.0) * 40.3044
-            + mol_fractions.get("CaO", 0.0) * 56.0774
-            + mol_fractions.get("Na2O", 0.0) * 61.9789
-            + mol_fractions.get("K2O", 0.0) * 94.196
-            + mol_fractions.get("P2O5", 0.0) * 141.937
-            + x_fe2o3 * 159.687
-            + x_feo * 71.844
+        redox_oxide_moles = {
+            oxide: mol_fractions.get(oxide, 0.0)
+            for oxide in KRESS91_MOL_FRACTION_OXIDES
+        }
+        redox_oxide_moles.update({'Fe2O3': x_fe2o3, 'FeO': x_feo})
+        mass_fractions = project_oxide_composition(
+            redox_oxide_moles,
+            source_basis='moles',
         )
-        if weighted_total <= 0.0:
-            fe2o3_wt = 0.0
-            feo_wt = 0.0
-        else:
-            fe2o3_wt = 100.0 * x_fe2o3 * 159.687 / weighted_total
-            feo_wt = 100.0 * x_feo * 71.844 / weighted_total
+        fe2o3_wt = 100.0 * mass_fractions.get('Fe2O3', 0.0)
+        feo_wt = 100.0 * mass_fractions.get('FeO', 0.0)
         return {
             **base,
             "status": "ok",

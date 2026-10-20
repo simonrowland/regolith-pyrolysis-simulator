@@ -68,6 +68,49 @@ def test_simulator_has_no_forbidden_internal_kg_mutations():
     assert not violations, "\n".join(violations)
 
 
+def test_composition_projection_has_no_literal_oxide_molar_mass_tables():
+    repo = Path(__file__).parent.parent
+    projector_callers = (
+        "engines/builtin/overhead_gas_equilibrium.py",
+        "simulator/core.py",
+        "engines/builtin/electrolysis_step.py",
+        "benchmarks/melt_activity_benchmark.py",
+        "tests/chemistry/test_corpus_anchored_parity.py",
+    )
+    missing_callers = [
+        relative
+        for relative in projector_callers
+        if "project_oxide_composition" not in (repo / relative).read_text()
+    ]
+    assert not missing_callers, "composition paths bypass formula projector: " + ", ".join(
+        missing_callers
+    )
+
+    roots = ("simulator", "engines", "benchmarks", "scripts", "tests")
+    violations = []
+    for root_name in roots:
+        for path in (repo / root_name).rglob("*.py"):
+            relative = path.relative_to(repo).as_posix()
+            tree = ast.parse(path.read_text(), filename=relative)
+            for node in ast.walk(tree):
+                if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+                    continue
+                value = node.value
+                if not isinstance(value, ast.Dict):
+                    continue
+                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                names = [
+                    target.id.lower()
+                    for target in targets
+                    if isinstance(target, ast.Name)
+                ]
+                if not any("molar_mass" in name and "oxide" in name for name in names):
+                    continue
+                violations.append(f"{relative}:{node.lineno}")
+
+    assert not violations, "literal oxide molar-mass tables: " + ", ".join(violations)
+
+
 def _forbidden_internal_kg_mutation_hits(root: Path) -> list[str]:
     # Scan regular files under the old roots and extensions, skipping only
     # __pycache__ and hidden directories. This intentionally does not emulate
