@@ -12,7 +12,10 @@ extraction:
     2300 K squares and the 2400 K triangles was read on the same Figure 2 scale. Figure 3
     centres on curves 1-3 were read twice and kept as a typed refusal: the integral melt
     Gibbs energy has no solution-composition carrier. Four centres that are glyph gaps, not
-    open squares, were removed (4.87, 7.16, 21.65, and 73.53 mol% Al2O3).'
+    open squares, were removed (4.87, 7.16, 21.65, and 73.53 mol% Al2O3). The centre at
+    (2972, 1014) was the channel between two strokes; the square is the closed hole at
+    (2960.0, 989.5), 14.63 mol% and 10.07 kJ/mol. The other 58 Figure 3 centres sit on
+    dark marker ink or a closed 18x19 px hole.'
   date: '2026-10-20'
   worker: grok-resume-11242-1792500084
   provenance_path: text/shornikov-2000-aluminosilicate-thermodynamics/pdftotext-layout.txt
@@ -1716,7 +1719,14 @@ species:
           (0.22 kJ/mol, 0.50 mol%). The legend glyphs near x=3427 (a circle at y=768 and a triangle
           at y=964) were excluded. Four stored open-square centres were removed because they are
           glyph gaps, not closed square holes: (2794, 766), (2832, 872), (3080, 1118), and
-          (3964, 1438). The last is the upper counter of a printed 8. A partly hidden square near
+          (3964, 1438). The last is the upper counter of a printed 8. The stored centre (2972, 1014)
+          was the same kind of stroke channel. A bright flood from it does not stay inside a 36 px
+          window. The open square is the closed hole at (2960.0, 989.5), 19x18 px, 342 bright
+          pixels. Read 1 and the radius-14 dark centroid are that hole centre (shift 0.00 px). The
+          mean is 14.63 mol% and 10.07 kJ/mol. The nearest filled-circle centre, (2982.3, 961.3),
+          is 36 px away, so the ring is not the circle. Every other retained centre was checked the
+          same way: filled centres are gray 32, and the other 18 square holes stay inside 18x19 or
+          19x19 px. A partly hidden square near
           (2796, 748) was not given a new centre. Curves 4-9 and the white gaps past about 85 mol%, where those
           curves converge, were not given a centre.'
       units: kJ/mol
@@ -1892,13 +1902,13 @@ species:
         - series: 2
           symbol: open_square
           T_K: '2300'
-          Al2O3_mole_percent_as_read: '15.38'
-          neg_delta_fG_kJ_mol: '10.70'
+          Al2O3_mole_percent_as_read: '14.63'
+          neg_delta_fG_kJ_mol: '10.07'
           read_uncertainty_kJ_mol: '0.26'
           read_uncertainty_mol_percent: '0.59'
-          read_1_px: [2972.0, 1014.0]
-          read_2_px: [2973.6, 1013.9]
-          read_shift_px: '1.60'
+          read_1_px: [2960.0, 989.5]
+          read_2_px: [2960.0, 989.5]
+          read_shift_px: '0.00'
         - series: 2
           symbol: open_square
           T_K: '2300'
