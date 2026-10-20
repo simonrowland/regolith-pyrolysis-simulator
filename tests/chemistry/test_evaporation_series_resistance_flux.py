@@ -301,6 +301,15 @@ def test_cro2_evaporation_proxy_uses_shared_sio_collision_parameters():
     assert result.d_ab_m2_s == pytest.approx(expected, rel=1e-12)
 
 
+def test_potassium_transport_row_is_marked_proxy_with_unknown_source():
+    from simulator.condensation import _LENNARD_JONES_PARAMS, _LENNARD_JONES_PROVENANCE
+
+    assert _LENNARD_JONES_PARAMS["K"] == (3.987, 1305.0, 39.098)
+    row = _LENNARD_JONES_PROVENANCE["K"]
+    assert row["status"] == "proxy"
+    assert "unknown" in row["source"]
+
+
 def test_chapman_enskog_prefactor_matches_bsl_atmosphere_form():
     """Default condensation D_AB uses the BSL atm prefactor, not 0.00266.
 
