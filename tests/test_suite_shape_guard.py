@@ -303,6 +303,75 @@ def test_suite_shape_roster_drift_is_checked_under_mark_expression(
     assert "test_unrostered_heavy" in message
 
 
+def _run_duration_hint_guard(
+    monkeypatch,
+    tmp_path: Path,
+    full_collection: list[dict[str, object]],
+    duration_hints: dict[str, float],
+) -> None:
+    monkeypatch.setitem(globals(), "HEAVY_ROSTER", frozenset())
+    monkeypatch.setitem(
+        globals(), "_collect_full_suite_items", lambda: full_collection
+    )
+    monkeypatch.setitem(globals(), "_nightly_yield_violations", lambda: [])
+    hint_path = tmp_path / "duration-hints.json"
+    hint_path.write_text(
+        json.dumps({"durations_seconds": duration_hints}), encoding="utf-8"
+    )
+    monkeypatch.setitem(globals(), "DURATION_HINTS_PATH", hint_path)
+    selected_items = [
+        SimpleNamespace(
+            nodeid=f"tests/test_selected.py::test_{index}",
+            get_closest_marker=lambda _name: None,
+            iter_markers=lambda _name: (),
+        )
+        for index in range(1001)
+    ]
+    request = SimpleNamespace(
+        session=SimpleNamespace(items=selected_items),
+        config=SimpleNamespace(
+            option=SimpleNamespace(markexpr="not nightly")
+        ),
+    )
+    test_suite_shape_heavy_tests_are_grouped_and_rostered(request)
+
+
+def test_duration_hint_group_deselected_by_not_nightly_is_not_stale(
+    monkeypatch, tmp_path: Path
+) -> None:
+    _run_duration_hint_guard(
+        monkeypatch,
+        tmp_path,
+        [
+            {
+                "nodeid": "tests/test_nightly.py::test_heavy",
+                "marks": ["nightly"],
+                "timeout_s": None,
+                "xdist_groups": ["magemin_fullrun_a"],
+            }
+        ],
+        {"magemin_fullrun_a": 12.0},
+    )
+
+
+def test_duration_hint_with_no_collected_group_is_still_stale(
+    monkeypatch, tmp_path: Path
+) -> None:
+    with pytest.raises(AssertionError, match="stale=\\['magemin_fullrun_z'\\]"):
+        _run_duration_hint_guard(
+            monkeypatch,
+            tmp_path,
+            [
+                {
+                    "nodeid": "tests/test_selected.py::test_fast",
+                    "timeout_s": None,
+                    "xdist_groups": [],
+                }
+            ],
+            {"magemin_fullrun_z": 12.0},
+        )
+
+
 # Keep this guard unmarked so the PR tier's ``-m "not nightly"`` runs it.
 def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
     violations: list[str] = []
