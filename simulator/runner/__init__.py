@@ -90,6 +90,7 @@ from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
 )
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.liner_life import build_liner_life_run_diagnostic
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     evaluate_vacuum_pyrolysis_comparison,
@@ -1633,6 +1634,7 @@ class PyrolysisRun:
                 existing_by_segment_species_kg=(
                     _nested_species_kg_from_segment_species(existing_before)
                 ),
+                authority=execution.trace.wall_deposit_sticking_authority,
             )
             final_summary["wall_fouling_lifespan"] = {
                 **lifespan,
@@ -3807,12 +3809,11 @@ def _wall_fouling_report(
         alpha_notice or {},
     )
     authoritative = bool(authority.get("authoritative_for_resinter", True))
-    wall_deposit_unavailable = (
-        not authoritative
-        and not positive
-        and not segment_load_kg
-        and bool(authority.get("wall_saturation_pressure_refused_species"))
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=total_wall_load_kg > 0.0,
+        authority=authority,
     )
+    wall_deposit_unavailable = availability.status == "refused"
     campaigns_by_segment: dict[str, float | str] = {}
     campaigns_to_resinter: float | str | None
     aggregate_campaigns_to_resinter: float | str | None = "infinite"
@@ -3861,7 +3862,7 @@ def _wall_fouling_report(
     nominal_verdict = None if wall_deposit_unavailable else verdict
     if not authoritative and not wall_deposit_unavailable:
         verdict = "non-authoritative"
-    return {
+    report = {
         "liner_material": cfg["liner_material"],
         "dominant_species": dominant_species,
         "dominant_species_wall_deposit_kg": (
@@ -3891,12 +3892,16 @@ def _wall_fouling_report(
         "nominal_verdict": nominal_verdict,
         "verdict": verdict,
     }
+    if availability.refusal is not None:
+        report["refusal"] = availability.refusal
+    return report
 
 
 def _wall_fouling_lifespan_report(
     *,
     per_campaign_by_segment_species_kg: Mapping[str, Mapping[str, float]],
     existing_by_segment_species_kg: Mapping[str, Mapping[str, float]],
+    authority: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return INFO-only remaining-life projection from execution-local rates."""
 
@@ -3911,6 +3916,11 @@ def _wall_fouling_lifespan_report(
         for segment, species_kg in existing_by_segment_species_kg.items()
     }
     total_per_campaign = sum(per_segment.values())
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=total_per_campaign > 0.0,
+        authority=authority,
+    )
+    refused = availability.status == "refused"
     controlling_segment: str | None = None
     threshold = cfg.get("resinter_threshold_kg")
     threshold_kg = None if threshold is None else float(threshold)
@@ -3920,7 +3930,10 @@ def _wall_fouling_lifespan_report(
         and threshold_kg > 0.0
     )
     campaigns_by_segment: dict[str, float | str] = {}
-    if total_per_campaign <= 0.0:
+    if refused:
+        campaigns_to_resinter = None
+        nominal_verdict = None
+    elif total_per_campaign <= 0.0:
         campaigns_to_resinter: float | str = "infinite"
         nominal_verdict = "slow-fouling"
     elif threshold_qualified:
@@ -3959,12 +3972,14 @@ def _wall_fouling_lifespan_report(
             f"< {cfg['fast_fouling_campaign_threshold']}, else slow-fouling"
         )
 
-    return {
+    report = {
         "input_basis": "execution_local_committed_rate_per_campaign",
         "liner_material": cfg["liner_material"],
         "controlling_segment": controlling_segment,
-        "wall_deposit_kg_per_campaign": _clean_report_float(
-            total_per_campaign
+        "wall_deposit_kg_per_campaign": (
+            None
+            if refused
+            else _clean_report_float(total_per_campaign)
         ),
         "existing_wall_load_kg_by_segment": {
             key: _clean_report_float(value)
@@ -3991,6 +4006,9 @@ def _wall_fouling_lifespan_report(
         "verdict_authoritative": False,
         "authoritative_for_selection": False,
     }
+    if availability.refusal is not None:
+        report["refusal"] = availability.refusal
+    return report
 
 
 def _required_stage0_carbon_kg(feedstock: Mapping[str, Any],

@@ -16,6 +16,7 @@ from simulator.coating_lifespan import (
     project_lifecycle,
 )
 from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 
 
 MASS_BALANCE_CLOSURE_LIMIT_PCT = 5.0e-12
@@ -187,9 +188,11 @@ class FoulingLifecycleHarness:
             campaigns_to_resinter_total=(
                 records[-1].campaigns_to_resinter_total
                 if records
-                else CampaignsToResinterTotal(
-                    value="infinite",
+                else campaigns_to_resinter_total(
+                    {},
+                    resinter_threshold_kg=self._resinter_threshold_kg,
                     authoritative_for_resinter=False,
+                    measured=False,
                 )
             ),
             lifecycle_projection=project_lifecycle(
@@ -229,35 +232,73 @@ def _campaigns_total_from_artifact(
     snapshot: FoulingTerminalSnapshot,
     resinter_threshold_kg: float | None,
 ) -> CampaignsToResinterTotal:
-    explicit = artifact.campaigns_to_resinter_total
-    if isinstance(explicit, CampaignsToResinterTotal):
-        return explicit
-    if isinstance(explicit, Mapping):
-        return CampaignsToResinterTotal(
-            value=explicit.get("value", explicit.get("campaigns_to_resinter", "infinite")),
-            authoritative_for_resinter=(
-                bool(explicit.get("authoritative_for_resinter", True))
-                and _authoritative_for_resinter(snapshot)
-            ),
-            notices=tuple(explicit.get("notices", ())),
-        )
-    report = _find_fouling_report(artifact.result_document)
-    if report is not None:
-        return CampaignsToResinterTotal(
-            value=report.get(
-                "aggregate_campaigns_to_resinter",
-                report.get("campaigns_to_resinter", "infinite"),
-            ),
-            authoritative_for_resinter=(
-                bool(report.get("authoritative_for_resinter", True))
-                and _authoritative_for_resinter(snapshot)
-            ),
-            notices=tuple(report.get("notices", ())),
-        )
-    return campaigns_to_resinter_total(
+    authority_payload = (
+        snapshot.wall_deposit_sticking_authority
+        if isinstance(snapshot.wall_deposit_sticking_authority, Mapping)
+        else {}
+    )
+    authority = wall_deposit_sticking_authority_status(
+        snapshot.wall_deposit_by_segment_species_kg,
+        authority_payload,
+    )
+    authoritative = bool(authority.get("authoritative_for_resinter", False))
+    local_total = campaigns_to_resinter_total(
         snapshot.wall_deposit_by_segment_species_kg,
         resinter_threshold_kg=resinter_threshold_kg,
-        authoritative_for_resinter=_authoritative_for_resinter(snapshot),
+        authoritative_for_resinter=authoritative,
+        authority=authority,
+    )
+    explicit = artifact.campaigns_to_resinter_total
+    if isinstance(explicit, CampaignsToResinterTotal):
+        value = explicit.value
+        explicit_refusal = explicit.refusal
+        supplied_authority = explicit.authoritative_for_resinter
+        notices = explicit.notices
+    else:
+        report = _find_fouling_report(artifact.result_document)
+        if isinstance(explicit, Mapping):
+            value = explicit.get(
+                "value",
+                explicit.get("campaigns_to_resinter", local_total.value),
+            )
+            explicit_refusal = explicit.get("refusal")
+            supplied_authority = bool(
+                explicit.get("authoritative_for_resinter", True)
+            )
+            notices = tuple(explicit.get("notices", ()))
+        elif report is not None:
+            value = report.get(
+                "aggregate_campaigns_to_resinter",
+                report.get("campaigns_to_resinter", local_total.value),
+            )
+            explicit_refusal = report.get("refusal")
+            supplied_authority = bool(
+                report.get("authoritative_for_resinter", True)
+            )
+            notices = tuple(report.get("notices", ()))
+        else:
+            value = local_total.value
+            explicit_refusal = None
+            supplied_authority = local_total.authoritative_for_resinter
+            notices = local_total.notices
+
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=local_total.value != "infinite",
+        authority=authority,
+        refusal=(explicit_refusal or local_total.refusal),
+    )
+    if availability.status == "refused":
+        value = None
+    return CampaignsToResinterTotal(
+        value=value,
+        authoritative_for_resinter=(
+            bool(supplied_authority)
+            and authoritative
+            and availability.status != "refused"
+        ),
+        notices=notices,
+        refusal=availability.refusal,
+        measured_empty_deposit=availability.status == "measured_empty",
     )
 
 
@@ -278,19 +319,6 @@ def _find_fouling_report(document: Mapping[str, Any] | None) -> Mapping[str, Any
         if isinstance(candidate, Mapping) and "campaigns_to_resinter" in candidate:
             return candidate
     return None
-
-
-def _authoritative_for_resinter(snapshot: FoulingTerminalSnapshot) -> bool:
-    authority = (
-        snapshot.wall_deposit_sticking_authority
-        if isinstance(snapshot.wall_deposit_sticking_authority, Mapping)
-        else {}
-    )
-    grounded = wall_deposit_sticking_authority_status(
-        snapshot.wall_deposit_by_segment_species_kg,
-        authority,
-    )
-    return bool(grounded.get("authoritative_for_resinter", False))
 
 
 def _mass_balance_error_pct(artifact: FoulingRunArtifact) -> float | None:

@@ -28,6 +28,7 @@ from simulator.diagnostics import (
     wall_deposit_sticking_authority_status,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.vapour_rail.instrumentation import (
     merge_vapour_carrier_lineage,
     vapour_carrier_authority_severity,
@@ -177,19 +178,50 @@ class LifecycleProjection:
 
 @dataclass(frozen=True)
 class CampaignsToResinterTotal:
-    value: float | str
+    value: float | str | None
     authoritative_for_resinter: bool
     notices: tuple[Mapping[str, Any], ...] = ()
+    refusal: Mapping[str, Any] | None = None
+    measured_empty_deposit: bool = field(default=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "notices", tuple(_freeze_value(item) for item in self.notices))
+        if self.refusal is not None:
+            refusal = _freeze_value(self.refusal)
+            reason = refusal.get("reason") if isinstance(refusal, Mapping) else None
+            authority = refusal.get("authority") if isinstance(refusal, Mapping) else None
+            count = refusal.get("count") if isinstance(refusal, Mapping) else None
+            if (
+                not isinstance(reason, str)
+                or not reason.strip()
+                or not isinstance(authority, Mapping)
+                or not authority
+                or isinstance(count, bool)
+                or not isinstance(count, int)
+                or count < 0
+            ):
+                raise FoulingProjectionError(
+                    "resinter refusal requires a reason, authority, and non-negative count"
+                )
+            object.__setattr__(self, "refusal", refusal)
+        if (self.value is None) != (self.refusal is not None):
+            raise FoulingProjectionError(
+                "unavailable campaigns_to_resinter requires a refusal, and a refusal requires None"
+            )
+        if self.value == "infinite" and not self.measured_empty_deposit:
+            raise FoulingProjectionError(
+                "infinite campaigns_to_resinter requires a measured empty deposit"
+            )
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        payload = {
             "value": self.value,
             "authoritative_for_resinter": self.authoritative_for_resinter,
             "notices": [_plain_authority_mapping(item) for item in self.notices],
         }
+        if self.refusal is not None:
+            payload["refusal"] = _plain_authority_mapping(self.refusal)
+        return payload
 
 
 def merge_run_snapshot(
@@ -577,6 +609,8 @@ def campaigns_to_resinter_total(
     *,
     resinter_threshold_kg: float | None,
     authoritative_for_resinter: bool,
+    authority: Mapping[str, Any] | None = None,
+    measured: bool = True,
 ) -> CampaignsToResinterTotal:
     if resinter_threshold_kg is not None:
         resinter_threshold_kg = _positive_finite(
@@ -589,7 +623,14 @@ def campaigns_to_resinter_total(
         for kg in species_kg.values()
         if float(kg) > EPSILON_KG
     )
-    if total_wall_load_kg <= 0.0:
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=total_wall_load_kg > 0.0,
+        authority=authority,
+        measured=measured,
+    )
+    if availability.status == "refused":
+        value: float | str | None = None
+    elif total_wall_load_kg <= 0.0:
         value: float | str = "infinite"
     elif resinter_threshold_kg is None:
         value = f"resinter_threshold_kg / {total_wall_load_kg:.12g}"
@@ -597,7 +638,12 @@ def campaigns_to_resinter_total(
         value = float(resinter_threshold_kg) / total_wall_load_kg
     return CampaignsToResinterTotal(
         value=value,
-        authoritative_for_resinter=bool(authoritative_for_resinter),
+        authoritative_for_resinter=(
+            bool(authoritative_for_resinter)
+            and availability.status != "refused"
+        ),
+        refusal=availability.refusal,
+        measured_empty_deposit=availability.status == "measured_empty",
     )
 
 

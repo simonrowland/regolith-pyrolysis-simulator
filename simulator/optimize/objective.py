@@ -31,10 +31,10 @@ from simulator.optimize.physics import (
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
 from simulator.core import read_high_t_melt_activity_fallback_notice
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.three_product_report import classify_products
 from simulator.diagnostics import (
-    WALL_SATURATION_PRESSURE_REFUSED_CODE,
     wall_deposit_remobilization_by_segment_species,
     wall_deposit_sticking_authority_status,
 )
@@ -3400,16 +3400,17 @@ def _scores_dominate(
 
 
 def _normalize_campaigns_to_resinter(campaigns_to_resinter: Any) -> float:
-    if campaigns_to_resinter is None or (
-        isinstance(campaigns_to_resinter, str)
-        and campaigns_to_resinter == "infinite"
-    ):
+    if campaigns_to_resinter is None:
+        raise ObjectiveComputationError(
+            "campaigns_to_resinter is unavailable and cannot be priced"
+        )
+    if isinstance(campaigns_to_resinter, str) and campaigns_to_resinter == "infinite":
         return math.inf
     try:
         campaigns = float(campaigns_to_resinter)
     except (TypeError, ValueError, OverflowError) as exc:
         raise ObjectiveComputationError(
-            "campaigns_to_resinter must be numeric, None, or 'infinite'"
+            "campaigns_to_resinter must be numeric or 'infinite'"
         ) from exc
     # Positive fouling with an unusable signed lifetime is physically no better
     # than an observed zero lifetime; keep that failure finite and rankable.
@@ -3424,10 +3425,14 @@ def furnace_amortization_cost_per_run(
     multiplier: float,
     min_fouling_penalty: float,
     *,
-    has_positive_fouling: bool,
+    has_positive_fouling: bool | None,
 ) -> float:
     """Price one run's share of the furnace lifetime."""
 
+    if has_positive_fouling is None:
+        raise ObjectiveComputationError(
+            "furnace amortization is unavailable with a refused wall-deposit figure"
+        )
     if not has_positive_fouling:
         return 0.0
     campaigns = _normalize_campaigns_to_resinter(campaigns_to_resinter)
@@ -3626,6 +3631,7 @@ def product_summary(
     has_positive_fouling = summary.get("has_positive_qualified_fouling", False)
     summary["campaigns_to_resinter_worst_segment"] = lifetime
     summary["has_positive_qualified_fouling"] = has_positive_fouling
+    refusal = summary.get("wall_deposit_refusal")
     if cost_parameters is not None:
         summary.update(
             _furnace_amortization_summary(
@@ -3633,6 +3639,7 @@ def product_summary(
                 lifetime,
                 has_positive_fouling=has_positive_fouling,
                 cost_parameters=cost_parameters,
+                refusal=refusal,
             )
         )
     return MappingProxyType(summary)
@@ -3684,12 +3691,16 @@ def _furnace_amortization_summary(
     *,
     has_positive_fouling: bool | None,
     cost_parameters: Mapping[str, Any] | CostParameters | None,
+    refusal: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
     if has_positive_fouling is None:
-        return MappingProxyType({
-            "furnace_amortization_status": "batch_cost_unavailable",
+        payload = {
+            "furnace_amortization_status": "wall_deposit_unavailable",
             "furnace_amortization_batch_cost_equivalents": None,
-        })
+        }
+        if refusal is not None:
+            payload["wall_deposit_refusal"] = refusal
+        return MappingProxyType(payload)
     parameters = (
         cost_parameters
         if isinstance(cost_parameters, CostParameters)
@@ -4259,10 +4270,11 @@ def _coating_lifetime_projection(
     has_positive_fouling: bool | None = _has_positive_wall_deposit(
         wall_deposit_by_segment_species
     )
-    unavailable = _wall_deposit_lifetime_unavailable(
-        wall_deposit_by_segment_species,
-        authority,
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=has_positive_fouling,
+        authority=authority,
     )
+    unavailable = availability.status == "refused"
     payload = getattr(coating_margin, "status_payload", {}) or {}
     if isinstance(payload, Mapping) and payload.get(
         "coating_constraint_mode"
@@ -4295,33 +4307,15 @@ def _coating_lifetime_projection(
         aggregate_campaigns_to_resinter = None
         lifetime = None
         has_positive_fouling = None
-    return MappingProxyType({
+    result = {
         "campaigns_to_resinter": campaigns_to_resinter,
         "aggregate_campaigns_to_resinter": aggregate_campaigns_to_resinter,
         "campaigns_to_resinter_worst_segment": lifetime,
         "has_positive_qualified_fouling": has_positive_fouling,
-    })
-
-
-def _wall_deposit_lifetime_unavailable(
-    wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
-    authority: Mapping[str, Any] | None,
-) -> bool:
-    if (
-        _has_positive_wall_deposit(wall_deposit_by_segment_species)
-        or not isinstance(authority, Mapping)
-        or _coating_authority_is_authoritative(authority)
-    ):
-        return False
-    codes = authority.get("codes", ())
-    return (
-        authority.get("code") == WALL_SATURATION_PRESSURE_REFUSED_CODE
-        or (
-            isinstance(codes, (tuple, list, set, frozenset))
-            and WALL_SATURATION_PRESSURE_REFUSED_CODE in codes
-        )
-        or bool(authority.get("wall_saturation_pressure_refused_species"))
-    )
+    }
+    if availability.refusal is not None:
+        result["wall_deposit_refusal"] = availability.refusal
+    return MappingProxyType(result)
 
 
 def _campaigns_elapsed(run_execution: Any) -> float:
@@ -4459,6 +4453,8 @@ def _furnace_lifespan_cost_summary_from_raw(
             None if wall_deposit_unavailable else cumulative_by_species
         ),
     }
+    if lifetime.get("wall_deposit_refusal") is not None:
+        summary["wall_deposit_refusal"] = lifetime["wall_deposit_refusal"]
     if wall_deposit_unavailable:
         return MappingProxyType(summary)
     if threshold is None:
@@ -4856,7 +4852,7 @@ def _depreciation_expense_per_run_summary(
             "wall_deposit_total_kg": None,
         })
     if summary.get("lifespan_cost_status") == "wall_deposit_unavailable":
-        return MappingProxyType({
+        payload = {
             "status": "wall_deposit_unavailable",
             "furnace_resinter_cost_usd": cost_parameters.furnace_resinter_cost_usd,
             "depreciation_expense_per_run_usd": None,
@@ -4866,19 +4862,49 @@ def _depreciation_expense_per_run_summary(
             "campaigns_to_resinter": None,
             "resinter_threshold_kg": summary.get("resinter_threshold_kg"),
             "wall_deposit_total_kg": None,
-        })
+        }
+        if summary.get("wall_deposit_refusal") is not None:
+            payload["wall_deposit_refusal"] = summary["wall_deposit_refusal"]
+        return MappingProxyType(payload)
     threshold = summary.get("resinter_threshold_kg")
     wall_load = _finite_float(summary.get("wall_deposit_total_kg", 0.0), "wall_deposit_total_kg")
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=wall_load > 0.0,
+        refusal=summary.get("wall_deposit_refusal"),
+    )
     if threshold is not None:
         threshold_kg = _finite_float(threshold, "resinter_threshold_kg")
         if threshold_kg <= 0.0:
             raise ObjectiveComputationError("resinter_threshold_kg must be positive")
-        if wall_load <= 0.0:
+        if availability.status == "measured_empty":
             campaigns_to_resinter = None
             depreciation = 0.0
             status = "no_wall_deposit"
         else:
-            campaigns_to_resinter = threshold_kg / wall_load
+            raw = _wall_deposit_metric_raw(run_execution, sim)
+            campaigns_elapsed = (
+                _campaigns_elapsed(run_execution)
+                if run_execution is not None
+                else 1.0
+            )
+            aggregate_campaigns = _aggregate_campaigns_to_resinter(
+                raw,
+                campaigns_elapsed=campaigns_elapsed,
+            )
+            if isinstance(aggregate_campaigns, bool) or not isinstance(
+                aggregate_campaigns, int | float
+            ):
+                raise ObjectiveComputationError(
+                    "aggregate campaigns_to_resinter is unavailable"
+                )
+            campaigns_to_resinter = _finite_float(
+                aggregate_campaigns,
+                "aggregate_campaigns_to_resinter",
+            )
+            if campaigns_to_resinter <= 0.0:
+                raise ObjectiveComputationError(
+                    "aggregate campaigns_to_resinter must be positive"
+                )
             # Unit check: USD/resinter / runs/resinter = USD/run.
             depreciation = cost_parameters.furnace_resinter_cost_usd / campaigns_to_resinter
             status = "campaigns_to_resinter"

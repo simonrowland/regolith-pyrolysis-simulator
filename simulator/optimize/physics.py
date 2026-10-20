@@ -23,6 +23,7 @@ from simulator.accounting.completeness import (
 from simulator.accounting.queries import AccountingQueries
 from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.trace import WALL_DEPOSIT_ZONE_NAMES
 
@@ -483,11 +484,11 @@ class PhysicsConstraintSet:
             has_wall_deposit = any(kg > _EPS for kg in by_campaign.values())
             authority = _coating_authority_status(trace, by_campaign)
             authoritative = _authority_is_authoritative(authority)
-            if (
-                not authoritative
-                and not has_wall_deposit
-                and authority.get("wall_saturation_pressure_refused_species")
-            ):
+            availability = wall_deposit_figure_availability(
+                has_positive_deposit=has_wall_deposit,
+                authority=authority,
+            )
+            if availability.status == "refused":
                 return self.coating_from_fouling_report({
                     "campaigns_to_resinter_total": None,
                     "wall_deposit_kg_per_campaign": None,
