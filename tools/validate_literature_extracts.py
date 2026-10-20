@@ -38,6 +38,8 @@ Usage::
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
+from functools import lru_cache
 import math
 import re
 import subprocess
@@ -67,6 +69,21 @@ FIDELITY_GRADUATION_LEDGER_SCHEMA = (
     "literature_extract_fidelity_graduation_ledger.v1"
 )
 LAB_PARAMETER_VOCABULARY_PATH = ROOT / "data" / "literature" / "lab_parameter_vocabulary.yaml"
+
+
+@lru_cache(maxsize=512)
+def _load_extract_yaml_cached(path: str, mtime_ns: int, size: int) -> Any:
+    return yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+
+
+def load_extract_yaml(path: Path) -> Any:
+    """Load YAML with an in-process cache invalidated by file stat changes."""
+    resolved = path.resolve()
+    metadata = resolved.stat()
+    parsed = _load_extract_yaml_cached(
+        str(resolved), metadata.st_mtime_ns, metadata.st_size
+    )
+    return deepcopy(parsed)
 
 # Scored physics series. The first six are read by the rail/scoring machinery;
 # the d-032 additions (owner ruling 2026-09-21) are physics quantities the rail
@@ -1692,8 +1709,7 @@ def validate_extract_file(
     check_fidelity_match: bool = False,
 ) -> list[str]:
     try:
-        text = path.read_text(encoding="utf-8")
-        doc = yaml.safe_load(text)
+        doc = load_extract_yaml(path)
     except Exception as exc:  # noqa: BLE001 — surface parse failures as validation errors
         return [f"{path}: failed to load YAML: {exc}"]
     if isinstance(doc, Mapping) and doc.get("schema_version") == TABLE_SCHEMA_VERSION:
@@ -1723,7 +1739,7 @@ def validate_extract_file(
             return errors
 
         try:
-            parent_doc = yaml.safe_load(parent_path.read_text(encoding="utf-8"))
+            parent_doc = load_extract_yaml(parent_path)
         except Exception as exc:  # noqa: BLE001 — surface parent parse failures
             errors.append(f"{parent_path}: failed to load YAML: {exc}")
             return errors

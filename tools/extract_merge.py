@@ -47,6 +47,7 @@ if str(TOOLS_DIR) not in sys.path:
 from validate_literature_extracts import (  # noqa: E402
     EXTRACTS_DIR,
     discover_extracts,
+    load_extract_yaml,
     load_fidelity_policy,
     pre_policy_source_ids,
     validate_extract_file,
@@ -85,7 +86,7 @@ _SCALAR_KEYS_BY_TYPE: dict[str, tuple[str, ...]] = {
 
 
 def _load_yaml(path: Path) -> Any:
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
+    return load_extract_yaml(path)
 
 
 def load_source_priority(

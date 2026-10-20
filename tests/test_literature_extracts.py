@@ -15,6 +15,7 @@ import copy
 import hashlib
 import json
 import math
+import os
 import sys
 from collections import Counter
 from decimal import Decimal
@@ -3271,6 +3272,24 @@ def test_pilot_extract_count_exact_and_merge_smoke():
         assert hashlib.sha256(merged_payload).hexdigest() == (
             "569b1af9d179b8009dc5626531be9ef7c87e29528779aa18c2cc2b64fcd6d76a"
         )
+
+
+def test_extract_yaml_cache_copies_and_reloads_stat_changes(tmp_path: Path):
+    path = tmp_path / "extract.yaml"
+    path.write_text("value: 1\n", encoding="utf-8")
+
+    misses_before = vle._load_extract_yaml_cached.cache_info().misses
+    parsed = vle.load_extract_yaml(path)
+    parsed["value"] = 9
+    assert vle.load_extract_yaml(path) == {"value": 1}
+    assert vle._load_extract_yaml_cached.cache_info().misses == misses_before + 1
+
+    metadata = path.stat()
+    path.write_text("value: 2\n", encoding="utf-8")
+    os.utime(path, ns=(metadata.st_atime_ns, metadata.st_mtime_ns + 1_000_000))
+    assert path.stat().st_size == metadata.st_size
+    assert vle.load_extract_yaml(path) == {"value": 2}
+    assert vle._load_extract_yaml_cached.cache_info().misses == misses_before + 2
 
 
 # ---------------------------------------------------------------------------
