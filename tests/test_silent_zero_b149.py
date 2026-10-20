@@ -533,6 +533,39 @@ def test_internal_analytical_missing_liquid_reaction_coefficients_refuse() -> No
     assert note["field"] == "antoine_coefficients"
 
 
+def test_internal_analytical_missing_gas_rail_coefficients_refuse() -> None:
+    from copy import deepcopy
+
+    from engines.builtin.vapor_pressure import GAS_RAIL_STANDARD_REACTION_KEY
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.equilibrium import EquilibriumMixin
+
+    magnesium = deepcopy(VAPOR_PRESSURE_DATA["metals"]["Mg"])
+    gas_rail = magnesium[GAS_RAIL_STANDARD_REACTION_KEY]
+    for key in ("status", "runtime_disposition", "authority_status"):
+        gas_rail.pop(key, None)
+    gas_rail["authoritative"] = True
+    gas_rail.pop("antoine")
+    sim = _internal_analytical_host(
+        temperature_K=1700.0,
+        composition_wt_pct={"MgO": 100.0},
+        vapor_pressures={"metals": {"Mg": magnesium}, "oxide_vapors": {}},
+    )
+
+    result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+    assert result.status == "refused"
+    notes = result.diagnostics.get("silent_zero_notes") or []
+    note = next(
+        n
+        for n in notes
+        if n.get("species") == "Mg"
+        and n.get("zero_because") == ZeroBecause.MISSING_COEFFICIENT.value
+    )
+    assert note["doctrine_category"] == CATEGORY_REFUSE
+    assert note["field"] == "antoine_coefficients"
+
+
 def test_internal_analytical_out_of_range_oxide_pressure_is_flagged() -> None:
     from simulator.condensation import VAPOR_PRESSURE_DATA
     from simulator.equilibrium import EquilibriumMixin
