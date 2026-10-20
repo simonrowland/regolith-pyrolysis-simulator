@@ -22,6 +22,12 @@ ACTIVITIES = {
     "itoh_1989_zno_solid_zinc_silicate_p006_t02_r04_c04": ("ZnO", "0.202", "1073"),
     "itoh_1989_zno_solid_zinc_silicate_p006_t02_r04_c05": ("SiO2", "1.0", "1073"),
 }
+TABLE1_ADDITIONS = {
+    "itoh_1989_table1_cu2o_present_work_2nd_law": "-172.1",
+    "itoh_1989_table1_cu2o_present_work_3rd_law": "-169.0",
+    "itoh_1989_table1_cu2o_incra": "-170.7",
+    "itoh_1989_table1_cu2o_elliott": "-174.9",
+}
 
 
 def _migrate(path: Path):
@@ -37,7 +43,7 @@ def _assert_printed_values(document: dict, migrated) -> None:
         for row in migrated.observations.values()
         if row.source_id == document["source_id"]
     }
-    assert len(rows) == 63
+    assert len(rows) == 67
     assert not migrated.validation.hard_issues
     assert not migrated.registry_issues
     for observation_id, (formula, printed, temperature) in ACTIVITIES.items():
@@ -47,8 +53,15 @@ def _assert_printed_values(document: dict, migrated) -> None:
         assert row.identity.species.formula == formula
         assert row.identity.temperature_K.value == Decimal(temperature)
         assert row.point_conditions["phase_assemblage"].state.tag.value == "value"
+    for observation_id, printed in TABLE1_ADDITIONS.items():
+        row = rows[observation_id]
+        assert row.value.kind is ValueKind.POINT
+        assert row.value.point == Decimal(printed)
+        assert row.identity.species.formula == "Cu2O"
+        assert row.identity.temperature_K.value == Decimal("298.15")
     for observation_id, row in rows.items():
         assert row.value.kind is ValueKind.POINT
+        assert row.identity.species.formula in document["species"]
         if observation_id in ACTIVITIES:
             assert row.identity.temperature_K.value in {Decimal("973"), Decimal("1073")}
         elif observation_id.startswith(("itoh_1989_table_3_", "itoh_1989_table_4_", "itoh_1989_table_5_")):
@@ -147,3 +160,28 @@ def test_table5_grid_mutations_fail_for_grid_and_extract_cells(tmp_path: Path) -
     mutated = tmp_path / EXTRACT.name
     mutated.write_text(yaml.safe_dump(document, allow_unicode=True, sort_keys=False), encoding="utf-8")
     assert not _migrate(mutated).validation.hard_issues
+
+
+def test_table6_silica_reference_is_quartz_and_solid_solutions_stay_crystal() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    for row in document["species"]["SiO2"]["observations"]:
+        if row.get("locator", {}).get("table") == "6":
+            assert row["standard_state"]["state"]["value"]["endmember"]["polymorph"]["value"] == "quartz"
+            assert "JANAF O-037" in row["standard_state"]["note"]
+    migrated = _migrate(EXTRACT)
+    zno_activity = next(row for row in document["species"]["ZnO"]["observations"] if row.get("locator", {}).get("table") == "6")
+    assert zno_activity["standard_state"]["state"]["value"]["endmember"]["polymorph"]["tag"] == "unknown"
+    assert zno_activity["standard_state"]["state"]["value"]["endmember"]["polymorph"]["reason"] == "unrecognised polymorph 'wurtzite'"
+    for row in migrated.observations.values():
+        if row.source_id == yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))["source_id"] and "table_5_" in row.observation_id:
+            assert row.identity.species.phase.value.value == "cr"
+
+
+def test_formation_free_energy_fits_remain_context_with_printed_equations() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    cu2o_context = document["species"]["Cu2O"]["context"]
+    zno_context = document["species"]["ZnO"]["context"]
+    eq8 = next(row for row in cu2o_context if row["observation_id"] == "itoh_1989_eq8_cu2o_standard_formation_free_energy_fit")
+    eq10 = next(row for row in zno_context if row["observation_id"] == "itoh_1989_eq10_zno_standard_formation_free_energy_fit")
+    assert eq8["values"]["equation_as_printed"] == "ΔG°Cu2O/J mol-1 = -166690 + 71.03 T/K ± 100"
+    assert eq10["values"]["equation_as_printed"] == "ΔG°ZnO/J mol-1 = -355940 + 108.53 T/K ± 190"
