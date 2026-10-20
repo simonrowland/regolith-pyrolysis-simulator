@@ -3,16 +3,18 @@ source_id: shornikov-2007-ca-aluminosilicate-activities
 source:
   citation: >-
     Shornikov, S. I. (2007), Redox condition influence on CaO-MgO-FeO-Al2O3-SiO2
-    melt evaporation, Experiment in Geosciences 14(1):37-38.
+    melt evaporation, Experiment in Geosciences 14(1):37-39.
   year: 2007
   corpus_asset: raw/shornikov-2007-ca-aluminosilicate-activities/shornikov-2007-ca-aluminosilicate-activities.pdf
 extraction:
   method: >-
     The PDF is three pages of Experiment in Geosciences 2007, volume 14, number 1.
-    The closing figure of the CaO-Al2O3-SiO2 melts paper and the Shushkanova
-    diamond abstract were not extracted. The redox note's printed factors and
-    evaporation coefficients were read on the 600 dpi pages. No figure curve
-    was digitized.
+    The redox note runs from journal page 37 through its references on journal
+    page 39. The closing figure of the CaO-Al2O3-SiO2 melts paper and the
+    Shushkanova diamond abstract, which begins after those references, were
+    not extracted. The printed factors, the quoted Hashimoto coefficients, and
+    the estimated total-pressure discrepancy were read on the 600 dpi pages.
+    No figure curve was digitized.
   date: '2026-10-20'
   worker: t1372-w1
 review_status: draft
@@ -31,6 +33,13 @@ fidelity_samples:
     page: 2
     published_page: 38
     pdf_page_index: 1
+- path: species.SiO2.observations[shornikov_2007_redox_sio2_ptot_discrepancy].values.ratio_as_printed
+  value: 10^4-10^5
+  note: Journal p. 39, estimated discrepancy in ptot(SiO2).
+  locator:
+    page: 3
+    published_page: 39
+    pdf_page_index: 2
 - path: species.SiO.observations[shornikov_2007_redox_sio_ratio].values.ratio_as_printed
   value: approximately 60 times
   note: Journal p. 37, p(SiO) versus the chemically neutral case.
@@ -49,9 +58,9 @@ experiments:
   method: >-
     Conference note on redox conditions and oxide-melt evaporation. The printed
     pressure factors compare a reducing container with chemically neutral
-    evaporation. The evaporation coefficients compare measured rates with
-    equilibrium rates from reference data. No single temperature is printed on
-    those sentences.
+    evaporation. The two evaporation coefficients are quoted from the
+    paragraph on Hashimoto's graphite-container experiments. No single
+    temperature is printed on those sentences.
 species:
   SiO2:
     observations:
@@ -71,17 +80,63 @@ species:
         note: No uncertainty is printed on this coefficient.
       values:
         quantity: evaporation_coefficient_alpha
-        method_class: author_derived
+        method_class: quoted_attributed
+        attribution: >-
+          Hashimoto [14, 15]. Printed citations: Hashimoto A. // Geochem. J.
+          1983. V. 17. No. 3. P. 111-145. Hashimoto A. // Nature. 1990. V. 347.
+          No. 6288. P. 53-55. The coefficient sentence does not assign 0.04
+          to one of the two papers.
         alpha: 0.04
         alpha_as_printed: '0.04'
         material: liquid silicon dioxide
         formula_as_printed: SiO2
+        temperature_as_printed: >-
+          The coefficient sentence does not print a temperature. The same
+          paragraph prints Hashimoto's kinetics study at 1873-2373 K.
         source_disagreement: >-
-          This note prints αv(SiO2) = 0.04 for liquid silicon dioxide.
-          Shornikov (2008), Geochemistry International 46(7):727, prints
-          αv(SiO2) = 0.4 for liquid silicon dioxide, stored in
-          shornikov-2008-redox-oxide-evaporation. This extract does not
-          choose between the two printed values.
+          This note prints αv(SiO2) = 0.04 inside the paragraph that describes
+          Hashimoto's graphite-container experiment [14, 15], for liquid
+          silicon dioxide. The following paragraph says the evaporation
+          coefficient of liquid SiO2 determined by this note's author is close
+          to a unit and cites reference [19]; that sentence does not print
+          0.04. Shornikov (2008), Geochemistry International 46(7):727, prints
+          αv(SiO2) = 0.4 in the parallel sentence inside the Hashimoto [24, 25]
+          paragraph, also for liquid silicon dioxide. Neither coefficient
+          sentence prints a temperature. Both papers print 1873-2373 K as the
+          range of that kinetics study. The 2008 extract stores 0.4 as
+          author_estimate. The printed quantity, phase, and material are the
+          same. The digits 0.04 and 0.4 disagree. This extract does not choose
+          between them.
+    - observation_id: shornikov_2007_redox_sio2_ptot_discrepancy
+      type: partial_pressure
+      locator:
+        page: 3
+        published_page: 39
+        pdf_page_index: 2
+        note: >-
+          The sentence begins at the bottom of published p. 38, "Estimated
+          discrepancies", and the number is the first line of the left column
+          on published p. 39. 600 dpi PDF page 3. The words 10, superscript 4,
+          hyphen, 10, superscript 5 are at pt x 221.70-251.58, y 41.45-53.88
+          (px x 1848-2130, y 345-449). The 4 and the 5 sit above the baseline.
+      phase: g
+      experiment: shornikov-2007-redox-note
+      units: pressure ratio as printed
+      uncertainty:
+        note: The sentence prints a range. No single value and no uncertainty are printed.
+      values:
+        quantity: partial_pressure
+        method_class: author_estimate
+        oxide_as_printed: SiO2
+        quantity_as_printed: ptot(SiO2)
+        ratio_as_printed: 10^4-10^5
+        comparison_as_printed: >-
+          Estimated discrepancies with the results obtained by Hashimoto [14, 15]
+        absolute_pressure: not printed
+        source_comparison: >-
+          Shornikov (2008) prints the same estimated difference, 10^4-10^5, for
+          p°tot(SiO2). This row stores the 2007 sentence. It does not print one
+          temperature.
   Mg2SiO4:
     observations:
     - observation_id: shornikov_2007_redox_forsterite_alpha
@@ -100,15 +155,26 @@ species:
         note: No uncertainty is printed on this coefficient.
       values:
         quantity: evaporation_coefficient_alpha
-        method_class: author_derived
+        method_class: quoted_attributed
+        attribution: >-
+          Hashimoto [14, 15]. Printed citations: Hashimoto A. // Geochem. J.
+          1983. V. 17. No. 3. P. 111-145. Hashimoto A. // Nature. 1990. V. 347.
+          No. 6288. P. 53-55. The coefficient sentence does not assign 0.2
+          to one of the two papers.
         alpha: 0.2
         alpha_as_printed: '0.2'
         material: liquid forsterite
         formula_as_printed: Mg2SiO4
+        temperature_as_printed: >-
+          The coefficient sentence does not print a temperature. The Hashimoto
+          kinetics study in the same discussion is printed at 1873-2373 K.
         source_comparison: >-
-          This note prints αv(Mg2SiO4) = 0.2 for liquid forsterite. Shornikov
-          (2008) prints the same 0.2 for liquid forsterite. That agreement is
-          the printed text of both papers, not a correction of either one.
+          This note prints αv(Mg2SiO4) = 0.2 in the same Hashimoto [14, 15]
+          sentence as the silica coefficient, for liquid forsterite. Shornikov
+          (2008) prints 0.2 for liquid forsterite in the parallel Hashimoto
+          sentence. The printed coefficient, liquid phase, and material match.
+          Neither sentence prints a temperature. Both papers print the same
+          digit.
   SiO:
     observations:
     - observation_id: shornikov_2007_redox_sio_ratio
@@ -284,9 +350,11 @@ species:
         status: context_only
         value_as_printed: not extracted
         note: >-
-          Journal page 39 begins Shushkanova, Litvin, Dubrovinskaia, and
-          Dubrovinsky on melting relations of a model garnet-pyrrhotite-carbonate
-          system at 7-20 GPa. It is not a Shornikov evaporation dataset.
+          Journal page 39 continues the redox note through its conclusions and
+          references 1-23. Shushkanova, Litvin, Dubrovinskaia, and Dubrovinsky
+          begin in the right column after reference 23, on melting relations of
+          a model garnet-pyrrhotite-carbonate system at 7-20 GPa. That abstract
+          is not a Shornikov evaporation dataset.
     - observation_id: shornikov_2007_figures_not_digitised
       type: figure_not_digitised
       locator:
