@@ -1,0 +1,188 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2015-complex-oxide-vapor
+source:
+  citation: Shornikov, S. I., and Yakovlev, O. I. (2015). Study of Complex Molecular Species
+    in the Gas Phase over the CaO–MgO–Al2O3–TiO2–SiO2 System. Geochemistry International,
+    53(8), 690–699. DOI 10.1134/S0016702915080066. Original Russian text in Geokhimiya,
+    2015, No. 8, 695–705.
+  year: 2015
+  corpus_asset: raw/shornikov-2015-complex-oxide-vapor/shornikov-2015-complex-oxide-vapor.pdf
+  corpus_sha256: de86b1ae3468a4145712b7affa7bcef1fa17353aa035e7d07c9fef00ea3e3e7a
+extraction:
+  method: pdftotext and the MinerU HTML table agree on every Table 2 enthalpy cell. The
+    table is a cited compilation, so it was not passed through mineru_table_draft emit
+    and it is not a scored gibbs_table. Figures 1–3 were inspected on 110 dpi page
+    renders. No figure coordinate was read.
+  date: '2026-10-20'
+  worker: t1372-w2-w9-t1
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables: []
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: sh15_sio2_activity_reprint
+      type: activity_reference_sentence
+      locator:
+        published_page: 692
+        pdf_page_index: 2
+        page: 3
+        equation: '(16)'
+        note: The integral is printed across the page break onto published page 693.
+          The paragraph says the Al2O3–SiO2 example follows from Shornikov et al. 1994
+          and Shornikov and Archakov 2000.
+      units: as printed
+      standard_state: Equation (16) integrates ln a[SiO2] from x[Al2O3] = 0. The paper
+        does not state whether that limit is a solid oxide, a liquid oxide, or a
+        polymorph. The activities are attributed to the cited papers. No activity
+        row is stored.
+      values:
+        equation_as_printed: ln a[SiO2] = −∫ from x[Al2O3]=0 of x[Al2O3] d ln (a[Al2O3]/a[SiO2])
+        equation: '(16)'
+        anchor_as_printed: x[Al2O3] = 0
+        phase_as_printed: The paper does not state the phase of the x[Al2O3] = 0 limit.
+        attribution: Shornikov et al., 1994; Shornikov and Archakov, 2000
+        expected_migration_phase: unknown
+    - observation_id: sh15_fig1_curves
+      type: figure_series_refusal
+      locator:
+        published_page: 693
+        pdf_page_index: 3
+        page: 4
+        figure: '1'
+        note: 110 dpi render of published page 693. Panels (a), (b), (d), and (e)
+          are continuous curves. Panels (c) and (f) carry open and filled circles on
+          the activity curves. No tick calibration was made.
+      units: as printed
+      values:
+        temperatures_as_printed: 2300 K for Al2O3–SiO2 and 2100 K for CaO–SiO2
+        caption_attribution: Shornikov et al., 1994; Shornikov and Archakov, 2000;
+          Stolyarova et al., 1991. Panels (a, d) and (b, e) are calculated from the
+          activities in (c, f) and from Semenov et al., 1976 equilibrium constants.
+        activity_markers: Panel (c) open circles are a[SiO2] and filled circles are
+          a[Al2O3]. Panel (f) open circles are a[SiO2] and filled circles are a[CaO].
+        decision: refused
+        reason: The caption assigns the activities to the cited experiments. The
+          pressure and composition panels are calculated from those activities. The
+          points were not read.
+    - observation_id: sh15_complex_fraction_bound
+      type: laboratory_conditions
+      locator:
+        published_page: 690
+        pdf_page_index: 0
+        page: 1
+        paragraph: Knudsen-cell abundance
+        note: The sentence closes published page 690 and continues on 691.
+      units: as printed
+      T_range_K:
+      - 1500
+      - 2500
+      values:
+        bound_as_printed: no more than 1% of the total concentration
+        conditions_as_printed: quasiequilibrium evaporation, in a Knudsen effusion
+          cell, of the compounds listed in Table 1
+        span_as_printed: earlier publications present evaporation data for this system
+          at 1500–2500 K, with CaAlO, CaSiO, CaSiO3, MgAlO, AlSiO, and CaTiO3 identified
+        decision: context only
+        reason: The 1% bound is not paired with one composition. The 1500–2500 K span
+          is the range of the cited papers.
+  Al2O3:
+    observations: []
+    context:
+    - observation_id: sh15_table2_enthalpies
+      type: quoted_prose_schema_gap
+      locator:
+        published_page: 697
+        pdf_page_index: 7
+        page: 8
+        table: '2'
+        note: pdftotext and the MinerU HTML table agree on every cell below. No digit
+          was changed. Starred uncertainties are Glushko et al., 1978–1982. Double-starred
+          uncertainties are the least-squares calculations named in the footnote. The
+          caption cites Glushko et al., 1978–1982; Shornikov et al., 1994; Shornikov,
+          2001, 2013. Parent inputs of the least-squares rows are not published here.
+      units: kJ/mol
+      T_range_K:
+      - 2000
+      - 2000
+      values:
+        quantity_as_printed: ΔHr(T) at 2000 K
+        rows_as_printed:
+        - 'I [CaO] = (Ca) + (O) | 1049 ± 15*'
+        - 'II [CaO] = (CaO) | 660 ± 15*'
+        - 'III [MgO] = (Mg) + (O) | 986 ± 15*'
+        - 'IV [MgO] = (MgO) | 630 ± 15*'
+        - 'V [Al2O3] = 2(Al) + 3(O) | 3055 ± 10*'
+        - 'VI [TiO2] = (TiO) + (O) | 1022 ± 20*'
+        - 'VII [TiO2] = (TiO2) | 595 ± 20*'
+        - 'VIII [SiO2] = (SiO) + (O) | 1043 ± 13*'
+        - 'IX [SiO2] = (SiO2) | 552 ± 10*'
+        - 'X 1/2[Al6Si2O13] = (AlSiO) + 2(Al) + 5.5(O) | 5332 ± 26**'
+        - 'XI (Al) + (SiO) = (AlSiO) | –314 ± 26**'
+        - 'XII (AlO) + (Si) = (AlSiO) | –582 ± 20**'
+        - 'XIII (Al) + (Si) + (O) = (AlSiO) | –525 ± 26**'
+        - 'XIV [MgAl2O4] = (MgAlO) + (Al) + 3(O) | 3291 ± 32**'
+        - 'XV (Mg) + (AlO) = (MgAlO) | –213 ± 35**'
+        - 'XVI (MgO) + (Al) = (MgAlO) | –387 ± 34**'
+        - 'XVII (Mg) + (Al) + (O) = (MgAlO) | –719 ± 23**'
+        - 'XVIII [CaTiO3] = (CaTiO3) | 1030 ± 22**'
+        - 'XIX (CaO) + (TiO2) = (CaTiO3) | –298 ± 30**'
+        - 'XX (Ca) + (Ti) + 3(O) = (CaTiO3) | –1983 ± 81**'
+        decision: context only
+        schema_gap: OBSERVATION_TYPES has no reaction-enthalpy type. These cells are
+          not stored as gibbs_table. No parent link is invented for the least-squares rows.
+    - observation_id: sh15_fig2_calculated
+      type: figure_series_refusal
+      locator:
+        published_page: 695
+        pdf_page_index: 5
+        page: 6
+        figure: '2'
+        note: 110 dpi render of published page 695. Six panels of continuous curves.
+          No data markers.
+      units: as printed
+      values:
+        temperature_K: 2000
+        caption_attribution: calculated from Shornikov et al., 1994; Shornikov, 2001;
+          Shornikov, 2013
+        decision: refused
+        reason: Calculated curves. No marker to read.
+    - observation_id: sh15_fig3_replot
+      type: figure_series_refusal
+      locator:
+        published_page: 696
+        pdf_page_index: 6
+        page: 7
+        figure: '3'
+        note: 110 dpi render of published page 696. Each labelled line in the six
+          panels carries filled-circle markers. The abscissa is 10^4/T. No tick
+          calibration was made and no marker centre was read.
+      units: as printed
+      values:
+        caption_attribution: Knudsen effusion mass spectrometry, Mo cell, Shornikov
+          et al., 1994; Shornikov, 2001; Shornikov, 2013
+        prose_as_printed: partial pressures of the complex species increase by factors
+          of 10^2 to 10^3 over 200–300 degrees. According to Shornikov et al., 1994,
+          Al and SiO increase roughly six-fold from 1933 to 2033 K while AlSiO increases
+          sixteen-fold.
+        decision: refused
+        reason: The caption and the six-fold sentence assign the points to the cited
+          papers. The markers were not read.
+    - observation_id: sh15_chase_melting_points
+      type: quoted_prose_schema_gap
+      locator:
+        published_page: 694
+        pdf_page_index: 4
+        page: 5
+        paragraph: crystalline evaporation at 2000 K
+        note: The sentence is on published page 694.
+      units: as printed
+      values:
+        value_as_printed: 2180 ± 10 K for mullite, 2388 ± 15 K for spinel, and 2243 ±
+          5 K for perovskite
+        attribution: Chase, 1998, quoted to say that 2000 K is below these melting
+          points, so the components were evaporated from crystalline phases
+        decision: context only
+        reason: Cited melting points. Not a transition measured in this paper.
