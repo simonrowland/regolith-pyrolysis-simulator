@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import json
 import math
 import sys
 from collections import Counter
@@ -3243,6 +3244,33 @@ def test_pilot_extract_count_exact_and_merge_smoke():
     report = em.build_consistency_report(extracts)
     assert report["kind"] == "cross_source_consistency"
     assert "conflicts" in report
+
+    # Golden pin the current merged output while allowing the live corpus to
+    # grow with post-policy extracts. Update this snapshot when the 347-source
+    # corpus changes intentionally.
+    if len(files) == 347:
+        merged_payload = json.dumps(
+            {"by_species": view, "coverage": cov, "consistency": report},
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+            default=lambda value: {
+                "type": type(value).__qualname__, "value": str(value)
+            },
+        ).encode("utf-8")
+        assert len(extracts) == 347
+        assert len(view["species"]) == 1842
+        assert sum(
+            len(species.get("observations") or [])
+            for species in view["species"].values()
+        ) == 8881
+        assert cov["source_count"] == 347
+        assert cov["cells_found"] == 2875
+        assert len(report["conflicts"]) == 10
+        assert hashlib.sha256(merged_payload).hexdigest() == (
+            "569b1af9d179b8009dc5626531be9ef7c87e29528779aa18c2cc2b64fcd6d76a"
+        )
 
 
 # ---------------------------------------------------------------------------
