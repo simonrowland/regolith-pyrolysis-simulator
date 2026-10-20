@@ -40,6 +40,7 @@ import simulator.optimize.profiles as profiles_module
 import simulator.melt_backend.vaporock as vaporock_module
 from simulator.optimize.evaluate import (
     EvaluationInputError,
+    FailureCategory,
     _build_eval_inputs,
     _build_prefix_eval_inputs,
 )
@@ -2897,6 +2898,64 @@ def test_c2a_profile_window_respects_selected_material_applied_ceiling(
         )
 
     assert f"{expected_bound} {applied_ceiling_C:g} C" in str(exc.value)
+
+
+def test_c2a_material_limit_is_a_candidate_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bundle = load_config_bundle()
+    setpoints = copy.deepcopy(bundle.setpoints)
+    setpoints["furnace_material"] = "dense_alumina_continuous"
+    setpoints["furnace_max_T_C"] = 2200.0
+    monkeypatch.setattr(
+        evaluate_module,
+        "load_config_bundle",
+        lambda *args, **kwargs: replace(bundle, setpoints=setpoints),
+    )
+
+    result = evaluate_module.evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile=_c2a_window_profile(1600.0, 1800.0, 18),
+        candidate_id="over-limit",
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.INVALID_PATCH
+    assert result.eval_spec is None
+    assert result.cache_key is None
+    assert result.objectives is None
+    assert "furnace_material[dense_alumina_continuous]" in result.notes[0]
+    assert f"{resolve_furnace_max_T_C('dense_alumina_continuous'):g} C" in (
+        result.notes[0]
+    )
+
+
+def test_c2a_material_limit_uses_recipe_patched_furnace_request(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bundle = load_config_bundle()
+    setpoints = copy.deepcopy(bundle.setpoints)
+    setpoints["furnace_material"] = "zirconia_ysz"
+    setpoints["furnace_max_T_C"] = 1600.0
+    monkeypatch.setattr(
+        evaluate_module,
+        "load_config_bundle",
+        lambda *args, **kwargs: replace(bundle, setpoints=setpoints),
+    )
+
+    spec, _ = _build_eval_inputs(
+        RecipePatch({FURNACE_MAX_T_C_PATH: 1843.0}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        _c2a_window_profile(1600.0, 1800.0, 18),
+        RecipeSchema(),
+    )
+
+    assert spec.runtime_campaign_overrides["C2A_continuous"][
+        "thermal_window_high_C"
+    ] == pytest.approx(1800.0)
 
 
 def test_lab_schedule_uses_setpoints_furnace_ceiling_when_constraint_unset(

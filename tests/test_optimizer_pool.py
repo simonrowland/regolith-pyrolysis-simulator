@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from concurrent.futures import Future, ProcessPoolExecutor
 from dataclasses import replace
 import json
@@ -425,6 +426,37 @@ def _store_rejected_evaluate(
         result,
         run_reference=rejected_reference,
         notes=("backend_status=out_of_domain",),
+    )
+
+
+def _thermal_refusal_then_fake_evaluate(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+    output_dir: str,
+    **kwargs: object,
+) -> ScoredResult:
+    if candidate_id == "over-limit":
+        return evaluate_module.evaluate(
+            patch,
+            feedstock_id,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            constraints=kwargs.get("constraints"),
+            schema=kwargs.get("schema"),
+        )
+    return _fake_evaluate(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        output_dir=output_dir,
+        **kwargs,
     )
 
 
@@ -922,6 +954,123 @@ def test_pool_preserves_input_order_under_reversed_completion(tmp_path: Path) ->
     )
 
     assert [result.candidate_id for result in results] == ["slow", "fast"]
+
+
+def test_pool_records_thermal_refusal_and_continues(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from simulator.config import load_config_bundle
+
+    bundle = load_config_bundle()
+    setpoints = dict(bundle.setpoints)
+    setpoints.update({
+        "furnace_material": "dense_alumina_continuous",
+        "furnace_max_T_C": 2200.0,
+    })
+    monkeypatch.setattr(
+        evaluate_module,
+        "load_config_bundle",
+        lambda *args, **kwargs: replace(bundle, setpoints=setpoints),
+    )
+    monkeypatch.setattr(pool_module, "_is_picklable", lambda value: False)
+
+    def direct_supervisor(
+        task: pool_module._PoolTask,
+        evaluate_fn: Callable[..., ScoredResult],
+        *,
+        warm_runtime_spec: object,
+        per_eval_timeout_seconds: float | None,
+    ) -> dict[str, object]:
+        del warm_runtime_spec, per_eval_timeout_seconds
+        result = evaluate_fn(
+            task.patch,
+            task.feedstock_id,
+            task.fidelity,
+            profile=task.profile,
+            candidate_id=task.candidate_id,
+            output_dir=task.output_dir,
+            constraints=task.constraints,
+            schema=task.schema,
+            **dict(task.evaluator_kwargs or {}),
+        )
+        return {"kind": "result", "index": task.index, "result": result}
+
+    monkeypatch.setattr(pool_module, "_evaluate_task_supervised", direct_supervisor)
+
+    def profile(high_C: float) -> dict[str, object]:
+        return {
+            "profile_id": f"pool-c2a-window-{high_C:g}",
+            "profile_schema_version": "profile-schema-v1",
+            "feedstock": "lunar_mare_low_ti",
+            "objectives": [
+                {
+                    "metric": "oxygen_kg",
+                    "sense": "maximize",
+                    "units": "kg",
+                    "weight": 1.0,
+                    "rationale": "test oxygen objective evidence",
+                }
+            ],
+            "constraints": {"gates": ["delivered_stream_purity"]},
+            "seed_recipes": [
+                {
+                    "id": "seed",
+                    "source_campaign": "C2A_continuous",
+                    "patch": {
+                        "campaigns": {
+                            "C2A_continuous": {
+                                "p_total_mbar_default": 10.0,
+                                "temp_range_C": [1600.0, high_C],
+                                "duration_h": 18,
+                            }
+                        }
+                    },
+                }
+            ],
+            "run": {
+                "campaign": "C2A_continuous",
+                "hours": 18,
+                "mass_kg": 1000.0,
+                "backend_name": "internal-analytical",
+            },
+            "fidelities": {
+                "internal-analytical": {"backend_name": "internal-analytical"}
+            },
+        }
+
+    requests = [
+        PoolEvaluationRequest(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile=profile(1800.0),
+            candidate_id="over-limit",
+        ),
+        PoolEvaluationRequest(
+            _patch(2),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile=profile(1600.0),
+            candidate_id="within-limit",
+        ),
+    ]
+
+    results = evaluate_batch(
+        requests,
+        max_workers=2,
+        output_root=tmp_path,
+        evaluate_fn=_thermal_refusal_then_fake_evaluate,
+    )
+
+    assert [result.candidate_id for result in results] == [
+        "over-limit",
+        "within-limit",
+    ]
+    assert results[0].failure_category is FailureCategory.INVALID_PATCH
+    assert results[0].eval_spec is None
+    assert results[0].objectives is None
+    assert results[1].feasible is True
 
 
 @pytest.mark.timeout(10)
