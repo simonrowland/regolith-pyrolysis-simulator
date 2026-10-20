@@ -317,6 +317,35 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     return payload
 
 
+def viscous_p_bulk_extrapolation_notice(
+    diagnostic: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Demote a transitional viscous-P_bulk refusal to an explicit notice."""
+    if not diagnostic or diagnostic.get("reason") != (
+        "viscous_p_bulk_transport_out_of_domain"
+    ):
+        return None
+    from simulator.transport_regime import continuum_validity_refuses
+
+    if not continuum_validity_refuses(diagnostic):
+        return None
+    return {
+        **{
+            key: value
+            for key, value in diagnostic.items()
+            if key not in ("silent_zero_notes", "evaporation_flux_kg_hr")
+        },
+        "status": "extrapolated",
+        "authority_level": "extrapolated",
+        "authority_class": "extrapolated",
+        "doctrine_category": 2,
+        "ledger_yields_authorized": True,
+        "evaporation_flux_status": "extrapolated",
+        "detail": diagnostic["detail"]
+        + "; finite continuation of the same continuum fit; not certified transitional transport",
+    }
+
+
 def refuse_viscous_p_bulk_out_of_domain(
     *,
     knudsen_number: float,

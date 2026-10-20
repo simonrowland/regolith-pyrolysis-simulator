@@ -1137,6 +1137,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         )
         from simulator.evaporation import (
             viscous_p_bulk_out_of_domain_diagnostic,
+            viscous_p_bulk_extrapolation_notice,
         )
         from simulator.transport_regime import continuum_validity_refuses
 
@@ -1178,18 +1179,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 active_gas_transport_species
                 and continuum_validity_refuses(domain_refusal)
             ):
-                if domain_refusal.get("reason") == "viscous_p_bulk_transport_out_of_domain":
-                    continuum_extrapolation = {
-                        **{key: value for key, value in domain_refusal.items()
-                           if key not in ("silent_zero_notes", "evaporation_flux_kg_hr")},
-                        "status": "extrapolated",
-                        "authority_level": "extrapolated",
-                        "authority_class": "extrapolated",
-                        "doctrine_category": 2,
-                        "ledger_yields_authorized": True,
-                        "evaporation_flux_status": "extrapolated",
-                        "detail": domain_refusal["detail"] + "; finite continuation of the same continuum fit; not certified transitional transport",
-                    }
+                continuum_extrapolation = (
+                    viscous_p_bulk_extrapolation_notice(domain_refusal)
+                )
             if (
                 active_gas_transport_species
                 and continuum_validity_refuses(domain_refusal)
