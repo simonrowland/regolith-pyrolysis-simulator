@@ -2,13 +2,13 @@
 
 Source: Shornikov, S. I. (2017), “Thermodynamic Properties of Spinel MgAl2O4: A Mass Spectrometric Study,” *Russian Journal of Physical Chemistry A* 91(2), 287–294. DOI 10.1134/S0036024417020303. Extract: [shornikov-2017-spinel-thermodynamics.yaml](shornikov-2017-spinel-thermodynamics.yaml).
 
-This is not the evaporation paper already extracted as `shornikov-2017-spinel-evaporation` (91(1), 10–16, DOI 10.1134/S0036024417010241). The title, volume number, and DOI differ. Reference [1] of this paper is that evaporation study.
+This is not the evaporation paper already extracted as `shornikov-2017-spinel-evaporation` (91(1), 10–16, DOI 10.1134/S0036024417010241). The title, volume number, and DOI differ. PDF page 8 prints reference [1] as “S. I. Shornikov, Zh. Fiz. Khim. 90 (2016, in press).” The identity with the evaporation paper is an inference from the 1851–2089 K span, not the citation this paper prints.
 
 ## Tables
 
 MinerU `convert` of the content-list JSON wrote `p002-t01` (PDF page 2, published 288) and `p004-t02` (PDF page 4, published 290). `emit` was given only the this-work rows: Table 1 CSV row 29 and Table 2 CSV row 14. It wrote five cells and skipped nothing. `pdftotext -layout` agrees with MinerU on every digit of those cells.
 
-The ± cells are not emit traps (`non_numeric_in_numeric_column` only). Emit stored the whole cell, for example `-12.02 ± 1.14`. After the render check the committed rows split the cell into `value` and `uncertainty`. The confidence level is not stated.
+The ± cells are not emit traps. Emit stored the whole cell, for example `-12.02 ± 1.14`, and flagged `non_numeric_in_numeric_column`. After the render check the committed rows split the cell into `value` and `uncertainty`, and that flag was removed. The confidence level is not stated.
 
 Table 1’s temperature cell is the range `1851–2298`, so it was not mapped as `T_K`. The committed rows carry `T_range_K: [1851, 2298]` and an unknown point temperature. No midpoint is stored.
 
@@ -80,7 +80,7 @@ Equations (12)–(13), PDF page 5, published page 291: “where p_i and p_i° ar
 
 “Crystalline” and “liquid” in equations (20)–(22) and in the liquid-state paragraph are the spinel phase, not the oxide reference. The formation rows say the paper does not state the oxide phase. That prose is not on an activity row, so the activity mapper does not read it.
 
-The cell metal is not restated. The paper points to reference [52]. It is not copied from the 2016 conference abstract.
+The cell metal is not restated. The final introductory paragraph on published page 290 (PDF page 4) points to reference [52]. It is not copied from the 2016 conference abstract. Crystalline is printed in the conclusion on PDF page 7 and as crystal-line (sol) beside equations (20) and (21) on PDF page 6. The Table 1 caption does not say crystalline. Equation (19) is the fit ΔG_T = ΔH_T − TΔS_T.
 
 ## Not run here
 
