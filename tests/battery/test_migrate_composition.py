@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 import subprocess
 import sys
@@ -3070,6 +3072,34 @@ _GREEN_TYPED_INITIAL_EXCEPTIONS = frozenset(
     }
 )
 
+# Identity composition or point conditions still differ from green 4153a7c4b
+# on these sources only. Each one is a typed charge, a catalogue proxy, or
+# the Plante datum-note input. Activity rows that only lost a derived point
+# composition (Basu and the same printed-map family) are not listed: those
+# were the bad7fd5eb regression and must match.
+_GREEN_OBSERVATION_COMPOSITION_EXCEPTIONS = frozenset(
+    {
+        # Table 5 typed charge. Four rows gain a point composition
+        # (5582ddc39, 362141f44, 160b7c6c4).
+        "kems-015-hashimoto-1983",
+        # Point composition carries initial_charge_only and the source oxide order.
+        "kems-020-hastie-1981-nbsir",
+        # Catalogue proxy: printed_oxides becomes sample_catalog_proxy and
+        # the row gains a point composition.
+        "kems-023-demaria-1973",
+        # composition_role initial_charge_only on the analytical SNW glass.
+        "kems-027-plante-hastie-1983",
+        # datum_state derivation input: green stored the literal
+        # "values.composition_derivation"; this tip stores the note
+        # (add271eb0, 5e5f06cd4).
+        "kems-042-plante-1979",
+        # proxy_flag initial_charge_only on the typed charge rows (829ce3701).
+        "kems-137-bischof-2023",
+        # Typed starting glass: order, last digit, and proxy (3692a683d).
+        "ta-flemetakis-2024",
+    }
+)
+
 # Printed starting charges typed on the extract. Mole fractions come from
 # the owner converter, not from a pasted inventory.
 _RESTORED_STARTING_WT = {
@@ -3110,7 +3140,21 @@ def _green_migrate_module():
     return module
 
 
-def _typed_initials_by_experiment(module) -> dict[str, object]:
+def _plain_digest(payload: object) -> str:
+    encoded = json.dumps(payload, default=str, ensure_ascii=False)
+    return hashlib.sha256(encoded.encode()).hexdigest()
+
+
+def _census_typed_initials_and_observations(
+    module,
+) -> tuple[dict[str, object], dict[str, tuple[str, str, str]]]:
+    """Typed experiment initials, plus one digest per observation.
+
+    Each observation maps to (source_id, identity-composition digest,
+    point-conditions digest). Both sides use this tip's ``to_plain``, and
+    the digest keeps dict order, so an oxide reordering fails the census.
+    """
+
     migrator = module.Migrator(root=REPO_ROOT)
     for path in migrate_module.discover_extracts(REPO_ROOT / "data" / "literature" / "extracts"):
         migrator._migrate_extract(path)
@@ -3121,19 +3165,47 @@ def _typed_initials_by_experiment(module) -> dict[str, object]:
         initial = experiment.sample.initial_composition
         if initial is not None and initial.state.is_value:
             typed[experiment_id] = initial
-    return typed
+    observations: dict[str, tuple[str, str, str]] = {}
+    for observation in migrator.result.observations.values():
+        plain = to_plain(observation)
+        identity = plain.get("identity") if isinstance(plain, dict) else None
+        composition = identity.get("composition") if isinstance(identity, dict) else None
+        point_conditions = plain.get("point_conditions") if isinstance(plain, dict) else None
+        observations[observation.observation_id] = (
+            observation.source_id,
+            _plain_digest(composition),
+            _plain_digest(point_conditions),
+        )
+    return typed, observations
+
+
+def _sources_with_composition_drift(
+    green: dict[str, tuple[str, str, str]],
+    current: dict[str, tuple[str, str, str]],
+) -> set[str]:
+    drifted: set[str] = set()
+    for observation_id in set(green) | set(current):
+        green_row = green.get(observation_id)
+        current_row = current.get(observation_id)
+        if green_row is None or current_row is None or green_row[1:] != current_row[1:]:
+            drifted.add((green_row or current_row)[0])
+    return drifted
 
 
 def test_every_extract_keeps_green_typed_initials() -> None:
-    """A migrator change must not drop an initial green still types.
+    """A migrator change must not drop an initial or a point composition green still types.
 
-    Runs the migrator on every extract. The required set is green
-    4153a7c4b's typed initials on those same extracts, minus the
-    exceptions documented above.
+    One pass per module. Typed initials must cover green 4153a7c4b minus
+    the four experiment exceptions. Identity composition and point
+    conditions must match except the sources documented above. A source
+    in that set that no longer differs fails too, so the list cannot go stale.
     """
 
-    green_ids = set(_typed_initials_by_experiment(_green_migrate_module()))
-    current_typed = _typed_initials_by_experiment(migrate_module)
+    green_typed, green_obs = _census_typed_initials_and_observations(
+        _green_migrate_module()
+    )
+    current_typed, current_obs = _census_typed_initials_and_observations(migrate_module)
+    green_ids = set(green_typed)
     missing = green_ids - _GREEN_TYPED_INITIAL_EXCEPTIONS - set(current_typed)
     assert missing == set()
     assert _GREEN_TYPED_INITIAL_EXCEPTIONS <= green_ids
@@ -3147,6 +3219,11 @@ def test_every_extract_keeps_green_typed_initials() -> None:
             {oxide: as_decimal(weight) for oxide, weight in weights.items()}
         )
         assert dict(initial.state.value.components) == dict(expected.components)
+    drifted = _sources_with_composition_drift(green_obs, current_obs)
+    assert drifted == _GREEN_OBSERVATION_COMPOSITION_EXCEPTIONS, (
+        f"unexpected {sorted(drifted - _GREEN_OBSERVATION_COMPOSITION_EXCEPTIONS)}; "
+        f"no longer drifting {sorted(_GREEN_OBSERVATION_COMPOSITION_EXCEPTIONS - drifted)}"
+    )
 
 
 def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:

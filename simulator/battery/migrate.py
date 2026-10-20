@@ -3769,7 +3769,14 @@ def _composition_located_from_values(
     locator: Locator | None,
     role_refusal: list[str] | None = None,
 ) -> Located[Composition] | None:
-    """Convert typed initial/datum maps or structurally signaled FeOT maps."""
+    """Convert a typed role, a derivation note, or a structurally signaled FeOT map.
+
+    ``composition_role`` is the typed declaration. A ``composition_derivation``
+    note is the older admission green used for a printed wt% map that names
+    its own conversion (Banya Table 3). Role rows keep that note in the
+    derivation inputs. Note-only rows do not: green's derivation recorded the
+    weights and molar masses without copying the note text.
+    """
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
     role, _refusal = _declared_composition_role(values)
@@ -3782,12 +3789,14 @@ def _composition_located_from_values(
     if not wt:
         return None
     has_feot = any(str(oxide).strip() == "FeOT" for oxide in wt)
-    if not has_feot and role not in _COMPOSITION_ROLE_TOKENS:
+    has_derivation_note = isinstance(source_note, str) and bool(source_note.strip())
+    admitted_by_role_or_feot = has_feot or role in _COMPOSITION_ROLE_TOKENS
+    if not admitted_by_role_or_feot and not has_derivation_note:
         return None
     derivation = wt_pct_to_mole_fraction_derivation(
         wt,
         locator,
-        source_note=source_note,
+        source_note=source_note if admitted_by_role_or_feot else None,
     )
     if set(wt) == {"K2O", "SiO2"} and wt["SiO2"] == Decimal("100") - wt["K2O"]:
         # This lineage follows from the printed Decimal values only for the
@@ -14641,12 +14650,21 @@ class Migrator:
                 **(point_conditions or {}),
                 "printed_composition": row_sample.printed_composition,
             }
-            if (
-                row_sample.initial_composition is not None
-                and row_sample.initial_composition.state.is_value
-                and "composition" not in point_conditions
-            ):
-                point_conditions["composition"] = row_sample.initial_composition
+            # An observation-level printed wt% map is the datum's composition.
+            # A typed experiment initial is copied when this row owns one.
+            # Otherwise derive the mole-fraction point here. sample_from_equipment
+            # no longer invents an experiment initial from an untyped map
+            # (bad7fd5eb); that gate must not drop the point composition.
+            if "composition" not in point_conditions:
+                derived = row_sample.initial_composition
+                if derived is None:
+                    printed = row_sample.printed_composition
+                    _printed, derived = _located_printed_and_initial(
+                        printed.state.value,
+                        printed.locator or locator,
+                    )
+                if derived is not None and derived.state.is_value:
+                    point_conditions["composition"] = derived
         if declared_experiment_id is None or (
             declared_experiment_id in self.result.experiments
             and (
