@@ -135,12 +135,12 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     Transitional Kn at nonzero overhead is out-of-domain for viscous
     Poiseuille P_bulk. Applicability lives in
     ``simulator.transport_regime.assess_continuum_formula_validity``:
-    pyrolysis extraction fail-closes (status=refused); Stage 0 bakeout
-    computes and marks (status=out_of_domain). Missing campaign is
-    UNKNOWN and still refuses so the pyrolysis guard cannot be dropped
-    by omitting the stage. The 0.6.3 optimizer floor (~1 mbar, Kn≈0.004)
-    never enters this domain; t-379 (0.7) lifts pyrolysis refusals with
-    transitional/molecular conductance.
+    pyrolysis extraction classifies it as out-of-domain (status=refused) for
+    the provider to promote to a flagged finite prediction; Stage 0 bakeout
+    computes and marks (status=out_of_domain). Missing campaign is UNKNOWN
+    and keeps the refusal classification so the guard cannot be dropped by
+    omitting the stage. The 0.6.3 optimizer floor (~1 mbar, Kn≈0.004) never
+    enters this domain.
     """
     from simulator.transport_constants import (
         FREE_MOLECULAR_KNUDSEN_MIN,
@@ -357,15 +357,15 @@ def refuse_viscous_p_bulk_out_of_domain(
     process_regime: str | None = None,
     asking_site: str = "evaporation.viscous_p_bulk",
     stage: str | None = None,
-) -> None:
-    """Typed refusal when ledger yields leave the viscous P_bulk domain.
+) -> dict[str, Any] | None:
+    """Flag transitional transport and refuse invalid or unsupported inputs.
 
     TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
-    safety gate and NOT a coating gate. Hard-raises when the diagnostic helper
-    reports a load-bearing transitional refusal or an invalid Kn input.
-    Bakeout out-of-domain marks do not raise. The authoritative provider
-    returns a refused result from the same payload; bounded C7/native-Fe
-    consumers apply their own explicitly tagged diagnostic-limited policy.
+    safety gate and NOT a coating gate. A load-bearing transitional state
+    returns a status-bearing extrapolation notice. Invalid Kn and other
+    fail-closed inputs remain typed refusals. Bakeout out-of-domain marks do
+    not raise; bounded C7/native-Fe consumers retain their explicitly tagged
+    diagnostic-limited policy.
     """
     from simulator.transport_regime import continuum_validity_refuses
 
@@ -380,8 +380,12 @@ def refuse_viscous_p_bulk_out_of_domain(
         asking_site=asking_site,
         stage=stage,
     )
-    if diagnostic is None or not continuum_validity_refuses(diagnostic):
-        return
+    if diagnostic is None:
+        return None
+    if notice := viscous_p_bulk_extrapolation_notice(diagnostic):
+        return notice
+    if not continuum_validity_refuses(diagnostic):
+        return None
     reason = str(
         diagnostic.get("reason")
         or "viscous_p_bulk_transport_out_of_domain"
