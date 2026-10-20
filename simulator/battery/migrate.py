@@ -14655,10 +14655,6 @@ class Migrator:
                 experiment_id, row_sample.printed_composition
             )
         ):
-            point_conditions = {
-                **(point_conditions or {}),
-                "printed_composition": row_sample.printed_composition,
-            }
             # An observation-level printed wt% map is the datum's composition.
             # A typed experiment initial is copied when this row owns one.
             # Otherwise derive the mole-fraction point here. sample_from_equipment
@@ -14666,16 +14662,58 @@ class Migrator:
             # (bad7fd5eb); that gate must not drop the point composition.
             # A refused composition_role stays queued and untyped (b716).
             # A row with no role still derives, which is the Basu recovery.
-            if "composition" not in point_conditions and not composition_role_refusal:
+            derived = None
+            declared_order = False
+            if "composition" not in (point_conditions or {}) and not composition_role_refusal:
                 derived = row_sample.initial_composition
                 if derived is None:
                     printed = row_sample.printed_composition
+                    # The printed fingerprint sorts keys so two maps compare
+                    # equal. Mole conversion adds in that order, and the last
+                    # digit follows it. A declared derivation names this wt%
+                    # map, so convert that map in printed order and record
+                    # composition before printed_composition, which is the
+                    # typed-path order. A row with no derivation keeps the
+                    # fingerprint order.
+                    wt_for_conversion = printed.state.value
+                    declared_note = (
+                        values.get("composition_derivation")
+                        if isinstance(values, Mapping)
+                        else None
+                    )
+                    if (
+                        isinstance(declared_note, str)
+                        and declared_note.strip()
+                        and initial_oxide_map
+                        and _printed_fingerprint(initial_oxide_map)
+                        == _printed_fingerprint(wt_for_conversion)
+                    ):
+                        wt_for_conversion = initial_oxide_map
+                        declared_order = True
                     _printed, derived = _located_printed_and_initial(
-                        printed.state.value,
+                        wt_for_conversion,
                         printed.locator or locator,
                     )
-                if derived is not None and derived.state.is_value:
-                    point_conditions["composition"] = derived
+            if (
+                declared_order
+                and derived is not None
+                and derived.state.is_value
+            ):
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "composition": derived,
+                }
+            point_conditions = {
+                **(point_conditions or {}),
+                "printed_composition": row_sample.printed_composition,
+            }
+            if (
+                not declared_order
+                and derived is not None
+                and derived.state.is_value
+                and "composition" not in point_conditions
+            ):
+                point_conditions["composition"] = derived
         if declared_experiment_id is None or (
             declared_experiment_id in self.result.experiments
             and (

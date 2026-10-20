@@ -393,7 +393,18 @@ species:
             CaO: 2.24
             Na2O: 1.44
             K2O: 0.40
-          composition_role: {value: datum_state, locator: {page: 115, published_page: 115, pdf_page_index: 2, section: Experimental}, quote: 'Printed Saratov chondrule oxide composition in mass percent, copied from the experiment sample record.'}
+          composition_role: &shornikov_bulk_charge
+            value: initial_charge_only
+            locator:
+              page: 116
+              published_page: 116
+              pdf_page_index: 3
+              section: Results and Discussion
+            quote: >-
+              The composition change in the residual melt was calculated from
+              the partial pressures of the vapor species of the gas phase over
+              the chondrule melt determined in the experiment depending on the
+              temperature (Fig. 1a) and the evaporation time (Fig. 1b).
           composition_derivation: Printed Saratov chondrule oxide composition in mass percent, copied from the experiment sample record.
           method_as_printed: Knudsen mass spectrometric effusion method; pressure-conversion details are referred to Yakovlev et al. (1984).
           pressure_range_as_printed: 10^-8–10^-7 atm
@@ -674,7 +685,7 @@ species:
             CaO: 2.24
             Na2O: 1.44
             K2O: 0.40
-          composition_role: {value: datum_state, locator: {page: 115, published_page: 115, pdf_page_index: 2, section: Experimental}, quote: 'Printed Saratov chondrule oxide composition in mass percent, copied from the experiment sample record.'}
+          composition_role: *shornikov_bulk_charge
           composition_derivation: Printed Saratov chondrule oxide composition in mass percent, copied from the experiment sample record.
           method_as_printed: Knudsen mass spectrometric effusion method; pressure-conversion details are referred to Yakovlev et al. (1984).
           pressure_range_as_printed: 10^-8–10^-7 atm

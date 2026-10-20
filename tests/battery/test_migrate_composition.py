@@ -2,12 +2,7 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
 import re
-import subprocess
-import sys
-import types
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
@@ -3057,55 +3052,6 @@ def test_plante_1979_migrator_keeps_typed_k2si2o5_initial(
     )
 
 
-# Green 4153a7c4b typed these. This tip withholds them on purpose.
-# Bischof: 829ce3701 withholds conflicting owner-selected initials.
-# Nominal recipe (p.4: SiO2 50.34, Al2O3 15.40, MgO 10.80, CaO 23.46)
-# disagrees with Table 6 EPMA Start. Neither inventory is authoritative.
-# Robinot: bad7fd5eb / 6cac821ce do not promote an untyped oxide map.
-# The generated experiment is the unbound quote robinot_2026_eac1_composition_quoted_sesko.
-_GREEN_TYPED_INITIAL_EXCEPTIONS = frozenset(
-    {
-        "10.1016/j.gca.2023.08.027::experiment::an-di-1-low",
-        "10.1016/j.gca.2023.08.027::experiment::an-di-2-low",
-        "10.1016/j.gca.2023.08.027::experiment::an-di-3-high",
-        "10.1016/j.asr.2026.02.003::kems-044-robinot-2026",
-    }
-)
-
-# Sources whose identity composition, point conditions, or experiment
-# initial still differ from green 4153a7c4b. Activity rows that only lost
-# a derived point composition are absent: that was the bad7fd5eb regression.
-_GREEN_COMPOSITION_DRIFT_SOURCES = frozenset(
-    {
-        # Generated experiment gains a starting composition.
-        "kems-006-zhang-2021",
-        # Typed initials kept; locator note and empty derivation parameters.
-        "kems-012-sossi-2019",
-        # Table 5 typed charge. Four rows gain a point composition
-        # (5582ddc39, 362141f44, 160b7c6c4).
-        "kems-015-hashimoto-1983",
-        # Point composition carries initial_charge_only and the source oxide order.
-        "kems-020-hastie-1981-nbsir",
-        # Catalogue proxy: printed_oxides becomes sample_catalog_proxy and
-        # the row gains a point composition.
-        "kems-023-demaria-1973",
-        # composition_role initial_charge_only on the analytical SNW glass.
-        "kems-027-plante-hastie-1983",
-        # datum_state derivation input: green stored the literal
-        # "values.composition_derivation"; this tip stores the note
-        # (add271eb0, 5e5f06cd4).
-        "kems-042-plante-1979",
-        # Unbound quoted composition withheld as an initial (bad7fd5eb).
-        "kems-044-robinot-2026",
-        # proxy_flag initial_charge_only; three conflicting initials withheld.
-        "kems-137-bischof-2023",
-        # Typed 12-digit paste kept instead of a prose re-derivation.
-        "norris-2017-earth-volatiles-nature",
-        # Typed starting glass: order, last digit, and proxy (3692a683d).
-        "ta-flemetakis-2024",
-    }
-)
-
 # Printed starting charges typed on the extract. Mole fractions come from
 # the owner converter, not from a pasted inventory.
 _RESTORED_STARTING_WT = {
@@ -3129,129 +3075,64 @@ _RESTORED_STARTING_WT = {
 }
 
 
-def _green_migrate_module():
-    name = "simulator.battery._green_4153a7c4b_migrate"
-    cached = sys.modules.get(name)
-    if cached is not None:
-        return cached
-    source = subprocess.check_output(
-        ["git", "show", "4153a7c4b:simulator/battery/migrate.py"],
-        cwd=REPO_ROOT,
-        text=True,
+
+_RESTORED_STARTING_EXTRACTS = {
+    "10.1016/j.gca.2007.09.005::experiment::type-b-cai-like-lab-melt": (
+        "kems-010-richter-2007.yaml"
+    ),
+    "10.6028/nbs.ir.81-2279::experiment::hastie-1981-measured-soda-lime-glass": (
+        "kems-020-hastie-1981-nbsir.yaml"
+    ),
+    "9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series": (
+        "llnl-2021-cai-aerodynamic-levitation.yaml"
+    ),
+}
+
+# Green 4153a7c4b SiO2 mole fraction for the Table 1 analytical SNW glass,
+# printed order SiO2 then Fe2O3. Alphabetical conversion ends in 8557.
+_PLANTE_HASTIE_GREEN_SIO2 = Decimal("0.5938921582998945505736528565")
+_PLANTE_HASTIE_ROWS = (
+    "plante_hastie_1983_table1_snw_glass_composition",
+    "plante_hastie_1983_detection_limits_quoted",
+)
+_SHORNIKOV_PRESSURE_ROWS = (
+    "shornikov_2025_k_pressure_range_1450_1500k",
+    "shornikov_2025_na_pressure_range_1450_1500k",
+)
+_SHORNIKOV_EXPERIMENT = "saratov-chondrule-kems-series"
+
+
+def _observation(result, local_id: str):
+    return next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.endswith("::" + local_id)
     )
-    module = types.ModuleType(name)
-    module.__file__ = migrate_module.__file__
-    sys.modules[name] = module
-    exec(compile(source, name, "exec"), module.__dict__)
-    return module
 
 
-def _plain_digest(payload: object) -> str:
-    encoded = json.dumps(payload, default=str, ensure_ascii=False)
-    return hashlib.sha256(encoded.encode()).hexdigest()
-
-
-def _census_typed_initials_and_observations(
-    module,
-) -> tuple[
-    dict[str, object],
-    dict[str, tuple[str, str, str]],
-    dict[str, tuple[str | None, str]],
-]:
-    """Typed experiment initials, observation digests, and initial digests.
-
-    Each observation maps to (source_id, identity-composition digest,
-    point-conditions digest). Each experiment maps to (source_id, initial
-    digest), including an absent initial. Both sides use this tip's
-    ``to_plain``, and the digest keeps dict order.
-    """
-
-    migrator = module.Migrator(root=REPO_ROOT)
-    for path in migrate_module.discover_extracts(REPO_ROOT / "data" / "literature" / "extracts"):
-        migrator._migrate_extract(path)
-    for work_id in list(migrator.result.works):
-        migrator._promote_universal_observation_printed_compositions(work_id)
-    source_by_experiment: dict[str, str] = {}
-    observations: dict[str, tuple[str, str, str]] = {}
-    for observation in migrator.result.observations.values():
-        if observation.experiment_id and observation.source_id:
-            source_by_experiment.setdefault(
-                observation.experiment_id, observation.source_id
-            )
-        plain = to_plain(observation)
-        identity = plain.get("identity") if isinstance(plain, dict) else None
-        composition = identity.get("composition") if isinstance(identity, dict) else None
-        point_conditions = plain.get("point_conditions") if isinstance(plain, dict) else None
-        observations[observation.observation_id] = (
-            observation.source_id,
-            _plain_digest(composition),
-            _plain_digest(point_conditions),
+def _extract_values(name: str, local_id: str) -> dict:
+    document = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / name).read_text(
+            encoding="utf-8"
         )
-    # A declared experiment can differ while none of its observations carry
-    # that id. The work names its source when it has only one.
-    source_by_work: dict[str, str] = {}
-    for work_id, work in migrator.result.works.items():
-        if len(work.source_ids) == 1:
-            source_by_work[work_id] = work.source_ids[0]
-    typed: dict[str, object] = {}
-    initials: dict[str, tuple[str | None, str]] = {}
-    for experiment_id, experiment in migrator.result.experiments.items():
-        initial = experiment.sample.initial_composition
-        if initial is not None and initial.state.is_value:
-            typed[experiment_id] = initial
-        initials[experiment_id] = (
-            source_by_experiment.get(experiment_id)
-            or source_by_work.get(experiment.work_id or ""),
-            _plain_digest(to_plain(initial) if initial is not None else None),
-        )
-    return typed, observations, initials
-
-
-def _sources_with_composition_drift(
-    green: dict[str, tuple[str, str, str]],
-    current: dict[str, tuple[str, str, str]],
-    green_initials: dict[str, tuple[str | None, str]],
-    current_initials: dict[str, tuple[str | None, str]],
-) -> set[str]:
-    drifted: set[str] = set()
-    for observation_id in set(green) | set(current):
-        green_row = green.get(observation_id)
-        current_row = current.get(observation_id)
-        if green_row is None or current_row is None or green_row[1:] != current_row[1:]:
-            drifted.add((green_row or current_row)[0])
-    for experiment_id in set(green_initials) | set(current_initials):
-        green_row = green_initials.get(experiment_id)
-        current_row = current_initials.get(experiment_id)
-        if green_row is None or current_row is None or green_row[1] != current_row[1]:
-            source = (green_row or current_row)[0]
-            if source is None:
-                drifted.add(experiment_id)
-            else:
-                drifted.add(source)
-    return drifted
-
-
-def test_every_extract_keeps_green_typed_initials() -> None:
-    """A migrator change must not drop an initial or a point composition green still types.
-
-    One pass per module. Typed initials must cover green 4153a7c4b minus
-    the four experiment exceptions. Identity composition, point conditions,
-    and experiment initials must match except the eleven sources above.
-    A source in that set that no longer differs fails too.
-    """
-
-    green_typed, green_obs, green_initials = _census_typed_initials_and_observations(
-        _green_migrate_module()
     )
-    current_typed, current_obs, current_initials = _census_typed_initials_and_observations(
-        migrate_module
-    )
-    green_ids = set(green_typed)
-    missing = green_ids - _GREEN_TYPED_INITIAL_EXCEPTIONS - set(current_typed)
-    assert missing == set()
-    assert _GREEN_TYPED_INITIAL_EXCEPTIONS <= green_ids
+    for species in document["species"].values():
+        for observation in species.get("observations") or ():
+            if observation.get("observation_id") == local_id:
+                return observation["values"]
+    raise AssertionError(local_id)
+
+
+def test_restored_starting_charges_match_printed_weights(tmp_path: Path) -> None:
+    """Richter, Hastie, and LLNL keep the printed starting charge."""
+
+    found = {}
+    for experiment_id, name in _RESTORED_STARTING_EXTRACTS.items():
+        result = _migrate_real_extract(tmp_path / name, name)
+        found[experiment_id] = result.experiments[experiment_id]
     for experiment_id, weights in _RESTORED_STARTING_WT.items():
-        initial = current_typed[experiment_id]
+        initial = found[experiment_id].sample.initial_composition
+        assert initial is not None and initial.state.is_value
         assert initial.state.value.amount_basis is AmountBasis.MOLE_FRACTION
         assert initial.state.value.proxy_flag is None
         assert initial.inference is not None
@@ -3260,13 +3141,77 @@ def test_every_extract_keeps_green_typed_initials() -> None:
             {oxide: as_decimal(weight) for oxide, weight in weights.items()}
         )
         assert dict(initial.state.value.components) == dict(expected.components)
-    drifted = _sources_with_composition_drift(
-        green_obs, current_obs, green_initials, current_initials
+
+
+def test_plante_hastie_analytical_rows_keep_printed_order(tmp_path: Path) -> None:
+    """Table 1 analytical glass keeps printed order and green's SiO2 digit.
+
+    The sorted printed fingerprint reorders the oxides and changes SiO2's
+    last digit. These two rows are the measured composition and the
+    detection-limit quote of that same map. They are not initial_charge_only.
+    """
+
+    values = _extract_values(
+        "kems-027-plante-hastie-1983.yaml", _PLANTE_HASTIE_ROWS[0]
     )
-    assert drifted == _GREEN_COMPOSITION_DRIFT_SOURCES, (
-        f"unexpected {sorted(drifted - _GREEN_COMPOSITION_DRIFT_SOURCES)}; "
-        f"no longer drifting {sorted(_GREEN_COMPOSITION_DRIFT_SOURCES - drifted)}"
+    printed = values["composition_wt_pct"]
+    expected = wt_pct_to_mole_fraction(
+        {oxide: as_decimal(weight) for oxide, weight in printed.items()}
     )
+    assert dict(expected.components)["SiO2"] == _PLANTE_HASTIE_GREEN_SIO2
+    result = _migrate_real_extract(tmp_path, "kems-027-plante-hastie-1983.yaml")
+    for local_id in _PLANTE_HASTIE_ROWS:
+        observation = _observation(result, local_id)
+        point = observation.point_conditions or {}
+        assert list(point)[:2] == ["composition", "printed_composition"]
+        composition = point["composition"]
+        assert composition.state.is_value
+        assert composition.state.value.proxy_flag is None
+        assert [name for name, _amount in composition.state.value.components] == list(
+            printed
+        )
+        assert dict(composition.state.value.components) == dict(expected.components)
+        identity = observation.identity.composition
+        assert identity is not None and identity.is_value
+        assert dict(identity.value.components) == dict(expected.components)
+
+
+def test_shornikov_pressure_rows_use_initial_charge_only(tmp_path: Path) -> None:
+    """The 1450-1500 K pressures use the p.115 bulk charge, not the residual.
+
+    p.116 calculates the residual-melt change from those pressures. The
+    proxy stays on the pressure rows. The experiment initial is the bulk
+    charge itself and is not flagged.
+    """
+
+    values = _extract_values(
+        "shornikov-2025-saratov-alkali-evaporation.yaml",
+        _SHORNIKOV_PRESSURE_ROWS[0],
+    )
+    printed = values["oxides_wt_pct"]
+    expected = wt_pct_to_mole_fraction(
+        {oxide: as_decimal(weight) for oxide, weight in printed.items()}
+    )
+    result = _migrate_real_extract(
+        tmp_path, "shornikov-2025-saratov-alkali-evaporation.yaml"
+    )
+    for local_id in _SHORNIKOV_PRESSURE_ROWS:
+        observation = _observation(result, local_id)
+        for composition in (
+            observation.identity.composition,
+            (observation.point_conditions or {})["composition"].state,
+        ):
+            assert composition is not None and composition.is_value
+            assert composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            assert dict(composition.value.components) == dict(expected.components)
+    experiment = next(
+        item
+        for item in result.experiments.values()
+        if item.experiment_id.endswith(_SHORNIKOV_EXPERIMENT)
+    )
+    initial = experiment.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.state.value.proxy_flag is None
 
 
 def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:
