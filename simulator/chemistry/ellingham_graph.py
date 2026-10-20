@@ -54,21 +54,32 @@ class EllinghamPressureRefusal(ValueError):
 
 
 def _physical_pO2_bar(pO2_bar: float) -> float:
-    """Mass-action pO2 (bar): refuse a negative fugacity, then floor tiny positives.
+    """Delegate supplied oxygen admission and notices to the O2 owner."""
+    from simulator.vapour_rail.channels import validate_physical_pO2_bar
 
-    The 1e-30 floor is a division guard for a physically valid (zero or
-    tiny) pO2, not a validator. ``max(negative, 1e-30)`` maps an invalid
-    fugacity onto a valid-looking one and kills the ``numerator <= 0``
-    guard in ``_metal_activity_factor_from_segment``. Refuse first, floor
-    second.
-    """
-    pO2 = float(pO2_bar)
-    if pO2 < 0.0:
-        raise EllinghamPressureRefusal(
-            f"pO2_bar must be non-negative; got {pO2_bar!r} "
-            "(negative fugacity is not a physical pO2)"
-        )
-    return max(pO2, 1e-30)
+    try:
+        return validate_physical_pO2_bar(pO2_bar)
+    except ValueError as exc:
+        raise EllinghamPressureRefusal(str(exc)) from exc
+
+
+
+def _sio_oxygen_pressure_factor(pO2_bar: float, reference_bar: float) -> float:
+    """SiO2(l) -> SiO(g) + 1/2 O2: continue the declared reaction reference."""
+    from simulator.vapour_rail.channels import _log_oxygen_ratio
+
+    oxygen = _physical_pO2_bar(pO2_bar)
+    # K = (P_SiO/P0)*(pO2/P0)**(1/2)/a_SiO2. At fixed T/activity,
+    # P/P_ref = sqrt(p_ref/pO2); bar/bar is dimensionless. This applies on
+    # both sides of p_ref and tends continuously to 1 there. Keep the direct
+    # sqrt expression for exact in-band compatibility; use log differences
+    # only when the unpowered quotient under/overflows.
+    ratio = reference_bar / oxygen
+    return (
+        math.sqrt(ratio) if 0.0 < ratio < math.inf
+        else math.exp(0.5 * _log_oxygen_ratio(reference_bar, oxygen))
+    )
+
 
 
 @dataclass(frozen=True)
@@ -456,8 +467,11 @@ def effective_equilibrium_pressure_Pa(
                 float(row.get("pO2_reference_bar", 1.0) or 1.0),
             )
             P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
-        elif species == "SiO" and pO2 > float(vacuum_floor_bar):
-            P_eq_Pa *= math.sqrt(float(vacuum_floor_bar) / pO2)
+        elif species == "SiO":
+            # Historical argument is a legacy reference fallback, never an
+            # admission floor; a declared source reference takes precedence.
+            reference_bar = float(row.get("pO2_reference_bar", vacuum_floor_bar) or vacuum_floor_bar)
+            P_eq_Pa *= _sio_oxygen_pressure_factor(pO2, reference_bar)
         return max(P_eq_Pa, 0.0)
 
     raise EllinghamPressureRefusal(
