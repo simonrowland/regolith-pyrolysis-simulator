@@ -60,6 +60,7 @@ from simulator.chemistry.melt_activity import (
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
+    ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_segments,
 )
 from simulator.chemistry.kernel import (
@@ -250,6 +251,7 @@ def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
     # NIST-JANAF Na-013, liquid Na2O formation Gibbs energies, doubled from
     # kJ/mol Na2O to the 4 Na + O2 -> 2 Na2O basis (kJ/mol O2).
     for temperature_K, expected_standard_delta_g in (
+        (1200.0, -483.844),
         (1300.0, -433.616),
         (1400.0, -384.082),
     ):
@@ -264,23 +266,87 @@ def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
             expected_standard_delta_g
         )
 
-    # The fusion correction reaches the alpha standard Gibbs energy at the
-    # JANAF Na2O melting transition (1405.2 K).
+    # Approach Tm from below: the fusion correction reaches the alpha Gibbs
+    # energy as its ΔH_fus(1-T/Tm) term tends to zero.
     alpha_na2o_segment = next(
         segment
         for segment in ellingham_fit_segments("Na")
         if "Na2O(alpha)" in segment.phase_basis
     )
     melting_temperature_K = 1405.2
+    just_below_melting_temperature_K = melting_temperature_K - 1e-6
     _priority, diagnostic = BuiltinMetallothermicStepProvider._na_thermo_priority(
         ("FeO",),
-        melting_temperature_K - CELSIUS_TO_KELVIN_OFFSET,
+        just_below_melting_temperature_K - CELSIUS_TO_KELVIN_OFFSET,
         {"Na2O": 1.0, "FeO": 1.0},
     )
     assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
         alpha_na2o_segment.delta_g_kJ_per_mol_O2(melting_temperature_K),
         abs=1e-3,
     )
+
+
+def test_na_standard_state_at_and_above_melting_keeps_ellingham_path():
+    melting_temperature_C = 1405.2 - CELSIUS_TO_KELVIN_OFFSET
+    for temperature_C in (
+        melting_temperature_C,
+        1150.0,
+        1181.5,
+        1500.0,
+    ):
+        _priority, diagnostic = (
+            BuiltinMetallothermicStepProvider._na_thermo_priority(
+                ("FeO",),
+                temperature_C,
+                {"Na2O": 1.0, "FeO": 1.0},
+            )
+        )
+        temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
+        assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
+            ellingham_delta_g_kj_per_mol_o2("Na", temperature_K)
+        )
+        if temperature_C == 1150.0:
+            assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
+                -371.612616
+            )
+
+
+def test_na_feo_crossover_margin_at_1181_5_c_keeps_green_value():
+    _priority, diagnostic = (
+        BuiltinMetallothermicStepProvider._na_thermo_priority(
+            ("FeO",),
+            1181.5,
+            {"Na2O": 1.0, "FeO": 1.0},
+        )
+    )
+    assert diagnostic["margin"]["FeO"] == pytest.approx(
+        -0.001828,
+        abs=1e-6,
+    )
+
+
+def test_na_standard_state_keeps_out_of_band_ellingham_prediction():
+    provider = BuiltinMetallothermicStepProvider()
+    temperature_K = 3001.0
+    temperature_C = temperature_K - CELSIUS_TO_KELVIN_OFFSET
+    _priority, diagnostic = provider._na_thermo_priority(
+        ("FeO",),
+        temperature_C,
+        {"Na2O": 1.0, "FeO": 1.0},
+    )
+    assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
+        ellingham_delta_g_kj_per_mol_o2("Na", temperature_K)
+    )
+    extrapolations = provider._ellingham_pair_fit_extrapolations(
+        "Na",
+        ("FeO",),
+        temperature_C,
+    )
+    authority = provider._ellingham_fit_diagnostic(extrapolations)[
+        "ellingham_authority"
+    ]
+    assert authority["status"] == "extrapolation_limited"
+    assert authority[ELLINGHAM_AUTHORITY_LIMIT_FLAG] is True
 
 
 def test_reconstructed_mn_authority_is_not_mislabeled_as_fit_extrapolation():
