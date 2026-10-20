@@ -1163,9 +1163,10 @@ class OverheadGasModel:
                 gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
 
         if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
-            gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
-                gas.composition.get('CO2', 0.0), cover_gas_partial_pressures(
-                    '96% CO2', melt.p_total_mbar)['CO2'])  # mbar — cover-gas partial pressure
+            for species, partial_mbar in cover_gas_partial_pressures(
+                melt.ambient_atmosphere, melt.p_total_mbar,
+            ).items():
+                gas.composition[species] = max(gas.composition.get(species, 0.0), partial_mbar)
         elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — inert-sweep total pressure floor
             # Kr audit 2026-07-25: key the sweep balance partial off the
@@ -1276,9 +1277,10 @@ class OverheadGasModel:
         atmosphere_name = getattr(melt.atmosphere, 'name', '')
         if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — CO2 total pressure floor
-            gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
-                gas.composition.get('CO2', 0.0), cover_gas_partial_pressures(
-                    '96% CO2', melt.p_total_mbar)['CO2'])  # mbar — cover-gas partial pressure
+            for species, partial_mbar in cover_gas_partial_pressures(
+                melt.ambient_atmosphere, melt.p_total_mbar,
+            ).items():
+                gas.composition[species] = max(gas.composition.get(species, 0.0), partial_mbar)
         elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — sweep total pressure floor
             # Kr audit 2026-07-25: same stamped-carrier fix as the

@@ -1,4 +1,4 @@
-"""Body/environment pressure floors for vacuum-sensitive chemistry."""
+"""Total ambient pressure limits, declared cover gas, and numerical O2 guards."""
 
 from __future__ import annotations
 
@@ -70,7 +70,8 @@ def cover_gas_partial_pressures(
     if token == "AIR":
         return {"O2": pressure * 0.21, "N2": pressure * 0.79}
     if token in {"CO2", "O2", "N2", "AR", "KR", "HE"}:
-        return {token: pressure}
+        species = {"AR": "Ar", "KR": "Kr", "HE": "He"}.get(token, token)
+        return {species: pressure}
     if token.endswith("%CO2"):
         try:
             fraction = float(token[:-4]) / 100.0
@@ -109,7 +110,7 @@ def _positive_finite_bar(value: object, *, field: str) -> float:
 
 
 def vacuum_floor_bar_for_body(body: object) -> float:
-    """Resolve the chemistry vacuum floor for a body token.
+    """Resolve the total-pressure vacuum/ambient limit for a body token.
 
     Grounding:
     - Moon: owner-reviewed nanotorr correction sets 1.3e-12 bar; NASA
@@ -141,6 +142,20 @@ def vacuum_floor_bar_for_environment(
             ambient_pressure_bar,
             field="ambient_pressure_bar",
         )
+    return vacuum_floor_bar_for_body(canonical)
+
+
+def oxygen_numerical_floor_bar_for_body(body: object) -> float:
+    """Division/log guard, never an ambient oxygen measurement.
+
+    Preserve the historical airless-body resolution. Mars's CO2 total pressure
+    is not an oxygen lower bound; use the historical numerical guard there.
+    The Moon's 1.3e-12 bar and asteroid's 1e-14 bar remain numerical guards,
+    not claims that their exospheres are pure oxygen.
+    """
+    canonical = normalize_body_name(body)
+    if canonical == "mars":
+        return DEFAULT_VACUUM_FLOOR_BAR
     return vacuum_floor_bar_for_body(canonical)
 
 

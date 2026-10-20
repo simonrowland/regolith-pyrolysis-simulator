@@ -115,3 +115,20 @@ def test_controlled_background_pressure_pin_before_owner_reuse(finite_headspace)
     # 1000 mbar. Pin before reusing the two existing background projections.
     assert gas.composition['CO2'].hex() == (100.0).hex()
     assert gas.composition['O2'].hex() == (900.0).hex()
+
+
+@pytest.mark.parametrize('finite_headspace', [False, True])
+def test_stage0_air_projects_oxygen_fraction_without_assuming_co2(finite_headspace):
+    sim = _sim({'earth': {
+        'composition_wt_pct': {'SiO2': 100.0},
+        'body': 'earth',
+        'environment': {'surface_pressure_mbar': 1000.0, 'atmosphere': 'air'},
+    }}, finite_headspace=finite_headspace)
+    sim.load_batch('earth')
+    sim.start_campaign(CampaignPhase.C0)
+    snapshot = sim.step()
+    assert snapshot.overhead.composition['O2'] == 210.0
+    assert snapshot.overhead.composition['N2'] == 790.0
+    assert 'CO2' not in snapshot.overhead.composition
+    assert sim._headspace_transport_pO2_bar_from_ledger(0.0) == pytest.approx(0.21)
+    assert sim._commanded_pO2_bar() == pytest.approx(0.21)
