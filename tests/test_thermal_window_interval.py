@@ -40,6 +40,9 @@ def test_preheat_interval_hours_rejects_descending_ranges() -> None:
         ([1600.0, 1800.0, 25.0], 600.0),
         ([1600.0, 1800.0, float("nan")], 600.0),
         ([1800.0, 1600.0], 600.0),
+        ([], 600.0),
+        (["warm", "hot"], 600.0),
+        ("warm", 600.0),
         ([1600.0], 600.0),
         (["warm", 1800.0], 600.0),
         ([1600.0, 1800.0], "slow"),
@@ -47,7 +50,7 @@ def test_preheat_interval_hours_rejects_descending_ranges() -> None:
 )
 def test_three_preheat_readers_refuse_the_same_invalid_inputs(
     monkeypatch: pytest.MonkeyPatch,
-    temperature_range: list[object],
+    temperature_range: object,
     ramp_rate: object,
 ) -> None:
     with pytest.raises(ValueError):
@@ -93,6 +96,28 @@ def test_three_preheat_readers_refuse_the_same_invalid_inputs(
         recipe_db_profile._thermal_window_preheat_hours(
             "C0", temperature_range
         )
+
+    monkeypatch.setattr(
+        recipe_db_profile,
+        "_setpoint_campaign_config",
+        lambda _campaign: {
+            "temp_range_C": temperature_range,
+            "preheat_ramp_C_per_hr": ramp_rate,
+        },
+    )
+    row = type("TargetRow", (), {"target_id": "parity-probe"})()
+    script_readers = (
+        lambda: recipe_db_profile._validate_campaign_window_within_caps(
+            row, campaign="C0", hours=1
+        ),
+        lambda: recipe_db_profile._construct_campaign_hold_hours(
+            row, campaign="C0", requested_hours=1
+        ),
+        lambda: recipe_db_profile._campaign_window_patch("C0", hours=1),
+    )
+    for read_interval in script_readers:
+        with pytest.raises(ValueError):
+            read_interval()
 
 
 def test_preheat_interval_hours_rejects_invalid_ramps() -> None:
@@ -163,3 +188,34 @@ def test_three_preheat_readers_agree_on_valid_intervals(
     )
     assert evaluate_hours == expected_hours
     assert script_hours == expected_hours
+
+
+@pytest.mark.parametrize(
+    "temperature_range",
+    [[], ["warm", "hot"], "warm"],
+)
+def test_evaluate_does_not_skip_present_malformed_interval(
+    monkeypatch: pytest.MonkeyPatch, temperature_range: object
+) -> None:
+    profile = {
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "duration_h": 1,
+            "temp_range_C": temperature_range,
+            "preheat_ramp_C_per_hr": 600.0,
+        }
+    }
+    monkeypatch.setattr(
+        evaluate,
+        "_furnace_ceiling_C",
+        lambda *args, **kwargs: (2000.0, "test ceiling"),
+    )
+    with pytest.raises(evaluate.EvaluationInputError):
+        evaluate._profile_thermal_window_schedule(
+            profile["run"],
+            profile=profile,
+            recipe_patch=None,
+            constraints=None,
+            setpoints={},
+        )
