@@ -14,7 +14,7 @@ extraction:
 review_status: draft
 fidelity_samples:
   - path: species.Cr.observations[schreiber_1976_fig4_YG_CrVI_fraction].values.points[0].value
-    value: '10'
+    value: '0.10'
     locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none}
 species:
   Cr:
@@ -22,8 +22,9 @@ species:
       - observation_id: schreiber_1976_fig4_YG_CrVI_fraction
         type: concentration_series
         locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: YG}
-        phase: glass
-        units: '% of total Cr as printed'
+        phase: l
+        regime: melt_equilibration_quench
+        units: dimensionless fraction as printed
         values:
           quantity: valence_ratio
           formula: Cr
@@ -34,177 +35,176 @@ species:
             value_form: fraction
           method_class: measured_direct
           points:
-            - value: '10'
+            - value: '0.10'
               value_as_published: 10%
               T_C: '1500'
-              log_pO2_as_printed: '0'
-              log_pO2_units: log10(atm)
+              log_fO2: {value: '0', units: log10(atm)}
               formula: Cr
               point_conditions:
-                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
-                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
+                composition: {state: {tag: unknown, reason: 'Table 3 has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
+                printed_composition: {state: {tag: value, value: {SiO2: '53.9 wt%', MgO: '29.3 wt%', Al2O3: '10.7 wt%', CaO: '5.7 wt%', Cr2O3: '0.5 wt%'}}, locator: {page: 16, pdf_page_index: 15, published_page: 1236, table: '3', row: FAS}}
                 total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
       - observation_id: schreiber_1976_fig4_YG_CrIII_fraction
         type: concentration_series
         locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: YG}
-        phase: glass
-        units: '% of total Cr as printed'
+        phase: l
+        regime: melt_equilibration_quench
+        units: dimensionless fraction as printed
         values:
           quantity: valence_ratio
           formula: Cr
           valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
           method_class: measured_direct
           points:
-            - value: '90'
+            - value: '0.90'
               value_as_published: 90%
               T_C: '1500'
-              log_pO2_as_printed: '0'
-              log_pO2_units: log10(atm)
+              log_fO2: {value: '0', units: log10(atm)}
               formula: Cr
               point_conditions:
-                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
-                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
+                composition: {state: {tag: unknown, reason: 'Table 3 has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
+                printed_composition: {state: {tag: value, value: {SiO2: '53.9 wt%', MgO: '29.3 wt%', Al2O3: '10.7 wt%', CaO: '5.7 wt%', Cr2O3: '0.5 wt%'}}, locator: {page: 16, pdf_page_index: 15, published_page: 1236, table: '3', row: FAS}}
                 total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
       - observation_id: schreiber_1976_fig4_G_CrIII_fraction
         type: concentration_series
         locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: G}
-        phase: glass
-        units: '% of total Cr as printed'
+        phase: l
+        regime: melt_equilibration_quench
+        units: dimensionless fraction as printed
         values:
           quantity: valence_ratio
           formula: Cr
           valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
           method_class: measured_direct
           points:
-            - value: '90'
+            - value: '0.90'
               value_as_published: 90%
               T_C: '1500'
-              log_pO2_as_printed: '2.6'
-              log_pO2_units: log10(atm)
+              log_fO2: {value: '-2.6', units: log10(atm)}
               formula: Cr
               point_conditions:
-                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
-                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
+                composition: {state: {tag: unknown, reason: 'Table 3 has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
+                printed_composition: {state: {tag: value, value: {SiO2: '53.9 wt%', MgO: '29.3 wt%', Al2O3: '10.7 wt%', CaO: '5.7 wt%', Cr2O3: '0.5 wt%'}}, locator: {page: 16, pdf_page_index: 15, published_page: 1236, table: '3', row: FAS}}
                 total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
       - observation_id: schreiber_1976_fig4_G_CrII_fraction
         type: concentration_series
         locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: G}
-        phase: glass
-        units: '% of total Cr as printed'
+        phase: l
+        regime: melt_equilibration_quench
+        units: dimensionless fraction as printed
         values:
           quantity: valence_ratio
           formula: Cr
           valence_basis: {numerator_oxidation_states: [2], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
           method_class: measured_direct
           points:
-            - value: '10'
+            - value: '0.10'
               value_as_published: 10%
               T_C: '1500'
-              log_pO2_as_printed: '2.6'
-              log_pO2_units: log10(atm)
+              log_fO2: {value: '-2.6', units: log10(atm)}
               formula: Cr
               point_conditions:
-                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
-                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
+                composition: {state: {tag: unknown, reason: 'Table 3 has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
+                printed_composition: {state: {tag: value, value: {SiO2: '53.9 wt%', MgO: '29.3 wt%', Al2O3: '10.7 wt%', CaO: '5.7 wt%', Cr2O3: '0.5 wt%'}}, locator: {page: 16, pdf_page_index: 15, published_page: 1236, table: '3', row: FAS}}
                 total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
       - observation_id: schreiber_1976_fig4_BG_CrIII_fraction
         type: concentration_series
         locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: BG}
-        phase: glass
-        units: '% of total Cr as printed'
+        phase: l
+        regime: melt_equilibration_quench
+        units: dimensionless fraction as printed
         values:
           quantity: valence_ratio
           formula: Cr
           valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
           method_class: measured_direct
           points:
-            - value: '55'
+            - value: '0.55'
               value_as_published: 55%
               T_C: '1500'
-              log_pO2_as_printed: '5.2'
-              log_pO2_units: log10(atm)
+              log_fO2: {value: '-5.2', units: log10(atm)}
               formula: Cr
               point_conditions:
-                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
-                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
+                composition: {state: {tag: unknown, reason: 'Table 3 has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
+                printed_composition: {state: {tag: value, value: {SiO2: '53.9 wt%', MgO: '29.3 wt%', Al2O3: '10.7 wt%', CaO: '5.7 wt%', Cr2O3: '0.5 wt%'}}, locator: {page: 16, pdf_page_index: 15, published_page: 1236, table: '3', row: FAS}}
                 total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
       - observation_id: schreiber_1976_fig4_BG_CrII_fraction
         type: concentration_series
         locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: BG}
-        phase: glass
-        units: '% of total Cr as printed'
+        phase: l
+        regime: melt_equilibration_quench
+        units: dimensionless fraction as printed
         values:
           quantity: valence_ratio
           formula: Cr
           valence_basis: {numerator_oxidation_states: [2], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
           method_class: measured_direct
           points:
-            - value: '45'
+            - value: '0.45'
               value_as_published: 45%
               T_C: '1500'
-              log_pO2_as_printed: '5.2'
-              log_pO2_units: log10(atm)
+              log_fO2: {value: '-5.2', units: log10(atm)}
               formula: Cr
               point_conditions:
-                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
-                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
+                composition: {state: {tag: unknown, reason: 'Table 3 has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
+                printed_composition: {state: {tag: value, value: {SiO2: '53.9 wt%', MgO: '29.3 wt%', Al2O3: '10.7 wt%', CaO: '5.7 wt%', Cr2O3: '0.5 wt%'}}, locator: {page: 16, pdf_page_index: 15, published_page: 1236, table: '3', row: FAS}}
                 total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
       - observation_id: schreiber_1976_fig4_B_CrIII_fraction
         type: concentration_series
         locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: B}
-        phase: glass
-        units: '% of total Cr as printed'
+        phase: l
+        regime: melt_equilibration_quench
+        units: dimensionless fraction as printed
         values:
           quantity: valence_ratio
           formula: Cr
           valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
           method_class: measured_direct
           points:
-            - value: '20'
+            - value: '0.20'
               value_as_published: 20%
               T_C: '1500'
-              log_pO2_as_printed: '7.9'
-              log_pO2_units: log10(atm)
+              log_fO2: {value: '-7.9', units: log10(atm)}
               formula: Cr
               point_conditions:
-                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
-                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
+                composition: {state: {tag: unknown, reason: 'Table 3 has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
+                printed_composition: {state: {tag: value, value: {SiO2: '53.9 wt%', MgO: '29.3 wt%', Al2O3: '10.7 wt%', CaO: '5.7 wt%', Cr2O3: '0.5 wt%'}}, locator: {page: 16, pdf_page_index: 15, published_page: 1236, table: '3', row: FAS}}
                 total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
       - observation_id: schreiber_1976_fig4_B_CrII_fraction
         type: concentration_series
         locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: B}
-        phase: glass
-        units: '% of total Cr as printed'
+        phase: l
+        regime: melt_equilibration_quench
+        units: dimensionless fraction as printed
         values:
           quantity: valence_ratio
           formula: Cr
           valence_basis: {numerator_oxidation_states: [2], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
           method_class: measured_direct
           points:
-            - value: '80'
+            - value: '0.80'
               value_as_published: 80%
               T_C: '1500'
-              log_pO2_as_printed: '7.9'
-              log_pO2_units: log10(atm)
+              log_fO2: {value: '-7.9', units: log10(atm)}
               formula: Cr
               point_conditions:
-                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
-                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
+                composition: {state: {tag: unknown, reason: 'Table 3 has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
+                printed_composition: {state: {tag: value, value: {SiO2: '53.9 wt%', MgO: '29.3 wt%', Al2O3: '10.7 wt%', CaO: '5.7 wt%', Cr2O3: '0.5 wt%'}}, locator: {page: 16, pdf_page_index: 15, published_page: 1236, table: '3', row: FAS}}
                 total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
     context:
@@ -217,7 +217,54 @@ species:
         type: table
         locator: {page: 15, pdf_page_index: 14, published_page: 1235, table: '2'}
         units: kcal/mol as printed
-        values: {quantity: one-electron reduction reaction enthalpies, units: kcal/mol, admission_status: typed_unavailable, reason: no reaction-enthalpy token; these are not delta_fH values}
+        values:
+          quantity: one-electron reduction reaction enthalpies
+          units: kcal/mole as printed
+          candidate_tokens: [delta_fH]
+          admission_status: typed_unavailable
+          reason: >-
+            These are reaction enthalpies, not standard formation enthalpies from
+            elements; no matching reaction-enthalpy token is available.
+          reference_key:
+            - letter: A
+              attribution: this work
+            - letter: B
+              attribution: calculated from Frohberg and Richter (1968)
+            - letter: C
+              attribution: calculated from Hirashima et al. (1974)
+            - letter: D
+              attribution: Johnston (1965)
+            - letter: E
+              attribution: Paul and Lahiri (1966)
+            - letter: F
+              attribution: calculated from Lahiri et al. (1974)
+            - letter: G
+              attribution: Johnston (1964)
+            - letter: H
+              attribution: Majumdar and Lahiri (1975), calculated from data of A. Paul
+            - letter: I
+              attribution: Majumdar and Lahiri (1975)
+            - letter: J
+              attribution: Morris et al. (1974)
+            - letter: K
+              attribution: Bannerjee and Paul (1975)
+            - letter: L
+              attribution: Paul and Douglas (1965)
+          table_rows:
+            - {redox_couple: Cr3+-Cr2+, melt: Ca-Mg-Al-silicates, value: '38 ± 20', reference: A}
+            - {redox_couple: Cr3+-Cr2+, melt: Ca-silicates, value: '76 ± 40', reference: B}
+            - {redox_couple: Cr3+-Cr2+, melt: 'Ca, Mg, Ba-phosphates', value: '32 ± 20', reference: C}
+            - {redox_couple: Mn3+-Mn2+, melt: Na-disilicate, value: '14', reference: D}
+            - {redox_couple: Mn3+-Mn2+, melt: 'Na, Li-borates', value: '8-16', reference: 'E, F'}
+            - {redox_couple: Fe3+-Fe2+, melt: Na-silicates, value: '27-38', reference: 'G, H'}
+            - {redox_couple: Fe3+-Fe2+, melt: Na-phosphates, value: '11.5', reference: I}
+            - {redox_couple: Co3+-Co2+, melt: Ni-disilicate, value: '5', reference: D}
+            - {redox_couple: Eu3+-Eu2+, melt: 'Ca, Mg-Al-silicates', value: '25 ± 10', reference: J}
+            - {redox_couple: Cu2+-Cu+, melt: 'Na, Al-borates', value: '14.6', reference: K}
+            - {redox_couple: Cu+-Cu0, melt: 'Na, Al-borates', value: '54.3', reference: K}
+            - {redox_couple: Ti4+-Ti3+, melt: Na-disilicate, value: '29', reference: D}
+            - {redox_couple: Ce4+-Ce3+, melt: alkali silicates, value: '8-31', reference: 'D, L'}
+            - {redox_couple: Ce4+-Ce3+, melt: alkali borates, value: '3-18', reference: L}
       - observation_id: schreiber_1976_table3_bulk_compositions
         type: table
         locator: {page: 16, pdf_page_index: 15, published_page: 1236, table: '3'}
