@@ -28,7 +28,11 @@ from simulator.diagnostics import (
     wall_deposit_sticking_authority_status,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.wall_deposit_availability import wall_deposit_figure_availability
+from simulator.wall_deposit_availability import (
+    WALL_SATURATION_PRESSURE_REFUSAL_EVENTS,
+    wall_deposit_figure_availability,
+    wall_deposit_refusal_events,
+)
 from simulator.vapour_rail.instrumentation import (
     merge_vapour_carrier_lineage,
     vapour_carrier_authority_severity,
@@ -229,6 +233,7 @@ def merge_run_snapshot(
     run_export: FoulingTerminalSnapshot,
     *,
     export_includes_carried: bool = False,
+    campaign_index: int | None = None,
 ) -> tuple[FoulingTerminalSnapshot, NestedDeposit]:
     """Return ``(post_merge_snapshot, per_run_net_deposit)``."""
 
@@ -244,15 +249,22 @@ def merge_run_snapshot(
         else _plain_nested_deposit(exported)
     )
     cumulative = _add_deposits(carried, per_run_net)
+    merged_authority = _merged_wall_deposit_sticking_authority(
+        carried_projection.wall_deposit_sticking_authority
+        if carried_projection is not None
+        else None,
+        run_export.wall_deposit_sticking_authority,
+        campaign_index=campaign_index,
+    )
     authority = wall_deposit_sticking_authority_status(
         cumulative,
-        _merged_wall_deposit_sticking_authority(
-            carried_projection.wall_deposit_sticking_authority
-            if carried_projection is not None
-            else None,
-            run_export.wall_deposit_sticking_authority,
-        ),
+        merged_authority,
     )
+    refusal_events = merged_authority.get(
+        WALL_SATURATION_PRESSURE_REFUSAL_EVENTS
+    )
+    if refusal_events:
+        authority[WALL_SATURATION_PRESSURE_REFUSAL_EVENTS] = refusal_events
     return (
         FoulingTerminalSnapshot(
             wall_deposit_by_segment_species_kg=cumulative,
@@ -268,8 +280,17 @@ def merge_run_snapshot(
 def _merged_wall_deposit_sticking_authority(
     carried_authority: Mapping[str, Any] | None,
     run_authority: Mapping[str, Any] | None,
+    *,
+    campaign_index: int | None = None,
 ) -> dict[str, Any]:
     merged: dict[str, Any] = {}
+    refusal_events = wall_deposit_refusal_events(carried_authority)
+    refusal_events.extend(
+        wall_deposit_refusal_events(
+            run_authority,
+            campaign=campaign_index,
+        )
+    )
     for authority in (carried_authority, run_authority):
         if not isinstance(authority, Mapping):
             continue
@@ -304,8 +325,29 @@ def _merged_wall_deposit_sticking_authority(
                         ):
                             current_by_segment[str(segment)] = record
 
+        raw_refusals = authority.get(
+            "wall_saturation_pressure_refusals_by_species"
+        )
+        if isinstance(raw_refusals, Mapping):
+            by_species = merged.setdefault(
+                "wall_saturation_pressure_refusals_by_species",
+                {},
+            )
+            if isinstance(by_species, dict):
+                for species, by_segment in raw_refusals.items():
+                    if not isinstance(by_segment, Mapping):
+                        continue
+                    current = by_species.setdefault(str(species), {})
+                    if not isinstance(current, dict):
+                        continue
+                    for segment, raw_record in by_segment.items():
+                        if isinstance(raw_record, Mapping):
+                            current.setdefault(
+                                str(segment),
+                                _plain_authority_mapping(raw_record),
+                            )
+
         for key in (
-            "wall_saturation_pressure_refusals_by_species",
             "wall_saturation_pressure_extrapolations_by_species",
             "evaporation_transport_notices_by_species",
         ):
@@ -376,6 +418,8 @@ def _merged_wall_deposit_sticking_authority(
                         lineage.get(product_key),
                         carrier_species,
                     )
+    if refusal_events:
+        merged[WALL_SATURATION_PRESSURE_REFUSAL_EVENTS] = refusal_events
     return merged
 
 
@@ -404,11 +448,12 @@ def merge_snapshot_sequence(
     carried: FoulingTerminalSnapshot | None = None
     trajectory: list[FoulingTerminalSnapshot] = []
     per_run_net: list[NestedDeposit] = []
-    for run_export in run_exports:
+    for campaign_index, run_export in enumerate(run_exports, start=1):
         carried, net = merge_run_snapshot(
             carried,
             run_export,
             export_includes_carried=export_includes_carried,
+            campaign_index=campaign_index,
         )
         trajectory.append(carried)
         per_run_net.append(net)

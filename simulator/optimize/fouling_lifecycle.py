@@ -16,7 +16,11 @@ from simulator.coating_lifespan import (
     project_lifecycle,
 )
 from simulator.diagnostics import wall_deposit_sticking_authority_status
-from simulator.wall_deposit_availability import wall_deposit_figure_availability
+from simulator.wall_deposit_availability import (
+    WALL_SATURATION_PRESSURE_REFUSAL_EVENTS,
+    wall_deposit_figure_availability,
+    wall_deposit_refusal_events,
+)
 
 
 MASS_BALANCE_CLOSURE_LIMIT_PCT = 5.0e-12
@@ -149,16 +153,25 @@ class FoulingLifecycleHarness:
                 carried,
                 snapshot,
                 export_includes_carried=self._export_includes_carried,
+                campaign_index=campaign_index,
             )
             total = _campaigns_total_from_artifact(
                 artifact,
                 snapshot=snapshot,
                 resinter_threshold_kg=self._resinter_threshold_kg,
+                campaign_index=campaign_index,
             )
             authority = wall_deposit_sticking_authority_status(
                 cumulative.wall_deposit_by_segment_species_kg,
                 cumulative.wall_deposit_sticking_authority,
             )
+            refusal_events = wall_deposit_refusal_events(
+                cumulative.wall_deposit_sticking_authority
+            )
+            if refusal_events:
+                authority[WALL_SATURATION_PRESSURE_REFUSAL_EVENTS] = (
+                    refusal_events
+                )
             cumulative_availability = wall_deposit_figure_availability(
                 has_positive_deposit=bool(
                     authority.get("deposited_species")
@@ -246,6 +259,7 @@ def _campaigns_total_from_artifact(
     *,
     snapshot: FoulingTerminalSnapshot,
     resinter_threshold_kg: float | None,
+    campaign_index: int,
 ) -> CampaignsToResinterTotal:
     authority_payload = (
         snapshot.wall_deposit_sticking_authority
@@ -256,6 +270,12 @@ def _campaigns_total_from_artifact(
         snapshot.wall_deposit_by_segment_species_kg,
         authority_payload,
     )
+    refusal_events = wall_deposit_refusal_events(
+        authority_payload,
+        campaign=campaign_index,
+    )
+    if refusal_events:
+        authority[WALL_SATURATION_PRESSURE_REFUSAL_EVENTS] = refusal_events
     authoritative = bool(authority.get("authoritative_for_resinter", False))
     local_total = campaigns_to_resinter_total(
         snapshot.wall_deposit_by_segment_species_kg,

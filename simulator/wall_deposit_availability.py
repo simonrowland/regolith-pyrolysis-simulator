@@ -9,6 +9,9 @@ from typing import Any, Literal
 
 WALL_SATURATION_PRESSURE_REFUSED_CODE = "wall_deposit_saturation_pressure_refused"
 WALL_DEPOSIT_MEASUREMENT_UNAVAILABLE_CODE = "wall_deposit_measurement_unavailable"
+WALL_SATURATION_PRESSURE_REFUSAL_EVENTS = (
+    "wall_saturation_pressure_refusal_events"
+)
 
 
 @dataclass(frozen=True)
@@ -55,6 +58,16 @@ def wall_deposit_figure_availability(
                 "output_status": "status_bearing" if pressure_refused else "unavailable",
                 "authoritative_for_resinter": False,
             }
+        reasons = wall_deposit_refusal_events(refusal_authority)
+        explicit_reasons = explicit_refusal.get("reasons")
+        if isinstance(explicit_reasons, (list, tuple)):
+            supplied_reasons = [
+                dict(reason)
+                for reason in explicit_reasons
+                if isinstance(reason, Mapping)
+            ]
+            if len(supplied_reasons) > len(reasons):
+                reasons = supplied_reasons
         return WallDepositAvailability(
             status="refused",
             refusal={
@@ -66,6 +79,8 @@ def wall_deposit_figure_availability(
                 ),
                 "authority": refusal_authority,
                 "count": _count(explicit_refusal, refusal_authority),
+                "refusal_events": len(reasons),
+                "reasons": reasons,
             },
         )
     if not measured:
@@ -88,6 +103,50 @@ def wall_deposit_figure_availability(
 
 def _mapping(value: Any) -> dict[str, Any]:
     return dict(value) if isinstance(value, Mapping) else {}
+
+
+def wall_deposit_refusal_events(
+    authority: Mapping[str, Any] | None,
+    *,
+    campaign: int | None = None,
+) -> list[dict[str, Any]]:
+    """Return refusal event records, retaining each campaign's source record."""
+
+    payload = _mapping(authority)
+    raw_events = payload.get(WALL_SATURATION_PRESSURE_REFUSAL_EVENTS)
+    if isinstance(raw_events, (list, tuple)):
+        return [
+            dict(event)
+            for event in raw_events
+            if isinstance(event, Mapping)
+        ]
+
+    records = payload.get("wall_saturation_pressure_refusals_by_species")
+    if not isinstance(records, Mapping):
+        return []
+    events: list[dict[str, Any]] = []
+    for species, by_segment in sorted(
+        records.items(),
+        key=lambda item: str(item[0]),
+    ):
+        if not isinstance(by_segment, Mapping):
+            continue
+        for segment, record in sorted(
+            by_segment.items(),
+            key=lambda item: str(item[0]),
+        ):
+            if not isinstance(record, Mapping):
+                continue
+            events.append(
+                {
+                    "campaign": campaign,
+                    "species": str(species),
+                    "segment": str(segment),
+                    "reason": _string(record.get("reason")),
+                    "authority": dict(record),
+                }
+            )
+    return events
 
 
 def _has_pressure_refusal(authority: Mapping[str, Any]) -> bool:
