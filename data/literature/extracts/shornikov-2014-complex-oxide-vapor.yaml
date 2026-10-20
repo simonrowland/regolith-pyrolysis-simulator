@@ -56,7 +56,7 @@ species:
         pdf_page_index: 0
         figure: '1'
         note: >
-          Fig. 1 at 600 dpi. Curves 1-4 are sequences of filled circles. There is no square. Curve 5 has no circle. The circles are calculated at 2200 K from [2, 3] and were not read as log p. Crop pdftoppm -r 600 -f 1 -l 1 -x 2100 -y 600 -W 2100 -H 1800. Page pixel = crop pixel + (2100, 600).
+          Fig. 1 at 600 dpi. Curves 1-4 are sequences of filled circles. There is no square. Curve 5 has no circle. The circles are calculated at 2200 K from [2, 3] and were not read as log p. Coordinates are the crop pdftoppm -r 600 -f 1 -l 1 -x 2100 -y 600 -W 2100 -H 1800. Page pixel = crop pixel + (2100, 600). Circles with crop x above 2100 were measured on pdftoppm -r 600 -f 1 -l 1 -x 1900 -y 400 -W 2800 -H 2200 and converted by subtracting (200, 200).
       units: as printed
       values:
         temperature_K: 2200
@@ -64,10 +64,10 @@ species:
         symbols_as_printed: 1 (SiO), 2 (Al), 3 (O2), 4 (AlSiO), 5 total vapor pressure
         decision: context_not_read
         circle_counts:
-          1_SiO: 18
-          2_Al: 19
-          3_O2: 18
-          4_AlSiO: 18
+          1_SiO: 21
+          2_Al: 22
+          3_O2: 22
+          4_AlSiO: 21
           5_total: 0
         reason: Calculated curves. Every circle is listed. No log p was digitized.
         markers:
@@ -250,6 +250,36 @@ species:
           cx_px: 2029
           cy_px: 611
           dt_px: 19.0
+          dpi: 600
+        - id: fig1-s1-19
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2101
+          cy_px: 609
+          dt_px: 19.1
+          dpi: 600
+        - id: fig1-s1-20
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2171
+          cy_px: 607
+          dt_px: 19.0
+          dpi: 600
+        - id: fig1-s1-21
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2248
+          cy_px: 606
+          dt_px: 18.2
           dpi: 600
         - id: fig1-s2-01
           series: 2
@@ -441,6 +471,46 @@ species:
           cy_px: 1189
           dt_px: 21.0
           dpi: 600
+        - id: fig1-s2-20
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2100
+          cy_px: 1196
+          dt_px: 21.8
+          dpi: 600
+        - id: fig1-s2-21
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2172
+          cy_px: 1203
+          dt_px: 21.9
+          dpi: 600
+        - id: fig1-s2-22
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2245
+          cy_px: 1220
+          dt_px: 21.9
+          dpi: 600
+        - id: fig1-s3-00
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read; clipped by the y-axis
+          cx_px: 834
+          cy_px: 814
+          dt_px: 11.0
+          dpi: 600
         - id: fig1-s3-01
           series: 3
           species_as_printed: O2
@@ -621,6 +691,36 @@ species:
           cy_px: 647
           dt_px: 13.6
           dpi: 600
+        - id: fig1-s3-19
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2100
+          cy_px: 646
+          dt_px: 15.8
+          dpi: 600
+        - id: fig1-s3-20
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2172
+          cy_px: 645
+          dt_px: 16.8
+          dpi: 600
+        - id: fig1-s3-21
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2243
+          cy_px: 644
+          dt_px: 17.0
+          dpi: 600
         - id: fig1-s4-01
           series: 4
           species_as_printed: AlSiO
@@ -800,6 +900,36 @@ species:
           cx_px: 2029
           cy_px: 1532
           dt_px: 21.0
+          dpi: 600
+        - id: fig1-s4-19
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2100
+          cy_px: 1536
+          dt_px: 21.4
+          dpi: 600
+        - id: fig1-s4-20
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2172
+          cy_px: 1541
+          dt_px: 21.5
+          dpi: 600
+        - id: fig1-s4-21
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2245
+          cy_px: 1558
+          dt_px: 21.5
           dpi: 600
         series_4_numeral:
           cx_px: 1647

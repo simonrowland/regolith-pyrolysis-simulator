@@ -20,7 +20,7 @@ These are labels and a citation. They are not new measured points. The 1% bound 
 
 ## Figures
 
-Fig. 1 was re-rendered at 600 dpi: `pdftoppm -r 600 -f 1 -l 1 -x 2100 -y 600 -W 2100 -H 1800`. Pixels below are crop pixels. Page pixel = crop pixel + (2100, 600). A circle is a local maximum of the distance transform on a pure-color mask (one channel above 200 and the other two under 40; black is all channels under 45). Maxima within 22 px are one circle. The joining stroke has radius about 6 px and is not a circle. No log p was read. The curves are calculated at 2200 K from [2, 3], so the circles stay context.
+Fig. 1 was re-rendered at 600 dpi. The decision-table coordinates are `pdftoppm -r 600 -f 1 -l 1 -x 2100 -y 600 -W 2100 -H 1800`. Page pixel = crop pixel + (2100, 600). Circles past crop x = 2100 were measured on `pdftoppm -r 600 -f 1 -l 1 -x 1900 -y 400 -W 2800 -H 2200` and converted by subtracting (200, 200). A circle is a local maximum of the distance transform on a pure-color mask (one channel above 200 and the other two under 40; black is all channels under 45). Maxima within 22 px are one circle. The joining stroke has radius about 6 px and is not a circle. No log p was read. The curves are calculated at 2200 K from [2, 3], so the circles stay context.
 
 There is no square. The earlier sentence that line 1 ends in a filled square was wrong. Every core on curves 1–4 is a filled circle. Curve 5, the purple total-pressure line, has no circle core.
 
@@ -46,6 +46,9 @@ Stroke peaks kept out of the table, radius under the circle cut: green 11, red 1
 | fig1-s1-16 | 1 | SiO | 1894 | 617 | 20.0 | context, not read (calculated) |
 | fig1-s1-17 | 1 | SiO | 1961 | 614 | 19.4 | context, not read (calculated) |
 | fig1-s1-18 | 1 | SiO | 2029 | 611 | 19.0 | context, not read (calculated) |
+| fig1-s1-19 | 1 | SiO | 2101 | 609 | 19.1 | context, not read (calculated); past the first crop |
+| fig1-s1-20 | 1 | SiO | 2171 | 607 | 19.0 | context, not read (calculated); past the first crop |
+| fig1-s1-21 | 1 | SiO | 2248 | 606 | 18.2 | context, not read (calculated); past the first crop |
 | fig1-s2-01 | 2 | Al | 834 | 990 | 11.0 | context, not read (calculated) |
 | fig1-s2-02 | 2 | Al | 970 | 989 | 21.0 | context, not read (calculated) |
 | fig1-s2-03 | 2 | Al | 1049 | 1012 | 21.2 | context, not read (calculated) |
@@ -65,6 +68,10 @@ Stroke peaks kept out of the table, radius under the circle cut: green 11, red 1
 | fig1-s2-17 | 2 | Al | 1894 | 1178 | 20.9 | context, not read (calculated) |
 | fig1-s2-18 | 2 | Al | 1961 | 1183 | 21.1 | context, not read (calculated) |
 | fig1-s2-19 | 2 | Al | 2029 | 1189 | 21.0 | context, not read (calculated) |
+| fig1-s2-20 | 2 | Al | 2100 | 1196 | 21.8 | context, not read (calculated); past the first crop |
+| fig1-s2-21 | 2 | Al | 2172 | 1203 | 21.9 | context, not read (calculated); past the first crop |
+| fig1-s2-22 | 2 | Al | 2245 | 1220 | 21.9 | context, not read (calculated); past the first crop |
+| fig1-s3-00 | 3 | O2 | 834 | 814 | 11.0 | context, not read (calculated); clipped by the y-axis |
 | fig1-s3-01 | 3 | O2 | 970 | 815 | 21.0 | context, not read (calculated) |
 | fig1-s3-02 | 3 | O2 | 1049 | 789 | 21.0 | context, not read (calculated) |
 | fig1-s3-03 | 3 | O2 | 1114 | 747 | 14.8 | context, not read (calculated) |
@@ -83,6 +90,9 @@ Stroke peaks kept out of the table, radius under the circle cut: green 11, red 1
 | fig1-s3-16 | 3 | O2 | 1897 | 650 | 10.2 | context, not read (calculated) |
 | fig1-s3-17 | 3 | O2 | 1956 | 648 | 12.0 | context, not read (calculated) |
 | fig1-s3-18 | 3 | O2 | 2029 | 647 | 13.6 | context, not read (calculated) |
+| fig1-s3-19 | 3 | O2 | 2100 | 646 | 15.8 | context, not read (calculated); past the first crop |
+| fig1-s3-20 | 3 | O2 | 2172 | 645 | 16.8 | context, not read (calculated); past the first crop |
+| fig1-s3-21 | 3 | O2 | 2243 | 644 | 17.0 | context, not read (calculated); past the first crop |
 | fig1-s4-01 | 4 | AlSiO | 971 | 1475 | 21.0 | context, not read (calculated) |
 | fig1-s4-02 | 4 | AlSiO | 1049 | 1477 | 21.2 | context, not read (calculated) |
 | fig1-s4-03 | 4 | AlSiO | 1114 | 1495 | 21.0 | context, not read (calculated) |
@@ -101,8 +111,117 @@ Stroke peaks kept out of the table, radius under the circle cut: green 11, red 1
 | fig1-s4-16 | 4 | AlSiO | 1894 | 1528 | 21.4 | context, not read (calculated) |
 | fig1-s4-17 | 4 | AlSiO | 1961 | 1529 | 21.4 | context, not read (calculated) |
 | fig1-s4-18 | 4 | AlSiO | 2029 | 1532 | 21.0 | context, not read (calculated) |
+| fig1-s4-19 | 4 | AlSiO | 2100 | 1536 | 21.4 | context, not read (calculated); past the first crop |
+| fig1-s4-20 | 4 | AlSiO | 2172 | 1541 | 21.5 | context, not read (calculated); past the first crop |
+| fig1-s4-21 | 4 | AlSiO | 2245 | 1558 | 21.5 | context, not read (calculated); past the first crop |
 
 The first red circle, fig1-s2-01, is clipped by the y-axis.
+The first blue circle, fig1-s3-00, is clipped by the same y-axis.
+
+Round 2 first scanned the crop that ends at page x = 4200. That crop holds the y-axis clip, fig1-s3-00 at (834, 814), radius 11, and it cuts off the circles that continue to the 100 mol % frame. The census that decides is the wider render, `pdftoppm -r 600 -f 1 -l 1 -x 1900 -y 400 -W 2800 -H 2200`. Coordinates below stay in the first crop's frame: wide pixel minus (200, 200). The mask is one channel above 180 and the other two under 80; black is all three under 60. A strict mask (200 / 40, black under 45) returns the same cores. A local maximum of the distance transform with radius at least 8 px is a core. Two maxima are one disk when their separation is under max(12 px, 0.55 of the smaller radius plus 0.5 of the larger); none of these circle centres merged. Counts are SiO 21, Al 22, O2 22, AlSiO 21, total-pressure 0.
+
+| source | SiO | Al | O2 | AlSiO |
+| --- | --- | --- | --- | --- |
+| round-1 extract, crop ended at page x 4200 | 18 | 19 | 18 | 18 |
+| sol per-colour scan, same crop | 18 | 19 | 19 | 18 |
+| grok full-page scan | 21 | 22 | 22 | 21 |
+| this wide scan | 21 | 22 | 22 | 21 |
+
+Sol's extra O2 circle is fig1-s3-00, the disk the y-axis clips. The other difference is three circles on each curve at crop x about 2100, 2172, and 2245 (page x about 4200, 4272, and 4345). They sit between the first crop's right edge and the 100 mol % frame. Sol's window flagged the border core as an edge and could not see the two beyond it. Grok's page coordinates land on these cores within 4 px, and the pixel at each centre is that series' colour. The radii are 15.8 to 21.9, the same as the circles already listed. Purple has no core. The joining stroke stays under 8 px. The black numeral 4 stays the refused glyph at (1647, 1430), radius 6.4. The narrow-crop green core at (1442, 638), radius 11, is the overlap of fig1-s1-07 and fig1-s1-08, whose centres are 39 px apart; this scan does not keep it as its own disk.
+
+### Fig. 1 wide-crop core list
+
+Every core of radius at least 8 px inside the figure window. cx and cy are the first crop's frame.
+
+| cx | cy | r px | colour | matched row |
+| --- | --- | --- | --- | --- |
+| 970 | 751 | 21.95 | green | fig1-s1-01 |
+| 1049 | 733 | 19.92 | green | fig1-s1-02 |
+| 1115 | 709 | 20.25 | green | fig1-s1-03 |
+| 1204 | 683 | 19.65 | green | fig1-s1-04 |
+| 1283 | 664 | 16.49 | green | fig1-s1-05 |
+| 1345 | 658 | 19.65 | green | fig1-s1-06 |
+| 1421 | 646 | 17.12 | green | fig1-s1-07 |
+| 1456 | 640 | 16.0 | green | fig1-s1-08 |
+| 1503 | 641 | 21.0 | green | fig1-s1-09 |
+| 1551 | 636 | 20.62 | green | fig1-s1-10 |
+| 1599 | 631 | 19.0 | green | fig1-s1-11 |
+| 1653 | 627 | 18.0 | green | fig1-s1-12 |
+| 1712 | 622 | 16.76 | green | fig1-s1-13 |
+| 1767 | 618 | 16.0 | green | fig1-s1-14 |
+| 1829 | 614 | 16.0 | green | fig1-s1-15 |
+| 1893 | 617 | 21.02 | green | fig1-s1-16 |
+| 1960 | 614 | 20.25 | green | fig1-s1-17 |
+| 2029 | 611 | 19.92 | green | fig1-s1-18 |
+| 2101 | 609 | 19.1 | green | fig1-s1-19 |
+| 2171 | 607 | 19.0 | green | fig1-s1-20 |
+| 2248 | 606 | 18.25 | green | fig1-s1-21 |
+| 834 | 989 | 12.0 | red | fig1-s2-01 |
+| 970 | 989 | 21.93 | red | fig1-s2-02 |
+| 1048 | 1012 | 22.14 | red | fig1-s2-03 |
+| 1114 | 1053 | 21.93 | red | fig1-s2-04 |
+| 1205 | 1077 | 21.93 | red | fig1-s2-05 |
+| 1282 | 1082 | 22.14 | red | fig1-s2-06 |
+| 1345 | 1105 | 21.84 | red | fig1-s2-07 |
+| 1418 | 1109 | 21.93 | red | fig1-s2-08 |
+| 1459 | 1111 | 21.93 | red | fig1-s2-09 |
+| 1503 | 1132 | 21.84 | red | fig1-s2-10 |
+| 1551 | 1136 | 21.84 | red | fig1-s2-11 |
+| 1600 | 1138 | 21.84 | red | fig1-s2-12 |
+| 1653 | 1142 | 22.02 | red | fig1-s2-13 |
+| 1709 | 1145 | 21.93 | red | fig1-s2-14 |
+| 1768 | 1150 | 21.93 | red | fig1-s2-15 |
+| 1830 | 1154 | 22.02 | red | fig1-s2-16 |
+| 1894 | 1178 | 21.84 | red | fig1-s2-17 |
+| 1960 | 1183 | 21.93 | red | fig1-s2-18 |
+| 2029 | 1189 | 21.93 | red | fig1-s2-19 |
+| 2100 | 1196 | 21.84 | red | fig1-s2-20 |
+| 2172 | 1203 | 21.93 | red | fig1-s2-21 |
+| 2245 | 1220 | 21.95 | red | fig1-s2-22 |
+| 834 | 815 | 12.0 | blue | fig1-s3-00 |
+| 970 | 814 | 21.93 | blue | fig1-s3-01 |
+| 1048 | 789 | 21.84 | blue | fig1-s3-02 |
+| 1112 | 747 | 15.0 | blue | fig1-s3-03 |
+| 1205 | 721 | 15.81 | blue | fig1-s3-04 |
+| 1282 | 714 | 21.84 | blue | fig1-s3-05 |
+| 1343 | 695 | 16.0 | blue | fig1-s3-06 |
+| 1418 | 689 | 21.93 | blue | fig1-s3-07 |
+| 1459 | 689 | 21.93 | blue | fig1-s3-08 |
+| 1501 | 675 | 11.0 | blue | fig1-s3-09 |
+| 1549 | 672 | 14.0 | blue | fig1-s3-10 |
+| 1599 | 669 | 17.0 | blue | fig1-s3-11 |
+| 1652 | 666 | 20.0 | blue | fig1-s3-12 |
+| 1709 | 664 | 21.93 | blue | fig1-s3-13 |
+| 1768 | 664 | 21.93 | blue | fig1-s3-14 |
+| 1830 | 664 | 21.93 | blue | fig1-s3-15 |
+| 1894 | 651 | 11.05 | blue | fig1-s3-16 |
+| 1960 | 649 | 13.0 | blue | fig1-s3-17 |
+| 2027 | 647 | 14.0 | blue | fig1-s3-18 |
+| 2100 | 646 | 15.81 | blue | fig1-s3-19 |
+| 2172 | 645 | 16.76 | blue | fig1-s3-20 |
+| 2243 | 644 | 17.0 | blue | fig1-s3-21 |
+| 970 | 1475 | 21.59 | black | fig1-s4-01 |
+| 1048 | 1477 | 21.54 | black | fig1-s4-02 |
+| 1114 | 1495 | 21.26 | black | fig1-s4-03 |
+| 1205 | 1493 | 21.84 | black | fig1-s4-04 |
+| 1282 | 1474 | 21.84 | black | fig1-s4-05 |
+| 1345 | 1494 | 21.59 | black | fig1-s4-06 |
+| 1418 | 1484 | 21.21 | black | fig1-s4-07 |
+| 1459 | 1480 | 21.63 | black | fig1-s4-08 |
+| 1503 | 1507 | 21.93 | black | fig1-s4-09 |
+| 1551 | 1504 | 21.93 | black | fig1-s4-10 |
+| 1601 | 1501 | 21.93 | black | fig1-s4-11 |
+| 1653 | 1499 | 21.59 | black | fig1-s4-12 |
+| 1709 | 1497 | 21.93 | black | fig1-s4-13 |
+| 1768 | 1496 | 21.93 | black | fig1-s4-14 |
+| 1830 | 1495 | 21.54 | black | fig1-s4-15 |
+| 1894 | 1528 | 21.93 | black | fig1-s4-16 |
+| 1961 | 1529 | 21.59 | black | fig1-s4-17 |
+| 2029 | 1532 | 21.47 | black | fig1-s4-18 |
+| 2100 | 1536 | 21.38 | black | fig1-s4-19 |
+| 2172 | 1541 | 21.47 | black | fig1-s4-20 |
+| 2245 | 1558 | 21.54 | black | fig1-s4-21 |
+
 
 
 Fig. 2. Four lines of filled circles versus 1/T. Refused as a series. The caption assigns them to the Knudsen effusion data of [4], Shornikov 2003. They were not given per-marker rows.
