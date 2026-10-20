@@ -1,0 +1,22 @@
+source_id: schreiber-1986-oxygen-diffusion-redox
+source:
+  citation: Schreiber, H. D., Kozak, S. J., and McManus, K. K. (1986). Oxygen Diffusion and Redox Kinetics in a Geochemical Melt System. Lunar and Planetary Science XVII, 773-774 (abstract 1394).
+tables: []
+table_dispositions: []
+figures:
+  - {figure: '1', page: 2, disposition: deferred, numeric_points: none}
+  - {figure: '2', page: 2, disposition: deferred, numeric_points: none}
+schema_gaps:
+  - quantity: chemical oxygen diffusion coefficient
+    candidate_tokens: [activity_coefficient_temperature_fit, evaporation_coefficient_alpha]
+    reason: >-
+      Neither candidate represents a diffusion coefficient; the value about
+      9 x 10^-6 cm^2/sec and model-curve coefficients remain in context.
+  - quantity: oxygen diffusivity comparison
+    candidate_tokens: [activity_coefficient_temperature_fit, evaporation_coefficient_alpha]
+    reason: No quantity token represents diffusion coefficients or their ratios.
+table_tool: MinerU table draft returned zero table blocks; no printed tables are present.
+render_audit: >-
+  Physical page 2 was rendered at 600 dpi to verify both fugacity exponents,
+  the approximate coefficient 9 x 10^-6 cm^2/sec, the 1.48 wt% figure-caption
+  total Ce value, and the Figure 1 and Figure 2 axes and series.
