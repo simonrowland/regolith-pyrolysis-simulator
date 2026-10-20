@@ -12,6 +12,26 @@ def _designer(**geometry):
     return EquipmentDesigner({"condenser_geometry": geometry})
 
 
+def test_crucible_design_baseline_before_density_owner_change():
+    # SC-333-07 refactor pin, recorded at 4153a7c4b for a 100 kg batch.
+    # This captures shipped hardware geometry, not a density ground-truth claim.
+    design = EquipmentDesigner().design_for_batch(100.0, {})
+
+    assert (
+        design.crucible.volume_m3.hex(),
+        design.crucible.diameter_m.hex(),
+        design.crucible.height_m.hex(),
+        design.crucible.melt_surface_area_m2.hex(),
+        design.headspace_volume_m3.hex(),
+    ) == (
+        "0x1.6c16c16c16c16p-5",
+        "0x1.576f88447a1a4p-2",
+        "0x1.0193a6335b93bp-1",
+        "0x1.69dc30ddc99d6p-4",
+        "0x1.32a9611326c8ep-6",
+    )
+
+
 def test_batch_headspace_counts_freeboard_once_and_includes_pipe_volume():
     design = EquipmentDesigner().design_for_batch(1000.0, {})
 
