@@ -278,6 +278,29 @@ def test_cro2_evaporation_proxy_absolute_diffusivity_pin():
     assert result.d_ab_m2_s == pytest.approx(0.044327038311009044, rel=1e-12)
 
 
+def test_cro2_evaporation_proxy_uses_shared_sio_collision_parameters():
+    from simulator.condensation import _LENNARD_JONES_PARAMS
+
+    sio_sigma, sio_epsilon, _sio_molar_mass = _LENNARD_JONES_PARAMS["SiO"]
+    expected = _chapman_enskog_d_ab_m2_s(
+        "CrO2",
+        1973.0,
+        1000.0,
+        carrier="N2",
+        species_params=(sio_sigma, sio_epsilon, 83.9941),
+    )
+    result = _evap(
+        species="CrO2",
+        molar_mass_kg_mol=0.0839941,
+        knudsen_number=1.0e-7,
+        T_surface_K=1973.0,
+        T_gas_K=1973.0,
+        melt_resistance_enabled=False,
+    )
+
+    assert result.d_ab_m2_s == pytest.approx(expected, rel=1e-12)
+
+
 def test_chapman_enskog_prefactor_matches_bsl_atmosphere_form():
     """Default condensation D_AB uses the BSL atm prefactor, not 0.00266.
 
