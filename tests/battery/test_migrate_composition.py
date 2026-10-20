@@ -3191,7 +3191,13 @@ def test_shornikov_pressure_rows_use_initial_charge_only(tmp_path: Path) -> None
     role = values["composition_role"]
     assert role["value"] == INITIAL_CHARGE_ONLY_PROXY_FLAG
     assert role["locator"]["published_page"] == 115
-    assert "SiO2 (54.44)" in role["quote"]
+    assert role["quote"] == (
+        "The Saratov chondrite chondrules belong to type IIB "
+        "(according to the classification accepted in meteoritics) "
+        "and are an oxide material (wt %): SiO2 (54.44), TiO2 (0.13), "
+        "Al2O3 (3.20), FeO (13.17), MgO (24.98), CaO (2.24), "
+        "Na2O (1.44) and K2O (0.40)."
+    )
     assert "residual melt" in role["locator"]["note"]
     printed = values["oxides_wt_pct"]
     expected = wt_pct_to_mole_fraction(
