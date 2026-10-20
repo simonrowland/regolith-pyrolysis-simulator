@@ -83,3 +83,27 @@ def test_isolated_migration_keeps_all_typed_points_species_conditions_and_temper
         assert not item.notices
     assert migrated["jeon25_2_mgo_al2o3_p3_mgo"].value.point == Decimal("12.7")
     assert migrated["jeon25_3_mgo_cr2o3_p4_cr2o3"].value.point == Decimal("66.6")
+
+
+def test_context_rows_keep_correct_table_locators_and_printed_values() -> None:
+    context = [
+        record
+        for block in _document()["species"].values()
+        for record in block.get("context", [])
+    ]
+    by_id = {record["observation_id"]: record for record in context}
+    expected_pages = {
+        "jeon25_table2_composite_points_context": (7, 6, 6),
+        "jeon25_table2_metal_point_context": (7, 6, 6),
+        "jeon25_table3_metal_point_context": (8, 7, 7),
+        "jeon25_table3_mgo_c_point3_context": (8, 7, 7),
+    }
+    for observation_id, expected in expected_pages.items():
+        locator = by_id[observation_id]["locator"]
+        assert (locator["page"], locator["pdf_page_index"], locator["published_page"]) == expected
+
+    point3 = by_id["jeon25_table3_mgo_c_point3_context"]["values"]["values_as_published"]
+    assert point3 == "88.3 MgO, 0.3 Al2O3, 0.0 Cr2O3, 11.4 C, 0.0 CaO, 0.0 FeO, 0.0 SiO2."
+    factsage = by_id["jeon25_factsage_model_context"]["values"]["values_as_published"]
+    assert "0.77 at 1400 °C, p(O2)=10−6" in factsage
+    assert "0.81 at 1350 °C, p(O2)<10−18" in factsage
