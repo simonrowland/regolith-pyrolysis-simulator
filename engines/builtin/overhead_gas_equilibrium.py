@@ -349,7 +349,7 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
                         "species_molar_mass",
                         oxide_name,
                         "positive constituent is outside the closed "
-                        "nine-oxide gamma-one proxy domain",
+                        "nine-oxide proxy domain for gamma-one activities",
                     )
                 oxide_moles[oxide_name] = amount / molar_mass
         total = sum(oxide_moles.values())
