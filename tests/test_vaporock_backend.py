@@ -2883,15 +2883,32 @@ def test_oxygen_balance_gases_resolve_to_their_parent_oxide(
     assert _parent_oxide_for_vaporock_gas(gas_species) == parent_oxide
 
 
-@pytest.mark.parametrize(
-    ("gas_id", "parent_oxide"),
-    (("FeO_association_gas", "FeO"),),
-)
-def test_vaporock_parent_oxide_output_pin(gas_id, parent_oxide):
-    """Pin the current shared map/catalog parent-oxide output before the guard."""
-    assert repr(vaporock_module._parent_oxide_for_vaporock_gas(gas_id)) == repr(
-        parent_oxide
+def test_vaporock_parent_oxide_map_matches_catalog():
+    repo_root = Path(__file__).resolve().parents[1]
+    catalog = yaml.safe_load(
+        (repo_root / "data" / "vapor_pressures.yaml").read_text(
+            encoding="utf-8"
+        )
     )
+    catalog_parent_oxides_by_gas = {}
+    for family in catalog.get("families", {}).values():
+        species_rows = family.get("physical_properties", {}).get("species", {})
+        for gas_id, row in species_rows.items():
+            if isinstance(row, dict) and "parent_oxide" in row:
+                catalog_parent_oxides_by_gas.setdefault(gas_id, []).append(
+                    row["parent_oxide"]
+                )
+
+    parent_map = vaporock_module._VAPOROCK_GAS_PARENT_OXIDE
+    shared_gas_ids = sorted(parent_map.keys() & catalog_parent_oxides_by_gas.keys())
+    assert shared_gas_ids, "no shared VapoRock gas ids in the catalog"
+    for gas_id in shared_gas_ids:
+        map_parent_oxide = parent_map[gas_id]
+        for catalog_parent_oxide in catalog_parent_oxides_by_gas[gas_id]:
+            assert repr(map_parent_oxide) == repr(catalog_parent_oxide), (
+                f"{gas_id}: VapoRock parent {map_parent_oxide!r} != catalog parent "
+                f"{catalog_parent_oxide!r}"
+            )
 
 
 @pytest.mark.parametrize("gas_species", ("NaOH(g)", "KOH(g)"))
