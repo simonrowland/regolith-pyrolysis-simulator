@@ -1285,3 +1285,142 @@ def test_extraction_completeness_gate_margin_matches_7913470_golden() -> None:
 def test_physics_gates_do_not_restore_ellingham_or_mre_gate() -> None:
     assert all("ellingham" not in gate for gate in GATE_ORDER)
     assert all("mre" not in gate.lower() for gate in GATE_ORDER)
+
+
+# d-045 (2026-09-26). Charge basis in these reports is 1 kg, so the no-coating
+# envelope is 5e-4 kg of upstream wall deposit per campaign (0.05 % of charge).
+_D045_CHARGE_KG = 1.0
+
+
+def _d045_gate_report(**overrides: object) -> dict[str, object]:
+    report: dict[str, object] = {
+        "campaigns_to_resinter_total": math.inf,
+        "resinter_threshold_kg": None,
+        "wall_deposit_kg_per_campaign": 0.0,
+        "authoritative_for_resinter": False,
+        "output_status": "non-authoritative-threshold",
+        "status_reason": "resinter threshold is not grounded",
+        "feedstock_charge_mass_kg": _D045_CHARGE_KG,
+        "coating_constraint_mode": "upstream_deposit_fraction",
+        "coating_constraint_authoritative": True,
+        "sticking_alpha_authority": {
+            "authoritative_for_deposit_mass": True,
+        },
+    }
+    report.update(overrides)
+    return report
+
+
+def _d045_coating(**overrides: object):
+    return PhysicsConstraintSet(active_gates=("coating",)).coating_from_fouling_report(
+        _d045_gate_report(**overrides)
+    )
+
+
+def test_flagged_extrapolated_upstream_deposit_above_charge_fraction_is_infeasible() -> None:
+    """(a) A flagged deposit above 0.05 % of charge violates no-coating."""
+
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=5.001e-4,
+        unqualified_deposition_rate_kg_per_campaign=5.001e-4,
+        status_reason="wall saturation pressure extrapolated",
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_extrapolated",
+            "wall_saturation_pressure_extrapolations_by_species": {
+                "Fe": {"wall_temperature_C": 1400.0},
+            },
+        },
+    )
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
+    assert coating.status_payload["coating_violation_reasons"][0]["reason"] == (
+        "upstream_wall_deposit_fraction_exceeded"
+    )
+
+
+def test_flagged_extrapolated_upstream_deposit_below_charge_fraction_stays_feasible() -> None:
+    """(b) The same flagged deposit under 0.05 % of charge stays feasible."""
+
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=4.0e-4,
+        unqualified_deposition_rate_kg_per_campaign=4.0e-4,
+        status_reason="wall saturation pressure extrapolated",
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_extrapolated",
+            "wall_saturation_pressure_extrapolations_by_species": {
+                "Fe": {"wall_temperature_C": 1400.0},
+            },
+        },
+    )
+
+    assert coating.feasible
+    assert coating.status == "warning"
+    assert coating.status_payload["coating_warning_flags"][0]["reason"] == (
+        "flagged_upstream_wall_deposit_below_threshold"
+    )
+    assert coating.status_payload["sticking_alpha_authority"]["code"] == (
+        "wall_saturation_pressure_extrapolated"
+    )
+
+
+def test_refused_wall_psat_without_computable_deposit_is_never_feasible() -> None:
+    """(c) Refused wall P_sat with no deposit quantity is unavailable."""
+
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=None,
+        output_status="status_bearing",
+        status_reason="wall saturation pressure refused",
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["SiO"],
+        },
+    )
+
+    assert not coating.feasible
+    assert coating.status == "unavailable"
+    assert coating.observed is None
+    assert coating.status_payload["coating_verdict"] == "unavailable"
+
+
+def test_null_wall_deposit_quantity_is_unavailable_not_zero() -> None:
+    """b-808: a null deposit is excluded, not priced as a measured zero."""
+
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=None,
+        output_status="status_bearing",
+        status_reason="wall deposit quantity is null",
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "wall_quantity_unavailable": True,
+        },
+    )
+
+    assert not coating.feasible
+    assert coating.status == "unavailable"
+    assert coating.observed is None
+    assert coating.status_payload["coating_verdict"] == "unavailable"
+
+
+def test_measured_zero_upstream_deposit_stays_feasible() -> None:
+    """(d) A measured zero upstream deposit remains a feasible recipe."""
+
+    coating = _d045_coating(
+        wall_deposit_kg_per_campaign=0.0,
+        unqualified_deposition_rate_kg_per_campaign=0.0,
+        authoritative_for_resinter=True,
+        output_status="authoritative",
+        status_reason="",
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": True,
+            "code": "wall_deposit_sticking_alpha_provenance",
+        },
+    )
+
+    assert coating.feasible
+    assert coating.status != "unavailable"
+    assert coating.observed == pytest.approx(0.0)
+    assert coating.status_payload.get("coating_verdict") != "unavailable"
