@@ -47,13 +47,11 @@ scope_assessment:
     - table: '5'
       disposition: context-measured-lineage-pending
       reason: >-
-        Two experimental total standard entropy values fit S, but Table 5
-        computes each from the printed vibrational and configurational
-        components. Those component values have no distinct token and must not
-        be filed as total S. Per controller ruling t-1382, keep the totals in
-        context with candidate token S and method measured_reduced pending a
-        corpus TABLE_CSV asset; do not edit the generated INDEX. The 126.1 value is context-only because the prose
-        describes an extrapolation from experimental data, not a calorimetrically measured standard entropy at 298 K.
+        Table 5 totals remain in context because the component values have no
+        distinct Quantity token. derivation pending a corpus table asset
+        (controller, t-1382); 126.1 is the X=0 extrapolation of the experimental
+        S° totals, each of which is Svib plus Sconfig from equation (1), and is
+        not a calorimetric standard entropy of ordered MgTi2O5.
   figure_only_candidate: >-
     Figure 10 contains measured Cp points, but figure digitization is deferred
     by the family rule. Figures 11–12 are calculated or reduced curves and
@@ -263,7 +261,11 @@ species:
           rows_as_printed:
             - {sample_state: 'X = 0.14(1), Exp.', S_vib_as_printed: '124.8(1)', S_config_as_printed: '7.6(4)', S_total_as_printed: '132.4(4)'}
             - {sample_state: 'X = 0.37(1), Exp.', S_vib_as_printed: '129.4(1)', S_config_as_printed: '13.4(2)', S_total_as_printed: '142.8(2)'}
-          capture_note: derivation pending a corpus table asset (controller, t-1382)
+          capture_note: >-
+            derivation pending a corpus table asset (controller, t-1382); 126.1
+            is the X=0 extrapolation of the experimental S° totals, each of
+            which is Svib plus Sconfig from equation (1), and is not a
+            calorimetric standard entropy of ordered MgTi2O5.
 
       - observation_id: he2017_prose_vibrational_entropy_difference
         type: table_record
@@ -339,9 +341,11 @@ species:
           admission_status: context_only
           value_as_printed: '126.1'
           species: MgTi2O5
-          schema_gap: The prose describes 126.1 J mol−1 K−1 as an extrapolation from experimental data, not
-            as a calorimetrically measured standard entropy at 298 K.
-          capture_note: extrapolated value; no measured point is claimed
+          capture_note: >-
+            derivation pending a corpus table asset (controller, t-1382); 126.1
+            is the X=0 extrapolation of the experimental S° totals, each of
+            which is Svib plus Sconfig from equation (1), and is not a
+            calorimetric standard entropy of ordered MgTi2O5.
       - observation_id: he2017_figure1_structure
         type: figure_record
         locator: {page: 3, published_page: 3, pdf_page_index: 2, figure: '1'}

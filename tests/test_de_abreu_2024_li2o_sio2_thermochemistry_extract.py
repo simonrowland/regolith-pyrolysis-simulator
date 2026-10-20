@@ -12,7 +12,7 @@ import subprocess
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -237,6 +237,16 @@ def test_multiphase_transition_rows_are_retained_in_context_only() -> None:
         assert values["phase_reaction_as_printed"] == reaction
         assert values["technique_as_printed"] == technique
         assert values["assemblage_as_printed"] == assemblage
+    optimized_ids = set(
+        contexts["deabreu2024_table6_calphad_optimized_transition_rows"]["values"][
+            "typed_observation_ids"
+        ]
+    )
+    assert optimized_ids == {
+        observation_id
+        for observation_id in EXPECTED_FORMULA_BY_OBSERVATION_ID
+        if observation_id.startswith("deabreu2024_table6_g")
+    }
 
 
 def test_isolated_migration_preserves_formula_temperature_conditions_and_values() -> None:
@@ -259,6 +269,7 @@ def test_isolated_migration_preserves_formula_temperature_conditions_and_values(
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
     assert sum(len(rows) for rows in migrator.result.context_by_work.values()) == 33
+    assert all(record.value.kind is not ValueKind.UNAVAILABLE for record in records)
     for record in records:
         raw_id = record.observation_id.split("::")[-1]
         expected_formula, expected_temperature = expected_by_id[raw_id]

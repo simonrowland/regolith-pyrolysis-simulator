@@ -23,6 +23,12 @@ CORPUS_ROOT = Path(
     os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
 )
 PDF = CORPUS_ROOT / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
+T1382_CAPTURE_NOTE = (
+    "derivation pending a corpus table asset (controller, t-1382); 126.1 is "
+    "the X=0 extrapolation of the experimental S° totals, each of which is "
+    "Svib plus Sconfig from equation (1), and is not a calorimetric standard "
+    "entropy of ordered MgTi2O5."
+)
 
 TABLE1_RENDER_GRID = [
     ("milling_time_h", (0, 0, 3, 3, 3, 3, 3)),
@@ -102,9 +108,7 @@ def _assert_source_pins(document: dict, table1_grid=TABLE1_RENDER_GRID) -> None:
     pending_total = contexts["he2017_table5_standard_entropy_pending_asset"]["values"]
     assert pending_total["candidate_token"] == "standard entropy"
     assert pending_total["method_class"] == "measured_reduced"
-    assert pending_total["capture_note"] == (
-        "derivation pending a corpus table asset (controller, t-1382)"
-    )
+    assert pending_total["capture_note"] == T1382_CAPTURE_NOTE
     assert [row["S_total_as_printed"] for row in pending_total["rows_as_printed"]] == [
         "132.4(4)",
         "142.8(2)",
@@ -127,9 +131,17 @@ def _assert_source_pins(document: dict, table1_grid=TABLE1_RENDER_GRID) -> None:
         assert row["values"]["value_as_printed"] == printed_value
         assert row["values"]["candidate_tokens_considered"] == candidates
         assert row["values"]["admission_status"] == "context_only"
-    assert "not as a calorimetrically measured standard entropy at 298 K" in contexts[
+    extrapolated_total = contexts[
         "he2017_prose_extrapolated_ordered_standard_entropy"
-    ]["values"]["schema_gap"]
+    ]["values"]
+    assert extrapolated_total["capture_note"] == T1382_CAPTURE_NOTE
+    assert "schema_gap" not in extrapolated_total
+    table5_scope = next(
+        table["reason"]
+        for table in document["scope_assessment"]["tables"]
+        if table["table"] == "5"
+    )
+    assert T1382_CAPTURE_NOTE in table5_scope
 
     figures = [record for record in contexts.values() if record["type"] == "figure_record"]
     assert len(figures) == 13
