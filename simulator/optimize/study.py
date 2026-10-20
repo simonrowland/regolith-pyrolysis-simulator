@@ -44,12 +44,14 @@ from simulator.optimize.canonical import canonical_json_dumps
 from simulator.optimize.doe import active_sampler_name
 from simulator.optimize.determinism import pin_seeds
 from simulator.optimize.evaluate import (
+    _CandidateAdmissionError,
     EvaluationAbort,
     FailureCategory,
     RunReference,
     ScoredResult,
     _build_eval_inputs,
     _build_prefix_eval_inputs,
+    _invalid_patch_result,
     _is_stale_profile_refusal,
     _stale_profile_result,
     evaluate,
@@ -3580,6 +3582,8 @@ def _evaluate_candidates(
                             scored = _stale_profile_result(candidate.id, str(exc))
                         else:
                             raise
+                    except _CandidateAdmissionError as exc:
+                        scored = _invalid_patch_result(candidate.id, str(exc))
                     else:
                         scored = replace(
                             scored,
@@ -3647,41 +3651,44 @@ def _ensure_staged_prefix_replay(
         )
     prefix_patch = _prefix_patch_from_metadata(candidate, schema)
     context = conditional_context_from_metadata(candidate.metadata)
-    if context is not None and context.scope == "prefix-before-guard-stage":
-        context = c5_sampler_context(
-            schema,
-            active=True,
-            scope="prefix-before-guard-stage",
-            prefix_stage_ids=prefix_stage_ids,
-        )
-        prefix_spec, _ = _build_prefix_eval_inputs(
-            prefix_patch,
-            feedstock,
-            fidelity,
-            profile,
-            schema,
-            prefix_stage_ids=prefix_stage_ids,
-            prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
-            topology_id=_topology_id_metadata(candidate),
-            constraints=constraints,
-            conditional_context=context,
-        )
-    else:
-        base_spec, _ = _build_eval_inputs(
-            prefix_patch,
-            feedstock,
-            fidelity,
-            profile,
-            schema,
-            constraints=constraints,
-            conditional_context=context,
-        )
-        prefix_spec = make_prefix_eval_spec(
-            base_spec,
-            prefix_stage_ids=prefix_stage_ids,
-            prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
-            topology_id=_topology_id_metadata(candidate),
-        )
+    try:
+        if context is not None and context.scope == "prefix-before-guard-stage":
+            context = c5_sampler_context(
+                schema,
+                active=True,
+                scope="prefix-before-guard-stage",
+                prefix_stage_ids=prefix_stage_ids,
+            )
+            prefix_spec, _ = _build_prefix_eval_inputs(
+                prefix_patch,
+                feedstock,
+                fidelity,
+                profile,
+                schema,
+                prefix_stage_ids=prefix_stage_ids,
+                prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
+                topology_id=_topology_id_metadata(candidate),
+                constraints=constraints,
+                conditional_context=context,
+            )
+        else:
+            base_spec, _ = _build_eval_inputs(
+                prefix_patch,
+                feedstock,
+                fidelity,
+                profile,
+                schema,
+                constraints=constraints,
+                conditional_context=context,
+            )
+            prefix_spec = make_prefix_eval_spec(
+                base_spec,
+                prefix_stage_ids=prefix_stage_ids,
+                prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
+                topology_id=_topology_id_metadata(candidate),
+            )
+    except _CandidateAdmissionError as exc:
+        return _invalid_patch_result(candidate.id, str(exc)), False
     if not isinstance(prefix_spec, PrefixEvalSpec):
         raise StagedBeamStateError("staged prefix spec was not a PrefixEvalSpec")
     prefix_key = cache_key(prefix_spec)
@@ -3911,7 +3918,7 @@ def _lookup_cached(
             constraints=constraints,
             conditional_context=_full_evaluation_conditional_context(candidate),
         )
-    except RecipeValidationError:
+    except (RecipeValidationError, _CandidateAdmissionError):
         return None
     except ProfileValidationError as exc:
         if not _is_stale_profile_refusal(exc):
@@ -4006,6 +4013,8 @@ def _evaluate_one_supervised(
             if _is_stale_profile_refusal(exc):
                 return _stale_profile_result(candidate.id, str(exc))
             raise
+        except _CandidateAdmissionError as exc:
+            return _invalid_patch_result(candidate.id, str(exc))
         scored = replace(scored, eval_spec=spec, cache_key=cache_key(spec))
     return scored
 
@@ -4062,12 +4071,14 @@ def _evaluate_one(
         if _is_stale_profile_refusal(exc):
             return _stale_profile_result(candidate.id, str(exc))
         raise
+    except _CandidateAdmissionError as exc:
+        return _invalid_patch_result(candidate.id, str(exc))
     except EvaluationAbort:
         raise
     if not isinstance(scored, ScoredResult):
         raise TypeError("evaluator must return ScoredResult")
     scored = _with_candidate_id(scored, candidate.id)
-    if staged_prefix is not None:
+    if staged_prefix is not None and scored.eval_spec is not None:
         try:
             spec, _ = _build_eval_inputs(
                 candidate.patch.validated(schema),
@@ -4082,6 +4093,8 @@ def _evaluate_one(
             if _is_stale_profile_refusal(exc):
                 return _stale_profile_result(candidate.id, str(exc))
             raise
+        except _CandidateAdmissionError as exc:
+            return _invalid_patch_result(candidate.id, str(exc))
         scored = replace(scored, eval_spec=spec, cache_key=cache_key(spec))
     return scored
 

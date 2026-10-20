@@ -715,6 +715,10 @@ class EvaluationInputError(ValueError):
     """Raised when optimizer evaluation inputs or config references are invalid."""
 
 
+class _CandidateAdmissionError(EvaluationInputError):
+    """Raised when a candidate violates a pre-run admission limit."""
+
+
 def evaluate(
     patch: RecipePatch,
     feedstock_id: str,
@@ -735,14 +739,7 @@ def evaluate(
     try:
         validated_patch = patch.validated(active_schema)
     except RecipeValidationError as exc:
-        return ScoredResult(
-            candidate_id=candidate_id,
-            eval_spec=None,
-            cache_key=None,
-            feasible=False,
-            failure_category=FailureCategory.INVALID_PATCH,
-            notes=(str(exc),),
-        )
+        return _invalid_patch_result(candidate_id, str(exc))
 
     try:
         active_constraints = _composition_target_constraints(
@@ -765,6 +762,8 @@ def evaluate(
         if _is_stale_profile_refusal(exc):
             return _stale_profile_result(candidate_id, str(exc))
         raise
+    except _CandidateAdmissionError as exc:
+        return _invalid_patch_result(candidate_id, str(exc))
     except EvaluationInputError as exc:
         if _is_zero_input_basis_breach_message(str(exc)):
             return _zero_input_basis_result(candidate_id, str(exc))
@@ -3596,7 +3595,7 @@ def _profile_thermal_window_schedule(
         recipe_patch=recipe_patch,
     )
     if high_C > ceiling_C:
-        raise EvaluationInputError(
+        raise _CandidateAdmissionError(
             f"{campaign}.temp_range_C high {high_C:g} C exceeds "
             f"{ceiling_bound} {ceiling_C:g} C"
         )
@@ -3720,10 +3719,16 @@ def _furnace_ceiling_C(
     material = setpoints.get("furnace_material")
     material_caps = None
     if material:
+        requested_ceiling_C = (
+            recipe_patch.values[FURNACE_MAX_T_C_PATH]
+            if recipe_patch is not None
+            and FURNACE_MAX_T_C_PATH in recipe_patch.values
+            else setpoints.get("furnace_max_T_C")
+        )
         try:
             material_caps = resolve_furnace_temperature_caps(
                 str(material),
-                setpoints.get("furnace_max_T_C"),
+                requested_ceiling_C,
             )
         except ValueError as exc:
             raise EvaluationInputError(
@@ -5645,6 +5650,20 @@ def _stale_profile_result(
         cache_key=None,
         feasible=False,
         failure_category=FailureCategory.STALE_PROFILE,
+        notes=(error_message,),
+    )
+
+
+def _invalid_patch_result(
+    candidate_id: str | None,
+    error_message: str,
+) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=False,
+        failure_category=FailureCategory.INVALID_PATCH,
         notes=(error_message,),
     )
 
