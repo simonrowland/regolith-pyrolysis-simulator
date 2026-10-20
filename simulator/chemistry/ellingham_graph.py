@@ -71,6 +71,11 @@ def _physical_pO2_bar(pO2_bar: float) -> float:
     return max(pO2, 1e-30)
 
 
+def _sio_oxygen_pressure_factor(pO2_bar: float, reference_bar: float) -> float:
+    """Legacy fitted SiO oxygen factor, shared by its pressure consumers."""
+    return math.sqrt(reference_bar / pO2_bar) if pO2_bar > reference_bar else 1.0
+
+
 @dataclass(frozen=True)
 class EvolutionRankEntry:
     species: str
@@ -456,8 +461,8 @@ def effective_equilibrium_pressure_Pa(
                 float(row.get("pO2_reference_bar", 1.0) or 1.0),
             )
             P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
-        elif species == "SiO" and pO2 > float(vacuum_floor_bar):
-            P_eq_Pa *= math.sqrt(float(vacuum_floor_bar) / pO2)
+        elif species == "SiO":
+            P_eq_Pa *= _sio_oxygen_pressure_factor(pO2, float(vacuum_floor_bar))
         return max(P_eq_Pa, 0.0)
 
     raise EllinghamPressureRefusal(

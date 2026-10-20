@@ -1311,9 +1311,10 @@ class EquilibriumMixin:
             if (
                 name == 'SiO'
                 and not pO2_exponent
-                and pO2_bar > sio_reference_bar
             ):
-                suppression = math.sqrt(sio_reference_bar / pO2_bar)
+                from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
+
+                suppression = _sio_oxygen_pressure_factor(pO2_bar, sio_reference_bar)
                 P_sat = _require_finite_vapor_value(
                     P_sat * suppression,
                     species=name,

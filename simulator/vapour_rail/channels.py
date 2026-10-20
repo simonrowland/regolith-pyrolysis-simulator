@@ -842,6 +842,27 @@ def validate_physical_pO2_bar(pO2_bar: float) -> float:
     return oxygen
 
 
+def _pO2_evaluation_notice(oxygen: float) -> dict[str, Any] | None:
+    # The stated evaluator band limits evidence, not the supplied oxygen.
+    # Mass action uses p/p_ref (bar/bar): a decade in p changes log10(P)
+    # by the reaction exponent. Projecting to either edge would erase that
+    # dependence outside the band; at either edge this remains continuous.
+    if not MELT_DISSOCIATION_PO2_MIN_BAR <= oxygen <= MELT_DISSOCIATION_PO2_MAX_BAR:
+        return {
+            "reason": "pO2_outside_evaluator_band",
+            "authority_level": "extrapolated",
+            "certified_band": {
+                "pO2_bar": (
+                    MELT_DISSOCIATION_PO2_MIN_BAR,
+                    MELT_DISSOCIATION_PO2_MAX_BAR,
+                )
+            },
+            "pO2_bar_used": oxygen,
+            "was_clamped": False,
+        }
+    return None
+
+
 def _log_oxygen_ratio(
     oxygen: float, reference: float, *, base10: bool = False,
 ) -> float:
@@ -926,23 +947,9 @@ def o2_potential_from_pO2_bar(
         "pO2_reference_bar": p_ref,
         "standard_state_bar": 1.0,
     }
-    # The stated evaluator band limits evidence, not the supplied oxygen.
-    # Mass action uses p/p_ref (bar/bar): a decade in p changes log10(P)
-    # by the reaction exponent. Projecting to either edge would erase that
-    # dependence outside the band; at either edge this remains continuous.
-    if not MELT_DISSOCIATION_PO2_MIN_BAR <= oxygen <= MELT_DISSOCIATION_PO2_MAX_BAR:
-        receipt["extrapolation_notice"] = {
-            "reason": "pO2_outside_evaluator_band",
-            "authority_level": "extrapolated",
-            "certified_band": {
-                "pO2_bar": (
-                    MELT_DISSOCIATION_PO2_MIN_BAR,
-                    MELT_DISSOCIATION_PO2_MAX_BAR,
-                )
-            },
-            "pO2_bar_used": oxygen,
-            "was_clamped": False,
-        }
+    notice = _pO2_evaluation_notice(oxygen)
+    if notice is not None:
+        receipt["extrapolation_notice"] = notice
     return GasChannelPotential(
         channel_id=CHANNEL_O2,
         gas_formula="O2",
