@@ -33,6 +33,7 @@ species:
             - T_K: '1573'
               gamma: '0.287'
               as_printed: 'γ°ₒ = 0.287'
+              note: 'Column (a), calculated in this work: 0.287; column (b), reported by the investigator: 0.287 (scored).'
               uncertainty: {value: '0.005', meaning: one_sigma, note: standard deviation}
               locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'This work'}
         point_conditions:
@@ -49,6 +50,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Wilder [12]', T_K: '1373', gamma: '0.12'}
+        note: 'Column (a), calculated in this work: 0.118; column (b), reported by the investigator: 0.12 (scored).'
       - observation_id: kemori_1980_table2_wilder_1473
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Wilder [12]'}
@@ -56,6 +58,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Wilder [12]', T_K: '1473', gamma: '0.205'}
+        note: 'Column (a), calculated in this work: 0.198; column (b), reported by the investigator: 0.205 (scored).'
       - observation_id: kemori_1980_table2_rickert_wagner_1418
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Rickert and Wagner [13]'}
@@ -63,6 +66,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Rickert and Wagner [13]', T_K: '1418', gamma: '0.145'}
+        note: 'Column (a), calculated in this work: 0.143; column (b), reported by the investigator: 0.145 (scored).'
       - observation_id: kemori_1980_table2_kozuka_1373
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kozuka et al. [14]'}
@@ -70,6 +74,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kozuka et al. [14]', T_K: '1373', gamma: '0.120'}
+        note: 'Column (a), calculated in this work: 0.118; column (b), reported by the investigator: 0.120 (scored).'
       - observation_id: kemori_1980_table2_kozuka_1423
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kozuka et al. [14]'}
@@ -77,6 +82,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kozuka et al. [14]', T_K: '1423', gamma: '0.150'}
+        note: 'Column (a), calculated in this work: 0.150; column (b), reported by the investigator: 0.150 (scored).'
       - observation_id: kemori_1980_table2_kozuka_1473
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kozuka et al. [14]'}
@@ -84,6 +90,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kozuka et al. [14]', T_K: '1473', gamma: '0.195'}
+        note: 'Column (a), calculated in this work: 0.189; column (b), reported by the investigator: 0.195 (scored).'
       - observation_id: kemori_1980_table2_fruehan_richardson_1373
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Fruehan and Richardson [15]'}
@@ -91,6 +98,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Fruehan and Richardson [15]', T_K: '1373', gamma: '0.122'}
+        note: 'Column (a), calculated in this work: 0.119; column (b), reported by the investigator: 0.122 (scored).'
       - observation_id: kemori_1980_table2_fruehan_richardson_1473
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Fruehan and Richardson [15]'}
@@ -98,6 +106,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Fruehan and Richardson [15]', T_K: '1473', gamma: '0.204'}
+        note: 'Column (a), calculated in this work: 0.199; column (b), reported by the investigator: 0.204 (scored).'
       - observation_id: kemori_1980_table2_nanda_geiger_1408
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Nanda and Geiger [16]'}
@@ -105,6 +114,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Nanda and Geiger [16]', T_K: '1408', gamma: '0.12'}
+        note: 'Column (a), calculated in this work: 0.141; column (b), reported by the investigator: 0.12 (scored).'
       - observation_id: kemori_1980_table2_jacob_jeffes_1373
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Jacob and Jeffes [17]'}
@@ -112,6 +122,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Jacob and Jeffes [17]', T_K: '1373', gamma: '0.128'}
+        note: 'Column (a), calculated in this work: 0.126; column (b), reported by the investigator: 0.128 (scored).'
       - observation_id: kemori_1980_table2_jacob_jeffes_1573
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Jacob and Jeffes [17]'}
@@ -119,6 +130,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Jacob and Jeffes [17]', T_K: '1573', gamma: '0.333'}
+        note: 'Column (a), calculated in this work: 0.324; column (b), reported by the investigator: 0.333 (scored).'
       - observation_id: kemori_1980_table2_kulkarni_1373
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kulkarni [18]'}
@@ -126,6 +138,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kulkarni [18]', T_K: '1373', gamma: '0.115'}
+        note: 'Column (a), calculated in this work: 0.114; column (b), reported by the investigator: 0.115 (scored).'
       - observation_id: kemori_1980_table2_kulkarni_1473
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kulkarni [18]'}
@@ -133,6 +146,7 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kulkarni [18]', T_K: '1473', gamma: '0.195'}
+        note: 'Column (a), calculated in this work: 0.194; column (b), reported by the investigator: 0.195 (scored).'
       - observation_id: kemori_1980_table2_kulkarni_1573
         type: activity_coefficient
         locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kulkarni [18]'}
@@ -140,6 +154,240 @@ species:
         units: dimensionless
         standard_state: Henry's law, oxygen at infinite dilution in liquid copper
         values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kulkarni [18]', T_K: '1573', gamma: '0.286'}
+        note: 'Column (a), calculated in this work: 0.279; column (b), reported by the investigator: 0.286 (scored).'
+      - observation_id: kemori_1980_table3_this_work_1573_eq3
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'This work', equation: 'eq3'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1573'
+          epsilon: '-11.8'
+          equation_as_printed: 'eq3'
+          concentration_interval_as_printed: '0.1808–4.9138'
+        uncertainty:
+          absolute: '0.9'
+          as_printed: '−(11.8 ± 0.9)'
+
+      - observation_id: kemori_1980_table3_this_work_1573_eq4
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'This work', equation: 'eq4'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1573'
+          epsilon: '-6.1'
+          equation_as_printed: 'eq4'
+          concentration_interval_as_printed: '0.1808–4.9138'
+
+      - observation_id: kemori_1980_table3_jacob_jeffes_1373_eq3
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'Jacob and Jeffes [17]', equation: 'eq3'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1373'
+          epsilon: '-9.2'
+          equation_as_printed: 'eq3'
+          concentration_interval_as_printed: '0.2101–1.6248'
+        uncertainty:
+          absolute: '1.6'
+          as_printed: '−(9.2 ± 1.6)'
+
+      - observation_id: kemori_1980_table3_jacob_jeffes_1373_eq4
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'Jacob and Jeffes [17]', equation: 'eq4'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1373'
+          epsilon: '-8.7'
+          equation_as_printed: 'eq4'
+          concentration_interval_as_printed: '0.2101–1.6248'
+
+      - observation_id: kemori_1980_table3_jacob_jeffes_1573_eq3
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'Jacob and Jeffes [17]', equation: 'eq3'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1573'
+          epsilon: '-7.4'
+          equation_as_printed: 'eq3'
+          concentration_interval_as_printed: '0.1921–1.6793'
+        uncertainty:
+          absolute: '1.2'
+          as_printed: '−(7.4 ± 1.2)'
+
+      - observation_id: kemori_1980_table3_jacob_jeffes_1573_eq4
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'Jacob and Jeffes [17]', equation: 'eq4'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1573'
+          epsilon: '-7.0'
+          equation_as_printed: 'eq4'
+          concentration_interval_as_printed: '0.1921–1.6793'
+
+      - observation_id: kemori_1980_table3_kulkarni_1373_eq3
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'Kulkarni [18]', equation: 'eq3'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1373'
+          epsilon: '-8.2'
+          equation_as_printed: 'eq3'
+          concentration_interval_as_printed: '0.0469–1.9757'
+        uncertainty:
+          absolute: '2.3'
+          as_printed: '−(8.2 ± 2.3)'
+
+      - observation_id: kemori_1980_table3_kulkarni_1373_eq4
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'Kulkarni [18]', equation: 'eq4'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1373'
+          epsilon: '-4.5'
+          equation_as_printed: 'eq4'
+          concentration_interval_as_printed: '0.0469–1.9757'
+
+      - observation_id: kemori_1980_table3_kulkarni_1473_eq3
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'Kulkarni [18]', equation: 'eq3'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1473'
+          epsilon: '-9.7'
+          equation_as_printed: 'eq3'
+          concentration_interval_as_printed: '0.0683–1.7830'
+        uncertainty:
+          absolute: '3.6'
+          as_printed: '−(9.7 ± 3.6)'
+
+      - observation_id: kemori_1980_table3_kulkarni_1473_eq4
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'Kulkarni [18]', equation: 'eq4'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1473'
+          epsilon: '-7.1'
+          equation_as_printed: 'eq4'
+          concentration_interval_as_printed: '0.0683–1.7830'
+
+      - observation_id: kemori_1980_table3_kulkarni_1573_eq3
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'Kulkarni [18]', equation: 'eq3'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1573'
+          epsilon: '-10.7'
+          equation_as_printed: 'eq3'
+          concentration_interval_as_printed: '0.1508–2.6038'
+        uncertainty:
+          absolute: '1.6'
+          as_printed: '−(10.7 ± 1.6)'
+
+      - observation_id: kemori_1980_table3_kulkarni_1573_eq4
+        type: interaction_parameter
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3', row: 'Kulkarni [18]', equation: 'eq4'}
+        phase: l
+        units: dimensionless ε°ₒ
+        derived_from: [unknown:kemori-1980-oxygen-liquid-copper]
+        derivation:
+          relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+          inputs: [unknown:kemori-1980-oxygen-liquid-copper]
+          output_unit: dimensionless Wagner interaction parameter
+        values:
+          quantity: wagner_interaction_parameter
+          method_class: model_derived
+          T_K: '1573'
+          epsilon: '-6.0'
+          equation_as_printed: 'eq4'
+          concentration_interval_as_printed: '0.1508–2.6038'
     context:
       - observation_id: kemori_1980_table1_copper_impurities
         type: context_record
@@ -150,7 +398,9 @@ species:
           The table reports bulk impurity mass ppm in the copper charge, not a
           species activity or a liquid-phase composition. Candidate store
           quantities do not fit this multi-element bulk assay.
-        values: {table_as_printed: 'Impurities in copper used in this work (mass ppm); Table 1.'}
+        values:
+          table_as_printed: Table 1 copper impurities, mass ppm
+          impurities_mass_ppm: {S: '8', Pb: '7', Ag: '6', Fe: '4', Ni: '2', Zn: '2', As: '1', Bi: '1', Sn: '1', Te: '1', P: '0', Al: '0', Au: '0', Cd: '0', Sb: '0', Se: '0', Si: '0', Mn: '0'}
       - observation_id: kemori_1980_table3_interaction_coefficients
         type: context_record
         units: dimensionless ε°ₒ; concentrations as printed
@@ -161,7 +411,11 @@ species:
           electrochemical data. The table's regression rows are retained here
           pending verification of the interaction_parameter encoding for this
           printed concentration-dependent form.
-        values: {table_as_printed: 'ε°ₒ values and concentration intervals, Table 3.'}
+        values:
+          table_as_printed: ε°ₒ values and concentration intervals, Table 3
+          solubility_fits:
+          - {equation_as_printed: 'ln N*_O = -20590/(T/K) + 11.259', temperature_range_K: [1358, 1483], equation_number: '14'}
+          - {equation_as_printed: 'ln N*_O = -12950/(T/K) + 6.273', temperature_range_K: [1508, 1583], equation_number: '15'}
       - observation_id: kemori_1980_tables5_6_activity_model
         type: model_derived
         units: dimensionless activity and J mol-1 coefficients
@@ -170,7 +424,17 @@ species:
         reason: >-
           Tables 5 and 6 report activities and coefficients calculated from
           polynomial solution models, not measured activity data.
-        values: {table_as_printed: 'Activities for N=2 through 7 and β coefficients for N=4.'}
+        values:
+          table_as_printed: Activities for N=2 through 7 and β coefficients for N=4
+          table5_rows_as_printed_in_order: [T_K, a_Cu_star, a_Cu_N_a, a_Cu_N_b, a_Cu2O_N_a, a_Cu2O_N_b]
+          table5_activity_rows:
+          - {N: 2, rows: [['1508', '0.933', '0.909', '0.898', '0.815', '0.872'], ['1523', '0.931', '0.904', '0.905', '0.827', '0.865'], ['1543', '0.928', '0.894', '0.897', '0.857', '0.861'], ['1558', '0.925', '0.886', '0.900', '0.882', '0.855'], ['1573', '0.924', '0.881', '0.892', '0.887', '0.853'], ['1583', '0.923', '0.874', '0.884', '0.905', '0.853']]}
+          - {N: 3, rows: [['1508', '0.933', '0.926', '0.919', '0.864', '0.870'], ['1523', '0.931', '0.923', '0.926', '0.862', '0.863'], ['1543', '0.928', '0.918', '0.919', '0.863', '0.859'], ['1558', '0.925', '0.915', '0.922', '0.860', '0.852'], ['1573', '0.924', '0.913', '0.913', '0.851', '0.850'], ['1583', '0.923', '0.912', '0.904', '0.844', '0.851']]}
+          - {N: 4, rows: [['1508', '0.933', '0.935', '0.935', '0.896', '0.896'], ['1523', '0.931', '0.933', '0.935', '0.889', '0.890'], ['1543', '0.928', '0.929', '0.925', '0.885', '0.887'], ['1558', '0.925', '0.925', '0.928', '0.882', '0.879'], ['1573', '0.924', '0.923', '0.921', '0.873', '0.875'], ['1583', '0.923', '0.921', '0.920', '0.872', '0.872']]}
+          - {N: 5, rows: [['1508', '0.933', '0.934', '0.933', '0.884', '0.885'], ['1523', '0.931', '0.932', '0.934', '0.878', '0.879'], ['1543', '0.928', '0.928', '0.924', '0.874', '0.876'], ['1558', '0.925', '0.924', '0.926', '0.871', '0.869'], ['1573', '0.924', '0.922', '0.919', '0.863', '0.865'], ['1583', '0.923', '0.920', '0.920', '0.861', '0.860']]}
+          - {N: 6, rows: [['1508', '0.933', '0.909', '0.910', '0.890', '0.896'], ['1523', '0.931', '0.907', '0.909', '0.892', '0.891'], ['1543', '0.928', '0.903', '0.900', '0.891', '0.887'], ['1558', '0.925', '0.901', '0.903', '0.885', '0.879'], ['1573', '0.924', '0.899', '0.898', '0.870', '0.876'], ['1583', '0.923', '0.896', '0.896', '0.871', '0.873']]}
+          - {N: 7, rows: [['1508', '0.933', '0.923', '0.921', '0.906', '0.904'], ['1523', '0.931', '0.917', '0.916', '0.895', '0.900'], ['1543', '0.928', '0.903', '0.902', '0.894', '0.897'], ['1558', '0.925', '0.888', '0.889', '0.895', '0.898'], ['1573', '0.924', '0.879', '0.875', '0.896', '0.896'], ['1583', '0.923', '0.861', '0.862', '0.901', '0.900']]}
+          table6_beta_J_mol: {Cu_liquid: {beta_02: '488840', beta_03: '-722960', beta_04: '367350'}, Cu2O_liquid: {beta_02: '322190', beta_03: '-405180', beta_04: '193660'}}
   Cu:
     observations:
       - observation_id: kemori_1980_table4_cu_in_cu_liquid
