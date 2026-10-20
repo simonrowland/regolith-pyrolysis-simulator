@@ -39,6 +39,15 @@ def test_render_pins_and_fidelity_mutation_are_detected() -> None:
 
     transitions = document["species"]["SiO2"]["observations"]
     table2 = {row["observation_id"]: row for row in transitions}
+    lower_limit = next(
+        row
+        for row in document["species"]["SiO2"]["context"]
+        if row["observation_id"] == "bissbort_2026_table2_mg0_01_tp"
+    )
+    assert "bissbort_2026_table2_mg0_01_tp" not in table2
+    assert lower_limit["values"]["T_C"] == "550"
+    assert lower_limit["values"]["value_as_printed"] == "550*"
+    assert lower_limit["values"]["lower_limit_note"] == "This Tp value marks a lower limit."
     assert table2["bissbort_2026_table2_mg76_06_tg"]["values"]["T_C"] == "626"
     assert table2["bissbort_2026_table2_mg100_15_tp"]["values"]["value_as_printed"] == "736"
     assert original_sample["values"]["value_as_published"] == "59.32"
@@ -65,13 +74,17 @@ def test_all_table_observations_migrate_with_species_composition_and_temperature
     assert migrator.result.registry_issues == []
 
     observations = tuple(migrator.result.observations.values())
-    assert len(observations) == 54
+    assert len(observations) == 53
+    assert not any(
+        observation.observation_id.endswith("bissbort_2026_table2_mg0_01_tp")
+        for observation in observations
+    )
     assert Counter(
         observation.identity.quantity.value
         for observation in observations
     ) == {
         Quantity.EQUILIBRIUM_PHASE_COMPOSITION: 27,
-        Quantity.TRANSITION_TEMPERATURE: 27,
+        Quantity.TRANSITION_TEMPERATURE: 26,
     }
 
     for observation in observations:

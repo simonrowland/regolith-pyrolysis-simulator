@@ -1408,85 +1408,6 @@ species:
         units: mol%
         note: Table 1 reports chemical-analysis errors of 1 mol% for FeO and MgO and 1.5 mol% for SiO2; confidence
           level is not stated.
-    - observation_id: bissbort_2026_table2_mg0_01_tp
-      type: transition_point
-      locator:
-        page: 9
-        published_page: 9
-        pdf_page_index: 8
-        table: '2'
-        row: Mg#0 measurement 1 Tp
-        column: Tp (°C)
-        note: The same Tp value is printed again in Table 3, physical PDF page 10, row Mg#0 measurement 1, column
-          Tp (°C).
-      phase: glass
-      units: °C
-      regime: tabulation
-      sample_as_published: Mg#0
-      thin_film_as_published: TF2
-      values:
-        quantity: transition_temperature
-        property_kind: glass_transition_peak
-        transition_as_printed: peak glass-transition temperature (Tp)
-        T_C: '550'
-        value_as_printed: 550*
-        method_class: measured_direct
-        method: Fast differential scanning calorimetry (FDSC); thin-film glass was measured at the printed matching
-          heating/cooling rate.
-        cooling_rate_C_s_as_printed: '5000'
-        matching_heating_rate_C_s_as_printed: '5000'
-        lower_limit: true
-        sample_id_as_printed: Mg#0
-      point_conditions:
-        composition:
-          state:
-            tag: unknown
-            reason: Table 1 has a below-detection component for Mg#0; the source does not report a complete melt
-              composition.
-          locator:
-            page: 3
-            published_page: 3
-            pdf_page_index: 2
-            table: '1'
-            row: Mg#0
-            column: FeO, MgO, SiO2
-        sample_id:
-          state:
-            tag: value
-            value: TF2
-          locator:
-            page: 9
-            published_page: 9
-            pdf_page_index: 8
-            table: '2'
-            row: Mg#0 measurement 1 Tp
-            column: Thin film
-        gas_environment:
-          state:
-            tag: value
-            value: N2 gas flow, 40 mL min−1
-          locator:
-            page: 3
-            published_page: 3
-            pdf_page_index: 2
-            section: 2.4 Fast Differential Scanning Calorimetry
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: The FDSC table and method do not report a numeric total pressure.
-          locator:
-            page: 9
-            published_page: 9
-            pdf_page_index: 8
-            table: '2'
-            row: Mg#0 measurement 1 Tp
-            column: Cooling Rate
-      uncertainty:
-        reported_status: printed
-        value: '5'
-        units: °C
-        note: Table 2 reports ±8 °C for the 3500 °C s−1 analysis and ±5 °C for all other temperatures; confidence
-          level is not stated.
     - observation_id: bissbort_2026_table2_mg43_02_tp
       type: transition_point
       locator:
@@ -4227,3 +4148,83 @@ species:
         attribution: present-work Eyring diffusivity and literature tracer-diffusion data
         schema_gap: Figure quantity retained without numeric points; no scoreable figure values are stored in this
           pass.
+    - observation_id: bissbort_2026_table2_mg0_01_tp
+      type: transition_temperature_lower_limit
+      locator:
+        page: 9
+        published_page: 9
+        pdf_page_index: 8
+        table: '2'
+        row: Mg#0 measurement 1 Tp
+        column: Tp (°C)
+        note: The same Tp value is printed again in Table 3, physical PDF page 10, row Mg#0 measurement 1, column
+          Tp (°C).
+      phase: glass
+      units: °C
+      regime: tabulation
+      sample_as_published: Mg#0
+      thin_film_as_published: TF2
+      values:
+        quantity: transition_temperature
+        property_kind: glass_transition_peak
+        transition_as_printed: peak glass-transition temperature (Tp)
+        T_C: '550'
+        value_as_printed: 550*
+        method_class: measured_direct
+        method: Fast differential scanning calorimetry (FDSC); thin-film glass was measured at the printed matching
+          heating/cooling rate.
+        cooling_rate_C_s_as_printed: '5000'
+        matching_heating_rate_C_s_as_printed: '5000'
+        lower_limit: true
+        lower_limit_note: "This Tp value marks a lower limit."
+        sample_id_as_printed: Mg#0
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: Table 1 has a below-detection component for Mg#0; the source does not report a complete melt
+              composition.
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            row: Mg#0
+            column: FeO, MgO, SiO2
+        sample_id:
+          state:
+            tag: value
+            value: TF2
+          locator:
+            page: 9
+            published_page: 9
+            pdf_page_index: 8
+            table: '2'
+            row: Mg#0 measurement 1 Tp
+            column: Thin film
+        gas_environment:
+          state:
+            tag: value
+            value: N2 gas flow, 40 mL min−1
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            section: 2.4 Fast Differential Scanning Calorimetry
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The FDSC table and method do not report a numeric total pressure.
+          locator:
+            page: 9
+            published_page: 9
+            pdf_page_index: 8
+            table: '2'
+            row: Mg#0 measurement 1 Tp
+            column: Cooling Rate
+      uncertainty:
+        reported_status: printed
+        value: '5'
+        units: °C
+        note: Table 2 reports ±8 °C for the 3500 °C s−1 analysis and ±5 °C for all other temperatures; confidence
+          level is not stated.
