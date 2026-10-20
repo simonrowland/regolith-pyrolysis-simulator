@@ -4851,6 +4851,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1060.84, 3174.06). Read activity = 0.1262 ± 0.001; T = 1875.0 ± 4 K. Exposed right arc. Dark pixel means channel max < 90. Rightmost dark x on each row in x=1060-1120, y=3135-3215. Radius 41.90 px, rms 0.36 px, 81 rows, identical at thresholds 70, 90, 110 and 130. A leftmost fit of x=1020-1080 has rms 3.16 px and is not used. The stored circle at (995.50, 3183.50) is 66 px away."
       T_range_K: [1875.0, 1875.0]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -4861,9 +4870,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1875.0 K is 310 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 366 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1875.0 K is 310 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 366 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
@@ -4985,6 +4997,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1705.36, 2667.78). Read activity = 0.2289 ± 0.001; T = 2181.7 ± 4 K. Exposed left arc. Dark pixel means channel max < 90. Leftmost dark x on each row in x=1660-1745, y=2630-2710. Radius 41.62 px, rms 0.43 px, identical at thresholds 70-130. The stored circle at (1739.00, 2663.00) is 34 px away."
       T_range_K: [2181.7, 2181.7]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -4995,9 +5016,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2181.7 K is 3 K below 2185 K and inside the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. The point is 3 K from 2185 K. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 59 K below 2241 K, so the sample phase stored here is crystalline perovskite. The point is within 100 K of that melting temperature."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2181.7 K is 3 K below 2185 K and inside the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. The point is 3 K from 2185 K. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 59 K below 2241 K, so the sample phase stored here is crystalline perovskite. The point is within 100 K of that melting temperature. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
@@ -5052,6 +5076,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1381.92, 2935.86). Read activity = 0.1745 ± 0.001; T = 2027.8 ± 4 K. Exposed left arc. Dark pixel means channel max < 90. Leftmost dark x on each row in x=1340-1420, y=2900-2980. Radius 42.83 px, rms 0.55 px, identical at thresholds 70-130. The stored circle at (1430.00, 2923.00) is 50 px away."
       T_range_K: [2027.8, 2027.8]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -5062,9 +5095,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2027.8 K is 157 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2 also lists 2098 K, and this point is 70 K from that lower melting temperature. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 213 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2027.8 K is 157 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2 also lists 2098 K, and this point is 70 K from that lower melting temperature. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 213 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
@@ -5186,6 +5222,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1198.00, 3048.00). Read activity = 0.1518 ± 0.001; T = 1940.2 ± 4 K. 240 of 360 degrees at radius 31.5 px, std 1.3 px. The stored circle at (1231.00, 3083.00) is 48 px away, so this is a separate centre."
       T_range_K: [1940.2, 1940.2]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -5196,9 +5241,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1940.2 K is 245 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 301 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1940.2 K is 245 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 301 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
@@ -5253,6 +5301,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. Page pixel (1534.00, 2812.00). Read activity = 0.1997 ± 0.001; T = 2100.1 ± 4 K. 250 of 360 degrees at radius 31 px, std 1.4 px, against the series radius 32 px. A literature error bar crosses the missing sector."
       T_range_K: [2100.1, 2100.1]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -5263,9 +5320,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2100.1 K is 85 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. The point is 85 K from 2185 K. Table 2 also lists 2098 K, and this point is 2 K from that lower melting temperature. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 141 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2100.1 K is 85 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. The point is 85 K from 2185 K. Table 2 also lists 2098 K, and this point is 2 K from that lower melting temperature. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 141 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
@@ -6136,6 +6196,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. The centre is the white interior whose rays to the inner stroke have median 32 px. Page pixel (885.00, 3261.00). Read activity = 0.1085 ± 0.001; T = 1791.3 ± 3 K. The inner-stroke rays agree to about 1 px."
       T_range_K: [1791.3, 1791.3]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -6146,9 +6215,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1791.3 K is 394 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 450 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1791.3 K is 394 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 450 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
@@ -6203,6 +6275,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. The centre is the white interior whose rays to the inner stroke have median 32 px. Page pixel (995.50, 3183.50). Read activity = 0.1243 ± 0.002; T = 1843.9 ± 5 K. A neighbouring stroke enters part of the ring, so the read is widened."
       T_range_K: [1843.9, 1843.9]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -6213,9 +6294,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1843.9 K is 341 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 397 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1843.9 K is 341 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 397 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
@@ -6270,6 +6354,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. The centre is the white interior whose rays to the inner stroke have median 32 px. Page pixel (1155.00, 3102.00). Read activity = 0.1408 ± 0.001; T = 1919.8 ± 3 K. The inner-stroke rays agree to about 1 px."
       T_range_K: [1919.8, 1919.8]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -6280,9 +6373,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1919.8 K is 265 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 321 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1919.8 K is 265 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 321 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
@@ -6337,6 +6433,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. The centre is the white interior whose rays to the inner stroke have median 32 px. Page pixel (1231.00, 3083.00). Read activity = 0.1447 ± 0.001; T = 1955.9 ± 3 K. The inner-stroke rays agree to about 1 px."
       T_range_K: [1955.9, 1955.9]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -6347,9 +6452,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1955.9 K is 229 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 285 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1955.9 K is 229 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 285 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
@@ -6404,6 +6512,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. The centre is the white interior whose rays to the inner stroke have median 32 px. Page pixel (1307.00, 3025.00). Read activity = 0.1564 ± 0.001; T = 1992.1 ± 3 K. The inner-stroke rays agree to about 1 px."
       T_range_K: [1992.1, 1992.1]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -6414,9 +6531,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1992.1 K is 193 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 249 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 1992.1 K is 193 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 249 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
@@ -6471,6 +6591,15 @@ species:
         note: "600 dpi PDF page 5 (published p. 1432), 5100 by 6600 px. Fig. 3b temperature ticks: 1800 at x=902.5, 2000 at x=1323.5, 2200 at x=1746.5, 2400 at x=2162.5. T/K = 1370.173 + 0.475845*x. Least-squares residuals -0.38, -0.05, +1.24, -0.81 K. Activity ticks: 0.3 at y=2317.5, 0.2 at y=2810.5, 0.1 at y=3303.0. a = 0.770337 - 0.000202943*y, about 493 px per 0.1. Residuals at most 0.000034. The frame at y=3550.5 is not a labelled zero; the same line places it at a=0.0498. Series 3, open circle, TiO2. The centre is the white interior whose rays to the inner stroke have median 32 px. Page pixel (1430.00, 2923.00). Read activity = 0.1771 ± 0.001; T = 2050.6 ± 3 K. The inner-stroke rays agree to about 1 px."
       T_range_K: [2050.6, 2050.6]
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: >-
+            The activity species is TiO2 in the crystalline perovskite
+            sample. Rutile on standard_state.endmember is the pure-oxide
+            reference, inferred below the Table 2 TiO2 melting point
+            2185 ± 10 K on published page 1431. That reference is not a
+            polymorph of this component.
       standard_state:
         state:
           tag: value
@@ -6481,9 +6610,12 @@ species:
               phase:
                 tag: value
                 value: cr
+              polymorph:
+                tag: value
+                value: rutile
             component_basis: TiO2
         inferred: true
-        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2050.6 K is 134 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2 also lists 2098 K, and this point is 47 K from that lower melting temperature. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 190 K below 2241 K, so the sample phase stored here is crystalline perovskite."
+        inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2050.6 K is 134 K below 2185 K and below the stated ±10 K band, so the stable phase of the pure oxide is the crystalline solid. Table 2 also lists 2098 K, and this point is 47 K from that lower melting temperature. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 190 K below 2241 K, so the sample phase stored here is crystalline perovskite. Rutile is the stable polymorph of that crystalline pure oxide at ambient pressure, below the Table 2 melting temperature 2185 ± 10 K, ref. [41]. This activity reference does not print a polymorph token; the name is that stability inference."
         locator:
           page: 4
           pdf_page_index: 3
