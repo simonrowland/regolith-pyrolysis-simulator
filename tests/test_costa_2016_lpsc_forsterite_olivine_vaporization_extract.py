@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from simulator.battery.migrate import Migrator
+from tests.battery.factories import migrate_one_extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,8 +10,7 @@ EXTRACT = ROOT / "data/literature/extracts/costa-2016-lpsc-forsterite-olivine-va
 
 
 def test_costa_2016_observations_and_table_1_context_migrate() -> None:
-    migrator = Migrator(root=ROOT, index={}, aliases={})
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
 
     result = migrator.result
