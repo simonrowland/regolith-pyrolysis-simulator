@@ -136,6 +136,19 @@ experiments:
         published_page: 276
         table: '2'
         note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - [K2O, '43.94']
+          - [SiO2, '56.06']
+      locator:
+        published_page: 276
+        table: '2'
+        note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     form:
       state: {tag: value, value: crystalline K2Si2O5}
       locator: {page: 271, section: '3. Procedure'}

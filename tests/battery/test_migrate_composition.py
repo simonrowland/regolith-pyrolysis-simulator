@@ -2997,6 +2997,61 @@ def test_registry_charge_repeated_by_row_keeps_derived_initial_composition(
     assert dict(initial.state.value.components) == dict(expected.components)
 
 
+def test_plante_1979_migrator_keeps_typed_k2si2o5_initial(
+    tmp_path: Path,
+) -> None:
+    """Table 2's K2Si2O5 charge stays a typed initial after migration.
+
+    The committed work snapshot can keep a stale initial after the migrator
+    stops deriving one. This runs the migrator on the extract.
+    """
+
+    result = _migrate_real_extract(tmp_path, "kems-042-plante-1979.yaml")
+    experiment = result.experiments[_PLANTE_EXPERIMENT_ID]
+    printed = experiment.sample.printed_composition
+    assert printed is not None and printed.state.is_value
+    assert as_decimal(printed.state.value["K2O"]) == as_decimal(_PLANTE_CHARGE_WT["K2O"])
+    assert as_decimal(printed.state.value["SiO2"]) == as_decimal(_PLANTE_CHARGE_WT["SiO2"])
+    assert printed.locator is not None
+    assert str(printed.locator.table) == "2"
+    assert printed.locator.published_page == 276
+    initial = experiment.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert initial.state.value.proxy_flag is None
+    assert initial.inference is not None
+    assert initial.inference.relation == "wt_pct_to_mole_fraction"
+    expected = wt_pct_to_mole_fraction(
+        {key: as_decimal(value) for key, value in _PLANTE_CHARGE_WT.items()}
+    )
+    assert dict(initial.state.value.components) == dict(expected.components)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.experiment_id == _PLANTE_EXPERIMENT_ID
+    ]
+    assert len(rows) == 383
+    start = next(
+        observation
+        for observation in rows
+        if observation.observation_id.endswith(
+            "plante1979_table2_k2o_s1104_000_1302K"
+        )
+    )
+    later = next(
+        observation
+        for observation in rows
+        if observation.observation_id.endswith(
+            "plante1979_table2_k2o_s1104_027_1396K"
+        )
+    )
+    assert start.identity.composition is not None and start.identity.composition.is_value
+    assert later.identity.composition is not None and later.identity.composition.is_value
+    assert dict(start.identity.composition.value.components) != dict(
+        later.identity.composition.value.components
+    )
+
+
 def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:
     """Table 2 is one K2Si2O5 charge; series are analysis groups, not reloads.
 
