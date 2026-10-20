@@ -1,0 +1,2324 @@
+schema_version: literature_extract.v1
+source_id: liu-li-2025-se-te-sulfide-silicate
+source:
+  citation: 'Liu, Z. & Li, Y. (2025). The partitioning of selenium and tellurium between sulfide liquid and silicate melt and their abundances in the silicate Earth. Earth and Planetary Science Letters, 656, 119277.'
+  doi: 10.1016/j.epsl.2025.119277
+  year: 2025
+  corpus_asset: raw/liu-li-2025-se-te-sulfide-silicate/liu-li-2025-se-te-sulfide-silicate.pdf
+  sha256: 8452baafe107a8512aa12cee91ba971f3bde76a5318f606b058a040d4d90beee
+extraction:
+  method: >-
+    Born-digital pdftotext-layout review. Table 1 was transcribed from the exact text layer and checked against a 600 dpi render of physical PDF page 3. The MinerU table draft tool was attempted but refused because no MinerU content-list is supplied. Figures 1–9 were inspected at 600 dpi for caption metadata, plotted series and visible marker counts; numeric figure reads are deferred. The main-text PDF refers to supplementary Tables S2 and S3 for measured phase compositions, but those tables are not in the supplied source directory.
+  date: '2026-10-20'
+  worker: fam19-1019
+review_status: draft
+fidelity_samples:
+  - path: species.S.observations[liu_li_2025_table_1_s_in_silicate_melt_c-2].values.points[0].value
+    value: '3889'
+    locator: {page: 3, pdf_page_index: 2, table: '1', row: C-2}
+  - path: species.S.observations[liu_li_2025_table_1_s_in_silicate_melt_e-3].values.points[0].value
+    value: '2218'
+    locator: {page: 3, pdf_page_index: 2, table: '1', row: E-3}
+  - path: species.S.observations[liu_li_2025_table_1_s_in_silicate_melt_do1].values.points[0].value
+    value: '1173'
+    locator: {page: 3, pdf_page_index: 2, table: '1', row: DO1}
+species:
+  S:
+    observations:
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_c-2
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: C-2
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: C-2
+            sample_material_as_published: quenched silicate melt (Sil) from run C-2
+            starting_materials_as_published: Basalt + Sulfide-1 + 10 % FeO
+            run_products_as_printed: Sil + Sul
+            value: '3889'
+            value_as_printed: '3889'
+            T_C: '1400'
+            uncertainty:
+              value: '317'
+              units: µg/g
+              as_printed: 317 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: C-2
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1400'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-2
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-2
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-2
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-2
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-2
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-2
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_e-1
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: E-1
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: E-1
+            sample_material_as_published: quenched silicate melt (Sil) from run E-1
+            starting_materials_as_published: Basalt + Sulfide-1 + 5 % FeO
+            run_products_as_printed: Sil + Sul
+            value: '1802'
+            value_as_printed: '1802'
+            T_C: '1400'
+            uncertainty:
+              value: '147'
+              units: µg/g
+              as_printed: 147 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: E-1
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1400'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-1
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-1
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-1
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '36'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-1
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-1
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-1
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_c-1
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: C-1
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: C-1
+            sample_material_as_published: quenched silicate melt (Sil) from run C-1
+            starting_materials_as_published: Basalt + Sulfide-1
+            run_products_as_printed: Sil + Sul
+            value: '2572'
+            value_as_printed: '2572'
+            T_C: '1400'
+            uncertainty:
+              value: '134'
+              units: µg/g
+              as_printed: 134 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: C-1
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1400'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-1
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-1
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-1
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-1
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-1
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-1
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_c-4
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: C-4
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: C-4
+            sample_material_as_published: quenched silicate melt (Sil) from run C-4
+            starting_materials_as_published: Andesite + Sulfide-1
+            run_products_as_printed: Sil + Sul
+            value: '881'
+            value_as_printed: '881'
+            T_C: '1400'
+            uncertainty:
+              value: '121'
+              units: µg/g
+              as_printed: 121 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: C-4
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1400'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-4
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-4
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-4
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-4
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-4
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-4
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_c-3
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: C-3
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: C-3
+            sample_material_as_published: quenched silicate melt (Sil) from run C-3
+            starting_materials_as_published: Dacite + Sulfide-1
+            run_products_as_printed: Sil + Sul
+            value: '429'
+            value_as_printed: '429'
+            T_C: '1400'
+            uncertainty:
+              value: '72'
+              units: µg/g
+              as_printed: 72 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: C-3
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1400'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-3
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-3
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-3
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-3
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-3
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-3
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_c-5
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: C-5
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: C-5
+            sample_material_as_published: quenched silicate melt (Sil) from run C-5
+            starting_materials_as_published: Rhyolite + Sulfide-2
+            run_products_as_printed: Sil + Sul
+            value: '499'
+            value_as_printed: '499'
+            T_C: '1400'
+            uncertainty:
+              value: '88'
+              units: µg/g
+              as_printed: 88 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: C-5
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1400'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-5
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-5
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-5
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-5
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-5
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: C-5
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_o-2
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: O-2
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: O-2
+            sample_material_as_published: quenched silicate melt (Sil) from run O-2
+            starting_materials_as_published: Rhyolite + Sulfide-2 + 5 % FeS2
+            run_products_as_printed: Sil + Sul
+            value: '815'
+            value_as_printed: '815'
+            T_C: '1400'
+            uncertainty:
+              value: '47'
+              units: µg/g
+              as_printed: 47 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: O-2
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1400'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-2
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-2
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-2
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-2
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-2
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-2
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_o-1
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: O-1
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: O-1
+            sample_material_as_published: quenched silicate melt (Sil) from run O-1
+            starting_materials_as_published: Rhyolite + Sulfide-2 + 10 % FeS2
+            run_products_as_printed: Sil + Sul
+            value: '1615'
+            value_as_printed: '1615'
+            T_C: '1400'
+            uncertainty:
+              value: '54'
+              units: µg/g
+              as_printed: 54 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: O-1
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1400'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-1
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-1
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-1
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-1
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-1
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: O-1
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_e-2
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: E-2
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: E-2
+            sample_material_as_published: quenched silicate melt (Sil) from run E-2
+            starting_materials_as_published: Basalt + Sulfide-1
+            run_products_as_printed: Sil + Sul
+            value: '967'
+            value_as_printed: '967'
+            T_C: '1300'
+            uncertainty:
+              value: '98'
+              units: µg/g
+              as_printed: 98 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: E-2
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1300'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-2
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-2
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-2
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '36'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-2
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-2
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-2
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_e-3
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: E-3
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: E-3
+            sample_material_as_published: quenched silicate melt (Sil) from run E-3
+            starting_materials_as_published: Basalt + Sulfide-1
+            run_products_as_printed: Sil + Sul
+            value: '2218'
+            value_as_printed: '2218'
+            T_C: '1500'
+            uncertainty:
+              value: '107'
+              units: µg/g
+              as_printed: 107 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: E-3
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1500'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-3
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-3
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-3
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-3
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-3
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-3
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_e-4
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: E-4
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: E-4
+            sample_material_as_published: quenched silicate melt (Sil) from run E-4
+            starting_materials_as_published: Basalt + Sulfide-1
+            run_products_as_printed: Sil + Sul
+            value: '2775'
+            value_as_printed: '2775'
+            T_C: '1600'
+            uncertainty:
+              value: '330'
+              units: µg/g
+              as_printed: 330 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: E-4
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1600'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-4
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-4
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-4
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-4
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-4
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-4
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_e-5
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: E-5
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: E-5
+            sample_material_as_published: quenched silicate melt (Sil) from run E-5
+            starting_materials_as_published: Basalt + Sulfide-3
+            run_products_as_printed: Sil + Sul
+            value: '2114'
+            value_as_printed: '2114'
+            T_C: '1500'
+            uncertainty:
+              value: '190'
+              units: µg/g
+              as_printed: 190 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: E-5
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1500'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-5
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-5
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-5
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-5
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-5
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-5
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_e-6
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: E-6
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: E-6
+            sample_material_as_published: quenched silicate melt (Sil) from run E-6
+            starting_materials_as_published: Basalt + Sulfide-3
+            run_products_as_printed: Sil + Sul
+            value: '2458'
+            value_as_printed: '2458'
+            T_C: '1600'
+            uncertainty:
+              value: '246'
+              units: µg/g
+              as_printed: 246 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: E-6
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1600'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-6
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-6
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-6
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-6
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-6
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: E-6
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_ed-2
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: ED-2
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: ED-2
+            sample_material_as_published: quenched silicate melt (Sil) from run ED-2
+            starting_materials_as_published: Andesite + Sulfide-1
+            run_products_as_printed: Sil + Sul
+            value: '328'
+            value_as_printed: '328'
+            T_C: '1200'
+            uncertainty:
+              value: '36'
+              units: µg/g
+              as_printed: 36 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: ED-2
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1200'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-2
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-2
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-2
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '48'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-2
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-2
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-2
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_ed-3
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: ED-3
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: ED-3
+            sample_material_as_published: quenched silicate melt (Sil) from run ED-3
+            starting_materials_as_published: Andesite + Sulfide-1
+            run_products_as_printed: Sil + Sul
+            value: '427'
+            value_as_printed: '427'
+            T_C: '1300'
+            uncertainty:
+              value: '60'
+              units: µg/g
+              as_printed: 60 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: ED-3
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1300'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-3
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-3
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-3
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '36'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-3
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-3
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-3
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_ed-5
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: ED-5
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: ED-5
+            sample_material_as_published: quenched silicate melt (Sil) from run ED-5
+            starting_materials_as_published: Andesite + Sulfide-2
+            run_products_as_printed: Sil + Sul
+            value: '1247'
+            value_as_printed: '1247'
+            T_C: '1500'
+            uncertainty:
+              value: '29'
+              units: µg/g
+              as_printed: 29 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: ED-5
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1500'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-5
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-5
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-5
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-5
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-5
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-5
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_ed-6
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: ED-6
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: ED-6
+            sample_material_as_published: quenched silicate melt (Sil) from run ED-6
+            starting_materials_as_published: Andesite + Sulfide-3
+            run_products_as_printed: Sil + Sul
+            value: '1596'
+            value_as_printed: '1596'
+            T_C: '1500'
+            uncertainty:
+              value: '96'
+              units: µg/g
+              as_printed: 96 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: ED-6
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1500'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-6
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-6
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: < −1.6
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-6
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '24'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-6
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: Graphite
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-6
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: ED-6
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+      - observation_id: liu_li_2025_table_1_s_in_silicate_melt_do1
+        type: equilibrium_phase_composition
+        phase: glass
+        regime: quench_equilibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          row: DO1
+          note: S concentration in quenched silicate melt (Sil), Table 1.
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: S concentration in quenched silicate melt; µg/g
+          method_as_printed: The method for the Table 1 S column is not separately stated.
+          points:
+          - sample_id_as_published: DO1
+            sample_material_as_published: quenched silicate melt (Sil) from run DO1
+            starting_materials_as_published: Andesite + Sulfide-4 + Anhydrite
+            run_products_as_printed: Sil + Oli + Sul + Anhy
+            value: '1173'
+            value_as_printed: '1173'
+            T_C: '1200'
+            uncertainty:
+              value: '83'
+              units: µg/g
+              as_printed: 83 (1σ)
+              confidence_level: not_stated
+              notice: confidence level not stated
+              locator:
+                page: 3
+                pdf_page_index: 2
+                table: '1'
+                row: DO1
+                column: 1σ
+            quench_statement:
+              text: All experiments were quenched by turning off the electrical power supplied to the graphite heaters.
+              preservation: not_stated
+              quench_direction: not_stated
+              locator:
+                page: 2
+                pdf_page_index: 1
+                section: Experimental and analytical methods
+            point_conditions:
+              temperature_C:
+                state:
+                  tag: value
+                  value: '1200'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: DO1
+                  column: Temperature (°C)
+              total_pressure_Pa:
+                state:
+                  tag: value
+                  value: 1000000000
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: DO1
+                  column: Pressure (GPa)
+                  note: Printed 1 GPa; converted to Pa.
+              delta_FMQ:
+                state:
+                  tag: value
+                  value: ~1.5
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: DO1
+                  column: fO2 (ΔFMQ)
+                  note: FMQ is the fayalite–magnetite–quartz buffer; value retained as printed, including bound or approximation.
+              duration_hours:
+                state:
+                  tag: value
+                  value: '48'
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: DO1
+                  column: Duration (hours)
+              capsule:
+                state:
+                  tag: value
+                  value: MgO
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: DO1
+                  column: Capsule
+              composition:
+                state:
+                  tag: unknown
+                  reason: Run-specific quenched silicate-melt composition is reported only in supplementary Tables S2 and S3, which
+                    were not supplied.
+                locator:
+                  page: 3
+                  pdf_page_index: 2
+                  table: '1'
+                  row: DO1
+                  note: Table 1 gives starting materials and run products, not the complete final melt composition.
+  SiO2:
+    observations: []
+    context:
+      - observation_id: liu_li_2025_table_1_experimental_runs
+        type: measured_table_context
+        locator:
+          page: 3
+          pdf_page_index: 2
+          table: '1'
+          note: 'Table 1: Overview of experimental conditions and products and calculated sulfide-liquid/silicate-melt partition coefficients. Its 18 S-in-silicate-melt measurements are typed as separate observations below.'
+        units: 'Temperature °C; pressure GPa; duration hours; partition coefficients dimensionless; partition-coefficient uncertainties 1σ as printed. The Table 1 S concentrations and uncertainties are typed in the 18 observations above.'
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - liquidus_composition
+          - residue_component_composition
+          - activity
+          - activity_coefficient
+          - interaction_parameter
+          - valence_ratio
+          - fugacity
+        reason_unscored: >-
+          Table 1's 18 S-in-silicate-melt concentrations and their printed 1σ uncertainties are typed as equilibrium_phase_composition observations under species S. The calculated sulfide-liquid/silicate-melt DSe, DTe, DS and DCu values have no matching store token and remain in this context record. Table 1 does not print run-specific final melt oxide compositions; the referenced supplementary Tables S2 and S3 are absent. The printed ΔFMQ conditions, including bounds and the approximate DO1 value, are preserved as printed without conversion.
+        values:
+          quantity_as_printed: Experimental conditions and calculated partition coefficients of Se, Te, S and Cu between sulfide liquid and silicate melt; the S-in-silicate-melt concentration for each run is typed in a corresponding observation.
+          data_characterization: >-
+            The S-in-silicate-melt concentrations and 1σ uncertainties are typed as 18 measured_direct equilibrium_phase_composition observations. The DSe, DTe, DS and DCu columns are calculated partition coefficients derived using the weight proportions of Se, Te, S and Cu in sulfide liquid and silicate melt, as stated on physical PDF page 3; they remain context because the store has no phase-partition coefficient token.
+          data_rows_printed: 18
+          table_role: measured results with calculated partition coefficients
+          calculation_as_printed: >-
+            We calculated DSe, Te, S, Cu using the weight proportions of Se, Te, S, and Cu in sulfide liquid and silicate melt (Tables S2 and S3).
+          footnote_as_printed: 'Sil = quenched silicate melt; Sul = sulfide liquid; Anhy = anhydrite; Oli = olivine. See Table S1 for the composition of Sulfide-1 to Sulfide-4 used in the starting materials.'
+          rows:
+            - {run_id: C-2, starting_materials_as_printed: 'Basalt + Sulfide-1 + 10 % FeO', T_C: '1400', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '176', DSe_1sigma: '9', DTe_sulfide_silicate: '1036', DTe_1sigma: '94', DS_sulfide_silicate: '83', DS_1sigma: '7', DCu_sulfide_silicate: '256', DCu_1sigma: '42'}
+            - {run_id: E-1, starting_materials_as_printed: 'Basalt + Sulfide-1 + 5 % FeO', T_C: '1400', P_GPa: '1', duration_hours: '36', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '310', DSe_1sigma: '18', DTe_sulfide_silicate: '1682', DTe_1sigma: '409', DS_sulfide_silicate: '189', DS_1sigma: '16', DCu_sulfide_silicate: '510', DCu_1sigma: '42'}
+            - {run_id: C-1, starting_materials_as_printed: 'Basalt + Sulfide-1', T_C: '1400', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '333', DSe_1sigma: '14', DTe_sulfide_silicate: '2833', DTe_1sigma: '259', DS_sulfide_silicate: '131', DS_1sigma: '7', DCu_sulfide_silicate: '516', DCu_1sigma: '40'}
+            - {run_id: C-4, starting_materials_as_printed: 'Andesite + Sulfide-1', T_C: '1400', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '664', DSe_1sigma: '39', DTe_sulfide_silicate: '2531', DTe_1sigma: '407', DS_sulfide_silicate: '389', DS_1sigma: '54', DCu_sulfide_silicate: '890', DCu_1sigma: '153'}
+            - {run_id: C-3, starting_materials_as_printed: 'Dacite + Sulfide-1', T_C: '1400', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '860', DSe_1sigma: '99', DTe_sulfide_silicate: '7344', DTe_1sigma: '3717', DS_sulfide_silicate: '774', DS_1sigma: '131', DCu_sulfide_silicate: '1734', DCu_1sigma: '248'}
+            - {run_id: C-5, starting_materials_as_printed: 'Rhyolite + Sulfide-2', T_C: '1400', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '1715', DSe_1sigma: '205', DTe_sulfide_silicate: '25,394', DTe_1sigma: '5332', DS_sulfide_silicate: '672', DS_1sigma: '119', DCu_sulfide_silicate: '2614', DCu_1sigma: '482'}
+            - {run_id: O-2, starting_materials_as_printed: 'Rhyolite + Sulfide-2 + 5 % FeS2', T_C: '1400', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '2170', DSe_1sigma: '285', DTe_sulfide_silicate: '21,035', DTe_1sigma: '3531', DS_sulfide_silicate: '434', DS_1sigma: '26', DCu_sulfide_silicate: '3901', DCu_1sigma: '508'}
+            - {run_id: O-1, starting_materials_as_printed: 'Rhyolite + Sulfide-2 + 10 % FeS2', T_C: '1400', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '1690', DSe_1sigma: '149', DTe_sulfide_silicate: '4443', DTe_1sigma: '1210', DS_sulfide_silicate: '241', DS_1sigma: '8', DCu_sulfide_silicate: '4207', DCu_1sigma: '339'}
+            - {run_id: E-2, starting_materials_as_printed: 'Basalt + Sulfide-1', T_C: '1300', P_GPa: '1', duration_hours: '36', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '308', DSe_1sigma: '53', DTe_sulfide_silicate: '1871', DTe_1sigma: '392', DS_sulfide_silicate: '345', DS_1sigma: '35', DCu_sulfide_silicate: '872', DCu_1sigma: '24'}
+            - {run_id: E-3, starting_materials_as_printed: 'Basalt + Sulfide-1', T_C: '1500', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '306', DSe_1sigma: '20', DTe_sulfide_silicate: '1608', DTe_1sigma: '423', DS_sulfide_silicate: '152', DS_1sigma: '8', DCu_sulfide_silicate: '436', DCu_1sigma: '15'}
+            - {run_id: E-4, starting_materials_as_printed: 'Basalt + Sulfide-1', T_C: '1600', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '261', DSe_1sigma: '6', DTe_sulfide_silicate: '1759', DTe_1sigma: '102', DS_sulfide_silicate: '121', DS_1sigma: '15', DCu_sulfide_silicate: '284', DCu_1sigma: '68'}
+            - {run_id: E-5, starting_materials_as_printed: 'Basalt + Sulfide-3', T_C: '1500', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '397', DSe_1sigma: '10', DTe_sulfide_silicate: '2766', DTe_1sigma: '189', DS_sulfide_silicate: '155', DS_1sigma: '15', DCu_sulfide_silicate: '446', DCu_1sigma: '86'}
+            - {run_id: E-6, starting_materials_as_printed: 'Basalt + Sulfide-3', T_C: '1600', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '335', DSe_1sigma: '13', DTe_sulfide_silicate: '2154', DTe_1sigma: '212', DS_sulfide_silicate: '129', DS_1sigma: '13', DCu_sulfide_silicate: '354', DCu_1sigma: '29'}
+            - {run_id: ED-2, starting_materials_as_printed: 'Andesite + Sulfide-1', T_C: '1200', P_GPa: '1', duration_hours: '48', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '716', DSe_1sigma: '44', DTe_sulfide_silicate: '2695', DTe_1sigma: '786', DS_sulfide_silicate: '1019', DS_1sigma: '112', DCu_sulfide_silicate: '1293', DCu_1sigma: '227'}
+            - {run_id: ED-3, starting_materials_as_printed: 'Andesite + Sulfide-1', T_C: '1300', P_GPa: '1', duration_hours: '36', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '772', DSe_1sigma: '44', DTe_sulfide_silicate: '2947', DTe_1sigma: '266', DS_sulfide_silicate: '757', DS_1sigma: '108', DCu_sulfide_silicate: '1171', DCu_1sigma: '231'}
+            - {run_id: ED-5, starting_materials_as_printed: 'Andesite + Sulfide-2', T_C: '1500', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '869', DSe_1sigma: '47', DTe_sulfide_silicate: '3574', DTe_1sigma: '522', DS_sulfide_silicate: '277', DS_1sigma: '8', DCu_sulfide_silicate: '814', DCu_1sigma: '126'}
+            - {run_id: ED-6, starting_materials_as_printed: 'Andesite + Sulfide-3', T_C: '1500', P_GPa: '1', duration_hours: '24', capsule: Graphite, run_products: 'Sil + Sul', delta_FMQ_as_printed: '< −1.6', DSe_sulfide_silicate: '610', DSe_1sigma: '64', DTe_sulfide_silicate: '3725', DTe_1sigma: '477', DS_sulfide_silicate: '193', DS_1sigma: '14', DCu_sulfide_silicate: '482', DCu_1sigma: '60'}
+            - {run_id: DO1, starting_materials_as_printed: 'Andesite + Sulfide-4 + Anhydrite', T_C: '1200', P_GPa: '1', duration_hours: '48', capsule: MgO, run_products: 'Sil + Oli + Sul + Anhy', delta_FMQ_as_printed: '~1.5', delta_FMQ_approximate: true, DSe_sulfide_silicate: '877', DSe_1sigma: '153', DTe_sulfide_silicate: '2460', DTe_1sigma: '159', DS_sulfide_silicate: '242', DS_1sigma: '18', DCu_sulfide_silicate: '1218', DCu_1sigma: '200'}
+      - observation_id: liu_li_2025_prose_silicate_melt_composition_ranges
+        type: measured_summary_context
+        locator:
+          page: 3
+          pdf_page_index: 2
+          section: 3.1, Major and trace element compositions of samples
+        units: 'wt% for oxide totals and major oxides; µg/g for S and trace elements.'
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - liquidus_composition
+          - residue_component_composition
+        reason_unscored: >-
+          The prose reports aggregate ranges only, not complete melt compositions bound to individual run identifiers. The equilibrium_phase_composition token cannot store these partial summaries as if they were complete per-sample oxide vectors; no oxide values or samples are reconstructed.
+        values:
+          evidence_class: measured_direct
+          summaries:
+            - {quantity_as_printed: FeOtot in silicate melts, values_as_printed: '13.88 to 0.19', units: wt%}
+            - {quantity_as_printed: SiO2 in silicate melts, values_as_printed: '46.36 to 78.56', units: wt%}
+            - {quantity_as_printed: EPMA total for silicate melts, values_as_printed: '98.02 to 99.49', units: wt%}
+            - {quantity_as_printed: S content in silicate melt at sulfide saturation, values_as_printed: '328 to 3889', units: µg/g}
+            - {quantity_as_printed: Cu in silicate melts, values_as_printed: '7 to 165', units: µg/g}
+            - {quantity_as_printed: Ni in silicate melts, values_as_printed: '2 to 161', units: µg/g}
+            - {quantity_as_printed: Se in silicate melts, values_as_printed: '2 to 20', units: µg/g}
+            - {quantity_as_printed: Te in silicate melts, values_as_printed: '0.3 to 27', units: µg/g}
+      - observation_id: liu_li_2025_supplementary_phase_compositions_unavailable
+        type: data_availability_context
+        locator:
+          page: 11
+          pdf_page_index: 10
+          section: Data availability
+        units: 'Main-text PDF and supplied corpus source files.'
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+        reason_unscored: >-
+          The paper states that measured major and trace element concentrations in silicate melts and sulfide liquids are in Tables S2 and S3. Table S1 gives sulfide starting-material compositions, and Table S4 gives model conditions. Those supplementary files are not present in the supplied raw source directory. Table 1 and prose ranges do not provide complete run-specific silicate-melt compositions.
+        values:
+          quantity_as_printed: Supplementary analytical tables and run data
+          source_as_printed: Tables S1–S5 in Supplementary Materials
+          corpus_status: Supplementary files not supplied with the main-text PDF.
+          availability: 'Main-text PDF and sidecar only in raw/liu-li-2025-se-te-sulfide-silicate/.'
+      - observation_id: liu_li_2025_figure_1
+        type: figure_record
+        locator: {page: 4, pdf_page_index: 3, figure: '1'}
+        panel: A–D
+        attribution: 'This study; comparison data from Brenan (2015), Li et al. (2021), Patten et al. (2013) and Steenstra et al. (2018), as identified in the caption and legend.'
+        units: 'Partition coefficients dimensionless; T °C; corrected FeOtot wt%.'
+        values:
+          quantity: unavailable
+          quantity_as_printed: Sulfide-liquid/silicate-melt partition coefficients of Se and Te
+          schema_gap: No store quantity token represents a phase-to-phase partition coefficient.
+          species: 'Se and Te'
+          phase: Sulfide liquid / silicate melt
+          temperature_as_printed: '1200–1600 °C in panels A and B; variable run temperatures in panels C and D.'
+          axes_as_printed:
+            x: 'Temperature (°C) in panels A and B; corrected FeOtot in silicate melt (wt.%) in panels C and D'
+            y: 'DSul/SilSe in panels A and C; DSul/SilTe in panels B and D'
+          caption: >-
+            Sulfide liquid–silicate melt partition coefficients of Se and Te. (A, B) The plot of DSe,Te from the experiments on basaltic and andesitic melts as a function of temperature, showing a negligible effect of temperature on DSe,Te. (C, D) The plot of DSe,Te from all experiments as a function of the FeOtot content in silicate melt, corrected for an ideal activity of FeS in sulfide liquid. Previous data (Brenan, 2015; Li et al., 2021; Patten et al., 2013; Steenstra et al., 2018) were plotted for comparison. DSe,Te initially increase but then decrease with decreasing FeOtot content in silicate melt; they show no fO2-dependence in the experimental fO2 range of FMQ-5 to FMQ+1.5.
+          series:
+            - {name: 'This study, andesite, reducing, panels A and B', marker: filled red circles, marker_count: 8, evidence_class: measured_reduced}
+            - {name: 'This study, basalt, reducing, panels A and B', marker: filled cyan circles, marker_count: 10, evidence_class: measured_reduced}
+            - {name: 'This study, andesite, oxidized, panels A and B', marker: filled yellow circles, marker_count: 2, evidence_class: measured_reduced}
+            - {name: 'This study, panels C and D', marker: circles colored by ΔFMQ, marker_count: 26, evidence_class: measured_reduced}
+            - {name: 'Li et al. (2021), panels C and D', marker: squares, marker_count: 15, evidence_class: quoted_attributed}
+            - {name: 'Steenstra et al. (2018), panels C and D', marker: hexagons, marker_count: 18, evidence_class: quoted_attributed}
+            - {name: 'Patten et al. (2013), panels C and D', marker: red stars, marker_count: 2, evidence_class: quoted_attributed}
+            - {name: 'Brenan (2015), panels C and D', marker: open triangles, marker_count: 17, evidence_class: quoted_attributed}
+            - {name: Present-work guide curves, marker_count: 0, evidence_class: model_derived}
+          marker_count_note: Visible marker counts from the 600 dpi render; overlapping symbols may conceal coincident markers.
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: liu_li_2025_figure_2
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, figure: '2'}
+        panel: A–B
+        attribution: 'This study; comparison data from Brenan (2015), as identified in the caption and legend.'
+        units: 'Partition coefficients dimensionless; corrected FeOtot in silicate melt wt%.'
+        values:
+          quantity: unavailable
+          quantity_as_printed: Sulfide-liquid/silicate-melt partition coefficients of Se and Te
+          schema_gap: No store quantity token represents a phase-to-phase partition coefficient.
+          species: 'Se and Te'
+          phase: Sulfide liquid / silicate melt
+          temperature_as_printed: Variable by run; no temperature axis is shown.
+          axes_as_printed:
+            x: Corrected FeOtot in silicate melt (wt.%)
+            y: 'DSul/SilSe in panel A; DSul/SilTe in panel B'
+          caption: >-
+            Sulfide liquid–silicate melt partition coefficients of Se and Te. (A, B) The plot of DSe,Te from the experiments on basaltic, andesitic, and dacitic melts as a function of FeOtot in silicate melt, corrected for an ideal activity of FeS in sulfide liquid. Previous DSe,Te data from Brenan (2015) are significantly higher than those in this study.
+          series:
+            - {name: 'This study, ~7 wt.% Ni and ~3 wt.% Cu in sulfide', marker: filled green circles, marker_count: 24, evidence_class: measured_reduced}
+            - {name: 'This study, ~15 wt.% Ni and ~1 wt.% Cu in sulfide', marker: filled orange circles, marker_count: 6, evidence_class: measured_reduced}
+            - {name: 'Brenan (2015), ~15 wt.% Ni and ~1 wt.% Cu in sulfide', marker: open triangles, marker_count: 10, evidence_class: quoted_attributed}
+            - {name: Fitted trend, marker_count: 0, evidence_class: model_derived}
+          marker_count_note: Visible marker counts across panels A and B from the 600 dpi render; overlapping symbols may conceal coincident markers.
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: liu_li_2025_figure_3
+        type: figure_record
+        locator: {page: 6, pdf_page_index: 5, figure: '3'}
+        panel: A–D
+        attribution: 'This study; comparison data from Brenan (2015), as identified in the caption and legend.'
+        units: 'Dimensionless partition-coefficient ratios; temperature °C.'
+        values:
+          quantity: unavailable
+          quantity_as_printed: Ratios of sulfide-liquid/silicate-melt partition coefficients of Cu, S, Se and Te
+          schema_gap: No store quantity token represents these phase-partition ratios; they are not valence ratios.
+          species: 'Cu, S, Se and Te'
+          phase: Sulfide liquid / silicate melt
+          temperature_as_printed: '1200–1600 °C, as shown on the x-axis.'
+          axes_as_printed:
+            x: Temperature (°C)
+            y: 'Panels A–D show DCu/DSe, DS/DSe, DCu/DTe and DSe/DTe, respectively.'
+          caption: >-
+            Ratios of sulfide liquid–silicate melt partition coefficients of Cu, S, Se and Te as a function of temperature. (A–D) The DCu/DSe, DS/DSe and DCu/DTe ratios increase with decreasing temperature, while DSe/DTe ratios are nearly constant. Data of Brenan (2015) are plotted for comparison.
+          series:
+            - {name: This study, marker: filled circles colored by corrected FeO, marker_count: 58, evidence_class: measured_reduced}
+            - {name: Brenan (2015), marker: open triangles, marker_count: 29, evidence_class: quoted_attributed}
+          marker_count_note: Visible marker counts across panels A–D from the 600 dpi render; some symbols overlap.
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: liu_li_2025_figure_4
+        type: figure_record
+        locator: {page: 7, pdf_page_index: 6, figure: '4'}
+        panel: A–E
+        attribution: 'Observed arc-magma data from Jenner et al. (2010, 2012); MORB data from Yierpan et al. (2019); present-work model as described in the caption.'
+        units: 'Se and Te µg/g; Cu/Se and Se/Te ratios dimensionless; MgO wt%.'
+        values:
+          quantity: unavailable
+          quantity_as_printed: Modeled and observed Se and Te contents and Cu/Se and Se/Te ratios
+          schema_gap: No quantity token represents these scalar trace-element concentrations and element ratios as plotted.
+          species: 'Se, Te and Cu'
+          phase: Arc magmas and MORB liquids
+          temperature_as_printed: No temperature axis; no single temperature is stated in the caption.
+          axes_as_printed:
+            x: MgO in arc magmas (wt.%) for panels A and B; MgO in MORBs (wt.%) for panels C–E
+            y: 'Panel A Se; panel B Cu/Se; panel C Se; panel D Te; panel E Se/Te.'
+          caption: >-
+            Comparison of the modeled Se, Te contents and Cu/Se, Se/Te ratios with observed values in arc magmas and MORBs. (A, B) Modeled vs observed Se and Cu/Se systematics as a function of MgO in back-arc magmas from Manus and Lau basins. (C–E) Modeled vs observed Se, Te and Se/Te systematics as a function of MgO in MORBs from the Pacific–Antarctic ridge. Colored areas represent modeled results considering errors of DSe,Te calculated from Eqs. (15) and (16).
+          series:
+            - {name: Manus Basin observed points, marker: open blue circles, marker_count: 14, evidence_class: quoted_attributed}
+            - {name: Lau Basin observed points, marker: open red triangles, marker_count: 22, evidence_class: quoted_attributed}
+            - {name: Pacific–Antarctic ridge observed points, marker: open circles, marker_count: 56, evidence_class: quoted_attributed}
+            - {name: Present-work model curves and uncertainty areas, marker_count: 0, evidence_class: model_derived}
+          marker_count_note: Visible observed markers counted across panels from the 600 dpi render; overlapping points may conceal coincident markers.
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: liu_li_2025_figure_5
+        type: figure_record
+        locator: {page: 8, pdf_page_index: 7, figure: '5'}
+        panel: A–C
+        attribution: 'MORB observations from Yierpan et al. (2019); present-work model and comparison model inputs from Wang and Becker (2013) and Salters and Stracke (2004), as printed in the caption.'
+        units: 'Se and Te ng/g; Se/Te dimensionless; Fmean dimensionless.'
+        values:
+          quantity: unavailable
+          quantity_as_printed: Modeled Se–Te contents and Se/Te ratios in primary MORBs
+          schema_gap: No quantity token represents the plotted scalar element concentrations or Se/Te ratio.
+          species: 'Se and Te'
+          phase: Primary MORB melts
+          temperature_as_printed: No temperature axis; this is a partial-melting model.
+          axes_as_printed:
+            x: Degree of mantle partial melting (Fmean)
+            y: 'Se and Te contents (ng/g) in panels A and B; Se/Te in panel C.'
+          caption: >-
+            The modeled Se–Te contents and Se/Te ratios in primary MORBs as a function of the degree of mantle partial melting (Fmean). (A–C) Calculated Se–Te contents and Se/Te ratios in primary MORBs from the Pacific–Antarctic ridge are plotted. Colored areas show model results using 20 ± 5 ng/g Se, 1.35 ± 0.7 ng/g Te, and 150–250 µg/g S in the DMM; green and yellow lines use abundances from Wang and Becker (2013) and Salters and Stracke (2004).
+          series:
+            - {name: Pacific–Antarctic ridge primary MORB observations, marker: gray diamonds, marker_count: 36, evidence_class: quoted_attributed}
+            - {name: Present-work model curves and uncertainty areas, marker_count: 0, evidence_class: model_derived}
+            - {name: Wang and Becker (2013) and Salters and Stracke (2004) comparison curves, marker_count: 0, evidence_class: quoted_attributed}
+          marker_count_note: Visible MORB markers counted across panels A–C from the 600 dpi render; coincident markers may overlap.
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: liu_li_2025_figure_6
+        type: figure_record
+        locator: {page: 9, pdf_page_index: 8, figure: '6'}
+        panel: whole_figure
+        attribution: 'This study; comparison values from McDonough and Sun (1995), Wang and Becker (2013), and Yierpan et al. (2019), as printed in the caption.'
+        units: 'S, Se and Te abundance; 50% condensation temperature K at 10 Pa.'
+        values:
+          quantity: unavailable
+          quantity_as_printed: Abundances of S, Se and Te in the primitive mantle
+          schema_gap: No quantity token represents the plotted scalar element abundances.
+          species: 'S, Se and Te'
+          phase: Primitive mantle
+          temperature_as_printed: 50% condensation temperature (K) at 10 Pa; numeric points are deferred.
+          axes_as_printed:
+            x: 50% condensation temperature (K) at 10 Pa
+            y: CI-chondrite-normalized abundance
+          caption: >-
+            A plot of the abundances of S, Se and Te in the primitive mantle (PM) versus their 50% condensation temperature at 10 Pa. The red squares represent Se and Te estimates in the PM from this study, and the other values are from the literature.
+          series:
+            - {name: This study, marker: red squares, marker_count: 2, evidence_class: model_derived}
+            - {name: Wang and Becker (2013), marker: blue circles, marker_count: 3, evidence_class: quoted_attributed}
+            - {name: McDonough and Sun (1995), marker: green diamonds, marker_count: 3, evidence_class: quoted_attributed}
+            - {name: Yierpan et al. (2019), marker: shaded comparison range, marker_count: 0, evidence_class: quoted_attributed}
+          marker_count_note: Visible symbols counted from the 600 dpi render; ranges and uncertainty regions are not marker points.
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: liu_li_2025_figure_7
+        type: figure_record
+        locator: {page: 9, pdf_page_index: 8, figure: '7'}
+        panel: whole_figure
+        attribution: 'Peridotite data from the references named in the caption; PM inputs from this study, Wang and Becker (2013), and McDonough and Sun (1995); calculated depletion and refertilization models as described in the caption.'
+        units: 'Se/Te dimensionless; Te ng/g.'
+        values:
+          quantity: unavailable
+          quantity_as_printed: Se/Te versus Te in residual and metasomatic solid compositions
+          schema_gap: No quantity token represents a Se/Te element ratio or scalar Te concentration.
+          species: 'Se and Te'
+          phase: Mantle peridotites and modeled residual/metasomatic solids
+          temperature_as_printed: No temperature axis; no single temperature is stated in the caption.
+          axes_as_printed:
+            x: Te (ng/g)
+            y: Se/Te
+          caption: >-
+            Se/Te versus Te for calculated residual and metasomatic solid compositions in comparison with mantle peridotites. The red, green and blue lines show residual mantle after melt extraction; black lines show calculated metasomatic solid compositions for sulfide Se/Te ratios 13, 7 and 3; an orange line shows possible harzburgite melt depletion involving platinum-group minerals.
+          series:
+            - {name: Lherzolites, marker: gray circles, marker_count: 45, evidence_class: quoted_attributed}
+            - {name: Harzburgites, marker: gray triangles, marker_count: 35, evidence_class: quoted_attributed}
+            - {name: PM compositions and study estimates, marker: colored symbols, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: Sulfide-liquid depletion models, marker: 'red, green and blue lines with tick marks', marker_count: 0, evidence_class: model_derived}
+            - {name: Metasomatic mixing models, marker: black lines, marker_count: 0, evidence_class: model_derived}
+            - {name: Platinum-group-mineral depletion model, marker: orange line, marker_count: 0, evidence_class: model_derived}
+          marker_count_note: Visible marker counts from the 600 dpi render; coincident literature symbols may overlap.
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: liu_li_2025_figure_8
+        type: figure_record
+        locator: {page: 10, pdf_page_index: 9, figure: '8'}
+        panel: A–B
+        attribution: 'MORB and arc-basalts data from the references named in the legend; present-work model and Wang and Becker (2013) comparison model as printed in the caption.'
+        units: 'Se, Te ng/g; Se/Te dimensionless.'
+        values:
+          quantity: unavailable
+          quantity_as_printed: Modeled Se/Te ratios as a function of Se and Te contents in primary mantle melts
+          schema_gap: No quantity token represents the plotted scalar element concentrations or Se/Te ratio.
+          species: 'Se and Te'
+          phase: Primary mantle melts
+          temperature_as_printed: No temperature axis; no single temperature is stated in the caption.
+          axes_as_printed:
+            x: Se in melt (ng/g) in panel A; Te in melt (ng/g) in panel B
+            y: Se/Te in melt
+          caption: >-
+            The modeled Se/Te ratios as a function of Se and Te contents in primary mantle melts. (A, B) Se and Te contents and Se/Te ratios in primary MORBs from Pacific–Antarctic ridge, northern and southern Mid-Atlantic ridge, and primary arc basalts from Mariana arc are plotted. Solid lines show the present-work model; dashed lines show results using Se and Te abundances from Wang and Becker (2013).
+          series:
+            - {name: 'Primary MORB 1, Yierpan et al. (2019)', marker: red left-pointing triangles, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: 'Primary MORB 2, Lissner et al. (2014)', marker: orange right-pointing triangles, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: 'Primary MORB 3, Yierpan et al. (2020)', marker: blue upward triangles, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: 'Primary arc basalts, Kurzawa et al. (2019)', marker: green downward triangles, marker_count: 8, evidence_class: quoted_attributed}
+            - {name: Present-work and comparison model curves, marker_count: 0, evidence_class: model_derived}
+          marker_count_note: Visible symbol counts across panels A and B from the 600 dpi render; some markers overlap.
+          numeric_points: none
+          digitisation: deferred to a figure pass
+      - observation_id: liu_li_2025_figure_9
+        type: figure_record
+        locator: {page: 11, pdf_page_index: 10, figure: '9'}
+        panel: A–C
+        attribution: 'DMM and PM estimates and chondrite comparisons from the sources named in the caption.'
+        units: 'S/Se, S/Te and Se/Te dimensionless.'
+        values:
+          quantity: unavailable
+          quantity_as_printed: S/Se, S/Te and Se/Te ratios in DMM, PM and chondrites
+          schema_gap: No store quantity token represents these bulk element ratios; valence_ratio is not an elemental abundance ratio.
+          species: 'S, Se and Te'
+          phase: Depleted MORB mantle, primitive mantle and chondritic compositions
+          temperature_as_printed: No temperature axis; no single temperature is stated in the caption.
+          axes_as_printed:
+            x: Categories as labeled at left of each panel
+            y: 'S/Se in panel A; S/Te in panel B; Se/Te in panel C.'
+          caption: >-
+            The S/Se, S/Te and Se/Te ratios in the depleted MORB mantle (DMM), primitive mantle (PM), and different types of chondrites. The estimated ratios in the DMM and PM are compared with previous estimates and chondritic values.
+          series:
+            - {name: Enstatite chondrites EL and EH, marker: teal diamonds, marker_count: 6, evidence_class: quoted_attributed}
+            - {name: 'Ordinary chondrites LL, L and H', marker: gray circles, marker_count: 9, evidence_class: quoted_attributed}
+            - {name: 'Carbonaceous chondrites CO, CV, CM and CI', marker: olive triangles, marker_count: 12, evidence_class: quoted_attributed}
+            - {name: 'DMM, Salters and Stracke (2004)', marker: green downward triangle, marker_count: 3, evidence_class: quoted_attributed}
+            - {name: 'DMM, Yierpan et al. (2019)', marker: green range bar, marker_count: 3, evidence_class: quoted_attributed}
+            - {name: 'DMM, this study', marker: green star, marker_count: 3, evidence_class: model_derived}
+            - {name: 'PM, this study', marker: orange star, marker_count: 3, evidence_class: model_derived}
+            - {name: 'PM, Yierpan et al. (2019)', marker: orange range bar, marker_count: 3, evidence_class: quoted_attributed}
+            - {name: 'PM, Wang and Becker (2013)', marker: orange pentagon, marker_count: 3, evidence_class: quoted_attributed}
+            - {name: 'PM, McDonough and Sun (1995)', marker: orange pentagon, marker_count: 3, evidence_class: quoted_attributed}
+          marker_count_note: Visible category markers counted across panels A–C from the 600 dpi render.
+          numeric_points: none
+          digitisation: deferred to a figure pass
