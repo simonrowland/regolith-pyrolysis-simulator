@@ -8128,6 +8128,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "T_C",
         "T",
     ),
+    Quantity.ISOTOPE_DELTA: ("isotope_delta_isotope_delta",),
     Quantity.RESIDUE_COMPONENT_COMPOSITION: (
         "residue_ppm",
         "SiO2_wt_pct",
