@@ -10,9 +10,11 @@ extraction:
     from the text layer and checked cell by cell on 600 dpi renders. No digit was changed. Fig. 2 panel
     (a) series 4 stars were read from labelled ticks at 600 dpi. Table 2 enthalpies and entropies are stored
     per mol_species. The fusion-entropy unit is stored as J/mol K; the caption prints J/(mol K). Fig. 2 panels
-    (c), (d) and (e) series-4 stars that sit clear of the other glyphs were read from labelled ticks. Those
-    reads stay context. Delta_fG/(RT) and delta_fS have no quantity, and the melt delta_fH is not one oxide
-    partial enthalpy. Stars that sit on another glyph, or outside the labelled ticks, are deferred.
+    (c), (d) and (e) series-4 stars that sit clear of the other glyphs were read from labelled ticks. Panel
+    (e) stars inside the frame but above the highest labelled tick are in-frame extrapolations, and the
+    half-width is the distance past that tick. Panel (b) stars are drawn inside the series-3 squares and
+    stay deferred on the corrected log scale. Fig. 5 series-4 open stars each have a centre on the 600 dpi page. No Fig. 5 value is stored, because the composition is not a labelled-tick read on the panel that carries the star. Those reads stay context. Delta_fG/(RT) and delta_fS have no
+    quantity, and the melt delta_fH is not one oxide partial enthalpy.
   date: '2026-10-20'
   worker: t1372-w2-w8-t1
 review_status: draft
@@ -1608,13 +1610,13 @@ species:
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (b), series 4, 54.80 mol% GeO2. The vertical window upper peak is the series-1 filled triangle. The next peak, page px about (3104, 1515), is a star drawn on the series-3 square. That y is below the last labelled tick, -2 at y 936.5, so a value would extrapolate. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+        note: 'Panel (b), series 4, 54.80 mol% GeO2. Labelled y tick lines, measured on the tick line: 0 at 515.5, -1 at 936.5, -2 at 1358.0. Unlabelled half-steps at 726.5, 1147.5 and 1568.5 were not used. Least squares y = -421.25*log10(a) + 515.4167, residual rms 0.12 px. The open star is drawn inside the open square. The combined glyph runs about page y 1463-1553 at x 3104, below the labelled -2 tick, so a value would also extrapolate. No value stored. Legend: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K.'
       units: as reported
       values:
         composition_mol_percent_GeO2_as_printed: '54.80'
         series_as_printed: '4'
         decision: deferred
-        reason: 'The vertical window upper peak is the series-1 filled triangle. The next peak, page px about (3104, 1515), is a star drawn on the series-3 square. That y is below the last labelled tick, -2 at y 936.5, so a value would extrapolate. Deferred.'
+        reason: 'Star inside the square, and the glyph is below the labelled -2 tick at y 1358. Not read.'
     - observation_id: ge_2005_fig2b_star_59_59_deferred
       type: figure_marker_deferred
       locator:
@@ -1622,13 +1624,13 @@ species:
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (b), series 4, 59.59 mol% GeO2. Same geometry. Overlapped star and square near page px (3235, 1311), below the -2 tick. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+        note: 'Panel (b), series 4, 59.59 mol% GeO2. Same labelled ticks as the 54.80 row: 0 at 515.5, -1 at 936.5, -2 at 1358.0. The open star is drawn inside the open square near page y 1265-1343 at x 3236. That y is inside the labelled span. The centre of the star is not separable from the square, so no value is stored. The earlier below-minus-2 reason used the unlabelled half-step at 726.5 as the -1 tick and is withdrawn.'
       units: as reported
       values:
         composition_mol_percent_GeO2_as_printed: '59.59'
         series_as_printed: '4'
         decision: deferred
-        reason: 'Same geometry. Overlapped star and square near page px (3235, 1311), below the -2 tick. Deferred.'
+        reason: 'Star inside the square. Inside the labelled span. Centre not separable.'
     - observation_id: ge_2005_fig2b_star_62_41_deferred
       type: figure_marker_deferred
       locator:
@@ -1636,13 +1638,13 @@ species:
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (b), series 4, 62.41 mol% GeO2. Same geometry. Overlapped star and square near page px (3312, 1204), below the -2 tick. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+        note: 'Panel (b), series 4, 62.41 mol% GeO2. Same labelled ticks. Open star inside the open square near page y 1162-1234 at x 3313, inside the labelled span. Centre not separable. No value stored.'
       units: as reported
       values:
         composition_mol_percent_GeO2_as_printed: '62.41'
         series_as_printed: '4'
         decision: deferred
-        reason: 'Same geometry. Overlapped star and square near page px (3312, 1204), below the -2 tick. Deferred.'
+        reason: 'Star inside the square. Inside the labelled span. Centre not separable.'
     - observation_id: ge_2005_fig2b_star_66_40_deferred
       type: figure_marker_deferred
       locator:
@@ -1650,13 +1652,13 @@ species:
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (b), series 4, 66.40 mol% GeO2. Same geometry. Overlapped star and square near page px (3421, 1075), below the -2 tick. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+        note: 'Panel (b), series 4, 66.40 mol% GeO2. Same labelled ticks. Open star inside the open square near page y 1033-1099 at x 3422, inside the labelled span. Centre not separable. No value stored.'
       units: as reported
       values:
         composition_mol_percent_GeO2_as_printed: '66.40'
         series_as_printed: '4'
         decision: deferred
-        reason: 'Same geometry. Overlapped star and square near page px (3421, 1075), below the -2 tick. Deferred.'
+        reason: 'Star inside the square. Inside the labelled span. Centre not separable.'
     - observation_id: ge_2005_fig2b_star_71_83_deferred
       type: figure_marker_deferred
       locator:
@@ -1664,13 +1666,13 @@ species:
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (b), series 4, 71.83 mol% GeO2. The series converge. The window does not put a crosshair on a star that is clear of the triangle and the square inside the labelled y span. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+        note: 'Panel (b), series 4, 71.83 mol% GeO2. Same labelled ticks. Open star inside the open square near page y 888-950 at x 3571, inside the labelled span. The 600 dpi crop shows one shared interior. Centre not separable. No value stored.'
       units: as reported
       values:
         composition_mol_percent_GeO2_as_printed: '71.83'
         series_as_printed: '4'
         decision: deferred
-        reason: 'The series converge. The window does not put a crosshair on a star that is clear of the triangle and the square inside the labelled y span. Deferred.'
+        reason: 'Star inside the square. Inside the labelled span. Centre not separable.'
     - observation_id: ge_2005_fig2b_star_82_93_deferred
       type: figure_marker_deferred
       locator:
@@ -1678,13 +1680,13 @@ species:
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (b), series 4, 82.93 mol% GeO2. Only one compact peak, and the crosshair sits on the series-1 triangle. The star is not separated. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+        note: 'Panel (b), series 4, 82.93 mol% GeO2. Same labelled ticks. Open star inside the open square near page y 667-727 at x 3876, inside the labelled span. The filled triangle sits above the pair and is not the star. Centre not separable. No value stored.'
       units: as reported
       values:
         composition_mol_percent_GeO2_as_printed: '82.93'
         series_as_printed: '4'
         decision: deferred
-        reason: 'Only one compact peak, and the crosshair sits on the series-1 triangle. The star is not separated. Deferred.'
+        reason: 'Star inside the square. Inside the labelled span. Centre not separable.'
     - observation_id: ge_2005_fig2b_star_91_00_deferred
       type: figure_marker_deferred
       locator:
@@ -1692,139 +1694,244 @@ species:
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (b), series 4, 91.00 mol% GeO2. The crosshair sits on the triangle/square pair near log a about -0.3. The star is not separated. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
+        note: 'Panel (b), series 4, 91.00 mol% GeO2. Same labelled ticks. Open star inside the open square, with the filled triangle against the pair, near page y 573-637 at x 4097, inside the labelled span. Centre not separable. No value stored.'
       units: as reported
       values:
         composition_mol_percent_GeO2_as_printed: '91.00'
         series_as_printed: '4'
         decision: deferred
-        reason: 'The crosshair sits on the triangle/square pair near log a about -0.3. The star is not separated. Deferred.'
-    - observation_id: ge_2005_fig2c_star_62_41_deferred
-      type: figure_marker_deferred
+        reason: 'Star inside the square, against the filled triangle. Inside the labelled span. Centre not separable.'
+    - observation_id: ge_2005_fig2c_g_over_rt_62_41
+      type: gibbs_over_rt_schema_gap
       locator:
         page: 3
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (c), series 4, 62.41 mol% GeO2. The open star is drawn on the open square. The crosshair cannot be placed on one glyph. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
-      units: as reported
+        note: 'Panel (c). Labelled y tick lines: 0 at 1808.5, -3 at 2014.5, -6 at 2220.5, -9 at 2426.5, -12 at 2632.5, -15 at 2838.5. Least squares y = -68.666667*(ΔfG/(RT)) + 1808.500, residual rms 0.000 px. X ticks are unlabelled on this panel and sit on the labelled mol% ticks of panels (a) and (e). The composition is the printed melt. The guide line splits the open star. The centre is the midpoint of the two enclosed holes. Read half-width 0.15 covers 10 px. This star, 62.41 mol% GeO2: holes at page px (1262.1, 2539.3) and (1268.3, 2550.1). Centre (1265.2, 2544.7). The open square is below the star, with a gap. The crosshair sits on the star.'
+      units: dimensionless
       values:
+        delta_fG_over_RT: '-10.721'
+        read_1: '-10.643'
+        read_2: '-10.800'
+        T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '62.41'
-        series_as_printed: '4'
-        decision: deferred
-        reason: 'The open star is drawn on the open square. The crosshair cannot be placed on one glyph. Deferred.'
-    - observation_id: ge_2005_fig2c_star_66_40_deferred
-      type: figure_marker_deferred
+        composition_mol:
+          GeO2: '0.6241'
+          K2O: '0.3759'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px: (1265.2, 2544.7)
+        dpi: '600'
+        read_half_width: '0.15'
+        reason_not_scored: 'The axis prints ΔfG(T)/(RT), not ΔfG. delta_fG is an energy. No quantity token exists for the dimensionless ratio. The read is kept here.'
+    - observation_id: ge_2005_fig2c_g_over_rt_66_40
+      type: gibbs_over_rt_schema_gap
       locator:
         page: 3
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (c), series 4, 66.40 mol% GeO2. The open star is drawn on the open square. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
-      units: as reported
+        note: 'Panel (c). Same labelled y ticks and the same fit as the 62.41 row. The guide line splits the open star. Centre is the midpoint of the two enclosed holes. Read half-width 0.15 covers 10 px. This star, 66.40 mol% GeO2: holes at page px (1372.0, 2480.3) and (1377.9, 2491.0). Centre (1375.0, 2485.7). The bottom tip of the star touches the top edge of the open square. The centres are separate. The crosshair sits on the star.'
+      units: dimensionless
       values:
+        delta_fG_over_RT: '-9.861'
+        read_1: '-9.783'
+        read_2: '-9.939'
+        T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '66.40'
-        series_as_printed: '4'
-        decision: deferred
-        reason: 'The open star is drawn on the open square. Deferred.'
-    - observation_id: ge_2005_fig2c_star_71_83_deferred
-      type: figure_marker_deferred
+        composition_mol:
+          GeO2: '0.6640'
+          K2O: '0.3360'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px: (1375.0, 2485.7)
+        dpi: '600'
+        read_half_width: '0.15'
+        reason_not_scored: 'The axis prints ΔfG(T)/(RT), not ΔfG. delta_fG is an energy. No quantity token exists for the dimensionless ratio. The read is kept here.'
+    - observation_id: ge_2005_fig2c_g_over_rt_71_83
+      type: gibbs_over_rt_schema_gap
       locator:
         page: 3
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (c), series 4, 71.83 mol% GeO2. The open star is drawn on the open square. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
-      units: as reported
+        note: 'Panel (c). Same labelled y ticks and the same fit as the 62.41 row. Centre is the midpoint of the two enclosed holes. Read half-width 0.15 covers 10 px. This star, 71.83 mol% GeO2: holes at page px (1523.2, 2391.8) and (1527.5, 2404.6). Centre (1525.4, 2398.2). The bottom tip meets the open square. The star centre is above that junction. The crosshair sits on the star.'
+      units: dimensionless
       values:
+        delta_fG_over_RT: '-8.588'
+        read_1: '-8.495'
+        read_2: '-8.681'
+        T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '71.83'
-        series_as_printed: '4'
-        decision: deferred
-        reason: 'The open star is drawn on the open square. Deferred.'
-    - observation_id: ge_2005_fig2c_star_82_93_deferred
-      type: figure_marker_deferred
+        composition_mol:
+          GeO2: '0.7183'
+          K2O: '0.2817'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px: (1525.4, 2398.2)
+        dpi: '600'
+        read_half_width: '0.15'
+        reason_not_scored: 'The axis prints ΔfG(T)/(RT), not ΔfG. delta_fG is an energy. No quantity token exists for the dimensionless ratio. The read is kept here.'
+    - observation_id: ge_2005_fig2c_g_over_rt_82_93
+      type: gibbs_over_rt_schema_gap
       locator:
         page: 3
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (c), series 4, 82.93 mol% GeO2. The open star is drawn on the open square. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
-      units: as reported
+        note: 'Panel (c). Same labelled y ticks and the same fit as the 62.41 row. Centre is the midpoint of the two enclosed holes. Read half-width 0.15 covers 10 px. This star, 82.93 mol% GeO2: holes at page px (1836.1, 2192.5) and (1841.3, 2205.0). Centre (1838.7, 2198.8). The bottom tip meets the open square. A filled triangle sits to the right of the square, not on the star centre. The crosshair sits on the star.'
+      units: dimensionless
       values:
+        delta_fG_over_RT: '-5.683'
+        read_1: '-5.592'
+        read_2: '-5.774'
+        T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '82.93'
-        series_as_printed: '4'
-        decision: deferred
-        reason: 'The open star is drawn on the open square. Deferred.'
-    - observation_id: ge_2005_fig2c_star_91_00_deferred
-      type: figure_marker_deferred
+        composition_mol:
+          GeO2: '0.8293'
+          K2O: '0.1707'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px: (1838.7, 2198.8)
+        dpi: '600'
+        read_half_width: '0.15'
+        reason_not_scored: 'The axis prints ΔfG(T)/(RT), not ΔfG. delta_fG is an energy. No quantity token exists for the dimensionless ratio. The read is kept here.'
+    - observation_id: ge_2005_fig2c_g_over_rt_91_00
+      type: gibbs_over_rt_schema_gap
       locator:
         page: 3
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (c), series 4, 91.00 mol% GeO2. The star, the square and the filled triangle meet. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
-      units: as reported
+        note: 'Panel (c). Same labelled y ticks and the same fit as the 62.41 row. Centre is the midpoint of the two enclosed holes. Read half-width 0.15 covers 10 px. This star, 91.00 mol% GeO2: holes at page px (2061.7, 2022.9) and (2068.0, 2031.8). Centre (2064.9, 2027.4). The open square is below the star. The filled triangle meets the square, not the star centre. The crosshair sits on the star.'
+      units: dimensionless
       values:
+        delta_fG_over_RT: '-3.187'
+        read_1: '-3.122'
+        read_2: '-3.252'
+        T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '91.00'
-        series_as_printed: '4'
-        decision: deferred
-        reason: 'The star, the square and the filled triangle meet. Deferred.'
-    - observation_id: ge_2005_fig2e_star_54_80_deferred
-      type: figure_marker_deferred
+        composition_mol:
+          GeO2: '0.9100'
+          K2O: '0.0900'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px: (2064.9, 2027.4)
+        dpi: '600'
+        read_half_width: '0.15'
+        reason_not_scored: 'The axis prints ΔfG(T)/(RT), not ΔfG. delta_fG is an energy. No quantity token exists for the dimensionless ratio. The read is kept here.'
+    - observation_id: ge_2005_fig2e_dfS_54_80
+      type: formation_entropy_schema_gap
       locator:
         page: 3
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (e), series 4, 54.80 mol% GeO2. The star centre is near page y 3111, above the highest labelled tick (10 at y 3151.5). Not extrapolated. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
-      units: as reported
+        note: 'Panel (e). Labelled y tick lines: 10 at 3151.5, 0 at 3326.5, -10 at 3502.5, -20 at 3678.0, -30 at 3853.5, -40 at 4029.0. Least squares y = -17.554286*ΔfS + 3326.852, residual rms 0.171 px, with ΔfS in J/(mol K). Labelled x ticks match panel (a): 50 mol% GeO2 at 930.5, 60 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5. This open star is inside the frame (frame top y 3075) and above the highest labelled tick. In-frame extrapolation. The half-width is the distance past the 10 tick. Centre is the circumcentre of the top tip (1046, 3092) and the two lower tips (1033, 3136) and (1060, 3135): page px (1046.5, 3116.1). 35.4 px, 2.02 J/(mol K), above the 10 tick. The crosshair sits on the star.'
+      units: J/(mol K)
       values:
+        delta_fS_J_mol_K: '12.006'
+        T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '54.80'
-        series_as_printed: '4'
-        decision: deferred
-        reason: 'The star centre is near page y 3111, above the highest labelled tick (10 at y 3151.5). Not extrapolated. Deferred.'
-    - observation_id: ge_2005_fig2e_star_59_59_deferred
-      type: figure_marker_deferred
+        composition_mol:
+          GeO2: '0.5480'
+          K2O: '0.4520'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px: (1046.5, 3116.1)
+        dpi: '600'
+        read_half_width_J_mol_K: '2.02'
+        extrapolated_in_frame: 'true'
+        px_above_labelled_10_tick: '35.4'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints ΔfS(T), J/(mol K). The point is above the highest labelled tick. The half-width is that extrapolation.'
+    - observation_id: ge_2005_fig2e_dfS_59_59
+      type: formation_entropy_schema_gap
       locator:
         page: 3
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (e), series 4, 59.59 mol% GeO2. Star centre near page y 3122, above the 10 tick at y 3151.5. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
-      units: as reported
+        note: 'Panel (e). Same labelled y ticks and the same fit as the 54.80 row. In-frame extrapolation above the 10 tick at y 3151.5. The guide line splits the open star. Holes at page px (1177.2, 3119.4) and (1176.0, 3131.4). Centre (1176.6, 3125.4). 26.1 px, 1.49 J/(mol K), above the 10 tick. The crosshair sits on the star. The half-width is that extrapolation.'
+      units: J/(mol K)
       values:
+        delta_fS_J_mol_K: '11.476'
+        read_1: '11.818'
+        read_2: '11.134'
+        T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '59.59'
-        series_as_printed: '4'
-        decision: deferred
-        reason: 'Star centre near page y 3122, above the 10 tick at y 3151.5. Deferred.'
-    - observation_id: ge_2005_fig2e_star_62_41_deferred
-      type: figure_marker_deferred
+        composition_mol:
+          GeO2: '0.5959'
+          K2O: '0.4041'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px: (1176.6, 3125.4)
+        dpi: '600'
+        read_half_width_J_mol_K: '1.49'
+        extrapolated_in_frame: 'true'
+        px_above_labelled_10_tick: '26.1'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints ΔfS(T), J/(mol K). The point is above the highest labelled tick. The half-width is that extrapolation.'
+    - observation_id: ge_2005_fig2e_dfS_62_41
+      type: formation_entropy_schema_gap
       locator:
         page: 3
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (e), series 4, 62.41 mol% GeO2. Star centre near page y 3128, above the 10 tick at y 3151.5. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
-      units: as reported
+        note: 'Panel (e). Same labelled y ticks and the same fit as the 54.80 row. In-frame extrapolation above the 10 tick at y 3151.5. Holes at page px (1253.0, 3123.7) and (1252.3, 3135.2). Centre (1252.7, 3129.5). 22.0 px, 1.26 J/(mol K), above the 10 tick. The crosshair sits on the star. The half-width is that extrapolation.'
+      units: J/(mol K)
       values:
+        delta_fS_J_mol_K: '11.246'
+        read_1: '11.573'
+        read_2: '10.918'
+        T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '62.41'
-        series_as_printed: '4'
-        decision: deferred
-        reason: 'Star centre near page y 3128, above the 10 tick at y 3151.5. Deferred.'
-    - observation_id: ge_2005_fig2e_star_66_40_deferred
-      type: figure_marker_deferred
+        composition_mol:
+          GeO2: '0.6241'
+          K2O: '0.3759'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px: (1252.7, 3129.5)
+        dpi: '600'
+        read_half_width_J_mol_K: '1.26'
+        extrapolated_in_frame: 'true'
+        px_above_labelled_10_tick: '22.0'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints ΔfS(T), J/(mol K). The point is above the highest labelled tick. The half-width is that extrapolation.'
+    - observation_id: ge_2005_fig2e_dfS_66_40
+      type: formation_entropy_schema_gap
       locator:
         page: 3
         pdf_page_index: 2
         published_page: 1347
         figure: '2'
-        note: 'Panel (e), series 4, 66.40 mol% GeO2. Star centre near page y 3137, above the 10 tick at y 3151.5. Deferred. Legend on the panel: filled triangle 1 is emf [1], open square 3 is KEMS at 1300 K [19], open star 4 is this work at 1400 K. Open triangle 2, on panel (d) only, is calorimetry at 1223 K [9].'
-      units: as reported
+        note: 'Panel (e). Same labelled y ticks and the same fit as the 54.80 row. In-frame extrapolation above the 10 tick at y 3151.5. Holes at page px (1361.6, 3131.3) and (1361.5, 3145.1). Centre (1361.6, 3138.2). The upper hole is smaller because the guide line cuts it. 13.3 px, 0.76 J/(mol K), above the 10 tick. The crosshair sits on the star. The half-width is that extrapolation.'
+      units: J/(mol K)
       values:
+        delta_fS_J_mol_K: '10.747'
+        read_1: '11.140'
+        read_2: '10.354'
+        T_K: '1400'
         composition_mol_percent_GeO2_as_printed: '66.40'
-        series_as_printed: '4'
-        decision: deferred
-        reason: 'Star centre near page y 3137, above the 10 tick at y 3151.5. Deferred.'
+        composition_mol:
+          GeO2: '0.6640'
+          K2O: '0.3360'
+          basis: printed_mole_fraction
+        series_as_printed: 4, Knudsen cell mass spectrometry at 1400 K in this work
+        marker: open star
+        marker_centre_px: (1361.6, 3138.2)
+        dpi: '600'
+        read_half_width_J_mol_K: '0.76'
+        extrapolated_in_frame: 'true'
+        px_above_labelled_10_tick: '13.3'
+        reason_not_scored: 'No formation-entropy quantity. entropy_of_fusion is the melting entropy. The axis prints ΔfS(T), J/(mol K). The point is above the highest labelled tick. The half-width is that extrapolation.'
     - observation_id: ge_2005_fig2_replots_refused
       type: figure_series_refused
       locator:
@@ -1861,19 +1968,1193 @@ species:
       values:
         decision: refused
         reason: Axis temperature 1033 K and caption temperature 1300 K disagree.
-    - observation_id: ge_2005_fig5_deferred
+    - observation_id: ge_2005_fig5_c_series123_refused
+      type: figure_series_refused
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (c), top left, frame x 548-1560, bottom y 1933. Legend on panel (i), checked at 600 dpi: open triangle = series 1, Na2O-SiO2, KEMS [20]; open circle = series 2, Na2O-GeO2, emf [43]; filled triangle = series 3, K2O-SiO2, emf [46]; open star = series 4, K2O-GeO2, this work. Series 1, 2 and 3 are replots. Their centres were not stored.'
+      units: as reported
+      values:
+        decision: refused
+        panel: 'c'
+        reason: 'Replots of cited measurements [20], [43] and [46]. Not this work.'
+    - observation_id: ge_2005_fig5_f_series123_refused
+      type: figure_series_refused
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (f), top middle, frame x 1682-2693, bottom y 1933. Legend on panel (i), checked at 600 dpi: open triangle = series 1, Na2O-SiO2, KEMS [20]; open circle = series 2, Na2O-GeO2, emf [43]; filled triangle = series 3, K2O-SiO2, emf [46]; open star = series 4, K2O-GeO2, this work. Series 1, 2 and 3 are replots. Their centres were not stored.'
+      units: as reported
+      values:
+        decision: refused
+        panel: 'f'
+        reason: 'Replots of cited measurements [20], [43] and [46]. Not this work.'
+    - observation_id: ge_2005_fig5_i_series123_refused
+      type: figure_series_refused
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Legend on panel (i), checked at 600 dpi: open triangle = series 1, Na2O-SiO2, KEMS [20]; open circle = series 2, Na2O-GeO2, emf [43]; filled triangle = series 3, K2O-SiO2, emf [46]; open star = series 4, K2O-GeO2, this work. Series 1, 2 and 3 are replots. Their centres were not stored.'
+      units: as reported
+      values:
+        decision: refused
+        panel: 'i'
+        reason: 'Replots of cited measurements [20], [43] and [46]. Not this work.'
+    - observation_id: ge_2005_fig5_b_series123_refused
+      type: figure_series_refused
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (b), middle left, frame x 548-1560, bottom y 3834. Legend on panel (i), checked at 600 dpi: open triangle = series 1, Na2O-SiO2, KEMS [20]; open circle = series 2, Na2O-GeO2, emf [43]; filled triangle = series 3, K2O-SiO2, emf [46]; open star = series 4, K2O-GeO2, this work. Series 1, 2 and 3 are replots. Their centres were not stored.'
+      units: as reported
+      values:
+        decision: refused
+        panel: 'b'
+        reason: 'Replots of cited measurements [20], [43] and [46]. Not this work.'
+    - observation_id: ge_2005_fig5_e_series123_refused
+      type: figure_series_refused
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (e), middle middle, frame x 1682-2693, bottom y 3834. Legend on panel (i), checked at 600 dpi: open triangle = series 1, Na2O-SiO2, KEMS [20]; open circle = series 2, Na2O-GeO2, emf [43]; filled triangle = series 3, K2O-SiO2, emf [46]; open star = series 4, K2O-GeO2, this work. Series 1, 2 and 3 are replots. Their centres were not stored.'
+      units: as reported
+      values:
+        decision: refused
+        panel: 'e'
+        reason: 'Replots of cited measurements [20], [43] and [46]. Not this work.'
+    - observation_id: ge_2005_fig5_h_series123_refused
+      type: figure_series_refused
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (h), middle right, frame x 2794-3806, bottom y 3834. Legend on panel (i), checked at 600 dpi: open triangle = series 1, Na2O-SiO2, KEMS [20]; open circle = series 2, Na2O-GeO2, emf [43]; filled triangle = series 3, K2O-SiO2, emf [46]; open star = series 4, K2O-GeO2, this work. Series 1, 2 and 3 are replots. Their centres were not stored.'
+      units: as reported
+      values:
+        decision: refused
+        panel: 'h'
+        reason: 'Replots of cited measurements [20], [43] and [46]. Not this work.'
+    - observation_id: ge_2005_fig5_a_series123_refused
+      type: figure_series_refused
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (a), bottom left, frame x 548-1560, bottom y 5732. Legend on panel (i), checked at 600 dpi: open triangle = series 1, Na2O-SiO2, KEMS [20]; open circle = series 2, Na2O-GeO2, emf [43]; filled triangle = series 3, K2O-SiO2, emf [46]; open star = series 4, K2O-GeO2, this work. Series 1, 2 and 3 are replots. Their centres were not stored.'
+      units: as reported
+      values:
+        decision: refused
+        panel: 'a'
+        reason: 'Replots of cited measurements [20], [43] and [46]. Not this work.'
+    - observation_id: ge_2005_fig5_d_series123_refused
+      type: figure_series_refused
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (d), bottom middle, frame x 1682-2693, bottom y 5732. Legend on panel (i), checked at 600 dpi: open triangle = series 1, Na2O-SiO2, KEMS [20]; open circle = series 2, Na2O-GeO2, emf [43]; filled triangle = series 3, K2O-SiO2, emf [46]; open star = series 4, K2O-GeO2, this work. Series 1, 2 and 3 are replots. Their centres were not stored.'
+      units: as reported
+      values:
+        decision: refused
+        panel: 'd'
+        reason: 'Replots of cited measurements [20], [43] and [46]. Not this work.'
+    - observation_id: ge_2005_fig5_g_series123_refused
+      type: figure_series_refused
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (g), bottom right, frame x 2794-3806, bottom y 5732. Legend on panel (i), checked at 600 dpi: open triangle = series 1, Na2O-SiO2, KEMS [20]; open circle = series 2, Na2O-GeO2, emf [43]; filled triangle = series 3, K2O-SiO2, emf [46]; open star = series 4, K2O-GeO2, this work. Series 1, 2 and 3 are replots. Their centres were not stored.'
+      units: as reported
+      values:
+        decision: refused
+        panel: 'g'
+        reason: 'Replots of cited measurements [20], [43] and [46]. Not this work.'
+    - observation_id: ge_2005_fig5_c_star_1
       type: figure_marker_deferred
       locator:
         page: 8
         pdf_page_index: 7
         published_page: 1352
         figure: '5'
-        note: 'Nine panels at 1473 K for (1) Na2O-SiO2, (2) Na2O-GeO2, (3) K2O-SiO2 and (4) K2O-GeO2. Series 4 is this work. On the 600 dpi page the markers lie on the guide curves. Separating a marker from its curve is deferred to t-1380. No value was read. Panels: (a, b) activities, (c) Gibbs energy of melt formation, (d, e) partial enthalpies, (f) enthalpy of melt formation, (g, h) partial entropies, (i) the caption text says enthalpy and the panel axis prints an entropy. The caption is quoted in the audit.'
+        note: 'Panel (c), top left, frame x 548-1560, bottom y 1933. Open star, series 4, top-to-bottom index 1. Centre: template peak, and the two enclosed holes agree at (815.2, 742.8). Page px (815, 742). Match score 0.556. Labelled horizontal tick lines, the tick not the glyph: 0 at x 550.5, -2 at 711.5, -4 at 873.5, -6 at 1034.5, -8 at 1196.5, -10 at 1357.5, -12 at 1518.5. Least squares x = -80.6964*(delta_fG/(RT)) + 550.4643, residual rms 0.28 px. The vertical ticks at y 760.0, 985.5, 1211.5, 1437.0, 1662.5 and 1888.5 have no mol% numerals on this panel. The left margin and the gap to panel (f) are blank of mol% at 600 dpi. Horizontal-axis reading delta_fG/(RT) = -3.278, uncertainty 0.10 for an 8 px centre error. Not stored, because the composition is not labelled.'
       units: as reported
       values:
         decision: deferred
-        defer_to: t-1380
-        reason: Markers were not separated from the guide curves.
+        panel: 'c'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(815, 742)'
+        dpi: '600'
+        reason: 'Mol percent numerals are not printed on panel (c). No composition, so no value.'
+    - observation_id: ge_2005_fig5_c_star_2
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (c), top left, frame x 548-1560, bottom y 1933. Open star, series 4, top-to-bottom index 2. Centre: template peak. Page px (1001, 922). Match score 0.680. Labelled horizontal tick lines, the tick not the glyph: 0 at x 550.5, -2 at 711.5, -4 at 873.5, -6 at 1034.5, -8 at 1196.5, -10 at 1357.5, -12 at 1518.5. Least squares x = -80.6964*(delta_fG/(RT)) + 550.4643, residual rms 0.28 px. The vertical ticks at y 760.0, 985.5, 1211.5, 1437.0, 1662.5 and 1888.5 have no mol% numerals on this panel. The left margin and the gap to panel (f) are blank of mol% at 600 dpi. Horizontal-axis reading delta_fG/(RT) = -5.583, uncertainty 0.10 for an 8 px centre error. Not stored, because the composition is not labelled.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'c'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1001, 922)'
+        dpi: '600'
+        reason: 'Mol percent numerals are not printed on panel (c). No composition, so no value.'
+    - observation_id: ge_2005_fig5_c_star_3
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (c), top left, frame x 548-1560, bottom y 1933. Open star, series 4, top-to-bottom index 3. Centre: template peak. This glyph is the template. Page px (1219, 1170). Match score 1.000. Labelled horizontal tick lines, the tick not the glyph: 0 at x 550.5, -2 at 711.5, -4 at 873.5, -6 at 1034.5, -8 at 1196.5, -10 at 1357.5, -12 at 1518.5. Least squares x = -80.6964*(delta_fG/(RT)) + 550.4643, residual rms 0.28 px. The vertical ticks at y 760.0, 985.5, 1211.5, 1437.0, 1662.5 and 1888.5 have no mol% numerals on this panel. The left margin and the gap to panel (f) are blank of mol% at 600 dpi. Horizontal-axis reading delta_fG/(RT) = -8.285, uncertainty 0.10 for an 8 px centre error. Not stored, because the composition is not labelled.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'c'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1219, 1170)'
+        dpi: '600'
+        reason: 'Mol percent numerals are not printed on panel (c). No composition, so no value.'
+    - observation_id: ge_2005_fig5_c_star_4
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (c), top left, frame x 548-1560, bottom y 1933. Open star, series 4, top-to-bottom index 4. Centre: template peak. Page px (1317, 1293). Match score 0.641. Labelled horizontal tick lines, the tick not the glyph: 0 at x 550.5, -2 at 711.5, -4 at 873.5, -6 at 1034.5, -8 at 1196.5, -10 at 1357.5, -12 at 1518.5. Least squares x = -80.6964*(delta_fG/(RT)) + 550.4643, residual rms 0.28 px. The vertical ticks at y 760.0, 985.5, 1211.5, 1437.0, 1662.5 and 1888.5 have no mol% numerals on this panel. The left margin and the gap to panel (f) are blank of mol% at 600 dpi. Horizontal-axis reading delta_fG/(RT) = -9.499, uncertainty 0.10 for an 8 px centre error. Not stored, because the composition is not labelled.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'c'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1317, 1293)'
+        dpi: '600'
+        reason: 'Mol percent numerals are not printed on panel (c). No composition, so no value.'
+    - observation_id: ge_2005_fig5_c_star_5
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (c), top left, frame x 548-1560, bottom y 1933. Open star, series 4, top-to-bottom index 5. Centre: template peak. Page px (1385, 1382). Match score 0.678. Labelled horizontal tick lines, the tick not the glyph: 0 at x 550.5, -2 at 711.5, -4 at 873.5, -6 at 1034.5, -8 at 1196.5, -10 at 1357.5, -12 at 1518.5. Least squares x = -80.6964*(delta_fG/(RT)) + 550.4643, residual rms 0.28 px. The vertical ticks at y 760.0, 985.5, 1211.5, 1437.0, 1662.5 and 1888.5 have no mol% numerals on this panel. The left margin and the gap to panel (f) are blank of mol% at 600 dpi. Horizontal-axis reading delta_fG/(RT) = -10.342, uncertainty 0.10 for an 8 px centre error. Not stored, because the composition is not labelled.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'c'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1385, 1382)'
+        dpi: '600'
+        reason: 'Mol percent numerals are not printed on panel (c). No composition, so no value.'
+    - observation_id: ge_2005_fig5_c_star_6
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (c), top left, frame x 548-1560, bottom y 1933. Open star, series 4, top-to-bottom index 6. Centre: template peak. Page px (1430, 1446). Match score 0.657. Labelled horizontal tick lines, the tick not the glyph: 0 at x 550.5, -2 at 711.5, -4 at 873.5, -6 at 1034.5, -8 at 1196.5, -10 at 1357.5, -12 at 1518.5. Least squares x = -80.6964*(delta_fG/(RT)) + 550.4643, residual rms 0.28 px. The vertical ticks at y 760.0, 985.5, 1211.5, 1437.0, 1662.5 and 1888.5 have no mol% numerals on this panel. The left margin and the gap to panel (f) are blank of mol% at 600 dpi. Horizontal-axis reading delta_fG/(RT) = -10.899, uncertainty 0.10 for an 8 px centre error. Not stored, because the composition is not labelled.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'c'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1430, 1446)'
+        dpi: '600'
+        reason: 'Mol percent numerals are not printed on panel (c). No composition, so no value.'
+    - observation_id: ge_2005_fig5_c_star_7
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (c), top left, frame x 548-1560, bottom y 1933. Open star, series 4, top-to-bottom index 7. Centre: template peak. Page px (1502, 1553). Match score 0.725. Labelled horizontal tick lines, the tick not the glyph: 0 at x 550.5, -2 at 711.5, -4 at 873.5, -6 at 1034.5, -8 at 1196.5, -10 at 1357.5, -12 at 1518.5. Least squares x = -80.6964*(delta_fG/(RT)) + 550.4643, residual rms 0.28 px. The vertical ticks at y 760.0, 985.5, 1211.5, 1437.0, 1662.5 and 1888.5 have no mol% numerals on this panel. The left margin and the gap to panel (f) are blank of mol% at 600 dpi. Horizontal-axis reading delta_fG/(RT) = -11.792, uncertainty 0.10 for an 8 px centre error. Not stored, because the composition is not labelled.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'c'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1502, 1553)'
+        dpi: '600'
+        reason: 'Mol percent numerals are not printed on panel (c). No composition, so no value.'
+    - observation_id: ge_2005_fig5_f_star_1
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (f), top middle, frame x 1682-2693, bottom y 1933. Open star, series 4, top-to-bottom index 1. Centre: template peak. Page px (1904, 731). Match score 0.568. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'f'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1904, 731)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_f_star_2
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (f), top middle, frame x 1682-2693, bottom y 1933. Open star, series 4, top-to-bottom index 2. Centre: template peak. Page px (2072, 909). Match score 0.642. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'f'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2072, 909)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_f_star_3
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (f), top middle, frame x 1682-2693, bottom y 1933. Open star, series 4, top-to-bottom index 3. Centre: template peak. Page px (2289, 1155). Match score 0.601. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'f'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2289, 1155)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_f_star_4
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (f), top middle, frame x 1682-2693, bottom y 1933. Open star, series 4, top-to-bottom index 4. Centre: template peak. Page px (2377, 1276). Match score 0.673. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'f'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2377, 1276)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_f_star_5
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (f), top middle, frame x 1682-2693, bottom y 1933. Open star, series 4, top-to-bottom index 5. Centre: template peak. Page px (2440, 1364). Match score 0.679. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'f'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2440, 1364)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_f_star_6
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (f), top middle, frame x 1682-2693, bottom y 1933. Open star, series 4, top-to-bottom index 6. Centre: template peak. Page px (2486, 1428). Match score 0.665. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'f'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2486, 1428)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_f_star_7
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (f), top middle, frame x 1682-2693, bottom y 1933. Open star, series 4, top-to-bottom index 7. Centre: template peak. Page px (2556, 1534). Match score 0.680. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'f'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2556, 1534)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_i_star_1
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 1. Centre: template peak. Page px (3199, 729). Match score 0.691. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'i'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3199, 729)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_i_star_2
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 2. Centre: template peak. Page px (3074, 906). Match score 0.691. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'i'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3074, 906)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_i_star_3
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 3. Centre: template peak. Page px (3010, 1151). Match score 0.699. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'i'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3010, 1151)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_i_star_4
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 4. Centre: template peak. Page px (2950, 1272). Match score 0.561. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'i'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2950, 1272)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_i_star_5
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 5. Centre: template peak. Page px (2924, 1360). Match score 0.536. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'i'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2924, 1360)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_i_star_6
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 6. Centre: template peak. Page px (2916, 1423). Match score 0.545. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'i'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2916, 1423)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_i_star_7
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (i), top right, frame x 2794-3806, bottom y 1933. Open star, series 4, top-to-bottom index 7. Centre: template peak. Page px (2891, 1530). Match score 0.670. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'i'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2891, 1530)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_b_star_1
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (b), middle left, frame x 548-1560, bottom y 3834. Open star, series 4, top-to-bottom index 1. Centre: dark-pixel centroid of the star box x 632-644, y 2625-2642. The template peak (627, 2639) sits on the filled-circle edge and is not the centre. The star touches that circle. Page px (638, 2633). Centre uncertainty 6 px. The star is separable from the circle, and the two glyphs touch. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'b'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(638, 2633)'
+        dpi: '600'
+        reason: 'The star touches the series-2 circle. Centre is the star-box centroid, not the template peak. Axes are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_b_star_2
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (b), middle left, frame x 548-1560, bottom y 3834. Open star, series 4, top-to-bottom index 2. Centre: template peak. Page px (687, 2823). Match score 0.676. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'b'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(687, 2823)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_b_star_3
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (b), middle left, frame x 548-1560, bottom y 3834. Open star, series 4, top-to-bottom index 3. Centre: template peak. Page px (803, 3073). Match score 0.662. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'b'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(803, 3073)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_b_star_4
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (b), middle left, frame x 548-1560, bottom y 3834. Open star, series 4, top-to-bottom index 4. Centre: template peak. Page px (884, 3194). Match score 0.584. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'b'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(884, 3194)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_b_star_5
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (b), middle left, frame x 548-1560, bottom y 3834. Open star, series 4, top-to-bottom index 5. Centre: template peak. Page px (957, 3283). Match score 0.513. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'b'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(957, 3283)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_b_star_6
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (b), middle left, frame x 548-1560, bottom y 3834. Open star, series 4, top-to-bottom index 6. Centre: template peak. Page px (1016, 3347). Match score 0.571. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'b'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1016, 3347)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_b_star_7
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (b), middle left, frame x 548-1560, bottom y 3834. Open star, series 4, top-to-bottom index 7. Centre: template peak. Page px (1129, 3454). Match score 0.576. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'b'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1129, 3454)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_e_star_1
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (e), middle middle, frame x 1682-2693, bottom y 3834. Open star, series 4, top-to-bottom index 1. Centre: template peak. Page px (1832, 2645). Match score 0.514. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'e'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1832, 2645)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_e_star_2
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (e), middle middle, frame x 1682-2693, bottom y 3834. Open star, series 4, top-to-bottom index 2. Centre: template peak. Page px (1843, 2823). Match score 0.531. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'e'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1843, 2823)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_e_star_3
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (e), middle middle, frame x 1682-2693, bottom y 3834. Open star, series 4, top-to-bottom index 3. Centre: template peak. Page px (1911, 3067). Match score 0.577. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'e'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1911, 3067)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_e_star_4
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (e), middle middle, frame x 1682-2693, bottom y 3834. Open star, series 4, top-to-bottom index 4. Centre: template peak. Page px (1931, 3187). Match score 0.646. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'e'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1931, 3187)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_e_star_5
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (e), middle middle, frame x 1682-2693, bottom y 3834. Open star, series 4, top-to-bottom index 5. Centre: hole-pair midpoint of the two enclosed holes. The template peak (1955, 3273), score 0.498, agrees within 3 px. An open triangle of another series sits beside this star. Page px (1953, 3275). Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'e'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1953, 3275)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_e_star_6
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (e), middle middle, frame x 1682-2693, bottom y 3834. Open star, series 4, top-to-bottom index 6. Centre: template peak. Page px (1964, 3335). Match score 0.561. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'e'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1964, 3335)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_e_star_7
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (e), middle middle, frame x 1682-2693, bottom y 3834. Open star, series 4, top-to-bottom index 7. Centre: template peak. Page px (1993, 3441). Match score 0.544. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'e'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1993, 3441)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_h_star_1
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (h), middle right, frame x 2794-3806, bottom y 3834. Open star, series 4, top-to-bottom index 1. Centre: template peak. Page px (3697, 2814). Match score 0.675. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'h'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3697, 2814)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_h_star_2
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (h), middle right, frame x 2794-3806, bottom y 3834. Open star, series 4, top-to-bottom index 2. Centre: template peak. Page px (3615, 3061). Match score 0.578. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'h'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3615, 3061)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_h_star_3
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (h), middle right, frame x 2794-3806, bottom y 3834. Open star, series 4, top-to-bottom index 3. Centre: template peak. Page px (3531, 3182). Match score 0.521. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'h'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3531, 3182)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_h_star_4
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (h), middle right, frame x 2794-3806, bottom y 3834. Open star, series 4, top-to-bottom index 4. Centre: template peak. Page px (3464, 3270). Match score 0.579. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'h'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3464, 3270)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_h_star_5
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (h), middle right, frame x 2794-3806, bottom y 3834. Open star, series 4, top-to-bottom index 5. Centre: template peak. Page px (3398, 3333). Match score 0.507. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'h'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3398, 3333)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_h_star_6
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (h), middle right, frame x 2794-3806, bottom y 3834. Open star, series 4, top-to-bottom index 6. Centre: template peak. Page px (3280, 3439). Match score 0.486. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'h'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3280, 3439)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_a_star_1
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (a), bottom left, frame x 548-1560, bottom y 5732. Open star, series 4, top-to-bottom index 1. Centre: template peak. Page px (1441, 4540). Match score 0.737. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'a'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1441, 4540)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_a_star_2
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (a), bottom left, frame x 548-1560, bottom y 5732. Open star, series 4, top-to-bottom index 2. Centre: template peak. Page px (1315, 4721). Match score 0.507. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'a'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1315, 4721)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_a_star_3
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (a), bottom left, frame x 548-1560, bottom y 5732. Open star, series 4, top-to-bottom index 3. Centre: template peak. Page px (1173, 4971). Match score 0.734. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'a'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1173, 4971)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_a_star_4
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (a), bottom left, frame x 548-1560, bottom y 5732. Open star, series 4, top-to-bottom index 4. Centre: template peak. Page px (1115, 5093). Match score 0.772. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'a'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1115, 5093)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_a_star_5
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (a), bottom left, frame x 548-1560, bottom y 5732. Open star, series 4, top-to-bottom index 5. Centre: template peak. Page px (1073, 5183). Match score 0.448. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'a'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1073, 5183)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_a_star_6
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (a), bottom left, frame x 548-1560, bottom y 5732. Open star, series 4, top-to-bottom index 6. Centre: template peak. Page px (1045, 5246). Match score 0.507. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'a'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1045, 5246)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_a_star_7
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (a), bottom left, frame x 548-1560, bottom y 5732. Open star, series 4, top-to-bottom index 7. Centre: template peak. Page px (1000, 5353). Match score 0.562. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'a'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(1000, 5353)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_d_star_1
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (d), bottom middle, frame x 1682-2693, bottom y 5732. Open star, series 4, top-to-bottom index 1. Centre: template peak. Page px (2630, 4547). Match score 0.456. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'd'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2630, 4547)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_d_star_2
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (d), bottom middle, frame x 1682-2693, bottom y 5732. Open star, series 4, top-to-bottom index 2. Centre: template peak. Page px (2534, 4724). Match score 0.464. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'd'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2534, 4724)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_d_star_3
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (d), bottom middle, frame x 1682-2693, bottom y 5732. Open star, series 4, top-to-bottom index 3. Centre: template peak. Page px (2403, 4968). Match score 0.436. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'd'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2403, 4968)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_d_star_4
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (d), bottom middle, frame x 1682-2693, bottom y 5732. Open star, series 4, top-to-bottom index 4. Centre: template peak. Page px (2350, 5088). Match score 0.468. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'd'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2350, 5088)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_d_star_5
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (d), bottom middle, frame x 1682-2693, bottom y 5732. Open star, series 4, top-to-bottom index 5. Centre: template peak. Page px (2315, 5175). Match score 0.539. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'd'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2315, 5175)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_d_star_6
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (d), bottom middle, frame x 1682-2693, bottom y 5732. Open star, series 4, top-to-bottom index 6. Centre: template peak. Page px (2302, 5238). Match score 0.527. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'd'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2302, 5238)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_d_star_7
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (d), bottom middle, frame x 1682-2693, bottom y 5732. Open star, series 4, top-to-bottom index 7. Centre: template peak. Page px (2263, 5342). Match score 0.471. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'd'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(2263, 5342)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_g_star_1
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (g), bottom right, frame x 2794-3806, bottom y 5732. Open star, series 4, top-to-bottom index 1. Centre: template peak. Page px (3056, 4533). Match score 0.545. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'g'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3056, 4533)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_g_star_2
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (g), bottom right, frame x 2794-3806, bottom y 5732. Open star, series 4, top-to-bottom index 2. Centre: template peak. Page px (3182, 4713). Match score 0.671. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'g'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3182, 4713)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_g_star_3
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (g), bottom right, frame x 2794-3806, bottom y 5732. Open star, series 4, top-to-bottom index 3. Centre: template peak. Page px (3292, 4961). Match score 0.674. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'g'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3292, 4961)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_g_star_4
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (g), bottom right, frame x 2794-3806, bottom y 5732. Open star, series 4, top-to-bottom index 4. Centre: template peak. Page px (3341, 5082). Match score 0.574. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'g'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3341, 5082)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_g_star_5
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (g), bottom right, frame x 2794-3806, bottom y 5732. Open star, series 4, top-to-bottom index 5. Centre: template peak. Page px (3376, 5170). Match score 0.573. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'g'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3376, 5170)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_g_star_6
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (g), bottom right, frame x 2794-3806, bottom y 5732. Open star, series 4, top-to-bottom index 6. Centre: template peak. Page px (3415, 5233). Match score 0.421. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'g'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3415, 5233)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_g_star_7
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (g), bottom right, frame x 2794-3806, bottom y 5732. Open star, series 4, top-to-bottom index 7. Centre: template peak. Page px (3455, 5339). Match score 0.445. A 600 dpi crop centred on this peak is an open star, not a triangle or a circle. Centre uncertainty 8 px. No value is stored. Both axes of this panel were not calibrated on labelled ticks in this pass. Panel (i) prints mol percent on its own ticks, and those tick y values do not match this panel, so the labels were not copied.'
+      units: as reported
+      values:
+        decision: deferred
+        panel: 'g'
+        marker: open star
+        series_as_printed: '4'
+        marker_centre_px: '(3455, 5339)'
+        dpi: '600'
+        reason: 'Centre confirmed on a 600 dpi crop. Both axes of this panel are not calibrated, so no value.'
+    - observation_id: ge_2005_fig5_h_top_gap
+      type: figure_marker_deferred
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1352
+        figure: '5'
+        note: 'Panel (h), middle right. The six series-4 stars below follow the same vertical spacing as the seven-star panels, which leaves a gap above the star at page px (3697, 2814). The glyph in that gap, beside the printed 90 mol percent label, is a filled triangle against a filled circle, near page px (3760, 2634). A 600 dpi crop shows no open star. No series-4 centre was assigned and no value was stored.'
+      units: as reported
+      values:
+        decision: refused
+        panel: h
+        marker: filled triangle
+        series_as_printed: '3'
+        dpi: '600'
+        reason: 'Spacing gap at the top of panel (h). The glyph is a filled triangle, not an open star.'
   GeO2:
     observations: []
     context:
