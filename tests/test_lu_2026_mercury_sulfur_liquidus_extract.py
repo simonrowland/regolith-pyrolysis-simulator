@@ -250,6 +250,9 @@ def test_isolated_migration_keeps_species_temperature_and_conditions(tmp_path: P
             assert observation.value.point == Decimal(str(raw["values"]["value"]))
         else:
             assert observation.value.point == Decimal(str(raw["values"]["T_C"])) + Decimal("273.15")
+            assert raw["uncertainty"]["T_m_uncertainty_K"] == 12.5
+            assert observation.uncertainty.kind.value == "printed"
+            assert observation.uncertainty.verbatim == raw["uncertainty"]
 
     sulfur_rows = [
         observation for observation in result.observations.values()
