@@ -241,16 +241,6 @@ fidelity_samples:
       note: >-
         Figure 4 panel (a), series 8 at 2051 K. 600 dpi render.
         Local-stroke centre (1440.0, 1061.5) in the figure crop.
-  - path: species.MgO.observations[shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8].values.points[7].activity
-    value: '0.342'
-    locator:
-      page: 5
-      published_page: 291
-      pdf_page_index: 4
-      figure: '4'
-      note: >-
-        Figure 4 panel (a), series 8 at 2101 K. 600 dpi render.
-        Local-stroke centre (1532.0, 1044.5) in the figure crop.
 experiments:
   - experiment_id: shornikov_2017_spinel_thermodynamics_kems
     method: knudsen_effusion
@@ -1178,7 +1168,10 @@ species:
             to refuse. Refused, each by the symbol the render shows. About
             1310–1439 K, crop x 847–994 and y 974–1044: open and filled
             squares, not series 16. About 1620–1840 K, crop x 1200–1450:
-            up-triangles, open and half-filled, not series 16. The open
+            up-triangles, open and half-filled, not series 16. The marker
+            at crop (1368, 858), about 1767 K, is a right-pointing triangle
+            with the lower half filled, not an up-triangle and not series
+            16. The open
             right triangle at the right edge of that band is the stored
             1863 K point. Above that chain the symbol is a filled right
             triangle, series 13, not series 16. Legend symbols near crop
@@ -1232,7 +1225,7 @@ species:
             Series 8 is the open right-pointing triangle with one left
             stroke. A series 5 or 6 bar is the vertical stroke that extends
             past the triangle. Two left strokes that join at the corners
-            are not that open triangle. Eight centres on panel (a) and seven on panel (b)
+            are not that open triangle. Seven centres on panel (a) and seven on panel (b)
             are the activity observations. Refused on panel (a), one marker
             at a time. About 1425 K, crop (286, 741): up-triangle, series
             1-4. About 1522 K, crop (465, 692): up-triangle, series 1-4.
@@ -1259,7 +1252,11 @@ species:
             series-8 centre is there. About 2042 K, crop (1424, 880): the
             bar extends past the triangle and a horizontal stroke crosses
             it, series 5 or 6. About 2080 K, crop (1460, 980): the
-            bar extends past the triangle, series 5 or 6. About 2174 K,
+            bar extends past the triangle, series 5 or 6. About 2101 K,
+            crop (1532.0, 1044.5): two left strokes on this glyph. At 1200
+            dpi the white gap is 20 px and the strokes join for 4 rows at
+            the top and 4 rows at the bottom, the same pattern as 1861 K
+            and 2103 K. The marker above is a separate glyph. About 2174 K,
             crop (1666, 944): the bar extends past the triangle, series 5
             or 6. About 2274 K, crop (1852, 906): the bar extends past the
             triangle, series 5 or 6. The open triangle at crop (1633, 799)
@@ -1329,8 +1326,8 @@ species:
             and ±0.010 in activity. The points from 2161 K upward lie in the
             crystal-state range 2048–2298 K that the paper takes from
             reference [54] by equations (16) and (17). The 1917 K and
-            2008 K points are below that range. The 2051 K and 2101 K
-            points lie inside it. The reference sentence is equations (12)
+            2008 K points are below that range. The 2051 K point lies
+            inside it. The reference sentence is equations (12)
             and (13) for every point. The pure-oxide-at-experiment-T ruling
             was not applied.
         units: dimensionless
@@ -1439,21 +1436,6 @@ species:
                   Panel (a) series 8. Crop centre (1440.0, 1061.5), page
                   pixel (4000, 1496). A second outline runs along the lower
                   edge. The centre is in the open interior.
-            - T_K: '2101'
-              activity: '0.342'
-              crop_pixel_xy: [1532, 1044]
-              unrounded_T_K: '2101.11'
-              unrounded_activity: '0.3424'
-              locator:
-                page: 5
-                published_page: 291
-                pdf_page_index: 4
-                figure: '4'
-                note: >-
-                  Panel (a) series 8. Crop centre (1532.0, 1044.5), page
-                  pixel (4092, 1480). The bar that extends past a triangle
-                  belongs to the marker above this one. The centre is in
-                  the open interior.
         uncertainty:
           value: '0.010'
           unit: dimensionless
