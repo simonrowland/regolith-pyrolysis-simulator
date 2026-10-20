@@ -43,6 +43,20 @@ def _artifact(
     )
 
 
+def _refusal_notice(species: str, reason: str) -> dict[str, object]:
+    return {
+        "wall_saturation_pressure_refusals_by_species": {
+            species: {
+                "hot_wall": {
+                    "status": "refused",
+                    "reason": reason,
+                    "output_status": "status_bearing",
+                }
+            }
+        }
+    }
+
+
 def _authoritative_carrier_record(species: str) -> dict[str, object]:
     """A vapour-carrier record that establishes authority for one species.
 
@@ -126,20 +140,14 @@ def test_harness_runs_n_iterations_without_ledger_reuse_or_closure_breach() -> N
 
 
 def test_harness_keeps_refused_empty_deposit_lifetime_unavailable() -> None:
-    refusal_notice = {
-        "wall_saturation_pressure_refusals_by_species": {
-            "Mg": {
-                "hot_wall": {
-                    "status": "refused",
-                    "reason": "wall_saturation_pressure_out_of_domain",
-                    "output_status": "status_bearing",
-                }
-            }
-        }
-    }
-
     result = FoulingLifecycleHarness(
-        lambda _index: _artifact({}, authority=refusal_notice),
+        lambda _index: _artifact(
+            {},
+            authority=_refusal_notice(
+                "Mg",
+                "wall_saturation_pressure_out_of_domain",
+            ),
+        ),
         segment_area_m2={"duct_a": 1.0},
         rho_deposit_kg_m3=1000.0,
         thickness_limit_m=0.001,
@@ -162,19 +170,14 @@ def test_harness_keeps_refused_empty_deposit_lifetime_unavailable() -> None:
 
 
 def test_harness_retains_refusal_across_later_measured_zero_campaign() -> None:
-    refusal_notice = {
-        "wall_saturation_pressure_refusals_by_species": {
-            "Mg": {
-                "hot_wall": {
-                    "status": "refused",
-                    "reason": "wall_saturation_pressure_out_of_domain",
-                    "output_status": "status_bearing",
-                }
-            }
-        }
-    }
     artifacts = (
-        _artifact({}, authority=refusal_notice),
+        _artifact(
+            {},
+            authority=_refusal_notice(
+                "Mg",
+                "wall_saturation_pressure_out_of_domain",
+            ),
+        ),
         _artifact({}),
     )
 
@@ -216,27 +219,14 @@ def test_harness_retains_refusal_across_later_measured_zero_campaign() -> None:
 
 
 def test_harness_aggregates_refusals_across_campaigns() -> None:
-    def refusal_notice(species: str, reason: str) -> dict[str, object]:
-        return {
-            "wall_saturation_pressure_refusals_by_species": {
-                species: {
-                    "hot_wall": {
-                        "status": "refused",
-                        "reason": reason,
-                        "output_status": "status_bearing",
-                    }
-                }
-            }
-        }
-
     artifacts = (
         _artifact(
             {},
-            authority=refusal_notice("Mg", "Mg_pressure_out_of_domain"),
+            authority=_refusal_notice("Mg", "Mg_pressure_out_of_domain"),
         ),
         _artifact(
             {},
-            authority=refusal_notice("Na", "Na_pressure_out_of_domain"),
+            authority=_refusal_notice("Na", "Na_pressure_out_of_domain"),
         ),
     )
     result = FoulingLifecycleHarness(
@@ -257,9 +247,93 @@ def test_harness_aggregates_refusals_across_campaigns() -> None:
         "Na",
     )
     assert authority["status_bearing_refusal_count"] == 2
+    wire_refusal = total.to_dict()["refusal"]
+    assert wire_refusal["refusal_events"] == 2
+    assert wire_refusal["reasons"] == [
+        {
+            "campaign": 1,
+            "species": "Mg",
+            "segment": "hot_wall",
+            "reason": "Mg_pressure_out_of_domain",
+            "authority": {
+                "status": "refused",
+                "reason": "Mg_pressure_out_of_domain",
+                "output_status": "status_bearing",
+            },
+        },
+        {
+            "campaign": 2,
+            "species": "Na",
+            "segment": "hot_wall",
+            "reason": "Na_pressure_out_of_domain",
+            "authority": {
+                "status": "refused",
+                "reason": "Na_pressure_out_of_domain",
+                "output_status": "status_bearing",
+            },
+        },
+    ]
     records = authority["wall_saturation_pressure_refusals_by_species"]
     assert records["Mg"]["hot_wall"]["reason"] == "Mg_pressure_out_of_domain"
     assert records["Na"]["hot_wall"]["reason"] == "Na_pressure_out_of_domain"
+
+
+def test_harness_keeps_refusal_events_for_repeated_species() -> None:
+    artifacts = (
+        _artifact(
+            {},
+            authority=_refusal_notice(
+                "Mg", "Mg_campaign_1_pressure_out_of_domain"
+            ),
+        ),
+        _artifact(
+            {},
+            authority=_refusal_notice(
+                "Mg", "Mg_campaign_2_pressure_out_of_domain"
+            ),
+        ),
+    )
+    result = FoulingLifecycleHarness(
+        lambda index: artifacts[index],
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=1000.0,
+        thickness_limit_m=0.001,
+        resinter_threshold_kg=10.0,
+    ).run((0, 1))
+
+    total = result.campaigns_to_resinter_total
+    assert total.value is None
+    assert total.refusal is not None
+    assert total.refusal["count"] == 1
+    authority = total.refusal["authority"]
+    assert authority["status_bearing_refusal_count"] == 1
+    assert authority["wall_saturation_pressure_refused_species"] == ("Mg",)
+    wire_refusal = total.to_dict()["refusal"]
+    assert wire_refusal["refusal_events"] == 2
+    assert wire_refusal["reasons"] == [
+        {
+            "campaign": 1,
+            "species": "Mg",
+            "segment": "hot_wall",
+            "reason": "Mg_campaign_1_pressure_out_of_domain",
+            "authority": {
+                "status": "refused",
+                "reason": "Mg_campaign_1_pressure_out_of_domain",
+                "output_status": "status_bearing",
+            },
+        },
+        {
+            "campaign": 2,
+            "species": "Mg",
+            "segment": "hot_wall",
+            "reason": "Mg_campaign_2_pressure_out_of_domain",
+            "authority": {
+                "status": "refused",
+                "reason": "Mg_campaign_2_pressure_out_of_domain",
+                "output_status": "status_bearing",
+            },
+        },
+    ]
 
 
 def test_harness_rejects_warm_worker_reused_atom_ledger() -> None:
