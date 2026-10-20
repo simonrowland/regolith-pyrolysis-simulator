@@ -1,0 +1,245 @@
+schema_version: literature_extract.v1
+source_id: kemori-1980-oxygen-liquid-copper
+source:
+  citation: >-
+    Kemori N, Katayama I, Kozuka Z (1980). Thermodynamic Study of Oxygen in
+    Liquid Copper. Transactions of the Japan Institute of Metals 21(5):275–284.
+  doi: 10.2320/matertrans1960.21.275
+  year: 1980
+extraction:
+  method: >-
+    MinerU table draft, with the printed Table 2 values checked against its
+    600 dpi page render; prose checked in pdftotext-layout.
+  date: '2026-10-20'
+  worker: fam26-1020
+review_status: draft
+fidelity_samples:
+  - path: species.O.observations[kemori_1980_oxygen_activity_coefficient_infinite_dilution].values.points[0].gamma
+    value: '0.287'
+    locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2'}
+species:
+  O:
+    observations:
+      - observation_id: kemori_1980_oxygen_activity_coefficient_infinite_dilution
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'This work'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values:
+          quantity: activity_coefficient
+          method_class: measured_direct
+          points:
+            - T_K: '1573'
+              gamma: '0.287'
+              as_printed: 'γ°ₒ = 0.287'
+              uncertainty: {value: '0.005', meaning: one_sigma, note: standard deviation}
+              locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'This work'}
+        point_conditions:
+          composition:
+            state: {tag: unknown, reason: oxygen activity coefficient at infinite dilution}
+            locator: {page: 1, published_page: 275, pdf_page_index: 0, note: 'Abstract states infinite dilution in liquid copper.'}
+          oxygen_fugacity_Pa:
+            state: {tag: unknown, reason: not printed as an absolute oxygen fugacity for this coefficient}
+            locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2'}
+      - observation_id: kemori_1980_table2_wilder_1373
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Wilder [12]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Wilder [12]', T_K: '1373', gamma: '0.12'}
+      - observation_id: kemori_1980_table2_wilder_1473
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Wilder [12]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Wilder [12]', T_K: '1473', gamma: '0.205'}
+      - observation_id: kemori_1980_table2_rickert_wagner_1418
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Rickert and Wagner [13]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Rickert and Wagner [13]', T_K: '1418', gamma: '0.145'}
+      - observation_id: kemori_1980_table2_kozuka_1373
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kozuka et al. [14]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kozuka et al. [14]', T_K: '1373', gamma: '0.120'}
+      - observation_id: kemori_1980_table2_kozuka_1423
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kozuka et al. [14]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kozuka et al. [14]', T_K: '1423', gamma: '0.150'}
+      - observation_id: kemori_1980_table2_kozuka_1473
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kozuka et al. [14]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kozuka et al. [14]', T_K: '1473', gamma: '0.195'}
+      - observation_id: kemori_1980_table2_fruehan_richardson_1373
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Fruehan and Richardson [15]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Fruehan and Richardson [15]', T_K: '1373', gamma: '0.122'}
+      - observation_id: kemori_1980_table2_fruehan_richardson_1473
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Fruehan and Richardson [15]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Fruehan and Richardson [15]', T_K: '1473', gamma: '0.204'}
+      - observation_id: kemori_1980_table2_nanda_geiger_1408
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Nanda and Geiger [16]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Nanda and Geiger [16]', T_K: '1408', gamma: '0.12'}
+      - observation_id: kemori_1980_table2_jacob_jeffes_1373
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Jacob and Jeffes [17]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Jacob and Jeffes [17]', T_K: '1373', gamma: '0.128'}
+      - observation_id: kemori_1980_table2_jacob_jeffes_1573
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Jacob and Jeffes [17]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Jacob and Jeffes [17]', T_K: '1573', gamma: '0.333'}
+      - observation_id: kemori_1980_table2_kulkarni_1373
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kulkarni [18]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kulkarni [18]', T_K: '1373', gamma: '0.115'}
+      - observation_id: kemori_1980_table2_kulkarni_1473
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kulkarni [18]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kulkarni [18]', T_K: '1473', gamma: '0.195'}
+      - observation_id: kemori_1980_table2_kulkarni_1573
+        type: activity_coefficient
+        locator: {page: 5, published_page: 279, pdf_page_index: 4, table: '2', row: 'Kulkarni [18]'}
+        phase: l
+        units: dimensionless
+        standard_state: Henry's law, oxygen at infinite dilution in liquid copper
+        values: {quantity: activity_coefficient, method_class: quoted_attributed, attribution: 'Kulkarni [18]', T_K: '1573', gamma: '0.286'}
+    context:
+      - observation_id: kemori_1980_table1_copper_impurities
+        type: context_record
+        units: mass ppm
+        locator: {page: 3, published_page: 277, pdf_page_index: 2, table: '1'}
+        candidate_quantities: [equilibrium_phase_composition, impurity_concentration]
+        reason: >-
+          The table reports bulk impurity mass ppm in the copper charge, not a
+          species activity or a liquid-phase composition. Candidate store
+          quantities do not fit this multi-element bulk assay.
+        values: {table_as_printed: 'Impurities in copper used in this work (mass ppm); Table 1.'}
+      - observation_id: kemori_1980_table3_interaction_coefficients
+        type: context_record
+        units: dimensionless ε°ₒ; concentrations as printed
+        locator: {page: 6, published_page: 280, pdf_page_index: 5, table: '3'}
+        candidate_quantities: [interaction_parameter]
+        reason: >-
+          Table 3 reports oxygen self-interaction coefficients fitted from
+          electrochemical data. The table's regression rows are retained here
+          pending verification of the interaction_parameter encoding for this
+          printed concentration-dependent form.
+        values: {table_as_printed: 'ε°ₒ values and concentration intervals, Table 3.'}
+      - observation_id: kemori_1980_tables5_6_activity_model
+        type: model_derived
+        units: dimensionless activity and J mol-1 coefficients
+        locator: {page: 9, published_page: 283, pdf_page_index: 8, table: '5'}
+        candidate_quantities: [activity]
+        reason: >-
+          Tables 5 and 6 report activities and coefficients calculated from
+          polynomial solution models, not measured activity data.
+        values: {table_as_printed: 'Activities for N=2 through 7 and β coefficients for N=4.'}
+  Cu:
+    observations:
+      - observation_id: kemori_1980_table4_cu_in_cu_liquid
+        type: equilibrium_phase_composition
+        locator: {page: 9, published_page: 283, pdf_page_index: 8, table: '4', column: X_Cu}
+        phase: l
+        units: mole fraction
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: quoted_attributed
+          attribution: Kuxmann and Kurre [19]
+          basis_as_published: mole fraction in each Cu(l) or Cu2O(l) phase
+          points:
+            - {sample_id: 'Table 4, 1508 K', T_K: '1508', value: '0.87455', composition_mol: {Cu: '0.87455', Cu2O: '0.12545'}}
+            - {sample_id: 'Table 4, 1523 K', T_K: '1523', value: '0.86487', composition_mol: {Cu: '0.86487', Cu2O: '0.13513'}}
+            - {sample_id: 'Table 4, 1543 K', T_K: '1543', value: '0.84378', composition_mol: {Cu: '0.84378', Cu2O: '0.15622'}}
+            - {sample_id: 'Table 4, 1558 K', T_K: '1558', value: '0.82170', composition_mol: {Cu: '0.82170', Cu2O: '0.17830'}}
+            - {sample_id: 'Table 4, 1573 K', T_K: '1573', value: '0.80846', composition_mol: {Cu: '0.80846', Cu2O: '0.19154'}}
+            - {sample_id: 'Table 4, 1583 K', T_K: '1583', value: '0.78342', composition_mol: {Cu: '0.78342', Cu2O: '0.21658'}}
+      - observation_id: kemori_1980_table4_cu_in_cu2o_liquid
+        type: equilibrium_phase_composition
+        locator: {page: 9, published_page: 283, pdf_page_index: 8, table: '4', column: X_Cu}
+        phase: l
+        units: mole fraction
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: quoted_attributed
+          attribution: Kuxmann and Kurre [19]
+          basis_as_published: mole fraction in Cu2O(l) phase
+          points:
+            - {sample_id: 'Table 4, 1508 K', T_K: '1508', value: '0.22157', composition_mol: {Cu: '0.22157', Cu2O: '0.77843'}}
+            - {sample_id: 'Table 4, 1523 K', T_K: '1523', value: '0.24979', composition_mol: {Cu: '0.24979', Cu2O: '0.75021'}}
+            - {sample_id: 'Table 4, 1543 K', T_K: '1543', value: '0.26596', composition_mol: {Cu: '0.26596', Cu2O: '0.73404'}}
+            - {sample_id: 'Table 4, 1558 K', T_K: '1558', value: '0.33084', composition_mol: {Cu: '0.33084', Cu2O: '0.66916'}}
+            - {sample_id: 'Table 4, 1573 K', T_K: '1573', value: '0.35407', composition_mol: {Cu: '0.35407', Cu2O: '0.64593'}}
+            - {sample_id: 'Table 4, 1583 K', T_K: '1583', value: '0.39581', composition_mol: {Cu: '0.39581', Cu2O: '0.60419'}}
+  Cu2O:
+    observations:
+      - observation_id: kemori_1980_table4_cu2o_in_cu_liquid
+        type: equilibrium_phase_composition
+        locator: {page: 9, published_page: 283, pdf_page_index: 8, table: '4', column: X_Cu2O}
+        phase: l
+        units: mole fraction
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: quoted_attributed
+          attribution: Kuxmann and Kurre [19]
+          basis_as_published: mole fraction in Cu(l) phase
+          points:
+            - {sample_id: 'Table 4, 1508 K', T_K: '1508', value: '0.12545', composition_mol: {Cu: '0.87455', Cu2O: '0.12545'}}
+            - {sample_id: 'Table 4, 1523 K', T_K: '1523', value: '0.13513', composition_mol: {Cu: '0.86487', Cu2O: '0.13513'}}
+            - {sample_id: 'Table 4, 1543 K', T_K: '1543', value: '0.15622', composition_mol: {Cu: '0.84378', Cu2O: '0.15622'}}
+            - {sample_id: 'Table 4, 1558 K', T_K: '1558', value: '0.17830', composition_mol: {Cu: '0.82170', Cu2O: '0.17830'}}
+            - {sample_id: 'Table 4, 1573 K', T_K: '1573', value: '0.19154', composition_mol: {Cu: '0.80846', Cu2O: '0.19154'}}
+            - {sample_id: 'Table 4, 1583 K', T_K: '1583', value: '0.21658', composition_mol: {Cu: '0.78342', Cu2O: '0.21658'}}
+      - observation_id: kemori_1980_table4_cu2o_in_cu2o_liquid
+        type: equilibrium_phase_composition
+        locator: {page: 9, published_page: 283, pdf_page_index: 8, table: '4', column: X_Cu2O}
+        phase: l
+        units: mole fraction
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: quoted_attributed
+          attribution: Kuxmann and Kurre [19]
+          basis_as_published: mole fraction in Cu2O(l) phase
+          points:
+            - {sample_id: 'Table 4, 1508 K', T_K: '1508', value: '0.77843', composition_mol: {Cu: '0.22157', Cu2O: '0.77843'}}
+            - {sample_id: 'Table 4, 1523 K', T_K: '1523', value: '0.75021', composition_mol: {Cu: '0.24979', Cu2O: '0.75021'}}
+            - {sample_id: 'Table 4, 1543 K', T_K: '1543', value: '0.73404', composition_mol: {Cu: '0.26596', Cu2O: '0.73404'}}
+            - {sample_id: 'Table 4, 1558 K', T_K: '1558', value: '0.66916', composition_mol: {Cu: '0.33084', Cu2O: '0.66916'}}
+            - {sample_id: 'Table 4, 1573 K', T_K: '1573', value: '0.64593', composition_mol: {Cu: '0.35407', Cu2O: '0.64593'}}
+            - {sample_id: 'Table 4, 1583 K', T_K: '1583', value: '0.60419', composition_mol: {Cu: '0.39581', Cu2O: '0.60419'}}
