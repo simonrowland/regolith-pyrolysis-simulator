@@ -980,8 +980,8 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
 
     ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
     p_flux = sum(snapshot.evap_flux.species_kg_hr[species] for species in ("PO", "PO2", "P2"))
-    # b-850: alkali composite vapour rows now use the parent-oxide activity.
-    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(3.1212881367580105, rel=1e-12, abs=1e-12)
+    # d-198 S333-09: the single SI gas constant causes this R-scaled flux move.
+    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(3.1212884191278687, rel=1e-12, abs=1e-12)
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
     )
@@ -1180,12 +1180,14 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # ledger and re-speciation settles once after the evaporation batch,
         # so less oxygen stays in the melt: melt mass 995.6386 -> 994.9920 kg
         # (fresh executable measurement; flux and transport values unchanged).
+        # d-198 S333-09: the shared R constant moves flux and its coupled
+        # transport/melt followers at the expected R sensitivity.
         (
             1,
             1550.0,
-            3.123653392791531,
-            1390584.7638444814,
-            994.9920372838491,
+            3.1236536751613673,
+            1390585.2619891844,
+            994.9920369093475,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1228,7 +1230,8 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # ledger-commit floor, so evaporate_Al2O commits again. Not a refusal
     # drop: no channel is withdrawn.
     # t-766: three admitted P evaporations and nine flagged capture transitions.
-    assert len(sim.atom_ledger.transitions) == 46
+    # d-198 S333-16: trace Al2O2 depletion adds its evaporation/condensation pair.
+    assert len(sim.atom_ledger.transitions) == 48
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }

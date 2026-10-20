@@ -161,7 +161,8 @@ def test_compilation_comparison_numeric_output_digest() -> None:
         json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
 
-    assert digest == "1abf930cf423f44ba5e1e35c198302b10cc7fe29ecada60fac0de125963423c4"
+    # d-198 S333-09: the MgO comparison output moves at the expected R scale.
+    assert digest == "1435848b31a94790ecca227198d172db5867a019fe15a1e64fe3687bd04538b0"
 
 
 def test_rail_is_content_derived(tmp_path: Path) -> None:
@@ -305,16 +306,17 @@ def test_o2_identity_point_is_a_match() -> None:
 def test_formation_gibbs_current_numeric_outputs_before_consolidation() -> None:
     """Pin both current CEA formation paths before moving their subtraction owner."""
 
+    # d-198 S333-09: these formation Gibbs values shift with the shared R constant.
     pilot_po2 = resolve_pilot_channel("PO2")
-    assert engine_delta_fG_kJ_mol(pilot_po2, 1000.0).hex() == "-0x1.197cb595c8f2fp+8"
-    assert engine_delta_fG_kJ_mol(pilot_po2, 1500.0).hex() == "-0x1.14e027064b6d7p+8"
+    assert engine_delta_fG_kJ_mol(pilot_po2, 1000.0).hex() == "-0x1.197cb595df3b1p+8"
+    assert engine_delta_fG_kJ_mol(pilot_po2, 1500.0).hex() == "-0x1.14e0270661584p+8"
 
-    assert cea_delta_fG_kJ_mol("H2O", 298.15).hex() == "-0x1.c92865388f3b2p+7"
-    assert cea_delta_fG_kJ_mol("H2O", 1000.0).hex() == "-0x1.81293c3ccb96fp+7"
+    assert cea_delta_fG_kJ_mol("H2O", 298.15).hex() == "-0x1.c9286538b36b3p+7"
+    assert cea_delta_fG_kJ_mol("H2O", 1000.0).hex() == "-0x1.81293c3cea143p+7"
 
     # FeO stays gaseous while its elemental Fe reference crosses α → γ → δ.
-    assert cea_delta_fG_kJ_mol("FeO", 1000.0).hex() == "0x1.217ffb9d22418p+7"
-    assert cea_delta_fG_kJ_mol("FeO", 1500.0).hex() == "0x1.91b407cf81134p+6"
+    assert cea_delta_fG_kJ_mol("FeO", 1000.0).hex() == "0x1.217ffb9d392c1p+7"
+    assert cea_delta_fG_kJ_mol("FeO", 1500.0).hex() == "0x1.91b407cfa0df9p+6"
 
 
 def test_inconsistent_table_logk_does_not_admit_cea_comparison(monkeypatch) -> None:
