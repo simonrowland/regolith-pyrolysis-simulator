@@ -220,4 +220,3 @@ def feedstock_surface_pressure_mbar(feedstock: Mapping[str, Any]) -> float:
         else validated_environment_pressure if validated_environment_pressure is not None
         else 0.0
     )
-
