@@ -614,8 +614,8 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         return Rail.VAPOUR
     if quantity in MELT_ACTIVITY_QUANTITIES:
         # Sample phase is not a quantity property. A typed non-melt sample
-        # is refused by melt_activity_sample_phase_refusal and stays on this
-        # rail so the refusal is visible rather than dropped.
+        # is refused by melt_activity_sample_phase_refusal after source
+        # validity, and stays on this rail so the refusal is visible.
         return Rail.MELT_ACTIVITY
     if (
         quantity in FORMATION_QUANTITIES
@@ -663,12 +663,9 @@ def no_headline_rail_reason(
     return f"no_headline_rail:{quantity.value}"
 
 
-# Liquid and the two frozen-liquid tokens. Source spellings such as
-# "condensed_liquid" and "basaltic_silicate_melt" are already Phase.L.
-# Glass and supercooled liquid are melt-like samples, not solid solutions.
-_MELT_ACTIVITY_SAMPLE_PHASES = frozenset(
-    {Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
-)
+# Only a typed crystal. Liquid, glass, supercooled liquid, gas, and
+# aqueous stay on the melt-activity path. A psat template that leaves
+# phase "gas" on an activity row is not a solid solution.
 SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE = (
     "sample_phase_not_melt_activity_observable"
 )
@@ -677,23 +674,39 @@ SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE = (
 def melt_activity_sample_phase_refusal(
     identity: Identity,
 ) -> dict[str, object] | None:
-    """Detail when a typed non-melt sample is not a melt-activity observable.
+    """Detail when a crystalline sample is not a melt-activity observable.
 
-    Unknown and not-applicable phases are not a crystalline-sample statement,
-    so those rows stay on the melt-activity path. ``None`` means score it.
+    ``Phase.CR`` is the solid-solution sample. Unknown, not-applicable,
+    liquid, glass, supercooled liquid, gas, and aqueous are not that
+    statement. ``None`` means score it.
     """
 
     quantity = quantity_token(identity)
     if quantity not in MELT_ACTIVITY_QUANTITIES:
         return None
     phase = phase_token(identity.species)
-    if phase is None or phase in _MELT_ACTIVITY_SAMPLE_PHASES:
+    if phase is not Phase.CR:
         return None
     return {
         "reason": SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE,
         "sample_phase": phase.value,
         "quantity": quantity.value,
     }
+
+
+def _sample_phase_not_observable_prediction(
+    engine: Engine, identity: Identity, detail: Mapping[str, object]
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNSUPPORTED,
+        refusal_detail=detail,
+        identity=identity,
+    )
 
 
 def residual_key(
@@ -4703,19 +4716,11 @@ def predict_with_engine(
 
     _require_score_engine(engine)
     identity = observation.identity
-    if isinstance(identity, Identity):
-        sample_phase_detail = melt_activity_sample_phase_refusal(identity)
-        if sample_phase_detail is not None:
-            return EnginePrediction(
-                engine=engine,
-                channel=ENGINE_CHANNELS[engine],
-                execution=Execution(state=ExecutionState.NOT_PROBED),
-                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
-                lineage_complete=False,
-                refusal_reason=RefusalReason.UNSUPPORTED,
-                refusal_detail=sample_phase_detail,
-                identity=identity,
-            )
+    sample_phase_detail = (
+        melt_activity_sample_phase_refusal(identity)
+        if isinstance(identity, Identity)
+        else None
+    )
     from simulator.diagnostic_helpers.binary_pot_battery import (
         ARM_HEADLINE,
         ARM_QUALIFICATION,
@@ -5061,6 +5066,12 @@ def predict_with_engine(
                 requested=identity.composition if identity.composition is not None and identity.composition.is_value else None,
                 generated=generated,
             )
+        # Malformed composition is INVALID_SOURCE above. A crystal sample
+        # with a valid request is still not a melt observable.
+        if sample_phase_detail is not None:
+            return _sample_phase_not_observable_prediction(
+                engine, identity, sample_phase_detail
+            )
         activity_payload = generated.payload
         moles = dict(activity_payload.get("composition_mol") or {})
         built = OxideComposition(
@@ -5197,6 +5208,10 @@ def predict_with_engine(
                 version=activity.activity_model,
             )
     elif identity.composition is not None and identity.composition.is_value:
+        if sample_phase_detail is not None:
+            return _sample_phase_not_observable_prediction(
+                engine, identity, sample_phase_detail
+            )
         requested = identity.composition
         assert identity.composition.value is not None
         composition_value = identity.composition.value
@@ -6719,13 +6734,6 @@ def compile_residual(
             candidate,
         )
 
-    if sample_phase_detail is not None:
-        return _refused(
-            RefusalReason.UNSUPPORTED,
-            sample_phase_detail,
-            execution=Execution(state=ExecutionState.NOT_PROBED),
-        )
-
     if (
         quantity is Quantity.ACTIVITY
         and isinstance(identity, Identity)
@@ -6866,6 +6874,13 @@ def compile_residual(
             {"primary_check": gates.primary_check, "checks": [c.name for c in gates.checks]},
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
+        )
+
+    if sample_phase_detail is not None:
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            sample_phase_detail,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
         )
 
     missing_fusion_input = next(
