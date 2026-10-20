@@ -527,7 +527,7 @@ def test_provider_rejects_wrong_intent(
 @pytest.mark.parametrize(
     "control_name", ["dt_hr", "current_A", "voltage_V", "pO2_bar"]
 )
-@pytest.mark.parametrize("value", [1e-308, 1e30, 1e308])
+@pytest.mark.parametrize("value", [1e-308, 1e308])
 def test_provider_refuses_extreme_finite_electrolysis_controls(
     vapor_pressure_data,
     feedstocks_data,
@@ -614,6 +614,111 @@ def test_provider_predicts_and_flags_finite_low_po2_outside_certified_band(
     assert notice["control_reason"] == "below minimum 1e-09 bar"
     assert notice["authority_level"] == "extrapolated"
     assert notice["certified_band"] == {"pO2_bar": (1e-9, 1.0)}
+
+
+@pytest.mark.parametrize(
+    ("control_name", "value", "certified_band", "control_reason"),
+    [
+        ("dt_hr", 1.01, {"dt_hr": (0.0, 1.0)}, "above maximum 1 hr"),
+        ("current_A", 3001.0, {"current_A": (0.0, 3000.0)}, "above maximum 3000 A"),
+        ("voltage_V", 5.1, {"voltage_V": (0.0, 5.0)}, "above maximum 5 V"),
+        ("pO2_bar", 1.01, {"pO2_bar": (1e-9, 1.0)}, "above maximum 1 bar"),
+        ("dt_hr", 1e30, {"dt_hr": (0.0, 1.0)}, "above maximum 1 hr"),
+        ("current_A", 1e30, {"current_A": (0.0, 3000.0)}, "above maximum 3000 A"),
+        ("voltage_V", 1e30, {"voltage_V": (0.0, 5.0)}, "above maximum 5 V"),
+        ("pO2_bar", 1e30, {"pO2_bar": (1e-9, 1.0)}, "above maximum 1 bar"),
+    ],
+    ids=[
+        "duration", "current", "voltage", "oxygen-pressure",
+        "large-duration", "large-current", "large-voltage",
+        "large-oxygen-pressure",
+    ],
+)
+def test_provider_predicts_and_flags_finite_controls_outside_certified_band(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    control_name,
+    value,
+    certified_band,
+    control_reason,
+):
+    result = _dispatch_single_control_value(
+        control_name=control_name,
+        value=value,
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+    )
+
+    assert result.status == "ok", result.diagnostic
+    notices = result.diagnostic["notices"]
+    assert len(notices) == 1
+    assert notices[0] == {
+        "kind": "out_of_certified_band",
+        "control": control_name,
+        "reason": "electrolysis_control_out_of_domain",
+        "control_reason": control_reason,
+        "authority_level": "extrapolated",
+        "certified_band": certified_band,
+    }
+
+
+@pytest.mark.parametrize(
+    ("control_name", "value", "certified_band", "control_reason"),
+    [
+        ("current_A", 3001.0, {"current_A": (0.0, 3000.0)}, "above maximum 3000 A"),
+        ("voltage_V", 5.1, {"voltage_V": (0.0, 5.0)}, "above maximum 5 V"),
+        ("pO2_bar", 1.01, {"pO2_bar": (1e-9, 1.0)}, "above maximum 1 bar"),
+        ("current_A", 1e30, {"current_A": (0.0, 3000.0)}, "above maximum 3000 A"),
+        ("voltage_V", 1e30, {"voltage_V": (0.0, 5.0)}, "above maximum 5 V"),
+        ("pO2_bar", 1e30, {"pO2_bar": (1e-9, 1.0)}, "above maximum 1 bar"),
+    ],
+    ids=[
+        "current", "voltage", "oxygen-pressure",
+        "large-current", "large-voltage", "large-oxygen-pressure",
+    ],
+)
+def test_legacy_step_hour_predicts_and_flags_finite_controls_outside_certified_band(
+    control_name,
+    value,
+    certified_band,
+    control_reason,
+):
+    controls = {"voltage_V": 5.0, "current_A": 100.0, "pO2_bar": 1.0}
+    controls[control_name] = value
+    result = ElectrolysisModel().step_hour(
+        MeltState(composition_kg={}),
+        voltage_V=controls["voltage_V"],
+        current_A=controls["current_A"],
+        T_C=1600.0,
+        pO2_bar=controls["pO2_bar"],
+    )
+
+    notices = result["notices"]
+    assert len(notices) == 1
+    assert notices[0] == {
+        "kind": "out_of_certified_band",
+        "control": control_name,
+        "reason": "electrolysis_control_out_of_domain",
+        "control_reason": control_reason,
+        "authority_level": "extrapolated",
+        "certified_band": certified_band,
+    }
+
+
+def test_legacy_step_hour_refuses_binary64_overflow_before_empty_melt_energy():
+    result = ElectrolysisModel().step_hour(
+        MeltState(composition_kg={}),
+        voltage_V=1e308,
+        current_A=100.0,
+        T_C=1600.0,
+    )
+
+    assert result["reason_refused"] == "electrolysis_control_out_of_domain"
+    assert "voltage_V" in result["invalid_controls"]
+    assert "binary64" in result["invalid_controls"]["voltage_V"]
+    assert "energy_kWh" not in result
 
 
 @pytest.mark.parametrize(
