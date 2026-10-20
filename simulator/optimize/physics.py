@@ -667,6 +667,33 @@ class PhysicsConstraintSet:
                 threshold_is_unqualified = (
                     not math.isfinite(threshold) or threshold <= 0.0
                 )
+        if (
+            not authoritative
+            and "wall_deposit_kg_per_campaign" in report
+            and report["wall_deposit_kg_per_campaign"] is None
+        ):
+            status_payload = {**report, "constraint_mode": "continuous"}
+            if threshold_is_unqualified:
+                status_payload.update(
+                    coating_constraint_mode="no_unqualified_deposition",
+                    coating_constraint_authoritative=False,
+                )
+            return GateMargin(
+                gate="coating",
+                feasible=True,
+                margin=math.inf,
+                threshold=self.coating_min_campaigns_to_resinter,
+                observed=None,
+                detail=(
+                    "non-authoritative: coating feasibility unconstrained; "
+                    f"output_status={output_status}; status_reason={status_reason}"
+                ),
+                status="unavailable",
+                authoritative=False,
+                output_status=output_status,
+                status_reason=status_reason,
+                status_payload=status_payload,
+            )
         if constraint_mode == "no_unqualified_deposition" or threshold_is_unqualified:
             sticking_authority = report.get("sticking_alpha_authority")
             unavailable = not authoritative and (

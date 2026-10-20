@@ -3802,10 +3802,26 @@ def _wall_fouling_report(
         and threshold_kg > 0.0
     )
     fast_n = int(cfg["fast_fouling_campaign_threshold"])
+    authority = wall_deposit_sticking_authority_status(
+        wall_deposit_kg,
+        alpha_notice or {},
+    )
+    authoritative = bool(authority.get("authoritative_for_resinter", True))
+    wall_deposit_unavailable = (
+        not authoritative
+        and not positive
+        and not segment_load_kg
+        and bool(authority.get("wall_saturation_pressure_refused_species"))
+    )
     campaigns_by_segment: dict[str, float | str] = {}
-    aggregate_campaigns_to_resinter: float | str = "infinite"
-    if total_wall_load_kg <= 0.0:
-        campaigns_to_resinter: float | str = "infinite"
+    campaigns_to_resinter: float | str | None
+    aggregate_campaigns_to_resinter: float | str | None = "infinite"
+    if wall_deposit_unavailable:
+        campaigns_to_resinter = None
+        aggregate_campaigns_to_resinter = None
+        verdict = "non-authoritative"
+    elif total_wall_load_kg <= 0.0:
+        campaigns_to_resinter = "infinite"
         verdict = "slow-fouling"
     elif not threshold_is_qualified:
         controlling_segment_load_kg = max(
@@ -3842,19 +3858,22 @@ def _wall_fouling_report(
             if campaigns_to_resinter < fast_n
             else "slow-fouling"
         )
-    authority = wall_deposit_sticking_authority_status(
-        wall_deposit_kg,
-        alpha_notice or {},
-    )
-    authoritative = bool(authority.get("authoritative_for_resinter", True))
-    nominal_verdict = verdict
-    if not authoritative:
+    nominal_verdict = None if wall_deposit_unavailable else verdict
+    if not authoritative and not wall_deposit_unavailable:
         verdict = "non-authoritative"
     return {
         "liner_material": cfg["liner_material"],
         "dominant_species": dominant_species,
-        "dominant_species_wall_deposit_kg": _clean_report_float(dominant_kg),
-        "wall_deposit_kg_per_campaign": _clean_report_float(total_wall_load_kg),
+        "dominant_species_wall_deposit_kg": (
+            None
+            if wall_deposit_unavailable
+            else _clean_report_float(dominant_kg)
+        ),
+        "wall_deposit_kg_per_campaign": (
+            None
+            if wall_deposit_unavailable
+            else _clean_report_float(total_wall_load_kg)
+        ),
         "wall_deposit_basis": "total_wall_load_by_species",
         "resinter_threshold_kg": threshold,
         "resinter_threshold_basis": cfg.get("resinter_threshold_basis"),
