@@ -1754,10 +1754,14 @@ species:
       derivation:
         relation: >-
           Equation (13), published page 1432: ΔH_melt = ΔH_liq − ΔH_sol.
-          The parents are the Table 1 liquid enthalpy 7.73 kJ/mol and the
-          crystalline enthalpy −39.98 kJ/mol. Those printed values subtract
-          to 47.71 kJ/mol. Table 2 prints 47.61 kJ/mol. Both printed values
-          are kept.
+          The stored parents are the Table 1 rows on published page 1429:
+          liquid enthalpy 7.73 kJ/mol and crystalline enthalpy −39.98 ± 0.54
+          kJ/mol. Those printed values subtract to 47.71 kJ/mol. Table 2
+          prints 47.61 ± 1.84 kJ/mol. The abstract on published page 1428,
+          and the conclusions on published page 1433, print −39.88 ± 0.54
+          kJ/mol for the crystalline enthalpy. 7.73 − (−39.88) = 47.61,
+          which reproduces the Table 2 cell. The stored parent remains the
+          Table 1 cell −39.98. No printed value is changed.
         output_unit: kJ/mol
         inputs:
           - shornikova_2019_perovskite_thermodynamics_p002_t01_r26_c03
