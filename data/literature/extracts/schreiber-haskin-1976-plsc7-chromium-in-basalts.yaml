@@ -1,0 +1,255 @@
+schema_version: literature_extract.v1
+source_id: schreiber-haskin-1976-plsc7-chromium-in-basalts
+figure_policy: Figure records have no numeric plot points; figure values printed in captions are typed separately.
+source:
+  citation: >-
+    Schreiber, H. D. & Haskin, L. A. (1976). Chromium in basalts: Experimental
+    determination of redox states and partitioning among synthetic silicate
+    phases. Proceedings of the Seventh Lunar Science Conference, 1221-1242.
+  year: 1976
+extraction:
+  method: MinerU OCR used for scanned pages; figure caption values checked against a 600 dpi render of PDF page 9. Machine text page extraction is a repeated ADS label and is not usable for the article.
+  date: '2026-10-20'
+  worker: fam27-1020
+review_status: draft
+fidelity_samples:
+  - path: species.Cr.observations[schreiber_1976_fig4_YG_CrVI_fraction].values.points[0].value
+    value: '10'
+    locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none}
+species:
+  Cr:
+    observations:
+      - observation_id: schreiber_1976_fig4_YG_CrVI_fraction
+        type: concentration_series
+        locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: YG}
+        phase: glass
+        units: '% of total Cr as printed'
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          valence_basis:
+            numerator_oxidation_states: [6]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_direct
+          points:
+            - value: '10'
+              value_as_published: 10%
+              T_C: '1500'
+              log_pO2_as_printed: '0'
+              log_pO2_units: log10(atm)
+              formula: Cr
+              point_conditions:
+                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
+                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
+                total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
+      - observation_id: schreiber_1976_fig4_YG_CrIII_fraction
+        type: concentration_series
+        locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: YG}
+        phase: glass
+        units: '% of total Cr as printed'
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          method_class: measured_direct
+          points:
+            - value: '90'
+              value_as_published: 90%
+              T_C: '1500'
+              log_pO2_as_printed: '0'
+              log_pO2_units: log10(atm)
+              formula: Cr
+              point_conditions:
+                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
+                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
+                total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: YG}}
+      - observation_id: schreiber_1976_fig4_G_CrIII_fraction
+        type: concentration_series
+        locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: G}
+        phase: glass
+        units: '% of total Cr as printed'
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          method_class: measured_direct
+          points:
+            - value: '90'
+              value_as_published: 90%
+              T_C: '1500'
+              log_pO2_as_printed: '2.6'
+              log_pO2_units: log10(atm)
+              formula: Cr
+              point_conditions:
+                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
+                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
+                total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
+      - observation_id: schreiber_1976_fig4_G_CrII_fraction
+        type: concentration_series
+        locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: G}
+        phase: glass
+        units: '% of total Cr as printed'
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          valence_basis: {numerator_oxidation_states: [2], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          method_class: measured_direct
+          points:
+            - value: '10'
+              value_as_published: 10%
+              T_C: '1500'
+              log_pO2_as_printed: '2.6'
+              log_pO2_units: log10(atm)
+              formula: Cr
+              point_conditions:
+                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
+                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
+                total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: G}}
+      - observation_id: schreiber_1976_fig4_BG_CrIII_fraction
+        type: concentration_series
+        locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: BG}
+        phase: glass
+        units: '% of total Cr as printed'
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          method_class: measured_direct
+          points:
+            - value: '55'
+              value_as_published: 55%
+              T_C: '1500'
+              log_pO2_as_printed: '5.2'
+              log_pO2_units: log10(atm)
+              formula: Cr
+              point_conditions:
+                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
+                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
+                total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
+      - observation_id: schreiber_1976_fig4_BG_CrII_fraction
+        type: concentration_series
+        locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: BG}
+        phase: glass
+        units: '% of total Cr as printed'
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          valence_basis: {numerator_oxidation_states: [2], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          method_class: measured_direct
+          points:
+            - value: '45'
+              value_as_published: 45%
+              T_C: '1500'
+              log_pO2_as_printed: '5.2'
+              log_pO2_units: log10(atm)
+              formula: Cr
+              point_conditions:
+                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
+                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
+                total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: BG}}
+      - observation_id: schreiber_1976_fig4_B_CrIII_fraction
+        type: concentration_series
+        locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: B}
+        phase: glass
+        units: '% of total Cr as printed'
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          valence_basis: {numerator_oxidation_states: [3], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          method_class: measured_direct
+          points:
+            - value: '20'
+              value_as_published: 20%
+              T_C: '1500'
+              log_pO2_as_printed: '7.9'
+              log_pO2_units: log10(atm)
+              formula: Cr
+              point_conditions:
+                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
+                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
+                total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
+      - observation_id: schreiber_1976_fig4_B_CrII_fraction
+        type: concentration_series
+        locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', panel: none, row: B}
+        phase: glass
+        units: '% of total Cr as printed'
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          valence_basis: {numerator_oxidation_states: [2], denominator_kind: total_element, denominator_oxidation_state: null, value_form: fraction}
+          method_class: measured_direct
+          points:
+            - value: '80'
+              value_as_published: 80%
+              T_C: '1500'
+              log_pO2_as_printed: '7.9'
+              log_pO2_units: log10(atm)
+              formula: Cr
+              point_conditions:
+                fO2_log: {state: {tag: unknown, reason: 'Printed log pO2 is referenced to atm; canonical fO2_log is bar-only. Raw value retained as log_pO2_as_printed.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                temperature_K: {state: {tag: value, value: '1773.15'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
+                composition: {state: {tag: unknown, reason: 'Table 3 gives FAS as the sample composition but has dashed, unreported oxide entries; the full composition is incomplete.'}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
+                total_pressure_Pa: {state: {tag: unknown, reason: The paper does not report total synthesis pressure.}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}}
+                quench_state: {state: {tag: value, value: not_stated}, locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4', row: B}}
+    context:
+      - observation_id: schreiber_1976_table1_coordination
+        type: table
+        locator: {page: 11, pdf_page_index: 10, published_page: 1231, table: '1'}
+        units: mixed qualitative and ionic-radius units as printed
+        values: {quantity: chromium ionic coordination and stabilization conditions, admission_status: typed_unavailable, reason: no matching store token for coordination/site-preference data}
+      - observation_id: schreiber_1976_table2_reduction_enthalpy
+        type: table
+        locator: {page: 15, pdf_page_index: 14, published_page: 1235, table: '2'}
+        units: kcal/mol as printed
+        values: {quantity: one-electron reduction reaction enthalpies, units: kcal/mol, admission_status: typed_unavailable, reason: no reaction-enthalpy token; these are not delta_fH values}
+      - observation_id: schreiber_1976_table3_bulk_compositions
+        type: table
+        locator: {page: 16, pdf_page_index: 15, published_page: 1236, table: '3'}
+        units: wt% oxides as printed
+        values: {quantity: whole-sample bulk composition ranges and synthetic starting mixtures, admission_status: typed_unavailable, reason: not a single phase composition and outside this redox series}
+      - observation_id: schreiber_1976_table4_redox_potentials
+        type: table
+        locator: {page: 18, pdf_page_index: 17, published_page: 1238, table: '4'}
+        units: mixed relative ordering and volts as printed
+        values: {quantity: relative melt reactivity and standard aqueous reduction potentials, admission_status: typed_unavailable, reason: no store token for the printed potentials and relative ordering}
+      - observation_id: schreiber_1976_table5_lattice_sites
+        type: table
+        locator: {page: 20, pdf_page_index: 19, published_page: 1240, table: '5'}
+        units: qualitative descriptions as printed
+        values: {quantity: compiled crystal lattice-site descriptions and predicted chromium substitution, method_class: model_derived, admission_status: typed_unavailable, reason: qualitative predictions and no matching numeric quantity token}
+      - observation_id: schreiber_1976_figure4_absorption_spectra
+        type: figure_record
+        locator: {page: 9, pdf_page_index: 8, published_page: 1229, figure: '4'}
+        units: relative absorbance as plotted
+        values:
+          quantity: valence_ratio
+          formula: Cr
+          species: Cr
+          phase: glass
+          temperature: 1500 C
+          axes: {x: wavelength (angstroms x 10^-3), y: relative absorbance}
+          caption: Visible absorption spectra of Cr-doped FAS glasses; oxidation-state percentages printed in the caption and typed above.
+          panel: none_stated
+          series:
+            - {name: YG yellow-green, marker_count: 0}
+            - {name: G green, marker_count: 0}
+            - {name: BG blue-green, marker_count: 0}
+            - {name: B blue, marker_count: 0}
+          numeric_points: none
+          digitisation: deferred to a figure pass
