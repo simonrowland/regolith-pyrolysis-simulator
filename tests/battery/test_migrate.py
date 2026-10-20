@@ -10967,12 +10967,7 @@ def _load_store_if_needle(path: Path, needle: bytes, summary: dict[str, dict]) -
     return stored if isinstance(stored, dict) else {}
 
 
-def test_store_condensed_phase_densities_are_at_least_100_kg_per_m3() -> None:
-    for directory in ("extracts-v2", "observations-v2"):
-        assert (REPO_ROOT / "data" / "literature" / directory).is_dir(), directory
-    _, _, observations = load_migrated_store(REPO_ROOT)
-    assert observations, "migrated store contains no observations"
-
+def _condensed_density_points_below_floor(observations) -> list[str]:
     below_floor = []
     for observation in observations.values():
         if quantity_token(observation.identity) is not Quantity.DENSITY:
@@ -10988,9 +10983,37 @@ def test_store_condensed_phase_densities_are_at_least_100_kg_per_m3() -> None:
                 f"{observation.observation_id} ({observation.source_id}): "
                 f"{observation.value.point} kg/m3"
             )
+    return sorted(below_floor)
+
+
+def test_store_condensed_phase_densities_are_at_least_100_kg_per_m3() -> None:
+    # Silica aerogels can be about 1-100 kg/m3; porous regolith and minerals
+    # are about 1000-6000 kg/m3, so a condensed regolith/mineral value below
+    # 100 kg/m3 signals a unit error.
+    synthetic_low_density = F.observation(
+        "synthetic-low-condensed-density",
+        "synthetic-low-condensed-density",
+        Identity(
+            quantity=Quantity.DENSITY,
+            species=Species("SiO2", Phase.CR),
+        ),
+        as_decimal("3.03"),
+        evidence=EvidenceClass.QUOTED_ATTRIBUTED,
+        source_id="synthetic",
+    )
+    assert _condensed_density_points_below_floor(
+        {synthetic_low_density.observation_id: synthetic_low_density}
+    ) == ["synthetic-low-condensed-density (synthetic): 3.03 kg/m3"]
+
+    for directory in ("extracts-v2", "observations-v2"):
+        assert (REPO_ROOT / "data" / "literature" / directory).is_dir(), directory
+    _, _, observations = load_migrated_store(REPO_ROOT)
+    assert observations, "migrated store contains no observations"
+
+    below_floor = _condensed_density_points_below_floor(observations)
 
     assert not below_floor, (
-        "condensed-phase density below 100 kg/m3:\n" + "\n".join(sorted(below_floor))
+        "condensed-phase density below 100 kg/m3:\n" + "\n".join(below_floor)
     )
 
 
