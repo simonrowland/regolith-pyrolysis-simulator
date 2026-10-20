@@ -287,6 +287,26 @@ species:
           whether those simple oxides are solid or liquid.
         experiment: shornikov_2017_spinel_thermodynamics_kems
         mineru_flags: []
+        derivation:
+          relation: >-
+            Table 1 this-work row. Least squares of this paper's ΔG_T for
+            crystalline spinel, equation (19), assumed constant over the
+            printed range. Per 1 mol of compound. The ΔG_T grid is not
+            printed as a numeric table.
+          output_unit: kJ/mol
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 2
+              published_page: 288
+              pdf_page_index: 1
+              table: '1'
+              equation: '19'
+              note: >-
+                Equation (19) is ΔG_T = ΔH_T − TΔS_T. The least-squares
+                inputs are this paper's ΔG_T values. They are not printed
+                as a numeric table. Figure 2 series 16 is a partial marker
+                read, not that input list.
         values:
           quantity: delta_fH
           method_class: measured_reduced
@@ -363,6 +383,23 @@ species:
           whether those simple oxides are solid or liquid.
         experiment: shornikov_2017_spinel_thermodynamics_kems
         mineru_flags: []
+        derivation:
+          relation: >-
+            Table 1 this-work formation entropy. Least squares of ΔG_T,
+            equation (19). The ΔG_T grid is not printed as a numeric table.
+          output_unit: J/(mol K)
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 2
+              published_page: 288
+              pdf_page_index: 1
+              table: '1'
+              equation: '19'
+              note: >-
+                Equation (19) is ΔG_T = ΔH_T − TΔS_T. The least-squares
+                inputs are this paper's ΔG_T values. They are not printed
+                as a numeric table.
         values:
           quantity: delta_fS
           method_class: measured_reduced
@@ -422,6 +459,18 @@ species:
         phase: cr
         per: mol_species
         experiment: shornikov_2017_spinel_thermodynamics_kems
+        derived_from:
+          - shornikov_2017_spinel_thermodynamics_liquid_delta_fH
+          - shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
+        derivation:
+          relation: >-
+            Table 2 this-work melting enthalpy. Equations (20) and (22):
+            liquid-state formation enthalpy minus crystalline formation
+            enthalpy.
+          output_unit: kJ/mol
+          inputs:
+            - shornikov_2017_spinel_thermodynamics_liquid_delta_fH
+            - shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
         values:
           quantity: heat_of_fusion
           method_class: measured_reduced
@@ -470,6 +519,17 @@ species:
         phase: cr
         per: mol_species
         experiment: shornikov_2017_spinel_thermodynamics_kems
+        derived_from:
+          - shornikov_2017_spinel_thermodynamics_liquid_delta_fS
+          - shornikov_2017_spinel_thermodynamics_p002_t01_r29_c04
+        derivation:
+          relation: >-
+            Table 2 this-work melting entropy. Equation (21): liquid-state
+            formation entropy minus crystalline formation entropy.
+          output_unit: J/mol K
+          inputs:
+            - shornikov_2017_spinel_thermodynamics_liquid_delta_fS
+            - shornikov_2017_spinel_thermodynamics_p002_t01_r29_c04
         values:
           quantity: entropy_of_fusion
           method_class: measured_reduced
@@ -516,6 +576,18 @@ species:
         units: K
         phase: cr
         experiment: shornikov_2017_spinel_thermodynamics_kems
+        derived_from:
+          - shornikov_2017_spinel_thermodynamics_p004_t02_r14_c03
+          - shornikov_2017_spinel_thermodynamics_p004_t02_r14_c04
+        derivation:
+          relation: >-
+            Table 2 this-work melting temperature. Equation (22):
+            ΔH_melt / ΔS_melt. The paper calculates it from the liquid and
+            crystalline formation constants; it is not a separate pyrometry run.
+          output_unit: K
+          inputs:
+            - shornikov_2017_spinel_thermodynamics_p004_t02_r14_c03
+            - shornikov_2017_spinel_thermodynamics_p004_t02_r14_c04
         values:
           quantity: transition_temperature
           method_class: measured_reduced
@@ -565,6 +637,25 @@ species:
           (19), published page 292. The paper does not state whether those
           simple oxides are solid or liquid.
         experiment: shornikov_2017_spinel_thermodynamics_kems
+        derivation:
+          relation: >-
+            Published page 292. Gibbs energies of spinel formation in the
+            liquid state, from the MgAl2O4–SiO2 melt activities of equations
+            (16) and (17), reduced by equation (19). The activity grid is
+            not printed as a numeric table.
+          output_unit: kJ/mol
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              published_page: 292
+              pdf_page_index: 5
+              equation: '19'
+              note: >-
+                Equations (16) and (17) supply the melt activities. Those
+                activities are not printed as a numeric table. Equation (19)
+                is the reduction to the formation constants on published
+                page 292.
         values:
           quantity: delta_fH
           method_class: measured_reduced
@@ -615,6 +706,23 @@ species:
           (19), published page 292. The paper does not state whether those
           simple oxides are solid or liquid.
         experiment: shornikov_2017_spinel_thermodynamics_kems
+        derivation:
+          relation: >-
+            Published page 292, liquid-state formation entropy from equation
+            (19). The activity grid of equations (16) and (17) is not printed
+            as a numeric table.
+          output_unit: J/(mol K)
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              published_page: 292
+              pdf_page_index: 5
+              equation: '19'
+              note: >-
+                Same prose sentence as the liquid formation enthalpy.
+                Equations (16) and (17) supply the melt activities. Those
+                activities are not printed as a numeric table.
         values:
           quantity: delta_fS
           method_class: measured_reduced
