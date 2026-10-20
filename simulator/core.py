@@ -419,7 +419,10 @@ from simulator.feedstock_composition import (
     normalize_component_masses_kg,
     resolve_feedstock_composition,
 )
-from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
+from simulator.environment import (
+    DEFAULT_VACUUM_FLOOR_BAR, feedstock_body,
+    feedstock_surface_pressure_mbar as _feedstock_surface_pressure_mbar,
+)
 from simulator.fe_redox import (
     RedoxState,
     _non_absolute_redox_state_kwargs,
@@ -967,38 +970,6 @@ class PoisonedHourError(RuntimeError):
 
 class MeltHeadspaceProjectionError(RuntimeError):
     """Authoritative chemistry requested a missing headspace projection."""
-
-
-def _feedstock_surface_pressure_mbar(feedstock: Mapping[str, Any]) -> float:
-    environment = feedstock.get('environment', {}) or {}
-    surface_pressure = feedstock.get('surface_pressure_mbar')
-    environment_surface_pressure = environment.get('surface_pressure_mbar')
-
-    def _validated_surface_pressure(value: Any, field: str) -> float:
-        if not is_declared_real_scalar(value, allow_numeric_str=True):
-            raise TypeError(f"{field} must be numeric")
-        pressure_mbar = float(value)
-        if not math.isfinite(pressure_mbar) or pressure_mbar < 0.0:
-            raise ValueError(f"{field} must be finite and nonnegative")
-        return pressure_mbar
-
-    validated_surface_pressure = None
-    if surface_pressure not in (None, ''):
-        validated_surface_pressure = _validated_surface_pressure(
-            surface_pressure,
-            'surface_pressure_mbar',
-        )
-    validated_environment_pressure = None
-    if environment_surface_pressure not in (None, ''):
-        validated_environment_pressure = _validated_surface_pressure(
-            environment_surface_pressure,
-            'environment.surface_pressure_mbar',
-        )
-    return float(
-        validated_surface_pressure
-        or validated_environment_pressure
-        or 0.0
-    )
 
 
 def read_high_t_melt_activity_fallback_notice(
