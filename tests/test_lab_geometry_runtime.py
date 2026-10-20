@@ -871,12 +871,18 @@ def test_lab_surface_deposit_accounts_conserve_and_roll_up_by_surface() -> None:
     assert after_kg == pytest.approx(before_kg, abs=1.0e-15)
     assert ledger.total_kg_by_account("process.overhead_gas") == pytest.approx(0.0)
 
-    report = _wall_deposit_report_kg(state, ledger.registry)
+    unresolved_species_mol: dict[str, float] = {}
+    report = _wall_deposit_report_kg(
+        state,
+        ledger.registry,
+        unresolved_species_mol,
+    )
     report_mol = _wall_deposit_mol_by_species(state)
     trace_surface_kg = wall_deposit_by_segment_species_kg(ledger)
 
     assert report["SiO"] == pytest.approx(0.0012)
     assert report["Na"] == pytest.approx(0.00008)
+    assert unresolved_species_mol == {}
     assert report_mol["SiO"] > 0.0
     assert trace_surface_kg[("window", "SiO")] == pytest.approx(0.0002)
     assert trace_surface_kg[("condenser", "SiO")] == pytest.approx(0.0007)
@@ -890,8 +896,14 @@ def test_wall_deposit_report_includes_formula_only_species() -> None:
         initial_balances={account: {"In2O": 3.741952825179326e-11}}
     )
 
-    report = _wall_deposit_report_kg(ledger.mol_by_account(), ledger.registry)
+    unresolved_species_mol: dict[str, float] = {}
+    report = _wall_deposit_report_kg(
+        ledger.mol_by_account(),
+        ledger.registry,
+        unresolved_species_mol,
+    )
 
     assert report["In2O"] == pytest.approx(
         ledger.project_account_kg(account)["In2O"]
     )
+    assert unresolved_species_mol == {}

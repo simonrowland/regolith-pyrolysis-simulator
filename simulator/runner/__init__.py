@@ -57,7 +57,7 @@ from simulator.config import ConfigBundle, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import iron_oxide_values
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
-from simulator.accounting import AccountingQueries
+from simulator.accounting import AccountingQueries, UnknownSpeciesError
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
@@ -1582,10 +1582,16 @@ class PyrolysisRun:
             strict_result_contract=self.strict_result_contract,
         )
 
+        unresolved_wall_deposit_species_mol: dict[str, float] = {}
         final_summary = _final_summary_report(
             final_state,
             execution,
             sim.species_formula_registry,
+            unresolved_wall_deposit_species_mol,
+        )
+        _attach_wall_deposit_report_refusal(
+            run_metadata,
+            unresolved_wall_deposit_species_mol,
         )
         per_hour_summary = list(execution.per_hour)
         if self.include_wall_deposit_rate_diagnostics:
@@ -3353,12 +3359,20 @@ def _kg_by_species_from_mol_state(
     state: Mapping[str, Mapping[str, float]],
     account: str,
     species_formula_registry: Mapping[str, Any] | None,
+    unresolved_species_mol_by_species: dict[str, float],
 ) -> dict[str, float]:
     species_mol = state.get(account, {})
     kg_by_species: dict[str, float] = {}
     for species, mol in sorted(species_mol.items()):
-        formula = resolve_species_formula(species, species_formula_registry)
-        kg = float(mol) * formula.molar_mass_kg_per_mol()
+        mol_value = float(mol)
+        try:
+            formula = resolve_species_formula(species, species_formula_registry)
+        except UnknownSpeciesError:
+            unresolved_species_mol_by_species[species] = (
+                unresolved_species_mol_by_species.get(species, 0.0) + mol_value
+            )
+            continue
+        kg = mol_value * formula.molar_mass_kg_per_mol()
         if abs(kg) > 1e-12:
             kg_by_species[species] = _clean_report_float(kg)
     return kg_by_species
@@ -3367,9 +3381,13 @@ def _kg_by_species_from_mol_state(
 def _wall_deposit_report_kg(
     state: Mapping[str, Mapping[str, float]],
     species_formula_registry: Mapping[str, Any] | None,
+    unresolved_species_mol_by_species: dict[str, float],
 ) -> dict[str, float]:
     wall_deposit_kg = _kg_by_species_from_mol_state(
-        state, WALL_DEPOSIT_ACCOUNT, species_formula_registry,
+        state,
+        WALL_DEPOSIT_ACCOUNT,
+        species_formula_registry,
+        unresolved_species_mol_by_species,
     )
     segment_accounts = sorted(
         account
@@ -3378,7 +3396,10 @@ def _wall_deposit_report_kg(
     )
     for account in segment_accounts:
         for species, kg in _kg_by_species_from_mol_state(
-            state, account, species_formula_registry,
+            state,
+            account,
+            species_formula_registry,
+            unresolved_species_mol_by_species,
         ).items():
             wall_deposit_kg[species] = wall_deposit_kg.get(species, 0.0) + kg
     for species in SIO_WALL_DEPOSIT_SPECIES:
@@ -3387,6 +3408,36 @@ def _wall_deposit_report_kg(
         species: wall_deposit_kg[species]
         for species in sorted(wall_deposit_kg)
     }
+
+
+def _wall_deposit_report_refusal(
+    unresolved_species_mol_by_species: Mapping[str, float],
+) -> dict[str, Any] | None:
+    if not unresolved_species_mol_by_species:
+        return None
+    return {
+        "status": "refused",
+        "reason": "unknown_species_formula",
+        "unresolved_wall_deposit_species": [
+            {
+                "species": species,
+                "mol": float(mol),
+            }
+            for species, mol in sorted(unresolved_species_mol_by_species.items())
+        ],
+    }
+
+
+def _attach_wall_deposit_report_refusal(
+    run_metadata: dict[str, Any],
+    unresolved_species_mol_by_species: Mapping[str, float],
+) -> None:
+    refusal = _wall_deposit_report_refusal(unresolved_species_mol_by_species)
+    if refusal is None:
+        return
+    refusal_diagnostic = dict(run_metadata.get("refusal_diagnostic") or {})
+    refusal_diagnostic["wall_deposit_report"] = refusal
+    run_metadata["refusal_diagnostic"] = _json_safe(refusal_diagnostic)
 
 
 def _wall_deposit_mol_by_species(
@@ -3429,11 +3480,13 @@ def _final_summary_report(
     final_state: Mapping[str, Mapping[str, float]],
     execution: RunExecution,
     species_formula_registry: Mapping[str, Any] | None,
+    unresolved_species_mol_by_species: dict[str, float],
 ) -> dict[str, Any]:
     return {
         "wall_deposit_by_species_kg": _wall_deposit_report_kg(
             final_state,
             species_formula_registry,
+            unresolved_species_mol_by_species,
         ),
         "deposit_by_surface_species_kg": _nested_species_kg_from_segment_species(
             execution.trace.wall_deposit_by_segment_species_kg,
@@ -4306,9 +4359,11 @@ def build_sio_yield_report(
             {},
         ) or {}
     )
+    unresolved_wall_deposit_species_mol: dict[str, float] = {}
     wall_deposit_kg = _wall_deposit_report_kg(
         final_state,
         sim.species_formula_registry,
+        unresolved_wall_deposit_species_mol,
     )
     wall_fouling = _wall_fouling_report(
         wall_deposit_kg,
@@ -4317,6 +4372,31 @@ def build_sio_yield_report(
         ),
         alpha_notice=sticking_notice,
     )
+    wall_deposit_refusal = _wall_deposit_report_refusal(
+        unresolved_wall_deposit_species_mol
+    )
+    if wall_deposit_refusal is not None:
+        unresolved_items = wall_deposit_refusal[
+            "unresolved_wall_deposit_species"
+        ]
+        unresolved_summary = ", ".join(
+            f"{item['species']}={item['mol']} mol" for item in unresolved_items
+        )
+        wall_fouling["status"] = "warning"
+        wall_fouling["output_status"] = "refused"
+        wall_fouling["authoritative"] = False
+        wall_fouling["authoritative_for_resinter"] = False
+        wall_fouling["verdict_authoritative"] = False
+        wall_fouling["verdict"] = "non-authoritative"
+        wall_fouling["status_reason"] = "; ".join(
+            part
+            for part in (
+                str(wall_fouling.get("status_reason") or ""),
+                f"wall-deposit mass projection refused: {unresolved_summary}; "
+                "unknown species formula",
+            )
+            if part
+        )
 
     report = {
         "feedstock_id": feedstock_id,
@@ -4396,6 +4476,10 @@ def build_sio_yield_report(
             diagnostics["wall_sticking_alpha_provenance_notice"] = (
                 sticking_notice
             )
+        if wall_deposit_refusal is not None:
+            diagnostics["refusal_diagnostic"] = {
+                "wall_deposit_report": wall_deposit_refusal,
+            }
         geometry_notice = dict(
             getattr(
                 condensation_model,
@@ -5353,13 +5437,19 @@ def _runner_failure_result(
         "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
     }
     if sim is not None:
+        unresolved_wall_deposit_species_mol: dict[str, float] = {}
         final = _safe_failure_value(
             lambda: _final_summary_report(
                 final_state,
                 execution,
                 sim.species_formula_registry,
+                unresolved_wall_deposit_species_mol,
             ),
             final,
+        )
+        _attach_wall_deposit_report_refusal(
+            run_metadata,
+            unresolved_wall_deposit_species_mol,
         )
     stage_report = (
         _safe_failure_value(lambda: stage_purity_report(sim.train), {})
