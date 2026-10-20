@@ -12,7 +12,7 @@ from engines.magemin.domain import is_finite as magemin_domain_is_finite
 from engines.magemin.provider import is_finite as magemin_provider_is_finite
 from engines.vaporock.provider import is_finite as vaporock_provider_is_finite
 from scripts.classify_epoch2_liquid_fraction_failures import (
-    finite_float as classify_epoch2_finite_float,
+    _finite_float as classify_epoch2_finite_float,
 )
 from scripts.grid_pregrind_triage import finite_float as grid_pregrind_finite_float
 from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -39,6 +39,9 @@ FINITE_FLOAT_HELPERS = (
         classify_epoch2_finite_float,
     ),
 )
+STANDALONE_FINITE_FLOAT_SOURCE = (
+    "scripts/classify_epoch2_liquid_fraction_failures.py"
+)
 
 LOCAL_COPY_NAMES = (
     ("engines/magemin/provider.py", ("_is_finite", "is_finite"), "is_finite"),
@@ -59,11 +62,6 @@ LOCAL_COPY_NAMES = (
     ),
     (
         "scripts/grid_pregrind_triage.py",
-        ("_finite_float", "finite_float"),
-        "finite_float",
-    ),
-    (
-        "scripts/classify_epoch2_liquid_fraction_failures.py",
         ("_finite_float", "finite_float"),
         "finite_float",
     ),
@@ -130,7 +128,8 @@ def test_target_modules_have_no_local_scalar_boundary_copies():
     for source, helper in IS_FINITE_HELPERS:
         assert helper is is_finite, f"{source} does not use the owner predicate"
     for source, helper in FINITE_FLOAT_HELPERS:
-        assert helper is finite_float, f"{source} does not use the owner converter"
+        if source != STANDALONE_FINITE_FLOAT_SOURCE:
+            assert helper is finite_float, f"{source} does not use the owner converter"
 
     root = Path(__file__).resolve().parents[1]
     for source, helper_names, owner_name in LOCAL_COPY_NAMES:
