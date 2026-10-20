@@ -124,6 +124,30 @@ Series 1 and 2 differ by −640/T + 0.39 dex, so they cross near 1641 K and stay
 | 2a-29 | refuse | dt below 10 px and off every Table line; not a filled marker | unassigned | -6.111 | 0.06 | 0.6288 | 1590.4 | 3576.1 | 2104.6 | 2.2 | 0.553 | 2 | 0.567 | T outside the nearer line's printed interval |
 | 2a-30 | refuse | dt below 10 px and off every Table line; not a filled marker | unassigned | -6.335 | 0.06 | 0.6297 | 1588.2 | 3589.4 | 2185.3 | 8.0 | 0.353 | 2 | 0.367 | T outside the nearer line's printed interval |
 
+| 2a-80 | refuse | more than 0.18 dex from every Table line | unassigned | -4.102 | 0.06 | 0.5226 | 1913.7 | 1942.0 | 1396.0 | 31.8 | -0.298 | 2 | 0.317 | none |
+| 2a-81 | refuse | more than 0.18 dex from every Table line | unassigned | -4.419 | 0.06 | 0.5321 | 1879.3 | 2089.0 | 1509.0 | 29.0 | -0.358 | 2 | 0.374 | none |
+| 2a-82 | refuse | more than 0.18 dex from every Table line | unassigned | -4.507 | 0.06 | 0.5378 | 1859.5 | 2176.0 | 1540.0 | 29.1 | -0.294 | 2 | 0.308 | none |
+| 2a-83 | refuse | more than 0.18 dex from every Table line | unassigned | -4.804 | 0.06 | 0.5465 | 1829.7 | 2311.0 | 1646.0 | 25.0 | -0.355 | 2 | 0.367 | none |
+| 2a-84 | refuse | more than 0.18 dex from every Table line | unassigned | -4.839 | 0.06 | 0.5495 | 1819.9 | 2356.0 | 1658.0 | 25.3 | -0.311 | 2 | 0.321 | none |
+| 2a-85 | defer | series 1 and 2 both within 0.10 dex and not separable | 1 or 2 | -4.846 | 0.06 | 0.5644 | 1771.9 | 2585.0 | 1658.0 | 25.0 | 0.048 | 2 | 0.077 | none |
+| 2a-86 | defer | 0.10 to 0.18 dex off the nearer Table line | unassigned | -4.935 | 0.06 | 0.5600 | 1785.7 | 2518.0 | 1691.0 | 25.0 | -0.123 | 2 | 0.131 | none |
+| 2a-87 | defer | 0.10 to 0.18 dex off the nearer Table line | unassigned | -4.949 | 0.06 | 0.5721 | 1748.0 | 2704.0 | 1694.0 | 28.0 | 0.161 | 2 | 0.185 | none |
+| 2a-88 | defer | 0.10 to 0.18 dex off the nearer Table line | unassigned | -5.140 | 0.06 | 0.5670 | 1763.6 | 2626.0 | 1764.0 | 16.1 | -0.139 | 2 | 0.145 | none |
+| 2a-89 | refuse | more than 0.18 dex from every Table line | unassigned | -5.183 | 0.06 | 0.5583 | 1791.1 | 2492.0 | 1781.0 | 25.2 | -0.417 | 2 | 0.425 | none |
+| 2a-90 | refuse | more than 0.18 dex from every Table line | unassigned | -5.212 | 0.06 | 0.5615 | 1781.0 | 2541.0 | 1791.0 | 24.0 | -0.360 | 2 | 0.367 | none |
+| 2a-91 | refuse | more than 0.18 dex from every Table line | unassigned | -5.291 | 0.06 | 0.5697 | 1755.3 | 2667.0 | 1818.0 | 25.0 | -0.218 | 2 | 0.223 | none |
+| 2a-92 | refuse | more than 0.18 dex from every Table line | unassigned | -5.610 | 0.06 | 0.5773 | 1732.2 | 2784.0 | 1932.0 | 24.0 | -0.332 | 2 | 0.334 | none |
+| 2a-93 | refuse | more than 0.18 dex from every Table line | unassigned | -5.646 | 0.06 | 0.5835 | 1713.9 | 2879.0 | 1944.0 | 23.1 | -0.202 | 2 | 0.202 | none |
+| 2a-94 | refuse | more than 0.18 dex from every Table line | unassigned | -5.741 | 0.06 | 0.5788 | 1727.7 | 2807.0 | 1979.0 | 35.7 | -0.423 | 2 | 0.424 | none |
+| 2a-95 | defer | 0.10 to 0.18 dex off the nearer Table line | unassigned | -5.767 | 0.06 | 0.5998 | 1667.3 | 3130.0 | 1985.0 | 17.0 | 0.115 | 3 | 0.117 | none |
+| 2a-96 | refuse | more than 0.18 dex from every Table line | unassigned | -5.771 | 0.06 | 0.5846 | 1710.6 | 2896.0 | 1989.0 | 28.8 | -0.297 | 3 | 0.297 | none |
+| 2a-97 | refuse | more than 0.18 dex from every Table line | unassigned | -5.787 | 0.06 | 0.5764 | 1734.8 | 2771.0 | 1996.0 | 23.9 | -0.532 | 2 | 0.534 | none |
+| 2a-98 | refuse | more than 0.18 dex from every Table line | unassigned | -6.020 | 0.06 | 0.5961 | 1677.6 | 3073.0 | 2077.0 | 23.0 | -0.232 | 3 | 0.236 | none |
+| 2a-99 | refuse | more than 0.18 dex from every Table line | unassigned | -6.550 | 0.06 | 0.6065 | 1648.8 | 3233.0 | 2267.0 | 23.8 | -0.480 | 1 | 0.481 | none |
+| 2a-100 | refuse | more than 0.18 dex from every Table line | unassigned | -6.686 | 0.06 | 0.6188 | 1616.1 | 3422.0 | 2314.0 | 23.4 | -0.275 | 2 | 0.281 | T outside the nearer line's printed interval |
+| 2a-101 | defer | isolated triangle; not assigned to a Table line | unassigned | -6.723 | 0.06 | 0.5494 | 1820.2 | 2355.0 | 2339.0 | 14.2 | -0.190 | 3 | 2.197 | none |
+| 2a-102 | defer | 0.10 to 0.18 dex off the nearer Table line | unassigned | -7.264 | 0.06 | 0.6549 | 1526.9 | 3978.0 | 2517.0 | 14.4 | 0.104 | 2 | 0.126 | outside labelled ticks; T outside the nearer line's printed interval |
+
 Fit-stroke peaks on panel 2a: 5 peaks with dt < 10 px and |log10 p − nearer Table line| ≤ 0.10 dex. They are the line, not markers, and they are not given values.
 
 Refused as glyphs, x-axis numerals near the 0.60 and 0.64 labels: 2a-42 at (3169.7, 2893.3) dt 4.0, 2a-43 at (3657.5, 2892.3) dt 5.0, 2a-44 at (3687.4, 2893.7) dt 4.0, 2a-45 at (3793.7, 2891.1) dt 4.2, 2a-46 at (3878.1, 2893.9) dt 7.2.
@@ -144,7 +168,7 @@ Bare stretches of at least 100 px, with no separable mark:
 
 #### Panel 2b
 
-series 1 (f = 1.12e-3, Table n = 28, T 1704–1907 K): 13 read; series 2 (f = 2.39e-3, Table n = 7, T 1764–1983 K): 1 read; series 3 (f = 3.35e-3, Table n = 8, T 1795–1970 K): 3 read; series 4 (f = 3.75e-1, Table n = 9, T 1847–1947 K): 6 read.
+series 1 (f = 1.12e-3, Table n = 28, T 1704–1907 K): 13 read; series 2 (f = 2.39e-3, Table n = 7, T 1764–1983 K): 1 read; series 3 (f = 3.35e-3, Table n = 8, T 1795–1970 K): 6 read; series 4 (f = 3.75e-1, Table n = 9, T 1847–1947 K): 7 read.
 
 Series 2 has Table n = 7 and σ(B) = ±0.38. One separable circle sits on that line. The other six are not separable from the stroke, and they are not invented. A walk on the central equation through a ±28 px band found a ridge distance-transform radius of 0.62 px, which is white space, not a row of marks.
 
@@ -178,6 +202,12 @@ Series 2 has Table n = 7 and σ(B) = ±0.38. One separable circle sits on that l
 | 2b-18 | refuse | dt below 10 px and off every Table line; not a filled marker | unassigned | -6.814 | 0.04 | 0.5784 | 1729.0 | 3656.0 | 4060.0 | 6.0 | 1.287 | 2 | 1.668 | none |
 | 2b-39 | refuse | dt below 10 px and off every Table line; not a filled marker | unassigned | -8.407 | 0.04 | 0.5601 | 1785.5 | 3181.2 | 5029.8 | 6.4 | -0.352 | 2 | 0.467 | outside labelled ticks; T outside the nearer line's printed interval |
 
+| 2b-80 | read | within 0.10 dex of one Table line | 3 | -6.434 | 0.04 | 0.5037 | 1985.4 | 1717.0 | 3850.0 | 23.4 | -0.025 | 2 | 0.162 | T outside the nearer line's printed interval |
+| 2b-81 | read | within 0.10 dex of one Table line | 3 | -6.435 | 0.04 | 0.5054 | 1978.8 | 1761.0 | 3850.0 | 24.0 | 0.024 | 2 | 0.112 | T outside the nearer line's printed interval |
+| 2b-82 | defer | 0.10 to 0.18 dex off the nearer Table line | unassigned | -7.759 | 0.04 | 0.5463 | 1830.5 | 2824.0 | 4641.0 | 23.8 | -0.105 | 2 | 0.225 | none |
+| 2b-83 | read | within 0.10 dex of one Table line; filled triangle | 4 | -8.251 | 0.04 | 0.5318 | 1880.4 | 2447.0 | 4943.0 | 14.9 | 0.068 | 3 | 1.022 | outside labelled ticks |
+| 2b-84 | read | within 0.10 dex of one Table line | 3 | -8.348 | 0.04 | 0.5670 | 1763.6 | 3362.0 | 4992.0 | 24.0 | -0.089 | 2 | 0.201 | outside labelled ticks; T outside the nearer line's printed interval |
+
 Fit-stroke peaks on panel 2b: 20 peaks with dt < 10 px and |log10 p − nearer Table line| ≤ 0.10 dex. They are the line, not markers, and they are not given values.
 
 Refused as glyphs, ink above the top labelled tick y = 3588: 2b-07 at (2874.8, 3520.3) dt 6.0, 2b-08 at (2895.8, 3555.2) dt 2.8, 2b-10 at (2942.4, 3515.2) dt 6.1, 2b-12 at (3018.9, 3517.7) dt 8.0.
@@ -198,7 +228,7 @@ Bare stretches of at least 100 px, with no separable mark:
 
 #### Panel 2c
 
-series 1 (f = 1.12e-3, Table n = 21, T 1610–1907 K): 14 read; series 2 (f = 2.39e-3, Table n = 14, T 1749–1871 K): 2 read; series 3 (f = 3.35e-3, Table n = 6, T 1795–1970 K): 4 read; series 4 (f = 3.75e-1, Table n = 7, T 1847–1947 K): 6 read.
+series 1 (f = 1.12e-3, Table n = 21, T 1610–1907 K): 13 read; series 2 (f = 2.39e-3, Table n = 14, T 1749–1871 K): 2 read; series 3 (f = 3.35e-3, Table n = 6, T 1795–1970 K): 7 read; series 4 (f = 3.75e-1, Table n = 7, T 1847–1947 K): 6 read.
 
 | id | decision | reason | series | log10 p_ef | ± dex | 1000/T | T/K | cx | cy | dt | offset dex | second series | second abs dex | flags |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -215,10 +245,10 @@ series 1 (f = 1.12e-3, Table n = 21, T 1610–1907 K): 14 read; series 2 (f = 2.
 | 2c-18 | read | within 0.10 dex of one Table line | 1 | -7.576 | 0.04 | 0.5822 | 1717.8 | 3369.6 | 7075.9 | 16.0 | -0.033 | 2 | 0.478 | none |
 | 2c-20 | read | within 0.10 dex of one Table line | 1 | -7.758 | 0.04 | 0.5875 | 1702.1 | 3481.0 | 7171.0 | 17.9 | -0.044 | 2 | 0.469 | none |
 | 2c-28 | read | within 0.10 dex of one Table line | 1 | -8.392 | 0.04 | 0.6109 | 1636.8 | 3966.3 | 7502.2 | 14.9 | 0.065 | 2 | 0.586 | outside labelled ticks |
-| 2c-32 | read | within 0.10 dex of one Table line | 1 | -8.820 | 0.04 | 0.6203 | 1612.0 | 4161.5 | 7727.2 | 12.0 | -0.066 | 2 | 0.460 | outside labelled ticks |
+| 2c-32 | refuse | junction artifact; pixel is white, distance transform 0 px, not the recorded 12 px | unassigned | -8.820 | 0.04 | 0.6203 | 1612.0 | 4161.5 | 7727.2 | 0.0 | -0.066 | 2 | 0.460 | outside labelled ticks |
 | 2c-33 | refuse | numeral glyph (6 or 4) on the x-axis label row | unassigned | -9.017 | 0.04 | 0.6204 | 1611.8 | 4162.8 | 7831.3 | 10.0 | -0.260 | 2 | 0.265 | outside labelled ticks |
-| 2c-34 | read | within 0.10 dex of one Table line | 1 | -8.679 | 0.04 | 0.6211 | 1610.0 | 4177.7 | 7652.3 | 15.0 | 0.100 | 2 | 0.626 | outside labelled ticks; T outside the nearer line's printed interval |
-| 2c-35 | read | within 0.10 dex of one Table line | 1 | -8.841 | 0.04 | 0.6212 | 1609.7 | 4179.6 | 7737.9 | 11.0 | -0.058 | 2 | 0.468 | outside labelled ticks; T outside the nearer line's printed interval |
+| 2c-34 | read | within 0.10 dex of one Table line; re-read filled triangle above the junction, dt peak (4177, 7651) radius 15 | 1 | -8.679 | 0.04 | 0.6211 | 1610.0 | 4177.7 | 7652.3 | 15.0 | 0.100 | 2 | 0.626 | outside labelled ticks; T outside the nearer line's printed interval |
+| 2c-35 | refuse | junction artifact; distance transform 4.1 px at this pixel, not the recorded 11 px | unassigned | -8.841 | 0.04 | 0.6212 | 1609.7 | 4179.6 | 7737.9 | 4.1 | -0.058 | 2 | 0.468 | outside labelled ticks; T outside the nearer line's printed interval |
 | 2c-37 | read | within 0.10 dex of one Table line | 2 | -7.252 | 0.04 | 0.5570 | 1795.3 | 2848.4 | 6909.1 | 24.2 | -0.005 | 3 | 0.140 | none |
 | 2c-38 | read | within 0.10 dex of one Table line | 2 | -7.432 | 0.04 | 0.5611 | 1782.2 | 2933.5 | 7003.2 | 22.2 | -0.053 | 3 | 0.093 | none |
 | 2c-44 | read | within 0.10 dex of one Table line | 3 | -6.628 | 0.04 | 0.5349 | 1869.5 | 2390.2 | 6582.8 | 30.1 | 0.051 | 2 | 0.090 | none |
@@ -234,6 +264,14 @@ series 1 (f = 1.12e-3, Table n = 21, T 1610–1907 K): 14 read; series 2 (f = 2.
 | 2c-66 | refuse | numeral glyph (6 or 4) on the x-axis label row | unassigned | -9.005 | 0.04 | 0.5450 | 1834.8 | 2599.6 | 7838.1 | 10.0 | -0.402 | 3 | 2.000 | outside labelled ticks; T outside the nearer line's printed interval |
 | 2c-12 | refuse | dt below 10 px and off every Table line; not a filled marker | unassigned | -5.816 | 0.04 | 0.5649 | 1770.3 | 3011.3 | 6147.5 | 2.2 | 1.180 | 2 | 1.684 | outside labelled ticks |
 | 2c-25 | refuse | dt below 10 px and off every Table line; not a filled marker | unassigned | -8.229 | 0.04 | 0.5970 | 1675.2 | 3676.5 | 7418.6 | 5.0 | -0.216 | 2 | 0.300 | outside labelled ticks |
+
+| 2c-80 | read | within 0.10 dex of one Table line | 3 | -6.960 | 0.04 | 0.5421 | 1844.6 | 2540.0 | 6757.0 | 24.7 | -0.048 | 2 | 0.190 | none |
+| 2c-81 | defer | 0.10 to 0.18 dex off the nearer Table line | unassigned | -7.091 | 0.04 | 0.5441 | 1838.0 | 2580.0 | 6826.0 | 24.4 | -0.117 | 2 | 0.259 | none |
+| 2c-82 | read | within 0.10 dex of one Table line | 1 | -7.489 | 0.04 | 0.5806 | 1722.3 | 3338.0 | 7030.0 | 16.4 | 0.006 | 2 | 0.516 | none |
+| 2c-83 | defer | isolated triangle; not assigned to a Table line | unassigned | -7.668 | 0.04 | 0.5798 | 1724.9 | 3320.0 | 7125.0 | 15.0 | -0.200 | 2 | 0.309 | none |
+| 2c-84 | defer | 0.10 to 0.18 dex off the nearer Table line; filled triangle | unassigned | -7.684 | 0.04 | 0.5815 | 1719.6 | 3357.0 | 7133.0 | 15.0 | -0.160 | 2 | 0.351 | none |
+| 2c-85 | read | within 0.10 dex of one Table line | 3 | -7.754 | 0.04 | 0.5662 | 1766.3 | 3038.0 | 7173.0 | 28.0 | -0.068 | 2 | 0.214 | T outside the nearer line's printed interval |
+| 2c-86 | read | within 0.10 dex of one Table line | 3 | -7.854 | 0.04 | 0.5714 | 1750.0 | 3147.0 | 7225.0 | 24.2 | 0.002 | 2 | 0.145 | T outside the nearer line's printed interval |
 
 Fit-stroke peaks on panel 2c: 24 peaks with dt < 10 px and |log10 p − nearer Table line| ≤ 0.10 dex. They are the line, not markers, and they are not given values.
 
@@ -255,6 +293,466 @@ Bare stretches of at least 100 px, with no separable mark:
 | 3 | 2569 | 2752 | 183 |
 | 4 | 2184 | 2286 | 102 |
 | 4 | 2322 | 2444 | 122 |
+
+
+### Fig. 2 round-2 core list
+
+Dark pixels are gray below 110 on the 1200 dpi crop. A core is a local maximum of the distance transform with radius at least 8 px. Maxima within 10 px, or within 0.42 of the smaller radius, are one core. A filled marker on this render has radius at least 14 px and a compact thick core. A core under that radius is the fit stroke (about 8 px), the axis bar, a tick, or a numeral. The two junction rows 2c-32 and 2c-35 are not cores: the pixels measure radius 0 and 4.1. The triangle above them is 2c-34.
+
+Panel 2a: 149 cores. 37 match an existing row, 23 are new decision rows, 89 are refused.
+
+| cx | cy | r px | colour | matched row |
+| --- | --- | --- | --- | --- |
+| 1612 | 999 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1580 | 1003 | 11.7 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2781 | 1065 | 8.0 | black | 2a-07 |
+| 1580 | 1081 | 8.5 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1864 | 1169 | 20.0 | black | 2a-00 |
+| 1581 | 1184 | 9.2 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2018 | 1202 | 17.0 | black | 2a-02 |
+| 1844 | 1245 | 23.0 | black | 2a-18 |
+| 1516 | 1315 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1584 | 1361 | 8.5 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1519 | 1376 | 8.6 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1942 | 1396 | 31.8 | black | 2a-80 |
+| 2057 | 1408 | 27.0 | black | 2a-19 |
+| 2199 | 1489 | 33.2 | black | 2a-20 |
+| 2089 | 1509 | 29.0 | black | 2a-81 |
+| 2335 | 1524 | 29.1 | black | 2a-14 |
+| 2176 | 1540 | 29.1 | black | 2a-82 |
+| 1583 | 1580 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2499 | 1629 | 31.1 | black | 2a-15 |
+| 2311 | 1646 | 25.0 | black | 2a-83 |
+| 2333 | 1652 | 19.0 | black | refused: overlap peak between two circles; not a separate marker |
+| 2356 | 1658 | 25.3 | black | 2a-84 |
+| 2585 | 1658 | 25.0 | black | 2a-85 |
+| 1507 | 1670 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2588 | 1672 | 24.2 | black | 2a-85 |
+| 2518 | 1691 | 25.0 | black | 2a-86 |
+| 2584 | 1693 | 25.3 | black | 2a-23 |
+| 2704 | 1694 | 28.0 | black | 2a-87 |
+| 1507 | 1700 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1588 | 1726 | 8.5 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1608 | 1726 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2647 | 1752 | 23.0 | black | 2a-24 |
+| 2680 | 1762 | 25.0 | black | 2a-25 |
+| 2716 | 1763 | 30.0 | black | 2a-05 |
+| 2626 | 1764 | 16.1 | black | 2a-88 |
+| 2753 | 1767 | 10.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2492 | 1781 | 25.2 | black | 2a-89 |
+| 2775 | 1785 | 17.7 | black | 2a-06 |
+| 2541 | 1791 | 24.0 | black | 2a-90 |
+| 1589 | 1806 | 10.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2800 | 1806 | 17.0 | black | 2a-08 |
+| 2762 | 1813 | 8.1 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1587 | 1818 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2667 | 1818 | 25.0 | black | 2a-91 |
+| 2796 | 1831 | 11.3 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1587 | 1845 | 8.0 | black | refused: stroke or axis ridge, span 73 px; radius is not a filled marker |
+| 2645 | 1847 | 9.2 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2856 | 1848 | 26.1 | black | 2a-09 |
+| 2875 | 1866 | 27.7 | black | 2a-10 |
+| 2896 | 1879 | 27.2 | black | refused: same marker as 2a-26 |
+| 2914 | 1892 | 28.6 | black | 2a-26 |
+| 2926 | 1901 | 30.5 | black | 2a-26 |
+| 2784 | 1932 | 24.0 | black | 2a-92 |
+| 1801 | 1943 | 12.8 | black | 2a-31 |
+| 2879 | 1944 | 23.1 | black | 2a-93 |
+| 1795 | 1961 | 15.5 | black | 2a-31 |
+| 2807 | 1979 | 35.7 | black | 2a-94 |
+| 3130 | 1985 | 17.0 | black | 2a-95 |
+| 2896 | 1989 | 28.8 | black | 2a-96 |
+| 2771 | 1996 | 23.9 | black | 2a-97 |
+| 3048 | 1998 | 9.2 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3023 | 2024 | 22.0 | black | 2a-16 |
+| 3136 | 2029 | 25.5 | black | 2a-11 |
+| 2079 | 2062 | 19.0 | black | 2a-33 |
+| 2048 | 2068 | 21.2 | black | 2a-32 |
+| 3073 | 2077 | 23.0 | black | 2a-98 |
+| 3375 | 2084 | 15.0 | black | refused: same marker as 2a-27 |
+| 1592 | 2089 | 9.2 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1494 | 2092 | 8.1 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 3053 | 2102 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1538 | 2106 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 3203 | 2113 | 23.0 | black | 2a-17 |
+| 3378 | 2116 | 15.3 | black | refused: same marker as 2a-27 |
+| 3372 | 2148 | 10.0 | black | 2a-27 |
+| 3301 | 2168 | 24.0 | black | 2a-12 |
+| 3579 | 2185 | 8.0 | black | 2a-30 |
+| 1590 | 2192 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2578 | 2200 | 8.1 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1590 | 2222 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2238 | 2232 | 17.0 | black | 2a-34 |
+| 3522 | 2246 | 9.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2565 | 2255 | 8.6 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2222 | 2258 | 18.9 | black | refused: same marker as 2a-34 |
+| 2227 | 2267 | 18.7 | black | refused: same marker as 2a-34 |
+| 3233 | 2267 | 23.8 | black | 2a-99 |
+| 2344 | 2288 | 18.0 | black | 2a-35 |
+| 2335 | 2303 | 17.0 | black | 2a-35 |
+| 3422 | 2314 | 23.4 | black | 2a-100 |
+| 2355 | 2339 | 14.2 | black | 2a-101 |
+| 1596 | 2450 | 10.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2598 | 2451 | 12.0 | black | 2a-37 |
+| 1594 | 2460 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2596 | 2463 | 14.0 | black | 2a-37 |
+| 3978 | 2517 | 14.4 | black | 2a-102 |
+| 2772 | 2555 | 19.0 | black | 2a-38 |
+| 2997 | 2654 | 28.3 | black | 2a-40 |
+| 3007 | 2732 | 14.0 | black | 2a-41 |
+| 3132 | 2744 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2516 | 2748 | 8.0 | black | refused: stroke or axis ridge, span 36 px; radius is not a filled marker |
+| 1904 | 2755 | 8.0 | black | refused: stroke or axis ridge, span 37 px; radius is not a filled marker |
+| 1598 | 2759 | 8.0 | black | refused: stroke or axis ridge, span 43 px; radius is not a filled marker |
+| 3130 | 2760 | 10.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4109 | 2776 | 10.3 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3747 | 2781 | 8.1 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4067 | 2782 | 8.0 | black | refused: stroke or axis ridge, span 32 px; radius is not a filled marker |
+| 4124 | 2782 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3140 | 2784 | 14.0 | black | refused: x-axis junction, thick core 27 by 12 px; not a marker |
+| 3571 | 2786 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 3168 | 2790 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 3190 | 2790 | 8.0 | black | refused: stroke or axis ridge, span 107 px; radius is not a filled marker |
+| 3314 | 2790 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2516 | 2795 | 10.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2425 | 2797 | 8.0 | black | refused: stroke or axis ridge, span 81 px; radius is not a filled marker |
+| 2526 | 2797 | 8.0 | black | refused: stroke or axis ridge, span 84 px; radius is not a filled marker |
+| 2627 | 2797 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2149 | 2801 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2183 | 2801 | 8.0 | black | refused: stroke or axis ridge, span 76 px; radius is not a filled marker |
+| 1904 | 2803 | 10.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 1877 | 2805 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 1914 | 2805 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 1955 | 2805 | 8.0 | black | refused: stroke or axis ridge, span 39 px; radius is not a filled marker |
+| 2015 | 2805 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2048 | 2805 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 1616 | 2808 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 1657 | 2808 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 1522 | 2814 | 10.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 1501 | 2849 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2568 | 2902 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3262 | 2923 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3770 | 2925 | 8.1 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2038 | 2927 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3210 | 2927 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2426 | 2931 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3699 | 2931 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2556 | 2932 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3138 | 2932 | 8.6 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2479 | 2934 | 8.0 | black | refused: stroke or axis ridge, span 36 px; radius is not a filled marker |
+| 3012 | 2934 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 1925 | 2939 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2629 | 2939 | 8.1 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3068 | 2942 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 1796 | 2946 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3132 | 2946 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 1852 | 2949 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2423 | 2949 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3882 | 2956 | 10.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3766 | 2960 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2426 | 2964 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2676 | 2964 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+
+Panel 2b: 129 cores. 26 match an existing row, 5 are new decision rows, 98 are refused.
+
+| cx | cy | r px | colour | matched row |
+| --- | --- | --- | --- | --- |
+| 1605 | 3483 | 10.3 | black | refused: ink above the top labelled tick; radius is not a filled marker |
+| 3023 | 3490 | 8.0 | black | refused: ink above the top labelled tick; radius is not a filled marker |
+| 1602 | 3494 | 8.0 | black | refused: ink above the top labelled tick; radius is not a filled marker |
+| 1602 | 3531 | 8.0 | black | refused: ink above the top labelled tick; radius is not a filled marker |
+| 1606 | 3588 | 8.1 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1627 | 3588 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1608 | 3773 | 10.8 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1605 | 3796 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1605 | 3834 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1717 | 3850 | 23.4 | black | 2b-80 |
+| 1761 | 3850 | 24.0 | black | 2b-81 |
+| 1605 | 3856 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2241 | 3860 | 19.0 | black | 2b-00 |
+| 2298 | 3894 | 14.6 | black | 2b-01 |
+| 2513 | 4074 | 26.8 | black | 2b-02 |
+| 2104 | 4130 | 24.2 | black | 2b-28 |
+| 1609 | 4162 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2633 | 4179 | 13.9 | black | 2b-03 |
+| 1609 | 4184 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2625 | 4189 | 15.3 | black | 2b-03 |
+| 2673 | 4193 | 19.0 | black | 2b-04 |
+| 1614 | 4196 | 8.5 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2896 | 4386 | 15.0 | black | 2b-09 |
+| 2961 | 4399 | 15.7 | black | 2b-11 |
+| 2985 | 4402 | 15.6 | black | 2b-11 |
+| 2616 | 4417 | 24.8 | black | 2b-31 |
+| 1616 | 4444 | 10.3 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1911 | 4449 | 8.5 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1613 | 4456 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1613 | 4501 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 3542 | 4547 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3198 | 4599 | 15.0 | black | 2b-14 |
+| 3283 | 4607 | 15.6 | black | 2b-16 |
+| 2824 | 4641 | 23.8 | black | 2b-82 |
+| 1970 | 4663 | 15.3 | black | 2b-41 |
+| 1617 | 4744 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 3027 | 4746 | 24.7 | black | 2b-38 |
+| 3188 | 4776 | 23.9 | black | 2b-24 |
+| 1617 | 4785 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1500 | 4787 | 10.3 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1512 | 4791 | 8.1 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1619 | 4797 | 9.8 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1638 | 4797 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1617 | 4807 | 8.0 | black | refused: stroke or axis ridge, span 40 px; radius is not a filled marker |
+| 2177 | 4819 | 15.6 | black | 2b-43 |
+| 3658 | 4831 | 15.5 | black | 2b-19 |
+| 3728 | 4845 | 14.2 | black | 2b-21 |
+| 3753 | 4916 | 19.0 | black | 2b-22 |
+| 3705 | 4920 | 18.4 | black | 2b-20 |
+| 2447 | 4943 | 14.9 | black | 2b-83 |
+| 3229 | 4945 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3382 | 4961 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2426 | 4983 | 16.0 | black | 2b-47 |
+| 3885 | 4988 | 26.6 | black | 2b-23 |
+| 3362 | 4992 | 24.0 | black | 2b-84 |
+| 3221 | 4998 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1620 | 5013 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2508 | 5040 | 14.4 | black | 2b-48 |
+| 2547 | 5060 | 17.0 | black | 2b-49 |
+| 1620 | 5072 | 8.0 | black | refused: stroke or axis ridge, span 84 px; radius is not a filled marker |
+| 2571 | 5073 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2693 | 5151 | 16.0 | black | 2b-50 |
+| 1620 | 5173 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2143 | 5181 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1620 | 5195 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 4150 | 5196 | 11.7 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4026 | 5200 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4079 | 5200 | 8.0 | black | refused: stroke or axis ridge, span 58 px; radius is not a filled marker |
+| 4168 | 5200 | 8.0 | black | refused: stroke or axis ridge, span 43 px; radius is not a filled marker |
+| 3699 | 5202 | 10.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3724 | 5204 | 8.0 | black | refused: stroke or axis ridge, span 151 px; radius is not a filled marker |
+| 3911 | 5204 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 3178 | 5207 | 9.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 3284 | 5208 | 8.0 | black | refused: stroke or axis ridge, span 158 px; radius is not a filled marker |
+| 3459 | 5208 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2763 | 5210 | 12.2 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2884 | 5211 | 8.0 | black | refused: stroke or axis ridge, span 226 px; radius is not a filled marker |
+| 2659 | 5212 | 10.3 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2556 | 5215 | 8.0 | black | refused: stroke or axis ridge, span 92 px; radius is not a filled marker |
+| 2671 | 5215 | 8.0 | black | refused: stroke or axis ridge, span 78 px; radius is not a filled marker |
+| 2783 | 5215 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2847 | 5215 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2143 | 5217 | 10.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2190 | 5219 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2216 | 5219 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2239 | 5219 | 8.0 | black | refused: stroke or axis ridge, span 278 px; radius is not a filled marker |
+| 1862 | 5223 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 1903 | 5223 | 8.0 | black | refused: stroke or axis ridge, span 118 px; radius is not a filled marker |
+| 2037 | 5223 | 8.0 | black | refused: stroke or axis ridge, span 77 px; radius is not a filled marker |
+| 1624 | 5225 | 8.0 | black | refused: stroke or axis ridge, span 158 px; radius is not a filled marker |
+| 1802 | 5226 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 3705 | 5297 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3209 | 5301 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2683 | 5305 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2672 | 5306 | 9.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2175 | 5312 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2761 | 5316 | 8.1 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4255 | 5319 | 8.0 | black | refused: stroke or axis ridge, span 39 px; radius is not a filled marker |
+| 1639 | 5320 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2273 | 5322 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4307 | 5322 | 8.0 | black | refused: stroke or axis ridge, span 36 px; radius is not a filled marker |
+| 2579 | 5326 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4183 | 5328 | 8.6 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2531 | 5330 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3198 | 5330 | 8.6 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3617 | 5330 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4113 | 5330 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2657 | 5334 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3068 | 5334 | 8.0 | black | refused: stroke or axis ridge, span 31 px; radius is not a filled marker |
+| 3270 | 5334 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4057 | 5337 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3783 | 5340 | 10.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4177 | 5341 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2164 | 5342 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1500 | 5343 | 9.0 | black | refused: stroke or axis ridge, span 42 px; radius is not a filled marker |
+| 2583 | 5345 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3266 | 5345 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1628 | 5346 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2179 | 5346 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2683 | 5346 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1695 | 5348 | 8.0 | black | refused: stroke or axis ridge, span 32 px; radius is not a filled marker |
+| 2527 | 5348 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3124 | 5352 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3318 | 5360 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3565 | 5360 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3617 | 5360 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2764 | 5375 | 9.2 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1500 | 5392 | 9.2 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2242 | 5404 | 9.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+
+Panel 2c: 162 cores. 31 match an existing row, 7 are new decision rows, 124 are refused.
+
+| cx | cy | r px | colour | matched row |
+| --- | --- | --- | --- | --- |
+| 2893 | 6080 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3038 | 6087 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2196 | 6103 | 15.0 | black | 2c-01 |
+| 2158 | 6110 | 22.0 | black | 2c-00 |
+| 1761 | 6116 | 10.8 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1758 | 6128 | 8.0 | black | refused: stroke or axis ridge, span 118 px; radius is not a filled marker |
+| 2168 | 6133 | 21.6 | black | 2c-00 |
+| 1791 | 6256 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1764 | 6257 | 9.2 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1676 | 6278 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 2461 | 6290 | 15.3 | black | 2c-04 |
+| 2391 | 6291 | 17.0 | black | 2c-03 |
+| 2672 | 6387 | 15.5 | black | 2c-05 |
+| 1762 | 6472 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1762 | 6516 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1762 | 6535 | 8.0 | black | refused: stroke or axis ridge, span 147 px; radius is not a filled marker |
+| 2723 | 6539 | 18.0 | black | 2c-06 |
+| 2383 | 6584 | 30.1 | black | 2c-44 |
+| 2746 | 6635 | 14.0 | black | 2c-07 |
+| 1650 | 6696 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1682 | 6697 | 9.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2916 | 6703 | 15.0 | black | 2c-08 |
+| 2986 | 6703 | 15.0 | black | 2c-11 |
+| 2537 | 6718 | 24.5 | black | 2c-45 |
+| 2540 | 6757 | 24.7 | black | 2c-80 |
+| 1767 | 6780 | 9.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2580 | 6826 | 24.4 | black | 2c-81 |
+| 2848 | 6909 | 24.2 | black | 2c-37 |
+| 1766 | 6912 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2768 | 6948 | 24.7 | black | 2c-50 |
+| 1771 | 6949 | 9.5 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1766 | 6960 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1766 | 6983 | 8.0 | black | refused: stroke or axis ridge, span 43 px; radius is not a filled marker |
+| 2934 | 7002 | 24.2 | black | 2c-38 |
+| 3338 | 7030 | 16.4 | black | 2c-82 |
+| 3340 | 7059 | 15.8 | black | 2c-17 |
+| 3371 | 7074 | 16.0 | black | 2c-18 |
+| 1954 | 7118 | 18.4 | black | 2c-55 |
+| 3320 | 7125 | 15.0 | black | 2c-83 |
+| 3654 | 7125 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2028 | 7131 | 14.3 | black | 2c-57 |
+| 3357 | 7133 | 15.0 | black | 2c-84 |
+| 3475 | 7171 | 17.9 | black | 2c-20 |
+| 3038 | 7173 | 28.0 | black | 2c-85 |
+| 3147 | 7225 | 24.2 | black | 2c-86 |
+| 2163 | 7262 | 17.0 | black | refused: same marker as 2c-59 |
+| 2139 | 7266 | 19.7 | black | 2c-59 |
+| 1770 | 7274 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1656 | 7309 | 9.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
+| 1773 | 7315 | 10.3 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1783 | 7316 | 8.0 | black | refused: stroke or axis ridge, span 32 px; radius is not a filled marker |
+| 1770 | 7326 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2321 | 7359 | 16.2 | black | 2c-61 |
+| 2297 | 7374 | 10.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1770 | 7375 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3453 | 7375 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1770 | 7397 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3437 | 7408 | 8.1 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3445 | 7427 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 3966 | 7502 | 14.9 | black | 2c-28 |
+| 2459 | 7511 | 18.0 | black | 2c-63 |
+| 2772 | 7540 | 8.1 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2766 | 7580 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2533 | 7582 | 9.2 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2725 | 7591 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2762 | 7592 | 8.9 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 2524 | 7614 | 16.0 | black | 2c-65 |
+| 1773 | 7639 | 8.0 | black | refused: stroke or axis ridge, span 62 px; radius is not a filled marker |
+| 4177 | 7651 | 15.0 | black | 2c-34 |
+| 4152 | 7696 | 10.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4159 | 7713 | 9.2 | black | 2c-32 |
+| 2497 | 7714 | 8.0 | black | refused: stroke or axis ridge, span 33 px; radius is not a filled marker |
+| 4154 | 7729 | 8.0 | black | 2c-32 |
+| 2083 | 7740 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 4188 | 7741 | 12.0 | black | 2c-35 |
+| 4154 | 7743 | 10.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
+| 1773 | 7744 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 4075 | 7745 | 8.0 | black | refused: stroke or axis ridge, span 69 px; radius is not a filled marker |
+| 4164 | 7745 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 4205 | 7745 | 8.0 | black | refused: stroke or axis ridge, span 126 px; radius is not a filled marker |
+| 3736 | 7747 | 10.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 3324 | 7749 | 10.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 3601 | 7749 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 3620 | 7749 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 3664 | 7749 | 8.0 | black | refused: stroke or axis ridge, span 62 px; radius is not a filled marker |
+| 3746 | 7749 | 8.0 | black | refused: stroke or axis ridge, span 73 px; radius is not a filled marker |
+| 3836 | 7749 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 3228 | 7752 | 8.0 | black | refused: stroke or axis ridge, span 84 px; radius is not a filled marker |
+| 3336 | 7752 | 8.0 | black | refused: stroke or axis ridge, span 147 px; radius is not a filled marker |
+| 2911 | 7754 | 9.2 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2735 | 7755 | 13.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2921 | 7756 | 8.0 | black | refused: stroke or axis ridge, span 215 px; radius is not a filled marker |
+| 2497 | 7758 | 10.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2466 | 7760 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2507 | 7760 | 8.0 | black | refused: stroke or axis ridge, span 212 px; radius is not a filled marker |
+| 2758 | 7760 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2814 | 7760 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 2423 | 7761 | 9.0 | black | refused: stroke or axis ridge, span 36 px; radius is not a filled marker |
+| 2083 | 7762 | 9.8 | black | refused: axis bar or tick; radius is not a filled marker |
+| 1774 | 7764 | 8.6 | black | refused: axis bar or tick; radius is not a filled marker |
+| 1843 | 7767 | 8.0 | black | refused: stroke or axis ridge, span 166 px; radius is not a filled marker |
+| 2030 | 7767 | 8.0 | black | refused: axis bar or tick; radius is not a filled marker |
+| 4247 | 7812 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 4266 | 7822 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3358 | 7823 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2912 | 7827 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2507 | 7831 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 4270 | 7833 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2104 | 7834 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2187 | 7834 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3800 | 7837 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3848 | 7837 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2600 | 7838 | 10.0 | black | 2c-66 |
+| 2202 | 7845 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2602 | 7848 | 8.0 | black | 2c-66 |
+| 3221 | 7848 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3348 | 7848 | 8.1 | black | refused: x-axis numeral; radius is not a filled marker |
+| 4152 | 7849 | 10.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2773 | 7852 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 4027 | 7852 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3358 | 7853 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2419 | 7856 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3602 | 7856 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3852 | 7856 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2204 | 7857 | 10.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2494 | 7857 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2907 | 7857 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3726 | 7857 | 8.1 | black | refused: x-axis numeral; radius is not a filled marker |
+| 1967 | 7860 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2826 | 7860 | 8.0 | black | refused: stroke or axis ridge, span 31 px; radius is not a filled marker |
+| 4083 | 7860 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 4147 | 7860 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2507 | 7862 | 9.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2091 | 7863 | 8.1 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2367 | 7863 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3796 | 7863 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2972 | 7864 | 8.1 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3443 | 7865 | 9.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2770 | 7867 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3721 | 7867 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2104 | 7868 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2519 | 7868 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3220 | 7870 | 9.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2423 | 7871 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 4199 | 7871 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2117 | 7873 | 8.2 | black | refused: x-axis numeral; radius is not a filled marker |
+| 1964 | 7874 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2020 | 7874 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2531 | 7882 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3020 | 7882 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3774 | 7882 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2938 | 7889 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2561 | 7897 | 8.1 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2773 | 7897 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 3419 | 7897 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2602 | 7898 | 11.3 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2419 | 7901 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2822 | 7901 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 1967 | 7904 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2016 | 7908 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2602 | 7911 | 8.0 | black | refused: x-axis numeral; radius is not a filled marker |
+| 2169 | 7927 | 8.1 | black | refused: x-axis numeral; radius is not a filled marker |
 
 ### Fig. 4a, (SiO), p_ef/p_eq versus 1000 f
 
