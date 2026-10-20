@@ -150,6 +150,7 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_ACTIVITY_LIMITATION,
+    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
     melt_oxide_activity,
     na_reductant_activity_shift_kj_per_mol_o2,
 )
@@ -1878,9 +1879,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         composition_mol: Mapping[str, float],
     ) -> tuple[tuple[str, ...], dict[str, Any]]:
         temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
-        na_standard_delta_g = cls._delta_g_kj_per_mol_o2(
-            "Na",
-            temperature_C,
+        na_standard_delta_g = _na_activity_reference_standard_delta_g_kj_per_mol_o2(
+            temperature_K
         )
         na_activity_shift = na_reductant_activity_shift_kj_per_mol_o2(
             temperature_K,
