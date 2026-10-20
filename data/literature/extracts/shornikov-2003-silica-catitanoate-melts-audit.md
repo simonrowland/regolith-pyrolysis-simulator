@@ -14,7 +14,7 @@ Not a duplicate. No extract on this base cites this title or this symposium. It 
 
 Refused, one marker at a time:
 
-- TiO2 and SiO2 at about 40 mol% SiO2. They merge into one filled diamond. The core is one blob at page pixel (2628.7, 1054.7). Neither centre was stored.
+- TiO2 and SiO2 at about 40 mol% SiO2. Sol upholds the refusal. The two markers occupy one filled core at page pixel (2628.7, 1054.7). Neither centre can be assigned, so each species is its own refused row.
 - CaTiSiO5 at about 20 mol% SiO2 is stored. The visible arc is 261 degrees on the series-5 inner radius of 21 px, the radius of the clean circle at (2905, 956). The centre is (2084.0, 937.0), log10 a = −0.215, 20.37 mol% SiO2. The series-4 square at (2074.0, 980.6) hides the lower arc, so the uncertainty stays ±0.03 and ±0.4 mol%.
 - Fig. 2 series 1 (filled circles, SiO2–MgAl2O4, 2050 K, reference [13]) and series 2 (up-triangles, SiO2–CaAl2O4, 1933 K, reference [14]). Other papers.
 - The three symbols stacked near 71 mol% SiO2 are the Fig. 2 legend, not data.
@@ -66,7 +66,7 @@ Series 3 down-triangle cores, Δf G_T/RT ±0.02 (±0.03 at x=0, where the axis c
 
 ## This-work markers
 
-One row per stored marker. The TiO2 and SiO2 pair at about 40 mol% SiO2 remains one filled blob at (2628.7, 1054.7) and is not in this table.
+A marker is a centre, or an assignable exposed arc or tip, inside a stated uncertainty. One row per this-work marker, including the refused pair.
 
 | series | species | x | y | value | decision |
 | --- | --- | --- | --- | --- | --- |
@@ -114,3 +114,5 @@ One row per stored marker. The TiO2 and SiO2 pair at about 40 mol% SiO2 remains 
 | /5 open circle | CaTiSiO5 | 2626.0 | 868.0 | activity=0.909913 | read |
 | /5 open circle | CaTiSiO5 | 2905.0 | 950.0 | activity=0.564937 | read |
 | /5 open circle | CaTiSiO5 | 3185.0 | 1071.0 | activity=0.278612 | read |
+| /2 filled up-triangle | TiO2 | 2628.7 | 1054.7 | — | refused: one core with SiO2, centre not assignable |
+| /3 filled down-triangle | SiO2 | 2628.7 | 1054.7 | — | refused: one core with TiO2, centre not assignable |
