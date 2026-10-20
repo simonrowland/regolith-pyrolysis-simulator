@@ -1376,6 +1376,49 @@ def _c3_k_feo_request(sim, *, liquid_fraction, k_kg=30.0):
     )
 
 
+def test_c3_k_solubility_cap_accounts_for_consumed_feo_mass(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    monkeypatch.setattr(
+        provider,
+        "_reduction_margin_kj_per_mol_o2",
+        lambda *_args: 1.0,
+    )
+    monkeypatch.setattr(
+        provider,
+        "_ellingham_pair_fit_extrapolations",
+        lambda *_args: {},
+    )
+
+    result = provider.dispatch(
+        _c3_k_feo_request(sim, liquid_fraction=1.0)
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    feo_removed_mol = result.transition.debits[
+        "process.cleaned_melt"
+    ]["FeO"]
+    k2o_added_mol = result.transition.credits[
+        "process.cleaned_melt"
+    ]["K2O"]
+    feo_removed_kg = feo_removed_mol * MOLAR_MASS["FeO"] / 1000.0
+    k2o_added_kg = k2o_added_mol * MOLAR_MASS["K2O"] / 1000.0
+    final_melt_kg = 10.0 - feo_removed_kg + k2o_added_kg
+
+    assert k2o_added_kg / final_melt_kg == pytest.approx(
+        BuiltinMetallothermicStepProvider.K2O_SOLUBILITY_WT_PCT / 100.0,
+        abs=1e-12,
+    )
+
+
 def test_metallothermic_dispatch_consumes_only_phase_context_scalar_tier(
     vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
 ):
