@@ -19,19 +19,6 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.scalar_boundary import is_declared_real_scalar
 
-
-_OXIDE_MOLAR_MASS_G_MOL = {
-    "SiO2": 60.0843,
-    "MgO": 40.3044,
-    "Al2O3": 101.9613,
-    "TiO2": 79.866,
-    "Fe2O3": 159.6882,
-    "FeO": 71.844,
-    "CaO": 56.0774,
-    "Na2O": 61.9789,
-    "K2O": 94.196,
-}
-
 _DEFAULT_MELT_SPECIATION = {
     "AlO": {
         "parent_oxide": "Al2O3",
@@ -331,16 +318,30 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
     def _oxide_activity_proxy_gamma_1(composition_wt_pct: Any) -> dict[str, float]:
         if not isinstance(composition_wt_pct, Mapping):
             return {}
+        # Providers import simulator accounting lazily to avoid the
+        # simulator.core -> provider -> simulator package-init cycle.
+        from simulator.accounting.exceptions import UnknownSpeciesError
+        from simulator.accounting.formulas import resolve_species_formula
+        from simulator.condensation import DepositionInputRefusal
+
         oxide_moles: dict[str, float] = {}
         for oxide, wt_pct in dict(composition_wt_pct).items():
-            molar_mass = _OXIDE_MOLAR_MASS_G_MOL.get(str(oxide))
-            if molar_mass is None:
-                continue
             if not is_declared_real_scalar(wt_pct, allow_numeric_str=True):
                 continue
             amount = max(0.0, float(wt_pct or 0.0))
             if amount > 0.0:
-                oxide_moles[str(oxide)] = amount / molar_mass
+                oxide_name = str(oxide)
+                try:
+                    molar_mass = resolve_species_formula(
+                        oxide_name
+                    ).molar_mass_g_mol
+                except UnknownSpeciesError as exc:
+                    raise DepositionInputRefusal(
+                        "species_molar_mass",
+                        oxide_name,
+                        f"formula could not be resolved: {exc}",
+                    ) from exc
+                oxide_moles[oxide_name] = amount / molar_mass
         total = sum(oxide_moles.values())
         if total <= 0.0:
             return {}

@@ -7,8 +7,8 @@ real recipe compositions (alkali sweep ~23 g/mol → Fe vapor mid
 
 These tests pin:
 1. ``_mean_molar_mass_kg_mol`` math (mole-weighted, not mass-weighted).
-2. Defensive fallback to ``DEFAULT_PIPE_M_AVG_KG_MOL`` for empty /
-   None / unknown-only inputs.
+2. Defensive fallback to ``DEFAULT_PIPE_M_AVG_KG_MOL`` for empty / None
+   inputs, with typed refusal for positive species without a formula.
 3. Backward-compat invariant: ``_pipe_conductance`` without the new
    kwarg matches pre-W7 bit-for-bit.
 4. ``estimate_transport_state`` passes evap_flux species through.
@@ -202,17 +202,17 @@ def test_overhead_unresolvable_carrier_refuses_partial_pressures():
     assert exc_info.value.value == "unresolvable-carrier"
 
 
-def test_pipe_mean_molar_mass_pin_skips_unresolvable_positive_carrier():
-    mean_mass = _mean_molar_mass_kg_mol(
-        {"Na": 1.0, "unresolvable-carrier": 1.0}
-    )
+def test_pipe_mean_molar_mass_refuses_unresolvable_positive_carrier():
+    with pytest.raises(DepositionInputRefusal) as exc_info:
+        _mean_molar_mass_kg_mol(
+            {"Na": 1.0, "unresolvable-carrier": 1.0}
+        )
 
-    assert mean_mass == pytest.approx(
-        resolve_species_formula("Na").molar_mass_kg_per_mol()
-    )
+    assert exc_info.value.parameter == "species_molar_mass"
+    assert exc_info.value.value == "unresolvable-carrier"
 
 
-def test_batch_setup_pin_accepts_unresolvable_positive_flow_species():
+def test_batch_setup_refuses_all_unresolvable_positive_flow_species():
     bundle = load_config_bundle()
     vapor_pressures = dict(bundle.vapor_pressures)
     vapor_pressures["metals"] = dict(bundle.vapor_pressures["metals"])
@@ -231,10 +231,15 @@ def test_batch_setup_pin_accepts_unresolvable_positive_flow_species():
     sim = PyrolysisSimulator(
         backend, bundle.setpoints, bundle.feedstocks, vapor_pressures
     )
-    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    with pytest.raises(DepositionInputRefusal) as exc_info:
+        sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
 
-    assert "unresolvable-metal" in sim.vapor_pressures["metals"]
-    assert "unresolvable-oxide" in sim.vapor_pressures["oxide_vapors"]
+    assert exc_info.value.parameter == "species_molar_mass"
+    assert exc_info.value.value == [
+        "unresolvable-metal",
+        "unresolvable-oxide",
+    ]
+    assert exc_info.value.terminal_refusal is True
 
 
 def test_pure_kr_returns_kr_molar_mass_without_fallback():
@@ -295,12 +300,12 @@ def test_empty_mapping_returns_default_fallback():
     assert _mean_molar_mass_kg_mol({}) == DEFAULT_PIPE_M_AVG_KG_MOL
 
 
-def test_unknown_species_only_returns_default_fallback():
-    """A mixture made entirely of species not in ``MOLAR_MASS`` (e.g.,
-    a typo'd or experimental species) must NOT poison the denominator
-    with a zero — fall back to the documented default."""
-    M_avg = _mean_molar_mass_kg_mol({"ZZZ": 1.0, "Vibranium": 0.5})
-    assert M_avg == DEFAULT_PIPE_M_AVG_KG_MOL
+def test_positive_unresolvable_species_refuses_instead_of_falling_back():
+    """A positive carrier without a formula is missing input, not a fallback."""
+    with pytest.raises(DepositionInputRefusal) as exc_info:
+        _mean_molar_mass_kg_mol({"ZZZ": 1.0, "Vibranium": 0.5})
+
+    assert exc_info.value.parameter == "species_molar_mass"
 
 
 def test_negative_and_nan_masses_are_skipped():

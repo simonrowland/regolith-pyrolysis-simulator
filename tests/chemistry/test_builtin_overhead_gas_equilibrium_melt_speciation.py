@@ -10,20 +10,37 @@ import pytest
 from engines.builtin.overhead_gas_equilibrium import (
     BuiltinOverheadGasEquilibriumProvider,
 )
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.campaigns import CampaignManager
+from simulator.condensation import DepositionInputRefusal
 from simulator.state import CampaignPhase, GAS_CONSTANT
 from tests.chemistry.conftest import _build_sim
 
 
-def test_gamma_one_oxide_activity_pin_silently_drops_unlisted_oxide():
+def test_gamma_one_oxide_activity_uses_formula_mass_for_unlisted_oxide():
     activities = (
         BuiltinOverheadGasEquilibriumProvider._oxide_activity_proxy_gamma_1(
             {"Na2O": 50.0, "Cr2O3": 50.0}
         )
     )
 
-    assert activities == {"Na2O": 1.0}
+    na2o_moles = 50.0 / resolve_species_formula("Na2O").molar_mass_g_mol
+    cr2o3_moles = 50.0 / resolve_species_formula("Cr2O3").molar_mass_g_mol
+    total = na2o_moles + cr2o3_moles
+    assert activities == pytest.approx(
+        {"Na2O": na2o_moles / total, "Cr2O3": cr2o3_moles / total}
+    )
+
+
+def test_gamma_one_oxide_activity_refuses_unresolvable_positive_oxide():
+    with pytest.raises(DepositionInputRefusal) as exc_info:
+        BuiltinOverheadGasEquilibriumProvider._oxide_activity_proxy_gamma_1(
+            {"Na2O": 50.0, "unresolvable-oxide": 50.0}
+        )
+
+    assert exc_info.value.parameter == "species_molar_mass"
+    assert exc_info.value.value == "unresolvable-oxide"
 
 
 def test_partial_campaign_condenser_geometry_deep_merges_once_at_campaign_start(

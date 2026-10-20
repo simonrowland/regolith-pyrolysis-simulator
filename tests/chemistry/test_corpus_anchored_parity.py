@@ -55,6 +55,9 @@ from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
     VaporPressureComputationError,
 )
+from engines.builtin.overhead_gas_equilibrium import (
+    BuiltinOverheadGasEquilibriumProvider,
+)
 from engines.vaporock import VapoRockProvider
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -367,19 +370,6 @@ _OVERHEAD_ALLOWED_STATUSES = {
     "simulator_engine_surface_gap",
 }
 
-_OXIDE_MOLAR_MASS_G_MOL = {
-    "SiO2": 60.0843,
-    "MgO": 40.3044,
-    "Al2O3": 101.9613,
-    "TiO2": 79.866,
-    "Fe2O3": 159.6882,
-    "FeO": 71.844,
-    "CaO": 56.0774,
-    "Na2O": 61.9789,
-    "K2O": 94.196,
-}
-
-
 def _expected_overhead_status(anchor: AtomicRatioAnchor) -> str:
     if anchor.numerator_element not in _OVERHEAD_GAS_ELEMENT_SPECIES:
         return "simulator_engine_surface_gap"
@@ -426,26 +416,6 @@ def _build_sim_for_atomic_ratio_anchor(
     return sim
 
 
-def _oxide_activity_proxy_gamma_1(
-    composition_wt_pct: Mapping[str, float],
-) -> dict[str, float]:
-    oxide_moles: dict[str, float] = {}
-    for oxide, wt_pct in composition_wt_pct.items():
-        molar_mass = _OXIDE_MOLAR_MASS_G_MOL.get(str(oxide))
-        if molar_mass is None:
-            continue
-        wt = float(wt_pct)
-        if wt > 0.0:
-            oxide_moles[str(oxide)] = wt / molar_mass
-    total = sum(oxide_moles.values())
-    if total <= 0.0:
-        return {}
-    return {
-        oxide: amount / total
-        for oxide, amount in sorted(oxide_moles.items())
-    }
-
-
 def _seed_sf2004_reference_overhead_holdup(
     anchor: AtomicRatioAnchor,
 ) -> dict[str, float]:
@@ -473,6 +443,11 @@ def _dispatch_overhead_gas_equilibrium(
     sim: PyrolysisSimulator,
     anchor: AtomicRatioAnchor,
 ) -> dict[str, float]:
+    oxide_activities = (
+        BuiltinOverheadGasEquilibriumProvider._oxide_activity_proxy_gamma_1(
+            anchor.composition_wt_pct
+        )
+    )
     result = sim._chem_kernel.dispatch(
         ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM,
         temperature_C=anchor.T_K - 273.15,
@@ -480,9 +455,7 @@ def _dispatch_overhead_gas_equilibrium(
         control_inputs={
             "headspace_volume_m3": 1.0,
             "headspace_temperature_K": anchor.T_K,
-            "oxide_activities_gamma_1": _oxide_activity_proxy_gamma_1(
-                anchor.composition_wt_pct
-            ),
+            "oxide_activities_gamma_1": oxide_activities,
             "sf2004_fractional_vaporization_pct": 0.0,
         },
     )
