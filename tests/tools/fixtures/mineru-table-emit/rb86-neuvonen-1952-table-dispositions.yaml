@@ -1,0 +1,156 @@
+source_id: rb86-neuvonen-1952
+note: >-
+  This is a table-dispositions record rather than an emit mapping. The table
+  emitter writes scored observations only; the printed solution heats,
+  compositions, and structural properties have no fitting quantity token.
+tables:
+  - draft_table: p014-t01
+    page: 14
+    table: unnumbered
+    candidate_tokens: [cp]
+    disposition: context
+    reason: Mass-specific heat capacities in cal/gram/degree have no matching cp unit representation; the åkermanite value is calculated.
+  - draft_table: p014-t02
+    page: 14
+    table: unnumbered
+    candidate_tokens: [partial_molar_enthalpy, delta_fH]
+    disposition: context
+    reason: Measured mass-specific gelatin dissolution heats do not match either candidate quantity.
+  - draft_table: hand-transcribed-p015-filter-paper
+    page: 15
+    table: unnumbered run table
+    candidate_tokens: [cp]
+    disposition: context
+    reason: Measured filter-paper heat capacity is mass-specific in cal/gram/degree, which has no matching cp unit representation.
+  - draft_table: p016-t03
+    page: 16
+    table: 'I'
+    candidate_tokens: [equilibrium_phase_composition, residue_component_composition]
+    disposition: context
+    reason: Natural-melilite analyses and optical indices are not equilibrium compositions or process residues.
+  - draft_table: p017-t04
+    page: 17
+    table: 'II'
+    candidate_tokens: []
+    disposition: context
+    reason: Optical refractive indices have no quantity enum.
+  - draft_table: p018-t05
+    page: 18
+    table: 'III'
+    candidate_tokens: []
+    disposition: context
+    reason: Unit-cell dimensions and their ratio have no quantity enum.
+  - draft_table: p020-t06
+    page: 20
+    table: 'IV'
+    candidate_tokens: [equilibrium_phase_composition, residue_component_composition, density]
+    disposition: context
+    reason: The quoted natural sample analysis is neither an equilibrium composition nor a process residue; its specific gravity is not mass density.
+  - draft_table: p022-t07
+    page: 22
+    table: 'V'
+    candidate_tokens: [equilibrium_phase_composition, residue_component_composition]
+    disposition: context
+    reason: Quoted natural brucite analysis is not an equilibrium composition or process residue.
+  - draft_table: p023-t08
+    page: 23
+    table: unnumbered OCR artifact
+    candidate_tokens: []
+    disposition: not_a_table
+    reason: The draft is a fragment of a printed correction equation, not a tabular dataset.
+  - draft_table: p024-t09
+    page: 24
+    table: unnumbered OCR artifact
+    candidate_tokens: []
+    disposition: not_a_table
+    reason: The draft is a fragment of the printed calcium-oxide solution-heat table and is retained with the hand-transcribed run table.
+  - draft_table: p024-t10
+    page: 24
+    table: unnumbered OCR artifact
+    candidate_tokens: []
+    disposition: not_a_table
+    reason: The draft is a fragment of the printed alumina correction, not a separate table.
+  - draft_table: p025-t11
+    page: 25
+    table: unnumbered OCR artifact
+    candidate_tokens: []
+    disposition: not_a_table
+    reason: The draft is a fragment of the printed brucite correction equation, not a separate table.
+  - draft_table: p025-t12
+    page: 25
+    table: unnumbered
+    candidate_tokens: [partial_molar_enthalpy, delta_fH]
+    disposition: context
+    reason: The measured and composition-corrected brucite values are integral heats of solution, for which the store has no token.
+  - draft_table: p028-t13
+    page: 28
+    table: 'VI'
+    candidate_tokens: [partial_molar_enthalpy, delta_fH, heat_of_fusion]
+    disposition: context
+    reason: These are measured heats of solution of synthetic glasses, not partial molar, formation, or fusion enthalpies.
+  - draft_table: p029-t14
+    page: 29
+    table: continuation fragment
+    candidate_tokens: []
+    disposition: not_a_table
+    reason: Continuation artifact for Table VI; the table is retained once with all printed sample rows.
+  - draft_table: p029-t15
+    page: 29
+    table: 'VII'
+    candidate_tokens: [partial_molar_enthalpy, delta_fH, heat_of_fusion]
+    disposition: context
+    reason: These are measured heats of solution of crystalline melilites, not any candidate enthalpy quantity.
+  - draft_table: p030-t16
+    page: 30
+    table: unnumbered
+    candidate_tokens: [partial_molar_enthalpy, delta_fH]
+    disposition: context
+    reason: The two natural-melilite and one diopside run tables are integral solution heats with no matching quantity token.
+  - draft_table: p030-t17
+    page: 30
+    table: unnumbered
+    candidate_tokens: [partial_molar_enthalpy, delta_fH]
+    disposition: context
+    reason: Repeated diopside measurements are integral solution heats with no matching quantity token.
+  - draft_table: p031-t18
+    page: 31
+    table: unnumbered
+    candidate_tokens: [equilibrium_phase_composition, residue_component_composition]
+    disposition: context
+    reason: The corrected component breakdown is a natural-sample composition, not an equilibrium composition or process residue.
+  - draft_table: p036-t19
+    page: 36
+    table: 'VIII'
+    candidate_tokens: [delta_fH, S, cp, H_minus_H298]
+    disposition: context
+    reason: Born-Haber ionization, sublimation, dissociation, electron-affinity and formation inputs are model-cycle context; the S column is heat of sublimation, not entropy.
+  - draft_table: p038-t20
+    page: 38
+    table: 'IX'
+    candidate_tokens: [delta_fH, partial_molar_enthalpy]
+    disposition: context
+    reason: Heat for akermanite plus gehlenite forming a solid solution is not formation from elements or a partial molar enthalpy.
+  - draft_table: p039-t21
+    page: 39
+    table: unnumbered
+    candidate_tokens: [equilibrium_phase_composition, residue_component_composition]
+    disposition: context
+    reason: Calculated component breakdowns and correction values describe natural samples and do not fit the available composition or enthalpy quantities.
+  - draft_table: p040-t22
+    page: 40
+    table: 'X'
+    candidate_tokens: [heat_of_fusion, delta_fH]
+    disposition: context
+    reason: Crystal-to-glass reaction heat is neither fusion enthalpy nor formation enthalpy from elements.
+  - draft_table: p042-t23
+    page: 42
+    table: 'XI'
+    candidate_tokens: [delta_fH]
+    disposition: context
+    reason: Values are heat of formation from component oxides, not from elements; keep the printed formula, reaction and values in context.
+  - draft_table: p047-t24
+    page: 47
+    table: 'XII'
+    candidate_tokens: []
+    disposition: context
+    reason: Hydrothermal X-ray diffraction d-spacings have no matching quantity token; the stacked cells remain unsplit as printed.
