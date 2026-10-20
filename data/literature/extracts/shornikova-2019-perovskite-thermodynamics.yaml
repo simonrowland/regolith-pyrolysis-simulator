@@ -5030,19 +5030,12 @@ species:
       phase: cr
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember:
-              formula: TiO2
-              phase:
-                tag: unknown
-                reason: >-
-                  2181.7 K, read ±4 K, lies inside the Table 2 TiO2
-                  melting band 2185 ± 10 K on published page 1431.
-                  That overlap does not establish a crystalline
-                  pure-oxide reference.
-            component_basis: TiO2
+          tag: unknown
+          reason: >-
+            2181.7 K, read ±4 K, lies inside the Table 2 TiO2
+            melting band 2185 ± 10 K on published page 1431.
+            That overlap does not establish a crystalline
+            pure-oxide reference.
         inferred: true
         inference: "Published page 1431, under equations (5) and (6): \"where pi and pi° are the partial pressures of gas phase components over perovskite and a simple oxide (a pure component), respectively.\" Equation (6) is printed a_TiO2 = p_TiO2 / p°_TiO2 = (p_TiO / p°_TiO)(p_O / p°_O). Fig. 3 caption: series 3, the open circles, is this work. p°_TiO2 is the partial pressure over the pure oxide at the temperature of this point. Table 2 of this paper lists TiO2 melting temperatures from 2098 K to 2185 ± 10 K, ref. [41] on the 2185 ± 10 K row. The phase below follows that 2185 ± 10 K row, the highest TiO2 melting temperature in the table. 2181.7 K, read ±4 K, is 3 K below 2185 K and inside the stated ±10 K band. That overlap does not establish a crystalline pure-oxide reference, so the reference phase and polymorph stay unresolved. Table 2, this work, gives the perovskite melting temperature as 2241 ± 10 K. This point is 59 K below 2241 K, so the sample phase stored here is crystalline perovskite. The point is within 100 K of that melting temperature."
         locator:
@@ -5076,7 +5069,12 @@ species:
       values:
         quantity: activity
         method_class: figure_only
-        admission_status: admitted
+        admission_status: figure_only
+        reason: >-
+          2181.7 K, read ±4 K, lies inside the Table 2 TiO2
+          melting band 2185 ± 10 K on published page 1431.
+          That overlap does not establish a crystalline
+          pure-oxide reference.
         T_K: '2181.7'
         temperature_K: 2181.7
         activity: '0.2289'
