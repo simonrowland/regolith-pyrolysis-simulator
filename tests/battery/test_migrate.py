@@ -3339,8 +3339,7 @@ _WIMPENNY_EXTRACT = (
 
 
 def test_wimpenny_arkose_row_keeps_printed_two_sigma_uncertainty() -> None:
-    migrator = Migrator()
-    migrator._migrate_extract(_WIMPENNY_EXTRACT)
+    migrator = F.migrate_one_extract(REPO_ROOT, _WIMPENNY_EXTRACT)
     observation = next(
         observation
         for observation_id, observation in migrator.result.observations.items()

@@ -38,7 +38,7 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.records import as_decimal
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
-from tests.battery.factories import tabulation_experiment
+from tests.battery.factories import migrate_one_extract, tabulation_experiment
 
 
 _OBS_ROOTS = (
@@ -236,8 +236,7 @@ def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
     assert _initial_oxide_map_from_values(values, refusal_reason=refusal) is None
     assert refusal == []
 
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
     source_experiment = migrator.result.experiments[
         "10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay"
     ]
@@ -325,8 +324,7 @@ def _assert_plante_observations_use_analyzed_composition(
 
 def test_plante_section_4_1_detection_limits_have_no_vacuum_conditions() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
 
     observation = migrator.result.observations[
         "kems-027-plante-hastie-1983::plante_hastie_1983_detection_limits_quoted"
@@ -380,8 +378,7 @@ def test_plante_glass_initials_use_analyzed_printed_map_by_name(
         return convert(wt)
 
     monkeypatch.setattr(migrate_module, "wt_pct_to_mole_fraction", record_map)
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
     migrated_id = next(
         key
         for key in migrator.result.experiments
@@ -398,8 +395,7 @@ def test_plante_glass_initials_use_analyzed_printed_map_by_name(
 def test_plante_fig19_points_keep_pooled_sample_unknown_and_gas_phase() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
     source_points = {
         row["observation_id"]: row["values"]["points"]
         for species in doc["species"].values()
@@ -703,8 +699,7 @@ def test_markova_point_refusal_mutation_proof(monkeypatch: pytest.MonkeyPatch) -
         lambda candidate: doc if candidate == path else original_load_yaml(candidate),
     )
     target_t = migrate_module.as_decimal(point["T_C"]) + Decimal("273.15")
-    migrator = Migrator(REPO_ROOT)
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
     prefix = f"{doc['source_id']}::{raw['observation_id']}"
     row = next(
         observation
@@ -1092,8 +1087,9 @@ def test_duplicate_mass_percent_pairs_are_refused_without_collapsing(
 def test_real_pretyped_experiment_initials_match_printed_composition_owner(
     source: str, expected_experiments: int
 ) -> None:
-    migrator = Migrator()
-    migrator._migrate_extract(REPO_ROOT / "data/literature/extracts" / f"{source}.yaml")
+    migrator = migrate_one_extract(
+        REPO_ROOT, REPO_ROOT / "data/literature/extracts" / f"{source}.yaml"
+    )
     experiments = [
         experiment
         for experiment in migrator.result.experiments.values()
