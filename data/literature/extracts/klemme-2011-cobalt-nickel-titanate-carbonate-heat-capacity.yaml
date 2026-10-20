@@ -9,10 +9,9 @@ source:
   corpus_sha256: de63741dd94f4f557cfb66a5b3f8a7f323ce93dc25b0caec4f67063c3d8959de
 extraction:
   method: Machine transcription from the authoritative born-digital pdftotext-layout file, with table column assignment checked
-    against 600 dpi renders. The table tool could not draft because this corpus source has no MinerU content-list JSON. The
-    corpus raw directory contains only a sidecar; the read-only original PDF under Repos/regolith-sources/_incoming was used
-    for render checks. Tables 1-3 are measured Cp points; Tables 4-6 S(T) values are author-calculated from those measurements
-    using a T^3 extrapolation. Figures 1-4 are records only, with digitisation deferred.
+    against 600 dpi renders of the corpus PDF asset. The table tool could not draft because this source has no MinerU
+    content-list JSON. Tables 1-3 are measured Cp points; Tables 4-6 S(T) values are author-calculated from those
+    measurements using a T^3 extrapolation. Figures 1-4 are records only, with digitisation deferred.
   date: '2026-10-20'
   worker: fam24-1020
 review_status: draft
