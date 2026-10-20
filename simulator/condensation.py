@@ -115,6 +115,7 @@ from simulator.physical_constants import (
     BOLTZMANN,
     CELSIUS_TO_KELVIN_OFFSET,
 )
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
     wall_deposit_candidate_kg as query_wall_deposit_candidate_kg,
@@ -2966,6 +2967,7 @@ class CondensationModel:
                 evap_flux.species_kg_hr,
                 self.overhead_pressure_mbar * 100.0,
                 reported_partial_pressures_mbar=self.species_partial_pressures_mbar,
+                species_formula_registry=self.species_formula_registry,
             )
             if self._species_partial_pressures_configured
             else {}
@@ -6141,6 +6143,7 @@ def _flowing_species_partial_pressures_pa(
     total_pressure_pa: float,
     *,
     reported_partial_pressures_mbar: Mapping[str, float] | None = None,
+    species_formula_registry: Mapping[str, Any] | None = None,
 ) -> dict[str, float]:
     try:
         if not is_declared_real_scalar(
@@ -6181,9 +6184,6 @@ def _flowing_species_partial_pressures_pa(
     else:
         molar_flow_by_species: dict[str, float] = {}
         for species, raw_rate_kg_hr in species_kg_hr.items():
-            molar_mass_g_mol = MOLAR_MASS.get(species)
-            if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
-                continue
             try:
                 if not is_declared_real_scalar(
                     raw_rate_kg_hr,
@@ -6195,8 +6195,14 @@ def _flowing_species_partial_pressures_pa(
                 continue
             if not math.isfinite(rate_kg_hr) or rate_kg_hr <= 0.0:
                 continue
+            # An unresolved positive carrier must refuse instead of silently
+            # dropping out of the mole-flow denominator and renormalizing the
+            # remaining species as if that carrier were absent.
+            molar_mass_kg_mol = resolve_species_formula(
+                str(species), species_formula_registry
+            ).molar_mass_kg_per_mol()
             molar_flow_by_species[str(species)] = (
-                rate_kg_hr / (molar_mass_g_mol / 1000.0)
+                rate_kg_hr / molar_mass_kg_mol
             )
         total_molar_flow = sum(molar_flow_by_species.values())
         if total_molar_flow <= 0.0:
