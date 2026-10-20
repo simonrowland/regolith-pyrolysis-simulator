@@ -23,7 +23,7 @@ import pytest
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
-from simulator.condensation import CondensationModel
+from simulator.condensation import CondensationModel, DepositionInputRefusal
 from simulator.core import PyrolysisSimulator
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.equipment import EquipmentDesigner
@@ -164,8 +164,8 @@ def test_catalog_generated_carriers_reach_overhead_partial_pressures():
     )
 
 
-def test_overhead_formula_only_carrier_pressure_pin_before_fix():
-    """Pin the base behavior that drops formula-resolvable H2 from Dalton's law."""
+def test_overhead_formula_only_carrier_is_included_in_pressure_normalization():
+    """Formula parsing keeps H2 in Dalton's law without a registry entry."""
 
     na_kg_hr = resolve_species_formula("Na").molar_mass_kg_per_mol()
     h2_kg_hr = resolve_species_formula("H2").molar_mass_kg_per_mol()
@@ -176,20 +176,22 @@ def test_overhead_formula_only_carrier_pressure_pin_before_fix():
 
     partials = OverheadGasModel.species_partial_pressures(flux, 10.0, {})
 
-    assert partials == {"Na": 10.0}
+    assert partials == pytest.approx({"Na": 5.0, "H2": 5.0})
 
 
-def test_overhead_unresolvable_carrier_pressure_pin_before_fix():
-    """Pin the base behavior that silently drops an unresolvable carrier."""
+def test_overhead_unresolvable_carrier_refuses_partial_pressures():
+    """An unknown positive carrier cannot silently alter the pressure sum."""
 
     flux = EvaporationFlux(
         species_kg_hr={"Na": 1.0, "unresolvable-carrier": 1.0},
         total_kg_hr=2.0,
     )
 
-    partials = OverheadGasModel.species_partial_pressures(flux, 10.0, {})
+    with pytest.raises(DepositionInputRefusal) as exc_info:
+        OverheadGasModel.species_partial_pressures(flux, 10.0, {})
 
-    assert partials == {"Na": 10.0}
+    assert exc_info.value.parameter == "species_molar_mass"
+    assert exc_info.value.value == "unresolvable-carrier"
 
 
 def test_pure_kr_returns_kr_molar_mass_without_fallback():
