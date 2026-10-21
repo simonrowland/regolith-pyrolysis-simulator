@@ -1,0 +1,376 @@
+schema_version: literature_extract.v1
+source_id: saridikmen-2009-phosphide-sulphide
+source:
+  citation: Saridikmen, H., Kucukkaragoz, C. S. and Eric, R. H. (2009), “Phosphide and Sulphide Capacities of Ferromanganese
+    Smelting Slags,” Molten 2009 Santiago proceedings, 287–298.
+  year: 2009
+extraction:
+  method: Born-digital pdftotext-layout; measured composition/capacity tables preserved in context because the schema
+    has no capacity or melt/alloy composition-vector token; figures 1–10 recorded with digitisation deferred.
+  date: '2026-10-21'
+  worker: fam38-1021
+review_status: draft
+scope_assessment:
+  document_type: equilibrate-quench-ferromanganese slag capacity measurements
+  scored_observations: 0
+  note: No capacity token exists. Table 1 and Table 2 retain every numeric row; figures 1–10 are deferred to a figure
+    pass.
+species:
+  MnO:
+    observations: []
+    context:
+    - observation_id: saridikmen_2009_table1_slag_composition_capacity_context
+      type: schema_gap_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 290
+        table: '1'
+      units: mass percent; Eo as printed; log capacity as printed
+      values:
+        method_class: measured_reduced
+        quantity_as_printed: 16 slag compositions, calculated O-2 binding energies, and logarithmic phosphide/sulphide
+          capacities
+        candidate_tokens:
+        - phosphide_capacity
+        - sulphide_capacity
+        - activity
+        - activity_coefficient
+        - residue_component_composition
+        disposition_reason: No quantity token exists for phosphide or sulphide capacity; equilibrated liquid-slag
+          composition vectors have no stored composition-vector token. Full numeric rows are preserved.
+        T_K: '1773'
+        oxygen_partial_pressure_as_printed: around 1.22 × 10^-16 atm under CO
+        table_values_as_printed: "Table 1: Slag phase compositions in mass percentage\nExperiment Code         \
+          \ SiO2    Al2O3   MgO           MnO    CaO       Ca3P2        CaS          Eo          Log Cp      Log\
+          \ Cs\n         1              45.92    6.50    11.60        14.80   18.16     0.003      1.599       5521.35\
+          \        -14.624     -8.112\n         2              41.61    9.14    18.70         4.42   22.34     0.012\
+          \      2.382       5374.46        -14.177     -7.920\n         3              38.44    6.64    13.20 \
+          \        3.00   34.84     0.029      2.362       5254.80        -13.486     -7.427\n         4       \
+          \       38.47    6.50    15.00         3.02   33.40     0.003      2.196       5248.09        -13.761\
+          \     -7.520\n         5              44.48    7.54    19.30         9.22   16.42     0.003      1.811\
+          \       5450.62        -14.715     -8.064\n         6              37.13    7.95    8.34          1.73\
+          \   40.88     0.015      2.513       5229.79        -13.437     -7.554\n         7              43.25\
+          \    5.86    13.20        17.90   17.29     0.003      0.956       5443.66        -14.598     -8.048\n\
+          \         8              44.04    5.78    13.10        17.40   16.53     0.006      1.908       5472.38\
+          \        -14.212     -8.028\n         9              40.66    5.83    14.60         6.88   29.20     0.018\
+          \      1.710       5315.78        -13.744     -7.877\n        10              43.06    5.69    10.30 \
+          \       13.40   24.21     0.003      1.872       5430.32        -14.237     -7.863\n        11       \
+          \       42.49    5.86    15.80        10.10   22.81     0.009      1.753       5385.68        -14.112\
+          \     -7.741\n        12              42.43    6.15    16.40         8.07   23.61     0.021      1.984\
+          \       5380.38        -14.145     -7.750\n        13              44.68    7.31    18.40         8.22\
+          \   18.32     0.012      1.685       5451.32        -14.326     -8.022\n        14              39.20\
+          \    6.35    13.40         4.78   32.84     0.012      2.133       5277.49        -14.005     -7.666\n\
+          \        15              39.92    6.27    13.20         4.44   32.61     0.015      2.149       5298.60\
+          \        -13.923     -7.702\n        16              41.67    6.58    15.10         6.93   25.90     0.015\
+          \      2.531       5366.99        -14.222     -7.903"
+    - observation_id: saridikmen_2009_table2_metal_composition_context
+      type: schema_gap_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 290
+        table: '2'
+      units: mass percent as printed
+      values:
+        method_class: measured_direct
+        quantity_as_printed: 16 equilibrium metal-phase compositions (Mn, Si, Fe, C, P, S)
+        candidate_tokens:
+        - residue_component_composition
+        - valence_ratio
+        disposition_reason: The store has no metal-alloy bulk-composition vector token; these equilibrium metal
+          analyses are retained in context and not mislabeled as residue composition.
+        T_K: '1773'
+        table_values_as_printed: "Table 2: Metal phase compositions in mass percentage\nExperiment Code        \
+          \         Mn               Si              Fe                   C                  P                 \
+          \ S\n         1                      66.1            11.2            18.6               3.309        \
+          \       0.016             0.038\n         2                      75.9            12.9            6.55\
+          \               3.273               0.017             0.024\n         3                      70.7    \
+          \        6.29            17.7               5.258               0.017             0.017\n         4  \
+          \                    68.6            7.41            18.5                4.72               0.003    \
+          \         0.019\n         5                      65.9            12.2            18.2                3.01\
+          \               0.018             0.034\n         6                      66.7            10.4        \
+          \    18.5               3.943               0.005             0.016\n         7                      79.4\
+          \            7.25            7.51                4.6                0.022             0.030\n        \
+          \ 8                      72.3            8.29            13.1                4.99               0.013\
+          \             0.039\n         9                      68.8            4.18            18.4            \
+          \    6.48               0.02              0.030\n        10                      74.4            6.42\
+          \            13.4                5.03               0.01              0.038\n        11              \
+          \        73.7            6.38            14.5                4.84               0.024             0.030\n\
+          \        12                      68.1            7.76            18.9                4.72            \
+          \   0.047             0.027\n        13                      65.6            12.3            18.5    \
+          \            2.88               0.03              0.029\n        14                      81          \
+          \    4.29            7.34                6.31               0.025             0.025\n        15      \
+          \                74.2            5.39            13.6                6.06               0.022        \
+          \     0.024\n        16                      79.1            7.49            7.11                5.16\
+          \               0.037             0.043"
+    - observation_id: saridikmen_2009_figure1_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 291
+        figure: '1'
+      panel: whole_figure
+      phase: MnO–CaO–SiO2–MgO–Al2O3–CaS–Ca3P2 slag, liquid at 1773 K
+      units: phosphide_capacity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: phosphide_capacity
+        species: sulphide and phosphide capacity of slag
+        temperature_as_printed: 1773 K
+        axes_as_printed:
+          x: basicity as printed (CaO/SiO2 or optical basicity)
+          y: log Cp
+        series:
+        - name: experimental slag runs
+          marker: as identified in figure
+          marker_count: 16
+          attribution: Saridikmen et al. (2009)
+        caption: The effect of basicity on the phosphide capacity of slag at 1773 K
+        attribution: Saridikmen, Kucukkaragoz and Eric (2009)
+        digitisation: deferred to a figure pass
+    - observation_id: saridikmen_2009_figure2_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 291
+        figure: '2'
+      panel: whole_figure
+      phase: MnO–CaO–SiO2–MgO–Al2O3–CaS–Ca3P2 slag, liquid at 1773 K
+      units: sulphide_capacity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: sulphide_capacity
+        species: sulphide and phosphide capacity of slag
+        temperature_as_printed: 1773 K
+        axes_as_printed:
+          x: basicity as printed (CaO/SiO2 or optical basicity)
+          y: log Cs
+        series:
+        - name: experimental slag runs
+          marker: as identified in figure
+          marker_count: 16
+          attribution: Saridikmen et al. (2009)
+        caption: The effect of basicity on the sulphide capacity of slag at 1773 K
+        attribution: Saridikmen, Kucukkaragoz and Eric (2009)
+        digitisation: deferred to a figure pass
+    - observation_id: saridikmen_2009_figure3_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 292
+        figure: '3'
+      panel: whole_figure
+      phase: MnO–CaO–SiO2–MgO–Al2O3–CaS–Ca3P2 slag, liquid at 1773 K
+      units: phosphide_capacity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: phosphide_capacity
+        species: sulphide and phosphide capacity of slag
+        temperature_as_printed: 1773 K
+        axes_as_printed:
+          x: CaO content
+          y: log Cp
+        series:
+        - name: experimental slag runs
+          marker: as identified in figure
+          marker_count: 16
+          attribution: Saridikmen et al. (2009)
+        caption: The effect of CaO content on the phosphide capacity of slag at 1773 K
+        attribution: Saridikmen, Kucukkaragoz and Eric (2009)
+        digitisation: deferred to a figure pass
+    - observation_id: saridikmen_2009_figure4_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 292
+        figure: '4'
+      panel: whole_figure
+      phase: MnO–CaO–SiO2–MgO–Al2O3–CaS–Ca3P2 slag, liquid at 1773 K
+      units: sulphide_capacity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: sulphide_capacity
+        species: sulphide and phosphide capacity of slag
+        temperature_as_printed: 1773 K
+        axes_as_printed:
+          x: CaO content
+          y: log Cs
+        series:
+        - name: experimental slag runs
+          marker: as identified in figure
+          marker_count: 16
+          attribution: Saridikmen et al. (2009)
+        caption: The effect of CaO content on the sulphide capacity of slag at 1773 K
+        attribution: Saridikmen, Kucukkaragoz and Eric (2009)
+        digitisation: deferred to a figure pass
+    - observation_id: saridikmen_2009_figure5_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 293
+        figure: '5'
+      panel: whole_figure
+      phase: MnO–CaO–SiO2–MgO–Al2O3–CaS–Ca3P2 slag, liquid at 1773 K
+      units: phosphide_capacity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: phosphide_capacity
+        species: sulphide and phosphide capacity of slag
+        temperature_as_printed: 1773 K
+        axes_as_printed:
+          x: MnO content
+          y: log Cp
+        series:
+        - name: experimental slag runs
+          marker: as identified in figure
+          marker_count: 16
+          attribution: Saridikmen et al. (2009)
+        caption: The effect of MnO content on the phosphide capacity of slag at 1773 K
+        attribution: Saridikmen, Kucukkaragoz and Eric (2009)
+        digitisation: deferred to a figure pass
+    - observation_id: saridikmen_2009_figure6_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 293
+        figure: '6'
+      panel: whole_figure
+      phase: MnO–CaO–SiO2–MgO–Al2O3–CaS–Ca3P2 slag, liquid at 1773 K
+      units: sulphide_capacity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: sulphide_capacity
+        species: sulphide and phosphide capacity of slag
+        temperature_as_printed: 1773 K
+        axes_as_printed:
+          x: MnO content
+          y: log Cs
+        series:
+        - name: experimental slag runs
+          marker: as identified in figure
+          marker_count: 16
+          attribution: Saridikmen et al. (2009)
+        caption: The effect of MnO content on the sulphide capacity of slag at 1773 K
+        attribution: Saridikmen, Kucukkaragoz and Eric (2009)
+        digitisation: deferred to a figure pass
+        note: Caption text says phosphide capacity; the adjoining results discussion identifies Figure 6 as sulphide
+          capacity. No figure values were digitised.
+    - observation_id: saridikmen_2009_figure7_deferred
+      type: figure_record
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 294
+        figure: '7'
+      panel: whole_figure
+      phase: MnO–CaO–SiO2–MgO–Al2O3–CaS–Ca3P2 slag, liquid at 1773 K
+      units: phosphide_capacity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: phosphide_capacity
+        species: sulphide and phosphide capacity of slag
+        temperature_as_printed: 1773 K
+        axes_as_printed:
+          x: MgO content
+          y: log Cp
+        series:
+        - name: experimental slag runs
+          marker: as identified in figure
+          marker_count: 16
+          attribution: Saridikmen et al. (2009)
+        caption: The effect of MgO content on the phosphide capacity of slag at 1773 K
+        attribution: Saridikmen, Kucukkaragoz and Eric (2009)
+        digitisation: deferred to a figure pass
+    - observation_id: saridikmen_2009_figure8_deferred
+      type: figure_record
+      locator:
+        page: 9
+        pdf_page_index: 8
+        published_page: 294
+        figure: '8'
+      panel: whole_figure
+      phase: MnO–CaO–SiO2–MgO–Al2O3–CaS–Ca3P2 slag, liquid at 1773 K
+      units: sulphide_capacity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: sulphide_capacity
+        species: sulphide and phosphide capacity of slag
+        temperature_as_printed: 1773 K
+        axes_as_printed:
+          x: MgO content
+          y: log Cs
+        series:
+        - name: experimental slag runs
+          marker: as identified in figure
+          marker_count: 16
+          attribution: Saridikmen et al. (2009)
+        caption: The effect of MgO content on the sulphide capacity of slag at 1773 K
+        attribution: Saridikmen, Kucukkaragoz and Eric (2009)
+        digitisation: deferred to a figure pass
+    - observation_id: saridikmen_2009_figure9_deferred
+      type: figure_record
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: 295
+        figure: '9'
+      panel: whole_figure
+      phase: MnO–CaO–SiO2–MgO–Al2O3–CaS–Ca3P2 slag, liquid at 1773 K
+      units: phosphide_capacity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: phosphide_capacity
+        species: sulphide and phosphide capacity of slag
+        temperature_as_printed: 1773 K
+        axes_as_printed:
+          x: O-2 binding energy Eo
+          y: log Cp
+        series:
+        - name: experimental slag runs
+          marker: as identified in figure
+          marker_count: 16
+          attribution: Saridikmen et al. (2009)
+        - name: linear model fit
+          marker: line
+          marker_count: 0
+          attribution: present study; equations 11–12
+        caption: The relationship between Eo and phosphide capacity of slag at 1773 K
+        attribution: Saridikmen, Kucukkaragoz and Eric (2009)
+        digitisation: deferred to a figure pass
+    - observation_id: saridikmen_2009_figure10_deferred
+      type: figure_record
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: 295
+        figure: '10'
+      panel: whole_figure
+      phase: MnO–CaO–SiO2–MgO–Al2O3–CaS–Ca3P2 slag, liquid at 1773 K
+      units: sulphide_capacity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: sulphide_capacity
+        species: sulphide and phosphide capacity of slag
+        temperature_as_printed: 1773 K
+        axes_as_printed:
+          x: O-2 binding energy Eo
+          y: log Cs
+        series:
+        - name: experimental slag runs
+          marker: as identified in figure
+          marker_count: 16
+          attribution: Saridikmen et al. (2009)
+        - name: linear model fit
+          marker: line
+          marker_count: 0
+          attribution: present study; equations 11–12
+        caption: The relationship between Eo and sulphide capacity of slag at 1773 K
+        attribution: Saridikmen, Kucukkaragoz and Eric (2009)
+        digitisation: deferred to a figure pass
