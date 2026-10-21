@@ -1,0 +1,201 @@
+schema_version: literature_extract.v1
+source_id: sukenaga-2021-sodium-silicate-thermal-conductivity-heat-capacity
+source:
+  citation: >-
+    Sukenaga, S., Endo, T., Nishi, T., Yamada, H., Ohara, K., Wakihara, T.,
+    Inoue, K., Kawanishi, S., Ohta, H. & Shibata, H. (2021), "Thermal
+    Conductivity of Sodium Silicate Glasses and Melts: Contribution of Diffusive
+    and Propagative Vibration Modes", Frontiers in Materials 8:753746.
+  doi: 10.3389/fmats.2021.753746
+  year: 2021
+extraction:
+  method: >-
+    Born-digital PDF transcribed from pdftotext-layout; Table 1 was checked
+    against the 600 dpi render of physical PDF page 3. Figure records are
+    deferred; no plotted values were digitised.
+  date: '2026-10-21'
+  worker: codex
+review_status: draft
+evidence_policy:
+  classification: measured_table_and_figure_only
+  measurement_claim: >-
+    Table 1 reports room-temperature properties of silica and sodium disilicate
+    glasses. The printed density, mass-specific heat capacity, thermal
+    diffusivity, and thermal conductivity values are retained in context because
+    the current extract migrator has no density source field, the heat-capacity
+    token is molar-basis, and no compatible tokens exist for the other properties.
+    Figures 1–3 are recorded for a later figure pass.
+  missing_values: No plotted values were estimated or digitised.
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: sukenaga_2021_table1_room_temperature_glass_properties
+      type: table_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 3
+        table: '1'
+      phase: glass
+      units: mol%, 10^-7 m2 s^-1, J kg^-1 K^-1, kg m^-3, W m^-1 K^-1
+      quote: >-
+        Composition and properties of the glass samples at room temperature.
+        The analyzed composition of the NS2 glass is indicated in parentheses.
+        Assuming the uncertainty in Cp is ±1%, the possible error range for the
+        derived κ value is ±2.2%.
+      values:
+        method_class: measured_tabulated
+        quantity_as_printed: composition and thermophysical properties
+        room_temperature_K: 300
+        rows:
+        - sample: SiO2 glass
+          composition_mol_pct: {SiO2: 100, Na2O: not_reported}
+          thermal_diffusivity_10^-7_m2_s: 8.67
+          thermal_diffusivity_sigma_10^-7_m2_s: 0.17
+          cp_J_kg_K: 736
+          cp_attribution: Richet et al. (1982), footnote 1
+          density_kg_m3: 2200
+          density_sigma_kg_m3: 2
+          thermal_conductivity_W_m_K: 1.40
+        - sample: NS2 glass (Na2O·2SiO2)
+          nominal_composition_mol_pct: {SiO2: 67.0, Na2O: 33.0}
+          analyzed_composition_mol_pct: {SiO2: 66.1, Na2O: 33.9}
+          thermal_diffusivity_10^-7_m2_s: 4.40
+          thermal_diffusivity_sigma_10^-7_m2_s: 0.11
+          cp_J_kg_K: 886
+          density_kg_m3: 2490
+          density_sigma_kg_m3: 10
+          thermal_conductivity_W_m_K: 0.971
+        candidate_tokens:
+        - density: enum exists, but QUANTITY_SOURCE_FIELDS has no density field, so the value cannot migrate
+        - cp: token is molar-basis; the printed values are mass-specific
+        - thermal diffusivity: no store quantity token
+        - thermal conductivity: no store quantity token
+        schema_gap: >-
+          Thermal conductivity is derived by the authors from thermal
+          diffusivity, density and Cp; those inputs have no compatible
+          extract-to-store mapping. Derivation pending a corpus table asset
+          (controller, t-1382).
+        note: >-
+          Silica-glass Cp=736 J kg^-1 K^-1 is attributed to Richet et al.
+          (1982), not measured in this study. The prose on physical PDF page 3
+          repeats the two densities as 2200 ± 2 and 2490 ± 10 kg m^-3; this
+          table is the single retained record. The printed κ uncertainty is
+          ±2.2% for derived κ, not a row-specific uncertainty.
+    - observation_id: sukenaga_2021_text_reported_structure_and_mean_free_path
+      type: printed_data_context
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 6
+        section: Discussion; phonon mean free path
+      phase: glass
+      units: nm
+      quote: >-
+        The silica-glass phonon mean free path was approximately 0.6 nm at
+        300 K, while the NS2-glass value was close to 0.4 nm. The total
+        correlation function had major peaks at 0.163, 0.233, 0.264, and
+        0.316 nm, assigned respectively to Si-O, Na-O, O-O, and Si-Si
+        correlations.
+      values:
+        method_class: model_derived
+        quantity_as_printed: estimated phonon mean free path and total correlation peak positions
+        T_K: 300
+        silica_glass_mean_free_path_nm: 0.6
+        silica_glass_mean_free_path_approximate: true
+        NS2_glass_mean_free_path_nm: 0.4
+        NS2_glass_mean_free_path_approximate: true
+        total_correlation_function_major_peaks_nm:
+        - {correlation: Si-O, r_nm: 0.163}
+        - {correlation: Na-O, r_nm: 0.233}
+        - {correlation: O-O, r_nm: 0.264}
+        - {correlation: Si-Si, r_nm: 0.316}
+        schema_gap: No store token for phonon mean free path or total correlation peak positions.
+    - observation_id: sukenaga_2021_figure1_deferred
+      type: figure_record
+      locator: {page: 4, pdf_page_index: 3, published_page: 4, figure: '1'}
+      units: kg m^-3, J kg^-1 K^-1, 10^-7 m2 s^-1, W m^-1 K^-1, K
+      values:
+        method_class: figure_only
+        quantity_as_printed: density, specific heat capacity, thermal diffusivity, thermal conductivity
+        species: SiO2 and Na2O·2SiO2 (NS2)
+        phase: glass and melt
+        T_K: [250, 1750]
+        caption: >-
+          Temperature dependence of (A) density, (B) specific heat capacity,
+          (C) thermal diffusivity, and (D) thermal conductivity of silica and
+          sodium disilicate (NS2) compositions. Reported Shartsis et al. (1952)
+          NS2 melt density; dashed estimated silica density; blue triangle and
+          circle NS2 melt diffusivities derived from Nishi et al. (2019) and
+          Manako et al. (2018); blue dashed NS2 melt/glass thermal conductivity
+          from Hayashi et al. (2001). NS2 melt laser-flash thermal conductivity
+          uncertainty is estimated as ±7.2%.
+        panels: [A, B, C, D]
+        axes_as_printed:
+          x: Temperature, T/K
+          y:
+            A: Density, ρ/kg·m^-3
+            B: Specific heat capacity, Cp/J·kg^-1·K^-1
+            C: Thermal diffusivity, 10^7 α/m^2·s^-1
+            D: Thermal conductivity, κ/W·m^-1·K^-1
+        series:
+        - {name: NS2 glass present study, marker_count: 'not counted; plotted marker'}
+        - {name: NS2 melt Shartsis et al. (1952), marker_count: 'not counted; plotted markers'}
+        - {name: silica glass present study, marker_count: 'not counted; plotted marker'}
+        - {name: estimated silica density and conductivity curves, marker_count: 0}
+        - {name: silica and NS2 Cp data and estimates, marker_count: 'not counted; plotted markers and curves'}
+        - {name: silica and NS2 diffusivity data, marker_count: 'not counted; plotted markers'}
+        - {name: NS2 melt diffusivity from Manako et al. (2018) and Nishi et al. (2019), marker_count: 'not counted; plotted markers'}
+        - {name: silica and NS2 thermal conductivity measurements and literature curves, marker_count: 'not counted; plotted markers and curves'}
+        digitisation: deferred to a figure pass
+    - observation_id: sukenaga_2021_figure2_deferred
+      type: figure_record
+      locator: {page: 6, pdf_page_index: 5, published_page: 6, figure: '2'}
+      units: m s^-1, W m^-1 K^-1, K
+      values:
+        method_class: figure_only
+        quantity_as_printed: velocity of sound and thermal conductivity contribution
+        species: SiO2 and Na2O·2SiO2 (NS2)
+        phase: glass and melt
+        T_K: [250, 1750]
+        caption: >-
+          (A) Velocity of sound for silica and NS2 glass and melt. (B)
+          Comparison of estimated diffusive vibration-mode contribution
+          (κdiff) with experimental thermal conductivity (κexp).
+        panels: [A, B]
+        axes_as_printed:
+          A: {x: 'Temperature, T/K', y: 'Velocity of sound, v/m·s^-1'}
+          B: {x: 'Temperature, T/K', y: 'Thermal conductivity, κ/W·m^-1·K^-1'}
+        series:
+        - {name: estimated silica-glass sound velocity, marker_count: 'not counted; plotted markers'}
+        - {name: NS2 glass sound velocity from Hiroshima et al. (2008), marker_count: 1}
+        - {name: NS2 melt sound velocity from Hayashi et al. (2001), marker_count: 'not counted; plotted markers'}
+        - {name: silica and NS2 experimental conductivity, marker_count: 'not counted; plotted markers and curves'}
+        - {name: estimated diffusive conductivity contribution, marker_count: 0}
+        digitisation: deferred to a figure pass
+    - observation_id: sukenaga_2021_figure3_deferred
+      type: figure_record
+      locator: {page: 6, pdf_page_index: 5, published_page: 6, figure: '3'}
+      units: 10 l/nm, S(q), T(r), nm, K
+      values:
+        method_class: figure_only
+        quantity_as_printed: phonon mean free path and structure functions
+        species: Na2O·2SiO2 (NS2)
+        phase: glass and melt
+        T_K: [300, 300]
+        caption: >-
+          (A) Estimated phonon mean free path of silica and NS2 glass and melt.
+          (B) S(q) of NS2 glass at 300 K. (C) Total correlation function T(r) of
+          NS2 glass at 300 K; inset is a schematic of SiO4 tetrahedra and typical
+          interatomic distance between silicon atoms (Waseda and Toguri, 1978).
+        panels: [A, B, C]
+        axes_as_printed:
+          A: {x: 'Temperature, T/K', y: 'Phonon mean free path, 10 l/nm'}
+          B: {x: 10^-1 q/nm^-1, y: S(q)}
+          C: {x: 10 r/nm, y: T(r)}
+        series:
+        - {name: silica and NS2 glass/melt mean free path, marker_count: 'not counted; plotted markers'}
+        - {name: NS2 glass structure factor S(q), marker_count: 0}
+        - {name: NS2 glass total correlation function T(r), marker_count: 0}
+        digitisation: deferred to a figure pass
