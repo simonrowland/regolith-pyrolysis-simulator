@@ -96,6 +96,7 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any, Mapping, Sequence
 
+from simulator.physical_constants import PA_PER_BAR
 from simulator.vapour_rail.nasa_cea import (
     Nasa9Segment,
     NasaCeaPolynomial,
@@ -289,7 +290,7 @@ def _load_cea_polynomials_from_text(
             citation=values.get("citation"),
             source_ref_code=values.get("source_ref_code"),
             reference_pressure_Pa=float(
-                values.get("reference_pressure_Pa", 100_000.0)
+                values.get("reference_pressure_Pa", PA_PER_BAR)
             ),
         )
     return tuple(polynomials.items())
@@ -331,7 +332,7 @@ def _oxygen_atom_partial_pressure_bar(
         raise OffgasFO2Unavailable(
             "NASA CEA O and O2 records use different reference pressures"
         )
-    reference_pressure_bar = molecular_oxygen.reference_pressure_Pa / 100_000.0
+    reference_pressure_bar = molecular_oxygen.reference_pressure_Pa / PA_PER_BAR
     equilibrium_constant = reaction_equilibrium_constant(
         (
             (2.0, oxygen.evaluate(temperature_K)),
@@ -669,7 +670,7 @@ def co2_dissociation_partials_bar(
     if c == 0.0:
         return {"p_O2_bar": b, "p_CO_bar": 0.0, "p_CO2_bar": 0.0, "notices": []}
     polys = load_buffer_polynomials()
-    reference_bar = polys["O2"].reference_pressure_Pa / 100_000.0
+    reference_bar = polys["O2"].reference_pressure_Pa / PA_PER_BAR
     if any(polys[s].reference_pressure_Pa != polys["O2"].reference_pressure_Pa
            for s in ("CO", "CO2")):
         raise OffgasFO2Unavailable("CO2/CO/O2 records have different standard pressures")
