@@ -16,7 +16,7 @@ from typing import Any
 import yaml
 from simulator.yaml_cache import load_cached_safe_yaml
 
-from engines.antoine import _antoine_log10_pressure, _antoine_skip_notice
+from engines.antoine import _append_antoine_skip_notice, _antoine_log10_pressure
 from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
     canonical_melt_oxide_activity_name,
@@ -298,6 +298,7 @@ def _analytical_vapor_pressures_from_activities(
     by_species: dict[str, dict[str, Any]] = {}
     extrapolations: dict[str, Any] = {}
     warnings: list[str] = []
+    antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
 
     from simulator.vapour_rail.catalog import compiled_catalog_for
 
@@ -372,13 +373,13 @@ def _analytical_vapor_pressures_from_activities(
         C = float(antoine.get("C", 0.0) or 0.0)
         if not (A > 0.0 and T_K > 300.0):
             if not A > 0.0:
-                warnings.append(
-                    _antoine_skip_notice(
-                        antoine,
-                        species=species,
-                        site="alphamelts_volatility.metal_antoine",
-                        temperature_K=T_K,
-                    )
+                _append_antoine_skip_notice(
+                    warnings,
+                    antoine_skip_notice_keys,
+                    antoine,
+                    species=species,
+                    site="alphamelts_volatility.metal_antoine",
+                    temperature_K=T_K,
                 )
             continue
         activity = float(activities.get(parent_oxide, 0.0) or 0.0)
@@ -503,13 +504,13 @@ def _analytical_vapor_pressures_from_activities(
         B = float(antoine.get("B", 0.0) or 0.0)
         C = float(antoine.get("C", 0.0) or 0.0)
         if not A > 0.0:
-            warnings.append(
-                _antoine_skip_notice(
-                    antoine,
-                    species=species,
-                    site="alphamelts_volatility.oxide_vapor_antoine",
-                    temperature_K=T_K,
-                )
+            _append_antoine_skip_notice(
+                warnings,
+                antoine_skip_notice_keys,
+                antoine,
+                species=species,
+                site="alphamelts_volatility.oxide_vapor_antoine",
+                temperature_K=T_K,
             )
             continue
         parent_oxide = str(data.get("parent_oxide", "") or "")

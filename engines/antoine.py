@@ -5,6 +5,14 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 
+def _antoine_skip_reason(coefficients: Mapping[str, object]) -> str:
+    return (
+        "missing_antoine_A"
+        if coefficients.get("A") is None
+        else "nonpositive_antoine_A"
+    )
+
+
 def _antoine_skip_notice(
     coefficients: Mapping[str, object],
     *,
@@ -13,15 +21,35 @@ def _antoine_skip_notice(
     temperature_K: float,
 ) -> str:
     """Describe a skipped Antoine row without changing its evaluation."""
-    reason = (
-        "missing_antoine_A"
-        if coefficients.get("A") is None
-        else "nonpositive_antoine_A"
-    )
+    reason = _antoine_skip_reason(coefficients)
     return (
         "antoine_species_skipped: "
         f"species={species} site={site} reason={reason} "
         f"temperature_K={temperature_K:.3f}"
+    )
+
+
+def _append_antoine_skip_notice(
+    notices: list[str],
+    seen: set[tuple[str, str, str]],
+    coefficients: Mapping[str, object],
+    *,
+    species: str,
+    site: str,
+    temperature_K: float,
+) -> None:
+    """Append at most one notice per skipped species/site/reason in a result."""
+    key = (species, site, _antoine_skip_reason(coefficients))
+    if key in seen:
+        return
+    seen.add(key)
+    notices.append(
+        _antoine_skip_notice(
+            coefficients,
+            species=species,
+            site=site,
+            temperature_K=temperature_K,
+        )
     )
 
 

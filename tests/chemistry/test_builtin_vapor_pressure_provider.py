@@ -334,6 +334,12 @@ def _set_antoine_a(coefficients, a_value):
         coefficients["A"] = a_value
 
 
+class _RepeatedItems(dict):
+    def items(self):
+        yield from super().items()
+        yield from super().items()
+
+
 def _assert_antoine_skip_notice(
     warnings,
     *,
@@ -459,6 +465,27 @@ def test_builtin_provider_reports_skipped_oxide_vapor_antoine_A(
         reason=reason,
         temperature_K=1900.0,
     )
+    assert "SiO" not in result.diagnostic["vapor_pressures_Pa"]
+
+
+def test_builtin_provider_deduplicates_repeated_antoine_skip_in_one_result(
+    vapor_pressure_data,
+) -> None:
+    data = copy.deepcopy(vapor_pressure_data)
+    row = data["oxide_vapors"]["SiO"]
+    row["antoine"] = {"B": 0.0, "C": 0.0}
+    data["oxide_vapors"] = _RepeatedItems({"SiO": row})
+
+    provider = BuiltinVaporPressureProvider(data)
+    provider._vapour_rail_catalog = None
+    result = provider.dispatch(_request_for_oxide_at_T_K("SiO2", 1900.0))
+
+    notice = (
+        "antoine_species_skipped: species=SiO "
+        "site=builtin_vapor_pressure.oxide_vapor_antoine "
+        "reason=missing_antoine_A temperature_K=1900.000"
+    )
+    assert result.warnings.count(notice) == 1
     assert "SiO" not in result.diagnostic["vapor_pressures_Pa"]
 
 
