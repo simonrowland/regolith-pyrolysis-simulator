@@ -187,6 +187,70 @@ _STAGE_AREA_ALIASES = {
 }
 
 
+def wall_temperature_schedule(config: Mapping, default_C: float) -> dict:
+    """Translate a wall trajectory by the requested default-temperature change.
+
+    Premise: the YAML schedule specifies offsets from its default wall T.
+    T_new(t) = T_yaml(t) + (default_new - default_yaml). The difference is
+    kelvins (equivalently degrees C); timing and ramp slopes are unchanged.
+    With zero change this returns the original trajectory exactly.
+    """
+    from copy import deepcopy
+    result = deepcopy(dict(config))
+    delta_C = float(default_C) - float(config['default_C'])
+    result['default_C'] = float(default_C)
+    schedule = result.get('schedule', [])
+    if isinstance(schedule, Mapping):
+        schedule = schedule.get('segments', [])
+    for segment in schedule:
+        for key in ('start_C', 'end_C'):
+            if key in segment:
+                segment[key] = float(segment[key]) + delta_C
+    return result
+
+
+def resolve_wall_temperature_patch(base: Mapping, patch: Mapping) -> Mapping:
+    """Compile public wall requests at the shared setpoints merge boundary.
+
+    Serialization retains the existing default_C paths. The runtime schedule
+    derives from that request and the actual base trajectory, including custom
+    base mappings. An explicitly supplied schedule owns its own temperatures.
+    """
+    requested = patch.get('overhead_headspace')
+    source = base.get('overhead_headspace')
+    if not isinstance(requested, Mapping) or not isinstance(source, Mapping):
+        return patch
+    result = dict(patch)
+    headspace = dict(requested)
+    result['overhead_headspace'] = headspace
+
+    def compile_wall(original, request):
+        if (isinstance(original, Mapping) and isinstance(request, Mapping)
+                and 'default_C' in request and 'schedule' not in request
+                and 'schedule' in original):
+            compiled = wall_temperature_schedule(original, request['default_C'])
+            compiled.update(request)
+            return compiled
+        return request
+
+    if 'liner_temperature_C' in requested:
+        headspace['liner_temperature_C'] = compile_wall(
+            source.get('liner_temperature_C'), requested['liner_temperature_C'])
+    pipes = requested.get('pipe_segment_temperatures_C')
+    original_pipes = source.get('pipe_segment_temperatures_C')
+    if isinstance(pipes, Mapping) and isinstance(original_pipes, Mapping):
+        compiled_pipes = dict(pipes)
+        headspace['pipe_segment_temperatures_C'] = compiled_pipes
+        segments = pipes.get('segments')
+        if isinstance(segments, Mapping):
+            originals = original_pipes.get('segments', {})
+            compiled_pipes['segments'] = {
+                name: compile_wall(originals.get(name), request)
+                for name, request in segments.items()
+            }
+    return result
+
+
 class OverheadConfigurationError(ValueError):
     """Invalid overhead configuration input."""
 

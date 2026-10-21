@@ -862,6 +862,9 @@ def _deep_merge_setpoints(
             normalize_chemistry_kernel_config(raw_kernel_patch)
         except (TypeError, ValueError) as exc:
             raise RunnerError(str(exc)) from exc
+    if _top_level:
+        from simulator.overhead import resolve_wall_temperature_patch
+        patch = resolve_wall_temperature_patch(base, patch)
     merged = dict(base)
     for key, value in patch.items():
         current = merged.get(key)

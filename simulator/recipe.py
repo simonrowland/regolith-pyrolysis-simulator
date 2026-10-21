@@ -129,13 +129,17 @@ DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V = 2.5
 BOUNDS_DIGEST_SCHEMA_VERSION = "optimizer-bounds-digest-v1"
 
 
-def _c5_allow_mre_voltage_cap_upper_bound() -> float:
-    path = DEFAULT_DATA_DIR / "setpoints.yaml"
-    try:
-        with path.open("r", encoding="utf-8") as handle:
-            loaded = load_cached_safe_yaml(handle.read()) or {}
-    except OSError:
-        return DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V
+def _c5_allow_mre_voltage_cap_upper_bound(
+    setpoints: Mapping[str, Any] | None = None,
+) -> float:
+    if setpoints is None:
+        path = DEFAULT_DATA_DIR / "setpoints.yaml"
+        try:
+            loaded = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
+        except OSError:
+            return DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V
+    else:
+        loaded = setpoints
     if not isinstance(loaded, Mapping):
         return DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V
     campaigns = loaded.get("campaigns")
@@ -201,8 +205,23 @@ C3_ALKALI_DOSING_NA_KG_PATH: KeyPath = tuple(
 C3_ALKALI_DOSING_K_KG_PATH: KeyPath = tuple(
     "campaigns.C3.alkali_dosing.K_kg".split(".")
 )
-C3_ALKALI_DOSING_NA_HIGH_KG = 140.0
-C3_ALKALI_DOSING_K_HIGH_KG = 56.0
+
+
+def _c3_alkali_dose_highs(setpoints: Mapping[str, Any]) -> tuple[float, float]:
+    c3 = setpoints['campaigns']['C3']
+    # Na_total already covers all cycles. K is per cycle: total kg =
+    # kg/cycle * the declared Path-B cycle count; one cycle recovers the
+    # per-cycle ceiling and zero cycles permits zero dose. No charge scaling.
+    return (
+        float(c3['Na_phase']['Na_total_kg'][1]),
+        float(c3['K_phase']['K_per_cycle_kg'][1])
+        * float(c3['K_phase']['cycles_after_pathB']),
+    )
+
+
+_C3_DEFAULT_DOSE_HIGHS = _c3_alkali_dose_highs(load_cached_safe_yaml(
+    (DEFAULT_DATA_DIR / "setpoints.yaml").read_text(encoding="utf-8")))
+C3_ALKALI_DOSING_NA_HIGH_KG, C3_ALKALI_DOSING_K_HIGH_KG = _C3_DEFAULT_DOSE_HIGHS
 # Deadband exists only so continuous samplers can reach OFF; keep it well
 # below physically meaningful C3 shuttle doses.
 C3_ALKALI_DOSING_ZERO_LEVEL_FRACTION = 0.01
@@ -528,6 +547,15 @@ def _o2_bubbler_rate_knob(path: str, *, bounds_source: str) -> KnobSpec:
 class RecipeSchema:
     """Curated allowlist plus global deny prefixes for optimizer recipes."""
 
+    REQUIRED_PAIR_VALUE_PATHS = frozenset(tuple(path.split(".")) for path in (
+        "campaigns.C0.temp_range_C",
+        "campaigns.C0b_p_cleanup.temp_range_C",
+        "campaigns.C2B.temp_range_C",
+        "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
+        "campaigns.C4.temp_range_C",
+        "campaigns.C5.temp_range_C",
+    ))
+
     # These whole-value list paths replace YAML ranges such as
     # ``temp_range_C: [lo, hi]``. V1 still forbids list-item paths; future C5
     # endpoint-hours/current knobs should be added here only after R1/R2
@@ -686,6 +714,7 @@ class RecipeSchema:
             units="mbar",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.pO2_mbar",
             scale="log",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C0b_p_cleanup.p_total_mbar_default",
@@ -722,6 +751,7 @@ class RecipeSchema:
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_continuous.p_total_mbar",
             scale="log",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_continuous.duration_hr",
@@ -762,12 +792,14 @@ class RecipeSchema:
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
             scale="log",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_staged.p_total_mbar_default",
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
             scale="log",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_staged.depletion_flux_decay_fraction",
@@ -967,6 +999,7 @@ class RecipeSchema:
             units="mbar",
             bounds_source="setpoints:campaigns.C2B.pO2_mbar",
             scale="log",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2B.p_total_mbar_default",
@@ -1282,6 +1315,7 @@ class RecipeSchema:
             high=OVERHEAD_HOT_WALL_MAX_C,
             units="C",
             bounds_source=OVERHEAD_HOT_WALL_BOUNDS_SOURCE,
+            search_enabled=False,
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_0_to_stage_1.default_C",
@@ -1377,12 +1411,8 @@ class RecipeSchema:
         self.setpoints = (
             _default_setpoints() if setpoints is None else setpoints
         )
-        # Treat the class allowlist as a template even when passed explicitly, so
-        # source-fingerprinted bounds (notably C5 MRE cap) refresh on use.
         template_allowlist = (
-            allowlist
-            if allowlist is not None and allowlist != type(self).ALLOWLIST
-            else _default_allowlist_for_source(type(self).ALLOWLIST)
+            allowlist if allowlist is not None else type(self).ALLOWLIST
         )
         self.allowlist = _setpoint_sourced_allowlist(
             template_allowlist,
@@ -1474,7 +1504,32 @@ class RecipeSchema:
             for path, value in canonical_values.items()
             if self.spec_for(path).runtime_enabled
         }
-        return _setpoints_patch_from_runtime_values(runtime_values)
+        result = _setpoints_patch_from_runtime_values(runtime_values)
+        campaigns = result.get("campaigns", {})
+        for key in ("C0b_p_cleanup", "C2A_continuous"):
+            cfg = campaigns.get(key, {})
+            if "duration_h" in cfg:
+                value = cfg["duration_h"]
+                hours = _duration_limit_hours(value)
+                if "max_hold_hr" in cfg:
+                    if cfg["max_hold_hr"] != hours:
+                        raise RecipeValidationError(
+                            f"{key}: duration and max_hold_hr both set one endpoint"
+                        )
+                    # The shipped recipe declares a duration envelope and the
+                    # matching selected cap. Keep that canonical representation.
+                else:
+                    cfg["duration_h"] = hours
+        c3 = campaigns.get("C3", {})
+        for phase in ("K_phase", "Na_phase"):
+            cfg = c3.get(phase, {})
+            value = cfg.get("pO2_bakeout_mbar")
+            if isinstance(value, list):
+                cfg["pO2_bakeout_mbar"] = sum(value) / len(value)
+        for key in ("duration_after_pathA_h", "duration_after_pathB_h_per_phase"):
+            if key in c3:
+                c3[key] = _duration_limit_hours(c3[key])
+        return result
 
     def redox_cleanup_doses_kg(self, patch: "RecipePatch") -> tuple[float, float]:
         validated = patch.validated(self)
@@ -1896,6 +1951,15 @@ def _setpoints_patch_from_runtime_values(
     return nested
 
 
+def _duration_limit_hours(value: Any) -> Any:
+    """A validated duration band commands its upper endpoint, in hours.
+
+    For [low, high], the maximum duration is high; [h, h] is exactly h.
+    Scalars are already commands. Both C2A/C0b and C3 use this rule.
+    """
+    return value[-1] if isinstance(value, list) else value
+
+
 def _runtime_path_and_value(path: KeyPath, value: Any) -> tuple[KeyPath, Any]:
     mapped = CANONICAL_TO_RUNTIME_PATH.get(path)
     if mapped is None:
@@ -2011,26 +2075,6 @@ def _ordered_c2a_staged_stages(stages: list[dict[str, Any]], order: Any) -> list
     return [stages_by_name[name] for name in stage_order]
 
 
-def _setpoints_source_fingerprint() -> tuple[str, int | None, int | None, str]:
-    path = DEFAULT_DATA_DIR / "setpoints.yaml"
-    try:
-        stat_result = path.stat()
-        contents = path.read_bytes()
-    except OSError:
-        return (str(path), None, None, "missing")
-    digest = hashlib.sha256(contents).hexdigest()
-    return (str(path), stat_result.st_mtime_ns, stat_result.st_size, digest)
-
-
-def _default_allowlist_for_source(
-    template_allowlist: tuple[KnobSpec, ...],
-) -> tuple[KnobSpec, ...]:
-    return _cached_default_allowlist(
-        _setpoints_source_fingerprint(),
-        template_allowlist,
-    )
-
-
 def _setpoint_sourced_allowlist(
     template_allowlist: tuple[KnobSpec, ...],
     setpoints: Mapping[str, Any],
@@ -2038,6 +2082,13 @@ def _setpoint_sourced_allowlist(
     converted_source_prefix = "engineering_envelope converted from setpoints:"
     resolved: list[KnobSpec] = []
     for spec in template_allowlist:
+        if spec.path == C5_ALLOW_MRE_VOLTAGE_CAP_PATH:
+            resolved.append(replace(spec, high=_c5_allow_mre_voltage_cap_upper_bound(setpoints)))
+            continue
+        if spec.path in (C3_ALKALI_DOSING_NA_KG_PATH, C3_ALKALI_DOSING_K_KG_PATH):
+            highs = _c3_alkali_dose_highs(setpoints)
+            resolved.append(replace(spec, high=highs[0 if spec.path == C3_ALKALI_DOSING_NA_KG_PATH else 1]))
+            continue
         if spec.bounds_source.startswith("setpoints:"):
             source_path = spec.bounds_source.removeprefix("setpoints:")
             scale = 1
@@ -2084,20 +2135,6 @@ def _setpoint_sourced_allowlist(
             replace(spec, low=low, high=high, bounds_source=bounds_source)
         )
     return tuple(resolved)
-
-
-@lru_cache(maxsize=8)
-def _cached_default_allowlist(
-    _source_fingerprint: tuple[str, int | None, int | None, str],
-    template_allowlist: tuple[KnobSpec, ...],
-) -> tuple[KnobSpec, ...]:
-    c5_cap_high = _c5_allow_mre_voltage_cap_upper_bound()
-    return tuple(
-        replace(spec, high=c5_cap_high)
-        if spec.path == C5_ALLOW_MRE_VOLTAGE_CAP_PATH
-        else spec
-        for spec in template_allowlist
-    )
 
 
 def default_bounds_digest() -> str:
@@ -2773,7 +2810,6 @@ def _validate_pressure_pair(
         )
 
 
-@lru_cache(maxsize=1)
 def _default_setpoints() -> Mapping[str, Any]:
     path = DEFAULT_DATA_DIR / "setpoints.yaml"
     with path.open("r", encoding="utf-8") as handle:
@@ -2814,6 +2850,8 @@ def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:
         _validate_numeric_bounds(spec, float(value))
         return
     if spec.kind == "float":
+        if spec.path in schema.REQUIRED_PAIR_VALUE_PATHS and not isinstance(value, list):
+            raise RecipeValidationError(f"{_format_path(spec.path)} requires [low, high] pair")
         if spec.path == O2_BUBBLER_TARGET_FO2_LOG_PATH and value is None:
             return
         if isinstance(value, list):
@@ -2830,6 +2868,8 @@ def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:
                 raise RecipeValidationError(
                     f"{_format_path(spec.path)} range low exceeds high"
                 )
+            if spec.path == ("campaigns", "C4", "temp_range_C") and numeric_values[0] == numeric_values[1]:
+                raise RecipeValidationError("campaigns.C4.temp_range_C requires a strictly increasing pair")
             for item in numeric_values:
                 _validate_numeric_bounds(spec, item)
             return

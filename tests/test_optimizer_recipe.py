@@ -118,7 +118,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "0cfae3821a514712c36151ca997fd5d9381191deeccca66ceb807628e179b160"
+        "79dc6bf410edce24dce852e95ddad783fcbb376f6f2b546c316c4173a62925f2"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -329,19 +329,9 @@ def _c2a_staged_setpoints(
 
 def _write_c5_mre_cap_bound_yaml(data_dir: Path, high: float, mtime_ns: int) -> None:
     path = data_dir / "setpoints.yaml"
-    path.write_text(
-        yaml.safe_dump(
-            {
-                "campaigns": {
-                    "C5": {
-                        "allow_mre_voltage_cap_upper_bound_V": high,
-                    }
-                }
-            },
-            sort_keys=True,
-        ),
-        encoding="utf-8",
-    )
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text(encoding="utf-8"))
+    setpoints["campaigns"]["C5"]["allow_mre_voltage_cap_upper_bound_V"] = high
+    path.write_text(yaml.safe_dump(setpoints, sort_keys=True), encoding="utf-8")
     os.utime(path, ns=(mtime_ns, mtime_ns))
 
 
@@ -440,7 +430,7 @@ def test_pinned_c2a_temperature_targets_leave_other_knobs_searchable() -> None:
         spec = schema.spec_for(path)
         assert spec.search_enabled is False
         assert spec.runtime_enabled is True
-    assert ("campaigns", "C2A_staged", "p_total_mbar") in search_paths
+    assert ("campaigns", "C2A_staged", "stages", "alkali_early_fe", "p_total_mbar") in search_paths
     assert (
         "campaigns",
         "C2A_staged",
@@ -562,10 +552,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    assert len(paths) == 65
+    assert len(paths) == 59
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
+        == "9e8932d384c7dbcb1a17aab3d3066f820b5fc99c098116d82a29d65bdd8c1817"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -872,16 +862,14 @@ def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
     assert loaded_patch.values[PTOTAL_DEFAULT] == pytest.approx(10.0)
     assert loaded_patch.values[
         ("campaigns", "C2A_continuous", "duration_hr")
-    ] == [20, 24]
+    ] == 24
 
     run = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)
     config = run._session_config()
     assert config.setpoints["campaigns"]["C0b_p_cleanup"]["pO2_mbar_default"] == 10.0
     assert config.setpoints["campaigns"]["C0b_p_cleanup"]["p_total_mbar_default"] == 10.0
-    assert config.setpoints["campaigns"]["C2A_continuous"]["duration_h"] == [
-        20,
-        24,
-    ]
+    assert config.setpoints["campaigns"]["C2A_continuous"]["duration_h"] == 24
+    assert CampaignManager(config.setpoints)._max_hold_hr(CampaignPhase.C2A) == 24
 
 
 def test_furnace_max_t_c_default_and_clamp_chokepoint() -> None:

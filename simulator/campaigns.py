@@ -321,7 +321,7 @@ class CampaignManager:
                 self.furnace_max_T_C, float(material_ceiling)
             )
         # User-configurable overrides
-        self.c4_max_temp_C = 1670.0  # Max T for C4 Mg pyrolysis (default)
+        self.c4_max_temp_C = c4_default_hold_temp_C(setpoints)
 
         # Runtime overrides from UI (keyed by campaign name)
         # Structure: {'C2A': {'ramp_rate': 10.0, 'pO2_mbar': 1.0,
@@ -777,7 +777,22 @@ class CampaignManager:
     def _configured_max_hold_hr(self,
                                 campaign: CampaignPhase,
                                 *path: str) -> float:
-        value = self._campaign_config(campaign).get('max_hold_hr')
+        cfg = self._campaign_config(campaign)
+        # Recipe duration bands materialize to scalar commands. Stock YAML
+        # pairs remain envelopes; max_hold_hr owns their selected endpoint.
+        duration_key = None
+        if campaign in (CampaignPhase.C0B, CampaignPhase.C2A):
+            duration_key = 'duration_h'
+        elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA) and path:
+            duration_key = {
+                'A': 'duration_after_pathA_h',
+                'default': 'duration_after_pathB_h_per_phase',
+            }.get(path[-1])
+        if duration_key is not None:
+            duration = self._scalar_config_float(cfg, duration_key)
+            if duration is not None:
+                return duration
+        value = cfg.get('max_hold_hr')
         label = f"{self._campaign_config_key(campaign)}.max_hold_hr"
         for key in path:
             label = f"{label}.{key}"
@@ -1731,8 +1746,13 @@ class CampaignManager:
             return self._configured_temperature_ramp(campaign)
 
         elif campaign == CampaignPhase.C0B:
-            # Isothermal hold at midpoint of [1180, 1320]
-            return (1250.0, 30.0)
+            cfg = self._campaign_config(campaign)
+            low, high = cfg['temp_range_C']
+            # C0b is an isothermal midpoint hold; null ramp retains the
+            # existing acquisition rate. No public ramp knob exists yet.
+            ramp = cfg.get('dT_dt_C_per_hr')
+            return ((float(low) + float(high)) / 2.0,
+                    30.0 if ramp is None else self._required_float(ramp, 'C0b.dT_dt_C_per_hr'))
 
         elif campaign == CampaignPhase.C2A:
             # Continuous ramp 1050 C -> furnace_max_T_C
@@ -1841,10 +1861,23 @@ class CampaignManager:
             bakeout_target = self._float(ovr.get('bakeout_target_C'), default_bakeout)
             ramp_rate = self._float(ovr.get('ramp_rate'), 50.0)
             cycle_period = 6  # hours per inject-bakeout cycle
-            if campaign_hour % cycle_period < 3:
-                return (inject_target, ramp_rate)  # injection phase
-            else:
-                return (bakeout_target, ramp_rate)  # bakeout phase
+            is_injection = campaign_hour % cycle_period < 3
+            # The same phase clock owns temperature and manual bakeout pO2.
+            # YAML pairs are envelopes; explicit recipe pairs materialize to
+            # scalar commands. Without one, the searched shared pO2 stays live.
+            cfg = self._campaign_config(campaign)
+            requested = phase_cfg.get('pO2_bakeout_mbar')
+            if (requested is not None and not isinstance(requested, (list, tuple))
+                    and 'pO2_mbar' not in ovr and LAB_SCHEDULE_OVERRIDE_KEY not in ovr):
+                po2 = self._pressure_config_float(
+                    cfg, 'pO2_mbar', 'pO2_mbar_default', 1.0)
+                if not is_injection:
+                    po2 = self._required_float(
+                        requested, f'{phase_key}.pO2_bakeout_mbar')
+                melt.pO2_mbar = po2
+                melt.p_total_mbar = max(po2, self._pressure_config_float(
+                    cfg, 'p_total_mbar', 'p_total_mbar_default', 1.0))
+            return (inject_target if is_injection else bakeout_target, ramp_rate)
 
         elif campaign == CampaignPhase.C4:
             # Selects hold_temp_C from the C4 override, else
@@ -2985,17 +3018,11 @@ class CampaignManager:
         elif current == CampaignPhase.C4:
             if self.c5_enabled:
                 return CampaignPhase.C5
-            # Canonical no-MRE path: Mg is selectively recovered before the
-            # final high-temperature pyrolysis ramp.  Reuse C2A physics with a
-            # scoped, derived schedule.  The configured band midpoints need
-            # 12 h for the catalogued 1150->1320 C post-shuttle floor at
-            # 15 C/h and 70 h for 1320->1843 C at 7.5 C/h.  The 160 h hard
-            # cap is the conservative slow-band schedule (132 h) plus the
-            # existing 28 h extraction window.  The path marker prevents a C3
-            # loop.
+            # The final pass uses the same searched maximum and soft endpoint
+            # owner as the initial C2A pass. A scoped literal must not replace
+            # an optimizer request on re-entry after Mg recovery.
             self._pending_post_mg_c2a_overrides = {
-                'min_hold_hr': 82.0,
-                'max_hours': 160.0,
+                'max_hours': self._max_hold_hr(CampaignPhase.C2A),
             }
             # Mark A-family paths for the final-pass C2A successor above;
             # path 'B' keeps its operator-chosen record (the marker used to
