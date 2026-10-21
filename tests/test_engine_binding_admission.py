@@ -1300,6 +1300,41 @@ def test_equilibrium_binding_producers_follow_input_selected_dependencies(
     ) == ()
 
 
+@pytest.mark.parametrize(
+    ("configured_mode", "runtime_mode", "expected_producers"),
+    [
+        ("openimcc", "constant_gamma", ("builtin-vapor-pressure",)),
+        ("constant_gamma", "openimcc", ("builtin-vapor-pressure", "openimcc")),
+    ],
+)
+def test_equilibrium_binding_producers_follow_runtime_activity_mode(
+    monkeypatch: pytest.MonkeyPatch,
+    configured_mode: str,
+    runtime_mode: str,
+    expected_producers: tuple[str, ...],
+) -> None:
+    import simulator.reduced_real_determinism as replay
+
+    monkeypatch.setattr(
+        replay,
+        "record_dependency_vector",
+        lambda *_args, **_kwargs: {
+            "vapor_pressure_provider_selection": "builtin-vapor-pressure",
+        },
+    )
+    sim = SimpleNamespace(
+        setpoints={"high_t_melt_activity": configured_mode},
+        _high_t_melt_activity=runtime_mode,
+        melt=SimpleNamespace(temperature_C=1800.0 - 273.15),
+    )
+
+    assert replay.record_binding_producer_ids(
+        sim,
+        artifact="equilibrium_post_record",
+    ) == expected_producers
+    assert sim.setpoints["high_t_melt_activity"] == configured_mode
+
+
 def test_equilibrium_guard_does_not_borrow_gate_supplier_admission(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
