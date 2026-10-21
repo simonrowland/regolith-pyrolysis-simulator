@@ -2699,6 +2699,7 @@ species:
           during extraction.
     - observation_id: lopatin_2023_sample13_NaBO2_activity
       type: activity_coefficient
+      phase: l
       locator:
         page: 5
         pdf_page_index: 4
@@ -2711,15 +2712,13 @@ species:
         quantity: activity
         method_class: measured_reduced
         formula: NaBO2
-        method_as_printed: KEMS ion-current comparison; the source does not identify sample 13 as a homogeneous melt at 1330
-          K.
+        method_as_printed: KEMS ion-current comparison.
         standard_state_as_printed: Pure sodium borate activity standard; physical reference phase not stated in the source.
         points:
         - sample: '13'
           T_K: '1330'
           activity: '0.10'
           activity_as_printed: '0.10'
-          phase_at_1330K_as_printed: not stated; sample 13 is omitted from the homogeneous-melt set
           locator:
             page: 5
             pdf_page_index: 4
@@ -2773,6 +2772,7 @@ species:
         output_unit: dimensionless activity
     - observation_id: lopatin_2023_sample13_NaBO2_activity_coefficient
       type: activity_coefficient
+      phase: l
       locator:
         page: 5
         pdf_page_index: 4
@@ -2785,15 +2785,13 @@ species:
         quantity: activity_coefficient
         method_class: measured_tabulated
         formula: NaBO2
-        method_as_printed: KEMS ion-current comparison; the source does not identify sample 13 as a homogeneous melt at 1330
-          K.
+        method_as_printed: KEMS ion-current comparison.
         standard_state_as_printed: Pure sodium borate activity standard; physical reference phase not stated in the source.
         points:
         - sample: '13'
           T_K: '1330'
           gamma: '0.35'
           gamma_as_printed: '0.35'
-          phase_at_1330K_as_printed: not stated; sample 13 is omitted from the homogeneous-melt set
           locator:
             page: 5
             pdf_page_index: 4
@@ -5975,6 +5973,7 @@ species:
           during extraction.
     - observation_id: lopatin_2023_sample13_B2O3_activity
       type: activity_coefficient
+      phase: l
       locator:
         page: 5
         pdf_page_index: 4
@@ -5987,15 +5986,13 @@ species:
         quantity: activity
         method_class: measured_reduced
         formula: B2O3
-        method_as_printed: KEMS ion-current comparison; the source does not identify sample 13 as a homogeneous melt at 1330
-          K.
+        method_as_printed: KEMS ion-current comparison.
         standard_state_as_printed: Pure boron oxide activity standard; physical reference phase not stated in the source.
         points:
         - sample: '13'
           T_K: '1330'
           activity: '0.24'
           activity_as_printed: '0.24'
-          phase_at_1330K_as_printed: not stated; sample 13 is omitted from the homogeneous-melt set
           locator:
             page: 5
             pdf_page_index: 4
@@ -6049,6 +6046,7 @@ species:
         output_unit: dimensionless activity
     - observation_id: lopatin_2023_sample13_B2O3_activity_coefficient
       type: activity_coefficient
+      phase: l
       locator:
         page: 5
         pdf_page_index: 4
@@ -6061,15 +6059,13 @@ species:
         quantity: activity_coefficient
         method_class: measured_tabulated
         formula: B2O3
-        method_as_printed: KEMS ion-current comparison; the source does not identify sample 13 as a homogeneous melt at 1330
-          K.
+        method_as_printed: KEMS ion-current comparison.
         standard_state_as_printed: Pure boron oxide activity standard; physical reference phase not stated in the source.
         points:
         - sample: '13'
           T_K: '1330'
           gamma: '0.42'
           gamma_as_printed: '0.42'
-          phase_at_1330K_as_printed: not stated; sample 13 is omitted from the homogeneous-melt set
           locator:
             page: 5
             pdf_page_index: 4

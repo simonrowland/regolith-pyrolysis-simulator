@@ -115,6 +115,26 @@ def test_table2_points_migrate_with_compositions_and_deferred_figures(tmp_path: 
                 assert migrated_point.value.point == Decimal(expected)
                 assert migrated_point.identity.species.formula == formula
 
+    sample13_rows = [
+        (source_observation, point)
+        for species in document["species"].values()
+        for source_observation in species["observations"]
+        for point in source_observation["values"]["points"]
+        if point.get("sample") == "13"
+    ]
+    assert len(sample13_rows) == 4
+    for source_observation, point in sample13_rows:
+        assert source_observation["phase"] == "l"
+        assert "phase_at_1330K_as_printed" not in point
+        matches = [
+            row for row in observations
+            if row.observation_id.startswith(f"{SID}::{source_observation['observation_id']}::")
+            and row.locator is not None
+            and "row 13;" in row.locator.record
+        ]
+        assert len(matches) == 1
+        assert matches[0].identity.species.phase.value.value == "l"
+
     figures = [record for species in document["species"].values() for record in species["context"] if record.get("type") == "figure_record"]
     assert {record["locator"]["figure"] for record in figures} == {str(i) for i in range(1, 8)}
     assert all(record["values"]["digitisation"] == "deferred to a figure pass" for record in figures)
