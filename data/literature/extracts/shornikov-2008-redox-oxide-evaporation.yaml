@@ -767,9 +767,11 @@ species:
         values:
           quantity: partial_pressure
           gas_species: O(g)
-          method_class: measured_tabulated
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
           admission_status: admitted
           attribution: Experimental values cited to Shornikov [15].
+          source_note: "The text on pp. 726–728 does not name an oxide equilibrium for the Mo cell; this attributed reducing value remains untyped for source-oxygen selection."
           method: Knudsen-cell mass spectrometry, as stated for Table 2.
           points:
             - sample_number: 1
