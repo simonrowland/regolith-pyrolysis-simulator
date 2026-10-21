@@ -338,6 +338,13 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         if row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
     ]
     assert len(residue_observations) == 384
+    isotope_observations = [
+        row
+        for row in observations
+        if row.identity.quantity.value is Quantity.ISOTOPE_DELTA
+    ]
+    assert len(isotope_observations) == 90
+    assert all(row.identity.species.phase.value == "l" for row in isotope_observations)
     experiment_initial_compositions = [
         experiment.sample.initial_composition
         for experiment in migrator.result.experiments.values()
