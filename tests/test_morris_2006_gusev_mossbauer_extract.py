@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import os
 from pathlib import Path
 
@@ -118,7 +119,17 @@ def test_derived_class_means_remain_context_linked_to_table5():
         assert row["values"]["derived_from"] == [f"tables:{SID}"]
         assert row["values"]["derivation"]["inputs"] == [f"tables:{SID}"]
         assert "table-5.csv" in row["values"]["derivation"]["locator"]
-        assert "remain context" in row["values"]["derivation"]["relation"]
+        relation = row["values"]["derivation"]["relation"]
+        assert "Standard deviation of class members or 2%, whichever is larger, for subspectral areas." in relation
+        assert "printed averages are retained as printed" in relation
+        assert "arithmetic means of member target values" not in relation
+        assert "remain context" in relation
+
+    with (TABLES / "table-5.csv").open(newline="", encoding="utf-8") as table_file:
+        csv_row = next(row for row in csv.DictReader(table_file) if row["sample_id_as_printed"] == "A510RB0")
+    page_cell = RENDER_GRID[("A510RB0", "Backstay_Scuppler")]["Ol_area_pct"]
+    assert page_cell == "35"
+    assert csv_row["Ol_area_percent_as_printed"] == page_cell
 
 
 @pytest.mark.skipif(not PDF.is_file() or not TEXT.is_file(), reason=f"corpus source is unavailable: {SID}")

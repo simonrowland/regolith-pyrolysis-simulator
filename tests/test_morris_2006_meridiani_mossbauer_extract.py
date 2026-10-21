@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import os
 from pathlib import Path
 
@@ -124,7 +125,17 @@ def test_derived_class_means_remain_context_linked_to_registered_tables():
     assert table10["values"]["derived_from"] == [f"tables:{SID}"]
     assert table10["values"]["derivation"]["inputs"] == [f"tables:{SID}"]
     assert "table-9.csv" in table10["values"]["derivation"]["locator"]
+    relation = table10["values"]["derivation"]["relation"]
+    assert 'Calculated from elemental data in Table 9.' in relation
+    assert "arithmetic means of member target values" not in relation
+    assert "copies" not in relation
+    assert "remain context" in relation
     assert "OCBP1" in table10["values"]["disposition_reason"]
+
+    with (TABLES / "table-9.csv").open(newline="", encoding="utf-8") as table_file:
+        csv_row = next(row for row in csv.DictReader(table_file) if row["quantity_as_printed"] == "Fe3+/FeT")
+    page_cell = "0.39 ± 0.03"
+    assert csv_row["Martian_Dust_average_percent_as_printed"] == page_cell
 
 
 @pytest.mark.skipif(not PDF.is_file() or not TEXT.is_file(), reason=f"corpus source is unavailable: {SID}")
