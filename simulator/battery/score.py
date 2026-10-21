@@ -136,6 +136,7 @@ from simulator.battery.source_lineage import (
     openimcc_pack_coefficient_sources,
 )
 from simulator.battery.validate import (
+    _asset_ids,
     _observation_lineage,
     _pressure_blocking_notices,
     _resolve_coefficient_sources,
@@ -2028,8 +2029,8 @@ def lineage_complete_for(
     """True when every engine alias is mapped and store ids resolve.
 
     Without a store, completeness is the mapping itself: unmapped MELTS
-    aliases stay incomplete. With a store, ``_resolve_coefficient_sources``
-    must return a set (unknown strings are not independence).
+    aliases stay incomplete. With a store, the resolver must return a
+    complete ancestry. An incomplete result is not independence.
     """
 
     lineage_sources = coefficient_lineage_sources(sources)
@@ -2041,10 +2042,9 @@ def lineage_complete_for(
     expanded = expand_coefficient_sources(lineage_sources)
     if works is None or observations is None:
         return True
-    return (
-        _resolve_coefficient_sources(expanded, observations, works, experiments)
-        is not None
-    )
+    return _resolve_coefficient_sources(
+        expanded, observations, works, experiments
+    ).complete
 
 
 def resolve_source_relation(
@@ -2059,16 +2059,26 @@ def resolve_source_relation(
     if not lineage_complete:
         return SourceRelation.UNKNOWN
     table_ids = _table_ids(works)
-    ref_ids = _observation_lineage(reference.observation_id, observations, table_ids)
+    ref_ids = _observation_lineage(
+        reference.observation_id,
+        observations,
+        table_ids,
+        asset_ids=_asset_ids(works),
+    )
     cand_ids = _resolve_coefficient_sources(
         coefficient_lineage_sources(coefficient_sources),
         observations,
         works,
         experiments,
     )
-    if ref_ids is None or cand_ids is None:
+    if (
+        not ref_ids.complete
+        or not cand_ids.complete
+        or ref_ids.ids is None
+        or cand_ids.ids is None
+    ):
         return SourceRelation.UNKNOWN
-    if ref_ids & cand_ids:
+    if ref_ids.ids & cand_ids.ids:
         return SourceRelation.SAME_INPUT
     return SourceRelation.INDEPENDENT
 
@@ -6886,17 +6896,22 @@ def compile_residual(
         and engine is Engine.INTERNAL_ANALYTICAL
         and quantity is Quantity.FE3_FE2_RATIO
     ):
-        # The Kress citation does not resolve in the store, so a complete
-        # reference still arrives here as UNKNOWN. The attribution split
-        # applies only when that reference's own ancestry walk succeeds.
-        # A None walk (printed-unresolved, or any unresolvable parent)
-        # stays UNKNOWN.
+        # The attribution split applies only when both walks are COMPLETE.
+        # An unresolved Kress citation, a printed-unresolved coefficient,
+        # or an incomplete reference stays UNKNOWN.
         reference_lineage = _observation_lineage(
             relation_reference.observation_id,
             context.observations,
             _table_ids(context.works),
+            asset_ids=_asset_ids(context.works),
         )
-        if reference_lineage is not None:
+        coefficient_lineage = _resolve_coefficient_sources(
+            coefficient_lineage_sources(prediction.coefficient_sources),
+            context.observations,
+            context.works,
+            context.experiments,
+        )
+        if reference_lineage.complete and coefficient_lineage.complete:
             attribution = (
                 None
                 if reference.evidence is None

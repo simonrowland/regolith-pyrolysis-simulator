@@ -41,6 +41,7 @@ import re
 from contextlib import contextmanager
 from dataclasses import dataclass, fields, is_dataclass
 from decimal import Decimal, InvalidOperation
+from enum import Enum
 from typing import Any, Iterable, Iterator, Mapping, Sequence
 
 from simulator.battery.enums import (
@@ -1434,6 +1435,18 @@ def _table_ids(works: Mapping[str, Work] | None) -> set[str]:
     return ids
 
 
+def _asset_ids(works: Mapping[str, Work] | None) -> set[str]:
+    """Every registered source-file id, including non-table assets."""
+
+    ids: set[str] = set()
+    if not works:
+        return ids
+    for work in works.values():
+        for asset in work.source_files.files:
+            ids.add(asset.asset_id)
+    return ids
+
+
 def _work_for_alias(src: str, works: Mapping[str, Work] | None) -> Work | None:
     """Work owning a work id, source id, or non-table file/pdf alias."""
 
@@ -1450,13 +1463,64 @@ def _work_for_alias(src: str, works: Mapping[str, Work] | None) -> Work | None:
     return None
 
 
+class AncestryFailure(Enum):
+    """Why an ancestry walk is not a resolved id set."""
+
+    PRINTED_UNRESOLVED = "printed_unresolved"
+    UNRESOLVABLE_INPUT = "unresolvable_input"
+    CYCLE = "cycle"
+    MISSING_EXPERIMENT_MAP = "missing_experiment_map"
+    UNKNOWN_ALIAS = "unknown_alias"
+
+
+@dataclass(frozen=True)
+class Ancestry:
+    """COMPLETE ids, or INCOMPLETE with one reason. Never an empty success."""
+
+    ids: frozenset[str] | None = None
+    failure: AncestryFailure | None = None
+
+    def __post_init__(self) -> None:
+        if (self.ids is None) == (self.failure is None):
+            raise ValueError("ancestry is complete or incomplete, not both")
+        if self.ids is not None and len(self.ids) == 0:
+            raise ValueError("complete ancestry cannot be empty")
+
+    @property
+    def complete(self) -> bool:
+        return self.failure is None
+
+    @staticmethod
+    def of(ids: set[str]) -> "Ancestry":
+        return Ancestry(ids=frozenset(ids))
+
+    @staticmethod
+    def incomplete(failure: AncestryFailure) -> "Ancestry":
+        return Ancestry(failure=failure)
+
+
 # A scoring walk resolves the same work once per cell. The bound index is
 # that walk's snapshot: the maps must not be edited while it is entered.
 # An unbound call recomputes. It does not remember a previous map, so
 # replacing an observation in the same dict cannot return the old ids.
 _BOUND_WORK_INPUTS: dict[
-    tuple[int, int], tuple[frozenset[str], dict[str, set[str] | None]]
+    tuple[int, int], tuple[frozenset[str], dict[str, Ancestry]]
 ] = {}
+
+
+def _experiment_membership_failure(
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment] | None,
+) -> Ancestry | None:
+    """INCOMPLETE when a work cannot be shown to contain every member."""
+
+    if not experiments:
+        return Ancestry.incomplete(AncestryFailure.MISSING_EXPERIMENT_MAP)
+    if any(
+        experiments.get(obs.experiment_id) is None for obs in observations.values()
+    ):
+        return Ancestry.incomplete(AncestryFailure.MISSING_EXPERIMENT_MAP)
+    return None
 
 
 def _inputs_for_work(
@@ -1465,13 +1529,16 @@ def _inputs_for_work(
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
     obs_by_work: Mapping[str, tuple[Observation, ...]] | None = None,
-) -> set[str] | None:
+) -> Ancestry:
+    membership = _experiment_membership_failure(observations, experiments)
+    if membership is not None:
+        return membership
+    assert experiments is not None
     ids: set[str] = set()
+    asset_ids = {asset.asset_id for asset in work.source_files.files}
     for asset in work.source_files.files:
         if asset.role is AssetRole.TABLE_CSV:
             ids.add(asset.asset_id)
-    if not experiments:
-        return ids
     grouped = (
         obs_by_work.get(work.work_id, ())
         if obs_by_work is not None
@@ -1483,13 +1550,19 @@ def _inputs_for_work(
         )
     )
     for obs in grouped:
-        nested = _observation_lineage(obs.observation_id, observations, table_ids)
-        if nested is None:
-            # One incomplete row makes the work alias incomplete. A table
-            # asset or a complete sibling must not hide that None.
-            return None
-        ids |= nested
-    return ids
+        nested = _observation_lineage(
+            obs.observation_id,
+            observations,
+            table_ids,
+            asset_ids=asset_ids,
+        )
+        if not nested.complete:
+            return nested
+        assert nested.ids is not None
+        ids |= set(nested.ids)
+    if not ids:
+        return Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
+    return Ancestry.of(ids)
 
 
 def _index_work_inputs(
@@ -1497,14 +1570,22 @@ def _index_work_inputs(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
-) -> dict[str, set[str] | None]:
+) -> dict[str, Ancestry]:
+    membership = _experiment_membership_failure(observations, experiments)
+    if membership is not None:
+        return {work.work_id: membership for work in works.values()}
     obs_by_work: dict[str, list[Observation]] = {}
-    if experiments:
-        for obs in observations.values():
-            experiment = experiments.get(obs.experiment_id)
-            if experiment is None:
-                continue
-            obs_by_work.setdefault(experiment.work_id, []).append(obs)
+    assert experiments is not None
+    for obs in observations.values():
+        experiment = experiments.get(obs.experiment_id)
+        if experiment is None:
+            return {
+                work.work_id: Ancestry.incomplete(
+                    AncestryFailure.MISSING_EXPERIMENT_MAP
+                )
+                for work in works.values()
+            }
+        obs_by_work.setdefault(experiment.work_id, []).append(obs)
     grouped = {work_id: tuple(rows) for work_id, rows in obs_by_work.items()}
     return {
         work.work_id: _inputs_for_work(
@@ -1543,12 +1624,11 @@ def _inputs_registered_under_work(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
-) -> set[str] | None:
+) -> Ancestry:
     bound = _BOUND_WORK_INPUTS.get((id(observations), id(experiments)))
     if bound is not None and bound[0] == frozenset(table_ids):
         found_map = bound[1]
         if work.work_id in found_map:
-            # None is a stored incomplete expansion, not a missing entry.
             return found_map[work.work_id]
     return _inputs_for_work(work, observations, experiments, table_ids)
 
@@ -1557,43 +1637,89 @@ def _observation_lineage(
     observation_id: str,
     observations: Mapping[str, Observation],
     table_ids: set[str],
-    seen: set[str] | None = None,
-) -> set[str] | None:
-    """Observation/table ids in derived_from ancestry. None = unresolvable."""
+    *,
+    asset_ids: set[str] | None = None,
+    _cache: dict[str, Ancestry] | None = None,
+    _stack: set[str] | None = None,
+) -> Ancestry:
+    """COMPLETE observation/table ids, or INCOMPLETE with one reason.
 
-    if seen is None:
-        seen = set()
-    if observation_id in seen:
-        return set()
+    A shared ancestor is returned from the cache. An id still on the
+    active stack is a cycle. A derivation input that is neither an
+    observation, a table, nor a registered source asset is unresolvable
+    and is not dropped. A registered non-table asset stays out of the
+    id set: it is a source file, not an observation or table ancestor.
+    """
+
+    if _cache is None:
+        _cache = {}
+    if _stack is None:
+        _stack = set()
+    cached = _cache.get(observation_id)
+    if cached is not None:
+        return cached
+    if observation_id in _stack:
+        return Ancestry.incomplete(AncestryFailure.CYCLE)
     if observation_id in table_ids:
-        return {observation_id}
+        result = Ancestry.of({observation_id})
+        _cache[observation_id] = result
+        return result
     obs = observations.get(observation_id)
     if obs is None:
-        return None
-    seen.add(observation_id)
+        return Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
+    _stack.add(observation_id)
     if (
         obs.derivation is not None
         and obs.derivation.declares_unresolved_printed_inputs
     ):
-        # Printed inputs are absent from derivation.inputs. Ancestry that
-        # reaches this row is incomplete, not an independent lineage.
-        return None
-    ids: set[str] = {observation_id}
-    if obs.read_from and obs.read_from in table_ids:
-        ids.add(obs.read_from)
-    for parent in obs.derived_from or ():
-        nested = _observation_lineage(parent, observations, table_ids, seen)
-        if nested is None:
-            return None
-        ids |= nested
-    if obs.derivation is not None:
-        for inp in obs.derivation.inputs:
-            if inp in observations or inp in table_ids:
-                nested = _observation_lineage(inp, observations, table_ids, seen)
-                if nested is None:
-                    return None
-                ids |= nested
-    return ids
+        result = Ancestry.incomplete(AncestryFailure.PRINTED_UNRESOLVED)
+    else:
+        ids: set[str] = {observation_id}
+        if obs.read_from and obs.read_from in table_ids:
+            ids.add(obs.read_from)
+        result = Ancestry.of(ids)
+        for parent in obs.derived_from or ():
+            nested = _observation_lineage(
+                parent,
+                observations,
+                table_ids,
+                asset_ids=asset_ids,
+                _cache=_cache,
+                _stack=_stack,
+            )
+            if not nested.complete:
+                result = nested
+                break
+            assert nested.ids is not None and result.ids is not None
+            ids |= set(nested.ids)
+            result = Ancestry.of(ids)
+        else:
+            if obs.derivation is not None:
+                for inp in obs.derivation.inputs:
+                    if inp not in observations and inp not in table_ids:
+                        if asset_ids is not None and inp in asset_ids:
+                            continue
+                        result = Ancestry.incomplete(
+                            AncestryFailure.UNRESOLVABLE_INPUT
+                        )
+                        break
+                    nested = _observation_lineage(
+                        inp,
+                        observations,
+                        table_ids,
+                        asset_ids=asset_ids,
+                        _cache=_cache,
+                        _stack=_stack,
+                    )
+                    if not nested.complete:
+                        result = nested
+                        break
+                    assert nested.ids is not None and result.ids is not None
+                    ids |= set(nested.ids)
+                    result = Ancestry.of(ids)
+    _stack.remove(observation_id)
+    _cache[observation_id] = result
+    return result
 
 
 def _resolve_coefficient_sources(
@@ -1601,37 +1727,40 @@ def _resolve_coefficient_sources(
     observations: Mapping[str, Observation],
     works: Mapping[str, Work] | None,
     experiments: Mapping[str, Experiment] | None = None,
-) -> set[str] | None:
-    """Resolve coefficient_sources to observation/table ids.
+) -> Ancestry:
+    """Resolve coefficient_sources to a COMPLETE id set or one failure.
 
-    Unregistered strings and aliases that cannot expand to observation or
-    table inputs are unknown, never independence. A work/source/file alias
-    expands to every observation/table registered under that work.
+    An unknown string is an unknown alias. A work, source, or PDF alias
+    expands through the work's members. The first incomplete member is
+    the result; it is not dropped.
     """
 
     if not sources:
-        return None
+        return Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
     table_ids = _table_ids(works)
+    asset_ids = _asset_ids(works)
     resolved: set[str] = set()
     for src in sources:
         if src in observations:
-            nested = _observation_lineage(src, observations, table_ids)
-            if nested is None:
-                return None
-            resolved |= nested
+            nested = _observation_lineage(
+                src, observations, table_ids, asset_ids=asset_ids
+            )
         elif src in table_ids:
-            resolved.add(src)
+            nested = Ancestry.of({src})
         else:
             work = _work_for_alias(src, works)
             if work is None:
-                return None
-            expanded = _inputs_registered_under_work(
+                return Ancestry.incomplete(AncestryFailure.UNKNOWN_ALIAS)
+            nested = _inputs_registered_under_work(
                 work, observations, experiments, table_ids
             )
-            if expanded is None or not expanded:
-                return None
-            resolved |= expanded
-    return resolved
+        if not nested.complete:
+            return nested
+        assert nested.ids is not None
+        resolved |= set(nested.ids)
+    if not resolved:
+        return Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
+    return Ancestry.of(resolved)
 
 
 def validate_residual(
@@ -1876,7 +2005,10 @@ def validate_residual(
                     else:
                         table_ids = _table_ids(works)
                         ref_ids = _observation_lineage(
-                            reference.observation_id, observations, table_ids
+                            reference.observation_id,
+                            observations,
+                            table_ids,
+                            asset_ids=_asset_ids(works),
                         )
                         cand_ids = _resolve_coefficient_sources(
                             coefficient_lineage_sources(engine.coefficient_sources),
@@ -1884,7 +2016,7 @@ def validate_residual(
                             works,
                             experiments,
                         )
-                        if ref_ids is None or cand_ids is None:
+                        if not ref_ids.complete or not cand_ids.complete:
                             issues.append(
                                 _issue(
                                     f"{path}.source_relation",
@@ -1892,7 +2024,7 @@ def validate_residual(
                                     "unresolvable lineage source implies unknown, never independence",
                                 )
                             )
-                        elif ref_ids & cand_ids:
+                        elif ref_ids.ids is not None and ref_ids.ids & (cand_ids.ids or frozenset()):
                             issues.append(
                                 _issue(
                                     f"{path}.source_relation",

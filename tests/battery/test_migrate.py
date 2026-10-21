@@ -342,7 +342,12 @@ from simulator.battery.records import (
     as_decimal,
 )
 from tests.battery import load_observation_store_summary
-from simulator.battery.validate import _observation_lineage, validate_corpus
+from simulator.battery.validate import (
+    AncestryFailure,
+    _asset_ids,
+    _observation_lineage,
+    validate_corpus,
+)
 from simulator.yaml_cache import YAML12SafeLoader, load_cached_safe_yaml
 from tests.battery import factories as F
 
@@ -2785,8 +2790,9 @@ def test_unlocated_printed_unresolved_requires_a_locator() -> None:
 def _assert_reloaded_printed_unresolved(
     root: Path, marker: str, *, resolved_parent: str
 ) -> None:
-    _works, experiments, loaded = load_migrated_store(root)
-    report = validate_corpus(_works, experiments, loaded, residuals=None)
+    works, experiments, loaded = load_migrated_store(root)
+    report = validate_corpus(works, experiments, loaded, residuals=None)
+    asset_ids = _asset_ids(works)
     rows = [obs for obs in loaded.values() if marker in obs.observation_id]
     assert rows
     for obs in rows:
@@ -2800,14 +2806,22 @@ def _assert_reloaded_printed_unresolved(
             == f"printed derivation inputs do not resolve; locator {locator!r}"
             for issue in report.hard_issues
         )
-        assert _observation_lineage(obs.observation_id, loaded, set()) is None
+        assert (
+            _observation_lineage(
+                obs.observation_id, loaded, set(), asset_ids=asset_ids
+            ).failure
+            is AncestryFailure.PRINTED_UNRESOLVED
+        )
     parents = [
         obs for obs in loaded.values() if resolved_parent in obs.observation_id
     ]
     assert parents
     for obs in parents:
         assert obs.derivation is None or not obs.derivation.declares_unresolved_printed_inputs
-        assert _observation_lineage(obs.observation_id, loaded, set()) is not None
+        walked = _observation_lineage(
+            obs.observation_id, loaded, set(), asset_ids=asset_ids
+        )
+        assert walked.complete and walked.ids == frozenset({obs.observation_id})
 
 
 def test_printed_unresolved_stays_flagged_after_reload(tmp_path: Path) -> None:

@@ -6362,6 +6362,7 @@ def test_printed_unresolved_work_alias_stays_incomplete() -> None:
 
     from simulator.battery.score import lineage_complete_for
     from simulator.battery.validate import (
+        AncestryFailure,
         _inputs_for_work,
         _inputs_registered_under_work,
         _observation_lineage,
@@ -6439,12 +6440,10 @@ def test_printed_unresolved_work_alias_stays_incomplete() -> None:
         table_ids = _table_ids(works)
 
         def assert_incomplete(alias: str) -> None:
-            assert (
-                _resolve_coefficient_sources(
-                    (alias,), observations, works, experiments
-                )
-                is None
+            resolved = _resolve_coefficient_sources(
+                (alias,), observations, works, experiments
             )
+            assert resolved.failure is AncestryFailure.PRINTED_UNRESOLVED
             assert (
                 lineage_complete_for(
                     (alias,),
@@ -6476,12 +6475,15 @@ def test_printed_unresolved_work_alias_stays_incomplete() -> None:
                 "lineage-pdf",
             )
         )
-        assert _inputs_for_work(work, observations, experiments, table_ids) is None
+        assert (
+            _inputs_for_work(work, observations, experiments, table_ids).failure
+            is AncestryFailure.PRINTED_UNRESOLVED
+        )
         assert (
             _inputs_registered_under_work(
                 work, observations, experiments, table_ids
-            )
-            is None
+            ).failure
+            is AncestryFailure.PRINTED_UNRESOLVED
         )
         for alias in shape_aliases:
             assert_incomplete(alias)
@@ -6489,19 +6491,20 @@ def test_printed_unresolved_work_alias_stays_incomplete() -> None:
             assert (
                 _inputs_registered_under_work(
                     work, observations, experiments, table_ids
-                )
-                is None
+                ).failure
+                is AncestryFailure.PRINTED_UNRESOLVED
             )
             for alias in shape_aliases:
                 assert_incomplete(alias)
         if _name == "sibling-and-table":
+            assert _observation_lineage(
+                sibling.observation_id, observations, table_ids
+            ).complete
             assert (
-                _observation_lineage(sibling.observation_id, observations, table_ids)
-                is not None
-            )
-            assert (
-                _observation_lineage(printed.observation_id, observations, table_ids)
-                is None
+                _observation_lineage(
+                    printed.observation_id, observations, table_ids
+                ).failure
+                is AncestryFailure.PRINTED_UNRESOLVED
             )
 
     complete_observations = {
@@ -6721,23 +6724,19 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
     works = {work.work_id: work, ref_work.work_id: ref_work}
     table_ids = _table_ids(works)
 
-    assert _observation_lineage(parent.observation_id, observations, table_ids) == {
-        parent.observation_id
+    def ids_of(row_id: str) -> set[str]:
+        result = _observation_lineage(row_id, observations, table_ids)
+        assert result.complete and result.ids is not None
+        return set(result.ids)
+
+    assert ids_of(parent.observation_id) == {parent.observation_id}
+    assert ids_of(left.observation_id) == {left.observation_id, parent.observation_id}
+    assert ids_of(right.observation_id) == {right.observation_id, parent.observation_id}
+    assert ids_of(unprinted.observation_id) == {unprinted.observation_id}
+    assert ids_of(table_reader.observation_id) == {
+        table_reader.observation_id,
+        "pin-table",
     }
-    assert _observation_lineage(left.observation_id, observations, table_ids) == {
-        left.observation_id,
-        parent.observation_id,
-    }
-    assert _observation_lineage(right.observation_id, observations, table_ids) == {
-        right.observation_id,
-        parent.observation_id,
-    }
-    assert _observation_lineage(
-        unprinted.observation_id, observations, table_ids
-    ) == {unprinted.observation_id}
-    assert _observation_lineage(
-        table_reader.observation_id, observations, table_ids
-    ) == {table_reader.observation_id, "pin-table"}
 
     expected_alias = {
         parent.observation_id,
@@ -6750,12 +6749,11 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
 
     def assert_alias_complete() -> None:
         for alias in (work.work_id, "pin-source", "pin-pdf"):
-            assert (
-                _inputs_registered_under_work(
-                    work, observations, experiments, table_ids
-                )
-                == expected_alias
+            expanded = _inputs_registered_under_work(
+                work, observations, experiments, table_ids
             )
+            assert expanded.complete and expanded.ids is not None
+            assert set(expanded.ids) == expected_alias
             assert lineage_complete_for(
                 (alias,),
                 works=works,
@@ -6810,6 +6808,504 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
         evidence=replace(complete.evidence, attribution="K&C88+; K&C91"),
     )
     assert _compile_redox(calibration)[0].source_relation is SourceRelation.TRAINING
+
+
+def _alias_fixture(prefix: str):
+    work = replace(
+        F.work(f"{prefix}-work"),
+        source_ids=(f"{prefix}-work", f"{prefix}-source"),
+    )
+    pdf, table = work.source_files.files
+    work = replace(
+        work,
+        source_files=replace(
+            work.source_files,
+            files=(
+                replace(pdf, asset_id=f"{prefix}-pdf"),
+                replace(table, asset_id=f"{prefix}-table"),
+            ),
+        ),
+    )
+    experiment = F.tabulation_experiment(
+        experiment_id=f"{prefix}-exp", work_id=work.work_id
+    )
+    reference_work = replace(
+        F.work(f"{prefix}-ref-work"), source_ids=(f"{prefix}-ref-work",)
+    )
+    reference_experiment = F.tabulation_experiment(
+        experiment_id=f"{prefix}-ref-exp", work_id=reference_work.work_id
+    )
+    reference = F.observation(
+        f"{prefix}-ref",
+        reference_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=f"{prefix}-ref-work",
+    )
+    return work, experiment, reference_work, reference_experiment, reference
+
+
+def _assert_alias_failure(work, experiment, rows, aliases, failure) -> None:
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        _resolve_coefficient_sources,
+        bound_work_inputs,
+    )
+
+    _prefix, _exp, reference_work, reference_experiment, reference = _alias_fixture(
+        "holder"
+    )
+    del _prefix, _exp
+    observations = {row.observation_id: row for row in rows}
+    observations[reference.observation_id] = reference
+    experiments = {
+        experiment.experiment_id: experiment,
+        reference_experiment.experiment_id: reference_experiment,
+    }
+    works = {work.work_id: work, reference_work.work_id: reference_work}
+
+    def check() -> None:
+        for alias in aliases:
+            resolved = _resolve_coefficient_sources(
+                (alias,), observations, works, experiments
+            )
+            assert resolved.failure is failure
+            assert (
+                lineage_complete_for(
+                    (alias,),
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is False
+            )
+            assert (
+                resolve_source_relation(
+                    reference,
+                    (alias,),
+                    True,
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is SourceRelation.UNKNOWN
+            )
+
+    check()
+    with bound_work_inputs(works, observations, experiments):
+        check()
+
+
+def test_unresolvable_derivation_input_is_incomplete() -> None:
+    """b-979: a qualified pointer that is not in the store is not dropped."""
+
+    from simulator.battery.validate import AncestryFailure, _observation_lineage, _table_ids
+
+    work, experiment, reference_work, reference_experiment, reference = _alias_fixture(
+        "missing-input"
+    )
+    parent = F.observation(
+        "missing-input-parent",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="missing-input-source",
+    )
+    child = F.observation(
+        "missing-input-child",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="missing-input-source",
+        derived_from=(parent.observation_id,),
+        derivation=Derivation(
+            relation="qualified pointer",
+            inputs=(parent.observation_id, "other::missing"),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
+    )
+    observations = {parent.observation_id: parent, child.observation_id: child}
+    table_ids = _table_ids({work.work_id: work})
+    assert _observation_lineage(parent.observation_id, observations, table_ids).complete
+    assert (
+        _observation_lineage(child.observation_id, observations, table_ids).failure
+        is AncestryFailure.UNRESOLVABLE_INPUT
+    )
+    pdf_id = "missing-input-pdf"
+    registered = F.observation(
+        "missing-input-registered-pdf",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="missing-input-source",
+        derived_from=(),
+        derivation=Derivation(
+            relation="read from the source pdf",
+            inputs=(pdf_id,),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
+    )
+    asset_ids = {asset.asset_id for asset in work.source_files.files}
+    registered_ids = {registered.observation_id: registered}
+    bare = _observation_lineage(
+        registered.observation_id, registered_ids, table_ids
+    )
+    assert bare.failure is AncestryFailure.UNRESOLVABLE_INPUT
+    registered_walk = _observation_lineage(
+        registered.observation_id,
+        registered_ids,
+        table_ids,
+        asset_ids=asset_ids,
+    )
+    assert registered_walk.complete
+    assert registered_walk.ids == frozenset({registered.observation_id})
+    registered_observations = {
+        registered.observation_id: registered,
+        reference.observation_id: reference,
+    }
+    assert (
+        resolve_source_relation(
+            registered,
+            ("missing-input-table",),
+            True,
+            works={work.work_id: work, reference_work.work_id: reference_work},
+            observations=registered_observations,
+            experiments={
+                experiment.experiment_id: experiment,
+                reference_experiment.experiment_id: reference_experiment,
+            },
+        )
+        is SourceRelation.INDEPENDENT
+    )
+    _assert_alias_failure(
+        work,
+        experiment,
+        (parent, child),
+        (
+            child.observation_id,
+            work.work_id,
+            "missing-input-source",
+            "missing-input-pdf",
+        ),
+        AncestryFailure.UNRESOLVABLE_INPUT,
+    )
+
+
+def test_cyclic_ancestry_is_incomplete() -> None:
+    """b-979: an active cycle is incomplete. A shared parent stays complete."""
+
+    from simulator.battery.validate import AncestryFailure, _observation_lineage, _table_ids
+
+    work, experiment, *_rest = _alias_fixture("cycle")
+    left = replace(
+        F.observation(
+            "cycle-left",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="cycle-source",
+        ),
+        derived_from=("cycle-right",),
+    )
+    right = replace(left, observation_id="cycle-right", derived_from=("cycle-left",))
+    observations = {left.observation_id: left, right.observation_id: right}
+    table_ids = _table_ids({work.work_id: work})
+    assert (
+        _observation_lineage(left.observation_id, observations, table_ids).failure
+        is AncestryFailure.CYCLE
+    )
+    assert (
+        _observation_lineage(right.observation_id, observations, table_ids).failure
+        is AncestryFailure.CYCLE
+    )
+    input_left = F.observation(
+        "input-cycle-left",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="cycle-source",
+        derived_from=(),
+        derivation=Derivation(
+            relation="input cycle",
+            inputs=("input-cycle-right",),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
+    )
+    input_right = replace(
+        input_left,
+        observation_id="input-cycle-right",
+        derivation=replace(input_left.derivation, inputs=("input-cycle-left",)),
+    )
+    input_observations = {
+        input_left.observation_id: input_left,
+        input_right.observation_id: input_right,
+    }
+    assert (
+        _observation_lineage(
+            input_left.observation_id, input_observations, table_ids
+        ).failure
+        is AncestryFailure.CYCLE
+    )
+    _assert_alias_failure(
+        work,
+        experiment,
+        (left, right),
+        (left.observation_id, work.work_id, "cycle-source", "cycle-pdf"),
+        AncestryFailure.CYCLE,
+    )
+    parent = F.observation(
+        "dag-parent",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="cycle-source",
+    )
+    dag_left = replace(left, observation_id="dag-left", derived_from=("dag-parent",))
+    dag_right = replace(right, observation_id="dag-right", derived_from=("dag-parent",))
+    dag = {
+        parent.observation_id: parent,
+        dag_left.observation_id: dag_left,
+        dag_right.observation_id: dag_right,
+    }
+    assert _observation_lineage(dag_left.observation_id, dag, table_ids).complete
+    assert _observation_lineage(dag_right.observation_id, dag, table_ids).complete
+
+
+def test_missing_experiment_map_alias_is_incomplete() -> None:
+    """b-979: a missing experiment map does not certify the table assets alone."""
+
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _inputs_for_work,
+        _inputs_registered_under_work,
+        _observation_lineage,
+        _resolve_coefficient_sources,
+        _table_ids,
+        bound_work_inputs,
+    )
+
+    work, experiment, *_rest = _alias_fixture("membership")
+    printed = _printed_unresolved_observation(
+        "membership-b",
+        experiment.experiment_id,
+        derived_from=(),
+    )
+    observations = {printed.observation_id: printed}
+    works = {work.work_id: work}
+    table_ids = _table_ids(works)
+    assert (
+        _observation_lineage(printed.observation_id, observations, table_ids).failure
+        is AncestryFailure.PRINTED_UNRESOLVED
+    )
+    maps: tuple[Mapping[str, object] | None, ...] = (
+        None,
+        {},
+        {"other-exp": experiment},
+    )
+    aliases = (work.work_id, "membership-source", "membership-pdf")
+    for experiments in maps:
+        assert (
+            _inputs_for_work(work, observations, experiments, table_ids).failure
+            is AncestryFailure.MISSING_EXPERIMENT_MAP
+        )
+
+        def check() -> None:
+            assert (
+                _inputs_registered_under_work(
+                    work, observations, experiments, table_ids
+                ).failure
+                is AncestryFailure.MISSING_EXPERIMENT_MAP
+            )
+            for alias in aliases:
+                assert (
+                    _resolve_coefficient_sources(
+                        (alias,), observations, works, experiments
+                    ).failure
+                    is AncestryFailure.MISSING_EXPERIMENT_MAP
+                )
+                assert (
+                    lineage_complete_for(
+                        (alias,),
+                        works=works,
+                        observations=observations,
+                        experiments=experiments,
+                    )
+                    is False
+                )
+
+        check()
+        with bound_work_inputs(works, observations, experiments):
+            check()
+
+
+def test_unknown_alias_is_incomplete() -> None:
+    """b-979: an unmatched work, source, or PDF string is an unknown alias."""
+
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _resolve_coefficient_sources,
+        bound_work_inputs,
+    )
+
+    work, experiment, reference_work, reference_experiment, reference = _alias_fixture(
+        "unknown"
+    )
+    row = F.observation(
+        "unknown-row",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="unknown-source",
+    )
+    observations = {row.observation_id: row, reference.observation_id: reference}
+    experiments = {
+        experiment.experiment_id: experiment,
+        reference_experiment.experiment_id: reference_experiment,
+    }
+    works = {work.work_id: work, reference_work.work_id: reference_work}
+    aliases = ("missing-work", "missing-source", "missing-pdf")
+
+    def check() -> None:
+        for alias in aliases:
+            assert (
+                _resolve_coefficient_sources(
+                    (alias,), observations, works, experiments
+                ).failure
+                is AncestryFailure.UNKNOWN_ALIAS
+            )
+            assert (
+                lineage_complete_for(
+                    (alias,),
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is False
+            )
+            assert (
+                resolve_source_relation(
+                    reference,
+                    (alias,),
+                    True,
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is SourceRelation.UNKNOWN
+            )
+
+    check()
+    with bound_work_inputs(works, observations, experiments):
+        check()
+
+
+def test_printed_unresolved_redox_coefficient_stays_unknown() -> None:
+    """b-979: incomplete coefficient ancestry is not relabeled by Fe redox."""
+
+    from simulator.battery.enums import RawInputStatus
+
+    identity = _fe_ratio_identity()
+    experiment = F.tabulation_experiment()
+    work = F.work()
+    printed = F.observation(
+        "redox-coefficient",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derived_from=(),
+        derivation=Derivation(
+            relation="printed redox inputs",
+            inputs=(),
+            parameters=(),
+            output_unit="dimensionless",
+            raw_inputs=Located(
+                State.of(RawInputStatus.PRINTED_UNRESOLVED),
+                locator=F.loc(),
+            ),
+        ),
+    )
+    reference = F.observation(
+        "redox-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    calibration = replace(
+        reference,
+        observation_id="redox-reference-calibration",
+        evidence=replace(reference.evidence, attribution="K&C88+; K&C91"),
+    )
+    aliases = (
+        printed.observation_id,
+        work.work_id,
+        "janaf-4th",
+        "pdf-1",
+    )
+    for row in (reference, calibration):
+        for alias in aliases:
+            prediction = EnginePrediction(
+                engine=Engine.INTERNAL_ANALYTICAL,
+                channel="internal-analytical",
+                execution=Execution(
+                    state=ExecutionState.PRODUCED, call_evidence="test:redox"
+                ),
+                value=Decimal("0.4"),
+                unit=QUANTITY_UNITS[Quantity.FE3_FE2_RATIO],
+                authority=Authority.CERTIFIED,
+                coefficient_sources=(alias,),
+                lineage_complete=True,
+                identity=row.identity,
+            )
+            residual, candidate = compile_residual(
+                row,
+                Engine.INTERNAL_ANALYTICAL,
+                context=_context(work, experiment, row, printed),
+                prediction=prediction,
+                comparison_ids={row.observation_id},
+                derived_band=DecisionBand(
+                    Decimal("1"), "dimensionless", "test-dex"
+                ),
+            )
+            assert residual.source_relation is SourceRelation.UNKNOWN
+            assert residual.score_eligible is False
+            assert candidate is not None
+            assert candidate.engine is not None
+            assert candidate.engine.lineage_complete is False
+    table_prediction = EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel="internal-analytical",
+        execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:redox"),
+        value=Decimal("0.4"),
+        unit=QUANTITY_UNITS[Quantity.FE3_FE2_RATIO],
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("nasa-cea-thermo",),
+        lineage_complete=True,
+        identity=reference.identity,
+    )
+    table_residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, printed),
+        prediction=table_prediction,
+        comparison_ids={reference.observation_id},
+        derived_band=DecisionBand(Decimal("1"), "dimensionless", "test-dex"),
+    )
+    assert table_residual.source_relation is SourceRelation.INDEPENDENT
 
 
 def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
