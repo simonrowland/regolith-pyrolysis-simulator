@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader import (
     COMPILATION_ROOT,
     EXPECTED_PDF_SHA256,
@@ -29,7 +30,7 @@ from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader imp
 
 # The source PDF lives in the private corpus repository, not in the simulator repository.
 # REGOLITH_CORPUS_ROOT points a gate at a corpus checkout (same default as the extract mirror test).
-CORPUS_CHECKOUT = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS_CHECKOUT = regolith_corpus_root()
 PDF = CORPUS_CHECKOUT / "raw" / "hemingway-haas-robinson-1982-usgs-b1544" / SOURCE_PDF_NAME
 
 PRINTED_CP_REVERSALS = (

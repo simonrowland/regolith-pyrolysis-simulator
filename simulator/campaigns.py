@@ -1104,6 +1104,29 @@ class CampaignManager:
         self._c2a_staged_stage_idx = idx
         return stages[idx]
 
+    def _c2a_stage_target_and_ramp(self, stage: Mapping) -> tuple[float, float]:
+        stage_name = stage.get('name')
+        cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
+        if stage_name == 'fe_hot_hold':
+            ovr = self._campaign_overrides(CampaignPhase.C2A_STAGED)
+            target = self._float(
+                ovr.get('hold_temp_C'),
+                self._required_float(
+                    cfg.get('default_hold_T_C'),
+                    'C2A_staged.default_hold_T_C',
+                ),
+            )
+        else:
+            target = self._required_float(
+                stage.get('target_C'),
+                f"C2A_staged.stages.{stage_name}.target_C",
+            )
+        ramp = self._required_float(
+            stage.get('ramp_rate_C_per_hr'),
+            f"C2A_staged.stages.{stage_name}.ramp_rate_C_per_hr",
+        )
+        return (target, ramp)
+
     def _c2a_staged_c3_na_scoped_overrides(self) -> dict:
         cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
         na_stage = cfg.get('na_shuttle_stage', {})
@@ -1731,54 +1754,15 @@ class CampaignManager:
             if (
                     self._c2a_staged_depletion_flux_decay_fraction() <= 0.0
                     and not self._c2a_staged_has_log_slope_depletion(stages)):
-                cfg = self._campaign_config(campaign)
                 selected = self._c2a_staged_stage_by_hour(campaign_hour, stages)
                 if selected is None:
                     raise ValueError('C2A_staged.stages did not select a stage')
+                return self._c2a_stage_target_and_ramp(selected)
 
-                if selected.get('name') == 'fe_hot_hold':
-                    ovr = self._campaign_overrides(campaign)
-                    target = self._float(
-                        ovr.get('hold_temp_C'),
-                        self._required_float(
-                            cfg.get('default_hold_T_C'),
-                            'C2A_staged.default_hold_T_C',
-                        ),
-                    )
-                else:
-                    target = self._required_float(
-                        selected.get('target_C'),
-                        f"C2A_staged.stages.{selected.get('name')}.target_C",
-                    )
-                ramp = self._required_float(
-                    selected.get('ramp_rate_C_per_hr'),
-                    f"C2A_staged.stages.{selected.get('name')}.ramp_rate_C_per_hr",
-                )
-                return (target, ramp)
-
-            cfg = self._campaign_config(campaign)
             selected = self._c2a_staged_current_stage()
             if selected is None:
                 raise ValueError('C2A_staged.stages did not select a stage')
-            if selected.get('name') == 'fe_hot_hold':
-                ovr = self._campaign_overrides(campaign)
-                target = self._float(
-                    ovr.get('hold_temp_C'),
-                    self._required_float(
-                        cfg.get('default_hold_T_C'),
-                        'C2A_staged.default_hold_T_C',
-                    ),
-                )
-            else:
-                target = self._required_float(
-                    selected.get('target_C'),
-                    f"C2A_staged.stages.{selected.get('name')}.target_C",
-                )
-            ramp = self._required_float(
-                selected.get('ramp_rate_C_per_hr'),
-                f"C2A_staged.stages.{selected.get('name')}.ramp_rate_C_per_hr",
-            )
-            return (target, ramp)
+            return self._c2a_stage_target_and_ramp(selected)
 
         elif campaign == CampaignPhase.C2B:
             target = self._materialized_target_T_C_by_phase.get(campaign)
