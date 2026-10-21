@@ -5218,7 +5218,7 @@ species:
       T_range_K:
       - 1873.0
       - 2173.0
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -5231,6 +5231,7 @@ species:
       regime: langmuir_free_evaporation
       units: dimensionless
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         alpha: null
         gas_species: Mg(g)
         material: Type_B_CAI_like_liquid
@@ -5288,10 +5289,11 @@ species:
       T_range_K:
       - 1873.0
       - 2173.0
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       regime: langmuir_free_evaporation
       units: mol cm^-2 s^-1 (log10 scale in Fig. 2 OCR scatter)
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: vacuum_evaporation_flux_J_Mg_vs_T
         composition_wt_pct:
           MgO: 11.48
@@ -5340,10 +5342,11 @@ species:
       T_range_K:
       - 1973.15
       - 2173.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       regime: langmuir_free_evaporation
       units: as published
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: sample_surface_area_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -5386,10 +5389,11 @@ species:
       T_range_K:
       - 1973.15
       - 2173.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       regime: langmuir_free_evaporation
       units: as published
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: sample_surface_area_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -5432,10 +5436,11 @@ species:
       T_range_K:
       - 1973.15
       - 2173.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       regime: langmuir_free_evaporation
       units: as published
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: sample_surface_area_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -5478,10 +5483,11 @@ species:
       T_range_K:
       - 1973.15
       - 2173.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       regime: langmuir_free_evaporation
       units: as published
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: sample_surface_area_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -5524,10 +5530,11 @@ species:
       T_range_K:
       - 1973.15
       - 2173.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       regime: langmuir_free_evaporation
       units: as published
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: sample_surface_area_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -5570,10 +5577,11 @@ species:
       T_range_K:
       - 1973.15
       - 2173.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       regime: langmuir_free_evaporation
       units: as published
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: sample_surface_area_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -5616,10 +5624,11 @@ species:
       T_range_K:
       - 1973.15
       - 2173.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       regime: langmuir_free_evaporation
       units: as published
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: sample_surface_area_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -5662,10 +5671,11 @@ species:
       T_range_K:
       - 1973.15
       - 2173.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       regime: langmuir_free_evaporation
       units: as published
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: sample_surface_area_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -5698,56 +5708,6 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
             paragraph: iridium loops
       experiment: cai-r-16
-    - observation_id: richter_2007_mg_quoted_fits
-      experiment: type-b-cai-like-lab-melt
-      type: alpha
-      class_tag: model
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-        published_page: 5553
-        figure: '3'
-      quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 = 25.3,
-        E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes are 2σ
-      units: gamma_o dimensionless; E kJ mol−1; J_o mol cm−2 s−1
-      values:
-        quantity: published_alpha_and_flux_arrhenius_fits
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        alpha_form:
-          expression: γ = γ0 exp(−E/RT)
-          gamma_o: 143.0
-          E_kJ_per_mol: 121.0
-        flux_form:
-          expression: J = J0 exp(−E/RT)
-          J_o_mol_cm2_s: 3810000.0
-          E_kJ_per_mol: 551.0
-          locator:
-            source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-            published_page: 5552
-            figure: '2'
-          quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶ mol cm−2 s−1, E = 551 ± 63 kJ mol−1
-            for magnesium; J0 = 4.17 × 10⁷ mol cm−2 s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
-            are 2σ
-      supersedes: richter_2007_mg_cai_langmuir_alpha_arrhenius
-      regime: combined_vacuum_and_finite_hydrogen_pressure_alpha_fit
-      uncertainty:
-        alpha_E_kJ_per_mol: 53.0
-        flux_E_kJ_per_mol: 63.0
-        convention: 2σ
-        quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 =
-          25.3, E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes
-          are 2σ
-        flux_quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶ mol cm−2 s−1, E = 551 ± 63 kJ mol−1
-          for magnesium; J0 = 4.17 × 10⁷ mol cm−2 s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
-          are 2σ
-        alpha_locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-          published_page: 5553
-          figure: '3'
-        flux_locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-          published_page: 5552
-          figure: '2'
     - observation_id: richter_2007_mg_table1_quoted_series_r3-12
       type: rate_series
       class_tag: measured
@@ -5761,6 +5721,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -5783,7 +5744,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -6698,6 +6659,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -6727,7 +6689,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -7642,6 +7604,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -7671,7 +7634,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -8586,6 +8549,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -8614,7 +8578,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -9529,6 +9493,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -9558,7 +9523,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -10473,6 +10438,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -10502,7 +10468,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -11417,6 +11383,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -11439,7 +11406,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -12354,6 +12321,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -12376,7 +12344,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -13291,6 +13259,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -13313,7 +13282,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -14228,6 +14197,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -14250,7 +14220,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -15165,6 +15135,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -15189,7 +15160,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -16104,6 +16075,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -16133,7 +16105,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -17048,6 +17020,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -17077,7 +17050,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -17992,6 +17965,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -18021,7 +17995,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -18936,6 +18910,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -18965,7 +18940,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -19880,6 +19855,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -19909,7 +19885,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -20824,6 +20800,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -20853,7 +20830,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -21768,6 +21745,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -21797,7 +21775,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -22712,6 +22690,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -22734,7 +22713,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -23649,6 +23628,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -23678,7 +23658,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -24593,6 +24573,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -24622,7 +24603,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -25537,6 +25518,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -25566,7 +25548,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -26481,6 +26463,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -26510,7 +26493,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -27425,6 +27408,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -27453,7 +27437,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -28368,6 +28352,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -28392,7 +28377,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -29307,6 +29292,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -29331,7 +29317,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -30246,6 +30232,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -30270,7 +30257,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -31185,6 +31172,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -31207,7 +31195,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -32122,6 +32110,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -32144,7 +32133,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -33059,6 +33048,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -33081,7 +33071,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -33996,6 +33986,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -34024,7 +34015,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -34939,6 +34930,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -34968,7 +34960,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -35883,6 +35875,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -35912,7 +35905,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -36827,6 +36820,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -36856,7 +36850,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -37771,6 +37765,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -37800,7 +37795,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -38715,6 +38710,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -38743,7 +38739,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -39658,6 +39654,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -39680,7 +39677,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -40595,6 +40592,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -40618,7 +40616,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -41533,6 +41531,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -41556,7 +41555,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -42471,6 +42470,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -42493,7 +42493,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -43408,6 +43408,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -43430,7 +43431,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -44345,6 +44346,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -44369,7 +44371,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -45284,6 +45286,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -45313,7 +45316,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -46228,6 +46231,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -46257,7 +46261,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -47172,6 +47176,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -47200,7 +47205,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -48115,6 +48120,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -48144,7 +48150,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -49059,6 +49065,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -49087,7 +49094,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -50002,6 +50009,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -50031,7 +50039,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -50946,6 +50954,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -50975,7 +50984,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -51890,6 +51899,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -51919,7 +51929,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -52834,6 +52844,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_mass_loss_and_reduced_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -52862,7 +52873,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -55264,181 +55275,1734 @@ species:
           T_C: 1600.0
           time_min: 4285.0
           mass_loss_pct: 48.5
-    - observation_id: richter_2007_table2_f2_ts65
-      type: rate_series
-      class_tag: inverse
+    context:
+    - observation_id: richter_2007_table1_reduced_flux_context
+      kind: measured_reduced_flux_context
+      table: '1'
       locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-        published_page: 5559
-        table: '2'
-        paragraph: F2 (TS65)
-      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: F2 (TS65) | B2 | 6.12 | 26.0
-        | 49.2'
-      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
-      values:
-        quantity: magnesium_loss_inferred_from_isotope_fractionation
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        sample: F2 (TS65)
-        CAI_type: B2
-        FMg_permil_per_amu: 6.12
-        kinetic_isotope_alpha_Simon: 0.97978
-        kinetic_isotope_alpha_this_work: 0.991
-        Mg_evaporated_percent_Simon: 26.0
-        Mg_evaporated_percent_this_work: 49.2
-        field_classes:
-          FMg_permil_per_amu: measured_secondary
-          kinetic_isotope_alpha_Simon: model
-          kinetic_isotope_alpha_this_work: model
-          Mg_evaporated_percent_Simon: inverse
-          Mg_evaporated_percent_this_work: inverse
-        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
-          not these laboratory evaporation residues.
-    - observation_id: richter_2007_table2_e107
-      type: rate_series
-      class_tag: inverse
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-        published_page: 5559
-        table: '2'
-        paragraph: E107
-      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: E107 | B2 | 1.99 | 9.4 | 19.9'
-      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
-      values:
-        quantity: magnesium_loss_inferred_from_isotope_fractionation
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        sample: E107
-        CAI_type: B2
-        FMg_permil_per_amu: 1.99
-        kinetic_isotope_alpha_Simon: 0.97978
-        kinetic_isotope_alpha_this_work: 0.991
-        Mg_evaporated_percent_Simon: 9.4
-        Mg_evaporated_percent_this_work: 19.9
-        field_classes:
-          FMg_permil_per_amu: measured_secondary
-          kinetic_isotope_alpha_Simon: model
-          kinetic_isotope_alpha_this_work: model
-          Mg_evaporated_percent_Simon: inverse
-          Mg_evaporated_percent_this_work: inverse
-        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
-          not these laboratory evaporation residues.
-    - observation_id: richter_2007_table2_3537_1
-      type: rate_series
-      class_tag: inverse
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-        published_page: 5559
-        table: '2'
-        paragraph: 3537-1
-      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: 3537-1 | B1 | 3.26 | 14.9 | 30.4'
-      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
-      values:
-        quantity: magnesium_loss_inferred_from_isotope_fractionation
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        sample: 3537-1
-        CAI_type: B1
-        FMg_permil_per_amu: 3.26
-        kinetic_isotope_alpha_Simon: 0.97978
-        kinetic_isotope_alpha_this_work: 0.991
-        Mg_evaporated_percent_Simon: 14.9
-        Mg_evaporated_percent_this_work: 30.4
-        field_classes:
-          FMg_permil_per_amu: measured_secondary
-          kinetic_isotope_alpha_Simon: model
-          kinetic_isotope_alpha_this_work: model
-          Mg_evaporated_percent_Simon: inverse
-          Mg_evaporated_percent_this_work: inverse
-        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
-          not these laboratory evaporation residues.
-    - observation_id: richter_2007_table2_ts33
-      type: rate_series
-      class_tag: inverse
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-        published_page: 5559
-        table: '2'
-        paragraph: TS33
-      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: TS33 | B1 | 4.01 | 18.0 | 35.9'
-      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
-      values:
-        quantity: magnesium_loss_inferred_from_isotope_fractionation
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        sample: TS33
-        CAI_type: B1
-        FMg_permil_per_amu: 4.01
-        kinetic_isotope_alpha_Simon: 0.97978
-        kinetic_isotope_alpha_this_work: 0.991
-        Mg_evaporated_percent_Simon: 18.0
-        Mg_evaporated_percent_this_work: 35.9
-        field_classes:
-          FMg_permil_per_amu: measured_secondary
-          kinetic_isotope_alpha_Simon: model
-          kinetic_isotope_alpha_this_work: model
-          Mg_evaporated_percent_Simon: inverse
-          Mg_evaporated_percent_this_work: inverse
-        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
-          not these laboratory evaporation residues.
-    - observation_id: richter_2007_table2_ts34
-      type: rate_series
-      class_tag: inverse
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-        published_page: 5559
-        table: '2'
-        paragraph: TS34
-      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: TS34 | B1 | 5.63 | 24.2 | 46.4'
-      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
-      values:
-        quantity: magnesium_loss_inferred_from_isotope_fractionation
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        sample: TS34
-        CAI_type: B1
-        FMg_permil_per_amu: 5.63
-        kinetic_isotope_alpha_Simon: 0.97978
-        kinetic_isotope_alpha_this_work: 0.991
-        Mg_evaporated_percent_Simon: 24.2
-        Mg_evaporated_percent_this_work: 46.4
-        field_classes:
-          FMg_permil_per_amu: measured_secondary
-          kinetic_isotope_alpha_Simon: model
-          kinetic_isotope_alpha_this_work: model
-          Mg_evaporated_percent_Simon: inverse
-          Mg_evaporated_percent_this_work: inverse
-        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
-          not these laboratory evaporation residues.
-    - observation_id: richter_2007_table2_golfball
-      type: rate_series
-      class_tag: inverse
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-        published_page: 5559
-        table: '2'
-        paragraph: Golfball
-      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: Golfball | B | 1.61 | 7.7 | 16.4'
-      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
-      values:
-        quantity: magnesium_loss_inferred_from_isotope_fractionation
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        sample: Golfball
-        CAI_type: B
-        FMg_permil_per_amu: 1.61
-        kinetic_isotope_alpha_Simon: 0.97978
-        kinetic_isotope_alpha_this_work: 0.991
-        Mg_evaporated_percent_Simon: 7.7
-        Mg_evaporated_percent_this_work: 16.4
-        field_classes:
-          FMg_permil_per_amu: measured_secondary
-          kinetic_isotope_alpha_Simon: model
-          kinetic_isotope_alpha_this_work: model
-          Mg_evaporated_percent_Simon: inverse
-          Mg_evaporated_percent_this_work: inverse
-        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
-          not these laboratory evaporation residues.
+        pages:
+        - 6
+        - 7
+        table: '1'
+      schema_gap: t-1382
+      note: Printed table reports molar area fluxes and isotope values alongside directly
+        scored mass loss. The flux values depend on the printed surface areas, which have
+        no store quantity token; retain the table values as context and preserve the printed
+        input cells in the companion CSV.
+      rows:
+      - sample: richter_2007_mg_quoted_fits
+        source_observation_ids:
+        - richter_2007_mg_quoted_fits
+        species: Mg
+        printed_values:
+          quantity: published_alpha_and_flux_arrhenius_fits
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          alpha_form:
+            expression: γ = γ0 exp(−E/RT)
+            gamma_o: 143.0
+            E_kJ_per_mol: 121.0
+          flux_form:
+            expression: J = J0 exp(−E/RT)
+            J_o_mol_cm2_s: 3810000.0
+            E_kJ_per_mol: 551.0
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+              published_page: 5552
+              figure: '2'
+            quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶
+              mol cm−2 s−1, E = 551 ± 63 kJ mol−1 for magnesium; J0 = 4.17 × 10⁷ mol cm−2
+              s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
+              are 2σ
+        locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5553
+          figure: '3'
+        quotes:
+        - The combined vacuum and finite hydrogen pressure data are fit by the functional
+          form γ = γ0e−E/RT with γ0 = 25.3, E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E
+          = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes are 2σ
+        temperature_range_K: null
+        standard_state: null
+        fit_output: true
+      - sample: R3-12
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-12
+        printed_table_values:
+          temperature_quote: 1900 °C
+          T_C: 1900.0
+          time_min: 0.0
+          mass_loss_pct: 7.9
+          Mg_loss_pct: 0.29
+          composition_wt_pct:
+            MgO: 11.37
+            SiO2: 44.53
+            Al2O3: 19.26
+            CaO: 24.84
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-12
+        printed_quotes:
+        - R3-12 | 2.5 | 0 | 11.37 | 44.53 | 19.26 | 24.84 | 22.4 | 21.3 | 25.4 | 7.9 |
+          0.29 | [blank] | [blank] | [blank]
+      - sample: R3-10
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-10
+        - richter_2007_sio_table1_quoted_series_r3-10
+        printed_table_values:
+          temperature_quote: 1900 °C
+          T_C: 1900.0
+          time_min: 15.0
+          mass_loss_pct: 32.0
+          Mg_loss_pct: 42.59
+          J_Mg_mol_cm2_s: 1.92e-07
+          composition_wt_pct:
+            MgO: 9.13
+            SiO2: 31.52
+            Al2O3: 26.86
+            CaO: 32.48
+          delta25Mg_permil: 8.135
+          J_Si_mol_cm2_s: 6.02e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-10
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-10
+        printed_quotes:
+        - R3-10 | 2.5 | 15 | 9.13 | 31.52 | 26.86 | 32.48 | 24.0 | 18.9 | 28.4 | 32.0
+          | 42.59 | 1.92 × 10−7 | 6.02 × 10−7 | 8.135 ± 0.007
+        - R3-10 | 2.5 | 15 | 9.13 | 31.52 | 26.86 | 32.48 | 24.0 | 18.9 | 28.4 | 32.0
+          | 42.59 | 1.92 × 10−7 | 6.02 × 10−7 | 8.135 ± 0.007
+      - sample: R3-11
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-11
+        - richter_2007_sio_table1_quoted_series_r3-11
+        printed_table_values:
+          temperature_quote: 1900 °C
+          T_C: 1900.0
+          time_min: 20.0
+          mass_loss_pct: 43.8
+          Mg_loss_pct: 82.61
+          J_Mg_mol_cm2_s: 2.44e-07
+          composition_wt_pct:
+            MgO: 3.33
+            SiO2: 25.24
+            Al2O3: 32.35
+            CaO: 39.09
+          delta25Mg_permil: 25.81
+          J_Si_mol_cm2_s: 5.42e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-11
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-11
+        printed_quotes:
+        - R3-11 | 2.5 | 20 | 3.33 | 25.24 | 32.35 | 39.09 | 20.9 | 15.9 | 22.6 | 43.8
+          | 82.61 | 2.44 × 10−7 | 5.42 × 10−7 | 25.810 ± 0.020
+        - R3-11 | 2.5 | 20 | 3.33 | 25.24 | 32.35 | 39.09 | 20.9 | 15.9 | 22.6 | 43.8
+          | 82.61 | 2.44 × 10−7 | 5.42 × 10−7 | 25.810 ± 0.020
+      - sample: R3-13
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-13
+        - richter_2007_sio_table1_quoted_series_r3-13
+        printed_table_values:
+          temperature_quote: 1900 °C
+          T_C: 1900.0
+          time_min: 25.0
+          mass_loss_pct: 50.6
+          Mg_loss_pct: 99.59
+          J_Mg_mol_cm2_s: 2.4e-07
+          composition_wt_pct:
+            MgO: 0.09
+            SiO2: 17.76
+            Al2O3: 37.08
+            CaO: 45.05
+          J_Si_mol_cm2_s: 5.25e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-13
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-13
+        printed_quotes:
+        - R3-13 | 2.5 | 25 | 0.09 | 17.76 | 37.08 | 45.05 | 21.3 | 15.4 | 23.3 | 50.6
+          | 99.59 | 2.40 × 10−7 | 5.25 × 10−7 | [blank]
+        - R3-13 | 2.5 | 25 | 0.09 | 17.76 | 37.08 | 45.05 | 21.3 | 15.4 | 23.3 | 50.6
+          | 99.59 | 2.40 × 10−7 | 5.25 × 10−7 | [blank]
+      - sample: R3-15
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-15
+        - richter_2007_sio_table1_quoted_series_r3-15
+        printed_table_values:
+          temperature_quote: 1900 °C
+          T_C: 1900.0
+          time_min: 25.0
+          mass_loss_pct: 47.3
+          Mg_loss_pct: 96.15
+          J_Mg_mol_cm2_s: 2.35e-07
+          composition_wt_pct:
+            MgO: 0.8
+            SiO2: 21.1
+            Al2O3: 35.1
+            CaO: 43.1
+          delta25Mg_permil: 47.733
+          J_Si_mol_cm2_s: 4.97e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-15
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-15
+        printed_quotes:
+        - R3-15 | 2.5 | 25 | 0.80 | 21.10 | 35.10 | 43.10 | 21.7 | 15.8 | 24.1 | 47.3
+          | 96.15 | 2.35 × 10−7 | 4.97 × 10−7 | 47.733 ± 0.023
+        - R3-15 | 2.5 | 25 | 0.80 | 21.10 | 35.10 | 43.10 | 21.7 | 15.8 | 24.1 | 47.3
+          | 96.15 | 2.35 × 10−7 | 4.97 × 10−7 | 47.733 ± 0.023
+      - sample: R3-9
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-9
+        - richter_2007_sio_table1_quoted_series_r3-9
+        printed_table_values:
+          temperature_quote: 1900 °C
+          T_C: 1900.0
+          time_min: 30.0
+          mass_loss_pct: 48.3
+          Mg_loss_pct: 94.99
+          J_Mg_mol_cm2_s: 2.41e-07
+          composition_wt_pct:
+            MgO: 1.04
+            SiO2: 21.81
+            Al2O3: 35.06
+            CaO: 42.08
+          delta25Mg_permil: 43.265
+          J_Si_mol_cm2_s: 5.13e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-9
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-9
+        printed_quotes:
+        - R3-9 | 2.5 | 30 | 1.04 | 21.81 | 35.06 | 42.08 | 26.4 | 18.2 | 35.6 | 48.3 |
+          94.99 | 2.41 × 10−7 | 5.13 × 10−7 | 43.265 ± 0.017
+        - R3-9 | 2.5 | 30 | 1.04 | 21.81 | 35.06 | 42.08 | 26.4 | 18.2 | 35.6 | 48.3 |
+          94.99 | 2.41 × 10−7 | 5.13 × 10−7 | 43.265 ± 0.017
+      - sample: R-16
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-16
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 0.0
+          mass_loss_pct: 2.4
+          Mg_loss_pct: 0.68
+          composition_wt_pct:
+            MgO: 11.77
+            SiO2: 44.44
+            Al2O3: 20.01
+            CaO: 23.78
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-16
+        printed_quotes:
+        - R-16 | 1.0 | 0 | 11.77 | 44.44 | 20.01 | 23.78 | 5.9 | 5.8 | 4.2 | 2.4 | 0.68
+          | [blank] | [blank] | [blank]
+      - sample: R-14
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-14
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 30.0
+          mass_loss_pct: 31.7
+          Mg_loss_pct: 59.11
+          composition_wt_pct:
+            MgO: 7.03
+            SiO2: 29.63
+            Al2O3: 29.03
+            CaO: 34.31
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-14
+        printed_quotes:
+        - R-14 | 1.0 | 30 | 7.03 | 29.63 | 29.03 | 34.31 | 5.8 | 5.0 | 4.1 | 31.7 | 59.11
+          | [blank] | [blank] | [blank]
+      - sample: R-15
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-15
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 45.0
+          mass_loss_pct: 42.2
+          Mg_loss_pct: 85.06
+          composition_wt_pct:
+            MgO: 2.91
+            SiO2: 25.4
+            Al2O3: 32.87
+            CaO: 38.82
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-15
+        printed_quotes:
+        - R-15 | 1.0 | 45 | 2.91 | 25.40 | 32.87 | 38.82 | 6.0 | 4.7 | 4.5 | 42.2 | 85.06
+          | [blank] | [blank] | [blank]
+      - sample: R-17
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-17
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 60.0
+          mass_loss_pct: 50.0
+          Mg_loss_pct: 99.62
+          composition_wt_pct:
+            MgO: 0.09
+            SiO2: 18.49
+            Al2O3: 37.39
+            CaO: 44.03
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-17
+        printed_quotes:
+        - R-17 | 1.0 | 60 | 0.09 | 18.49 | 37.39 | 44.03 | 6.0 | 4.2 | 4.4 | 50.0 | 99.62
+          | [blank] | [blank] | [blank]
+      - sample: R-6
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-6
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 0.0
+          mass_loss_pct: 2.4
+          Mg_loss_pct: -0.27
+          composition_wt_pct:
+            MgO: 11.66
+            SiO2: 45.34
+            Al2O3: 19.64
+            CaO: 23.36
+          delta25Mg_permil: 0.13
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-6
+        printed_quotes:
+        - R-6 | 2.5 | 0 | 11.66 | 45.34 | 19.64 | 23.36 | 20.0 | 19.7 | 20.9 | 2.4 | –0.27
+          | [blank] | [blank] | 0.130 ± 0.025
+      - sample: R-3
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-3
+        - richter_2007_sio_table1_quoted_series_r-3
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 30.0
+          mass_loss_pct: 14.3
+          Mg_loss_pct: 11.47
+          J_Mg_mol_cm2_s: 2.18e-08
+          composition_wt_pct:
+            MgO: 11.82
+            SiO2: 38.87
+            Al2O3: 22.55
+            CaO: 26.76
+          delta25Mg_permil: 1.723
+          J_Si_mol_cm2_s: 1.36e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-3
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-3
+        printed_quotes:
+        - R-3 | 2.5 | 30 | 11.82 | 38.87 | 22.55 | 26.76 | 21.5 | 19.5 | 23.8 | 14.3 |
+          11.47 | 2.18 × 10−8 | 1.36 × 10−7 | 1.723 ± 0.009
+        - R-3 | 2.5 | 30 | 11.82 | 38.87 | 22.55 | 26.76 | 21.5 | 19.5 | 23.8 | 14.3 |
+          11.47 | 2.18 × 10−8 | 1.36 × 10−7 | 1.723 ± 0.009
+      - sample: R-2
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-2
+        - richter_2007_sio_table1_quoted_series_r-2
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 60.0
+          mass_loss_pct: 26.2
+          Mg_loss_pct: 33.86
+          J_Mg_mol_cm2_s: 3.52e-08
+          composition_wt_pct:
+            MgO: 10.07
+            SiO2: 33.58
+            Al2O3: 25.72
+            CaO: 30.63
+          delta25Mg_permil: 5.494
+          J_Si_mol_cm2_s: 1.24e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-2
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-2
+        printed_quotes:
+        - R-2 | 2.5 | 60 | 10.07 | 33.58 | 25.72 | 30.63 | 22.8 | 18.9 | 26.3 | 26.2 |
+          33.86 | 3.52 × 10−8 | 1.24 × 10−7 | 5.494 ± 0.044
+        - R-2 | 2.5 | 60 | 10.07 | 33.58 | 25.72 | 30.63 | 22.8 | 18.9 | 26.3 | 26.2 |
+          33.86 | 3.52 × 10−8 | 1.24 × 10−7 | 5.494 ± 0.044
+      - sample: R-18
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-18
+        - richter_2007_sio_table1_quoted_series_r-18
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 90.0
+          mass_loss_pct: 36.1
+          Mg_loss_pct: 71.21
+          J_Mg_mol_cm2_s: 6.08e-08
+          composition_wt_pct:
+            MgO: 5.2
+            SiO2: 28.05
+            Al2O3: 30.51
+            CaO: 36.24
+          delta25Mg_permil: 17.059
+          J_Si_mol_cm2_s: 1.41e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-18
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-18
+        printed_quotes:
+        - R-18 | 2.5 | 90 | 5.20 | 28.05 | 30.51 | 36.24 | 27.4 | 21.8 | 39.9 | 36.1 |
+          71.21 | 6.08 × 10−8 | 1.41 × 10−7 | 17.059 ± 0.032
+        - R-18 | 2.5 | 90 | 5.20 | 28.05 | 30.51 | 36.24 | 27.4 | 21.8 | 39.9 | 36.1 |
+          71.21 | 6.08 × 10−8 | 1.41 × 10−7 | 17.059 ± 0.032
+      - sample: R-4
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-4
+        - richter_2007_sio_table1_quoted_series_r-4
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 90.0
+          mass_loss_pct: 38.3
+          Mg_loss_pct: 74.94
+          J_Mg_mol_cm2_s: 4.77e-08
+          composition_wt_pct:
+            MgO: 4.61
+            SiO2: 27.45
+            Al2O3: 31.07
+            CaO: 36.87
+          delta25Mg_permil: 18.681
+          J_Si_mol_cm2_s: 1.08e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-4
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-4
+        printed_quotes:
+        - R-4 | 2.5 | 90 | 4.61 | 27.45 | 31.07 | 36.87 | 20.6 | 16.3 | 22.2 | 38.3 |
+          74.94 | 4.77 × 10−8 | 1.08 × 10−7 | 18.681 ± 0.042
+        - R-4 | 2.5 | 90 | 4.61 | 27.45 | 31.07 | 36.87 | 20.6 | 16.3 | 22.2 | 38.3 |
+          74.94 | 4.77 × 10−8 | 1.08 × 10−7 | 18.681 ± 0.042
+      - sample: R3-14
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-14
+        - richter_2007_sio_table1_quoted_series_r3-14
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 100.0
+          mass_loss_pct: 40.9
+          Mg_loss_pct: 83.41
+          J_Mg_mol_cm2_s: 5.38e-08
+          composition_wt_pct:
+            MgO: 3.12
+            SiO2: 26.13
+            Al2O3: 31.76
+            CaO: 38.98
+          delta25Mg_permil: 25.372
+          J_Si_mol_cm2_s: 1.15e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-14
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-14
+        printed_quotes:
+        - R3-14 | 2.5 | 100 | 3.12 | 26.13 | 31.76 | 38.98 | 23.5 | 17.4 | 27.6 | 40.9
+          | 83.41 | 5.38 × 10−8 | 1.15 × 10−7 | 25.372 ± 0.031
+        - R3-14 | 2.5 | 100 | 3.12 | 26.13 | 31.76 | 38.98 | 23.5 | 17.4 | 27.6 | 40.9
+          | 83.41 | 5.38 × 10−8 | 1.15 × 10−7 | 25.372 ± 0.031
+      - sample: R2-1
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-1
+        - richter_2007_sio_table1_quoted_series_r2-1
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 105.0
+          mass_loss_pct: 49.2
+          Mg_loss_pct: 99.12
+          J_Mg_mol_cm2_s: 5.82e-08
+          composition_wt_pct:
+            MgO: 0.19
+            SiO2: 19.91
+            Al2O3: 36.53
+            CaO: 43.38
+          delta25Mg_permil: 69.148
+          J_Si_mol_cm2_s: 1.23e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-1
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-1
+        printed_quotes:
+        - R2-1 | 2.5 | 105 | 0.19 | 19.91 | 36.53 | 43.38 | 21.7 | 15.6 | 24.2 | 49.2
+          | 99.12 | 5.82 × 10−8 | 1.23 × 10−7 | 69.148 ± 0.063
+        - R2-1 | 2.5 | 105 | 0.19 | 19.91 | 36.53 | 43.38 | 21.7 | 15.6 | 24.2 | 49.2
+          | 99.12 | 5.82 × 10−8 | 1.23 × 10−7 | 69.148 ± 0.063
+      - sample: R-7
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-7
+        - richter_2007_sio_table1_quoted_series_r-7
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 60.0
+          mass_loss_pct: 31.9
+          Mg_loss_pct: 54.11
+          J_Mg_mol_cm2_s: 4.97e-08
+          composition_wt_pct:
+            MgO: 7.67
+            SiO2: 30.45
+            Al2O3: 28.23
+            CaO: 33.65
+          delta25Mg_permil: 10.574
+          J_Si_mol_cm2_s: 1.35e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-7
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-7
+        printed_quotes:
+        - R-7 | 3.3 | 60 | 7.67 | 30.45 | 28.23 | 33.65 | 27.8 | 24.4 | 30.1 | 31.9 |
+          54.11 | 4.97 × 10−8 | 1.35 × 10−7 | 10.574 ± 0.044
+        - R-7 | 3.3 | 60 | 7.67 | 30.45 | 28.23 | 33.65 | 27.8 | 24.4 | 30.1 | 31.9 |
+          54.11 | 4.97 × 10−8 | 1.35 × 10−7 | 10.574 ± 0.044
+      - sample: R-13
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-13
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 0.0
+          composition_wt_pct:
+            MgO: 11.64
+            SiO2: 45.48
+            Al2O3: 19.58
+            CaO: 23.31
+          isotope_reference_as_printed: ≡0.000
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-13
+        printed_quotes:
+        - R-13 | 6.0 | 0 | 11.64 | 45.48 | 19.58 | 23.31 | [blank] | [blank] | [blank]
+          | [blank] | [blank] | [blank] | [blank] | ≡0.000
+      - sample: R-8
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-8
+        - richter_2007_sio_table1_quoted_series_r-8
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 30.0
+          mass_loss_pct: 11.1
+          Mg_loss_pct: 7.02
+          J_Mg_mol_cm2_s: 2.39e-08
+          composition_wt_pct:
+            MgO: 11.94
+            SiO2: 40.59
+            Al2O3: 21.69
+            CaO: 25.77
+          delta25Mg_permil: 0.935
+          J_Si_mol_cm2_s: 1.84e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-8
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-8
+        printed_quotes:
+        - R-8 | 6.0 | 30 | 11.94 | 40.59 | 21.69 | 25.77 | 87.5 | 83.4 | 171.9 | 11.1
+          | 7.02 | 2.39 × 10−8 | 1.84 × 10−7 | 0.935 ± 0.029
+        - R-8 | 6.0 | 30 | 11.94 | 40.59 | 21.69 | 25.77 | 87.5 | 83.4 | 171.9 | 11.1
+          | 7.02 | 2.39 × 10−8 | 1.84 × 10−7 | 0.935 ± 0.029
+      - sample: R-9
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-9
+        - richter_2007_sio_table1_quoted_series_r-9
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 60.0
+          mass_loss_pct: 20.6
+          Mg_loss_pct: 23.02
+          J_Mg_mol_cm2_s: 3.4e-08
+          composition_wt_pct:
+            MgO: 11.08
+            SiO2: 35.7
+            Al2O3: 24.31
+            CaO: 28.91
+          delta25Mg_permil: 3.547
+          J_Si_mol_cm2_s: 1.5e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-9
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-9
+        printed_quotes:
+        - R-9 | 6.0 | 60 | 11.08 | 35.70 | 24.31 | 28.91 | 82.6 | 76.6 | 146.6 | 20.6
+          | 23.02 | 3.40 × 10−8 | 1.50 × 10−7 | 3.547 ± 0.027
+        - R-9 | 6.0 | 60 | 11.08 | 35.70 | 24.31 | 28.91 | 82.6 | 76.6 | 146.6 | 20.6
+          | 23.02 | 3.40 × 10−8 | 1.50 × 10−7 | 3.547 ± 0.027
+      - sample: R-11
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r-11
+        - richter_2007_sio_table1_quoted_series_r-11
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 90.0
+          mass_loss_pct: 27.8
+          Mg_loss_pct: 42.23
+          J_Mg_mol_cm2_s: 4.97e-08
+          composition_wt_pct:
+            MgO: 9.16
+            SiO2: 32.36
+            Al2O3: 26.78
+            CaO: 31.7
+          delta25Mg_permil: 7.689
+          J_Si_mol_cm2_s: 1.55e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-11
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-11
+        printed_quotes:
+        - R-11 | 6.0 | 90 | 9.16 | 32.36 | 26.78 | 31.70 | 91.3 | 80.0 | 190.4 | 27.8
+          | 42.23 | 4.97 × 10−8 | 1.55 × 10−7 | 7.689 ± 0.028
+        - R-11 | 6.0 | 90 | 9.16 | 32.36 | 26.78 | 31.70 | 91.3 | 80.0 | 190.4 | 27.8
+          | 42.23 | 4.97 × 10−8 | 1.55 × 10−7 | 7.689 ± 0.028
+      - sample: R2-4
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-4
+        - richter_2007_sio_table1_quoted_series_r2-4
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 120.0
+          mass_loss_pct: 37.0
+          Mg_loss_pct: 72.82
+          J_Mg_mol_cm2_s: 6.22e-08
+          composition_wt_pct:
+            MgO: 4.92
+            SiO2: 28.11
+            Al2O3: 30.57
+            CaO: 36.4
+          delta25Mg_permil: 18.867
+          J_Si_mol_cm2_s: 1.41e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-4
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-4
+        printed_quotes:
+        - R2-4 | 6.0 | 120 | 4.92 | 28.11 | 30.57 | 36.40 | 88.5 | 75.5 | 176.6 | 37.0
+          | 72.82 | 6.22 × 10−8 | 1.41 × 10−7 | 18.867 ± 0.083
+        - R2-4 | 6.0 | 120 | 4.92 | 28.11 | 30.57 | 36.40 | 88.5 | 75.5 | 176.6 | 37.0
+          | 72.82 | 6.22 × 10−8 | 1.41 × 10−7 | 18.867 ± 0.083
+      - sample: R2-5
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-5
+        - richter_2007_sio_table1_quoted_series_r2-5
+        printed_table_values:
+          temperature_quote: 1800 °C
+          T_C: 1800.0
+          time_min: 180.0
+          mass_loss_pct: 49.8
+          Mg_loss_pct: 99.73
+          J_Mg_mol_cm2_s: 6.0e-08
+          composition_wt_pct:
+            MgO: 0.06
+            SiO2: 18.69
+            Al2O3: 37.47
+            CaO: 43.79
+          J_Si_mol_cm2_s: 1.29e-07
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-5
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-5
+        printed_quotes:
+        - R2-5 | 6.0 | 180 | 0.06 | 18.69 | 37.47 | 43.79 | 90.4 | 72.5 | 186.0 | 49.8
+          | 99.73 | 6.00 × 10−8 | 1.29 × 10−7 | [blank]
+        - R2-5 | 6.0 | 180 | 0.06 | 18.69 | 37.47 | 43.79 | 90.4 | 72.5 | 186.0 | 49.8
+          | 99.73 | 6.00 × 10−8 | 1.29 × 10−7 | [blank]
+      - sample: R2-21
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-21
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 0.0
+          mass_loss_pct: 11.1
+          Mg_loss_pct: 1.39
+          composition_wt_pct:
+            MgO: 11.42
+            SiO2: 45.8
+            Al2O3: 19.56
+            CaO: 23.23
+          delta25Mg_permil: 0.209
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-21
+        printed_quotes:
+        - R2-21 | 1.0 | 0 | 11.42 | 45.80 | 19.56 | 23.23 | 3.9 | 3.7 | 1.8 | 11.1 | 1.39
+          | [blank] | [blank] | 0.209 ± 0.044
+      - sample: R2-20
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-20
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 90.0
+          mass_loss_pct: 35.0
+          Mg_loss_pct: 79.81
+          composition_wt_pct:
+            MgO: 3.61
+            SiO2: 26.55
+            Al2O3: 30.2
+            CaO: 39.64
+          delta25Mg_permil: 20.574
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-20
+        printed_quotes:
+        - R2-20 | 1.0 | 90 | 3.61 | 26.55 | 30.20 | 39.64 | 4.2 | 3.4 | 2.0 | 35.0 | 79.81
+          | [blank] | [blank] | 20.574 ± 0.044
+      - sample: R2-18
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-18
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 120.0
+          mass_loss_pct: 36.0
+          Mg_loss_pct: 69.97
+          composition_wt_pct:
+            MgO: 5.29
+            SiO2: 29.15
+            Al2O3: 29.75
+            CaO: 35.81
+          delta25Mg_permil: 15.661
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-18
+        printed_quotes:
+        - R2-18 | 1.0 | 120 | 5.29 | 29.15 | 29.75 | 35.81 | 4.7 | 3.6 | 2.5 | 36.0 |
+          69.97 | [blank] | [blank] | 15.661 ± 0.097
+      - sample: R2-19
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-19
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 150.0
+          mass_loss_pct: 35.3
+          Mg_loss_pct: 74.79
+          composition_wt_pct:
+            MgO: 4.62
+            SiO2: 28.17
+            Al2O3: 30.95
+            CaO: 36.27
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-19
+        printed_quotes:
+        - R2-19 | 1.0 | 150 | 4.62 | 28.17 | 30.95 | 36.27 | 5.4 | 4.3 | 3.4 | 35.3 |
+          74.79 | [blank] | [blank] | [blank]
+      - sample: R2-17
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-17
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 180.0
+          mass_loss_pct: 46.4
+          Mg_loss_pct: 98.81
+          composition_wt_pct:
+            MgO: 0.26
+            SiO2: 22.75
+            Al2O3: 36.88
+            CaO: 40.12
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-17
+        printed_quotes:
+        - R2-17 | 1.0 | 180 | 0.26 | 22.75 | 36.88 | 40.12 | 5.1 | 3.5 | 2.8 | 46.4 |
+          98.81 | [blank] | [blank] | [blank]
+      - sample: R2-7
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-7
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 270.0
+          mass_loss_pct: 45.9
+          Mg_loss_pct: 99.91
+          composition_wt_pct:
+            MgO: 0.02
+            SiO2: 19.26
+            Al2O3: 36.86
+            CaO: 43.86
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-7
+        printed_quotes:
+        - R2-7 | 1.0 | 270 | 0.02 | 19.26 | 36.86 | 43.86 | 5.6 | 4.0 | 3.7 | 45.9 | 99.91
+          | [blank] | [blank] | [blank]
+      - sample: R2-3
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-3
+        - richter_2007_sio_table1_quoted_series_r2-3
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 180.0
+          mass_loss_pct: 28.4
+          Mg_loss_pct: 44.79
+          J_Mg_mol_cm2_s: 1.2e-08
+          composition_wt_pct:
+            MgO: 8.76
+            SiO2: 32.67
+            Al2O3: 26.8
+            CaO: 31.77
+          J_Si_mol_cm2_s: 3.51e-08
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-3
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-3
+        printed_quotes:
+        - R2-3 | 2.5 | 180 | 8.76 | 32.67 | 26.80 | 31.77 | 17.9 | 15.6 | 16.9 | 28.4
+          | 44.79 | 1.20 × 10−8 | 3.51 × 10−8 | [blank]
+        - R2-3 | 2.5 | 180 | 8.76 | 32.67 | 26.80 | 31.77 | 17.9 | 15.6 | 16.9 | 28.4
+          | 44.79 | 1.20 × 10−8 | 3.51 × 10−8 | [blank]
+      - sample: R2-10
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-10
+        - richter_2007_sio_table1_quoted_series_r2-10
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 240.0
+          mass_loss_pct: 26.0
+          Mg_loss_pct: 37.93
+          J_Mg_mol_cm2_s: 9.55e-09
+          composition_wt_pct:
+            MgO: 9.5
+            SiO2: 33.72
+            Al2O3: 25.85
+            CaO: 30.91
+          delta25Mg_permil: 6.246
+          J_Si_mol_cm2_s: 3.03e-08
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-10
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-10
+        printed_quotes:
+        - R2-10 | 2.5 | 240 | 9.50 | 33.72 | 25.85 | 30.91 | 22.2 | 18.5 | 25.4 | 26.0
+          | 37.93 | 9.55 × 10−9 | 3.03 × 10−8 | 6.246 ± 0.091
+        - R2-10 | 2.5 | 240 | 9.50 | 33.72 | 25.85 | 30.91 | 22.2 | 18.5 | 25.4 | 26.0
+          | 37.93 | 9.55 × 10−9 | 3.03 × 10−8 | 6.246 ± 0.091
+      - sample: R2-16
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-16
+        - richter_2007_sio_table1_quoted_series_r2-16
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 330.0
+          mass_loss_pct: 44.4
+          Mg_loss_pct: 95.39
+          J_Mg_mol_cm2_s: 1.48e-08
+          composition_wt_pct:
+            MgO: 0.94
+            SiO2: 23.78
+            Al2O3: 34.46
+            CaO: 40.83
+          delta25Mg_permil: 41.201
+          J_Si_mol_cm2_s: 2.96e-08
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-16
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-16
+        printed_quotes:
+        - R2-16 | 2.5 | 330 | 0.94 | 23.78 | 34.46 | 40.83 | 18.4 | 14.8 | 17.8 | 44.4
+          | 95.39 | 1.48 × 10−8 | 2.96 × 10−8 | 41.201 ± 0.051
+        - R2-16 | 2.5 | 330 | 0.94 | 23.78 | 34.46 | 40.83 | 18.4 | 14.8 | 17.8 | 44.4
+          | 95.39 | 1.48 × 10−8 | 2.96 × 10−8 | 41.201 ± 0.051
+      - sample: R2-11
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-11
+        - richter_2007_sio_table1_quoted_series_r2-11
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 420.0
+          mass_loss_pct: 36.2
+          Mg_loss_pct: 72.47
+          J_Mg_mol_cm2_s: 1.12e-08
+          composition_wt_pct:
+            MgO: 4.92
+            SiO2: 28.99
+            Al2O3: 30.19
+            CaO: 35.89
+          delta25Mg_permil: 16.401
+          J_Si_mol_cm2_s: 2.48e-08
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-11
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-11
+        printed_quotes:
+        - R2-11 | 2.5 | 420 | 4.92 | 28.99 | 30.19 | 35.89 | 24.0 | 18.2 | 28.7 | 36.2
+          | 72.47 | 1.12 × 10−8 | 2.48 × 10−8 | 16.401 ± 0.050
+        - R2-11 | 2.5 | 420 | 4.92 | 28.99 | 30.19 | 35.89 | 24.0 | 18.2 | 28.7 | 36.2
+          | 72.47 | 1.12 × 10−8 | 2.48 × 10−8 | 16.401 ± 0.050
+      - sample: R2-12
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-12
+        - richter_2007_sio_table1_quoted_series_r2-12
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 480.0
+          mass_loss_pct: 45.5
+          Mg_loss_pct: 93.35
+          J_Mg_mol_cm2_s: 1.37e-08
+          composition_wt_pct:
+            MgO: 1.33
+            SiO2: 24.56
+            Al2O3: 33.77
+            CaO: 40.36
+          delta25Mg_permil: 34.976
+          J_Si_mol_cm2_s: 2.8e-08
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-12
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-12
+        printed_quotes:
+        - R2-12 | 2.5 | 480 | 1.33 | 24.56 | 33.77 | 40.36 | 25.2 | 17.7 | 31.9 | 45.5
+          | 93.35 | 1.37 × 10−8 | 2.80 × 10−8 | 34.976 ± 0.116
+        - R2-12 | 2.5 | 480 | 1.33 | 24.56 | 33.77 | 40.36 | 25.2 | 17.7 | 31.9 | 45.5
+          | 93.35 | 1.37 × 10−8 | 2.80 × 10−8 | 34.976 ± 0.116
+      - sample: R2-2
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-2
+        - richter_2007_sio_table1_quoted_series_r2-2
+        printed_table_values:
+          temperature_quote: 1700 °C
+          T_C: 1700.0
+          time_min: 540.0
+          mass_loss_pct: 53.7
+          Mg_loss_pct: 99.92
+          J_Mg_mol_cm2_s: 1.06e-08
+          composition_wt_pct:
+            MgO: 0.02
+            SiO2: 11.04
+            Al2O3: 41.39
+            CaO: 47.55
+          J_Si_mol_cm2_s: 2.52e-08
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-2
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-2
+        printed_quotes:
+        - R2-2 | 2.5 | 540 | 0.02 | 11.04 | 41.39 | 47.55 | 19.7 | 14.4 | 20.5 | 53.7
+          | 99.92 | 1.06 × 10−8 | 2.52 × 10−8 | [blank]
+        - R2-2 | 2.5 | 540 | 0.02 | 11.04 | 41.39 | 47.55 | 19.7 | 14.4 | 20.5 | 53.7
+          | 99.92 | 1.06 × 10−8 | 2.52 × 10−8 | [blank]
+      - sample: R2-13
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-13
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 900.0
+          mass_loss_pct: 36.7
+          Mg_loss_pct: 74.56
+          composition_wt_pct:
+            MgO: 4.55
+            SiO2: 29.4
+            Al2O3: 30.21
+            CaO: 35.84
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R2-13
+        printed_quotes:
+        - R2-13 | 1.0 | 900 | 4.55 | 29.40 | 30.21 | 35.84 | 5.2 | 3.9 | 3.0 | 36.7 |
+          74.56 | [blank] | [blank] | [blank]
+      - sample: R2-15
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-15
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 1200.0
+          mass_loss_pct: 34.9
+          Mg_loss_pct: 70.03
+          composition_wt_pct:
+            MgO: 5.24
+            SiO2: 30.16
+            Al2O3: 29.53
+            CaO: 35.11
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R2-15
+        printed_quotes:
+        - R2-15 | 1.0 | 1200 | 5.24 | 30.16 | 29.53 | 35.11 | 5.9 | 4.9 | 4.3 | 34.9 |
+          70.03 | [blank] | [blank] | [blank]
+      - sample: R2-14
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-14
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 1500.0
+          mass_loss_pct: 45.6
+          Mg_loss_pct: 99.81
+          composition_wt_pct:
+            MgO: 0.04
+            SiO2: 20.86
+            Al2O3: 36.1
+            CaO: 43.0
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R2-14
+        printed_quotes:
+        - R2-14 | 1.0 | 1500 | 0.04 | 20.86 | 36.10 | 43.00 | 5.4 | 3.8 | 3.4 | 45.6 |
+          99.81 | [blank] | [blank] | [blank]
+      - sample: R2-9
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-9
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 1800.0
+          mass_loss_pct: 50.0
+          Mg_loss_pct: 99.91
+          composition_wt_pct:
+            MgO: 0.02
+            SiO2: 16.29
+            Al2O3: 39.28
+            CaO: 44.41
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R2-9
+        printed_quotes:
+        - R2-9 | 1.0 | 1800 | 0.02 | 16.29 | 39.28 | 44.41 | 6.0 | 4.1 | 4.4 | 50.0 |
+          99.91 | [blank] | [blank] | [blank]
+      - sample: R2-8
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r2-8
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 2250.0
+          mass_loss_pct: 59.3
+          Mg_loss_pct: 99.89
+          composition_wt_pct:
+            MgO: 0.03
+            SiO2: 8.54
+            Al2O3: 45.21
+            CaO: 46.22
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R2-8
+        printed_quotes:
+        - R2-8 | 1.0 | 2250 | 0.03 | 8.54 | 45.21 | 46.22 | 4.9 | 3.1 | 2.7 | 59.3 | 99.89
+          | [blank] | [blank] | [blank]
+      - sample: R3-2
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-2
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 0.0
+          mass_loss_pct: 0.0
+          Mg_loss_pct: 0.0
+          composition_wt_pct:
+            MgO: 12.22
+            SiO2: 46.36
+            Al2O3: 19.31
+            CaO: 22.11
+          delta25Mg_permil: -0.105
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-2
+        printed_quotes:
+        - R3-2 | 2.5 | 0 | 12.22 | 46.36 | 19.31 | 22.11 | 22.1 | 21.9 | 25.0 | 0.0 |
+          0.00 | [blank] | [blank] | –0.105 ± 0.014
+      - sample: R3-1
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-1
+        - richter_2007_sio_table1_quoted_series_r3-1
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 1800.0
+          mass_loss_pct: 26.5
+          Mg_loss_pct: 42.07
+          J_Mg_mol_cm2_s: 1.49e-09
+          composition_wt_pct:
+            MgO: 9.62
+            SiO2: 33.93
+            Al2O3: 26.24
+            CaO: 30.21
+          delta25Mg_permil: 6.188
+          J_Si_mol_cm2_s: 4.16e-09
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-1
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-1
+        printed_quotes:
+        - R3-1 | 2.5 | 1800 | 9.62 | 33.93 | 26.24 | 30.21 | 22.3 | 18.5 | 25.7 | 26.5
+          | 42.07 | 1.49 × 10−9 | 4.16 × 10−9 | 6.188 ± 0.006
+        - R3-1 | 2.5 | 1800 | 9.62 | 33.93 | 26.24 | 30.21 | 22.3 | 18.5 | 25.7 | 26.5
+          | 42.07 | 1.49 × 10−9 | 4.16 × 10−9 | 6.188 ± 0.006
+      - sample: R3-20
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-20
+        - richter_2007_sio_table1_quoted_series_r3-20
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 2400.0
+          mass_loss_pct: 34.0
+          Mg_loss_pct: 65.1
+          J_Mg_mol_cm2_s: 1.76e-09
+          composition_wt_pct:
+            MgO: 6.43
+            SiO2: 31.01
+            Al2O3: 29.11
+            CaO: 33.45
+          delta25Mg_permil: 12.337
+          J_Si_mol_cm2_s: 3.85e-09
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-20
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-20
+        printed_quotes:
+        - R3-20 | 2.5 | 2400 | 6.43 | 31.01 | 29.11 | 33.45 | 22.2 | 17.6 | 25.6 | 34.0
+          | 65.10 | 1.76 × 10−9 | 3.85 × 10−9 | 12.337 ± 0.053
+        - R3-20 | 2.5 | 2400 | 6.43 | 31.01 | 29.11 | 33.45 | 22.2 | 17.6 | 25.6 | 34.0
+          | 65.10 | 1.76 × 10−9 | 3.85 × 10−9 | 12.337 ± 0.053
+      - sample: R3-21
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-21
+        - richter_2007_sio_table1_quoted_series_r3-21
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 2400.0
+          mass_loss_pct: 26.7
+          Mg_loss_pct: 43.32
+          J_Mg_mol_cm2_s: 1.3e-09
+          composition_wt_pct:
+            MgO: 9.44
+            SiO2: 33.69
+            Al2O3: 26.32
+            CaO: 30.54
+          J_Si_mol_cm2_s: 3.56e-09
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-21
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-21
+        printed_quotes:
+        - R3-21 | 2.5 | 2400 | 9.44 | 33.69 | 26.32 | 30.54 | 25.4 | 21.0 | 33.0 | 26.7
+          | 43.32 | 1.30 × 10−9 | 3.56 × 10−9 | [blank]
+        - R3-21 | 2.5 | 2400 | 9.44 | 33.69 | 26.32 | 30.54 | 25.4 | 21.0 | 33.0 | 26.7
+          | 43.32 | 1.30 × 10−9 | 3.56 × 10−9 | [blank]
+      - sample: R3-4
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-4
+        - richter_2007_sio_table1_quoted_series_r3-4
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 2700.0
+          mass_loss_pct: 33.3
+          Mg_loss_pct: 75.93
+          J_Mg_mol_cm2_s: 1.69e-09
+          composition_wt_pct:
+            MgO: 4.6
+            SiO2: 30.84
+            Al2O3: 30.2
+            CaO: 34.36
+          delta25Mg_permil: 19.861
+          J_Si_mol_cm2_s: 3.19e-09
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-4
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-4
+        printed_quotes:
+        - R3-4 | 2.5 | 2700 | 4.60 | 30.84 | 30.20 | 34.36 | 20.6 | 16.7 | 22.5 | 33.3
+          | 75.93 | 1.69 × 10−9 | 3.19 × 10−9 | 19.861 ± 0.023
+        - R3-4 | 2.5 | 2700 | 4.60 | 30.84 | 30.20 | 34.36 | 20.6 | 16.7 | 22.5 | 33.3
+          | 75.93 | 1.69 × 10−9 | 3.19 × 10−9 | 19.861 ± 0.023
+      - sample: R3-7
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-7
+        - richter_2007_sio_table1_quoted_series_r3-7
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 2998.0
+          mass_loss_pct: 45.5
+          Mg_loss_pct: 99.12
+          J_Mg_mol_cm2_s: 2.05e-09
+          composition_wt_pct:
+            MgO: 0.2
+            SiO2: 22.4
+            Al2O3: 36.01
+            CaO: 41.39
+          J_Si_mol_cm2_s: 3.88e-09
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-7
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-7
+        printed_quotes:
+        - R3-7 | 2.5 | 2998 | 0.20 | 22.40 | 36.01 | 41.39 | 20.4 | 15.5 | 22.0 | 45.5
+          | 99.12 | 2.05 × 10−9 | 3.88 × 10−9 | [blank]
+        - R3-7 | 2.5 | 2998 | 0.20 | 22.40 | 36.01 | 41.39 | 20.4 | 15.5 | 22.0 | 45.5
+          | 99.12 | 2.05 × 10−9 | 3.88 × 10−9 | [blank]
+      - sample: R3-19
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-19
+        - richter_2007_sio_table1_quoted_series_r3-19
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 3000.0
+          mass_loss_pct: 32.8
+          Mg_loss_pct: 63.31
+          J_Mg_mol_cm2_s: 1.51e-09
+          composition_wt_pct:
+            MgO: 6.7
+            SiO2: 31.34
+            Al2O3: 28.86
+            CaO: 33.11
+          delta25Mg_permil: 11.887
+          J_Si_mol_cm2_s: 3.32e-09
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-19
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-19
+        printed_quotes:
+        - R3-19 | 2.5 | 3000 | 6.70 | 31.34 | 28.86 | 33.11 | 25.1 | 19.6 | 31.7 | 32.8
+          | 63.31 | 1.51 × 10−9 | 3.32 × 10−9 | 11.887 ± 0.042
+        - R3-19 | 2.5 | 3000 | 6.70 | 31.34 | 28.86 | 33.11 | 25.1 | 19.6 | 31.7 | 32.8
+          | 63.31 | 1.51 × 10−9 | 3.32 × 10−9 | 11.887 ± 0.042
+      - sample: R3-18
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-18
+        - richter_2007_sio_table1_quoted_series_r3-18
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 3000.0
+          mass_loss_pct: 37.5
+          Mg_loss_pct: 77.74
+          J_Mg_mol_cm2_s: 1.68e-09
+          composition_wt_pct:
+            MgO: 4.34
+            SiO2: 29.39
+            Al2O3: 30.81
+            CaO: 35.46
+          delta25Mg_permil: 17.946
+          J_Si_mol_cm2_s: 3.32e-09
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-18
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-18
+        printed_quotes:
+        - R3-18 | 2.5 | 3000 | 4.34 | 29.39 | 30.81 | 35.46 | 21.8 | 16.9 | 24.8 | 37.5
+          | 77.74 | 1.68 × 10−9 | 3.32 × 10−9 | 17.946 ± 0.023
+        - R3-18 | 2.5 | 3000 | 4.34 | 29.39 | 30.81 | 35.46 | 21.8 | 16.9 | 24.8 | 37.5
+          | 77.74 | 1.68 × 10−9 | 3.32 × 10−9 | 17.946 ± 0.023
+      - sample: R3-8
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-8
+        - richter_2007_sio_table1_quoted_series_r3-8
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 3600.0
+          mass_loss_pct: 41.4
+          Mg_loss_pct: 92.15
+          J_Mg_mol_cm2_s: 1.64e-09
+          composition_wt_pct:
+            MgO: 1.65
+            SiO2: 26.73
+            Al2O3: 33.21
+            CaO: 38.4
+          delta25Mg_permil: 32.359
+          J_Si_mol_cm2_s: 3.0e-09
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-8
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-8
+        printed_quotes:
+        - R3-8 | 2.5 | 3600 | 1.65 | 26.73 | 33.21 | 38.40 | 21.2 | 16.1 | 23.7 | 41.4
+          | 92.15 | 1.64 × 10−9 | 3.00 × 10−9 | 32.359 ± 0.016
+        - R3-8 | 2.5 | 3600 | 1.65 | 26.73 | 33.21 | 38.40 | 21.2 | 16.1 | 23.7 | 41.4
+          | 92.15 | 1.64 × 10−9 | 3.00 × 10−9 | 32.359 ± 0.016
+      - sample: R3-5
+        source_observation_ids:
+        - richter_2007_mg_table1_quoted_series_r3-5
+        - richter_2007_sio_table1_quoted_series_r3-5
+        printed_table_values:
+          temperature_quote: 1600 °C
+          T_C: 1600.0
+          time_min: 4285.0
+          mass_loss_pct: 48.5
+          Mg_loss_pct: 99.51
+          J_Mg_mol_cm2_s: 1.5e-09
+          composition_wt_pct:
+            MgO: 0.12
+            SiO2: 17.74
+            Al2O3: 38.36
+            CaO: 43.78
+          J_Si_mol_cm2_s: 3.07e-09
+        source_locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-5
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-5
+        printed_quotes:
+        - R3-5 | 2.5 | 4285 | 0.12 | 17.74 | 38.36 | 43.78 | 20.9 | 15.3 | 23.1 | 48.5
+          | 99.51 | 1.50 × 10−9 | 3.07 × 10−9 | [blank]
+        - R3-5 | 2.5 | 4285 | 0.12 | 17.74 | 38.36 | 43.78 | 20.9 | 15.3 | 23.1 | 48.5
+          | 99.51 | 1.50 × 10−9 | 3.07 × 10−9 | [blank]
+      - sample: richter_2007_table2_f2_ts65
+        source_observation_ids:
+        - richter_2007_table2_f2_ts65
+        species: Mg
+        printed_values:
+          quantity: magnesium_loss_inferred_from_isotope_fractionation
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          sample: F2 (TS65)
+          CAI_type: B2
+          FMg_permil_per_amu: 6.12
+          kinetic_isotope_alpha_Simon: 0.97978
+          kinetic_isotope_alpha_this_work: 0.991
+          Mg_evaporated_percent_Simon: 26.0
+          Mg_evaporated_percent_this_work: 49.2
+          field_classes:
+            FMg_permil_per_amu: measured_secondary
+            kinetic_isotope_alpha_Simon: model
+            kinetic_isotope_alpha_this_work: model
+            Mg_evaporated_percent_Simon: inverse
+            Mg_evaporated_percent_this_work: inverse
+          note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient.
+            Table estimates concern natural CAIs, not these laboratory evaporation residues.
+        locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5559
+          table: '2'
+          paragraph: F2 (TS65)
+        quotes:
+        - 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991:
+          F2 (TS65) | B2 | 6.12 | 26.0 | 49.2'
+        temperature_range_K: null
+        standard_state: null
+        fit_output: true
+      - sample: richter_2007_table2_e107
+        source_observation_ids:
+        - richter_2007_table2_e107
+        species: Mg
+        printed_values:
+          quantity: magnesium_loss_inferred_from_isotope_fractionation
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          sample: E107
+          CAI_type: B2
+          FMg_permil_per_amu: 1.99
+          kinetic_isotope_alpha_Simon: 0.97978
+          kinetic_isotope_alpha_this_work: 0.991
+          Mg_evaporated_percent_Simon: 9.4
+          Mg_evaporated_percent_this_work: 19.9
+          field_classes:
+            FMg_permil_per_amu: measured_secondary
+            kinetic_isotope_alpha_Simon: model
+            kinetic_isotope_alpha_this_work: model
+            Mg_evaporated_percent_Simon: inverse
+            Mg_evaporated_percent_this_work: inverse
+          note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient.
+            Table estimates concern natural CAIs, not these laboratory evaporation residues.
+        locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5559
+          table: '2'
+          paragraph: E107
+        quotes:
+        - 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991:
+          E107 | B2 | 1.99 | 9.4 | 19.9'
+        temperature_range_K: null
+        standard_state: null
+        fit_output: true
+      - sample: richter_2007_table2_3537_1
+        source_observation_ids:
+        - richter_2007_table2_3537_1
+        species: Mg
+        printed_values:
+          quantity: magnesium_loss_inferred_from_isotope_fractionation
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          sample: 3537-1
+          CAI_type: B1
+          FMg_permil_per_amu: 3.26
+          kinetic_isotope_alpha_Simon: 0.97978
+          kinetic_isotope_alpha_this_work: 0.991
+          Mg_evaporated_percent_Simon: 14.9
+          Mg_evaporated_percent_this_work: 30.4
+          field_classes:
+            FMg_permil_per_amu: measured_secondary
+            kinetic_isotope_alpha_Simon: model
+            kinetic_isotope_alpha_this_work: model
+            Mg_evaporated_percent_Simon: inverse
+            Mg_evaporated_percent_this_work: inverse
+          note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient.
+            Table estimates concern natural CAIs, not these laboratory evaporation residues.
+        locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5559
+          table: '2'
+          paragraph: 3537-1
+        quotes:
+        - 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991:
+          3537-1 | B1 | 3.26 | 14.9 | 30.4'
+        temperature_range_K: null
+        standard_state: null
+        fit_output: true
+      - sample: richter_2007_table2_ts33
+        source_observation_ids:
+        - richter_2007_table2_ts33
+        species: Mg
+        printed_values:
+          quantity: magnesium_loss_inferred_from_isotope_fractionation
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          sample: TS33
+          CAI_type: B1
+          FMg_permil_per_amu: 4.01
+          kinetic_isotope_alpha_Simon: 0.97978
+          kinetic_isotope_alpha_this_work: 0.991
+          Mg_evaporated_percent_Simon: 18.0
+          Mg_evaporated_percent_this_work: 35.9
+          field_classes:
+            FMg_permil_per_amu: measured_secondary
+            kinetic_isotope_alpha_Simon: model
+            kinetic_isotope_alpha_this_work: model
+            Mg_evaporated_percent_Simon: inverse
+            Mg_evaporated_percent_this_work: inverse
+          note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient.
+            Table estimates concern natural CAIs, not these laboratory evaporation residues.
+        locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5559
+          table: '2'
+          paragraph: TS33
+        quotes:
+        - 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991:
+          TS33 | B1 | 4.01 | 18.0 | 35.9'
+        temperature_range_K: null
+        standard_state: null
+        fit_output: true
+      - sample: richter_2007_table2_ts34
+        source_observation_ids:
+        - richter_2007_table2_ts34
+        species: Mg
+        printed_values:
+          quantity: magnesium_loss_inferred_from_isotope_fractionation
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          sample: TS34
+          CAI_type: B1
+          FMg_permil_per_amu: 5.63
+          kinetic_isotope_alpha_Simon: 0.97978
+          kinetic_isotope_alpha_this_work: 0.991
+          Mg_evaporated_percent_Simon: 24.2
+          Mg_evaporated_percent_this_work: 46.4
+          field_classes:
+            FMg_permil_per_amu: measured_secondary
+            kinetic_isotope_alpha_Simon: model
+            kinetic_isotope_alpha_this_work: model
+            Mg_evaporated_percent_Simon: inverse
+            Mg_evaporated_percent_this_work: inverse
+          note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient.
+            Table estimates concern natural CAIs, not these laboratory evaporation residues.
+        locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5559
+          table: '2'
+          paragraph: TS34
+        quotes:
+        - 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991:
+          TS34 | B1 | 5.63 | 24.2 | 46.4'
+        temperature_range_K: null
+        standard_state: null
+        fit_output: true
+      - sample: richter_2007_table2_golfball
+        source_observation_ids:
+        - richter_2007_table2_golfball
+        species: Mg
+        printed_values:
+          quantity: magnesium_loss_inferred_from_isotope_fractionation
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          sample: Golfball
+          CAI_type: B
+          FMg_permil_per_amu: 1.61
+          kinetic_isotope_alpha_Simon: 0.97978
+          kinetic_isotope_alpha_this_work: 0.991
+          Mg_evaporated_percent_Simon: 7.7
+          Mg_evaporated_percent_this_work: 16.4
+          field_classes:
+            FMg_permil_per_amu: measured_secondary
+            kinetic_isotope_alpha_Simon: model
+            kinetic_isotope_alpha_this_work: model
+            Mg_evaporated_percent_Simon: inverse
+            Mg_evaporated_percent_this_work: inverse
+          note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient.
+            Table estimates concern natural CAIs, not these laboratory evaporation residues.
+        locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5559
+          table: '2'
+          paragraph: Golfball
+        quotes:
+        - 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991:
+          Golfball | B | 1.61 | 7.7 | 16.4'
+        temperature_range_K: null
+        standard_state: null
+        fit_output: true
+      - sample: richter_2007_sio_quoted_fits
+        source_observation_ids:
+        - richter_2007_sio_quoted_fits
+        species: SiO
+        printed_values:
+          quantity: published_alpha_and_flux_arrhenius_fits
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          alpha_form:
+            expression: γ = γ0 exp(−E/RT)
+            gamma_o: 25.3
+            E_kJ_per_mol: 92.0
+          flux_form:
+            expression: J = J0 exp(−E/RT)
+            J_o_mol_cm2_s: 41700000.0
+            E_kJ_per_mol: 576.0
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+              published_page: 5552
+              figure: '2'
+            quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶
+              mol cm−2 s−1, E = 551 ± 63 kJ mol−1 for magnesium; J0 = 4.17 × 10⁷ mol cm−2
+              s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
+              are 2σ
+        locators:
+        - source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5553
+          figure: '3'
+        quotes:
+        - The combined vacuum and finite hydrogen pressure data are fit by the functional
+          form γ = γ0e−E/RT with γ0 = 25.3, E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E
+          = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes are 2σ
+        temperature_range_K: null
+        standard_state: null
+        fit_output: true
   SiO:
     observations:
     - observation_id: richter_2007_sio_cai_langmuir_alpha_arrhenius
@@ -55451,7 +57015,7 @@ species:
       T_range_K:
       - 1873.0
       - 2173.0
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -55464,6 +57028,7 @@ species:
       regime: langmuir_free_evaporation
       units: dimensionless
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         alpha: null
         gas_species: SiO(g)
         material: Type_B_CAI_like_liquid
@@ -55501,56 +57066,6 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
             paragraph: iridium loop
             line_range: '107'
-    - observation_id: richter_2007_sio_quoted_fits
-      experiment: type-b-cai-like-lab-melt
-      type: alpha
-      class_tag: model
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-        published_page: 5553
-        figure: '3'
-      quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 = 25.3,
-        E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes are 2σ
-      units: gamma_o dimensionless; E kJ mol−1; J_o mol cm−2 s−1
-      values:
-        quantity: published_alpha_and_flux_arrhenius_fits
-        method_class: model_derived
-        admission_status: model_output_not_measurement
-        alpha_form:
-          expression: γ = γ0 exp(−E/RT)
-          gamma_o: 25.3
-          E_kJ_per_mol: 92.0
-        flux_form:
-          expression: J = J0 exp(−E/RT)
-          J_o_mol_cm2_s: 41700000.0
-          E_kJ_per_mol: 576.0
-          locator:
-            source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-            published_page: 5552
-            figure: '2'
-          quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶ mol cm−2 s−1, E = 551 ± 63 kJ mol−1
-            for magnesium; J0 = 4.17 × 10⁷ mol cm−2 s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
-            are 2σ
-      supersedes: richter_2007_sio_cai_langmuir_alpha_arrhenius
-      regime: combined_vacuum_and_finite_hydrogen_pressure_alpha_fit
-      uncertainty:
-        alpha_E_kJ_per_mol: 37.0
-        flux_E_kJ_per_mol: 36.0
-        convention: 2σ
-        quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 =
-          25.3, E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes
-          are 2σ
-        flux_quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶ mol cm−2 s−1, E = 551 ± 63 kJ mol−1
-          for magnesium; J0 = 4.17 × 10⁷ mol cm−2 s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
-          are 2σ
-        alpha_locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-          published_page: 5553
-          figure: '3'
-        flux_locator:
-          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-          published_page: 5552
-          figure: '2'
     - observation_id: richter_2007_sio_table1_quoted_series_r3-10
       type: rate_series
       class_tag: measured
@@ -55564,6 +57079,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -55585,7 +57101,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -55613,6 +57129,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -55634,7 +57151,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -55662,6 +57179,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -55683,7 +57201,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -55711,6 +57229,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -55732,7 +57251,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -55760,6 +57279,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -55781,7 +57301,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -55809,6 +57329,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -55830,7 +57351,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -55858,6 +57379,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -55879,7 +57401,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -55907,6 +57429,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -55928,7 +57451,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -55956,6 +57479,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -55977,7 +57501,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56005,6 +57529,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56026,7 +57551,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56054,6 +57579,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56075,7 +57601,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56103,6 +57629,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56124,7 +57651,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56152,6 +57679,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56173,7 +57701,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56201,6 +57729,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56222,7 +57751,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56250,6 +57779,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56271,7 +57801,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56299,6 +57829,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56320,7 +57851,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56348,6 +57879,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56369,7 +57901,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56397,6 +57929,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56418,7 +57951,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56446,6 +57979,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56467,7 +58001,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56495,6 +58029,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56516,7 +58051,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56544,6 +58079,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56565,7 +58101,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56593,6 +58129,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56614,7 +58151,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56642,6 +58179,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56663,7 +58201,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56691,6 +58229,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56712,7 +58251,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56740,6 +58279,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56761,7 +58301,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56789,6 +58329,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56810,7 +58351,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56838,6 +58379,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56859,7 +58401,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56887,6 +58429,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56908,7 +58451,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56936,6 +58479,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -56957,7 +58501,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -56985,6 +58529,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -57006,7 +58551,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -57034,6 +58579,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -57055,7 +58601,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -57083,6 +58629,7 @@ species:
         residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
       units: time min; temperature °C; flux mol cm−2 s−1; composition wt%; mass and Mg loss %; δ25Mg ‰
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: published_reduced_silicon_flux_time_series
         method_class: measured_direct
         system_class: silicate_melt
@@ -57104,7 +58651,7 @@ species:
         note: Directly reduced experimental fluxes, not the Arrhenius fits. Blanks omitted; quoted decimal cells retain printed
           precision. T_C retained without conversion.
       regime: langmuir_free_evaporation
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       uncertainty:
         note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger
           uncertainty, evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by
@@ -57133,7 +58680,7 @@ species:
       T_range_K:
       - 1873.15
       - 2173.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -57146,6 +58693,7 @@ species:
       regime: langmuir_free_evaporation
       units: qualitative bound (no numeric rate)
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: qualitative_non_loss_bound
         method_class: measured_direct_qualitative
         system_class: silicate_melt
@@ -57202,7 +58750,7 @@ species:
       T_range_K:
       - 1873.15
       - 2173.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -57215,6 +58763,7 @@ species:
       regime: langmuir_free_evaporation
       units: qualitative bound (no numeric rate)
       values:
+        system_note: "Type B CAI-like silicate melt; starting composition is printed in Table 1."
         quantity: qualitative_non_loss_bound
         method_class: measured_direct_qualitative
         system_class: silicate_melt

@@ -13,6 +13,8 @@ FEDKIN_SID = "kems-005-fedkin-2006"
 FEDKIN_EXTRACT = f"{FEDKIN_SID}.yaml"
 HASHIMOTO_SID = "kems-015-hashimoto-1983"
 HASHIMOTO_EXTRACT = f"{HASHIMOTO_SID}.yaml"
+RICHTER07_SID = "kems-010-richter-2007"
+RICHTER07_EXTRACT = f"{RICHTER07_SID}.yaml"
 TABLE2_RUNS = {
     "sossi-2019-run-2m-16-07-16e": Decimal("848.9"),
     "sossi-2019-run-2m-16-07-16a": Decimal("742.5"),
@@ -154,4 +156,46 @@ def _assert_hashimoto_table3_pins(result) -> None:
 def test_hashimoto_table3_residue_values_keep_row_temperature_and_conditions(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, HASHIMOTO_EXTRACT)
     _assert_hashimoto_table3_pins(result)
+
+
+def _assert_richter07_pins(result) -> None:
+    assert result.validation.hard_issues == ()
+    expected = {
+        "R3-1": Decimal("0.265"),
+        "R3-2": Decimal("0.0"),
+        "R3-4": Decimal("0.333"),
+    }
+    points = {
+        sample: next(
+            row
+            for row in result.observations.values()
+            if row.value.kind is ValueKind.POINT
+            and row.observation_id.rsplit("::T=", 1)[0].endswith(
+                f"richter_2007_mg_table1_mass_loss_fraction_{sample}"
+            )
+        )
+        for sample in expected
+    }
+    for sample, value in expected.items():
+        row = points[sample]
+        assert row.value.point == value
+        assert row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        assert row.identity.temperature_K.value == Decimal("1873.15")
+        assert row.identity.total_pressure_Pa is not None
+        assert row.point_conditions["temperature_K"].state.value == Decimal("1873.15")
+
+    contexts = [
+        context
+        for records in result.context_by_work.values()
+        for context in records
+        if context.get("source_id") == RICHTER07_SID
+    ]
+    table1 = next(context for context in contexts if context.get("table") == "1")
+    assert table1["schema_gap"] == "t-1382"
+    assert any(row.get("sample") == "R3-1" for row in table1["rows"])
+
+
+def test_richter07_table1_mass_loss_and_context_keep_conditions(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, RICHTER07_EXTRACT)
+    _assert_richter07_pins(result)
 
