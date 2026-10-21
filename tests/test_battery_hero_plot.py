@@ -31,6 +31,7 @@ from scripts.battery_hero_plot import (
     element_view_series,
     history_record_from_archive,
     load_element_abundance,
+    main,
     read_scores,
     render_hero_charts,
     render_plots,
@@ -337,6 +338,486 @@ def test_low_count_bins_are_markers_and_flagged_rows_are_hollow(tmp_path: Path) 
         plt.close(element_figure)
 
 
+def test_deck_scatter_uses_only_scorer_flag_for_hollow_markers() -> None:
+    figure, axis = plt.subplots()
+    try:
+        hero_plot._draw_hero_deck_scatter(
+            axis,
+            [
+                {
+                    "chart": "polymerisation",
+                    "engine": "openimcc",
+                    "x_value": "1.0",
+                    "y_value": "0.25",
+                    "flagged": True,
+                }
+            ],
+            engine_colors={"openimcc": "#0072b2"},
+        )
+        figure.canvas.draw()
+
+        marker = axis.collections[0]
+        assert list(marker.get_facecolors()[0]) == pytest.approx(
+            list(to_rgba("#ffffff"))
+        )
+        assert list(marker.get_edgecolors()[0]) == pytest.approx(
+            list(to_rgba("#0072b2"))
+        )
+    finally:
+        plt.close(figure)
+
+
+def test_solved_oxygen_marker_shape_preserves_flag_fill_semantics() -> None:
+    engine_color = "#0072b2"
+    points = [
+        {
+            "chart": "redox_sensitivity",
+            "engine": "openimcc",
+            "x_value": "0.1",
+            "y_value": "0.25",
+            "oxygen_mode": "solved",
+            "marker": "^",
+            "flagged": False,
+        },
+        {
+            "chart": "redox_sensitivity",
+            "engine": "openimcc",
+            "x_value": "0.2",
+            "y_value": "0.5",
+            "oxygen_mode": "solved",
+            "marker": "^",
+            "flagged": True,
+        },
+    ]
+    figure, axis = plt.subplots()
+    try:
+        hero_plot._draw_hero_deck_scatter(
+            axis, points, engine_colors={"openimcc": engine_color}
+        )
+        by_gid = {artist.get_gid(): artist for artist in axis.collections}
+        ordinary = by_gid["hero-deck-marker:openimcc:ordinary:^"]
+        flagged = by_gid["hero-deck-marker:openimcc:flagged:^"]
+        assert list(ordinary.get_facecolors()[0]) == pytest.approx(
+            list(to_rgba(engine_color))
+        )
+        assert list(flagged.get_facecolors()[0]) == pytest.approx(
+            list(to_rgba("#ffffff"))
+        )
+
+        handles = _hero_legend_handles(
+            {str(point["engine"]) for point in points},
+            {"openimcc": engine_color},
+            flagged=any(bool(point["flagged"]) for point in points),
+            source_labels=(("^", "solved cell oxygen balance"),),
+        )
+        source_handle = handles[-1]
+        assert source_handle.get_marker() == "^"
+        assert list(to_rgba(source_handle.get_markerfacecolor())) == pytest.approx(
+            list(to_rgba("#555555"))
+        )
+    finally:
+        plt.close(figure)
+
+
+def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    history = tmp_path / "history.jsonl"
+    history.write_text(
+        json.dumps(
+            {
+                "kind": "battery_hero_history",
+                "schema_version": 1,
+                "store_sha": "old-store",
+                "commit_date": "2026-10-18T10:27:53-04:00",
+                "metrics": [
+                    {
+                        "rail": "vapour",
+                        "engine": "openimcc",
+                        "n": 1,
+                        "rms_dex": "0.2",
+                        "median_abs_dex": "0.1",
+                    }
+                ],
+                "benchmarks": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    files = hero_plot.render_hero_deck_charts(
+        data, tmp_path / "deck", history_path=history
+    )
+
+    for chart in (
+        "polymerisation",
+        "redox-sensitivity",
+        "sio-evolution",
+        "residue-composition",
+        "fo2-cross-comparison",
+    ):
+        assert Path(files[f"deck:{chart}:png"]).is_file()
+        assert Path(files[f"deck:{chart}:svg"]).is_file()
+    cross_svg = Path(files["deck:fo2-cross-comparison:svg"]).read_text(
+        encoding="utf-8"
+    )
+    polymerisation_svg = Path(files["deck:polymerisation:svg"]).read_text(
+        encoding="utf-8"
+    )
+    residue_svg = Path(files["deck:residue-composition:svg"]).read_text(
+        encoding="utf-8"
+    )
+    sio_svg = Path(files["deck:sio-evolution:svg"]).read_text(encoding="utf-8")
+    assert "engine-computed fO2 not yet available" in cross_svg
+    assert "fraction evaporated: no typed mass-loss value yet (t-1312)" in residue_svg
+    assert "no history rows" in sio_svg
+    assert "1970-01-01" not in sio_svg
+    assert "Green landing date" not in polymerisation_svg
+
+
+def test_deck_sweet_spot_uses_same_colors_across_engine_panels(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    data = replace(
+        data,
+        hero_sweet_spot_cells={
+            ("vapour", "openimcc"): (
+                {
+                    "sio2_lower": 0.0,
+                    "sio2_upper": 1.0,
+                    "temperature_lower_K": 1000.0,
+                    "temperature_upper_K": 1100.0,
+                    "n": 3,
+                    "median_abs_dex": 1.0,
+                    "color_eligible": True,
+                },
+            ),
+            ("vapour", "magemin"): (
+                {
+                    "sio2_lower": 0.0,
+                    "sio2_upper": 1.0,
+                    "temperature_lower_K": 1000.0,
+                    "temperature_upper_K": 1100.0,
+                    "n": 3,
+                    "median_abs_dex": 2.0,
+                    "color_eligible": True,
+                },
+            ),
+        },
+    )
+    colors: dict[str, list[tuple[float, ...]]] = {}
+    original_draw = hero_plot._draw_hero_sweet_spot
+
+    def capture_color(axis, engine, cells, **kwargs):
+        colors.setdefault(engine, []).append(
+            kwargs["colormap"](kwargs["normalization"](1.0))
+        )
+        return original_draw(axis, engine, cells, **kwargs)
+
+    monkeypatch.setattr(hero_plot, "_draw_hero_sweet_spot", capture_color)
+    hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+
+    assert len(colors["openimcc"]) == len(colors["magemin"]) == 2
+    for openimcc_color, magemin_color in zip(
+        colors["openimcc"], colors["magemin"]
+    ):
+        assert openimcc_color == pytest.approx(magemin_color)
+
+
+def test_polymerisation_deck_facets_points_by_species_and_keeps_benchmark(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    points = tuple(
+        {
+            "chart": "polymerisation",
+            "engine": "openimcc",
+            "facet": facet,
+            "x_value": "1.0",
+            "y_value": "0.2",
+            "residual_dex": "0.2",
+            "flagged": False,
+        }
+        for facet in ("SiO2", "Ag", "P2O5")
+    )
+    data = replace(
+        data,
+        hero_deck_points=points,
+        hero_deck_metrics={
+            ("polymerisation", "openimcc"): {"n": 3},
+            ("polymerisation", "internal-analytical"): {"n": 0},
+        },
+        hero_deck_benchmarks={
+            ("polymerisation", "openimcc"): {
+                "benchmark_engine": "vaporock",
+                "n": 2,
+                "primary_rms_dex": "0.1",
+                "benchmark_rms_dex": "0.2",
+            }
+        },
+    )
+    drawn_facets: list[tuple[str, ...]] = []
+    original_draw = hero_plot._draw_hero_deck_scatter
+
+    def capture_facets(axis, plotted_points, *, engine_colors):
+        if plotted_points and plotted_points[0].get("chart") == "polymerisation":
+            drawn_facets.append(
+                tuple(sorted({str(point["facet"]) for point in plotted_points}))
+            )
+        original_draw(axis, plotted_points, engine_colors=engine_colors)
+
+    monkeypatch.setattr(hero_plot, "_draw_hero_deck_scatter", capture_facets)
+    files = hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+
+    point_facets = {str(point["facet"]) for point in points}
+    hero_order = hero_plot._hero_facets(data, "vapour")
+    ordered_facets = tuple(facet for facet in hero_order if facet in point_facets) + tuple(
+        sorted(point_facets - set(hero_order))
+    )
+    expected = tuple((facet,) for facet in ordered_facets)
+    assert tuple(drawn_facets) == expected
+    svg = Path(files["deck:polymerisation:svg"]).read_text(encoding="utf-8")
+    assert "Best comparison on chart rows" in svg
+    assert "vaporock" in svg
+
+
+def test_deck_legends_include_points_refusals_and_history_on_empty_axes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    data = replace(
+        data,
+        hero_deck_points=(
+            {
+                "chart": "polymerisation",
+                "engine": "openimcc",
+                "facet": "SiO2",
+                "x_value": "1.0",
+                "y_value": "0.2",
+                "residual_dex": "0.2",
+                "flagged": False,
+            },
+        ),
+        hero_deck_axis_refusals={
+            ("polymerisation", "vaporock", "no usable NBO/T"): 1,
+            ("residue_composition", "magemin", "no recorded mass loss"): 1,
+            ("fo2_cross_comparison", "magemin", "no measured fO2"): 1,
+        },
+        hero_deck_axis_refusal_details={},
+        hero_sweet_spot_cells={},
+    )
+    history = tmp_path / "history.jsonl"
+    history.write_text(
+        json.dumps(
+            {
+                "kind": "battery_hero_history",
+                "schema_version": 1,
+                "store_sha": "test-store",
+                "commit_date": "2026-10-18T10:27:53-04:00",
+                "metrics": [
+                    {"rail": "vapour", "engine": "thermoengine", "rms_dex": "0.2"},
+                    {
+                        "rail": "residue_composition",
+                        "engine": "thermoengine",
+                        "rms_dex": "0.3",
+                    },
+                    {"rail": "redox", "engine": "thermoengine", "rms_dex": "0.4"},
+                ],
+                "benchmarks": [
+                    {
+                        "rail": rail,
+                        "primary_engine": "openimcc",
+                        "benchmark_engine": "alphamelts",
+                        "primary_rms_dex": "0.2",
+                        "benchmark_rms_dex": "0.3",
+                        "n": 2,
+                    }
+                    for rail in ("vapour", "residue_composition", "redox")
+                ],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    legends: dict[str, set[str]] = {}
+    original_legend = Figure.legend
+
+    def capture_legend(figure: Figure, *args, **kwargs):
+        title = figure._suptitle.get_text() if figure._suptitle is not None else ""
+        handles = kwargs.get("handles", ())
+        legends[title] = {str(handle.get_label()) for handle in handles}
+        return original_legend(figure, *args, **kwargs)
+
+    monkeypatch.setattr(Figure, "legend", capture_legend)
+    hero_plot.render_hero_deck_charts(
+        data, tmp_path / "deck", history_path=history
+    )
+
+    assert legends["Polymerisation test"] >= {
+        "openimcc",
+        "vaporock",
+        "thermoengine",
+        "alphamelts",
+    }
+    assert legends["Residue composition"] >= {
+        "magemin",
+        "thermoengine",
+        "openimcc",
+        "alphamelts",
+    }
+    assert legends["fO₂ cross-comparison"] >= {
+        "magemin",
+        "thermoengine",
+        "openimcc",
+        "alphamelts",
+    }
+
+
+def test_sio_deck_distinguishes_oxygen_sources_and_pO2_bins(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    base = {
+        "chart": "sio_evolution",
+        "engine": "openimcc",
+        "facet": "10^-10–10^-9 bar",
+        "x_value": "1200",
+        "y_value": "0.2",
+        "residual_dex": "0.2",
+        "flagged": False,
+    }
+    points = (
+        {
+            **base,
+            "group_index": -10,
+            "group_label": "10^-10–10^-9 bar",
+            "oxygen_mode": "solved",
+        },
+        {
+            **base,
+            "group_index": -10,
+            "group_label": "10^-10–10^-9 bar",
+            "oxygen_mode": "printed",
+        },
+        {
+            **base,
+            "group_index": -9,
+            "group_label": "10^-9–10^-8 bar",
+            "oxygen_mode": "solved",
+        },
+    )
+    data = replace(data, hero_deck_points=points)
+    drawn_points: list[dict[str, object]] = []
+    original_draw = hero_plot._draw_hero_deck_scatter
+
+    def capture_draw(axis, plotted_points, *, engine_colors):
+        if plotted_points and plotted_points[0].get("chart") == "sio_evolution":
+            drawn_points.extend(plotted_points)
+        original_draw(axis, plotted_points, engine_colors=engine_colors)
+
+    monkeypatch.setattr(hero_plot, "_draw_hero_deck_scatter", capture_draw)
+    files = hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+    svg = Path(files["deck:sio-evolution:svg"]).read_text(encoding="utf-8")
+    by_mode = {
+        str(point["oxygen_mode"]): point
+        for point in drawn_points
+        if point["group_index"] == -10
+    }
+    solved_later_bin = next(
+        point for point in drawn_points if point["group_index"] == -9
+    )
+
+    assert by_mode["solved"]["marker"] == "^"
+    assert by_mode["printed"]["marker"] == "o"
+    assert by_mode["solved"]["marker_size"] != solved_later_bin["marker_size"]
+    assert "marker shapes distinguish source" in svg
+    assert "10^-10–10^-9 bar" in svg
+    assert "10^-9–10^-8 bar" in svg
+
+
+def test_deck_refusal_strip_includes_missing_scorer_axis(tmp_path: Path) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    row = _record(
+        engine="openimcc",
+        experiment="missing-oxygen-condition",
+        formula="Fe",
+        temperature_K=1200,
+        residual=0.25,
+    )
+    row["reference"] = "missing-deck-source::missing-oxygen-condition"
+    residuals.write_text(
+        "".join(
+            json.dumps(item) + "\n"
+            for item in (
+                {"kind": "battery_store_stamp", "revision": "test-store"},
+                row,
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    data = read_scores(residuals)
+    assert data.hero_deck_axis_refusals[
+        ("redox_sensitivity", "openimcc", "no fO2 for this row")
+    ] == 1
+    files = hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+    redox_svg = Path(files["deck:redox-sensitivity:svg"]).read_text(
+        encoding="utf-8"
+    )
+    assert "no fO2 for this row" in redox_svg
+
+
+def test_deck_refusal_strip_height_scales_with_reason_count(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    reasons = 14
+    data.hero_deck_axis_refusals.update(
+        {
+            ("polymerisation", "openimcc", f"deck-reason-{index}"): 1
+            for index in range(reasons)
+        }
+    )
+
+    original_draw = hero_plot._draw_hero_refusals
+    measured_heights: list[tuple[int, float]] = []
+
+    def capture_height(axis, entries, *, engine_colors):
+        original_draw(axis, entries, engine_colors=engine_colors)
+        count = len({reason for _engine, reason, _count in entries})
+        if count >= reasons:
+            height_inches = axis.get_position().height * axis.figure.get_figheight()
+            measured_heights.append((count, height_inches))
+
+    monkeypatch.setattr(hero_plot, "_draw_hero_refusals", capture_height)
+    hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+
+    assert measured_heights
+    count, height_inches = measured_heights[0]
+    assert count >= reasons
+    assert height_inches >= count * 0.12
+
+
 @pytest.mark.parametrize("view", ("species", "element"))
 def test_clipped_flagged_points_keep_a_hollow_marker(tmp_path: Path, view: str) -> None:
     residuals = tmp_path / "residuals.jsonl"
@@ -448,7 +929,9 @@ def test_hero_hollow_encoding_uses_only_scorer_flags(tmp_path: Path) -> None:
     hero_flagged_label = next(
         handle.get_label()
         for handle in _hero_legend_handles(
-            data, "vapour", _hero_engine_colors(data.engines)
+            {"openimcc"},
+            _hero_engine_colors(data.engines),
+            flagged=True,
         )
         if handle.get_markerfacecolor() == "#ffffff"
     )
@@ -572,6 +1055,7 @@ def test_species_view_labels_major_curves_and_element_view_labels_elements(
 
 def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     residuals = tmp_path / "residuals.jsonl"
     rows: list[dict[str, object]] = [
@@ -689,6 +1173,124 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
         "openimcc 1, thermoengine 1; scorer all-numeric and same-row rms include them."
     ) in hero_caption
 
+    redox_residuals = tmp_path / "redox-residuals.jsonl"
+    unselected_melt_activity = _record(
+        engine="openimcc",
+        experiment="melt-activity-unselected",
+        formula="SiO2",
+        temperature_K=1200,
+        residual=0.5,
+        rail="melt_activity",
+    )
+    unselected_melt_activity["candidate_observation"]["identity"]["composition"] = {
+        "tag": "value",
+        "value": {
+            "amount_basis": "mole_fraction",
+            "components": [["SiO2", "0.25"], ["FeO", "0.75"]],
+        },
+    }
+    redox_rows = [
+        {"kind": "battery_store_stamp", "revision": "test-store"},
+        _record(
+            engine="openimcc",
+            experiment="redox-1",
+            formula="FeO",
+            temperature_K=1100,
+            residual=0.25,
+            rail="redox",
+        ),
+        uncalibrated,
+        unselected_melt_activity,
+    ]
+    redox_residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in redox_rows), encoding="utf-8"
+    )
+    redox_data = read_scores(redox_residuals, rails=("redox",))
+    default_redox_data = read_scores(redox_residuals)
+    default_openimcc = default_redox_data.summaries["openimcc"]
+    redox_openimcc = redox_data.summaries["openimcc"]
+    assert default_openimcc.excluded_d139_rows == redox_openimcc.excluded_d139_rows == 1
+    assert (
+        default_openimcc.excluded_d139_by_rail
+        == redox_openimcc.excluded_d139_by_rail
+    )
+    unselected_melt_points = [
+        point
+        for (rail, formula, engine, _composition), points in (
+            redox_data.hero_series.items()
+        )
+        if (rail, formula, engine) == ("melt_activity", "SiO2", "openimcc")
+        for point in points
+    ]
+    assert len(unselected_melt_points) == 1
+    assert unselected_melt_points[0].residual_dex == pytest.approx(0.5)
+    melt_cells = redox_data.hero_sweet_spot_cells[("melt_activity", "openimcc")]
+    assert sum(int(cell["n"]) for cell in melt_cells) == 1
+    assert melt_cells == default_redox_data.hero_sweet_spot_cells[
+        ("melt_activity", "openimcc")
+    ]
+
+    default_hero_files = render_hero_charts(
+        default_redox_data, tmp_path / "default-rail-hero-images"
+    )
+    redox_hero_files = render_hero_charts(
+        redox_data, tmp_path / "redox-rail-hero-images"
+    )
+    caption_marker = (
+        "vapour scatter excludes uncalibrated kems p_partial rows under d-139: "
+    )
+    expected_caption_tail = (
+        "openimcc 1; scorer all-numeric and same-row rms include them"
+    )
+    default_caption_tail = (
+        default_hero_files["hero:vapour:svg"]
+        .read_text(encoding="utf-8")
+        .casefold()
+        .split(caption_marker, 1)[1]
+        .split(".", 1)[0]
+    )
+    redox_caption_tail = (
+        redox_hero_files["hero:vapour:svg"]
+        .read_text(encoding="utf-8")
+        .casefold()
+        .split(caption_marker, 1)[1]
+        .split(".", 1)[0]
+    )
+    assert default_caption_tail == redox_caption_tail == expected_caption_tail
+
+    assert main(
+        [
+            "--input",
+            str(redox_residuals),
+            "--output-dir",
+            str(tmp_path / "redox-images"),
+            "--history-path",
+            str(tmp_path / "history.jsonl"),
+            "--rail",
+            "redox",
+            "--group-by",
+            "species",
+            "--simulator-commit",
+            "sim-test",
+            "--openimcc-commit",
+            "openimcc-test",
+            "--render-date",
+            "2026-10-15",
+        ]
+    ) == 0
+    summary = json.loads(capsys.readouterr().out)
+    redox_svgs = [
+        Path(path)
+        for name, path in summary["files"].items()
+        if name.endswith(":tile_svg")
+    ]
+    assert redox_svgs
+    assert all(
+        "excluded under d-139: openimcc 1 uncalibrated KEMS p_partial"
+        in path.read_text(encoding="utf-8")
+        for path in redox_svgs
+    )
+
 
 def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
     abundance = load_element_abundance("lunar_mare_low_ti")
@@ -795,7 +1397,8 @@ def test_hero_series_keep_composition_and_count_refusals_by_reason(
         *(facet for facet, _label in HERO_MINOR_FACETS),
     }
     legend_handles = _hero_legend_handles(
-        data, "vapour", _hero_engine_colors(data.engines)
+        data.engines,
+        _hero_engine_colors(data.engines),
     )
     assert len(legend_handles) <= len(data.engines) + 2
     assert [handle.get_label() for handle in legend_handles].count(
@@ -886,8 +1489,74 @@ def test_non_observable_rows_are_separate_from_refusals_and_history(
         for item in record["refusal_coverage"]
     )
 
+
+def test_melt_activity_refusals_and_diagnostics_are_collected(
+    tmp_path: Path,
+) -> None:
+    scored = _record(
+        engine="openimcc",
+        experiment="ordinary",
+        formula="SiO2",
+        temperature_K=1800,
+        residual=0.2,
+        rail="melt_activity",
+    )
+    scored["notices"] = [
+        {
+            "kind": NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+            "reason": "extrapolated beyond certified band",
+        }
+    ]
+    metric_domain = _record(
+        engine="openimcc",
+        experiment="refused",
+        formula="SiO2",
+        temperature_K=1800,
+        residual=None,
+        status="refused",
+        rail="melt_activity",
+    )
+    metric_domain["refusal"] = {"reason": "metric_domain"}
+    not_observable = _record(
+        engine="magemin",
+        experiment="unobservable",
+        formula="SiO2",
+        temperature_K=1800,
+        residual=None,
+        status="refused",
+        rail="melt_activity",
+    )
+    residuals = tmp_path / "melt-activity.jsonl"
+    residuals.write_text(
+        "".join(
+            json.dumps(row) + "\n"
+            for row in (
+                {"kind": "battery_store_stamp", "revision": "melt-activity-test"},
+                scored,
+                metric_domain,
+                not_observable,
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    data = read_scores(residuals)
+
+    assert data.hero_refusal_totals == {
+        ("melt_activity", "openimcc", "metric_domain"): 1
+    }
+    assert _hero_refusal_entries(data, "melt_activity", "SiO2") == (
+        ("openimcc", "metric_domain", 1),
+    )
+    assert data.hero_diagnostics[("melt_activity", "magemin")][
+        "not_observable_count"
+    ] == 1
+    assert data.hero_diagnostics[("melt_activity", "openimcc")][
+        "open_predict_and_flag_notice_counts_by_kind"
+    ] == {NoticeKind.OUT_OF_CERTIFIED_BAND.value: 1}
+
     files = render_hero_charts(data, tmp_path / "rendered")
-    svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
+    svg = files["hero:melt_activity:svg"].read_text(encoding="utf-8").casefold()
     assert "not an observable of this engine" in svg
     assert "magemin 1" in svg
 

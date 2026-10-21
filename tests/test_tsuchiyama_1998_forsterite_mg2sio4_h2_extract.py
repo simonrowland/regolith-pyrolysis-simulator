@@ -4,7 +4,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from simulator.battery.enums import Quantity
-from simulator.battery.migrate import Migrator
+from tests.battery.factories import migrate_one_extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,8 +15,7 @@ EXTRACT = (
 
 
 def test_tsuchiyama_table_1_values_migrate_from_printed_page() -> None:
-    migrator = Migrator(root=ROOT, index={}, aliases={})
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
 
     observations = {

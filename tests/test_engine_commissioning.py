@@ -566,10 +566,20 @@ def test_alphamelts_subprocess_death_below_observed_floor_annotates_engine_reaso
     monkeypatch,
 ) -> None:
     """C01: only an actual subprocess death below the observed floor is annotated."""
+    import simulator.melt_backend.alphamelts as alphamelts_module
+
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
     backend._binary_path = Path('/tmp/fake-alphamelts')
     calls: list = []
+    monkeypatch.setattr(
+        alphamelts_module,
+        'engine_commissioning',
+        lambda *_args, **_kwargs: pytest.fail(
+            'crash annotation must reuse the commissioning assessment'
+        ),
+        raising=False,
+    )
 
     def fake_run(args, **kwargs):
         argv = list(args[0] if args and isinstance(args[0], (list, tuple)) else args)

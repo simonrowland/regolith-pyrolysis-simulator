@@ -22,6 +22,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     QUALIFICATION_SIO2_SWEEP_WT_PCT,
     QUANTITY_ACTIVITY,
     QUANTITY_PRESSURE,
+    PO2_NOT_AN_INPUT,
     REFUSAL_COMPOSITION_PROJECTED,
     REFUSAL_ENGINE_CRASH,
     REFUSAL_GATE_REFUSED_IN_ADAPTER,
@@ -610,18 +611,20 @@ def test_extract_preserves_valid_partial_pressures_and_reports_invalid_names() -
 def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     pot = BinaryPot(
         pot_id="fixture_pot",
-        kato_1993_table4_system="Al2O3-SiO2",
+        kato_1993_table4_system="CaO-Al2O3-SiO2",
         why="fixture",
-        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+        composition_wt_pct={"SiO2": 50.0, "CaO": 25.0, "Al2O3": 25.0},
     )
-    po2 = Po2Request(mode="engine_default", po2_bar=None)
+    po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
     captured: dict[str, object] = {}
 
     class _SubprocessBackend:
         _mode = "subprocess"
 
-        def equilibrate(self, **kwargs):
+        def equilibrate(self, fO2_log=None, redox_mode=None, **kwargs):
             captured.update(kwargs)
+            captured["fO2_log"] = fO2_log
+            captured["redox_mode"] = redox_mode
             return SimpleNamespace(
                 status="ok",
                 diagnostics={},
@@ -643,10 +646,205 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     cell = equilibrate_cell(handle, pot, temperature_K=1500.0, po2=po2)
     assert cell.status == "ok"
     assert captured["subprocess_run_mode"] == "isothermal"
+    assert captured["fO2_log"] is None
+    assert captured["redox_mode"] == PO2_NOT_AN_INPUT
     assert captured["pressure_bar"] == 1.0
     assert cell.melt_activities == {"SiO2": 0.5}
     assert cell.gas_partial_pressures_Pa == {"Na": 1.0}
     assert handle.available is True
+
+
+def test_psat_without_fo2_on_fe_melt_keeps_green_scorer_request() -> None:
+    from decimal import Decimal
+
+    from simulator.battery.enums import AmountBasis, Engine, Quantity
+    from simulator.battery.records import Composition
+    from simulator.battery.score import _oxygen_input_request
+    from tests.battery.factories import psat_identity
+
+    composition = Composition(
+        "review pin",
+        (("FeO", Decimal("0.2")), ("SiO2", Decimal("0.8"))),
+        AmountBasis.MOLE_FRACTION,
+    )
+    notices = []
+    request = _oxygen_input_request(
+        engine=Engine.THERMOENGINE,
+        channel="review pin",
+        sources=(),
+        identity=psat_identity("Na"),
+        requested=None,
+        quantity=Quantity.P_SAT,
+        composition_value=composition,
+        input_notices=notices,
+    )
+
+    assert isinstance(request, Po2Request)
+    assert request.mode == PO2_NOT_AN_INPUT
+    assert request.po2_bar is None
+
+
+def test_multivalent_not_an_input_keeps_alphamelts_intrinsic_refusal() -> None:
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    omitted = object()
+    received: list[tuple[float | None, object]] = []
+
+    class _RecordingAlphaMELTSBackend(AlphaMELTSBackend):
+        def equilibrate(
+            self,
+            temperature_C,
+            composition_kg=None,
+            fO2_log=None,
+            pressure_bar=1.0e-6,
+            *,
+            composition_mol=None,
+            composition_mol_by_account=None,
+            species_formula_registry=None,
+            redox_mode=omitted,
+            subprocess_run_mode=None,
+            **kwargs,
+        ):
+            received.append((fO2_log, redox_mode))
+            forwarded = dict(kwargs)
+            if redox_mode is not omitted:
+                forwarded["redox_mode"] = redox_mode
+            return super().equilibrate(
+                temperature_C=temperature_C,
+                composition_kg=composition_kg,
+                composition_mol=composition_mol,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_formula_registry,
+                fO2_log=fO2_log,
+                pressure_bar=pressure_bar,
+                subprocess_run_mode=subprocess_run_mode,
+                **forwarded,
+            )
+
+    pot = BinaryPot(
+        pot_id="feo_psat",
+        kato_1993_table4_system="FeO-SiO2",
+        why="Fe-bearing p_sat with no printed oxygen potential",
+        composition_wt_pct={"FeO": 20.0, "SiO2": 80.0},
+    )
+    backend = _RecordingAlphaMELTSBackend()
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1673.15,
+        po2=Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+        isolated=False,
+        timeout_s=2.0,
+    )
+
+    assert received == [(None, omitted)], {
+        "received": received,
+        "status": cell.status,
+        "refusal_reason": cell.refusal_reason,
+        "engine_reason": cell.engine_reason,
+    }
+    assert cell.status == "refusal"
+    assert "intrinsic closed-system fO2" in (cell.engine_reason or "")
+
+
+@pytest.mark.parametrize(
+    "oxide",
+    ("FeO", "Fe2O3", "TiO2", "Cr2O3", "MnO", "FeOT"),
+)
+def test_backend_owned_multivalent_rule_keeps_pinned_results(oxide: str) -> None:
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+    from simulator.melt_backend.base import multivalent_components
+
+    composition = {oxide: 1.0, "SiO2": 0.0}
+    expected = (oxide,)
+
+    assert multivalent_components(
+        composition,
+        oxide_aliases=MELTS_OXIDE_ALIASES,
+    ) == expected
+    assert multivalent_components(
+        SimpleNamespace(components=tuple(composition.items())),
+        oxide_aliases=MELTS_OXIDE_ALIASES,
+    ) == expected
+
+
+@pytest.mark.parametrize(
+    "redox_oxide",
+    ("FeO", "Fe2O3", "TiO2", "Cr2O3", "MnO"),
+)
+def test_not_an_input_refusal_stays_at_backend_boundary_for_multivalent_cell(
+    monkeypatch,
+    redox_oxide: str,
+) -> None:
+    from engines.domain_reason import OutOfDomainReason
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.base import EquilibriumResult
+
+    composition_kg = {"SiO2": 0.5, "CaO": 0.4, redox_oxide: 0.1}
+    backend = AlphaMELTSBackend()
+    backend._mode = "subprocess"
+    transport_calls: list[dict[str, object]] = []
+
+    def fake_transport(*args, **kwargs):
+        transport_calls.append(kwargs)
+        return EquilibriumResult(
+            status="ok",
+            liquid_fraction=1.0,
+            activity_coefficients={"SiO2": 0.5},
+        )
+
+    monkeypatch.setattr(backend, "_equilibrate_subprocess", fake_transport)
+    monkeypatch.setattr(backend, "_domain_gate", lambda *_args, **_kwargs: None)
+
+    direct = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg=composition_kg,
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode=PO2_NOT_AN_INPUT,
+        subprocess_run_mode="isothermal",
+    )
+
+    pot = BinaryPot(
+        pot_id=f"redox_{redox_oxide}",
+        kato_1993_table4_system="SiO2-CaO-redox oxide",
+        why="multivalent redox-mode refusal fixture",
+        composition_wt_pct={key: value * 100.0 for key, value in composition_kg.items()},
+    )
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1673.15,
+        po2=Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+        isolated=False,
+        timeout_s=2.0,
+    )
+
+    assert direct.status == "out_of_domain"
+    assert direct.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.INVALID_INPUT.value
+    )
+    assert cell.status == "refusal"
+    assert cell.engine_status == "ValueError"
+    assert "intrinsic closed-system fO2" in (cell.engine_reason or "")
+    assert transport_calls == []
 
 
 def test_domain_exception_does_not_kill_engine_handle() -> None:
@@ -1628,6 +1826,33 @@ def test_qualification_temperature_below_and_above_published_band() -> None:
     # the engine-arm 1500 K start.
     assert 1100.0 > t_min
     assert low["temperature_in_band"] is True
+
+
+@pytest.mark.parametrize("sio2_wt_pct", (32.0, 34.0))
+def test_qualification_gate_pins_observed_crash_floor_assessment(
+    sio2_wt_pct: float,
+) -> None:
+    from engines.engine_commissioning import assess_engine_commissioning
+
+    composition = scale_feo_mgo_for_sio2(
+        sio2_wt_pct,
+        {"FeO": 30.0, "MgO": 20.0, "SiO2": 50.0},
+    )
+    expected = assess_engine_commissioning(
+        "alphamelts",
+        sio2_wt_pct=sio2_wt_pct,
+        temperature_K=1700.0,
+    )
+
+    gate = assess_qualification_gate(composition, 1700.0)
+
+    assert gate["below_crash_floor"] is expected.below_crash_floor
+    assert gate["certified_band"]["sio2_crash_floor_wt_pct"] == (
+        expected.spec.sio2_wt_pct.observed_crash_floor_wt_pct
+    )
+    assert any("crash floor" in warning for warning in gate["warnings"]) is (
+        expected.below_crash_floor
+    )
 
 
 def test_qualification_sio2_sweep_pots_sum_to_100() -> None:

@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Any, Callable, Optional
 
 ENGINE_WORKER_CANCEL_POLL_S = 0.05
+ENGINE_WORKER_WATCHDOG_GRACE_S = 0.25
 ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S = 3.0
 ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S = 5.0
 # _stop_pair on the start() handshake-timeout path (diagnostic=False):
@@ -302,6 +303,44 @@ def _run_engine_worker(
 class WarmEngineWorker:
     """Persistent spawned worker with deadlines and crash/hang replacement."""
 
+    @staticmethod
+    def _caller_future_timeout_s(
+        call_timeout_s: float,
+        startup_timeout_s: float,
+        watchdog_grace_s: float = ENGINE_WORKER_WATCHDOG_GRACE_S,
+    ) -> float:
+        """Bound a caller wait across cold start, call, and timeout cleanup.
+
+        Premise: ``start()`` spawns before its handshake wall begins, the job
+        wall begins after READY, and a job timeout is reported only after the
+        watchdog grace and bounded stop joins. In seconds, the caller envelope
+        is call + startup + healthy-spawn slack + watchdog grace + stop joins
+        + one consumer poll tick. Default MAGEMin is 15 + 30 + 1 + 0.25 +
+        1.1 + 0.05 = 47.4 seconds. The adapter may cap this by its remaining
+        aggregate budget, which remains the stronger deadline.
+        """
+        call_s = float(call_timeout_s)
+        startup_s = float(startup_timeout_s)
+        grace_s = float(watchdog_grace_s)
+        if not math.isfinite(call_s) or call_s <= 0.0:
+            raise ValueError('worker call timeout must be finite and positive')
+        if not math.isfinite(startup_s) or startup_s <= 0.0:
+            raise ValueError(
+                'worker startup timeout must be finite and positive'
+            )
+        if not math.isfinite(grace_s) or grace_s < 0.0:
+            raise ValueError(
+                'worker watchdog grace must be finite and nonnegative'
+            )
+        return (
+            call_s
+            + startup_s
+            + ENGINE_WORKER_SPAWN_SLACK_S
+            + grace_s
+            + ENGINE_WORKER_STOP_PAIR_JOIN_S
+            + ENGINE_WORKER_CANCEL_POLL_S
+        )
+
     def __init__(
         self,
         *,
@@ -313,7 +352,7 @@ class WarmEngineWorker:
         call_timeout_s: float = 60.0,
         diagnostic_log_path: str | os.PathLike[str] | None = None,
         diagnostic_signal: int = signal.SIGUSR1,
-        watchdog_grace_s: float = 0.25,
+        watchdog_grace_s: float = ENGINE_WORKER_WATCHDOG_GRACE_S,
         daemon: bool = True,
     ) -> None:
         self.name = str(name)
@@ -335,6 +374,21 @@ class WarmEngineWorker:
         self.disabled = False
         self._state_lock = threading.Lock()
         self._pending_reap: list[Any] = []
+        self._pool_call_abort_event: threading.Event | None = None
+
+    def _begin_pool_call(self) -> threading.Event:
+        """Install the cancellation token before the pool enters ``call``."""
+        abort_event = threading.Event()
+        with self._state_lock:
+            if self._pool_call_abort_event is not None:
+                raise RuntimeError(f'{self.name} already has an active pool call')
+            self._pool_call_abort_event = abort_event
+        return abort_event
+
+    def _end_pool_call(self, abort_event: threading.Event) -> None:
+        with self._state_lock:
+            if self._pool_call_abort_event is abort_event:
+                self._pool_call_abort_event = None
 
     def start(self, *, timeout_s: Optional[float] = None) -> Any:
         """Start a fresh worker and wait for its bootstrap acknowledgement."""
@@ -342,6 +396,13 @@ class WarmEngineWorker:
         with self._state_lock:
             if self.disabled:
                 raise RuntimeError(f'{self.name} worker is disabled')
+            abort_event = self._pool_call_abort_event
+            if abort_event is not None and abort_event.is_set():
+                raise EngineWorkerTimeout(
+                    self.name,
+                    self.call_timeout_s,
+                    phase='job',
+                )
         context = multiprocessing.get_context('spawn')
         parent, child = context.Pipe(duplex=True)
         process = context.Process(
@@ -369,6 +430,14 @@ class WarmEngineWorker:
                 child.close()
                 parent.close()
                 raise RuntimeError(f'{self.name} worker is disabled')
+            if abort_event is not None and abort_event.is_set():
+                child.close()
+                parent.close()
+                raise EngineWorkerTimeout(
+                    self.name,
+                    self.call_timeout_s,
+                    phase='job',
+                )
             self.process = process
             self.connection = parent
             self.ready_payload = None
@@ -378,10 +447,19 @@ class WarmEngineWorker:
             still_ours = (
                 not self.disabled
                 and self.process is process
+                and not (
+                    abort_event is not None and abort_event.is_set()
+                )
             )
         if not still_ours:
             child.close()
             parent.close()
+            if abort_event is not None and abort_event.is_set():
+                raise EngineWorkerTimeout(
+                    self.name,
+                    self.call_timeout_s,
+                    phase='job',
+                )
             raise RuntimeError(f'{self.name} worker is disabled')
         try:
             process.start()
@@ -395,7 +473,11 @@ class WarmEngineWorker:
             raise
         child.close()
         with self._state_lock:
-            if self.disabled or self.process is not process:
+            if (
+                self.disabled
+                or self.process is not process
+                or (abort_event is not None and abort_event.is_set())
+            ):
                 cancelled = True
             else:
                 cancelled = False
@@ -410,6 +492,12 @@ class WarmEngineWorker:
                 diagnostic=False,
                 cleanup_group=True,
             )
+            if abort_event is not None and abort_event.is_set():
+                raise EngineWorkerTimeout(
+                    self.name,
+                    self.call_timeout_s,
+                    phase='job',
+                )
             raise RuntimeError(f'{self.name} worker is disabled')
         try:
             startup_timeout = self.startup_timeout_s
@@ -425,8 +513,17 @@ class WarmEngineWorker:
                         not self.disabled
                         and self.process is process
                         and self.connection is parent
+                        and not (
+                            abort_event is not None and abort_event.is_set()
+                        )
                     )
                 if not current:
+                    if abort_event is not None and abort_event.is_set():
+                        raise EngineWorkerTimeout(
+                            self.name,
+                            self.call_timeout_s,
+                            phase='job',
+                        )
                     raise RuntimeError(f'{self.name} worker is disabled')
                 remaining = deadline - time.monotonic()
                 if remaining <= 0.0:
@@ -478,6 +575,12 @@ class WarmEngineWorker:
                 or self.process is not process
                 or self.connection is not parent
             ):
+                if abort_event is not None and abort_event.is_set():
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        self.call_timeout_s,
+                        phase='job',
+                    )
                 raise RuntimeError(f'{self.name} worker is disabled')
             self.ready_payload = message[1]
             self.start_count += 1
@@ -485,13 +588,20 @@ class WarmEngineWorker:
 
     def call(self, request: Any, *, timeout_s: Optional[float] = None) -> Any:
         """Run one request; replace a dead or timed-out worker before return."""
+        timeout = self.call_timeout_s if timeout_s is None else max(
+            0.001, float(timeout_s))
         with self._state_lock:
             if self.disabled:
                 raise RuntimeError(f'{self.name} worker is disabled')
+            abort_event = self._pool_call_abort_event
+            if abort_event is not None and abort_event.is_set():
+                raise EngineWorkerTimeout(
+                    self.name,
+                    timeout,
+                    phase='job',
+                )
             process = self.process
             connection = self.connection
-        timeout = self.call_timeout_s if timeout_s is None else max(
-            0.001, float(timeout_s))
         if process is not None and not process.is_alive():
             _pool_debug(f'{self.name}: worker pid found dead at call entry')
             self._discard_current(
@@ -555,7 +665,44 @@ class WarmEngineWorker:
                 phase='job',
             )
         try:
+            with self._state_lock:
+                if abort_event is not None and abort_event.is_set():
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        timeout,
+                        phase='job',
+                    )
+                if (
+                    self.disabled
+                    or self.process is not process
+                    or self.connection is not connection
+                ):
+                    raise EngineWorkerDied(
+                        'call',
+                        f'{self.name} worker exited without a result',
+                    )
+                # Passing this locked check admits this request to the send.
+                # It may reach the child and briefly run its handler before an
+                # abort kills it; the post-send token and slot checks discard
+                # its result. Keep transport I/O outside the state lock so
+                # disable and abort can still kill the child if send blocks.
             connection.send(request)
+            with self._state_lock:
+                if abort_event is not None and abort_event.is_set():
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        timeout,
+                        phase='job',
+                    )
+                if (
+                    self.disabled
+                    or self.process is not process
+                    or self.connection is not connection
+                ):
+                    raise EngineWorkerDied(
+                        'call',
+                        f'{self.name} worker exited without a result',
+                    )
             deadline = time.monotonic() + remaining
             while True:
                 with self._state_lock:
@@ -674,6 +821,28 @@ class WarmEngineWorker:
             diagnostic=diagnostic,
             cleanup_group=True,
         )
+
+    def _abort_current_call(
+        self,
+        abort_event: threading.Event | None = None,
+    ) -> bool:
+        """Kill and reap the current worker without retiring this slot."""
+        with self._state_lock:
+            if abort_event is None:
+                abort_event = self._pool_call_abort_event
+            elif abort_event is not self._pool_call_abort_event:
+                return False
+            if abort_event is not None:
+                abort_event.set()
+            process, connection = self.process, self.connection
+        if process is None and connection is None:
+            return False
+        self._discard_current(
+            diagnostic=False,
+            expected_process=process,
+            expected_connection=connection,
+        )
+        return True
 
     def _stop_pair(
         self,
@@ -835,6 +1004,17 @@ class EngineWorkerPool:
         self._queue: queue.Queue[Any] = queue.Queue()
         self._workers = [worker_factory(index) for index in range(max(1, size))]
         self._threads: list[threading.Thread] = []
+        self._active_requests: dict[
+            Future,
+            tuple[WarmEngineWorker, threading.Event, threading.Event],
+        ] = {}
+        self._request_workers: weakref.WeakKeyDictionary[
+            Future, WarmEngineWorker
+        ] = weakref.WeakKeyDictionary()
+        self._diagnostic_written_futures: weakref.WeakSet[Future] = (
+            weakref.WeakSet()
+        )
+        self._active_requests_lock = threading.Lock()
         self._closed = False
         self._lifecycle_lock = threading.Lock()
         self._close_complete = threading.Event()
@@ -935,13 +1115,10 @@ class EngineWorkerPool:
                     'engine worker pool is closed'
                 )
             # A queued item MUST have someone who will run it. `timeout_s` is
-            # not a wall on this call -- it is stashed in the queue item and
-            # enforced later by `_consume` -> `worker.call`. So the wall is
-            # enforced by the consumer thread, and with no consumer alive
-            # there is no wall at all: the future is never completed, and a
-            # caller awaiting it (magemin.py `_call_magemin` awaits with NO
-            # timeout, by design, precisely because it trusts this wall) parks
-            # in `waiter.acquire()` at 0.0% CPU forever.
+            # stashed in the queue item and enforced later by `_consume` ->
+            # `worker.call`; callers that need a whole-wait wall must also
+            # bound `Future.result()` in case a consumer exits after this
+            # check.
             #
             # 2026-08-29, reproduced: retire the only consumer, then submit --
             # `_closed` is still False so the old guard passed, and the future
@@ -971,6 +1148,51 @@ class EngineWorkerPool:
             future: Future = Future()
             self._queue.put((future, request, timeout_s))
         return future
+
+    def _abort_request(
+        self,
+        future: Future,
+        *,
+        diagnostic_detail: str | None = None,
+    ) -> bool:
+        """Abort the worker currently running ``future`` and keep its slot.
+
+        The active-request lock prevents the consumer from releasing this
+        worker for its next request until the current process has been killed
+        and reaped. Diagnostic detail is appended to the assigned worker's
+        existing diagnostic log after the lock is released. Pending futures
+        have no assigned worker and return False.
+        """
+        diagnostic_path = None
+        should_log = False
+        aborted = False
+        with self._active_requests_lock:
+            active = self._active_requests.get(future)
+            if active is None:
+                worker = self._request_workers.get(future)
+            else:
+                worker, call_finished, abort_event = active
+                if not call_finished.is_set():
+                    aborted = worker._abort_current_call(abort_event)
+            if (
+                diagnostic_detail is not None
+                and worker is not None
+                and future not in self._diagnostic_written_futures
+            ):
+                self._diagnostic_written_futures.add(future)
+                diagnostic_path = worker.diagnostic_log_path
+                should_log = diagnostic_path is not None
+
+        if should_log and diagnostic_path is not None:
+            try:
+                diagnostic_path.parent.mkdir(parents=True, exist_ok=True)
+                with diagnostic_path.open('a', encoding='utf-8') as log:
+                    log.write(f'{diagnostic_detail}\n')
+            except OSError:
+                # Logging must not prevent worker cleanup or replace the
+                # typed timeout returned to the caller.
+                pass
+        return aborted
 
     def _start_and_consume(
         self,
@@ -1004,15 +1226,38 @@ class EngineWorkerPool:
                 if item is None:
                     return
                 future, request, timeout_s = item
-                if self._cancel_pending.is_set():
+                cancel_pending = False
+                with self._active_requests_lock:
+                    if self._cancel_pending.is_set():
+                        cancel_pending = True
+                    elif not future.set_running_or_notify_cancel():
+                        continue
+                    else:
+                        call_finished = threading.Event()
+                        abort_event = worker._begin_pool_call()
+                        self._request_workers[future] = worker
+                        self._active_requests[future] = (
+                            worker,
+                            call_finished,
+                            abort_event,
+                        )
+                if cancel_pending:
                     future.cancel()
                     continue
-                if not future.set_running_or_notify_cancel():
-                    continue
                 try:
-                    future.set_result(worker.call(request, timeout_s=timeout_s))
+                    result = worker.call(request, timeout_s=timeout_s)
                 except BaseException as exc:
+                    call_finished.set()
+                    with self._active_requests_lock:
+                        self._active_requests.pop(future, None)
+                        worker._end_pool_call(abort_event)
                     future.set_exception(exc)
+                else:
+                    call_finished.set()
+                    with self._active_requests_lock:
+                        self._active_requests.pop(future, None)
+                        worker._end_pool_call(abort_event)
+                    future.set_result(result)
             finally:
                 self._queue.task_done()
 

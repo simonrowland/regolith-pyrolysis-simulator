@@ -1,14 +1,16 @@
 """Melt-activity observations are not held to the engine_point contract.
 
-An activity or activity coefficient needs a normalized composition, a
-point temperature, and a reference state that matches the engine. Oxygen
-is required when the composition or the measured species holds a
-multivalent element. Pressure is not an input, and a missing required
-input is refused rather than defaulted.
+A melt activity or activity coefficient needs a normalized composition, a
+point temperature, and a reference state that matches the engine. For melt
+activity, oxygen is required when the composition or measured species holds
+a multivalent element. Other quantities follow their identity input profile.
+Pressure is not an input, and a missing required input is refused rather than
+defaulted.
 """
 
 from dataclasses import replace
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 
@@ -190,6 +192,51 @@ def _case(
 
 def _melt(experiment, bench, observation):
     return melt_activity_requests(collect_consumer_inputs(experiment, bench, observation))
+
+
+def _install_scoring_cell(
+    monkeypatch,
+    *,
+    melt_activities=None,
+    gas_pressures=None,
+):
+    seen = {"cell_calls": []}
+
+    def _open(name):
+        return SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            supports_intrinsic_fO2=False,
+        )
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        seen["cell_calls"].append(
+            {"mode": po2.mode, "po2_bar": po2.po2_bar}
+        )
+        return SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            melt_activities=dict(melt_activities or {}),
+            melt_activity_coefficients={},
+            gas_partial_pressures_Pa=dict(gas_pressures or {}),
+            hostname="test",
+            exit_code=0,
+            exit_signal=None,
+            notices=[],
+            authority=None,
+            certified_band=None,
+        )
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    return seen
 
 
 def test_requirement_tuple_does_not_include_pressure_or_oxygen():
@@ -552,6 +599,126 @@ def test_scorer_refuses_a_multivalent_gap_before_the_engine_default(monkeypatch)
     assert prediction.refusal_detail["reason"] == "missing_evidence"
     assert any("TiO2" in gap["missing"] for gap in prediction.refusal_detail["gaps"])
     assert prediction.refusal_detail["reason"] != "engine_default"
+
+
+def test_redox_free_activity_is_scored_without_an_oxygen_input(monkeypatch):
+    seen = _install_scoring_cell(
+        monkeypatch,
+        melt_activities={"SiO2": 0.4},
+    )
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    experiment, _bench, observation = _case(
+        composition=_composition(
+            ("SiO2", "0.5"), ("CaO", "0.3"), ("Al2O3", "0.2"),
+        ),
+        formula="SiO2",
+    )
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment, isolated=False,
+    )
+
+    assert seen["cell_calls"] == [{"mode": "not_an_input", "po2_bar": None}]
+    assert prediction.value == Decimal('0.4')
+
+
+def test_multivalent_psat_without_oxygen_keeps_green_scorer_decision(monkeypatch):
+    seen = _install_scoring_cell(monkeypatch, gas_pressures={"FeO": 3.0})
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    experiment = f.tabulation_experiment()
+    observation = f.observation(
+        "feo-psat",
+        experiment.experiment_id,
+        f.psat_identity("FeO"),
+        Decimal("1"),
+    )
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS,
+        observation,
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.value == Decimal("3.0")
+    assert prediction.refusal_reason is None
+    assert seen["cell_calls"] == [{"mode": "not_an_input", "po2_bar": None}]
+
+
+def test_fe_free_psat_numeric_residual_keeps_omitted_oxygen_mode(monkeypatch):
+    seen = _install_scoring_cell(monkeypatch, gas_pressures={"Na": 4.0})
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import (
+        ScoreContext,
+        predict_with_engine,
+        score_store,
+    )
+
+    work = f.work()
+    experiment = f.tabulation_experiment()
+    observation = f.observation(
+        "na-psat",
+        experiment.experiment_id,
+        f.psat_identity("Na"),
+        Decimal("2"),
+        source_id="janaf-4th",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={"janaf-4th": "reviewed"},
+        hostname="test",
+    )
+
+    def predict(engine, candidate, *, handles=None, experiment=None):
+        return predict_with_engine(
+            engine,
+            candidate,
+            experiment=experiment,
+            isolated=False,
+        )
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.ALPHAMELTS,),
+        predict=predict,
+    )
+
+    assert seen["cell_calls"] == [{"mode": "not_an_input", "po2_bar": None}]
+    assert residuals[0].numeric is not None
+    assert residuals[0].numeric.value == Decimal("0.3010299956639812")
+
+
+def test_redox_active_no_input_refuses_as_typed_scorer_input_error():
+    from simulator.battery.enums import Engine, RefusalReason
+    from simulator.battery.score import _oxygen_input_request
+
+    experiment, _bench, observation = _case(
+        composition=_composition(("FeO", "0.2"), ("SiO2", "0.8")),
+        formula="SiO2",
+    )
+    identity = observation.identity
+    assert identity is not None
+    composition = identity.composition
+    assert composition is not None and composition.is_value
+
+    decision = _oxygen_input_request(
+        engine=Engine.ALPHAMELTS,
+        channel="melt_activity",
+        sources=(),
+        identity=identity,
+        requested=identity.composition,
+        quantity=Quantity.ACTIVITY,
+        composition_value=composition.value,
+        input_notices=[],
+    )
+
+    assert decision.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert decision.refusal_detail['reason'] == 'missing_fO2'
+    assert decision.refusal_detail['multivalent'] == ['FeO']
 
 
 def test_scorer_compares_activity_and_coefficient_to_different_maps(monkeypatch):

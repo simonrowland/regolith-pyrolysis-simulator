@@ -1072,13 +1072,15 @@ def evaluate(
         key=key,
     )
 
-    _abort_on_mass_balance_breach(
-        run_execution,
-        patch=validated_patch,
-        candidate_id=candidate_id,
-        eval_spec=spec,
-        key=key,
-    )
+    snapshots = getattr(run_execution, "snapshots", None)
+    if status != "refused" or snapshots is None or snapshots:
+        _abort_on_mass_balance_breach(
+            run_execution,
+            patch=validated_patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            key=key,
+        )
 
     if status == "refused":
         return _physics_refused_result(

@@ -22,10 +22,10 @@ import time
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Literal, Mapping, Sequence
 
 import yaml
 
@@ -120,6 +120,10 @@ from simulator.battery.records import (
     StandardState,
     union_notices,
 )
+from simulator.melt_backend.base import (
+    MULTIVALENT_MELT_ELEMENTS,
+    multivalent_components,
+)
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
@@ -144,6 +148,7 @@ from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
+from simulator.fe_redox import feo_iw_log10_fO2_bar
 from simulator.diagnostic_helpers.species_rail import parse_formula_elements
 from simulator.reference_data.janaf import formula_composition
 
@@ -3580,59 +3585,6 @@ def cell_notices(
     return tuple(notices)
 
 
-# More than one oxidation state in silicate melts over the fO2 range these
-# engines are asked to run. The generator owns the table; scorer and contract
-# use that same mapping so redox admission cannot drift between consumers.
-
-
-def _oxide_lookup_key(name: str) -> str:
-    key = str(name).strip()
-    if key.endswith("_Liq"):
-        key = key[:-4]
-    if key.endswith("*"):
-        key = key[:-1]
-    return key
-
-
-def _elements_of_component(name: str) -> frozenset[str]:
-    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
-
-    key = _oxide_lookup_key(name)
-    canonical = MELTS_OXIDE_ALIASES.get(key.lower())
-    formula = "FeO" if canonical == "FeO_total" else (canonical or key)
-    parsed = formula_composition(formula)
-    if not parsed:
-        return frozenset()
-    return frozenset(element for element, _count in parsed)
-
-
-def _is_multivalent_name(name: str) -> bool:
-    from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
-
-    return any(
-        element in MULTIVALENT_MELT_ELEMENTS for element in _elements_of_component(name)
-    )
-
-
-def multivalent_components(
-    composition: Composition | None,
-    species: str | None,
-) -> tuple[str, ...]:
-    """Names that hold a multivalent element at a positive amount, plus the species.
-
-    A printed zero does not count, so FeO = 0 cannot hide TiO2.
-    """
-
-    present: list[str] = []
-    if composition is not None:
-        for name, amount in composition.components:
-            if amount > 0 and _is_multivalent_name(str(name)):
-                present.append(str(name))
-    if species and _is_multivalent_name(species) and species not in present:
-        present.append(species)
-    return tuple(sorted(set(present)))
-
-
 def stated_pure_substance_reservoir(identity: Identity) -> tuple[str, str] | None:
     """Pot formula and phase when the row states a pure condensed reservoir.
 
@@ -3666,12 +3618,19 @@ def oxygen_is_scorer_input(
     """
 
     quantity = quantity_token(identity)
-    redox = multivalent_components(composition, identity.species.formula)
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+
+    redox = multivalent_components(
+        composition,
+        identity.species.formula,
+        oxide_aliases=MELTS_OXIDE_ALIASES,
+    )
     if quantity in MELT_ACTIVITY_QUANTITIES:
         if redox:
             return True, "melt contains multivalent " + ", ".join(redox), redox
-        from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
-
+        # fO2 changes melt activity through redox speciation. With no
+        # multivalent element in this fixed oxide composition, there is no
+        # redox pair for oxygen potential to shift, so fO2 is not an input.
         return (
             False,
             "melt has no multivalent element "
@@ -3951,20 +3910,40 @@ def _printed_point_composition(observation: Observation) -> State[Composition] |
     return point.state
 
 
-def _solved_effusion_po2_bar(prediction: EnginePrediction) -> float | None:
-    engine = prediction.engine
+def _solved_effusion_oxygen_payload(
+    engine: Engine | None,
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> Mapping[str, object] | None:
     if engine is None:
         return None
-    prefix = OXYGEN_BALANCE_NOTICE_PREFIX
-    for notice in prediction.notices:
-        if notice.origin != f"engine:{engine.value}":
+    origin = f"engine:{engine.value}"
+    for notice in notices:
+        if isinstance(notice, Notice):
+            notice_origin, reason = notice.origin, notice.reason
+        elif isinstance(notice, Mapping):
+            notice_origin, reason = notice.get("origin"), notice.get("reason")
+        else:
             continue
-        if not notice.reason.startswith(prefix):
+        if notice_origin != origin or not isinstance(reason, str):
             continue
-        payload = json.loads(notice.reason.split(" ", 1)[1])
+        if not reason.startswith(OXYGEN_BALANCE_NOTICE_PREFIX):
+            continue
+        payload = json.loads(reason[len(OXYGEN_BALANCE_NOTICE_PREFIX) :])
+        if not isinstance(payload, Mapping):
+            continue
         value = payload.get("pO2_bar")
         if isinstance(value, (int, float)) and math.isfinite(float(value)):
-            return float(value)
+            return payload
+    return None
+
+
+def _solved_effusion_po2_bar(prediction: EnginePrediction) -> float | None:
+    payload = _solved_effusion_oxygen_payload(
+        prediction.engine, prediction.notices
+    )
+    value = None if payload is None else payload.get("pO2_bar")
+    if isinstance(value, (int, float)) and math.isfinite(float(value)):
+        return float(value)
     return None
 
 
@@ -4569,6 +4548,110 @@ def _oxygen_input_request(
         )
     input_notices.append(_omission_notice(quantity, oxygen_why))
     return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+
+
+def _battery_hero_oxygen_condition(
+    reference: str,
+    observations: Mapping[str, Observation],
+    engine: Engine,
+    notices: Iterable[Notice | Mapping[str, object]] = (),
+) -> tuple[str, Decimal | None, Decimal | None, str | None, str | None, str]:
+    """Return the oxygen condition used for a scored row and its provenance."""
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        PO2_NOT_AN_INPUT,
+    )
+
+    solved = _solved_effusion_oxygen_payload(engine, notices)
+    if solved is not None and solved.get("kind") == (
+        "fo2_oxygen_balance_effusion_solved"
+    ):
+        source_raw = solved.get("oxygen_condition_source")
+        source = source_raw if isinstance(source_raw, str) and source_raw else None
+        kind_raw = solved.get("kind")
+        kind = kind_raw if isinstance(kind_raw, str) else None
+        try:
+            pO2_bar = as_decimal(solved.get("pO2_bar"))
+            if not pO2_bar.is_finite() or pO2_bar <= 0:
+                raise ValueError("oxygen balance has no positive finite pO2")
+            # At these pressures fO2 ≈ pO2, so log10(fO2) is log10(pO2_bar).
+            log10_fO2_bar = pO2_bar.log10()
+            fO2_Pa = pO2_bar * PA_PER_BAR_DEC
+        except (TypeError, ValueError, ArithmeticError):
+            return (
+                "missing",
+                None,
+                None,
+                source,
+                kind,
+                "invalid solved oxygen balance condition",
+            )
+        return "solved", log10_fO2_bar, fO2_Pa, source, kind, ""
+
+    observation = observations.get(reference)
+    if observation is None or not isinstance(observation.identity, Identity):
+        return "missing", None, None, None, None, "no fO2 for this row"
+    identity = observation.identity
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return "missing", None, None, None, None, "no fO2 for this row"
+
+    requested = identity.composition
+    if requested is None or not requested.is_value:
+        requested = _printed_point_composition(observation)
+    composition_value = (
+        requested.value
+        if requested is not None and requested.is_value
+        else None
+    )
+    decision = _oxygen_input_request(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        identity=identity,
+        requested=requested,
+        quantity=quantity,
+        composition_value=composition_value,
+        input_notices=[],
+    )
+    if isinstance(decision, EnginePrediction):
+        detail = decision.refusal_detail or {}
+        reason = (
+            "no fO2 for this row"
+            if detail.get("reason") == "missing_fO2"
+            else "scorer did not produce an oxygen request"
+        )
+        return "missing", None, None, None, None, reason
+    if decision.mode == PO2_NOT_AN_INPUT:
+        return (
+            "not_an_input",
+            None,
+            None,
+            None,
+            None,
+            "oxygen is not an input for this row",
+        )
+    if decision.mode != PO2_COMMANDED or decision.po2_bar is None:
+        return (
+            "missing",
+            None,
+            None,
+            None,
+            None,
+            "scorer did not produce an oxygen request",
+        )
+
+    try:
+        pO2_bar = as_decimal(decision.po2_bar)
+        if not pO2_bar.is_finite() or pO2_bar <= 0:
+            raise ValueError("oxygen request is outside the positive finite domain")
+        log10_fO2_bar = pO2_bar.log10()
+        fO2_Pa = pO2_bar * PA_PER_BAR_DEC
+    except (TypeError, ValueError, ArithmeticError):
+        return "missing", None, None, None, None, "invalid scorer oxygen request"
+    mode = "printed" if _has_printed_fo2(observation, identity) else "commanded"
+    return mode, log10_fO2_bar, fO2_Pa, "observations-v2", mode, ""
 
 
 def predict_with_engine(
@@ -7278,10 +7361,16 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
 def diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
     """Compilation, ledger, and SF04 rows scored through diagnostic paths."""
 
+    from simulator.battery.compilation_tier import is_compilation_evidence
+
     out: list[Observation] = []
     for obs in context.observations.values():
         origin = context.origins.get(obs.observation_id)
-        if is_internal_consistency(origin) or is_compilation_source(obs.source_id, origin):
+        if (
+            is_internal_consistency(origin)
+            or is_compilation_evidence(obs)
+            or is_compilation_source(obs.source_id, origin)
+        ):
             out.append(obs)
             continue
         if is_sf04_workbook(obs):
@@ -9094,6 +9183,633 @@ def _paired_engine_rail_benchmarks(
                 }
             )
     return records
+
+
+_BATTERY_HERO_DECK_SOURCE_RAILS = (
+    Rail.VAPOUR.value,
+    Rail.REDOX.value,
+    Rail.SIO_EVOLUTION.value,
+    Rail.RESIDUE_COMPOSITION.value,
+)
+_BATTERY_HERO_DECK_CHART_IDS = (
+    "polymerisation",
+    "redox_sensitivity",
+    "sio_evolution",
+    "residue_composition",
+    "fo2_cross_comparison",
+)
+
+
+@dataclass(frozen=True)
+class _BatteryHeroNboTRefusal:
+    reason: Literal["free_oxygen_beyond_orthosilicate"]
+    detail: Mapping[str, Decimal]
+
+
+def _battery_hero_state_value(value: object) -> object | None:
+    if isinstance(value, Mapping):
+        return value.get("value") if value.get("tag") == "value" else None
+    return value
+
+
+def _battery_hero_nbo_t(
+    composition_raw: object,
+) -> Decimal | _BatteryHeroNboTRefusal | None:
+    """Calculate oxide-basis NBO/T from the composition used by the scorer.
+
+    Network formers T are Si, Al, and P: each is represented by tetrahedral
+    oxide units in the declared mole composition. Fe and other variable-valence
+    or coordination cations are not counted as T because this composition does
+    not resolve their coordination state. Let B be bridging oxygen and N be
+    non-bridging oxygen. Since O = B + N and each tetrahedron has four corners,
+    4T = 2B + N; subtracting gives N = 2O - 4T and NBO/T = (2*O - 4*T)/T.
+    This network derivation is valid only while 0 <= N <= 4T: there is no free
+    O2- beyond orthosilicate and no tricluster oxygen. Non-mole compositions
+    and negative results are unavailable rather than converted or clipped.
+    """
+
+    if not isinstance(composition_raw, Mapping):
+        return None
+    if composition_raw.get("amount_basis") != AmountBasis.MOLE_FRACTION.value:
+        return None
+    components = composition_raw.get("components")
+    if (
+        not isinstance(components, Sequence)
+        or isinstance(components, (str, bytes))
+        or not components
+    ):
+        return None
+
+    oxygen = Decimal(0)
+    tetrahedral_formers = Decimal(0)
+    try:
+        for component in components:
+            if (
+                not isinstance(component, Sequence)
+                or isinstance(component, (str, bytes))
+                or len(component) != 2
+            ):
+                return None
+            formula, raw_amount = component
+            amount = as_decimal(raw_amount)
+            parsed = formula_composition(str(formula))
+            if (
+                parsed is None
+                or not amount.is_finite()
+                or amount < 0
+            ):
+                return None
+            atom_counts = {element: Decimal(str(count)) for element, count in parsed}
+            if "B" in atom_counts:
+                return None
+            oxygen += amount * atom_counts.get("O", Decimal(0))
+            tetrahedral_formers += amount * sum(
+                (atom_counts.get(element, Decimal(0)) for element in ("Si", "Al", "P")),
+                Decimal(0),
+            )
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not oxygen.is_finite() or tetrahedral_formers <= 0:
+        return None
+    nbo_t = (Decimal(2) * oxygen - Decimal(4) * tetrahedral_formers) / tetrahedral_formers
+    if not nbo_t.is_finite():
+        return None
+    tolerance = Decimal("1e-9")
+    if abs(nbo_t - Decimal(4)) <= tolerance:
+        return Decimal(4)
+    if nbo_t < 0:
+        return Decimal(0) if nbo_t >= -tolerance else None
+    if nbo_t > Decimal(4):
+        return _BatteryHeroNboTRefusal(
+            reason="free_oxygen_beyond_orthosilicate",
+            detail={"computed_value": nbo_t},
+        )
+    return nbo_t
+
+
+def _battery_hero_delta_iw(
+    temperature_raw: object, fO2_pa_raw: object
+) -> Decimal | None:
+    try:
+        temperature = as_decimal(temperature_raw)
+        fO2_pa = as_decimal(fO2_pa_raw)
+        if (
+            not temperature.is_finite()
+            or temperature <= 0
+            or not fO2_pa.is_finite()
+            or fO2_pa <= 0
+        ):
+            return None
+        fO2_bar = fO2_pa / PA_PER_BAR_DEC
+        # The production FeO-IW buffer owns the fit; do not duplicate it here.
+        iw_log10_fO2_bar = Decimal(
+            str(feo_iw_log10_fO2_bar(float(temperature), a_feo=1.0))
+        )
+        delta_iw = fO2_bar.log10() - iw_log10_fO2_bar
+        return delta_iw if delta_iw.is_finite() else None
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+
+
+def _battery_hero_pO2_bin(fO2_pa_raw: object) -> tuple[int, str] | None:
+    try:
+        fO2_pa = as_decimal(fO2_pa_raw)
+        if not fO2_pa.is_finite() or fO2_pa <= 0:
+            return None
+        # Scored fO2_Pa is converted to pO2_bar under the scorer's stated
+        # ideal-gas assumption; use the same exact Pa/bar conversion here.
+        pO2_bar = fO2_pa / PA_PER_BAR_DEC
+        lower_decade = int(pO2_bar.log10().to_integral_value(rounding=ROUND_FLOOR))
+        return (
+            lower_decade,
+            f"10^{lower_decade}–10^{lower_decade + 1} bar",
+        )
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+
+
+def _battery_hero_deck_payload(row: Mapping[str, object]) -> dict[str, object]:
+    """Retain only deck inputs while the plotter streams the full archive."""
+
+    candidate = row.get("candidate_observation")
+    candidate = candidate if isinstance(candidate, Mapping) else {}
+    identity = candidate.get("identity")
+    identity = identity if isinstance(identity, Mapping) else {}
+    value = candidate.get("value")
+    value = value if isinstance(value, Mapping) else {}
+    numeric = row.get("numeric")
+    numeric = numeric if isinstance(numeric, Mapping) else {}
+    return {
+        "candidate_request": {"engine": _engine_from_payload(row)},
+        "candidate_observation": {
+            "identity": {
+                key: identity[key]
+                for key in (
+                    "composition",
+                    "fO2_Pa",
+                    "quantity",
+                    "species",
+                    "temperature_K",
+                )
+                if key in identity
+            },
+            "value": {
+                key: value[key]
+                for key in ("kind", "point")
+                if key in value
+            },
+        },
+        "notices": tuple(row.get("notices") or ()),
+        "numeric": {
+            "operation": numeric.get("operation"),
+            "value": numeric.get("value"),
+        },
+        "rail": row.get("rail"),
+        "reference": row.get("reference"),
+    }
+
+
+def _battery_hero_deck_store_observations(
+    rows: Iterable[Mapping[str, object]],
+) -> dict[str, Observation]:
+    references = {
+        str(row.get("reference") or "")
+        for row in rows
+        if row.get("reference")
+    }
+    sources = tuple(
+        sorted(
+            {
+                reference.split("::", 1)[0]
+                for reference in references
+                if "::" in reference
+            }
+        )
+    )
+    if not sources:
+        return {}
+
+    observation_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
+    if not observation_dir.is_dir():
+        raise FileNotFoundError(f"BLOCKED: need-full-seat {REPO_ROOT}")
+    tokens = source_filter_tokens(sources)
+    if not any(
+        path_matches_source_tokens(path, observation_dir, tokens)
+        for path in iter_observation_store_paths(observation_dir)
+    ):
+        return {}
+    _works, _experiments, observations = load_migrated_store(sources=sources)
+    return observations
+
+
+def _battery_hero_deck_join_key(
+    observation: Observation,
+) -> tuple[str, str | Decimal] | None:
+    point_conditions = observation.point_conditions or {}
+    for key, multiplier in (
+        ("time_s", Decimal(1)),
+        ("duration_s", Decimal(1)),
+        ("time_min", Decimal(60)),
+    ):
+        located = point_conditions.get(key)
+        if (
+            not isinstance(located, Located)
+            or located.inference is not None
+            or not located.state.is_value
+            or located.state.value is None
+        ):
+            continue
+        raw = located.state.value
+        if isinstance(raw, Value):
+            raw = point_magnitude(raw)
+        try:
+            seconds = as_decimal(raw) * multiplier
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        if seconds.is_finite():
+            return "time_s", seconds
+
+    identity = observation.identity
+    if isinstance(identity, Identity) and identity.exposure is not None:
+        exposure_state = identity.exposure
+        if exposure_state.is_value and exposure_state.value is not None:
+            duration = exposure_state.value.duration_s
+            if duration.is_value and duration.value is not None:
+                return "time_s", duration.value
+
+    for key in ("run_key", "run_id"):
+        located = point_conditions.get(key)
+        if (
+            isinstance(located, Located)
+            and located.inference is None
+            and located.state.is_value
+            and located.state.value is not None
+        ):
+            return "run", str(located.state.value)
+    return None
+
+
+def _battery_hero_mass_loss_fraction(
+    reference: str,
+    observations: Mapping[str, Observation],
+) -> tuple[Decimal | None, str | None]:
+    residue = observations.get(reference)
+    if residue is None:
+        return None, "no recorded mass loss"
+    join_key = _battery_hero_deck_join_key(residue)
+    if join_key is None:
+        return None, "no recorded mass loss"
+    matches = [
+        observation
+        for observation in observations.values()
+        if observation.experiment_id == residue.experiment_id
+        and quantity_token(observation.identity) is Quantity.MASS_LOSS_FRACTION
+        and _battery_hero_deck_join_key(observation) == join_key
+    ]
+    if not matches:
+        return None, "no recorded mass loss"
+    if len(matches) != 1:
+        return None, "ambiguous recorded mass loss"
+    measurement = matches[0].value
+    if measurement.kind is not ValueKind.POINT or measurement.point is None:
+        return None, "invalid recorded mass loss"
+    try:
+        fraction = as_decimal(measurement.point)
+    except (TypeError, ValueError, ArithmeticError):
+        return None, "invalid recorded mass loss"
+    if not fraction.is_finite() or fraction < 0 or fraction > 1:
+        return None, "invalid recorded mass loss"
+    return fraction, None
+
+
+def _battery_hero_deck_records(
+    rows: Iterable[Mapping[str, object]],
+    *,
+    primary_engines: Sequence[str] = (),
+    comparison_engines: Sequence[str] = (),
+    observations: Mapping[str, Observation] | None = None,
+) -> dict[str, object]:
+    """Score plotted deck axes and chart-specific same-row summaries."""
+
+    observations = observations or {}
+    points: list[dict[str, object]] = []
+    benchmark_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
+    metric_values: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
+    unavailable: dict[tuple[str, str], int] = defaultdict(int)
+    axis_refusals: dict[tuple[str, str, str], int] = defaultdict(int)
+    axis_refusal_details: dict[
+        tuple[str, str, str], list[Mapping[str, str]]
+    ] = defaultdict(list)
+    engines: set[str] = set()
+
+    def refuse_axis(
+        chart: str,
+        engine: str,
+        reason: str,
+        *,
+        detail: Mapping[str, object] | None = None,
+    ) -> None:
+        unavailable[(chart, engine)] += 1
+        key = (chart, engine, reason)
+        axis_refusals[key] += 1
+        if detail is not None:
+            axis_refusal_details[key].append(
+                {str(name): str(value) for name, value in detail.items()}
+            )
+
+    def add_point(
+        chart: str,
+        row: Mapping[str, object],
+        *,
+        facet: str,
+        x_value: Decimal,
+        y_value: Decimal,
+        residual_dex: Decimal,
+        **fields: object,
+    ) -> None:
+        engine = _engine_from_payload(row)
+        engines.add(engine)
+        point: dict[str, object] = {
+            "chart": chart,
+            "engine": engine,
+            "facet": facet,
+            "x_value": str(x_value),
+            "y_value": str(y_value),
+            "residual_dex": str(residual_dex),
+            "flagged": bool(_flagged_payload_strata(row)),
+            "reference": str(row.get("reference") or ""),
+            **fields,
+        }
+        points.append(point)
+        benchmark_rows[chart].append({**row, "rail": chart})
+
+    for row in rows:
+        rail = str(row.get("rail") or "")
+        if rail not in _BATTERY_HERO_DECK_SOURCE_RAILS:
+            continue
+        engine = _engine_from_payload(row)
+        if engine != "unknown":
+            engines.add(engine)
+        numeric = row.get("numeric")
+        candidate = row.get("candidate_observation")
+        identity = candidate.get("identity") if isinstance(candidate, Mapping) else None
+        identity = identity if isinstance(identity, Mapping) else {}
+        if (
+            not isinstance(numeric, Mapping)
+            or numeric.get("operation") != MetricOperation.DEX.value
+            or numeric.get("value") is None
+        ):
+            continue
+        try:
+            residual_dex = as_decimal(numeric["value"])
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        if not residual_dex.is_finite():
+            continue
+
+        species = identity.get("species")
+        formula = str(species.get("formula") or "") if isinstance(species, Mapping) else ""
+        composition = _battery_hero_state_value(identity.get("composition"))
+        temperature = _battery_hero_state_value(identity.get("temperature_K"))
+        fO2_pa = _battery_hero_state_value(identity.get("fO2_Pa"))
+        quantity = str(_battery_hero_state_value(identity.get("quantity")) or "")
+
+        is_redox_species = (
+            rail == Rail.VAPOUR.value and formula in {"Fe", "SiO", "Na"}
+        ) or (rail == Rail.SIO_EVOLUTION.value and formula == "SiO")
+        oxygen_condition = None
+        if is_redox_species:
+            try:
+                oxygen_engine = Engine(engine)
+            except ValueError:
+                oxygen_condition = (
+                    "missing",
+                    None,
+                    None,
+                    None,
+                    None,
+                    "scorer engine is unavailable",
+                )
+            else:
+                oxygen_condition = _battery_hero_oxygen_condition(
+                    str(row.get("reference") or ""),
+                    observations,
+                    oxygen_engine,
+                    row.get("notices") or (),
+                )
+        if is_redox_species:
+            assert oxygen_condition is not None
+            (
+                mode,
+                log10_fO2_bar,
+                request_fO2_pa,
+                oxygen_source,
+                oxygen_kind,
+                oxygen_reason,
+            ) = oxygen_condition
+            delta_iw = (
+                _battery_hero_delta_iw(temperature, request_fO2_pa)
+                if mode in {"printed", "commanded", "solved"}
+                and request_fO2_pa is not None
+                else None
+            )
+            if delta_iw is None:
+                reason = oxygen_reason
+                if mode in {"printed", "commanded", "solved"}:
+                    reason = "no finite temperature or delta-IW for this row"
+                refuse_axis("redox_sensitivity", engine, reason)
+            else:
+                add_point(
+                    "redox_sensitivity",
+                    row,
+                    facet=formula,
+                    x_value=delta_iw,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                    oxygen_mode=mode,
+                    oxygen_source=oxygen_source,
+                    oxygen_kind=oxygen_kind,
+                    log10_fO2_bar=str(log10_fO2_bar),
+                    fO2_Pa=str(request_fO2_pa),
+                )
+
+        if rail == Rail.VAPOUR.value:
+            nbo_t = _battery_hero_nbo_t(composition)
+            if nbo_t is None:
+                refuse_axis("polymerisation", engine, "no usable NBO/T")
+            elif isinstance(nbo_t, _BatteryHeroNboTRefusal):
+                refuse_axis(
+                    "polymerisation",
+                    engine,
+                    nbo_t.reason,
+                    detail=nbo_t.detail,
+                )
+            else:
+                add_point(
+                    "polymerisation",
+                    row,
+                    facet=formula,
+                    x_value=nbo_t,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                )
+
+        elif rail == Rail.SIO_EVOLUTION.value and formula == "SiO":
+            assert oxygen_condition is not None
+            (
+                mode,
+                log10_fO2_bar,
+                request_fO2_pa,
+                oxygen_source,
+                oxygen_kind,
+                oxygen_reason,
+            ) = oxygen_condition
+            pO2_bin = (
+                _battery_hero_pO2_bin(request_fO2_pa)
+                if mode in {"printed", "commanded", "solved"}
+                and request_fO2_pa is not None
+                else None
+            )
+            try:
+                temperature_value = as_decimal(temperature)
+            except (TypeError, ValueError, ArithmeticError):
+                temperature_value = Decimal("NaN")
+            if (
+                pO2_bin is None
+                or not temperature_value.is_finite()
+                or temperature_value <= 0
+            ):
+                reason = oxygen_reason
+                if mode in {"printed", "commanded", "solved"}:
+                    reason = "no finite temperature or pO2 bin for this row"
+                refuse_axis("sio_evolution", engine, reason)
+            else:
+                decade, group_label = pO2_bin
+                add_point(
+                    "sio_evolution",
+                    row,
+                    facet=group_label,
+                    x_value=temperature_value,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                    group_index=decade,
+                    group_label=group_label,
+                    oxygen_mode=mode,
+                    oxygen_source=oxygen_source,
+                    oxygen_kind=oxygen_kind,
+                    log10_fO2_bar=str(log10_fO2_bar),
+                    fO2_Pa=str(request_fO2_pa),
+                )
+
+        elif rail == Rail.REDOX.value and quantity == "fe3_fe2_ratio":
+            components = composition.get("components") if isinstance(composition, Mapping) else None
+            has_measured_composition = (
+                isinstance(components, Sequence)
+                and not isinstance(components, (str, bytes))
+                and bool(components)
+                and not composition.get("proxy_flag")
+            )
+            value_payload = candidate.get("value") if isinstance(candidate, Mapping) else None
+            raw_prediction = (
+                value_payload.get("point")
+                if isinstance(value_payload, Mapping)
+                and value_payload.get("kind") == "point"
+                else None
+            )
+            try:
+                prediction = as_decimal(raw_prediction)
+                fO2_value = as_decimal(fO2_pa)
+                if not has_measured_composition:
+                    raise ValueError("no measured composition")
+                if not prediction.is_finite() or prediction <= 0:
+                    raise ValueError("no positive measured redox prediction")
+                if not fO2_value.is_finite() or fO2_value <= 0:
+                    raise ValueError("no measured fO2")
+                # residual_dex = log10(predicted / measured), the score.py
+                # metric contract. Recover the measured scalar at that recorded
+                # precision because the score row serializes the prediction and
+                # residual, but not a second copy of the reference value.
+                measured = prediction / (Decimal(10) ** residual_dex)
+                if not measured.is_finite() or measured <= 0:
+                    raise ValueError("measured redox recovery left the metric domain")
+            except (TypeError, ValueError, ArithmeticError) as exc:
+                refuse_axis("fo2_cross_comparison", engine, str(exc))
+                continue
+            add_point(
+                "fo2_cross_comparison",
+                row,
+                facet="Fe3+/Fe2+ ratio",
+                x_value=measured,
+                y_value=prediction,
+                residual_dex=residual_dex,
+                fO2_Pa=str(fO2_value),
+                quantity=quantity,
+            )
+
+        elif rail == Rail.RESIDUE_COMPOSITION.value:
+            metric_values[("residue_composition", engine)].append(residual_dex)
+            reference = str(row.get("reference") or "")
+            fraction_evaporated, refusal_reason = _battery_hero_mass_loss_fraction(
+                reference,
+                observations,
+            )
+            if fraction_evaporated is None:
+                refuse_axis(
+                    "residue_composition",
+                    engine,
+                    refusal_reason or "no recorded mass loss",
+                )
+            else:
+                add_point(
+                    "residue_composition",
+                    row,
+                    facet=formula or quantity,
+                    x_value=fraction_evaporated,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                    fraction_evaporated=str(fraction_evaporated),
+                )
+
+    values_by_chart_engine: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
+    for point in points:
+        values_by_chart_engine[(str(point["chart"]), str(point["engine"]))].append(
+            as_decimal(point["residual_dex"])
+        )
+    metrics: dict[tuple[str, str], dict[str, object]] = {}
+    for chart in _BATTERY_HERO_DECK_CHART_IDS:
+        for engine in sorted(engines):
+            values = metric_values.get((chart, engine))
+            if values is None:
+                values = values_by_chart_engine.get((chart, engine), [])
+            metrics[(chart, engine)] = {
+                "rail": chart,
+                "engine": engine,
+                "n": len(values),
+                "rms_dex": None if not values else str(_rms(values)),
+                "median_abs_dex": (
+                    None if not values else str(_median_abs(values))
+                ),
+            }
+    benchmarks = {
+        (str(record["rail"]), str(record["primary_engine"])): record
+        for record in _paired_engine_rail_benchmarks(
+            (row for chart_rows in benchmark_rows.values() for row in chart_rows),
+            primary_engines=primary_engines,
+            comparison_engines=comparison_engines,
+            rails=_BATTERY_HERO_DECK_CHART_IDS,
+        )
+    } if primary_engines else {}
+    return {
+        "points": tuple(points),
+        "metrics": metrics,
+        "benchmarks": benchmarks,
+        "unavailable_axis_counts": dict(unavailable),
+        "axis_refusals": dict(axis_refusals),
+        "axis_refusal_details": {
+            key: tuple(details)
+            for key, details in axis_refusal_details.items()
+        },
+    }
 
 
 def _battery_hero_sio2_mole_fraction(composition_raw: object) -> Decimal | None:

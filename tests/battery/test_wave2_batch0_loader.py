@@ -18,7 +18,7 @@ from simulator.battery.enums import EvidenceClass, ValueKind
 from simulator.battery.generators.bench import engine_point_requests
 from simulator.battery.identity import atm_to_pa
 from simulator.battery.migrate import (
-    Migrator,
+    REPO_ROOT,
     _sample_from_plain,
     migrate,
     wt_pct_to_mole_fraction,
@@ -488,8 +488,7 @@ def test_kambayashi_table3_children_keep_printed_celsius_temperature() -> None:
         Path(__file__).resolve().parents[2]
         / "data/literature/extracts/kems-057-kambayashi-1985.yaml"
     )
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = factories.migrate_one_extract(REPO_ROOT, path)
     stem = "kambayashi_1985_pbo_table3_ion_current_ratios_1300c"
     children = [
         obs
@@ -550,8 +549,7 @@ def test_flemetakis_list_rows_are_not_collapsed() -> None:
         Path(__file__).resolve().parents[2]
         / "data/literature/extracts/ta-flemetakis-2024.yaml"
     )
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = factories.migrate_one_extract(REPO_ROOT, path)
     # Eight observations, four of them list-row tables (68 printed rows).
     # Replacing each table with one child would leave 8. Each printed list
     # row has to remain its own observation.

@@ -4835,10 +4835,17 @@ def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_pa
 
 
 def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
+    profile = {
+        **PROFILE,
+        "constraints": {
+            "gates": ["delivered_stream_purity", "furnace_temperature"]
+        },
+    }
     schema = RecipeSchema()
     patch = RecipePatch({})
-    loose = PhysicsConstraintSet()
-    tight = PhysicsConstraintSet(
+    loose = physics_constraints_from_profile(profile)
+    tight = replace(
+        loose,
         furnace_T_max_C=ThresholdSpec(
             id="furnace_T_max_C",
             value=1300.0,
@@ -4851,7 +4858,7 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
         patch.validated(schema),
         FEEDSTOCK,
         "internal-analytical",
-        PROFILE,
+        profile,
         schema,
         constraints=loose,
     )
@@ -4859,7 +4866,7 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
         patch.validated(schema),
         FEEDSTOCK,
         "internal-analytical",
-        PROFILE,
+        profile,
         schema,
         constraints=tight,
     )
@@ -4897,8 +4904,240 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
     candidate = study.Candidate(id="random-7-000000", patch=patch)
 
     assert cache_key(spec_tight) != cache_key(spec_loose)
-    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "internal-analytical", schema, store, loose)
-    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "internal-analytical", schema, store, tight) is None
+    assert study._lookup_cached(
+        candidate,
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        loose,
+    )
+    assert study._lookup_cached(
+        candidate,
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        tight,
+    ) is None
+
+
+def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
+    tmp_path: Path,
+) -> None:
+    profile = copy.deepcopy(PROFILE)
+    profile["profile_id"] = "legacy-extraction-capture-probe"
+    profile["constraints"] = {
+        "gates": ["extraction_completeness"],
+        "target_species": ["SiO", "Fe", "Ca", "Al", "Mg", "Na"],
+        "extraction_min_fraction": 0.01,
+    }
+    schema = RecipeSchema()
+    patch = RecipePatch({})
+    constraints = physics_constraints_from_profile(profile)
+    spec, _ = _build_eval_inputs(
+        patch.validated(schema),
+        FEEDSTOCK,
+        "internal-analytical",
+        profile,
+        schema,
+        constraints=constraints,
+    )
+    trace = {
+        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "backend_status": "diagnostic_stub",
+        "backend_authoritative": False,
+        "evidence_class": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "certification_allowed": False,
+        "snapshots": [{"mass_balance_error_pct": 0.0}],
+    }
+    primary_captures = (
+        "product_ledger_kg",
+        "terminal_rump_by_species_kg",
+        "terminal_rump_by_class_kg",
+        "oxygen_terminal_partition_kg",
+        "condensation_totals_kg",
+        "extraction_completeness_by_target",
+    )
+    assert all(key not in trace for key in primary_captures)
+    bound_margin = constraints.extraction_completeness(SimpleNamespace(**trace))
+    assert not bound_margin.feasible
+    assert "trace missing product_ledger_kg" in bound_margin.detail
+
+    threshold = ThresholdSpec(
+        id="extraction_completeness_min",
+        value=0.01,
+        units="fraction",
+        source="profile",
+        source_ref="legacy-extraction-capture-probe",
+    )
+    old_margin = GateMargin(
+        gate="extraction_completeness",
+        feasible=True,
+        margin=0.02668332604274586,
+        threshold=threshold,
+        observed=0.03668332604274586,
+        detail="legacy completeness without current capture evidence",
+    )
+    scored = ScoredResult(
+        candidate_id="legacy-completeness-row",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),
+                ObjectiveValue(
+                    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+                    "minimize",
+                    1.0,
+                    "kWh",
+                    ordinal=1,
+                ),
+            )
+        ),
+        feasibility_margins={"extraction_completeness": old_margin},
+        run_reference=_run_reference(
+            status="ok",
+            trace=trace,
+            product_summary={
+                "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                },
+            },
+            backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            backend_status="diagnostic_stub",
+            backend_authoritative=False,
+            evidence_class=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            certification_allowed=False,
+        ),
+    )
+    store = ResultStore(tmp_path / "legacy-extraction-cache.sqlite")
+    store.store(spec, scored, created_at="legacy")
+
+    cached = study._lookup_cached(
+        Candidate("legacy-completeness-probe", patch),
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        constraints,
+    )
+
+    assert cached is None
+
+    product_ledger = {
+        "SiO": 0.001,
+        "Fe": 0.001,
+        "Ca": 0.001,
+        "Al": 0.001,
+        "Mg": 0.001,
+        "Na": 0.001,
+    }
+    terminal_rump = {
+        "SiO2": 1.0,
+        "FeO": 1.0,
+        "Ca": 1.0,
+        "Al": 1.0,
+        "MgO": 1.0,
+        "Na2O": 1.0,
+    }
+    valid_scored = replace(
+        scored,
+        run_reference=replace(
+            scored.run_reference,
+            trace={**trace, "terminal_rump_by_species_kg": terminal_rump},
+            product_summary={
+                **scored.run_reference.product_summary,
+                "product_ledger_kg": product_ledger,
+            },
+        ),
+    )
+    store.store(spec, study._strip_heavy_result(valid_scored), created_at="bound")
+    bound = constraints.extraction_completeness(
+        SimpleNamespace(
+            **{
+                **trace,
+                "product_ledger_kg": product_ledger,
+                "terminal_rump_by_species_kg": terminal_rump,
+            }
+        )
+    )
+    assert math.isfinite(bound.observed)
+    assert not bound.feasible
+
+    stored = store.lookup(spec)
+    assert stored is not None
+    assert (
+        stored.feasibility_margins["extraction_completeness"].observed
+        == scored.feasibility_margins["extraction_completeness"].observed
+    )
+    replayed = study._lookup_cached(
+        Candidate("legacy-completeness-probe", patch),
+        profile,
+        FEEDSTOCK,
+        "internal-analytical",
+        schema,
+        store,
+        constraints,
+    )
+    assert replayed is None
+
+
+def test_aborted_artifacts_skip_unbound_extraction_cache_rows(
+    tmp_path: Path,
+) -> None:
+    profile = copy.deepcopy(PROFILE)
+    profile["profile_id"] = "aborted-extraction-capture-probe"
+    profile["constraints"] = {
+        "gates": ["extraction_completeness"],
+        "target_species": ["SiO", "Fe", "Ca", "Al", "Mg", "Na"],
+        "extraction_min_fraction": 0.01,
+    }
+    constraints = physics_constraints_from_profile(profile)
+    schema = RecipeSchema()
+    patch = RecipePatch({}).validated(schema)
+    scored = _seed_safe_certified_evaluator(
+        patch,
+        FEEDSTOCK,
+        "internal-analytical",
+        profile=profile,
+        candidate_id="legacy-extraction-candidate",
+        constraints=constraints,
+    )
+    assert scored.feasible
+    assert not constraints.extraction_completeness(
+        SimpleNamespace(**scored.run_reference.trace)
+    ).feasible
+    out = tmp_path / "aborted-extraction-cache"
+    out.mkdir()
+    ResultStore(out / "cache.sqlite").store(
+        scored.eval_spec,
+        scored,
+        created_at="legacy",
+    )
+
+    study._write_empty_artifacts(
+        out,
+        profile=profile,
+        feedstock=FEEDSTOCK,
+        fidelity="internal-analytical",
+        definitions=study.objective_definitions(profile),
+        failure_counts={},
+        constraints=constraints,
+    )
+
+    summary = json.loads((out / "study.summary.json").read_text(encoding="utf-8"))
+    pareto = json.loads((out / "pareto.json").read_text(encoding="utf-8"))
+    leaderboard_rows = list(csv.DictReader((out / "leaderboard.csv").open()))
+    assert summary["evaluated"] == 0
+    assert pareto["pareto"] == []
+    assert leaderboard_rows == []
 
 
 def test_feasible_analytical_cache_hit_skips_evaluation_and_splits_keys(
