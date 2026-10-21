@@ -9,11 +9,14 @@ from types import MappingProxyType
 
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
-    compressible_pressure_capacity_fraction,
     controlled_flow_capacity,
 )
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
+from simulator.transport_regime import (
+    gas_dynamic_viscosity_Pa_s, pipe_mass_flow_kg_s,
+    pipe_pressure_capacity_fraction,
+)
 
 
 OXYGEN_SPECIES = "O2"
@@ -180,7 +183,10 @@ def solve_capacity_shadow(
     temperature_K: float,
     volume_m3: float,
     dt_hr: float,
-    bleed_conductance_kg_s: float,
+    bleed_conductance_kg_s: float | None,
+    pipe_diameter_m: float,
+    pipe_length_m: float,
+    pipe_temperature_K: float,
     downstream_pressure_Pa: float,
     k_relief_kg_hr_Pa: float,
     p_open_Pa: float,
@@ -201,10 +207,11 @@ def solve_capacity_shadow(
     controls = {
         "cold_train_capacity": capacity,
         "dt_hr": dt_hr,
-        "bleed_conductance_kg_s": bleed_conductance_kg_s,
         "p_total_bar": 0.0,
         "p_downstream_bar": downstream_pressure_Pa / 100000.0,
     }
+    if bleed_conductance_kg_s is not None:
+        controls["bleed_conductance_kg_s"] = bleed_conductance_kg_s
     if not isinstance(accumulator_enabled, bool):
         return CapacityShadowRefusal(
             "accumulator_enabled must be a boolean",
@@ -225,12 +232,15 @@ def solve_capacity_shadow(
     invalid = BuiltinOverheadBleedProvider._invalid_destructive_control(controls)
     if invalid is not None:
         return CapacityShadowRefusal(invalid, 0)
+    if bleed_conductance_kg_s is not None:
+        bleed_conductance_kg_s = float(bleed_conductance_kg_s)
     if not all(
         math.isfinite(value) and value > 0.0
-        for value in (temperature_K, volume_m3, dt_hr)
+        for value in (temperature_K, volume_m3, dt_hr, pipe_diameter_m,
+                      pipe_length_m, pipe_temperature_K)
     ):
         return CapacityShadowRefusal(
-            "temperature_K, volume_m3, and dt_hr must be finite and positive",
+            "temperature_K, volume_m3, dt_hr, and pipe geometry must be finite and positive",
             0,
         )
     if vessel_rating_Pa is not None and (
@@ -346,7 +356,31 @@ def solve_capacity_shadow(
         )
         bleed_controls = dict(controls)
         bleed_controls["p_total_bar"] = total_pressure_Pa / 100000.0
-        bleed_controls["bleed_conductance_kg_s"] = bleed_conductance_kg_s
+        # Empty inventory has zero throughput. A declared species mass only
+        # carries the no-flow diagnostic through the boundary; it is never
+        # used to evaluate flow until a real mixture exists.
+        gas_mass = (
+            total_kg / total_mol if total_mol > 0.0
+            else next(iter(molar_mass_kg_mol.values()), None)
+        )
+        if gas_mass is None:
+            return CapacityShadowRefusal("missing gas molar mass", iteration)
+        pipe_args = (
+            pipe_diameter_m, pipe_length_m, gas_mass,
+            gas_dynamic_viscosity_Pa_s(pipe_temperature_K), pipe_temperature_K,
+        )
+        vacuum_capacity = 0.0
+        if total_mol > 0.0:
+            vacuum_capacity = (
+                bleed_conductance_kg_s if bleed_conductance_kg_s is not None
+                else pipe_mass_flow_kg_s(*pipe_args, total_pressure_Pa, 0.0)
+            )
+        executable_capacity = (
+            vacuum_capacity * pipe_pressure_capacity_fraction(
+                *pipe_args, total_pressure_Pa, downstream_pressure_Pa,
+            ) if total_mol > 0.0 else 0.0
+        )
+        bleed_controls["bleed_conductance_kg_s"] = executable_capacity
         if controlled_flow:
             positive_source_kg_hr = sum(
                 max(0.0, source_mol_hr.get(species, 0.0))
@@ -354,12 +388,16 @@ def solve_capacity_shadow(
                 for species in species_order
             )
             final_flow_capacity = controlled_flow_capacity(
-                pipe_capacity_kg_hr=bleed_conductance_kg_s * 3600.0,
+                pipe_capacity_kg_hr=vacuum_capacity * 3600.0,
                 equipment_capacity_kg_hr=capacity.value_kg_hr,
                 evolved_flux_kg_hr=positive_source_kg_hr,
                 retained_holdup_kg=retained_holdup_kg,
                 dt_hr=dt_hr,
                 upstream_pressure_bar=total_pressure_Pa / 100000.0,
+                pipe_diameter_m=pipe_diameter_m,
+                pipe_length_m=pipe_length_m,
+                gas_temperature_K=pipe_temperature_K,
+                gas_molar_mass_kg_mol=gas_mass,
             )
             bleed_controls["effective_transport_capacity"] = (
                 final_flow_capacity
@@ -480,14 +518,7 @@ def solve_capacity_shadow(
             final_flow_capacity.binding_cause,
         )
     else:
-        pipe_capacity_kg_hr = (
-            bleed_conductance_kg_s
-            * compressible_pressure_capacity_fraction(
-                total_pressure_Pa / 100000.0,
-                downstream_pressure_Pa / 100000.0,
-            )
-            * 3600.0
-        )
+        pipe_capacity_kg_hr = executable_capacity * 3600.0
         saturation = combined_saturation(
             total_evaporation_kg_hr=sum(positive_source_kg_hr.values()),
             oxygen_evaporation_kg_hr=positive_source_kg_hr.get(

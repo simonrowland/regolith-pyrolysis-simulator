@@ -46,6 +46,8 @@ def test_committed_disposition_uses_shared_flow_not_diagnostic_pressure():
         equipment_capacity_kg_hr=0.5,
         evolved_flux_kg_hr=0.4,
         upstream_pressure_bar=0.001,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        gas_temperature_K=1773.15, gas_molar_mass_kg_mol=0.032,
     )
 
     committed = [
@@ -64,6 +66,8 @@ def test_retained_holdup_drains_and_throttle_clears_only_after_evacuation():
         retained_holdup_kg=1.0,
         dt_hr=1.0,
         upstream_pressure_bar=0.001,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        gas_temperature_K=1773.15, gas_molar_mass_kg_mol=0.032,
     )
 
     assert first_tick.demand_flux_kg_hr == pytest.approx(1.0)
@@ -78,6 +82,8 @@ def test_retained_holdup_drains_and_throttle_clears_only_after_evacuation():
         retained_holdup_kg=0.0,
         dt_hr=1.0,
         upstream_pressure_bar=0.001,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        gas_temperature_K=1773.15, gas_molar_mass_kg_mol=0.032,
     )
     assert recovered.swallowed_flux_kg_hr == 0.0
     assert recovered.saturation == 0.0

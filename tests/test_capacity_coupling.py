@@ -13,9 +13,10 @@ import simulator.capacity_coupling as capacity_coupling
 import simulator.chemistry.melt_activity as melt_activity
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
-    compressible_pressure_capacity_fraction,
 )
 from simulator.accounting import resolve_species_formula
+from simulator.transport_regime import gas_dynamic_viscosity_Pa_s, pipe_pressure_capacity_fraction
+
 from simulator.capacity_coupling import (
     CapacityCouplingRefusalError,
     CapacityShadowRefusal,
@@ -104,6 +105,8 @@ def _o2_fixture(dt_hr: float = 1.0, *, max_iterations: int = 50):
         temperature_K=T_FOR_1000_PA_PER_MOL,
         volume_m3=1.0,
         dt_hr=dt_hr,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=T_FOR_1000_PA_PER_MOL,
         bleed_conductance_kg_s=1.0,
         downstream_pressure_Pa=0.0,
         k_relief_kg_hr_Pa=1.0e-30,
@@ -169,6 +172,8 @@ def test_two_species_binding_fixture_preserves_non_o2_head_partition(dt_hr):
         temperature_K=T_FOR_1000_PA_PER_MOL,
         volume_m3=1.0,
         dt_hr=dt_hr,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=T_FOR_1000_PA_PER_MOL,
         bleed_conductance_kg_s=1.0,
         downstream_pressure_Pa=0.0,
         k_relief_kg_hr_Pa=1.0e-30,
@@ -299,6 +304,8 @@ def test_relief_is_additional_to_zero_conductance_and_avoids_vessel_refusal():
         temperature_K=T_FOR_1000_PA_PER_MOL,
         volume_m3=1.0,
         dt_hr=1.0,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=T_FOR_1000_PA_PER_MOL,
         bleed_conductance_kg_s=0.0,
         downstream_pressure_Pa=0.0,
         k_relief_kg_hr_Pa=M_O2 * 5.0e-4,
@@ -355,6 +362,8 @@ def test_picard_source_uses_frozen_inventory_depletion_vector():
         temperature_K=T_FOR_1000_PA_PER_MOL,
         volume_m3=1.0,
         dt_hr=1.0,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=T_FOR_1000_PA_PER_MOL,
         bleed_conductance_kg_s=0.0,
         downstream_pressure_Pa=0.0,
         k_relief_kg_hr_Pa=1.0e-30,
@@ -408,6 +417,8 @@ def test_evaporation_refusal_is_not_swallowed_by_shadow_callbacks(refusal_site):
             temperature_K=T_FOR_1000_PA_PER_MOL,
             volume_m3=1.0,
             dt_hr=1.0,
+            pipe_diameter_m=0.12, pipe_length_m=1.0,
+            pipe_temperature_K=T_FOR_1000_PA_PER_MOL,
             bleed_conductance_kg_s=1.0,
             downstream_pressure_Pa=0.0,
             k_relief_kg_hr_Pa=1.0e-30,
@@ -1456,6 +1467,8 @@ def test_no_cold_train_reuses_head_bleed_without_evaluating_shadow_flux():
         temperature_K=300.0,
         volume_m3=1.0,
         dt_hr=1.0,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=300.0,
         bleed_conductance_kg_s=1.0,
         downstream_pressure_Pa=0.0,
         k_relief_kg_hr_Pa=0.0,
@@ -1481,6 +1494,8 @@ def test_invalid_capacity_tag_is_typed_refusal_before_flux_arithmetic():
         temperature_K=300.0,
         volume_m3=1.0,
         dt_hr=1.0,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=300.0,
         bleed_conductance_kg_s=1.0,
         downstream_pressure_Pa=0.0,
         k_relief_kg_hr_Pa=0.0,
@@ -1513,6 +1528,8 @@ def test_malformed_finite_capacity_is_refused_before_arithmetic(value):
         temperature_K=300.0,
         volume_m3=1.0,
         dt_hr=1.0,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=300.0,
         bleed_conductance_kg_s=1.0,
         downstream_pressure_Pa=0.0,
         k_relief_kg_hr_Pa=0.0,
@@ -1604,6 +1621,8 @@ def test_total_pressure_vessel_rating_refuses_after_convergence():
         temperature_K=T_FOR_1000_PA_PER_MOL,
         volume_m3=1.0,
         dt_hr=1.0,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=T_FOR_1000_PA_PER_MOL,
         bleed_conductance_kg_s=0.0,
         downstream_pressure_Pa=0.0,
         k_relief_kg_hr_Pa=1.0e-12,
@@ -1630,6 +1649,8 @@ def test_zero_bleed_saturation_boundary_refuses_on_picard_non_convergence():
         temperature_K=T_FOR_1000_PA_PER_MOL,
         volume_m3=1.0,
         dt_hr=1.0,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=T_FOR_1000_PA_PER_MOL,
         bleed_conductance_kg_s=1.0,
         downstream_pressure_Pa=100.0,
         k_relief_kg_hr_Pa=1.0e-30,
@@ -1740,6 +1761,8 @@ def test_pipe_saturation_uses_executable_pressure_ratio_capacity(
         temperature_K=T_FOR_1000_PA_PER_MOL,
         volume_m3=1.0,
         dt_hr=1.0,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=T_FOR_1000_PA_PER_MOL,
         bleed_conductance_kg_s=conductance,
         downstream_pressure_Pa=downstream_pressure_Pa,
         k_relief_kg_hr_Pa=1.0e-30,
@@ -1749,9 +1772,9 @@ def test_pipe_saturation_uses_executable_pressure_ratio_capacity(
 
     assert isinstance(result, CapacityShadowResult)
     total_pressure_Pa = sum(result.partial_pressures_Pa.values())
-    fraction = compressible_pressure_capacity_fraction(
-        total_pressure_Pa / 100000.0,
-        downstream_pressure_Pa / 100000.0,
+    fraction = pipe_pressure_capacity_fraction(
+        0.12, 1.0, M_N2, gas_dynamic_viscosity_Pa_s(T_FOR_1000_PA_PER_MOL),
+        T_FOR_1000_PA_PER_MOL, total_pressure_Pa, downstream_pressure_Pa,
     )
     executable_capacity = conductance * fraction * 3600.0
     expected = (
@@ -1763,13 +1786,29 @@ def test_pipe_saturation_uses_executable_pressure_ratio_capacity(
         total_mol=1.0,
         total_kg=M_N2,
         controls={
-            "bleed_conductance_kg_s": conductance,
+            "bleed_conductance_kg_s": executable_capacity / 3600.0,
             "p_total_bar": total_pressure_Pa / 100000.0,
             "p_downstream_bar": downstream_pressure_Pa / 100000.0,
             "dt_hr": 1.0,
         },
     )
     assert result.bled_species_mol == pytest.approx(provider_bled)
+
+
+def test_empty_controlled_shadow_takes_zero_source_limit():
+    result = solve_capacity_shadow(
+        pre_holdup_mol={}, molar_mass_kg_mol={"O2": M_O2},
+        flux_kg_hr_at_partials=lambda _partials: {},
+        capacity=FiniteCapacity(1.0), head_bled_species_mol={},
+        external_o2_holdup_mol=0.0, temperature_K=300.0,
+        volume_m3=1.0, dt_hr=1.0, bleed_conductance_kg_s=None,
+        pipe_diameter_m=0.12, pipe_length_m=1.0, pipe_temperature_K=1773.15,
+        downstream_pressure_Pa=0.0, k_relief_kg_hr_Pa=1e-30,
+        p_open_Pa=1e9, vessel_rating_Pa=1e12, controlled_flow=True,
+    )
+    assert isinstance(result, CapacityShadowResult)
+    assert result.bled_species_mol == {}
+    assert result.saturation.combined == 0.0
 
 
 def test_picard_source_includes_stoichiometric_oxide_vapor_oxygen():
@@ -1800,6 +1839,8 @@ def test_picard_source_includes_stoichiometric_oxide_vapor_oxygen():
         temperature_K=T_FOR_1000_PA_PER_MOL,
         volume_m3=1.0,
         dt_hr=1.0,
+        pipe_diameter_m=0.12, pipe_length_m=1.0,
+        pipe_temperature_K=T_FOR_1000_PA_PER_MOL,
         bleed_conductance_kg_s=1.0e-10,
         downstream_pressure_Pa=0.0,
         k_relief_kg_hr_Pa=1.0e-30,

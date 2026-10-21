@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import copy
 import math
+from types import SimpleNamespace
 
 import pytest
 
 from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
 from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent
+from simulator.core import PyrolysisSimulator
 from simulator.overhead import OverheadConfigurationError
 from simulator.state import Atmosphere, EvaporationFlux
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
@@ -140,13 +142,13 @@ def test_bleed_conductance_caps_partial_drain(
     )
 
     diagnostic = dict(result.diagnostic or {})
-    assert diagnostic["bled_o2_kg"] == pytest.approx(0.0075)
+    assert diagnostic["bled_o2_kg"] == pytest.approx(0.01)
     assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "O2"
-    ] == pytest.approx(0.9925)
+    ] == pytest.approx(0.99)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_stored"
-    )["O2"] == pytest.approx(0.0075)
+    )["O2"] == pytest.approx(0.01)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_vented_to_vacuum"
     ).get("O2", 0.0) == pytest.approx(0.0)
@@ -160,7 +162,7 @@ def test_bleed_conductance_caps_partial_drain(
         (float("nan"), 1.0, 0.0),
         (float("inf"), 1.0, 0.0),
         (1.1, float("nan"), 0.0),
-        (1.1, 1.0, 0.01 * (1.1**2 - 1.0**2) / 1.1**2),
+        (1.1, 1.0, 0.01),
     ],
 )
 def test_bleed_conductance_requires_positive_pressure_delta(
@@ -207,7 +209,7 @@ def test_bleed_conductance_requires_positive_pressure_delta(
     ).get("O2", 0.0) == pytest.approx(expected_bled_o2_kg)
 
 
-def test_bleed_rate_tends_continuously_to_zero_with_pressure_delta():
+def test_provider_consumes_resolved_capacity_and_only_guards_pressure_direction():
     provider = BuiltinOverheadBleedProvider()
     common = {
         "bleed_conductance_kg_s": 0.01,
@@ -237,9 +239,39 @@ def test_bleed_rate_tends_continuously_to_zero_with_pressure_delta():
         controls={**common, "p_total_bar": 1.0, "p_downstream_bar": 1.0},
     )
 
-    assert one_bar_delta == pytest.approx(0.0075)
-    assert 0.0 < tiny_delta < one_bar_delta * 1.0e-10
+    assert one_bar_delta == pytest.approx(0.01)
+    assert tiny_delta == one_bar_delta  # capacity already resolved by caller
     assert equal_pressure == {}
+
+
+@pytest.mark.parametrize("upstream_pa", [1e-4, 10.0, 1000.0])
+def test_live_vacuum_bleed_uses_actual_inventory_pressure_and_regime_owner(
+    upstream_pa, vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.melt.p_total_mbar = 0.0  # hard-vacuum setting, not upstream gas pressure
+    sim.melt.temperature_C = 1500.0
+    ar_mass = resolve_species_formula("Ar", sim.species_formula_registry).molar_mass_kg_per_mol()
+    sim.atom_ledger.load_external(
+        "process.overhead_gas", {"Ar": ar_mass}, source="test argon",
+        material_origin="feedstock",
+    )
+    monkeypatch.setattr(sim, "_overhead_gas_equilibrium_diagnostic",
+                        lambda: {"p_total_bar": upstream_pa / 1e5})
+    sim._overhead_headspace_config["downstream_pressure_bar"] = upstream_pa / 2e5
+    expected = sim.overhead_model._pipe_conductance(
+        upstream_pa, 1500.0, p_downstream_Pa=upstream_pa / 2,
+        species_kg_for_M_avg={"Ar": ar_mass},
+    )
+    vacuum = sim.overhead_model._pipe_conductance(
+        upstream_pa, 1500.0, species_kg_for_M_avg={"Ar": ar_mass},
+    )
+    if upstream_pa == 1e-4:
+        assert expected / vacuum == pytest.approx(0.5, rel=1e-4)
+    result = sim._dispatch_overhead_bleed()
+    bled_mol = (result.diagnostic or {})["bled_species_mol"].get("Ar", 0.0)
+    assert bled_mol * ar_mass == pytest.approx(min(ar_mass, expected * 3600.0), rel=1e-12)
+    assert sim.melt.p_total_mbar == 0.0
 
 
 @pytest.mark.parametrize(
@@ -446,7 +478,61 @@ def test_live_headspace_bleed_conductance_uses_headspace_species_m_avg(
         species_kg_for_M_avg={"Na": 1.0},
     )
 
-    assert sim._headspace_bleed_conductance_kg_s() == pytest.approx(expected)
+    assert sim._headspace_bleed_conductance_kg_s(
+        p_upstream_bar=0.01, p_downstream_bar=0.0,
+    ) == pytest.approx(expected)
+
+
+def test_c0_pipe_source_includes_canonical_coevolved_oxygen(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.melt.p_total_mbar = 0.0
+    sim.melt.temperature_C = 1500.0
+    flux = EvaporationFlux(species_kg_hr={"SiO": 1e-6}, total_kg_hr=1e-6)
+    inlet = sim._pipe_transport_inlet_flux(flux)
+    source = sim._project_evaporation_overhead_source_mol_hr(flux.species_kg_hr, {})
+    assert source["O2"] > 0.0
+    assert "O2" in inlet.species_kg_hr
+    for species, mol_hr in source.items():
+        mass = resolve_species_formula(species, sim.species_formula_registry).molar_mass_kg_per_mol()
+        assert inlet.species_kg_hr[species] == pytest.approx(mol_hr * mass)
+    state = sim.overhead_model.estimate_transport_state(inlet, sim.melt)
+    capacity = sim.overhead_model._pipe_conductance(
+        state["p_mean_Pa"], 1500.0, species_kg_for_M_avg=inlet.species_kg_hr,
+    )
+    assert capacity * 3600.0 == pytest.approx(inlet.total_kg_hr, rel=1e-12)
+    assert inlet.total_kg_hr > flux.total_kg_hr
+
+
+@pytest.mark.parametrize("override", [0.0, 0.01, -0.01])
+def test_headspace_override_none_canonical_retains_legacy_value(override):
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._overhead_headspace_config = {
+        "conductance_kg_s": None, "conductance_kg_s_per_bar": override,
+    }
+    assert sim._headspace_bleed_override_kg_s() == override
+
+
+@pytest.mark.parametrize("pressure_floor_mbar", [0.0, 0.001])
+def test_live_bleed_capacity_uses_same_shadow_pressure_as_controls(
+    pressure_floor_mbar, vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.melt.temperature_C = 1500.0
+    sim.melt.p_total_mbar = pressure_floor_mbar
+    sim.atom_ledger.load_external(
+        "process.overhead_gas", {"O2": 1.0}, source="test oxygen",
+        material_origin="feedstock",
+    )
+    monkeypatch.setattr(sim, "_overhead_gas_equilibrium_diagnostic", lambda: {"p_total_bar": 2.0})
+    sim._overhead_headspace_config["downstream_pressure_bar"] = 0.0
+    shadow = SimpleNamespace(partial_pressures_Pa={"O2": 1e-4})
+    expected = sim._headspace_bleed_conductance_kg_s(
+        p_upstream_bar=max(1e-9, pressure_floor_mbar / 1000.0), p_downstream_bar=0.0,
+    ) * 3600.0
+    result = sim._dispatch_overhead_bleed(capacity_result=shadow)
+    assert (result.diagnostic or {})["bled_o2_kg"] == pytest.approx(expected)
 
 
 @pytest.mark.parametrize(
@@ -593,7 +679,7 @@ def test_bleed_conductance_is_kg_s_not_per_bar(
     )
 
     diagnostic = dict(result.diagnostic or {})
-    assert diagnostic["bled_o2_kg"] == pytest.approx(0.000975)
+    assert diagnostic["bled_o2_kg"] == pytest.approx(0.01)
 
 
 def test_legacy_bleed_conductance_alias_remains_kg_s(
@@ -625,7 +711,7 @@ def test_legacy_bleed_conductance_alias_remains_kg_s(
     )
 
     diagnostic = dict(result.diagnostic or {})
-    assert diagnostic["bled_o2_kg"] == pytest.approx(0.000975)
+    assert diagnostic["bled_o2_kg"] == pytest.approx(0.01)
 
 
 def test_external_o2_bleed_is_not_stored_as_melt_offgas_product(

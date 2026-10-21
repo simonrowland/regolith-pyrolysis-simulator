@@ -994,6 +994,8 @@ HARD_CASES = (
             equipment_capacity_kg_hr=2.0,
             evolved_flux_kg_hr=1.0,
             upstream_pressure_bar=1.0,
+            pipe_diameter_m=0.12, pipe_length_m=1.0,
+            gas_temperature_K=1773.15, gas_molar_mass_kg_mol=0.032,
         ),
         TypeError,
     ),

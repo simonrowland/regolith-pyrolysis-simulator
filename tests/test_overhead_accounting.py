@@ -13,6 +13,7 @@ from simulator.state import (
     CampaignPhase,
     EvaporationFlux,
     MOLAR_MASS,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
     PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
 )
 from simulator.vapour_rail.batch import (
@@ -935,8 +936,17 @@ def test_explicit_vapor_stoich_must_conserve_atoms_not_just_mass():
         sim._route_to_condensation(flux)
 
 
-def test_cro2_condenses_to_terminal_chromium_oxide_account():
+def test_cro2_condenses_to_terminal_chromium_oxide_account(monkeypatch):
     sim = _cro2_train_sim()
+    routed = []
+    route = sim.condensation_model.route
+
+    def capture_route(*args, **kwargs):
+        result = route(*args, **kwargs)
+        routed.append(result)
+        return result
+
+    monkeypatch.setattr(sim.condensation_model, "route", capture_route)
     sim.atom_ledger.load_external(
         "process.overhead_gas", {"O2": 1.0}, source="test pO2 buffer",
         material_origin="feedstock",
@@ -957,21 +967,23 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
         cro2_kg = sim.atom_ledger.kg_by_account(account).get("CrO2", 0.0)
         if cro2_kg > 0.0:
             wall_cro2_by_account_kg[account] = cro2_kg
-    # 2026-07-30 7d42b4f rebaseline: real flowing CrO2 partial pressure is
-    # supersaturated on the first two walls; segment-local depletion then
-    # leaves 0.913341865141524 kg for terminal conversion.
+    # The pipe pressure inversion now includes molecular transport. Check the
+    # ledger against the production condensation resolver's segment allocation,
+    # rather than pinning coefficients at the former viscous-only pressure.
     assert wall_cro2_by_account_kg == pytest.approx(
         {
-            "process.wall_deposit_segment_stage_0_to_stage_1": (
-                0.04078029875692986
-            ),
-            "process.wall_deposit_segment_stage_1_to_stage_2": (
-                0.045877836101546096
-            ),
+            PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX + segment: species["CrO2"]
+            for segment, species in routed[-1].wall_deposit_by_segment_species.items()
+            if species.get("CrO2", 0.0) > 0.0
         },
         rel=1e-12,
         abs=0.0,
     )
+    assert set(wall_cro2_by_account_kg) == {
+        "process.wall_deposit_segment_stage_0_to_stage_1",
+        "process.wall_deposit_segment_stage_1_to_stage_2",
+    }
+    assert 0.0 < sum(wall_cro2_by_account_kg.values()) < 1.0
     remaining_cro2_kg = flux.species_kg_hr["CrO2"] - sum(
         wall_cro2_by_account_kg.values()
     )
@@ -1566,6 +1578,9 @@ def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
 
 def test_transport_saturation_uses_full_inlet_when_residual_is_nearly_captured():
     sim = _gas_train_sim()
+    # A positive pressure ceiling is necessary for a finite, nonzero capacity.
+    # True vacuum has zero design capacity and infinite saturation for any load.
+    sim.melt.p_total_mbar = 0.001
     residual_flux = EvaporationFlux(
         total_kg_hr=1.0e-12,
         species_kg_hr={"Fe": 1.0e-12},

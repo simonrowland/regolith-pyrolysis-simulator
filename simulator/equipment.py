@@ -373,7 +373,8 @@ class EquipmentDesigner:
         Compressible Poiseuille mass-flow capacity:             [EQ-3]
             ṁ = π × d⁴ × M × (P₁²-P₂²) / (256 × η × L × R × T)
 
-        At millibar pressures: viscous flow (Kn << 0.01).
+        The shared transport owner adds Knudsen/Clausing rarefied transport;
+        this Poiseuille expression is its high-pressure limit.
         Require C ≥ peak_evap_rate / acceptable_pressure_drop.
         Reference: 12 cm pipe handles 7-16 g/s SiO at 10 mbar.
         """
@@ -399,8 +400,8 @@ class EquipmentDesigner:
         # Calculate actual conductance
         p_Pa = pressure_mbar * 100.0
         T_K = 1773.15  # 1500°C pipe temperature
-        from simulator.overhead import (
-            compressible_poiseuille_mass_flow,
+        from simulator.transport_regime import (
+            pipe_mass_flow_kg_s,
             gas_dynamic_viscosity_Pa_s,
         )
 
@@ -408,8 +409,8 @@ class EquipmentDesigner:
 
         M_avg = 0.040  # kg/mol
         # Apply the shared integrated compressible law derived at
-        # simulator.overhead.PIPE-1; equipment capacity is P1 against vacuum.
-        C_mass = compressible_poiseuille_mass_flow(
+        # simulator.transport_regime; equipment capacity is P1 against vacuum.
+        C_mass = pipe_mass_flow_kg_s(
             d,
             L,
             M_avg,
