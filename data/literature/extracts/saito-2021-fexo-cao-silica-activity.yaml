@@ -6,20 +6,3307 @@ source:
   doi: 10.2355/isijinternational.ISIJINT-2020-349
   year: 2021
 extraction:
-  method: Born-digital pdftotext-layout; tables retained as numeric context because the nonstoichiometric FexO component
-    and its reference-phase basis do not map to a scored species/activity encoding; Figures 1–9 recorded with digitisation
-    deferred.
+  method: >-
+    Born-digital pdftotext-layout; Table 2 activities typed with printed solid and liquid standards. Mass-percent
+    composition cells remain in row locator notes; Figures 1–9 are recorded with digitisation deferred.
   date: '2026-10-21'
   worker: fam38-1021
 review_status: draft
 scope_assessment:
   document_type: electrochemical FexO activity measurement in ternary slag
-  scored_observations: 0
-  note: 'No typed points: the measured component is nonstoichiometric FexO and both activity references are nonstoichiometric
-    Fe-equilibrated oxide states. The complete numeric tables and all figures are retained in context.'
+  scored_observations: 84
+  note: >-
+    The 42 Table 2 rows provide separate solid-reference and liquid-reference activities. Their mass-percent
+    compositions stay in row locator notes; Table 1 and Figures 1–9 remain context or deferred.
+experiments:
+- experiment_id: saito_2021_emf_activity_measurement
+  method: emf_cell
+  attribution_as_printed: This work; electrochemical technique applied to measure FexO activities.
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 699
+    section: Experiments
+    note: A zirconia oxygen sensor and Mo/MoO2 reference electrode provide stable emf; pO2 is determined from Eq. 7 and activities from Eqs. 11 and 13.
 species:
-  FeO:
-    observations: []
+  "Fe(1-x)O":
+    observations:
+    - observation_id: saito_2021_table2_row_1_1_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id001
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 1-1
+        note: 'Mass% composition: FeO 29.0, FeO1.5 3.3, CaO 33.9, SiO2 33.9; printed CaO/SiO2 mass ratio 50/50'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.97'
+          units: log10(atm)
+          locator: *id001
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id001
+        activity: '0.727'
+    - observation_id: saito_2021_table2_row_1_1_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id001
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.97'
+          units: log10(atm)
+          locator: *id001
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id001
+        activity: '0.616'
+    - observation_id: saito_2021_table2_row_1_2_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id002
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 1-2
+        note: 'Mass% composition: FeO 37.5, FeO1.5 5.2, CaO 28.6, SiO2 28.6'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.90'
+          units: log10(atm)
+          locator: *id002
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id002
+        activity: '0.787'
+    - observation_id: saito_2021_table2_row_1_2_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id002
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.90'
+          units: log10(atm)
+          locator: *id002
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id002
+        activity: '0.666'
+    - observation_id: saito_2021_table2_row_1_3_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id003
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 1-3
+        note: 'Mass% composition: FeO 46.4, FeO1.5 6.4, CaO 23.6, SiO2 23.6'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.77'
+          units: log10(atm)
+          locator: *id003
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id003
+        activity: '0.911'
+    - observation_id: saito_2021_table2_row_1_3_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id003
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.77'
+          units: log10(atm)
+          locator: *id003
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id003
+        activity: '0.772'
+    - observation_id: saito_2021_table2_row_1_4_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id004
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 1-4
+        note: 'Mass% composition: FeO 48.8, FeO1.5 7.4, CaO 21.9, SiO2 21.9'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.76'
+          units: log10(atm)
+          locator: *id004
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id004
+        activity: '0.926'
+    - observation_id: saito_2021_table2_row_1_4_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id004
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.76'
+          units: log10(atm)
+          locator: *id004
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id004
+        activity: '0.785'
+    - observation_id: saito_2021_table2_row_2_1_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id005
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 2-1
+        note: 'Mass% composition: FeO 57.0, FeO1.5 4.2, CaO 7.8, SiO2 31.0; printed CaO/SiO2 mass ratio 20/80'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.87'
+          units: log10(atm)
+          locator: *id005
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id005
+        activity: '0.816'
+    - observation_id: saito_2021_table2_row_2_1_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id005
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.87'
+          units: log10(atm)
+          locator: *id005
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id005
+        activity: '0.692'
+    - observation_id: saito_2021_table2_row_2_2_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id006
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 2-2
+        note: 'Mass% composition: FeO 58.5, FeO1.5 3.9, CaO 7.5, SiO2 30.1'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.85'
+          units: log10(atm)
+          locator: *id006
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id006
+        activity: '0.838'
+    - observation_id: saito_2021_table2_row_2_2_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id006
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.85'
+          units: log10(atm)
+          locator: *id006
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id006
+        activity: '0.709'
+    - observation_id: saito_2021_table2_row_2_3_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id007
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 2-3
+        note: 'Mass% composition: FeO 59.8, FeO1.5 6.2, CaO 6.8, SiO2 27.3'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.72'
+          units: log10(atm)
+          locator: *id007
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id007
+        activity: '0.968'
+    - observation_id: saito_2021_table2_row_2_3_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id007
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.72'
+          units: log10(atm)
+          locator: *id007
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id007
+        activity: '0.821'
+    - observation_id: saito_2021_table2_row_2_4_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id008
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 2-4
+        note: 'Mass% composition: FeO 63.6, FeO1.5 7.1, CaO 5.9, SiO2 23.5'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.72'
+          units: log10(atm)
+          locator: *id008
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id008
+        activity: '0.970'
+    - observation_id: saito_2021_table2_row_2_4_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id008
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.72'
+          units: log10(atm)
+          locator: *id008
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id008
+        activity: '0.823'
+    - observation_id: saito_2021_table2_row_3_1_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id009
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 3-1
+        note: 'Mass% composition: FeO 59.3, FeO1.5 0.8, CaO 0.0, SiO2 39.9; printed CaO/SiO2 mass ratio 0/100'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.35'
+          units: log10(atm)
+          locator: *id009
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id009
+        activity: '0.469'
+    - observation_id: saito_2021_table2_row_3_1_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id009
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.35'
+          units: log10(atm)
+          locator: *id009
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id009
+        activity: '0.397'
+    - observation_id: saito_2021_table2_row_3_2_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id010
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 3-2
+        note: 'Mass% composition: FeO 61.9, FeO1.5 1.3, CaO 0.0, SiO2 36.8'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.16'
+          units: log10(atm)
+          locator: *id010
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id010
+        activity: '0.588'
+    - observation_id: saito_2021_table2_row_3_2_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id010
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.16'
+          units: log10(atm)
+          locator: *id010
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id010
+        activity: '0.498'
+    - observation_id: saito_2021_table2_row_3_3_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id011
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 3-3
+        note: 'Mass% composition: FeO 64.1, FeO1.5 3.4, CaO 0.0, SiO2 32.5'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.98'
+          units: log10(atm)
+          locator: *id011
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id011
+        activity: '0.719'
+    - observation_id: saito_2021_table2_row_3_3_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id011
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.98'
+          units: log10(atm)
+          locator: *id011
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id011
+        activity: '0.609'
+    - observation_id: saito_2021_table2_row_3_4_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id012
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 3-4
+        note: 'Mass% composition: FeO 64.4, FeO1.5 6.9, CaO 0.0, SiO2 28.7'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.84'
+          units: log10(atm)
+          locator: *id012
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id012
+        activity: '0.847'
+    - observation_id: saito_2021_table2_row_3_4_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id012
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.84'
+          units: log10(atm)
+          locator: *id012
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id012
+        activity: '0.717'
+    - observation_id: saito_2021_table2_row_4_1_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id013
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 4-1
+        note: 'Mass% composition: FeO 54.7, FeO1.5 6.7, CaO 11.6, SiO2 27.0; printed CaO/SiO2 mass ratio 30/70'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.85'
+          units: log10(atm)
+          locator: *id013
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id013
+        activity: '0.840'
+    - observation_id: saito_2021_table2_row_4_1_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id013
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.85'
+          units: log10(atm)
+          locator: *id013
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id013
+        activity: '0.711'
+    - observation_id: saito_2021_table2_row_4_2_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id014
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 4-2
+        note: 'Mass% composition: FeO 56.7, FeO1.5 6.0, CaO 11.2, SiO2 26.1'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.82'
+          units: log10(atm)
+          locator: *id014
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id014
+        activity: '0.862'
+    - observation_id: saito_2021_table2_row_4_2_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id014
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.82'
+          units: log10(atm)
+          locator: *id014
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id014
+        activity: '0.730'
+    - observation_id: saito_2021_table2_row_4_3_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id015
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 4-3
+        note: 'Mass% composition: FeO 57.5, FeO1.5 7.6, CaO 10.5, SiO2 24.4'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.77'
+          units: log10(atm)
+          locator: *id015
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id015
+        activity: '0.919'
+    - observation_id: saito_2021_table2_row_4_3_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id015
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.77'
+          units: log10(atm)
+          locator: *id015
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id015
+        activity: '0.778'
+    - observation_id: saito_2021_table2_row_4_4_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id016
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 4-4
+        note: 'Mass% composition: FeO 60.5, FeO1.5 8.3, CaO 9.4, SiO2 21.9'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.75'
+          units: log10(atm)
+          locator: *id016
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id016
+        activity: '0.941'
+    - observation_id: saito_2021_table2_row_4_4_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id016
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.75'
+          units: log10(atm)
+          locator: *id016
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id016
+        activity: '0.797'
+    - observation_id: saito_2021_table2_row_4_5_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id017
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 4-5
+        note: 'Mass% composition: FeO 60.2, FeO1.5 8.6, CaO 9.3, SiO2 21.8'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.74'
+          units: log10(atm)
+          locator: *id017
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id017
+        activity: '0.946'
+    - observation_id: saito_2021_table2_row_4_5_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id017
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.74'
+          units: log10(atm)
+          locator: *id017
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id017
+        activity: '0.801'
+    - observation_id: saito_2021_table2_row_4_6_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id018
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 4-6
+        note: 'Mass% composition: FeO 63.4, FeO1.5 9.6, CaO 8.1, SiO2 18.9'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.71'
+          units: log10(atm)
+          locator: *id018
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id018
+        activity: '0.984'
+    - observation_id: saito_2021_table2_row_4_6_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id018
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.71'
+          units: log10(atm)
+          locator: *id018
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id018
+        activity: '0.834'
+    - observation_id: saito_2021_table2_row_5_1_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id019
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 5-1
+        note: 'Mass% composition: FeO 56.7, FeO1.5 3.0, CaO 0.0, SiO2 40.2; printed CaO/SiO2 mass ratio 0/100'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.34'
+          units: log10(atm)
+          locator: *id019
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id019
+        activity: '0.473'
+    - observation_id: saito_2021_table2_row_5_1_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id019
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.34'
+          units: log10(atm)
+          locator: *id019
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id019
+        activity: '0.400'
+    - observation_id: saito_2021_table2_row_5_2_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id020
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 5-2
+        note: 'Mass% composition: FeO 58.8, FeO1.5 5.2, CaO 0.0, SiO2 36.0'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.14'
+          units: log10(atm)
+          locator: *id020
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id020
+        activity: '0.599'
+    - observation_id: saito_2021_table2_row_5_2_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id020
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.14'
+          units: log10(atm)
+          locator: *id020
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id020
+        activity: '0.507'
+    - observation_id: saito_2021_table2_row_5_3_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id021
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 5-3
+        note: 'Mass% composition: FeO 62.6, FeO1.5 6.3, CaO 0.0, SiO2 31.1'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.95'
+          units: log10(atm)
+          locator: *id021
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id021
+        activity: '0.745'
+    - observation_id: saito_2021_table2_row_5_3_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id021
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.95'
+          units: log10(atm)
+          locator: *id021
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id021
+        activity: '0.631'
+    - observation_id: saito_2021_table2_row_5_4_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id022
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 5-4
+        note: 'Mass% composition: FeO 64.8, FeO1.5 7.3, CaO 0.0, SiO2 27.8'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.87'
+          units: log10(atm)
+          locator: *id022
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id022
+        activity: '0.817'
+    - observation_id: saito_2021_table2_row_5_4_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id022
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.87'
+          units: log10(atm)
+          locator: *id022
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id022
+        activity: '0.692'
+    - observation_id: saito_2021_table2_row_5_5_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id023
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 5-5
+        note: 'Mass% composition: FeO 66.4, FeO1.5 7.5, CaO 0.0, SiO2 26.2'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.80'
+          units: log10(atm)
+          locator: *id023
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id023
+        activity: '0.882'
+    - observation_id: saito_2021_table2_row_5_5_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id023
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.80'
+          units: log10(atm)
+          locator: *id023
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id023
+        activity: '0.747'
+    - observation_id: saito_2021_table2_row_5_6_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id024
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 5-6
+        note: 'Mass% composition: FeO 65.3, FeO1.5 11.8, CaO 0.0, SiO2 22.9'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.72'
+          units: log10(atm)
+          locator: *id024
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id024
+        activity: '0.966'
+    - observation_id: saito_2021_table2_row_5_6_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id024
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.72'
+          units: log10(atm)
+          locator: *id024
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id024
+        activity: '0.818'
+    - observation_id: saito_2021_table2_row_5_7_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id025
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 5-7
+        note: 'Mass% composition: FeO 71.3, FeO1.5 11.2, CaO 0.0, SiO2 17.5'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.70'
+          units: log10(atm)
+          locator: *id025
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id025
+        activity: '0.993'
+    - observation_id: saito_2021_table2_row_5_7_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id025
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.70'
+          units: log10(atm)
+          locator: *id025
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id025
+        activity: '0.841'
+    - observation_id: saito_2021_table2_row_6_1_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id026
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 6-1
+        note: 'Mass% composition: FeO 29.7, FeO1.5 2.5, CaO 27.1, SiO2 40.7; printed CaO/SiO2 mass ratio 40/60'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.45'
+          units: log10(atm)
+          locator: *id026
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id026
+        activity: '0.421'
+    - observation_id: saito_2021_table2_row_6_1_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id026
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.45'
+          units: log10(atm)
+          locator: *id026
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id026
+        activity: '0.357'
+    - observation_id: saito_2021_table2_row_6_2_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id027
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 6-2
+        note: 'Mass% composition: FeO 39.5, FeO1.5 4.4, CaO 22.4, SiO2 33.6'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.95'
+          units: log10(atm)
+          locator: *id027
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id027
+        activity: '0.746'
+    - observation_id: saito_2021_table2_row_6_2_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id027
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.95'
+          units: log10(atm)
+          locator: *id027
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id027
+        activity: '0.632'
+    - observation_id: saito_2021_table2_row_6_3_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id028
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 6-3
+        note: 'Mass% composition: FeO 46.0, FeO1.5 5.9, CaO 19.3, SiO2 28.9'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.86'
+          units: log10(atm)
+          locator: *id028
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id028
+        activity: '0.825'
+    - observation_id: saito_2021_table2_row_6_3_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id028
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.86'
+          units: log10(atm)
+          locator: *id028
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id028
+        activity: '0.698'
+    - observation_id: saito_2021_table2_row_6_4_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id029
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 6-4
+        note: 'Mass% composition: FeO 48.4, FeO1.5 9.0, CaO 17.0, SiO2 25.6'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.74'
+          units: log10(atm)
+          locator: *id029
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id029
+        activity: '0.944'
+    - observation_id: saito_2021_table2_row_6_4_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id029
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.74'
+          units: log10(atm)
+          locator: *id029
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id029
+        activity: '0.799'
+    - observation_id: saito_2021_table2_row_6_5_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id030
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 6-5
+        note: 'Mass% composition: FeO 56.4, FeO1.5 12.0, CaO 12.6, SiO2 18.9'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.72'
+          units: log10(atm)
+          locator: *id030
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id030
+        activity: '0.971'
+    - observation_id: saito_2021_table2_row_6_5_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id030
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.72'
+          units: log10(atm)
+          locator: *id030
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id030
+        activity: '0.822'
+    - observation_id: saito_2021_table2_row_7_1_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id031
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 7-1
+        note: 'Mass% composition: FeO 46.5, FeO1.5 21.9, CaO 30.4, SiO2 1.3; printed CaO/SiO2 mass ratio 96/4'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.12'
+          units: log10(atm)
+          locator: *id031
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id031
+        activity: '0.609'
+    - observation_id: saito_2021_table2_row_7_1_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id031
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.12'
+          units: log10(atm)
+          locator: *id031
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id031
+        activity: '0.516'
+    - observation_id: saito_2021_table2_row_7_2_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id032
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 7-2
+        note: 'Mass% composition: FeO 51.9, FeO1.5 21.2, CaO 25.8, SiO2 1.1'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.88'
+          units: log10(atm)
+          locator: *id032
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id032
+        activity: '0.804'
+    - observation_id: saito_2021_table2_row_7_2_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id032
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.88'
+          units: log10(atm)
+          locator: *id032
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id032
+        activity: '0.681'
+    - observation_id: saito_2021_table2_row_7_3_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id033
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 7-3
+        note: 'Mass% composition: FeO 61.1, FeO1.5 21.3, CaO 16.9, SiO2 0.7'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.76'
+          units: log10(atm)
+          locator: *id033
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id033
+        activity: '0.928'
+    - observation_id: saito_2021_table2_row_7_3_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id033
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.76'
+          units: log10(atm)
+          locator: *id033
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id033
+        activity: '0.786'
+    - observation_id: saito_2021_table2_row_8_1_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id034
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 8-1
+        note: 'Mass% composition: FeO 33.4, FeO1.5 6.4, CaO 24.1, SiO2 36.1; printed CaO/SiO2 mass ratio 40/60'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.19'
+          units: log10(atm)
+          locator: *id034
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id034
+        activity: '0.566'
+    - observation_id: saito_2021_table2_row_8_1_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id034
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.19'
+          units: log10(atm)
+          locator: *id034
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id034
+        activity: '0.479'
+    - observation_id: saito_2021_table2_row_8_2_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id035
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 8-2
+        note: 'Mass% composition: FeO 41.8, FeO1.5 6.0, CaO 20.9, SiO2 31.4'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.98'
+          units: log10(atm)
+          locator: *id035
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id035
+        activity: '0.716'
+    - observation_id: saito_2021_table2_row_8_2_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id035
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.98'
+          units: log10(atm)
+          locator: *id035
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id035
+        activity: '0.606'
+    - observation_id: saito_2021_table2_row_9_1_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id036
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 9-1
+        note: 'Mass% composition: FeO 51.3, FeO1.5 6.2, CaO 2.1, SiO2 40.4; printed CaO/SiO2 mass ratio 5/95'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.41'
+          units: log10(atm)
+          locator: *id036
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id036
+        activity: '0.441'
+    - observation_id: saito_2021_table2_row_9_1_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id036
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.41'
+          units: log10(atm)
+          locator: *id036
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id036
+        activity: '0.373'
+    - observation_id: saito_2021_table2_row_9_2_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id037
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 9-2
+        note: 'Mass% composition: FeO 57.5, FeO1.5 4.9, CaO 1.9, SiO2 35.8'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.19'
+          units: log10(atm)
+          locator: *id037
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id037
+        activity: '0.563'
+    - observation_id: saito_2021_table2_row_9_2_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id037
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.19'
+          units: log10(atm)
+          locator: *id037
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id037
+        activity: '0.477'
+    - observation_id: saito_2021_table2_row_9_3_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id038
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 9-3
+        note: 'Mass% composition: FeO 59.8, FeO1.5 6.7, CaO 1.7, SiO2 31.8'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.01'
+          units: log10(atm)
+          locator: *id038
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id038
+        activity: '0.695'
+    - observation_id: saito_2021_table2_row_9_3_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id038
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-11.01'
+          units: log10(atm)
+          locator: *id038
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id038
+        activity: '0.589'
+    - observation_id: saito_2021_table2_row_9_4_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id039
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 9-4
+        note: 'Mass% composition: FeO 60.4, FeO1.5 9.6, CaO 1.5, SiO2 28.6'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.91'
+          units: log10(atm)
+          locator: *id039
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id039
+        activity: '0.784'
+    - observation_id: saito_2021_table2_row_9_4_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id039
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.91'
+          units: log10(atm)
+          locator: *id039
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id039
+        activity: '0.664'
+    - observation_id: saito_2021_table2_row_9_5_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id040
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 9-5
+        note: 'Mass% composition: FeO 61.6, FeO1.5 8.4, CaO 1.5, SiO2 28.5'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.85'
+          units: log10(atm)
+          locator: *id040
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id040
+        activity: '0.836'
+    - observation_id: saito_2021_table2_row_9_5_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id040
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.85'
+          units: log10(atm)
+          locator: *id040
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id040
+        activity: '0.708'
+    - observation_id: saito_2021_table2_row_9_6_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id041
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 9-6
+        note: 'Mass% composition: FeO 63.6, FeO1.5 12.1, CaO 1.2, SiO2 23.1'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.77'
+          units: log10(atm)
+          locator: *id041
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id041
+        activity: '0.911'
+    - observation_id: saito_2021_table2_row_9_6_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id041
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.77'
+          units: log10(atm)
+          locator: *id041
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id041
+        activity: '0.772'
+    - observation_id: saito_2021_table2_row_9_7_solid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: &id042
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+        record: Table 2 row 9-7
+        note: 'Mass% composition: FeO 64.7, FeO1.5 13.1, CaO 1.1, SiO2 21.1'
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.72'
+          units: log10(atm)
+          locator: *id042
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric solid FexO in equilibrium with pure solid Fe.
+          locator: *id042
+        activity: '0.968'
+    - observation_id: saito_2021_table2_row_9_7_liquid_activity
+      experiment: saito_2021_emf_activity_measurement
+      type: activity
+      locator: *id042
+      phase: l
+      units: dimensionless activity as printed
+      values:
+        quantity: activity
+        method_class: measured_tabulated
+        formula: Fe(1-x)O
+        T_K: '1573'
+        log_fO2:
+          value: '-10.72'
+          units: log10(atm)
+          locator: *id042
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Fe(1-x)O
+                phase:
+                  tag: value
+                  value: l
+                polymorph:
+                  tag: unknown
+                  reason: source does not state a polymorph
+                charge:
+                  tag: value
+                  value: 0
+              component_basis: Fe(1-x)O
+          inferred: false
+          note: The standard state is taken as pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe.
+          locator: *id042
+        activity: '0.820'
     context:
     - observation_id: saito_2021_table1_initial_compositions
       type: schema_gap_context
@@ -102,10 +3389,9 @@ species:
         - activity
         - valence_ratio
         - residue_component_composition
-        disposition_reason: The activity component is printed as nonstoichiometric FexO, which has no supported
-          species formula; the two references are pure nonstoichiometric FexO equilibrated with Fe, whose phase
-          basis remains unknown under the family standard-state ruling. Table rows are preserved intact without
-          scoring.
+        disposition_reason: Table 2 activities are scored with their printed solid and liquid standards. The mass-percent
+          composition columns are retained in the corresponding activity locator notes; no composition-vector token is
+          available.
         table_values_as_printed: "                                                   Table 2.     Experimental results\
           \ at 1 573 K.\n                        (mass%CaO)                  mass%\n                 No.       \
           \                                                      E/mV       log( pO2 / atm )   aFe x O (s) *   aFe\
