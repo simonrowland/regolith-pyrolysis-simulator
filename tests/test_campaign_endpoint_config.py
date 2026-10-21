@@ -228,6 +228,10 @@ def test_configured_campaign_endpoints_match_legacy_trip_points(
         current_A=current_A,
         low_current_hours=low_current_hours,
     )
+    if campaign == CampaignPhase.C2A:
+        # Keep this endpoint/cap matrix on its explicit historical 30 h cap;
+        # automatic phase-entry deadlines are exercised in test_c2a_deadline.
+        manager.overrides['C2A'] = {'max_hours': 30}
 
     assert manager.check_endpoint(melt, flux, CondensationTrain(), record) is expected
 
@@ -837,6 +841,7 @@ def test_zero_runtime_max_hours_uses_configured_campaign_default():
     manager = CampaignManager(_setpoints())
     manager.overrides["C2A"] = {"max_hours": 0.0}
     melt = _melt(CampaignPhase.C2A, 0)
+    manager.configure_campaign(melt, CampaignPhase.C2A)
 
     assert (
         manager.check_endpoint(
@@ -939,7 +944,7 @@ def test_campaign_endpoint_caps_and_classes_are_materialized():
 
     assert campaigns["C0"]["max_hold_hr"] == 25
     assert campaigns["C0b_p_cleanup"]["max_hold_hr"] == 3
-    assert campaigns["C2A_continuous"]["max_hold_hr"] == 30
+    assert campaigns["C2A_continuous"]["max_hold_hr"] is None
     assert campaigns["C2A_staged"]["max_hold_hr"] == 9
     assert campaigns["C2B"]["max_hold_hr"] == 20
     assert campaigns["C3"]["max_hold_hr"]["C3_K"] == {
@@ -997,6 +1002,8 @@ def test_campaign_endpoint_caps_and_classes_are_materialized():
 def test_sc109_c2a_soft_endpoint_refuses_unarmed_subthreshold_flux() -> None:
     """Fail-open input: continuous rate always below threshold after min_hold."""
     manager = CampaignManager(_setpoints())
+    manager.configure_campaign(
+        _melt(CampaignPhase.C2A, 0, temperature_C=2200), CampaignPhase.C2A)
     melt = _melt(CampaignPhase.C2A, 18)
     # OLD behaviour completed on absence of high flux; must stay incomplete.
     assert manager.check_endpoint(
@@ -1009,6 +1016,8 @@ def test_sc109_c2a_soft_endpoint_refuses_unarmed_subthreshold_flux() -> None:
 
 def test_sc109_c2a_soft_endpoint_completes_only_after_flux_arm_then_decay() -> None:
     manager = CampaignManager(_setpoints())
+    manager.configure_campaign(
+        _melt(CampaignPhase.C2A, 0, temperature_C=2200), CampaignPhase.C2A)
     record = BatchRecord(
         snapshots=[
             HourSnapshot(
@@ -1191,6 +1200,8 @@ def _assert_depletion_signal_refused(exc: CampaignEndpointRefusal, name: str) ->
 
 def test_c2a_armed_negative_rate_is_typed_refusal_not_depletion() -> None:
     manager = CampaignManager(_setpoints())
+    manager.configure_campaign(
+        _melt(CampaignPhase.C2A, 0, temperature_C=2200), CampaignPhase.C2A)
     record = BatchRecord(
         snapshots=[HourSnapshot(campaign=CampaignPhase.C2A, evap_flux=_flux(0.5))]
     )
@@ -1206,6 +1217,8 @@ def test_c2a_armed_negative_rate_is_typed_refusal_not_depletion() -> None:
 
 def test_c2a_armed_zero_rate_still_depletes() -> None:
     manager = CampaignManager(_setpoints())
+    manager.configure_campaign(
+        _melt(CampaignPhase.C2A, 0, temperature_C=2200), CampaignPhase.C2A)
     record = BatchRecord(
         snapshots=[HourSnapshot(campaign=CampaignPhase.C2A, evap_flux=_flux(0.5))]
     )
@@ -1220,6 +1233,8 @@ def test_c2a_armed_zero_rate_still_depletes() -> None:
 @pytest.mark.parametrize("bad_rate", [float("nan"), float("inf"), float("-inf")])
 def test_c2a_armed_nonfinite_rate_is_typed_refusal(bad_rate: float) -> None:
     manager = CampaignManager(_setpoints())
+    manager.configure_campaign(
+        _melt(CampaignPhase.C2A, 0, temperature_C=2200), CampaignPhase.C2A)
     record = BatchRecord(
         snapshots=[HourSnapshot(campaign=CampaignPhase.C2A, evap_flux=_flux(0.5))]
     )
@@ -1235,6 +1250,8 @@ def test_c2a_armed_nonfinite_rate_is_typed_refusal(bad_rate: float) -> None:
 
 def test_c2a_unarmed_negative_rate_does_not_soft_complete() -> None:
     manager = CampaignManager(_setpoints())
+    manager.configure_campaign(
+        _melt(CampaignPhase.C2A, 0, temperature_C=2200), CampaignPhase.C2A)
     assert manager.check_endpoint(
         _melt(CampaignPhase.C2A, 18),
         _flux(-1.0),

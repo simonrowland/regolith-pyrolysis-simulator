@@ -1377,12 +1377,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._mre_rung_ever_effective = False
         self._mre_voltage_sequence: list = []
 
-        # --- User-configurable parameters ---
-        self.c4_max_temp_C = 1670.0             # Max T for C4 Mg pyrolysis
-
         # --- Campaign manager ---
         from simulator.campaigns import CampaignManager
         self.campaign_mgr = CampaignManager(setpoints)
+        self.c4_max_temp_C = self.campaign_mgr.c4_max_temp_C
 
         # --- Subsystem models (lazy imports to avoid circular deps) ---
         self._condensation_model = None
