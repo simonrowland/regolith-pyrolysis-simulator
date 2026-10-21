@@ -1171,3 +1171,128 @@ input, select, button, textarea { font-family: inherit; }
         background: #0e1116;
     }
 }
+
+/* Optimizer Pareto and trajectory tradeoff view. Marker colour comes from
+   the theme tokens; the shape is the second channel. */
+.tradeoff-page {
+    max-width: 100%;
+    min-width: 0;
+}
+
+.tradeoff-page .section-card {
+    max-width: 100%;
+    min-width: 0;
+}
+
+.tradeoff-page .control-buttons {
+    flex-wrap: wrap;
+}
+
+.tradeoff-page .control-buttons .btn,
+.tradeoff-actions .btn {
+    flex: 0 1 auto;
+    white-space: normal;
+}
+
+.tradeoff-controls,
+.tradeoff-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: flex-end;
+    max-width: 100%;
+    margin-top: var(--space-4);
+}
+
+.tradeoff-controls .ctrl-row {
+    flex: 1 1 12rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.tradeoff-controls label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.tradeoff-controls select {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+    margin-top: var(--space-1);
+    background: var(--surface);
+    color: var(--text);
+}
+
+.tradeoff-chart {
+    width: 100%;
+    max-width: 100%;
+    min-height: 280px;
+    overflow: hidden;
+}
+
+.tradeoff-chart .js-plotly-plot,
+.tradeoff-chart .plot-container.plotly {
+    max-width: 100%;
+}
+
+.tradeoff-key,
+.tradeoff-page .param-table td,
+.tradeoff-run-list a {
+    overflow-wrap: anywhere;
+}
+
+.tradeoff-table td:first-child {
+    width: auto;
+    font-weight: 400;
+}
+
+.tradeoff-legend,
+.tradeoff-run-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 0;
+}
+
+.plot-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.plot-status::before {
+    content: "";
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    flex: 0 0 auto;
+}
+
+.plot-status-feasible::before {
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.plot-status-infeasible::before {
+    background:
+        linear-gradient(var(--danger), var(--danger)) center / 100% 2px no-repeat,
+        linear-gradient(var(--danger), var(--danger)) center / 2px 100% no-repeat;
+    transform: rotate(45deg);
+}
+
+.plot-status-unavailable::before {
+    background: var(--warning);
+    transform: rotate(45deg);
+    border-radius: 1px;
+}
+
+.plot-status-front::before {
+    box-shadow: 0 0 0 2px var(--text);
+}

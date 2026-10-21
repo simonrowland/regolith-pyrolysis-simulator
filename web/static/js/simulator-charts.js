@@ -19,15 +19,64 @@ const chartLayout = {
 };
 const chartConfig = { responsive: true, displayModeBar: false };
 
-// Temperature profile
-Plotly.newPlot('chart-temperature', [{
-    x: [], y: [], mode: 'lines', name: 'Melt T',
-    line: { color: '#dc2626', width: 2 }
-}], {
-    ...chartLayout,
-    title: { text: 'Temperature Profile', font: { size: 13 } },
-    yaxis: { ...chartLayout.yaxis, title: 'T (°C)' },
-}, chartConfig);
+function regolithChartTheme() {
+    const style = getComputedStyle(document.documentElement);
+    const read = (name, fallback) => {
+        const value = style.getPropertyValue(name).trim();
+        return value || fallback;
+    };
+    return {
+        text: read('--text', '#212529'),
+        border: read('--border', '#dee2e6'),
+        accent: read('--accent', '#059669'),
+        danger: read('--danger', '#dc2626'),
+        warning: read('--warning', '#d97706'),
+        primary: read('--primary', '#2563eb'),
+    };
+}
+
+function regolithChartLayout(partial) {
+    const theme = regolithChartTheme();
+    const extra = partial || {};
+    const base = {
+        margin: { t: 30, r: 20, b: 48, l: 64 },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        font: {
+            size: 11,
+            family: '"IBM Plex Sans", -apple-system, sans-serif',
+            color: theme.text,
+        },
+        xaxis: { gridcolor: theme.border, color: theme.text },
+        yaxis: { gridcolor: theme.border, color: theme.text },
+        legend: { font: { color: theme.text } },
+    };
+    return {
+        ...base,
+        ...extra,
+        font: { ...base.font, ...(extra.font || {}) },
+        xaxis: { ...base.xaxis, ...(extra.xaxis || {}) },
+        yaxis: { ...base.yaxis, ...(extra.yaxis || {}) },
+        legend: { ...base.legend, ...(extra.legend || {}) },
+    };
+}
+
+window.regolithChartTheme = regolithChartTheme;
+window.regolithChartLayout = regolithChartLayout;
+window.regolithChartConfig = { responsive: true, displayModeBar: false };
+
+// Temperature profile. Guarded so optimizer pages can load this file
+// without the simulator chart nodes.
+if (document.getElementById('chart-temperature')) {
+    Plotly.newPlot('chart-temperature', [{
+        x: [], y: [], mode: 'lines', name: 'Melt T',
+        line: { color: '#dc2626', width: 2 }
+    }], {
+        ...chartLayout,
+        title: { text: 'Temperature Profile', font: { size: 13 } },
+        yaxis: { ...chartLayout.yaxis, title: 'T (°C)' },
+    }, chartConfig);
+}
 
 // Melt composition (stacked area)
 const oxideColors = {
@@ -40,14 +89,16 @@ const compTraces = {};
 let compInitialized = false;
 
 // Overhead pressure
-Plotly.newPlot('chart-pressure', [{
-    x: [], y: [], mode: 'lines', name: 'Pressure',
-    line: { color: '#2563eb', width: 2 }
-}], {
-    ...chartLayout,
-    title: { text: 'Overhead Pressure', font: { size: 13 } },
-    yaxis: { ...chartLayout.yaxis, title: 'mbar' },
-}, chartConfig);
+if (document.getElementById('chart-pressure')) {
+    Plotly.newPlot('chart-pressure', [{
+        x: [], y: [], mode: 'lines', name: 'Pressure',
+        line: { color: '#2563eb', width: 2 }
+    }], {
+        ...chartLayout,
+        title: { text: 'Overhead Pressure', font: { size: 13 } },
+        yaxis: { ...chartLayout.yaxis, title: 'mbar' },
+    }, chartConfig);
+}
 
 // Mass flow (evaporation rates by species)
 const flowTraces = {};

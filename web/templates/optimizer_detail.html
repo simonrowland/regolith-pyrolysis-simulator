@@ -2,7 +2,7 @@
 {% block title %}Optimizer Result {{ result.candidate_id }} - Regolith Pyrolysis{% endblock %}
 
 {% block content %}
-<section class="main-area">
+<section class="main-area tradeoff-page">
     <div class="section-card">
         <h2>Optimizer Result Detail</h2>
         <table class="param-table">
@@ -68,6 +68,8 @@
             </form>
             <a class="btn"
                href="{{ url_for('web.optimizer_reoptimize_form', origin='local', study_id=result.run_id) }}">Re-optimize</a>
+            <a class="btn"
+               href="{{ url_for('web.optimizer_pareto_page', run_id=result.run_id) }}">Pareto tradeoffs</a>
             <a class="btn" href="{{ url_for('web.optimizer_page') }}">Back to optimizer</a>
         </div>
         <div id="optimizer-certify-job"></div>
@@ -309,5 +311,65 @@
             {% endif %}
         </table>
     </div>
+
+    <div class="section-card" id="optimizer-trajectory">
+        <h3>Hourly trajectory</h3>
+        {% set trajectory = result.trajectory or {} %}
+        {% if trajectory.message %}
+        <p class="empty-hint" role="status">{{ trajectory.message }}</p>
+        {% else %}
+        <form class="tradeoff-controls" method="get"
+              action="{{ url_for('web.optimizer_result_detail', run_id=result.run_id, cache_key=result.cache_key) }}">
+            <div class="ctrl-row">
+                <label for="trajectory-series">Series</label>
+                <select id="trajectory-series" name="series">
+                    {% for group in trajectory.series_groups %}
+                    <optgroup label="{{ group.label }}">
+                        {% for series in group.series %}
+                        <option value="{{ series.id }}" {% if series.id == trajectory.series_id %}selected{% endif %}>{{ series.label }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="tradeoff-actions">
+                <button class="btn" type="submit">Show series</button>
+            </div>
+        </form>
+        {% if trajectory.series_error %}
+        <p class="empty-hint" role="alert">{{ trajectory.series_error }}</p>
+        {% elif trajectory.chart %}
+        <div class="table-scroll">
+            <table class="param-table tradeoff-table">
+                <thead>
+                    <tr>
+                        <th>Hour</th>
+                        <th>{{ trajectory.series_label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in trajectory.series_points %}
+                    <tr>
+                        <td>{{ row.hour }}</td>
+                        <td>{% if row.value is none %}unavailable{% else %}{{ row.value }}{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div id="optimizer-trajectory-chart" class="tradeoff-chart" role="img"
+             aria-label="{{ trajectory.series_label }}"></div>
+        <script type="application/json" id="trajectory-payload">{{ trajectory.chart|tojson }}</script>
+        {% endif %}
+        {% endif %}
+    </div>
 </section>
 {% endblock %}
+
+{% block scripts %}
+{% if result.trajectory and result.trajectory.chart %}
+<script src="{{ url_for('web.static', filename='js/simulator-charts.js') }}"></script>
+<script src="{{ url_for('web.static', filename='js/optimizer-tradeoff.js') }}"></script>
+{% endif %}
+{% endblock %}
+
