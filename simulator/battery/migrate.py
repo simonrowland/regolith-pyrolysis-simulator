@@ -1409,18 +1409,24 @@ def _standard_state_from_extract_text(
     species_formula: str,
     *,
     phase_raw: object = None,
+    primary: State[StandardState] | None = None,
 ) -> StandardState | None:
-    """Map only an explicit, single-convention extract standard state.
+    """Legacy prose override for an explicit, single-convention standard state.
 
-    Extracts predate the v2 ``StandardState`` record and store this field as
-    source prose.  The mapper accepts the closed Raoultian convention only
-    when that prose names one liquid or solid endmember.  ``phase_raw`` is the
+    Applies only when the primary mapper had no opinion (``primary is None``).
+    A primary ``State``, including UNKNOWN, is never replaced.  Extracts
+    predate the v2 ``StandardState`` record and store this field as source
+    prose.  The mapper accepts the closed Raoultian convention only when that
+    prose names one liquid or solid endmember.  ``phase_raw`` is the
     measurement phase (the alloy or melt).  It is not a printed standard-state
     phase and never supplies the endmember.  Vapor-pressure ratios, mixed
     Raoultian/Henrian claims, and rows that name more than one endmember stay
-    unresolved.
+    unresolved.  Reference pressure is a printed bar number, never a default
+    of 1 bar.
     """
 
+    if primary is not None:
+        return None
     if not isinstance(raw, str):
         return None
     text = " ".join(raw.split())
@@ -1466,9 +1472,7 @@ def _standard_state_from_extract_text(
         convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
         endmember=make_species(endmember, phase),
         component_basis=endmember,
-        # Required Decimal. Same default as _standard_state_from_plain when
-        # the payload omits a pressure. The activity prose does not print it.
-        reference_pressure_bar=Decimal("1"),
+        reference_pressure_bar=_printed_reference_pressure_bar(lowered),
     )
 
 
@@ -14155,6 +14159,7 @@ class Migrator:
                 obs.get("standard_state"),
                 species.formula,
                 phase_raw=phase_raw,
+                primary=source_reference_state,
             )
             if reference_state is not None:
                 ident_kwargs["reference_state"] = State.of(reference_state)
