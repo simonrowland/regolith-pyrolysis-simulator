@@ -20,11 +20,149 @@ species:
           method_class: model_derived
           quantity_as_printed: negative log10 oxygen activity coefficient in liquid nickel and cobalt at 1600 C, calculated from equations 5 and 7
           candidate_quantity_tokens: [activity_coefficient]
-          schema_gap: 'The store has activity_coefficient but no scalar printed_form for a negative log10 activity coefficient; values stay context rather than being converted or relabelled.'
-          chromium_mass_percent: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
-          minus_log10_fO_in_Ni_as_printed: ['0.29', '0.49', '0.64', '0.78', '0.90', '1.01', '1.11', '1.21', '1.30', '1.39', '1.54', '1.69', '1.82', '1.94', '2.05', '2.16', '2.26', '2.35', '2.44', '2.52']
-          minus_log10_fO_in_Co_as_printed: ['0.28', '0.41', '0.53', '0.62', '0.71', '0.79', '0.86', '0.93', '1.00', '1.06', '1.17', '1.28', '1.38', '1.48', '1.57', '1.65', '1.73', '1.81', '1.89', '1.96']
-          note: 'The table is explicitly calculated from the fitted equations; each displayed cell was render-checked. The printed standard state is oxygen at infinite dilution on a wt% scale in the respective solvent.'
+          schema_gap: t-1394
+          note: The table is explicitly calculated from the fitted equations; all 60 displayed cells were render-checked. Values stay signed and in the printed negative-log form. The printed standard state is oxygen at infinite dilution on a wt% scale in each solvent.
+          table_rows:
+          - row: 1
+            chromium_mass_percent_as_printed: '1'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '1'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '0.29'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '0.28'}
+          - row: 2
+            chromium_mass_percent_as_printed: '2'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '2'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '0.49'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '0.41'}
+          - row: 3
+            chromium_mass_percent_as_printed: '3'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '3'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '0.64'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '0.53'}
+          - row: 4
+            chromium_mass_percent_as_printed: '4'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '4'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '0.78'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '0.62'}
+          - row: 5
+            chromium_mass_percent_as_printed: '5'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '5'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '0.90'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '0.71'}
+          - row: 6
+            chromium_mass_percent_as_printed: '6'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '6'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '1.01'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '0.79'}
+          - row: 7
+            chromium_mass_percent_as_printed: '7'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '7'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '1.11'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '0.86'}
+          - row: 8
+            chromium_mass_percent_as_printed: '8'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '8'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '1.21'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '0.93'}
+          - row: 9
+            chromium_mass_percent_as_printed: '9'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '9'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '1.30'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.00'}
+          - row: 10
+            chromium_mass_percent_as_printed: '10'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '10'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '1.39'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.06'}
+          - row: 11
+            chromium_mass_percent_as_printed: '12'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '12'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '1.54'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.17'}
+          - row: 12
+            chromium_mass_percent_as_printed: '14'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '14'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '1.69'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.28'}
+          - row: 13
+            chromium_mass_percent_as_printed: '16'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '16'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '1.82'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.38'}
+          - row: 14
+            chromium_mass_percent_as_printed: '18'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '18'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '1.94'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.48'}
+          - row: 15
+            chromium_mass_percent_as_printed: '20'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '20'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '2.05'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.57'}
+          - row: 16
+            chromium_mass_percent_as_printed: '22'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '22'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '2.16'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.65'}
+          - row: 17
+            chromium_mass_percent_as_printed: '24'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '24'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '2.26'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.73'}
+          - row: 18
+            chromium_mass_percent_as_printed: '26'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '26'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '2.35'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.81'}
+          - row: 19
+            chromium_mass_percent_as_printed: '28'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '28'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '2.44'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.89'}
+          - row: 20
+            chromium_mass_percent_as_printed: '30'
+            temperature_as_printed: 1600 °C
+            cells:
+              - {column: chromium mass percent, composition: Ni-Cr and Co-Cr row, value_as_printed: '30'}
+              - {column: '-log fO in Ni', composition: liquid Ni-Cr, value_as_printed: '2.52'}
+              - {column: '-log fO in Co', composition: liquid Co-Cr, value_as_printed: '1.96'}
       - observation_id: sakao_sano_1962_activity_coefficient_fits
         type: relation
         locator: {page: 2, published_page: 241, pdf_page_index: 1, section: Results}
