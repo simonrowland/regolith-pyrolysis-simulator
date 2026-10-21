@@ -3174,9 +3174,22 @@ species:
         candidate_tokens:
         - valence_ratio
         - fe3_fe2_ratio
-        disposition_reason: Component-area fractions have no matching quantity token. The reported class mean Fe3+/FeT
-          and its uncertainty are reductions of target-level fitted areas, for which the required table asset is
-          absent; values and stated uncertainty rules remain in context.
+        disposition_reason: >-
+          Component-area fractions have no matching quantity token. The printed class/subclass Fe3+/FeT summaries
+          are whole-sample Mössbauer ratios, not melt redox observations, and remain context under the controller
+          ruling. Their printed reductions are linked to tables:morris-2006-meridiani-mossbauer (table-3.csv target
+          rows and component-area cells).
+        derived_from:
+        - tables:morris-2006-meridiani-mossbauer
+        derivation:
+          relation: >-
+            Table 3 footnote d gives Fe3+/FeT = (npOx + Jar + Fe3D3 + Mt(3) + 0.5 × Mt(2.5) + Hm) / Sum, with
+            uncertainty ±0.03. Table 7 reports the class-level results from those target measurements. The reported
+            component-area means and stated uncertainty rules are retained as printed; the whole-sample ratios remain
+            context under the controller ruling.
+          inputs:
+          - tables:morris-2006-meridiani-mossbauer
+          locator: table-3.csv target rows and printed component-area cells; physical PDF pp. 8–9, Table 3
         attribution_as_printed: Morris et al. summaries from the Table 3 target measurements.
         page_locators:
         - page: 19
@@ -3497,9 +3510,21 @@ species:
         - residue_component_composition
         - equilibrium_phase_composition
         - valence_ratio
-        disposition_reason: The natural Mars soil compositions are not process residues or equilibrium phase compositions.
-          Printed Fe3+/FeT values are calculated from Table 9 and the OCBP1 composition is calculated from attributed
-          APXS analyses, so derived rows requiring the missing table asset stay in context.
+        disposition_reason: >-
+          The natural Mars soil compositions are not process residues or equilibrium phase compositions. The printed
+          GC Panda, MP Panda, and Average Dust Fe3+/FeT ratios copy Table 9 values and are linked to
+          tables:morris-2006-meridiani-mossbauer (table-9.csv Fe3+/FeT_as_printed column). They remain context under
+          the controller ruling because they are whole-sample Mössbauer ratios, not melt redox observations. OCBP1
+          Fe3+/FeT also remains context: footnote b attributes it to analyses not present in the registered table asset.
+        derived_from:
+        - tables:morris-2006-meridiani-mossbauer
+        derivation:
+          relation: >-
+            Table 10 footnote a copies the GC Panda, MP Panda, and Average Dust Fe3+/FeT values from Table 9. OCBP1
+            footnote b attributes its value separately. The ratios remain context under the controller ruling.
+          inputs:
+          - tables:morris-2006-meridiani-mossbauer
+          locator: table-9.csv Fe3+/FeT_as_printed column; physical PDF p. 22, Table 9; Table 10, p. 25
         attribution_as_printed: Footnote a derives values from Table 9; footnote b attributes OCBP1 inputs to R.
           Gellert (manuscript in preparation, 2006) and gives the calculation conditions.
         page_locators:
