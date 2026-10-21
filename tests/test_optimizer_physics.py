@@ -833,6 +833,9 @@ def test_d045_certain_deposit_equal_to_limit_is_clear_without_refused_species() 
         unqualified_deposition_rate_kg_per_campaign=5.0e-4,
     )
 
+    certain = coating.status_payload["certain_upstream_deposit_kg_per_campaign"]
+    limit = coating.status_payload["upstream_wall_deposit_limit_kg_per_campaign"]
+    assert certain == limit
     assert coating.feasible
     assert coating.status_payload["coating_verdict"] == "clear"
     assert coating.status_payload["coating_violation_reasons"] == []
