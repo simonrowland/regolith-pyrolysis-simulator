@@ -20,6 +20,8 @@ RENDER_PINS = {
     ("ehrt2008_redox_fraction_abs_1900C_argon", 0): ("1.00", "only Sn2+ species could be detected", "1900", "argon", "ABS", "2000"),
     ("ehrt2008_redox_fraction_abs_pressure_reduction", 0): ("0.20", "~20% Sn2+", "1650", "air", "ABS", "2000"),
     ("ehrt2008_redox_fraction_abs_pressure_reduction", 1): ("0.40", "~40% Sn2+", "1500", "air", "ABS", "2000"),
+    ("ehrt2008_redox_fraction_as_1000_ppmw_fig6", 0): ("1.00", "only Sn2+ could be detected", "1900", "argon", "AS", "1000"),
+    ("ehrt2008_redox_fraction_as_1000_ppmw_fig6", 1): ("1.00", "only Sn2+ was found; a loss of Sn was noted", "2000", "argon", "AS", "1000"),
 }
 DENSITY_RENDER_PINS = {
     "ehrt2008_density_AS": ("2.85", "2850.00", "AS"),
@@ -82,7 +84,7 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
     )
     assert all(observation.identity.temperature_K.is_value for observation in redox_observations)
     assert sorted(str(observation.identity.temperature_K.value) for observation in redox_observations) == sorted(
-        ["1873.15"] * 3 + ["1973.15"] + ["2073.15"] * 2 + ["2173.15", "1923.15", "1773.15"]
+        ["1873.15"] * 3 + ["1973.15"] + ["2073.15"] * 2 + ["2173.15"] * 2 + ["2273.15", "1923.15", "1773.15"]
     )
     as_composition = {"Al2O3": 15, "SiO2": 65, "BaO": 10, "CaO": 10}
     abs_composition = {"Al2O3": 10, "B2O3": 8, "SiO2": 67, "BaO": 2, "CaO": 9, "MgO": 4}
@@ -93,6 +95,7 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
         ("2073.15", "0.50"): abs_composition,
         ("2073.15", "0.80"): abs_composition,
         ("2173.15", "1.00"): abs_composition,
+        ("2273.15", "1.00"): as_composition,
         ("1923.15", "0.20"): abs_composition,
         ("1773.15", "0.40"): abs_composition,
     }
@@ -111,11 +114,41 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
             str(observation.identity.temperature_K.value),
             str(observation.value.point),
         )
-        assert components == expected_composition[identity]
+        if identity == ("2173.15", "1.00") and (
+            "::ehrt2008_redox_fraction_as_1000_ppmw_fig6::"
+            in observation.observation_id
+        ):
+            assert components == as_composition
+        else:
+            assert components == expected_composition[identity]
         assert observation.identity.total_pressure_Pa is not None
         assert observation.identity.total_pressure_Pa.is_value
         assert observation.identity.total_pressure_Pa.value == expected_pressure[identity]
         assert not observation.notices
+    fig6_as = [
+        observation
+        for observation in redox_observations
+        if "::ehrt2008_redox_fraction_as_1000_ppmw_fig6::"
+        in observation.observation_id
+    ]
+    assert len(fig6_as) == 2
+    assert sorted(str(observation.identity.temperature_K.value) for observation in fig6_as) == [
+        "2173.15",
+        "2273.15",
+    ]
+    for observation in fig6_as:
+        assert str(observation.value.point) == "1.00"
+        assert observation.point_conditions["atmosphere"].state.value == "argon"
+        assert dict(observation.identity.composition.value.components) == as_composition
+    abs_only_sn2 = [
+        observation
+        for observation in redox_observations
+        if "::ehrt2008_redox_fraction_abs_1900C_argon::"
+        in observation.observation_id
+    ]
+    assert len(abs_only_sn2) == 1
+    assert str(abs_only_sn2[0].value.point) == "1.00"
+    assert dict(abs_only_sn2[0].identity.composition.value.components) == abs_composition
     density_observations = {
         observation.observation_id.rsplit("::", 1)[-1]: observation
         for observation in observations
@@ -125,6 +158,14 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
     for observation_id, (printed, migrated, sample) in DENSITY_RENDER_PINS.items():
         observation = density_observations[observation_id]
         assert observation.identity.species.formula == "unknown"
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_value
+        assert dict(observation.identity.composition.value.components) == (
+            {"Al2O3": 15, "SiO2": 65, "BaO": 10, "CaO": 10}
+            if sample == "AS"
+            else {"Al2O3": 10, "B2O3": 8, "SiO2": 67, "BaO": 2, "CaO": 9, "MgO": 4}
+        )
+        assert observation.identity.composition.value.amount_basis.value == "mol_inventory"
         assert observation.value.kind is ValueKind.POINT
         assert str(observation.value.point) == migrated
         assert observation.derivation is not None
