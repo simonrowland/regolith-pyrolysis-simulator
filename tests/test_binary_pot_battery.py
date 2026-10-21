@@ -73,12 +73,11 @@ FIXTURE_REPORT = (
 
 
 def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> None:
+    from simulator.state import MeltState
+
     class Core:
         def __init__(self) -> None:
-            self.melt = SimpleNamespace(
-                oxygen_reservoir=SimpleNamespace(),
-                update_total_mass=lambda: None,
-            )
+            self.melt = MeltState()
 
         def _new_atom_ledger(self):
             return object()
@@ -89,7 +88,8 @@ def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> 
         def _build_chemistry_kernel(self):
             return None
 
-        def _refresh_vapor_pressures_from_kernel(self, equilibrium):
+        def _refresh_vapor_pressures_from_kernel(self, equilibrium, *, simulation_hour):
+            assert simulation_hour == self.melt.hour + 1
             equilibrium.vapor_pressures_Pa = {"SiO": 1.0}
             equilibrium.vapor_pressures_source = {
                 "SiO": "builtin_authoritative:test"

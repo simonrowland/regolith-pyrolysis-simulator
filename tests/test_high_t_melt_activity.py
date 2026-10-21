@@ -988,6 +988,51 @@ def test_recovered_historical_call_uses_direct_live_solve(call_index) -> None:
     )
 
 
+@pytest.mark.parametrize("include_diagnostic_shadows", [True, False])
+def test_reused_battery_core_preserves_certified_activity_on_refusal(
+    monkeypatch, include_diagnostic_shadows,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        _internal_analytical_vapor_pressure_adapter,
+        _new_internal_analytical_core,
+    )
+
+    core = _new_internal_analytical_core()
+    inputs = {
+        "core": core,
+        "temperature_C": 2400.65 - 273.15,
+        "pressure_bar": 1.0e-6,
+        "composition_kg": None,
+        "composition_mol": BASE_MELT_MOL,
+        "fO2_log": -9.0,
+        "po2_request": Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-9),
+        "include_diagnostic_shadows": include_diagnostic_shadows,
+    }
+    certified_result = _internal_analytical_vapor_pressure_adapter(**inputs)
+    certified = core._last_high_t_melt_activity
+    certificates = certified["certified_effective_gamma_by_parent"]
+    assert certificates
+    assert certificates["SiO2"]["hour"] == core.melt.hour + 1
+
+    def nonconverge(**_kwargs):
+        raise ImccNonconvergenceError("reused battery core refused", {})
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    refused_result = _internal_analytical_vapor_pressure_adapter(**inputs)
+    refused = core._last_high_t_melt_activity
+    assert refused["temperature_bridge"]["call_count"] > 0
+    assert refused["certified_effective_gamma_by_parent"] == certificates
+    held = refused["held_effective_gamma_by_parent"]["SiO2"]
+    assert held["method"] == "hold_last_certified_effective_gamma"
+    assert held["gamma_applied"] == certificates["SiO2"]["gamma_last"]
+    assert held["hour_gap"] == 0.0
+    assert refused_result.vapor_pressures_Pa["SiO"] == pytest.approx(
+        certified_result.vapor_pressures_Pa["SiO"],
+    )
+
+
 @pytest.mark.parametrize("silica_factor", [1.0, 0.99])
 def test_first_high_t_certificate_without_previous_temperature_can_hold(
     monkeypatch, silica_factor,
