@@ -1,0 +1,151 @@
+schema_version: literature_extract.v1
+source_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation
+source:
+  citation: 'Myers, D. L. & Jacobson, N. S. (2015), Experimental and Theoretical Studies of Volatile Metal Hydroxides, NASA Glenn Research Center presentation.'
+  year: 2015
+  corpus_asset: raw/myers-jacobson-2015-volatile-metal-hydroxides-presentation/myers-jacobson-2015-volatile-metal-hydroxides-presentation.pdf
+extraction:
+  method: 'Born-digital, one-page presentation. Table values transcribed from pdftotext-layout and checked against a 600 dpi render crop; plotted values deferred.'
+  date: '2026-10-20'
+  worker: fam34-1020
+review_status: draft
+fidelity_samples:
+  - path: species.Si(OH)4.observations[myers_jacobson_2015_presentation_sioh4_delta_fh_298].values.value
+    value: -1351.3
+    locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: Si(OH)4(g)}
+species:
+  Si(OH)4:
+    observations:
+      - observation_id: myers_jacobson_2015_presentation_sioh4_delta_fh_298
+        type: gibbs_table
+        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: Si(OH)4(g)}
+        phase: gas
+        T_range_K: [298, 298]
+        units: kJ/mol
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          value: -1351.3
+          value_as_printed: '-1351.3'
+          method_as_printed: 'Transpiration, Third Law'
+          identification_method_as_printed: 'Flow Rate Dependence, HPMS'
+          standard_state: formation enthalpy at 298 K, as printed
+        uncertainty: {sigma: 1.7, units: kJ/mol, value_as_printed: '±1.7'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: 298}}
+            locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', column_header: ΔfH°298}
+    context: []
+  SiO(OH)2:
+    observations:
+      - observation_id: myers_jacobson_2015_presentation_siooh2_delta_fh_298
+        type: gibbs_table
+        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: SiO(OH)2(g)}
+        phase: gas
+        T_range_K: [298, 298]
+        units: kJ/mol
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          value: -836
+          value_as_printed: '-836'
+          method_as_printed: 'Transpiration, Second Law'
+          identification_method_as_printed: 'Flow Rate Dependence'
+          standard_state: formation enthalpy at 298 K, as printed
+        uncertainty: {sigma: 40, units: kJ/mol, value_as_printed: '±40'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: 298}}
+            locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', column_header: ΔfH°298}
+    context: []
+  CrO2(OH)2:
+    observations:
+      - observation_id: myers_jacobson_2015_presentation_cro2oh2_delta_fh_298
+        type: gibbs_table
+        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: CrO2(OH)2(g)}
+        phase: gas
+        T_range_K: [298, 298]
+        units: kJ/mol
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          value: -741
+          value_as_printed: '-741'
+          method_as_printed: 'Transpiration, Third Law'
+          identification_method_as_printed: 'Flow Rate Dependence'
+          standard_state: formation enthalpy at 298 K, as printed
+        uncertainty: {sigma: 6, units: kJ/mol, value_as_printed: '±6'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: 298}}
+            locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', column_header: ΔfH°298}
+    context:
+      - observation_id: myers_jacobson_2015_presentation_cro2oh2_computational
+        type: relation
+        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: CrO2(OH)2(g), computational line}
+        units: kJ/mol
+        values:
+          method_class: model_derived
+          quantity_as_printed: computational enthalpy of formation at 298 K
+          candidate_quantity_tokens: [delta_fH]
+          printed_value: '-792±20'
+          note: Computational value; presentation rule limits typed poster values to printed measurements.
+  TiO(OH)2:
+    observations:
+      - observation_id: myers_jacobson_2015_presentation_tiooh2_delta_fh_298
+        type: gibbs_table
+        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: TiO(OH)2(g)}
+        phase: gas
+        T_range_K: [298, 298]
+        units: kJ/mol
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          value: -403
+          value_as_printed: '-403'
+          method_as_printed: 'Transpiration, Third Law'
+          identification_method_as_printed: 'Flow Rate Dependence'
+          standard_state: formation enthalpy at 298 K, as printed
+        uncertainty: {sigma: 13, units: kJ/mol, value_as_printed: '±13'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: 298}}
+            locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', column_header: ΔfH°298}
+    context:
+      - observation_id: myers_jacobson_2015_presentation_tiooh2_computational
+        type: relation
+        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: TiO(OH)2(g), computational line}
+        units: kJ/mol
+        values:
+          method_class: model_derived
+          quantity_as_printed: computational enthalpy of formation at 298 K
+          candidate_quantity_tokens: [delta_fH]
+          printed_value: '-820±50'
+          note: Computational value; presentation rule limits typed poster values to printed measurements.
+  Al(OH)3:
+    observations: []
+    context:
+      - observation_id: myers_jacobson_2015_presentation_aloh3_quoted_reaction_enthalpy
+        type: relation
+        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: Al(OH)3(g)}
+        units: kJ/mol
+        values:
+          method_class: quoted_attributed
+          attribution: 'Opila and Myers, J. Am. Ceram. Soc. 87(9), 1701–1705 (2004), as cited on the presentation.'
+          quantity_as_printed: reaction enthalpy at 1630 K
+          candidate_quantity_tokens: [delta_fH]
+          printed_value: 'ΔrH°1630=-210±20'
+          note: The table heading gives ΔfH°298, but this row explicitly prints reaction enthalpy at 1630 K; it is not scored as formation enthalpy.
+  Ta(OH)5:
+    observations: []
+    context:
+      - observation_id: myers_jacobson_2015_presentation_taoh5_reaction_enthalpy
+        type: relation
+        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: Ta(OH)5(g)}
+        units: kJ/mol
+        values:
+          method_class: measured_reduced
+          quantity_as_printed: reaction enthalpy at 1600 K
+          candidate_quantity_tokens: [delta_fH]
+          printed_value: 'ΔrH°1600=-151'
+          note: The table heading gives ΔfH°298, but this row explicitly prints reaction enthalpy at 1600 K; it is not scored as formation enthalpy.
