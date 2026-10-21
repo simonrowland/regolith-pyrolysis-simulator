@@ -4699,6 +4699,7 @@ def _predict_mass_loss_with_residue(
     channel: str,
     sources: tuple[str, ...],
     experiment: Experiment | None,
+    observation: Observation,
 ) -> EnginePrediction:
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
@@ -4706,16 +4707,24 @@ def _predict_mass_loss_with_residue(
         predict_mass_loss_fraction,
     )
 
+    source_path = (
+        REPO_ROOT / "data/literature/extracts" / f"{observation.source_id}.yaml"
+    )
+    source_document = load_yaml(source_path) if source_path.is_file() else {}
     temperature = temperature_of(identity)
     try:
         result = predict_mass_loss_fraction(
             engine.value,
             experiment,
             temperature_K=None if temperature is None else float(temperature),
+            source_document=source_document,
         )
     except ResidueInventoryRefusal as exc:
         reason = exc.reason
-        if reason in {"engine_capability_unsupported", "residue_method_unsupported"}:
+        if reason in {
+            "engine_capability_unsupported", "residue_method_unsupported",
+            "sourced_alpha_mass_loss_integration_incomplete",
+        }:
             refusal = RefusalReason.UNSUPPORTED
             execution = ExecutionState.UNSUPPORTED
         elif reason.endswith("_not_stated"):
@@ -4850,6 +4859,7 @@ def predict_with_engine(
             channel,
             sources,
             experiment,
+            observation,
         )
     if quantity is Quantity.FE3_FE2_RATIO:
         return _predict_fe_redox(engine, observation, identity, channel)

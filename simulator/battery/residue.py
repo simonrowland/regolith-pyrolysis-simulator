@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import atexit
+import json
 import math
 import multiprocessing
 import time
@@ -1031,11 +1032,82 @@ def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
     return _hashimoto_project_oxide_wt_pct(amounts)
 
 
+def _mass_loss_sourced_alphas(
+    experiment: object,
+    source_document: Mapping[str, Any],
+    temperature_K: float,
+) -> dict[str, dict[str, Any]]:
+    """Resolve only the experiment-linked fits in supported extract context."""
+    from simulator.battery.extract_context import iter_extract_context_containers
+
+    experiment_id = str(getattr(experiment, "experiment_id", ""))
+    local_id = experiment_id.rsplit("::", 1)[-1]
+    fits: dict[str, dict[str, Any]] = {}
+    for _formula, rows in iter_extract_context_containers(source_document):
+        for row in rows or ():
+            if not isinstance(row, Mapping):
+                continue
+            applies = row.get("applies_to_experiments") or ()
+            if local_id not in applies and experiment_id not in applies:
+                continue
+            values = row.get("values")
+            if not isinstance(values, Mapping) or "alpha_form" not in values:
+                continue
+            form = values["alpha_form"]
+            try:
+                if form["type"] != "arrhenius" or row["units"] != "dimensionless":
+                    raise ValueError("unsupported alpha fit")
+                species = str(values["gas_species"]).removesuffix("(g)")
+                prefactor = float(form["gamma_o"])
+                energy = float(form["E_J_per_mol"])
+                gas_constant = float(form["R_J_per_mol_K"])
+                low, high = map(float, row["T_range_K"])
+                locator = row["locator"]
+                if (
+                    not species or not row["observation_id"] or not locator
+                    or not all(math.isfinite(x) for x in (
+                        prefactor, energy, gas_constant, low, high, temperature_K
+                    ))
+                    or min(prefactor, gas_constant, low, temperature_K) <= 0.0
+                    or energy < 0.0 or high < low
+                ):
+                    raise ValueError("invalid alpha fit")
+                # Premise: alpha = gamma0 exp(-E/RT). E [J/mol] divided by
+                # R [J/(mol K)] * T [K] is dimensionless, as are gamma0 and
+                # alpha. Richter Fig. 3 gives Mg ~0.128 and SiO ~0.122 at
+                # 2073 K. Positive E makes alpha increase with T; no clamping.
+                alpha = prefactor * math.exp(-energy / (gas_constant * temperature_K))
+                if not math.isfinite(alpha) or not 0.0 < alpha <= 1.0:
+                    raise ValueError("alpha outside physical interval")
+            except (KeyError, TypeError, ValueError, OverflowError) as exc:
+                raise ResidueInventoryRefusal(
+                    "evaporation_coefficients_invalid", str(row.get("observation_id"))
+                ) from exc
+            if species in fits:
+                raise ResidueInventoryRefusal(
+                    "evaporation_coefficients_ambiguous", species
+                )
+            fits[species] = {
+                "alpha": alpha,
+                "source_observation_id": row["observation_id"],
+                "locator": dict(locator),
+                "T_range_K": [low, high],
+                "extrapolated": not low <= temperature_K <= high,
+            }
+    if not fits:
+        raise ResidueInventoryRefusal(
+            "evaporation_coefficients_not_sourced",
+            "per-species evaporation coefficients are not sourced for this work",
+        )
+    return fits
+
+
 def predict_mass_loss_fraction(
     engine: str,
     experiment: object,
     *,
     temperature_K: float | None,
+    source_document: Mapping[str, Any] | None = None,
 ) -> ResidueMassLossPrediction:
     """Predict one bulk mass-loss point through the existing residue integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -1120,61 +1192,24 @@ def predict_mass_loss_fraction(
         raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
     if not gas_channels:
         raise ResidueInventoryRefusal("residue_gas_channels_missing")
+    fits = _mass_loss_sourced_alphas(
+        experiment, source_document or {}, float(temperature_K)
+    )
+    # This WIP resolves the sourced fits but cannot yet execute the required
+    # uncertainty test, complete thermal history, or bounding-area comparison.
+    # Keep that implementation limit distinct from a claim about source data.
+    # Never resurrect the old common-unity, constant-area hold as a fallback.
     raise ResidueInventoryRefusal(
-        "evaporation_coefficients_not_sourced",
-        "per-species evaporation coefficients are not sourced for this work",
-    )
-    channels = tuple(
-        ResidueChannel(
-            str(species),
-            str(species),
-            parent,
-            1.0,
-            _HASHIMOTO_COMMON_UNITY_SOURCE,
-        )
-        for species, (parent, _parent_moles, _pO2_exponent) in gas_channels
-    )
-    engine_flags: set[str] = set()
-    engine_metadata: dict[str, str] = {}
-    pressure_model = _make_residue_pressure_model(
-        engine,
-        gas_channels,
-        gas_pack,
-        temperature_K=float(temperature_K),
-        total_pressure_Pa=total_pressure_Pa or 0.0,
-        engine_metadata=engine_metadata,
-        engine_flags=engine_flags,
-        missing_channels_reason="residue_pressure_channels_missing",
-        caller="Mass-loss residue prediction",
-    )
-    steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
-    integration = _hashimoto_integrate_geometry(
-        initial_inventory_mol,
-        channels,
-        pressure_model,
-        temperature_K=float(temperature_K),
-        duration_s=duration_s,
-        steps=steps,
-        geometry_policy_id="sphere_constant",
-        initial_area_m2=area_m2,
-    )
-    if integration.refusal is not None:
-        raise integration.refusal
-    # n_residue [mol] * M_oxide [kg mol^-1] gives m_residue [kg];
-    # 1 - m_residue/m0 is therefore a dimensionless bulk mass-loss fraction.
-    # R-11's rep5 Table 1 loss of 27.8% from 190.4 mg implies 137.4688 mg
-    # residue, an independent unit and basis sanity value for this conversion.
-    residue_mass_kg = math.fsum(
-        amount * _formula_terms(oxide)[1]
-        for oxide, amount in integration.inventory_mol.items()
-    )
-    mass_loss_fraction = 1.0 - residue_mass_kg / sample_mass_kg
-    if not math.isfinite(mass_loss_fraction) or not 0.0 <= mass_loss_fraction <= 1.0:
-        raise ResidueInventoryRefusal("mass_loss_fraction_invalid")
-    return ResidueMassLossPrediction(
-        mass_loss_fraction=mass_loss_fraction,
-        engine_flags=tuple(sorted(engine_flags)),
-        engine_metadata=engine_metadata,
+        "sourced_alpha_mass_loss_integration_incomplete",
+        json.dumps({
+            "sourced_alphas": fits,
+            "unsourced_bound_fraction": None,
+            "remaining_requirements": [
+                "unsourced-channel bound <= 1% and below mass-loss uncertainty",
+                "bound or document the incomplete initial preheat",
+                "score against both printed area endpoints unless self-similarity is established",
+            ],
+        }, sort_keys=True),
     )
 
 
