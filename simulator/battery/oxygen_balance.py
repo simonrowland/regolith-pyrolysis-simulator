@@ -132,6 +132,11 @@ def _solve_vacuum_oxygen_balance(
     if not active_channels or not strictly_monotone:
         raise ValueError("oxygen-balance flux is not strictly monotone for active channels")
 
+    def molar_flux(channel: _VacuumOxygenChannel, pressure: float) -> float:
+        return channel.alpha * pressure / math.sqrt(
+            2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
+        )
+
     def evaluate(logp: float) -> tuple[float, dict[str, float], float, float]:
         model_pressures = pressure_model(logp)
         if not isinstance(model_pressures, Mapping):
@@ -151,11 +156,9 @@ def _solve_vacuum_oxygen_balance(
                     f"pressure model returned invalid {channel.species!r} pressure"
                 )
             pressures[channel.species] = pressure
-            molar_flux = channel.alpha * pressure / math.sqrt(
-                2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
-            )
-            oxygen_flux += channel.oxygen_atoms * molar_flux
-            parent_flux += channel.parent_oxygen_demand * molar_flux
+            flux = molar_flux(channel, pressure)
+            oxygen_flux += channel.oxygen_atoms * flux
+            parent_flux += channel.parent_oxygen_demand * flux
         return oxygen_flux - parent_flux, pressures, oxygen_flux, parent_flux
 
     f_low = evaluate(low)[0]
@@ -202,10 +205,7 @@ def _solve_vacuum_oxygen_balance(
 
     relative_residual = abs(residual) / max(oxygen_flux, parent_flux, 1.0e-300)
     fluxes = {
-        channel.species: channel.alpha * pressures[channel.species]
-        / math.sqrt(
-            2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
-        )
+        channel.species: molar_flux(channel, pressures[channel.species])
         for channel in active_channels
     }
     return _VacuumOxygenBalance(
