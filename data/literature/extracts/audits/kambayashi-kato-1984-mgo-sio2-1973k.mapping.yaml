@@ -1,0 +1,51 @@
+source_id: kambayashi-kato-1984-mgo-sio2-1973k
+source:
+  citation: >-
+    Kambayashi, S. and Kato, E. (1984), “A thermodynamic study of (magnesium oxide + silicon dioxide)
+    by mass spectrometry at 1973 K”, Journal of Chemical Thermodynamics 16, 241–248.
+  year: 1984
+  doi: 10.1016/0021-9614(84)90085-5
+  corpus_asset: raw/kambayashi-kato-1984-mgo-sio2-1973k/kambayashi-kato-1984-mgo-sio2-1973k.pdf
+  corpus_sha256: dfe8714968a4fc571918218759adc5e8ccfa5a76ff1befe87ccd658a81b3a62f
+extraction:
+  method: >-
+    Born-digital paper; MinerU table drafts used for both tables and their numeric cells were checked against
+    600 dpi PDF renders. Extracted points were linked by the printed binary composition.
+  date: '2026-10-21'
+  worker: codex-resume-32763-1792554222
+review_status: draft
+tables:
+  - page: 3
+    published_page: 243
+    table_index: 1
+    type: rate_series
+    quantity: ion_intensity
+    unit: relative ion current normalized to Ie (dimensionless)
+    evidence_class: measured_direct
+    phase: gas
+    regime: knudsen_effusion
+    experiment: kambayashi_1984_kems_mgo_sio2
+    temperature: {as_printed: '1973', unit: K}
+    values:
+      - {column: 2, species: SiO}
+      - {column: 3, species: Mg}
+      - {column: 4, species: SiO, quantity: ion_intensity_ratio, unit: dimensionless ion intensity ratio}
+      - {column: 6, species: SiO}
+      - {column: 7, species: Mg}
+      - {column: 8, species: SiO, quantity: ion_intensity_ratio, unit: dimensionless ion intensity ratio}
+  - page: 6
+    published_page: 246
+    table_index: 2
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless activity
+    evidence_class: measured_reduced
+    phase: l
+    regime: knudsen_effusion
+    experiment: kambayashi_1984_kems_mgo_sio2
+    temperature: {as_printed: '1973', unit: K}
+    values:
+      - {column: 2, species: SiO2}
+      - {column: 3, species: MgO}
+      - {column: 6, species: SiO2}
+      - {column: 7, species: MgO}
