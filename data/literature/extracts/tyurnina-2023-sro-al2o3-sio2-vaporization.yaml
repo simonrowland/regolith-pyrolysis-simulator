@@ -399,7 +399,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '2.07'
         T_K: '2000'
       phase: gas
@@ -431,6 +431,11 @@ species:
             pdf_page_index: 5
             table: '3'
             row_label: sample 10
+      derived_from: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c06]
+      derivation:
+        relation: Atomic oxygen partial pressure calculated from the same-sample Sr and SiO partial pressures using Eq. (10).
+        inputs: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c06]
+
     - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c07
       type: partial_pressure
       locator:
@@ -444,7 +449,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '1.77'
         T_K: '2000'
       phase: gas
@@ -476,6 +481,11 @@ species:
             pdf_page_index: 5
             table: '3'
             row_label: sample 1
+      derived_from: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c06]
+      derivation:
+        relation: Atomic oxygen partial pressure calculated from the same-sample Sr and SiO partial pressures using Eq. (10).
+        inputs: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c06]
+
     - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c07
       type: partial_pressure
       locator:
@@ -489,7 +499,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '1.29'
         T_K: '2000'
       phase: gas
@@ -521,6 +531,11 @@ species:
             pdf_page_index: 5
             table: '3'
             row_label: sample 2
+      derived_from: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c06]
+      derivation:
+        relation: Atomic oxygen partial pressure calculated from the same-sample Sr and SiO partial pressures using Eq. (10).
+        inputs: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c06]
+
     - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c07
       type: partial_pressure
       locator:
@@ -534,7 +549,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '1.14'
         T_K: '2000'
       phase: gas
@@ -566,6 +581,11 @@ species:
             pdf_page_index: 5
             table: '3'
             row_label: sample 3
+      derived_from: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c06]
+      derivation:
+        relation: Atomic oxygen partial pressure calculated from the same-sample Sr and SiO partial pressures using Eq. (10).
+        inputs: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c06]
+
     - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c07
       type: partial_pressure
       locator:
@@ -579,7 +599,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.84'
         T_K: '2000'
       phase: gas
@@ -611,6 +631,11 @@ species:
             pdf_page_index: 5
             table: '3'
             row_label: sample 4
+      derived_from: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c06]
+      derivation:
+        relation: Atomic oxygen partial pressure calculated from the same-sample Sr and SiO partial pressures using Eq. (10).
+        inputs: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c06]
+
     - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c07
       type: partial_pressure
       locator:
@@ -624,7 +649,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.43'
         T_K: '2000'
       phase: gas
@@ -656,6 +681,11 @@ species:
             pdf_page_index: 5
             table: '3'
             row_label: sample 5
+      derived_from: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c06]
+      derivation:
+        relation: Atomic oxygen partial pressure calculated from the same-sample Sr and SiO partial pressures using Eq. (10).
+        inputs: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c06]
+
     - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c07
       type: partial_pressure
       locator:
@@ -669,7 +699,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.31'
         T_K: '2000'
       phase: gas
@@ -701,6 +731,11 @@ species:
             pdf_page_index: 5
             table: '3'
             row_label: sample 6
+      derived_from: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c06]
+      derivation:
+        relation: Atomic oxygen partial pressure calculated from the same-sample Sr and SiO partial pressures using Eq. (10).
+        inputs: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c06]
+
     - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c07
       type: partial_pressure
       locator:
@@ -714,7 +749,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.52'
         T_K: '2000'
       phase: gas
@@ -746,6 +781,11 @@ species:
             pdf_page_index: 5
             table: '3'
             row_label: sample 7
+      derived_from: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c06]
+      derivation:
+        relation: Atomic oxygen partial pressure calculated from the same-sample Sr and SiO partial pressures using Eq. (10).
+        inputs: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c05, tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c06]
+
     - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r11_c07
       type: partial_pressure
       locator:
@@ -759,7 +799,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.84'
         T_K: '2000'
       phase: gas
@@ -791,6 +831,11 @@ species:
             pdf_page_index: 5
             table: '3'
             row_label: sample 8
+      derived_from: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r11_c05]
+      derivation:
+        relation: Atomic oxygen partial pressure calculated from the same-sample Sr and SiO partial pressures using Eq. (10).
+        inputs: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r11_c05]
+
     - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r12_c07
       type: partial_pressure
       locator:
@@ -804,7 +849,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '1.15'
         T_K: '2000'
       phase: gas
@@ -836,6 +881,11 @@ species:
             pdf_page_index: 5
             table: '3'
             row_label: sample 9
+      derived_from: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r12_c05]
+      derivation:
+        relation: Atomic oxygen partial pressure calculated from the same-sample Sr and SiO partial pressures using Eq. (10).
+        inputs: [tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r12_c05]
+
   Sr:
     observations:
     - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c05
@@ -1254,6 +1304,19 @@ species:
         row_label: sample 1
         column_header: $a_i$  SrO
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SrO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: JANAF phase is solid at 2000 K; a SrO polymorph token is not represented in the extract schema}
+            component_basis: SrO
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure SrO reference is solid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1305,6 +1368,19 @@ species:
         row_label: sample 2
         column_header: $a_i$  SrO
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SrO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: JANAF phase is solid at 2000 K; a SrO polymorph token is not represented in the extract schema}
+            component_basis: SrO
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure SrO reference is solid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1356,6 +1432,19 @@ species:
         row_label: sample 3
         column_header: $a_i$  SrO
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SrO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: JANAF phase is solid at 2000 K; a SrO polymorph token is not represented in the extract schema}
+            component_basis: SrO
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure SrO reference is solid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1407,6 +1496,19 @@ species:
         row_label: sample 4
         column_header: $a_i$  SrO
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SrO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: JANAF phase is solid at 2000 K; a SrO polymorph token is not represented in the extract schema}
+            component_basis: SrO
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure SrO reference is solid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1458,6 +1560,19 @@ species:
         row_label: sample 5
         column_header: $a_i$  SrO
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SrO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: JANAF phase is solid at 2000 K; a SrO polymorph token is not represented in the extract schema}
+            component_basis: SrO
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure SrO reference is solid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1509,6 +1624,19 @@ species:
         row_label: sample 6
         column_header: $a_i$  SrO
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SrO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: JANAF phase is solid at 2000 K; a SrO polymorph token is not represented in the extract schema}
+            component_basis: SrO
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure SrO reference is solid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1560,6 +1688,19 @@ species:
         row_label: sample 7
         column_header: $a_i$  SrO
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SrO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: JANAF phase is solid at 2000 K; a SrO polymorph token is not represented in the extract schema}
+            component_basis: SrO
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure SrO reference is solid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1611,6 +1752,19 @@ species:
         row_label: sample 8
         column_header: $a_i$  SrO
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SrO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: JANAF phase is solid at 2000 K; a SrO polymorph token is not represented in the extract schema}
+            component_basis: SrO
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure SrO reference is solid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1662,6 +1816,19 @@ species:
         row_label: sample 9
         column_header: $a_i$  SrO
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SrO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: JANAF phase is solid at 2000 K; a SrO polymorph token is not represented in the extract schema}
+            component_basis: SrO
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure SrO reference is solid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1710,7 +1877,7 @@ species:
       locator:
         page: 6
         pdf_page_index: 5
-        table: '2'
+        table: '3'
         row_label: sample 10
         column_header: $a_i$  SrO
         note: Table 3 row bound to sample number and printed oxide mole percentages.
@@ -1732,6 +1899,19 @@ species:
         row_label: sample 10
         column_header: $a_i$   $\mathrm{Al_2O_3}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase: {tag: value, value: cr}
+              polymorph: {tag: value, value: corundum}
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure Al2O3 reference is solid corundum at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1799,6 +1979,19 @@ species:
         row_label: sample 1
         column_header: $a_i$   $\mathrm{Al_2O_3}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase: {tag: value, value: cr}
+              polymorph: {tag: value, value: corundum}
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure Al2O3 reference is solid corundum at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1849,6 +2042,19 @@ species:
         row_label: sample 2
         column_header: $a_i$   $\mathrm{Al_2O_3}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase: {tag: value, value: cr}
+              polymorph: {tag: value, value: corundum}
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure Al2O3 reference is solid corundum at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1899,6 +2105,19 @@ species:
         row_label: sample 3
         column_header: $a_i$   $\mathrm{Al_2O_3}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase: {tag: value, value: cr}
+              polymorph: {tag: value, value: corundum}
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure Al2O3 reference is solid corundum at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1949,6 +2168,19 @@ species:
         row_label: sample 4
         column_header: $a_i$   $\mathrm{Al_2O_3}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase: {tag: value, value: cr}
+              polymorph: {tag: value, value: corundum}
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure Al2O3 reference is solid corundum at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -1999,6 +2231,19 @@ species:
         row_label: sample 5
         column_header: $a_i$   $\mathrm{Al_2O_3}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase: {tag: value, value: cr}
+              polymorph: {tag: value, value: corundum}
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure Al2O3 reference is solid corundum at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -2049,6 +2294,19 @@ species:
         row_label: sample 6
         column_header: $a_i$   $\mathrm{Al_2O_3}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase: {tag: value, value: cr}
+              polymorph: {tag: value, value: corundum}
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure Al2O3 reference is solid corundum at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -2099,6 +2357,19 @@ species:
         row_label: sample 7
         column_header: $a_i$   $\mathrm{Al_2O_3}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase: {tag: value, value: cr}
+              polymorph: {tag: value, value: corundum}
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The pure Al2O3 reference is solid corundum at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
       units: dimensionless
       mineru_flags: []
       values:
@@ -2151,6 +2422,19 @@ species:
         row_label: sample 10
         column_header: $a_i$   $\mathrm{SiO_2}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase: {tag: value, value: l}
+            component_basis: SiO2
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The stable SiO2 reference is liquid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
+        note: 'Near-transition notice: 2000 K is within about 100 K of the high-cristobalite to liquid transition near 1999 K.'
       units: dimensionless
       mineru_flags: []
       values:
@@ -2202,6 +2486,19 @@ species:
         row_label: sample 1
         column_header: $a_i$   $\mathrm{SiO_2}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase: {tag: value, value: l}
+            component_basis: SiO2
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The stable SiO2 reference is liquid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
+        note: 'Near-transition notice: 2000 K is within about 100 K of the high-cristobalite to liquid transition near 1999 K.'
       units: dimensionless
       mineru_flags: []
       values:
@@ -2253,6 +2550,19 @@ species:
         row_label: sample 2
         column_header: $a_i$   $\mathrm{SiO_2}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase: {tag: value, value: l}
+            component_basis: SiO2
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The stable SiO2 reference is liquid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
+        note: 'Near-transition notice: 2000 K is within about 100 K of the high-cristobalite to liquid transition near 1999 K.'
       units: dimensionless
       mineru_flags: []
       values:
@@ -2304,6 +2614,19 @@ species:
         row_label: sample 3
         column_header: $a_i$   $\mathrm{SiO_2}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase: {tag: value, value: l}
+            component_basis: SiO2
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The stable SiO2 reference is liquid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
+        note: 'Near-transition notice: 2000 K is within about 100 K of the high-cristobalite to liquid transition near 1999 K.'
       units: dimensionless
       mineru_flags: []
       values:
@@ -2355,6 +2678,19 @@ species:
         row_label: sample 4
         column_header: $a_i$   $\mathrm{SiO_2}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase: {tag: value, value: l}
+            component_basis: SiO2
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The stable SiO2 reference is liquid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
+        note: 'Near-transition notice: 2000 K is within about 100 K of the high-cristobalite to liquid transition near 1999 K.'
       units: dimensionless
       mineru_flags: []
       values:
@@ -2406,6 +2742,19 @@ species:
         row_label: sample 5
         column_header: $a_i$   $\mathrm{SiO_2}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase: {tag: value, value: l}
+            component_basis: SiO2
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The stable SiO2 reference is liquid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
+        note: 'Near-transition notice: 2000 K is within about 100 K of the high-cristobalite to liquid transition near 1999 K.'
       units: dimensionless
       mineru_flags: []
       values:
@@ -2457,6 +2806,19 @@ species:
         row_label: sample 6
         column_header: $a_i$   $\mathrm{SiO_2}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase: {tag: value, value: l}
+            component_basis: SiO2
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The stable SiO2 reference is liquid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
+        note: 'Near-transition notice: 2000 K is within about 100 K of the high-cristobalite to liquid transition near 1999 K.'
       units: dimensionless
       mineru_flags: []
       values:
@@ -2508,6 +2870,19 @@ species:
         row_label: sample 7
         column_header: $a_i$   $\mathrm{SiO_2}$
         note: Table 3 row bound to sample number and printed oxide mole percentages.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase: {tag: value, value: l}
+            component_basis: SiO2
+        inferred: true
+        inference: >-
+          Inferred under t-1372 stable-phase rule: The stable SiO2 reference is liquid at 2000 K. Basis is JANAF 4th edition phase stability and the pure-oxide standard used for the comparative vapor-pressure activity equations at 2000 K.
+        note: 'Near-transition notice: 2000 K is within about 100 K of the high-cristobalite to liquid transition near 1999 K.'
       units: dimensionless
       mineru_flags: []
       values:
@@ -2550,6 +2925,194 @@ species:
         relation: Silica activity from comparative-cell SiO vapor pressure ratio in
           equation (12).
         inputs: *id018
+  unknown:
+    observations:
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p005_t02_sample1_tmelt
+      type: transition_point
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '2'
+        row_label: sample 1
+        column_header: Tmelt
+      units: K
+      phase: unknown
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_K: '1848'
+        formula: unknown
+        sample_id: '1'
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p005_t02_sample2_tmelt
+      type: transition_point
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '2'
+        row_label: sample 2
+        column_header: Tmelt
+      units: K
+      phase: unknown
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_K: '1858'
+        formula: unknown
+        sample_id: '2'
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p005_t02_sample3_tmelt
+      type: transition_point
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '2'
+        row_label: sample 3
+        column_header: Tmelt
+      units: K
+      phase: unknown
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_K: '1833'
+        formula: unknown
+        sample_id: '3'
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p005_t02_sample4_tmelt
+      type: transition_point
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '2'
+        row_label: sample 4
+        column_header: Tmelt
+      units: K
+      phase: unknown
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_K: '1815'
+        formula: unknown
+        sample_id: '4'
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p005_t02_sample5_tmelt
+      type: transition_point
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '2'
+        row_label: sample 5
+        column_header: Tmelt
+      units: K
+      phase: unknown
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_K: '1843'
+        formula: unknown
+        sample_id: '5'
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p005_t02_sample6_tmelt
+      type: transition_point
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '2'
+        row_label: sample 6
+        column_header: Tmelt
+      units: K
+      phase: unknown
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_K: '1929'
+        formula: unknown
+        sample_id: '6'
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p005_t02_sample7_tmelt
+      type: transition_point
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '2'
+        row_label: sample 7
+        column_header: Tmelt
+      units: K
+      phase: unknown
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_K: '1913'
+        formula: unknown
+        sample_id: '7'
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p005_t02_sample8_tmelt
+      type: transition_point
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '2'
+        row_label: sample 8
+        column_header: Tmelt
+      units: K
+      phase: unknown
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_K: '1898'
+        formula: unknown
+        sample_id: '8'
+    context:
+    - observation_id: tyurnina_2023_table3_gibbs_energy_context
+      type: thermodynamic_context
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+      units: kJ
+      values:
+        description: Printed Gibbs and excess Gibbs energies of mixing; not formation Gibbs energies.
+        rows:
+          - sample: 10
+            minus_delta_G: '12.9'
+            minus_delta_G_excess: '1.7'
+          - sample: 1
+            minus_delta_G: '20.3'
+            minus_delta_G_excess: '12.6'
+          - sample: 2
+            minus_delta_G: '32.3'
+            minus_delta_G_excess: '23.6'
+          - sample: 3
+            minus_delta_G: '43.9'
+            minus_delta_G_excess: '34.9'
+          - sample: 4
+            minus_delta_G: '47.6'
+            minus_delta_G_excess: '38.7'
+          - sample: 5
+            minus_delta_G: '56.5'
+            minus_delta_G_excess: '48.0'
+          - sample: 6
+            minus_delta_G: '62.3'
+            minus_delta_G_excess: '54.5'
+          - sample: 7
+            minus_delta_G: '65.4'
+            minus_delta_G_excess: '58.9'
+    - observation_id: tyurnina_2023_mullite_enthalpy_context
+      type: thermochemical_context
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Discussion
+      units: kJ and kJ/mol as printed
+      values:
+        reaction_18_at_1995_K: '2108 ± 155 kJ'
+        reaction_18_at_298_K: '2143 ± 158 kJ'
+        formation_from_oxides_at_1995_K: '−96 ± 160 kJ/mol'
+        formation_from_oxides_at_298_K: '−20 ± 160 kJ/mol'
+        formation_enthalpy_mullite: '−6869 ± 160 kJ/mol'
+        handbook_comparison: '−6819.2 kJ/mol'
+        note: The paper prints no temperature for −6869; no temperature is inferred.
 experiments:
 - experiment_id: tyurnina-2023-sas-kems
   locator:
@@ -2575,7 +3138,7 @@ fidelity_samples:
 scope_assessment:
   document_type: High-temperature mass-spectrometric vaporization and thermodynamic
     measurements in SrO–Al2O3–SiO2.
-  scored_observations: 53
+  scored_observations: 60
   note: Table 3 partial pressures and activities typed. The two 2023 corpus source
     IDs resolve to one identical publication and are represented once. Table 3 Gibbs
     energy columns are retained as context only because no store quantity token fits.
