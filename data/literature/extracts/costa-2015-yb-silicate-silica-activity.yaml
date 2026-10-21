@@ -100,7 +100,7 @@ species:
         values:
           method_class: mixed_model_and_quoted_measurement
           candidate_tokens: [evaporation_rate]
-          schema_gap: 'Area-specific mass flux has no store token; all printed flux values are retained here.'
+          schema_gap: 'Area-specific evaporation_rate flux is retained here; scoring requires confirming that the converter accepts mg cm−2 h−1 and establishing the needed apparatus inputs.'
           T_K: '1773'
           calculated: [{assemblage: SiO2, flux: '1.1e-2'}, {assemblage: Y2SiO5 + Y2O3, flux: '1.5e-5'}, {assemblage: Yb2SiO5 + Yb2O3, flux: '3.8e-5'}, {assemblage: Y2SiO5 + Y2Si2O7, flux: '3.1e-3'}, {assemblage: Yb2SiO5 + Yb2Si2O7, flux: '4.0e-3'}]
           cited_measurements: [{assemblage: 'Y2Si2O7 + <1% Y2SiO5', flux: '1.9e-3', attribution: '[a]'}, {assemblage: 'Yb2Si2O7 + <1% Yb2SiO5', flux: '2.0e-3', attribution: '[b]'}, {assemblage: 'Yb2Si2O7 + traces Yb2SiO5', flux: '2.3e-3', attribution: '[c]'}, {assemblage: Yb2Si2O7, flux: '0.75', attribution: '[d]'}]
