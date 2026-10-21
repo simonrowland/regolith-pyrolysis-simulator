@@ -173,7 +173,9 @@ dead_root.mkdir()
 (dead_root / owner_file).write_text(f"{fake_dead_pid}\tSynthetic start", encoding="ascii")
 unmatched_root = cache_root / "unmatched-worker-cache"
 unmatched_root.mkdir()
-(unmatched_root / owner_file).write_text(str(fake_dead_pid), encoding="ascii")
+(unmatched_root / owner_file).write_text(
+    f"{fake_dead_pid}\tSynthetic start", encoding="ascii"
+)
 
 original_kill = conftest.os.kill
 def kill_with_synthetic_dead_pid(pid, signal):
@@ -187,7 +189,9 @@ conftest.pytest_sessionstart(None)
 symlink_target = Path(os.environ["TEST_SYMLINK_CACHE_ROOT"]).resolve()
 symlink_child = symlink_target / f"gw-symlink-regolith-{'d' * 32}"
 symlink_child.mkdir()
-(symlink_child / owner_file).write_text(str(fake_dead_pid), encoding="ascii")
+(symlink_child / owner_file).write_text(
+    f"{fake_dead_pid}\tSynthetic start", encoding="ascii"
+)
 os.environ["REGOLITH_PYTEST_WORKER_CACHE_ROOT"] = os.environ["TEST_SYMLINK_CACHE_ROOT"]
 conftest.pytest_sessionstart(None)
 
