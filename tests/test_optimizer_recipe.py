@@ -61,6 +61,48 @@ from simulator.state import BatchRecord, CondensationTrain, EvaporationFlux, Mel
 FEEDSTOCK = "lunar_mare_low_ti"
 
 
+@pytest.mark.parametrize("field,value", [
+    ("pO2_mbar", [0.08, 0.35]),
+    ("pO2_mbar_default", 0.2),
+    ("pO2_bar", 0.0002),
+    ("o2_bubbler_kg_per_hr", 0.0),
+])
+def test_d203_c6_oxygen_controls_refuse_in_recipes_and_patches(field, value):
+    from simulator.recipe_errors import MalformedRecipeError
+
+    nested = {"campaigns": {"C6": {field: value}}}
+    with pytest.raises(RecipeValidationError, match="d-203"):
+        RecipePatch.from_nested(nested).validated()
+    with pytest.raises(MalformedRecipeError, match="d-203"):
+        SimSession().start(PyrolysisRun(
+            feedstock_id=FEEDSTOCK, setpoints_patch=nested)._session_config())
+    with pytest.raises(MalformedRecipeError, match="d-203"):
+        CampaignManager.validate_runtime_campaign_overrides({"C6": {field: value}})
+
+
+def test_d203_c6_total_pressure_uses_ar_band_without_o2_coupling():
+    schema = RecipeSchema()
+    path = ("campaigns", "C6", "p_total_mbar_default")
+    spec = schema.spec_for(path)
+    assert (spec.low, spec.high) == (5, 15)
+    assert spec.bounds_source == "setpoints:campaigns.C6.p_total_mbar"
+    assert not any(p[:2] == ("campaigns", "C6")
+                   for p in schema.PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT)
+    for value in (5.0, 10.0, 15.0):
+        assert schema.to_setpoints_patch(RecipePatch({path: value})) == {
+            "campaigns": {"C6": {"p_total_mbar_default": value}}}
+
+
+@pytest.mark.parametrize("pO2_mbar", [0.0, 0.2])
+def test_d203_direct_session_oxygen_adjustment_cannot_restore_c6_o2(pO2_mbar):
+    from simulator.recipe_errors import MalformedRecipeError
+
+    session = PyrolysisRun(feedstock_id=FEEDSTOCK, campaign="C6")._start_session()
+    with pytest.raises(MalformedRecipeError, match="d-203"):
+        session.adjust("pO2_mbar", pO2_mbar)
+    assert session.simulator.melt.pO2_mbar == 0.0
+
+
 def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     schema = RecipeSchema()
     empty = RecipePatch({})
@@ -90,8 +132,9 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
+    # d-210: regenerated from resolved setpoints with C6 Kr default and floor metadata.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
+        "97ccb54b0b047a09c7171ed38904e8728fbab608a7cf5204fcd27ebd6f6d94bc"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
@@ -2167,9 +2210,7 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         "campaigns.C5.p_total_mbar_default": (10, 100),
         "campaigns.C6.temp_range_C": (1380, 1450),
         "campaigns.C6.default_hold_T_C": (1380, 1450),
-        "campaigns.C6.pO2_mbar": (0.08, 0.35),
-        "campaigns.C6.pO2_mbar_default": (0.08, 0.35),
-        "campaigns.C6.p_total_mbar_default": (0.08, 0.35),
+        "campaigns.C6.p_total_mbar_default": (5, 15),
     }
     schema = RecipeSchema()
     actual = {

@@ -169,44 +169,21 @@ def test_continuum_pressure_bounds_are_derived_from_operating_point(campaign_nam
     setpoints = yaml.safe_load((DATA_DIR / "setpoints.yaml").read_text())
     campaign = setpoints["campaigns"][campaign_name]
     continuum = campaign["continuum_pressure_bounds"]
-    lower_mbar, upper_mbar = continuum["pN2_mbar"]
-    temperature_K = float(continuum["gas_temperature_C"]) + 273.15
-    pipe_diameter_m = float(continuum["pipe_diameter_m"])
-    knudsen_max = float(continuum["knudsen_max"])
-
-    expected_lower_mbar = (
-        condensation_module.BOLTZMANN_CONSTANT_J_K
-        * temperature_K
-        / (
-            math.sqrt(2.0)
-            * math.pi
-            * condensation_module.N2_COLLISION_DIAMETER_M ** 2
-            * knudsen_max
-            * pipe_diameter_m
-        )
-        / 100.0
+    gas = continuum["carrier_gas"]
+    assert gas == ("Kr" if campaign_name == "C6" else "N2")
+    band_key = "p_total_mbar" if campaign_name == "C6" else "pN2_mbar"
+    lower_mbar, upper_mbar = continuum[band_key]
+    floor_key = f"derived_p{gas}_floor_mbar"
+    at_floor = transport_regime_module.single_species_mean_free_path(
+        gas, continuum[floor_key] * 100.0,
+        continuum["gas_temperature_C"] + 273.15,
+        continuum["pipe_diameter_m"],
     )
+    assert at_floor.knudsen_number == pytest.approx(
+        continuum["knudsen_max"], rel=2e-6)
+    assert [lower_mbar, upper_mbar] == [5.0, 15.0]
+    assert lower_mbar >= continuum[floor_key]
 
-    assert continuum["carrier_gas"] == "N2"
-    assert "p_total_mbar" not in continuum
-    assert continuum["derived_pN2_floor_mbar"] == pytest.approx(
-        expected_lower_mbar,
-        rel=2.0e-6,
-    )
-    assert [lower_mbar, upper_mbar] == pytest.approx([5.0, 15.0])
-    assert lower_mbar >= expected_lower_mbar
-    pO2_min_mbar, pO2_max_mbar = campaign["pO2_mbar"]
-    derived_total_bounds = [
-        pO2_min_mbar + lower_mbar,
-        pO2_max_mbar + upper_mbar,
-    ]
-    assert derived_total_bounds[0] - pO2_min_mbar == pytest.approx(lower_mbar)
-    assert derived_total_bounds[1] - pO2_max_mbar == pytest.approx(upper_mbar)
-    assert condensation_module._knudsen_number(
-        lower_mbar * 100.0,
-        temperature_K,
-        pipe_diameter_m,
-    ) <= knudsen_max
 
 
 @pytest.mark.parametrize(

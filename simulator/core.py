@@ -1356,6 +1356,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Back-reduction cascade (if Si present):
         #   4Al(l) + 3SiO₂(melt) → 2Al₂O₃ + 3Si(l)
         self.thermite_Mg_inventory_kg = 0.0     # Mg available from additives
+        self._c6_entry_purge_pending = False
         self._activated_additive_reagents = set()
         self._thermite_Al2O3_reduced_this_hr = 0.0
         self._thermite_Al_produced_this_hr = 0.0
@@ -1681,6 +1682,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.shuttle_cycle_K = 0
         # Reset thermite state
         self.thermite_Mg_inventory_kg = 0.0
+        self._c6_entry_purge_pending = False
         self.shuttle_cycle_Na = 0
         self._shuttle_injected_this_hr = 0.0
         self._shuttle_reduced_this_hr = 0.0
@@ -6241,6 +6243,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._fe_redox_respeciation_diagnostics_this_hr = []
         self._fe_redox_internal_o2_capacity_mol_this_hr = 0.0
         self._fe_redox_internal_o2_consumed_mol_this_hr = 0.0
+        self._fe_redox_passive_o2_replenished_mol_this_hr = 0.0
 
     def _ledger_ferric_fraction_diagnostic(self) -> Dict[str, Any]:
         melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
@@ -6385,9 +6388,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # and this buffer. The finite Fe split must settle that same move,
             # not draw/release gas again. Select by the signed exchange, not a
             # positive balance: release may have depleted the buffer to zero.
-            # The existing provider caps uptake by real buffer mol and flags
-            # any finite Kress demand beyond the differential exchange step.
+            # Reducing credit is bounded by this hour's actual exchange;
+            # unmatched finite reduction products go to ordinary overhead.
             oxygen_source = FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER
+        passive_settlement = (
+            oxygen_source == FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER
+            and internal_o2_capacity_mol is None
+        )
+        # A released passive parcel can be replenished only once per hour.
+        # Explicit injections retain their existing independent funding.
+        replenished_mol = getattr(
+            self, '_fe_redox_passive_o2_replenished_mol_this_hr', 0.0)
+        exchange_release_mol = max(
+            0.0, self.melt.oxygen_reservoir.exchange_o2_mol - replenished_mol
+        ) if passive_settlement else 0.0
         buffer_capacity_mol = 0.0
         if internal_o2_capacity_mol is not None:
             buffer_capacity_mol = max(0.0, float(internal_o2_capacity_mol))
@@ -6398,11 +6412,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         elif oxygen_source == FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER:
             buffer_capacity_mol = max(0.0, float(
                 self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
-                    OXYGEN_SPECIES,
-                    0.0,
-                )
-                or 0.0
-            ))
+                    OXYGEN_SPECIES, 0.0)))
         if not math.isfinite(buffer_capacity_mol):
             raise AccountingError(
                 'Fe redox respeciation buffer oxygen capacity must be finite; '
@@ -6459,6 +6469,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             'oxygen_source': oxygen_source,
             'internal_o2_capacity_mol': buffer_capacity_mol,
+            'exchange_o2_mol': exchange_release_mol,
         }
         result = self._dispatch_only(
             ChemistryIntent.FE_REDOX_RESPECIATION,
@@ -6467,6 +6478,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         diagnostic = dict(result.diagnostic or {})
         diagnostic['status'] = str(result.status)
+        if (self.melt.campaign == CampaignPhase.C6
+                and diagnostic.get('overhead_o2_credit_mol', 0.0)
+                > OXYGEN_RESERVOIR_NOOP_MOL):
+            # With Mg present, Mg/MgO would scavenge free O2 (pO2 ~1e-26 bar).
+            # That Mg-vapour/scavenging pathway is absent (t-1390): retain the
+            # released atoms as gas for OVERHEAD_BLEED and expose the limitation.
+            diagnostic['notice'] = (
+                't-1390: Fe-redox O2 routed to overhead bleed; Mg-vapour/'
+                'O2 scavenging is not modeled (Mg/MgO pO2 ~1e-26 bar).')
         diagnostic['gate_authority'] = (
             self._melt_redox_gate_authority_provenance(gate_authority)
         )
@@ -6487,6 +6507,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             diagnostic['transition_name'] = transition.name
             self._project_cleaned_melt_from_atom_ledger()
+            if passive_settlement:
+                self._fe_redox_passive_o2_replenished_mol_this_hr = (
+                    replenished_mol + diagnostic.get('buffer_o2_credit_mol', 0.0))
             if oxygen_source == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS:
                 self._fe_redox_internal_o2_consumed_mol_this_hr = (
                     float(
@@ -12891,6 +12914,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if campaign == CampaignPhase.C6:
             self._last_c6_refusal_diagnostic = {}
             self._c6_campaign_refused = False
+            self._c6_entry_purge_pending = (
+                self._overhead_holdup_mol().get(OXYGEN_SPECIES, 0.0) > 0.0)
             self._init_thermite_inventory()
 
         if campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
@@ -13646,6 +13671,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.train,
                 self.record,
                 transport_state={
+                    'c6_entry_purge_pending': bool(
+                        self.melt.campaign == CampaignPhase.C6
+                        and self._c6_entry_purge_pending),
                     'binding_cause': str(getattr(
                         self.overhead,
                         'transport_binding_cause',
@@ -13983,6 +14011,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 2. Temperature ramp and carried-in passive exchange ---
         self._update_temperature()
         self._establish_melt_redox_gate_authority_for_current_hour()
+        c6_entry_purge = bool(
+            self.melt.campaign == CampaignPhase.C6
+            and self._c6_entry_purge_pending)
         self._apply_oxygen_reservoir_exchange()
         self._apply_o2_bubbler()
         # t-325: un-lanced solid char reduces melt FeO at T >= 700 C
@@ -14031,6 +14062,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 c6_target_T,
                 self.melt.temperature_C,
             )
+        if c6_entry_purge:
+            c6_hold_reached = False
         self._c6_at_hold_target_this_hr = c6_hold_reached
         if c6_hold_reached:
             self._step_thermite()
@@ -14421,6 +14454,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.paused_for_decision = True
         elif next_campaign is not None:
             self.start_campaign(next_campaign)
+
+        # Entry purge uses the normal finite bleed, hourly telemetry and cost
+        # owners. Keep Mg isolated for the entire last purge tick as well;
+        # the next tick may contact Mg only after the ledger has no carried O2.
+        if c6_entry_purge:
+            self._c6_entry_purge_pending = (
+                self._overhead_holdup_mol().get(OXYGEN_SPECIES, 0.0) > 0.0)
 
         if self.is_complete():
             self._finalize_record()

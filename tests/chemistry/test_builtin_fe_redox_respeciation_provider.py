@@ -333,3 +333,30 @@ def test_oxidizing_respeciation_refuses_managed_scalar_without_ledger_o2(
     assert result.diagnostic["reason"] == "fe_redox_respeciation_o2_unavailable"
     assert result.diagnostic["required_o2_mol"] > 0.0
     assert result.diagnostic["available_o2_mol"] == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize("exchange_mol", [0.0, -0.25, 0.25, 10.0])
+def test_reducing_split_settles_only_released_exchange_and_routes_excess_to_gas(
+    formula_registry, exchange_mol,
+):
+    result = BuiltinFeRedoxRespeciationProvider().dispatch(_request(
+        formula_registry,
+        {"process.cleaned_melt": {"Fe2O3": 4.0, "SiO2": 20.0},
+         "reservoir.fo2_buffer": {"O2": 1000.0}},
+        fO2_log=-20.0,
+        control_inputs={"oxygen_source": "fo2_buffer",
+                        "internal_o2_capacity_mol": 1000.0,
+                        "exchange_o2_mol": exchange_mol},
+    ))
+    assert result.status == "ok"
+    proposal = result.transition
+    validate_atom_balance(proposal, formula_registry)
+    # Reaction stoichiometry: two ferric Fe atoms release one O atom on
+    # reduction, hence 1/2 mol O2 per mol Fe2O3, independent of the Kress target.
+    released = proposal.debits["process.cleaned_melt"]["Fe2O3"] / 2
+    buffered = proposal.credits.get("reservoir.fo2_buffer", {}).get("O2", 0.0)
+    gas = proposal.credits.get("process.overhead_gas", {}).get("O2", 0.0)
+    assert buffered == min(released, max(0.0, exchange_mol))
+    assert gas == released - buffered
+    assert result.diagnostic["buffer_o2_credit_mol"] == buffered
+    assert result.diagnostic["overhead_o2_credit_mol"] == gas

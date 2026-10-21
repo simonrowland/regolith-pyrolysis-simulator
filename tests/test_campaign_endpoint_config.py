@@ -583,6 +583,24 @@ def test_c6_current_at_target_tick_can_satisfy_composition_endpoint() -> None:
     ) is True
 
 
+def test_c6_entry_purge_cannot_satisfy_composition_endpoint() -> None:
+    manager = CampaignManager(_setpoints())
+    melt = _melt(
+        CampaignPhase.C6, 0, temperature_C=1400.0,
+        composition_kg={"SiO2": 1.0, "Al2O3": 1.0, "CaO": 98.0},
+    )
+    assert manager.check_endpoint(
+        melt, _flux(), CondensationTrain(), BatchRecord(),
+        transport_state={"c6_entry_purge_pending": True},
+    ) is False
+    melt.campaign_hour = manager._c6_target_acquisition_limit()[0]
+    with pytest.raises(CampaignHoldAcquisitionRefusal):
+        manager.check_endpoint(
+            melt, _flux(), CondensationTrain(), BatchRecord(),
+            transport_state={"c6_entry_purge_pending": True},
+        )
+
+
 def test_c6_max_hold_counts_only_provider_dispatch_ticks() -> None:
     manager = CampaignManager(_setpoints())
     melt = _melt(CampaignPhase.C6, 80, temperature_C=1400.0)

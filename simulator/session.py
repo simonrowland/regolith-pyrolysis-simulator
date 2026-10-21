@@ -562,6 +562,9 @@ class SimSession:
             # "set the stirring state to this", not "merge".
             sim.melt.stir_state = clamp_stir_state(value)
         elif param == "pO2_mbar":
+            if sim.melt.campaign == CampaignPhase.C6:
+                sim.campaign_mgr._refuse_unknown_override_fields(
+                    "C6", {param: value})
             # 0.5.3 Phase C milestone review P2 (codex 2026-05-28):
             # commanding a positive pO2 under PN2_SWEEP or HARD_VACUUM
             # is a no-op for SiO suppression because the commanded-pO2

@@ -322,13 +322,31 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                     },
                 )
             debits = {CLEANED_MELT_ACCOUNT: {"Fe2O3": fe2o3_debit_mol}}
+            o2_credit = 0.5 * fe2o3_debit_mol
+            # 2 FeO + 1/2 O2 <-> Fe2O3: reducing d mol Fe2O3 releases
+            # d/2 mol O2 (3d = 2d + 2*(d/2) mol O atoms). Passive exchange
+            # already released e mol from buffer to gas; replenish at most e,
+            # never the whole finite split. With e=0 all O2 reaches headspace;
+            # with e>=d/2 all settles the previously booked exchange.
+            buffer_o2_credit = (
+                min(o2_credit, max(0.0, float(
+                    controls.get("exchange_o2_mol", 0.0) or 0.0)))
+                if oxygen_source == OXYGEN_SOURCE_FO2_BUFFER else 0.0
+            )
+            overhead_o2_credit = o2_credit - buffer_o2_credit
             credits = {
                 CLEANED_MELT_ACCOUNT: {"FeO": 2.0 * fe2o3_debit_mol},
-                o2_account: {OXYGEN_SPECIES: 0.5 * fe2o3_debit_mol},
             }
+            if buffer_o2_credit > 0.0:
+                credits[FO2_BUFFER_ACCOUNT] = {OXYGEN_SPECIES: buffer_o2_credit}
+            if overhead_o2_credit > 0.0:
+                credits[OXYGEN_ACCOUNT] = {OXYGEN_SPECIES: overhead_o2_credit}
+            diagnostic.update({
+                "buffer_o2_credit_mol": buffer_o2_credit,
+                "overhead_o2_credit_mol": overhead_o2_credit,
+            })
             direction = "reducing"
             o2_debit = 0.0
-            o2_credit = 0.5 * fe2o3_debit_mol
 
         proposal = LedgerTransitionProposal(
             debits=debits,

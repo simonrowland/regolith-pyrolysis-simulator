@@ -26,6 +26,7 @@ from simulator.environment import (
 from simulator.canonical import canonical_json_dumps
 from simulator.state import CondensationTrain
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.recipe_errors import c6_oxygen_control_refusal
 
 KeyPath = tuple[str, ...]
 
@@ -303,7 +304,7 @@ C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyTyp
 )
 O2_BUBBLER_CAMPAIGN_RATE_PATHS: tuple[KeyPath, ...] = tuple(
     tuple(f"campaigns.{campaign}.{O2_BUBBLER_RATE_KEY}".split("."))
-    for campaign in ("C2B", "C3", "C4", "C6")
+    for campaign in ("C2B", "C3", "C4")
 )
 O2_BUBBLER_RATE_PATHS: tuple[KeyPath, ...] = O2_BUBBLER_CAMPAIGN_RATE_PATHS
 
@@ -577,7 +578,6 @@ class RecipeSchema:
             "campaigns.C5.temp_range_C",
             "campaigns.C5.pO2_bar",
             "campaigns.C6.temp_range_C",
-            "campaigns.C6.pO2_mbar",
         )
     )
     PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT: Mapping[KeyPath, KeyPath] = MappingProxyType({
@@ -595,8 +595,6 @@ class RecipeSchema:
             tuple("campaigns.C4.p_total_mbar_default".split(".")),
         tuple("campaigns.C5.pO2_mbar_default".split(".")):
             tuple("campaigns.C5.p_total_mbar_default".split(".")),
-        tuple("campaigns.C6.pO2_mbar_default".split(".")):
-            tuple("campaigns.C6.p_total_mbar_default".split(".")),
     })
     PRESSURE_COUPLED_DEFAULT_PAIRS: tuple[tuple[KeyPath, KeyPath], ...] = tuple(
         PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT.items()
@@ -1232,32 +1230,11 @@ class RecipeSchema:
             bounds_source="engineering_envelope ratified-t155 A2 C6 max hold",
         ),
         _knob(
-            "campaigns.C6.pO2_mbar",
-            units="mbar",
-            bounds_source="setpoints:campaigns.C6.pO2_mbar",
-            search_enabled=False,
-            scale="log",
-        ),
-        _knob(
-            "campaigns.C6.pO2_mbar_default",
-            units="mbar",
-            bounds_source="setpoints:campaigns.C6.pO2_mbar",
-            search_enabled=False,
-            scale="log",
-        ),
-        _knob(
             "campaigns.C6.p_total_mbar_default",
             units="mbar",
-            bounds_source="setpoints:campaigns.C6.pO2_mbar",
+            bounds_source="setpoints:campaigns.C6.p_total_mbar",
             search_enabled=False,
             scale="log",
-        ),
-        _o2_bubbler_rate_knob(
-            "campaigns.C6.o2_bubbler_kg_per_hr",
-            bounds_source=(
-                "engineering_envelope inert SSO-O2 chunk-A C6 actuator "
-                "placeholder; runtime reader lands in chunk B"
-            ),
         ),
         _knob(
             f"chemistry_kernel.{OXYGEN_SINK_CHANNEL_MODE_KEY}",
@@ -1470,6 +1447,10 @@ class RecipeSchema:
 
     def spec_for(self, path: KeyPath) -> KnobSpec:
         normalized = _normalize_key_path(path)
+        if normalized[:2] == ('campaigns', 'C6'):
+            reason = c6_oxygen_control_refusal(normalized[2:3])
+            if reason:
+                raise RecipeValidationError(reason)
         if self.is_forbidden(normalized):
             raise RecipeValidationError(
                 f"forbidden recipe path: {_format_path(normalized)}"
@@ -1838,8 +1819,6 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C6.temp_range_C",
         "campaigns.C6.default_hold_T_C",
         "campaigns.C6.max_hold_hr",
-        "campaigns.C6.pO2_mbar",
-        "campaigns.C6.pO2_mbar_default",
         "campaigns.C6.p_total_mbar_default",
         "overhead_headspace.temperature_offset_K",
         "overhead_headspace.liner_temperature_C.default_C",

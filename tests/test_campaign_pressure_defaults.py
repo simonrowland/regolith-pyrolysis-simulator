@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from copy import deepcopy
 from pathlib import Path
 
@@ -11,6 +10,7 @@ from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.core import Atmosphere, CampaignPhase, MeltState
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun
+from simulator.transport_regime import single_species_mean_free_path
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -77,11 +77,11 @@ def _n2_lab_schedule() -> dict:
         (CampaignPhase.C3_NA, 1.0, 1.0, Atmosphere.CONTROLLED_O2),
         (CampaignPhase.C4, 0.2, 0.2, Atmosphere.CONTROLLED_O2),
         (CampaignPhase.C5, 50.0, 50.0, Atmosphere.O2_BACKPRESSURE),
-        (CampaignPhase.C6, 0.2, 0.2, Atmosphere.CONTROLLED_O2),
+        (CampaignPhase.C6, 0.0, 10.0, Atmosphere.PN2_SWEEP),
         (CampaignPhase.MRE_BASELINE, 50.0, 50.0, Atmosphere.O2_BACKPRESSURE),
     ],
 )
-def test_configure_campaign_pressure_defaults_match_legacy_constants(
+def test_configure_campaign_pressure_defaults_match_catalogue(
     campaign: CampaignPhase,
     pO2_mbar: float,
     p_total_mbar: float,
@@ -106,14 +106,98 @@ def test_c6_continuum_derivation_uses_selected_static_hold_temperature():
     assert campaign["default_hold_T_C"] == 1400
     assert campaign["temp_range_C"] == [1380, 1450]
 
-    expected_mbar = (
-        1.380649e-23 * (1400.0 + 273.15)
-        / (math.sqrt(2.0) * math.pi * (3.798e-10) ** 2 * 0.12 * 0.01)
-        / 100.0
+    assert continuum["carrier_gas"] == "Kr"
+    assert continuum["derived_pKr_floor_mbar"] == pytest.approx(
+        _continuum_floor_mbar(continuum), abs=5e-7
     )
-    assert continuum["derived_pN2_floor_mbar"] == pytest.approx(
-        expected_mbar, abs=5e-7
-    )
+    assert campaign["carrier_gas"] == "Kr"
+    assert campaign["p_total_mbar"] == [5, 15]
+    assert "pO2_mbar" not in campaign
+    assert "pO2_mbar_default" not in campaign
+
+
+@pytest.mark.parametrize("carrier", ["Kr", "pKr", "Ar", "pAr"])
+def test_c6_allows_only_approved_inert_carriers(carrier):
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C6"]["carrier_gas"] = carrier
+    melt = MeltState()
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C6)
+    assert melt.background_gas_species == carrier.removeprefix("p")
+    assert melt.pO2_mbar == 0.0
+
+
+@pytest.mark.parametrize("carrier", ["N2", "pN2", "O2", "CO2", "He", "unknown"])
+def test_c6_refuses_unapproved_carriers_in_campaign_owner(carrier):
+    from simulator.recipe_errors import MalformedRecipeError
+
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C6"]["carrier_gas"] = carrier
+    with pytest.raises(MalformedRecipeError, match="d-203/d-210"):
+        CampaignManager(setpoints).configure_campaign(MeltState(), CampaignPhase.C6)
+
+
+def test_c6_defaults_to_kr_when_carrier_is_omitted():
+    setpoints = _setpoints()
+    del setpoints["campaigns"]["C6"]["carrier_gas"]
+    melt = MeltState()
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C6)
+    assert melt.background_gas_species == "Kr"
+
+
+def test_c6_refuses_retired_oxygen_atmosphere():
+    from simulator.recipe_errors import MalformedRecipeError
+
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C6"]["atmosphere"] = "controlled_O2"
+    with pytest.raises(MalformedRecipeError, match="d-203"):
+        CampaignManager(setpoints).configure_campaign(MeltState(), CampaignPhase.C6)
+
+
+@pytest.mark.parametrize("carried_o2_mol", [0.0, 20.0])
+def test_c6_entry_bleeds_carried_oxygen_before_mg_contact(carried_o2_mol):
+    from simulator.session import SimSession
+
+    session = SimSession().start(PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C6",
+        additives_kg={"Mg": 50.0}, force_builtin_vapor_pressure=True,
+    )._session_config())
+    sim = session.simulator
+    if carried_o2_mol:
+        sim.atom_ledger.load_external_mol(
+            "process.overhead_gas", {"O2": carried_o2_mol},
+            source="test carried oxygen", material_origin="feedstock")
+    sim.start_campaign(CampaignPhase.C6)
+    sim.melt.temperature_C = 1400.0
+    step_thermite = sim._step_thermite
+    contacts = []
+
+    def contact_mg():
+        assert sim._overhead_holdup_mol().get("O2", 0.0) == 0.0
+        contacts.append(sim.melt.campaign_hour)
+        step_thermite()
+
+    sim._step_thermite = contact_mg
+    snapshots = []
+    for _ in range(10):
+        snapshots.append(sim.step())
+        if contacts:
+            break
+    sim.atom_ledger.assert_balanced()
+    assert len(contacts) == 1
+    assert sim.melt.background_gas_species == "Kr"
+    assert sim.melt.pO2_mbar == 0.0
+    assert sum(s.c6_at_hold_target for s in snapshots) == len(contacts)
+    assert contacts[0] == len(snapshots) - len(contacts)
+    assert (contacts[0] > 0) is bool(carried_o2_mol)
+    bled = sum(s.O2_vented_mol_hr + s.overhead.turbine_flow_mol_hr
+               for s in snapshots)
+    # Passive melt uptake remains active during purge; the bleed must carry
+    # a positive, ledger-conserving outlet rather than deleting the inventory.
+    assert 0.0 <= bled <= carried_o2_mol
+    assert (bled > 0.0) is bool(carried_o2_mol)
+    assert all(s.overhead.pressure_mbar == pytest.approx(10.0)
+               for s in snapshots if s.c6_at_hold_target)
+
 
 
 def _campaigns_with_continuum_bounds() -> dict[str, dict]:
@@ -123,30 +207,20 @@ def _campaigns_with_continuum_bounds() -> dict[str, dict]:
         if not isinstance(campaign, dict):
             continue
         bounds = campaign.get("continuum_pressure_bounds")
-        if isinstance(bounds, dict) and "derived_pN2_floor_mbar" in bounds:
+        if isinstance(bounds, dict):
             out[name] = campaign
     return out
 
 
-def _n2_continuum_floor_mbar(bounds: dict) -> float:
-    """Hard-sphere kinetic-theory continuum floor, from the block's OWN inputs.
-
-    lambda = k_B*T / (sqrt(2)*pi*sigma^2*p) and Kn = lambda/D, so requiring
-    Kn <= Kn_max gives p >= k_B*T / (sqrt(2)*pi*sigma^2*Kn_max*D).
-    Units: [J/K * K] / ([m^2] * [m]) = J/m^3 = Pa; /100 for mbar.
-    Sanity (known value): the same expression gives an N2 mean free path of
-    64.2 nm at 1 bar / 25 C against the textbook ~65 nm.
-    """
-    sigma_n2_m = 3.798e-10
-    T_K = float(bounds["gas_temperature_C"]) + 273.15
-    return (
-        1.380649e-23 * T_K
-        / (
-            math.sqrt(2.0) * math.pi * sigma_n2_m**2
-            * float(bounds["pipe_diameter_m"]) * float(bounds["knudsen_max"])
-        )
-        / 100.0
+def _continuum_floor_mbar(bounds: dict) -> float:
+    # Kn is inverse pressure: at 1 mbar the ratio Kn/Kn_max gives the
+    # floor in mbar. Use the transport owner and its carrier constants.
+    at_one_mbar = single_species_mean_free_path(
+        bounds["carrier_gas"], 100.0,
+        float(bounds["gas_temperature_C"]) + 273.15,
+        float(bounds["pipe_diameter_m"]),
     )
+    return at_one_mbar.knudsen_number / float(bounds["knudsen_max"])
 
 
 @pytest.mark.parametrize("campaign_name", sorted(_campaigns_with_continuum_bounds()))
@@ -165,29 +239,21 @@ def test_declared_continuum_floor_matches_its_own_derivation(campaign_name):
     below.
     """
     bounds = _campaigns_with_continuum_bounds()[campaign_name]["continuum_pressure_bounds"]
-    assert bounds.get("carrier_gas") == "N2", (
-        f"{campaign_name}: the derivation hard-codes the N2 collision diameter; "
-        f"a non-N2 carrier needs its own sigma, got {bounds.get('carrier_gas')!r}"
-    )
-    assert bounds["derived_pN2_floor_mbar"] == pytest.approx(
-        _n2_continuum_floor_mbar(bounds), abs=5e-7
-    ), (
-        f"{campaign_name}: derived_pN2_floor_mbar disagrees with the formula "
-        f"evaluated at this block's own gas_temperature_C / pipe_diameter_m / "
-        f"knudsen_max"
-    )
+    key = f"derived_p{bounds['carrier_gas']}_floor_mbar"
+    assert bounds[key] == pytest.approx(_continuum_floor_mbar(bounds), abs=5e-7)
+
 
 
 def test_campaign_default_pressure_versus_its_own_continuum_floor():
-    """The continuum edge is informational; transitional defaults are valid."""
-    known_violations = {"C4", "C6"}
+    """C4 remains below its declared floor; d-203/d-210 resolve C6 with Kr."""
+    known_violations = {"C4"}
 
     violations = {}
     for name, campaign in _campaigns_with_continuum_bounds().items():
         default_mbar = campaign.get("p_total_mbar_default")
         if default_mbar is None:
             continue
-        floor = _n2_continuum_floor_mbar(campaign["continuum_pressure_bounds"])
+        floor = _continuum_floor_mbar(campaign["continuum_pressure_bounds"])
         if float(default_mbar) < floor:
             violations[name] = (float(default_mbar), floor)
 

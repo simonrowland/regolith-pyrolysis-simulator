@@ -40,7 +40,7 @@ from simulator.furnace_materials import (
     resolve_furnace_max_T_C,
     setpoints_furnace_ceiling_C,
 )
-from simulator.recipe_errors import MalformedRecipeError
+from simulator.recipe_errors import MalformedRecipeError, c6_oxygen_control_refusal
 from simulator.environment import numerical_pressure_floor_bar_for_body
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe import (
@@ -237,6 +237,9 @@ class CampaignManager:
     def __init__(self, setpoints: dict):
         self.setpoints = setpoints
         self.campaigns = setpoints.get('campaigns', {})
+        reason = c6_oxygen_control_refusal(self._campaign_config(CampaignPhase.C6))
+        if reason:
+            raise MalformedRecipeError(reason)
         # CEILING INHERITS FROM THE PIPE MATERIAL. `furnace_material` names the row
         # in data/furnace_materials.yaml and its max_service_T_C IS the ceiling, so
         # changing the pipe changes the ceiling in exactly one place. An explicit
@@ -468,7 +471,9 @@ class CampaignManager:
         known = set(cls._COMMON_OVERRIDE_FIELDS)
         for phase in phases:
             known.update(cls._PHASE_OVERRIDE_FIELDS.get(phase, ()))
-        return tuple(sorted(field for field in known if field in derived))
+        return tuple(sorted(
+            field for field in known if field in derived
+            and not (campaign_name == 'C6' and c6_oxygen_control_refusal((field,)))))
 
     @classmethod
     @lru_cache(maxsize=1)
@@ -582,6 +587,10 @@ class CampaignManager:
             cls,
             campaign_name: str,
             fields: Mapping[str, object]) -> None:
+        if campaign_name == 'C6':
+            reason = c6_oxygen_control_refusal(fields)
+            if reason:
+                raise MalformedRecipeError(reason)
         known_fields = cls.known_override_fields(campaign_name)
         if not known_fields:
             known_campaigns = sorted({
@@ -1503,8 +1512,14 @@ class CampaignManager:
             melt.p_total_mbar = self._pressure_config_float(
                 cfg, 'p_total_mbar', 'p_total_mbar_default', 9.0)
 
-        elif campaign in (CampaignPhase.C2A, CampaignPhase.C2A_STAGED):
+        elif campaign in (CampaignPhase.C2A, CampaignPhase.C2A_STAGED,
+                          CampaignPhase.C6):
             cfg = self._campaign_config(campaign)
+            if (campaign == CampaignPhase.C6
+                    and cfg.get('atmosphere', 'recirculating_inert_sweep')
+                    != 'recirculating_inert_sweep'):
+                raise MalformedRecipeError(
+                    'd-203: C6.atmosphere must be recirculating_inert_sweep')
             melt.atmosphere = Atmosphere.PN2_SWEEP
             # Kr audit 2026-07-25: overhead's sweep branch keys the buffer
             # partial off melt.background_gas_species; continuous mode left
@@ -1512,10 +1527,19 @@ class CampaignManager:
             # for a Kr carrier (double-counted buffer). Stamp the configured
             # carrier; the condensation resolver reads the same config, so
             # its answer is unchanged (golden-neutral for the pN2 default).
-            melt.background_gas_species = _canonical_carrier_gas_key(
-                str(cfg.get('carrier_gas', 'pN2') or 'pN2')
-                if isinstance(cfg, Mapping) else 'pN2'
-            )
+            default_carrier = 'Kr' if campaign == CampaignPhase.C6 else 'pN2'
+            carrier = str(cfg.get('carrier_gas', default_carrier) or default_carrier)
+            if campaign == CampaignPhase.C6:
+                try:
+                    carrier = _canonical_carrier_gas_key(carrier)
+                except ValueError as exc:
+                    raise MalformedRecipeError(
+                        'd-203/d-210: C6 carrier must be Kr or Ar') from exc
+                if carrier not in {'Kr', 'Ar'}:
+                    raise MalformedRecipeError(
+                        'd-203/d-210: C6 carrier must be Kr or Ar; '
+                        f'got {carrier!r}')
+            melt.background_gas_species = _canonical_carrier_gas_key(carrier)
             melt.pO2_mbar = self._pressure_config_float(
                 cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
             melt.p_total_mbar = self._pressure_config_float(
@@ -1552,14 +1576,6 @@ class CampaignManager:
                 cfg, 'pO2_mbar', 'pO2_mbar_default', 50.0)
             melt.p_total_mbar = self._pressure_config_float(
                 cfg, 'p_total_mbar', 'p_total_mbar_default', 50.0)
-
-        elif campaign == CampaignPhase.C6:
-            cfg = self._campaign_config(campaign)
-            melt.atmosphere = Atmosphere.CONTROLLED_O2
-            melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.2)
-            melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 0.2)
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             cfg = self._campaign_config(campaign)
@@ -2743,17 +2759,21 @@ class CampaignManager:
         elif campaign == CampaignPhase.C6:
             hold_target_C, _ = self.get_temp_target(
                 campaign, melt.campaign_hour, melt)
+            purge_pending = bool(
+                (transport_state or {}).get('c6_entry_purge_pending'))
             at_hold_target = self.c6_at_hold_target(
                 hold_target_C,
                 melt.temperature_C,
-            )
+            ) and not purge_pending
             acquisition_limit_hr, limit_source = (
                 self._c6_target_acquisition_limit()
             )
             if completed_campaign_hour >= acquisition_limit_hr:
                 if not at_hold_target:
                     diagnostic = {
-                        'reason_refused': C6_HOLD_ACQUISITION_REFUSAL_REASON,
+                        'reason_refused': (
+                            'c6_entry_purge_incomplete' if purge_pending
+                            else C6_HOLD_ACQUISITION_REFUSAL_REASON),
                         'unacquired_hold_target_C': hold_target_C,
                         'temperature_C': float(melt.temperature_C),
                         'completed_campaign_hour': completed_campaign_hour,

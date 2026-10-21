@@ -1181,7 +1181,9 @@ def test_t155_bubbler_context_must_match_resolved_patch(
     )
 
     with pytest.raises(
-        EvaluationInputError, match="conditional_mask does not match resolved patch"
+        RecipeValidationError if campaign == "C6" else EvaluationInputError,
+        match=("d-203" if campaign == "C6"
+               else "conditional_mask does not match resolved patch"),
     ):
         _build_eval_inputs(
             patch,
