@@ -375,13 +375,26 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
     # probe; at 30c51c8 the alpha=1 and 0.25 results are 0.8286161505495706 Pa
     # and 0.3003449996328013 Pa. Those Pa values were still the d066-v1 pin
     # (pO2 0x1.160995d98f6e4p-17, 0.8286161505495706 Pa at alpha=1). d-071
-    # openimcc 249fde5 moves alpha=1 by +0.26% (0.8307320141688443 Pa).
-    # 100df4f re-anchors FeO(l), and the vacuum oxygen balance follows that
-    # standard state: alpha=1 becomes 0.9216674327271643 Pa (+11.2% versus
-    # the d066-v1 pin) and alpha=0.25 becomes 0.33536809943014373 Pa
-    # (+11.7%). ccabd0b and ec31045 do not move either root. 8cd96dd's oxide-parent
-    # count was already inside the d066-v1 pin.
-    # The two engines still use their own melt channel pressures for both arms.
+    # openimcc 249fde5 moves the openimcc alpha=1 root by +0.26%
+    # (0.8307320141688443 Pa). 100df4f re-anchors FeO(l), and that engine's
+    # vacuum oxygen balance follows that standard state: alpha=1 becomes
+    # 0.9216674327271643 Pa (+11.2% versus the d066-v1 pin) and alpha=0.25
+    # becomes 0.33536809943014373 Pa (+11.7%). ccabd0b and ec31045 hold
+    # both openimcc roots. 8cd96dd's oxide-parent count was already inside
+    # the d066-v1 pin.
+    #
+    # The internal-analytical arm is not independent of that pin. Run
+    # 18b6-1 is at 2073.15 K, above the 1950 K VapoRock cap, so the vapor
+    # kernel takes melt activities from openimcc. Its atomic-O factor,
+    # evaluate_gas at 1 bar, stays 0.0011502272448293085 from 66ec4a3
+    # through ec31045. The sample is Al2O3, CaO, FeO, MgO, SiO2, so the
+    # Tier-3 Mn/Sb/Ag/As condensate rows are outside this balance. At the
+    # old root's pO2, 100df4f changes p(Fe) by -9.2%, p(SiO) by -8.8%, and
+    # p(Mg) by +7.3%. 249fde5 moves the alpha=1 root from
+    # 1.025329278688018 Pa to 1.0288731840677143 Pa (+0.35%). 100df4f
+    # moves it to 0.9594349509429656 Pa (-6.43%, -0.0288 dex versus
+    # 66ec4a3) and alpha=0.25 from 0.374487438845255 Pa to
+    # 0.34960889447255017 Pa. ccabd0b, 86cbc45, and ec31045 hold both.
     assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.3542a12f3caa5p-17"
     assert (
         solved["openimcc"][1.0].pO2_bar * PA_PER_BAR
@@ -390,10 +403,10 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
         0.33536809943014373, rel=2.0e-5
     )
     assert solved["internal-analytical"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
-        1.025329, rel=2.0e-5
+        0.9594349509429656, rel=2.0e-5
     )
     assert solved["internal-analytical"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.374487, rel=2.0e-5
+        0.34960889447255017, rel=2.0e-5
     )
 
     # Replacing either engine's root by the other's does not close that engine's
