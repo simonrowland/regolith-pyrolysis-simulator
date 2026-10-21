@@ -4787,6 +4787,7 @@ def predict_with_engine(
             from engines.builtin.vapor_pressure import (
                 COEFF_BLOCK_PURE_COMPONENT,
                 VaporPressureComputationError,
+                _liquid_reference_pressure_from_solid,
                 _pow10_pressure_or_raise,
                 vapor_pressure_valid_range_K,
                 wall_condensation_antoine_coefficients,
@@ -4869,16 +4870,22 @@ def predict_with_engine(
                 source_phase in {"solid", "alpha_solid", "crystal", "crystalline"}
                 and reservoir[1] != Phase.CR.value
             ):
-                # A sublimation relation's temperature band certifies its
-                # solid reference only. Mg/Ca have no qualified liquid fit
-                # at these cold temperatures; retain a flagged phase proxy,
-                # never certify a (possibly supercooled) liquid from it.
+                # A sublimation relation certifies its solid reference only.
+                # The thermodynamic owner converts to a requested liquid
+                # reference when its JANAF fusion term is available.
+                phase_reason = "pure_component_antoine_phase_mismatch"
+                if reservoir[1] in {Phase.L.value, Phase.SUPERCOOLED_L.value}:
+                    pressure, fusion_unavailable = _liquid_reference_pressure_from_solid(
+                        formula, float(T), pressure,
+                    )
+                    if fusion_unavailable is not None:
+                        phase_reason += f"; {fusion_unavailable}"
                 authority = Authority.EXTRAPOLATED
                 notices += (
                     Notice(
                         kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                         affected_quantities=(Quantity.P_SAT,),
-                        reason="pure_component_antoine_phase_mismatch",
+                        reason=phase_reason,
                         origin=observation.observation_id,
                         source=source_phase,
                         destination=reservoir[1],
