@@ -8,8 +8,8 @@ import re
 import yaml
 
 from simulator.battery.enums import Quantity, UncertaintyKind
-from simulator.battery.migrate import Migrator
 from simulator.battery.score import _printed_uncertainty_band
+from tests.battery.factories import migrate_one_extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,8 +31,7 @@ def test_feo_table_7_rows_keep_their_own_printed_one_sigma():
     assert source_uncertainty["locator"]["page"] == 163
     assert source_uncertainty["locator"]["table"] == "7"
 
-    migrator = Migrator(root=ROOT, index=None, aliases={})
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(ROOT, EXTRACT, index=None, aliases={})
     migrator.finalize()
     observations = [
         observation

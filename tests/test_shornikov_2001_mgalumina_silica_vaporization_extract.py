@@ -3,7 +3,7 @@
 from decimal import Decimal
 from pathlib import Path
 
-from simulator.battery.migrate import Migrator
+from tests.battery.factories import migrate_one_extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,8 +11,7 @@ EXTRACT = ROOT / "data/literature/extracts/shornikov-2001-mgalumina-silica-vapor
 
 
 def test_shornikov_2001_figure_observations_keep_printed_temperatures() -> None:
-    migrator = Migrator(root=ROOT, index={}, aliases={})
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
 
     observations = {

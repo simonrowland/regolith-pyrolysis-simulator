@@ -305,38 +305,86 @@ def test_c0_and_c2b_temperature_ramps_follow_campaign_config(
 
 
 def test_c2a_staged_shipped_stage_targets_and_ramps_are_pinned() -> None:
-    # Golden values captured before removing the missing-key fallbacks.
-    manager = CampaignManager(_setpoints())
+    # Golden float.hex outputs captured through both production selectors
+    # before consolidating the target/ramp reads.
     stage_samples = (
-        ("alkali_early_fe", 0, (1250.0, 600.0)),
-        ("sio_window", 4, (1600.0, 175.0)),
-        ("fe_hot_hold", 7, (1750.0, 150.0)),
-        ("cool_for_na_shuttle", 8, (1150.0, 600.0)),
+        (
+            "alkali_early_fe",
+            0,
+            ("0x1.3880000000000p+10", "0x1.2c00000000000p+9"),
+            ("0x1.3880000000000p+10", "0x1.2c00000000000p+9"),
+        ),
+        (
+            "sio_window",
+            4,
+            ("0x1.9000000000000p+10", "0x1.5e00000000000p+7"),
+            ("0x1.9000000000000p+10", "0x1.5e00000000000p+7"),
+        ),
+        (
+            "fe_hot_hold",
+            7,
+            ("0x1.b580000000000p+10", "0x1.2c00000000000p+7"),
+            ("0x1.b580000000000p+10", "0x1.2c00000000000p+7"),
+        ),
+        (
+            "cool_for_na_shuttle",
+            8,
+            ("0x1.1f80000000000p+10", "0x1.2c00000000000p+9"),
+            ("0x1.1f80000000000p+10", "0x1.2c00000000000p+9"),
+        ),
     )
 
-    for stage_name, hour, expected in stage_samples:
-        actual = manager.get_temp_target(
+    shipped_stage_names = tuple(
+        stage["name"] for stage in _setpoints()["campaigns"]["C2A_staged"]["stages"]
+    )
+    assert shipped_stage_names == tuple(sample[0] for sample in stage_samples)
+
+    campaign_hour_manager = CampaignManager(_setpoints())
+    current_stage_setpoints = _setpoints()
+    current_stage_setpoints["campaigns"]["C2A_staged"][
+        "depletion_flux_decay_fraction"
+    ] = 0.01
+    current_stage_manager = CampaignManager(current_stage_setpoints)
+
+    for stage_index, sample in enumerate(stage_samples):
+        _, hour, campaign_hour_hex, current_stage_hex = sample
+        campaign_hour_actual = campaign_hour_manager.get_temp_target(
             CampaignPhase.C2A_STAGED,
             hour,
             MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=hour),
         )
-        assert actual == expected
+        assert tuple(value.hex() for value in campaign_hour_actual) == campaign_hour_hex
+
+        current_stage_manager._c2a_staged_stage_idx = stage_index
+        current_stage_actual = current_stage_manager.get_temp_target(
+            CampaignPhase.C2A_STAGED,
+            hour,
+            MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=hour),
+        )
+        assert tuple(value.hex() for value in current_stage_actual) == current_stage_hex
 
 
 def test_c2a_staged_missing_stage_target_refuses_with_setpoint_key() -> None:
-    setpoints = deepcopy(_setpoints())
-    _stage(setpoints, "sio_window").pop("target_C")
-    manager = CampaignManager(setpoints)
+    for selector in ("campaign_hour", "current_stage"):
+        setpoints = deepcopy(_setpoints())
+        _stage(setpoints, "sio_window").pop("target_C")
+        if selector == "current_stage":
+            setpoints["campaigns"]["C2A_staged"][
+                "depletion_flux_decay_fraction"
+            ] = 0.01
+        manager = CampaignManager(setpoints)
+        if selector == "current_stage":
+            manager._c2a_staged_stage_idx = 1
 
-    with pytest.raises(
-        ValueError,
-        match=r"Missing numeric campaign setpoint: C2A_staged\.stages\.sio_window\.target_C",
-    ):
-        manager.get_temp_target(
-            CampaignPhase.C2A_STAGED,
-            4,
-            MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=4),
-        )
+        with pytest.raises(
+            ValueError,
+            match=r"Missing numeric campaign setpoint: C2A_staged\.stages\.sio_window\.target_C",
+        ):
+            manager.get_temp_target(
+                CampaignPhase.C2A_STAGED,
+                4,
+                MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=4),
+            )
 
 
 def test_c2a_staged_missing_hold_default_refuses_with_setpoint_key() -> None:
