@@ -94,6 +94,7 @@ library is called.
 from __future__ import annotations
 
 import builtins
+import atexit
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
 import fcntl
@@ -1059,6 +1060,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         self._warnings: List[str] = []
         self._last_error: Optional[str] = None
         self._subprocess_pool: Optional[EngineWorkerPool] = None
+        self._ompi_tmpdir: Optional[str] = None
 
     # ------------------------------------------------------------------
     # MeltBackend interface
@@ -1159,6 +1161,30 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         f'{diagnostic_path.stem}-{index}{diagnostic_path.suffix}'
                     ),
                 )
+            previous_ompi_tmpdir = os.environ.get(
+                'OMPI_MCA_orte_tmpdir_base'
+            )
+            previous_prte_tmpdir = os.environ.get(
+                'PRTE_MCA_prte_tmpdir_base'
+            )
+            if previous_ompi_tmpdir is None and previous_prte_tmpdir is None:
+                self._ompi_tmpdir = tempfile.mkdtemp(
+                    prefix='regolith-ompi-'
+                )
+                atexit.register(
+                    shutil.rmtree, self._ompi_tmpdir, ignore_errors=True
+                )
+                os.environ['OMPI_MCA_orte_tmpdir_base'] = self._ompi_tmpdir
+                os.environ['PRTE_MCA_prte_tmpdir_base'] = self._ompi_tmpdir
+            else:
+                if previous_ompi_tmpdir is not None:
+                    os.environ.setdefault(
+                        'PRTE_MCA_prte_tmpdir_base', previous_ompi_tmpdir
+                    )
+                if previous_prte_tmpdir is not None:
+                    os.environ.setdefault(
+                        'OMPI_MCA_orte_tmpdir_base', previous_prte_tmpdir
+                    )
             try:
                 self._subprocess_pool = EngineWorkerPool(
                     worker_factory,
@@ -1170,15 +1196,32 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'{exc.detail}'
                 )
                 self._subprocess_pool = None
+                if self._ompi_tmpdir is not None:
+                    shutil.rmtree(self._ompi_tmpdir, ignore_errors=True)
+                    self._ompi_tmpdir = None
                 return False
+            finally:
+                if previous_ompi_tmpdir is None:
+                    os.environ.pop('OMPI_MCA_orte_tmpdir_base', None)
+                else:
+                    os.environ['OMPI_MCA_orte_tmpdir_base'] = previous_ompi_tmpdir
+                if previous_prte_tmpdir is None:
+                    os.environ.pop('PRTE_MCA_prte_tmpdir_base', None)
+                else:
+                    os.environ['PRTE_MCA_prte_tmpdir_base'] = previous_prte_tmpdir
 
         self._available = True
         return True
 
     def close(self) -> None:
-        if self._subprocess_pool is not None:
-            self._subprocess_pool.close(cancel_pending=True)
-            self._subprocess_pool = None
+        try:
+            if self._subprocess_pool is not None:
+                self._subprocess_pool.close(cancel_pending=True)
+                self._subprocess_pool = None
+        finally:
+            if self._ompi_tmpdir is not None:
+                shutil.rmtree(self._ompi_tmpdir, ignore_errors=True)
+                self._ompi_tmpdir = None
 
     def is_available(self) -> bool:
         return self._available

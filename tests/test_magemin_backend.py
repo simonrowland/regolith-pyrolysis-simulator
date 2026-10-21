@@ -883,6 +883,61 @@ def test_magemin_reinitialize_closes_existing_warm_pool(monkeypatch):
     assert backend._subprocess_pool is None
 
 
+@pytest.mark.parametrize("caller_tmpdir", [None, "caller-selected-ompi-dir"])
+def test_magemin_worker_pool_inherits_ompi_tmpdir_and_cleans_owned_dir(
+    monkeypatch, caller_tmpdir
+):
+    import simulator.melt_backend.magemin as magemin_module
+
+    observed = {}
+
+    class FakePool:
+        def __init__(self, _worker_factory, *, size):
+            observed["size"] = size
+            observed["ompi"] = os.environ.get("OMPI_MCA_orte_tmpdir_base")
+            observed["prte"] = os.environ.get("PRTE_MCA_prte_tmpdir_base")
+
+        def close(self, *, cancel_pending=False):
+            assert cancel_pending is True
+
+    monkeypatch.setattr(magemin_module, "EngineWorkerPool", FakePool)
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda _explicit: Path("/fake/MAGEMin")),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("subprocess", None),
+    )
+    monkeypatch.delenv("OMPI_MCA_orte_tmpdir_base", raising=False)
+    monkeypatch.delenv("PRTE_MCA_prte_tmpdir_base", raising=False)
+    if caller_tmpdir is not None:
+        monkeypatch.setenv("OMPI_MCA_orte_tmpdir_base", caller_tmpdir)
+
+    backend = MAGEMinBackend()
+    assert backend.initialize({}) is True
+    assert observed["size"] == 1
+    if caller_tmpdir is None:
+        assert observed["ompi"] == backend._ompi_tmpdir
+        assert observed["prte"] == backend._ompi_tmpdir
+        assert backend._ompi_tmpdir is not None
+        owned_tmpdir = Path(backend._ompi_tmpdir)
+        assert owned_tmpdir.is_dir()
+    else:
+        assert observed["ompi"] == caller_tmpdir
+        assert observed["prte"] == caller_tmpdir
+        assert backend._ompi_tmpdir is None
+        owned_tmpdir = None
+    assert os.environ.get("OMPI_MCA_orte_tmpdir_base") == caller_tmpdir
+    assert os.environ.get("PRTE_MCA_prte_tmpdir_base") is None
+
+    backend.close()
+    if owned_tmpdir is not None:
+        assert not owned_tmpdir.exists()
+
+
 def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request):
     import simulator.melt_backend.magemin as magemin_module
 
@@ -3246,13 +3301,17 @@ _LIVE_MAGEMIN_BINARY = MAGEMinBackend._locate_binary(None)
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_smoke_runs_real_binary(request):
+def test_magemin_live_smoke_runs_real_binary(request, monkeypatch):
     # End-to-end against the real MAGEMin binary: a basalt analog at
     # crustal P/T must equilibrate, report a silicate liquid, and -- the
     # invariant that matters -- leave ledger_transition None. MAGEMin is
     # shadow/diagnostic: it never gets AtomLedger authority.
     backend = MAGEMinBackend()
     request.addfinalizer(backend.close)
+    monkeypatch.delenv("OMPI_MCA_orte_tmpdir_base", raising=False)
+    monkeypatch.delenv("PRTE_MCA_prte_tmpdir_base", raising=False)
+    system_tmpdir = Path(tempfile.gettempdir())
+    existing_ompi_dirs = set(system_tmpdir.glob("ompi.*"))
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         available = backend.initialize({})
@@ -3262,6 +3321,9 @@ def test_magemin_live_smoke_runs_real_binary(request):
     # The subprocess bridge is the supported default; the live binary
     # must resolve to it (ctypes is opt-in only, pymagemin/julia rare).
     assert backend._bridge == "subprocess"
+    assert backend._ompi_tmpdir is not None
+    pool_ompi_tmpdir = Path(backend._ompi_tmpdir)
+    assert pool_ompi_tmpdir.is_dir()
 
     basalt_wt_pct = {
         "SiO2": 49.0,
@@ -3301,6 +3363,9 @@ def test_magemin_live_smoke_runs_real_binary(request):
     # Shadow posture: MAGEMin holds no AtomLedger authority, ever.
     assert result.ledger_transition is None
     assert backend.ledger_account_policies() == ()
+    assert set(system_tmpdir.glob("ompi.*")) == existing_ompi_dirs
+    backend.close()
+    assert not pool_ompi_tmpdir.exists()
 
 
 @pytest.mark.skipif(
