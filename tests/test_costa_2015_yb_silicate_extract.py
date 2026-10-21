@@ -48,6 +48,9 @@ def test_costa_2015_quoted_formation_enthalpy_migrates_as_one_point() -> None:
         for observation in migrator.result.observations.values()
     )
     context = species["context"]
+    flux = next(record for record in context if record["observation_id"] == "costa_2015_table_5_area_specific_flux")
+    assert "no store token" not in flux["values"]["schema_gap"]
+    assert "converter" in flux["values"]["schema_gap"]
     assert {record["type"] for record in context} >= {
         "measured_bulk_sample_analysis",
         "thermochemical_cycle_context",
