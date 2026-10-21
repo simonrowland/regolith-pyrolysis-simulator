@@ -2035,22 +2035,23 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
     migrator.finalize()
     assert len(migrator.result.validation.hard_issues) == 8
 
-    experiment = next(
-        item
-        for item in migrator.result.experiments.values()
-        if item.experiment_id.endswith(
-            "::experiment::markova-1984-stepwise-heating-series"
+    for panel, experiment_suffix in (
+        ("VI_lherzolite", "VI"),
+        ("V_alumina_basalt", "V"),
+    ):
+        experiment = next(
+            item
+            for item in migrator.result.experiments.values()
+            if item.experiment_id.endswith(f"::experiment::{experiment_suffix}")
         )
-    )
-    assert experiment.sample.mass_kg.state.tag == "unknown"
-    assert experiment.apparatus.geometry.orifice_area_m2.state.tag == "unknown"
-    assert experiment.apparatus.geometry.orifice_diameter_m.state.tag == "unknown"
-    assert experiment.apparatus.geometry.orifice_channel_length_m.state.tag == "unknown"
-    assert experiment.thermal_schedule.method.state.value == (
-        "Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps"
-    )
-    assert experiment.thermal_schedule.total_duration_s.state.tag == "unknown"
-    for panel in ("VI_lherzolite", "V_alumina_basalt"):
+        assert experiment.sample.mass_kg.state.tag == "unknown"
+        assert experiment.apparatus.geometry.orifice_area_m2.state.tag == "unknown"
+        assert experiment.apparatus.geometry.orifice_diameter_m.state.tag == "unknown"
+        assert experiment.apparatus.geometry.orifice_channel_length_m.state.tag == "unknown"
+        assert experiment.thermal_schedule.method.state.value == (
+            "Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps"
+        )
+        assert experiment.thermal_schedule.total_duration_s.state.tag == "unknown"
         rows = [
             item
             for item in migrator.result.observations.values()
