@@ -143115,7 +143115,7 @@ species:
         derived_from:
         - tables:neuman-2026-levitation-k-isotopes
         derivation:
-          relation: 1 - m_end/m_start, calculated from the displayed five-decimal starting and ending grams stored in each point derivation_parameters.
+          relation: 1 - m_end/m_start, calculated from the displayed starting and ending grams stored as each point's derivation_parameters.
           inputs:
           - tables:neuman-2026-levitation-k-isotopes
         points:
@@ -145151,7 +145151,7 @@ species:
         derived_from:
         - tables:neuman-2026-levitation-k-isotopes
         derivation:
-          relation: 1 - m_end/m_start, calculated from the displayed grams stored in each point's derivation_parameters.
+          relation: 1 - m_end/m_start, calculated from the displayed starting and ending grams stored as each point's derivation_parameters.
           inputs:
           - tables:neuman-2026-levitation-k-isotopes
         points:
