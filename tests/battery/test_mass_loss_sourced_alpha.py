@@ -134,3 +134,19 @@ def test_shrinking_area_numeric_pin_before_shared_formula_move(monkeypatch):
         initial_area_m2=0.0000913,
     )
     assert areas == pytest.approx([0.0000913, 0.00005751539592770096], rel=1e-14)
+
+
+def test_vacuum_oxygen_root_pin_before_flux_refactor():
+    from simulator.battery.oxygen_balance import _VacuumOxygenChannel, _solve_vacuum_oxygen_balance
+
+    channels = (
+        _VacuumOxygenChannel("Mg", 0.024305, 0.0, 1.0, -0.5, 0.5, "synthetic anchor"),
+        _VacuumOxygenChannel("O2", 0.0319988, 2.0, 0.0, 1.0, 1.0, "oxygen coproduct"),
+    )
+    result = _solve_vacuum_oxygen_balance(
+        lambda logp: {"Mg": 0.001 / (10.0**logp)**0.5, "O2": 100000.0 * 10.0**logp},
+        channels, temperature_K=2073.15,
+    )
+    # Analytic oxygen stoichiometry: 2*J_O2=J_Mg. Independent 50-digit
+    # evaluation gives this pO2 for the declared power-law pressures/masses.
+    assert result.pO2_bar == pytest.approx(0.0000020188591846109878, rel=1e-10)
