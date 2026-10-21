@@ -12,9 +12,9 @@ extraction:
   method: >-
     Manual transcription of printed Tables 4, 5 and 6 from the supplied PDF
     layout text. Table 5 activities and their printed Mg-in-Sn reduction inputs
-    are retained in context pending TABLE_CSV registration (t-1382). Table 6
-    calculated coefficients are context, not measured observations. Activity-
-    contour figures are not digitized. The method is slag–metal equilibrium,
+    are retained as measured-reduced observations backed by the registered
+    t5.csv corpus table. Table 6 calculated coefficients are context, not
+    measured observations. Activity-contour figures are not digitized. The method is slag–metal equilibrium,
     not KEMS.
   date: '2026-10-01'
   worker: codex
@@ -60,30 +60,27 @@ fidelity_samples:
       pdf_page_index: 4
       table: '5'
       note: Row 8 activity cell
-  - path: species.Mg.observations[guo_2021_table6_mg_activity_coefficients_1873k].values.points[0].gamma_as_printed
+  - species: Mg
+    observation_id: guo_2021_table6_mg_activity_coefficients_1873k
+    observable: model_output
+    field: gamma_first_column_as_printed
     value: '3.1713'
     note: Table 6 first activity-coefficient column
-    locator:
-      published_page: 2730
-      pdf_page_index: 6
-      table: '6'
-      note: First x[Mg] column gamma cell
-  - path: species.Mg.observations[guo_2021_table6_mg_activity_coefficients_1873k].values.points[3].gamma_as_printed
+    locator: {published_page: 2730, pdf_page_index: 6, table: '6', note: 'First x[Mg] column gamma cell'}
+  - species: Mg
+    observation_id: guo_2021_table6_mg_activity_coefficients_1873k
+    observable: model_output
+    field: gamma_fourth_column_as_printed
     value: '3.1718'
     note: Table 6 fourth activity-coefficient column
-    locator:
-      published_page: 2730
-      pdf_page_index: 6
-      table: '6'
-      note: Fourth x[Mg] column gamma cell
-  - path: species.Mg.observations[guo_2021_table6_mg_activity_coefficients_1873k].values.points[7].gamma_as_printed
+    locator: {published_page: 2730, pdf_page_index: 6, table: '6', note: 'Fourth x[Mg] column gamma cell'}
+  - species: Mg
+    observation_id: guo_2021_table6_mg_activity_coefficients_1873k
+    observable: model_output
+    field: gamma_eighth_column_as_printed
     value: '3.1703'
     note: Table 6 eighth activity-coefficient column
-    locator:
-      published_page: 2730
-      pdf_page_index: 6
-      table: '6'
-      note: Eighth x[Mg] column gamma cell
+    locator: {published_page: 2730, pdf_page_index: 6, table: '6', note: 'Eighth x[Mg] column gamma cell'}
 experiments:
   - experiment_id: guo_slag_metal_equilibrium_1873k
     method: quench_equilibration
@@ -105,55 +102,134 @@ experiments:
           note: The abstract states T = 1 873 K.
 species:
   MgO:
-    observations: []
-    context:
+    observations:
       - observation_id: guo_2021_table5_mgo_activities_1873k
-        type: activity
+        type: activity_coefficient
+        evidence_class: measured_reduced
+        method_class: measured_reduced
+        derived_from: [tables:guo-2021-mgo-activity-cmas-slag]
+        derivation:
+          relation: Table 5 MgO activity reduced from measured Mg-in-Sn mole fraction using the reference slag value in Table 4
+          inputs: [tables:guo-2021-mgo-activity-cmas-slag]
+          output_unit: dimensionless activity
         locator:
           published_page: 2728
           pdf_page_index: 4
           table: '5'
-          note: Eight measured MgO activity results; numeric rows retained pending a TABLE_CSV asset.
+          note: Eight measured MgO activity results; inputs transcribed in tables/guo-2021-mgo-activity-cmas-slag/t5.csv.
         units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: MgO
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: periclase}
+              component_basis: MgO
+          inferred: false
+          note: The paper states activity relative to pure solid MgO.
+          locator: {published_page: 2728, pdf_page_index: 4, table: '5'}
         values:
-          schema_gap: t-1382 (table assets)
           temperature_K: '1873'
+          quantity: activity
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
           standard_state_as_printed: relative to pure solid MgO
           uncertainty_as_printed: No numeric uncertainty is printed for the Table 5 activity cells.
           method_as_printed: slag-metal equilibrium using an Sn solvent and CaF2-MgO reference slag
           reference_activity_as_printed: '1'
+          reference_slag_x_Mg_average_as_printed: '0.00302'
           points:
             - row: '1'
               activity: '0.4478'
+              activity_as_printed: '0.4478'
               x_Mg_in_Sn: '0.001355'
+              x_Mg_in_Sn_as_printed: '0.001355'
+              T_C: '1599.85'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 2728, pdf_page_index: 4, table: '5'}
               composition_wt_pct: {CaO: '35.41', SiO2: '33.35', MgO: '9.26', Al2O3: '19.39'}
             - row: '2'
               activity: '0.5121'
+              activity_as_printed: '0.5121'
               x_Mg_in_Sn: '0.001550'
+              x_Mg_in_Sn_as_printed: '0.001550'
+              T_C: '1599.85'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 2728, pdf_page_index: 4, table: '5'}
               composition_wt_pct: {CaO: '36.62', SiO2: '32.02', MgO: '9.46', Al2O3: '19.75'}
             - row: '3'
               activity: '0.5379'
+              activity_as_printed: '0.5379'
               x_Mg_in_Sn: '0.001628'
+              x_Mg_in_Sn_as_printed: '0.001628'
+              T_C: '1599.85'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 2728, pdf_page_index: 4, table: '5'}
               composition_wt_pct: {CaO: '38.33', SiO2: '30.84', MgO: '9.51', Al2O3: '19.63'}
             - row: '4'
               activity: '0.6376'
+              activity_as_printed: '0.6376'
               x_Mg_in_Sn: '0.001929'
+              x_Mg_in_Sn_as_printed: '0.001929'
+              T_C: '1599.85'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 2728, pdf_page_index: 4, table: '5'}
               composition_wt_pct: {CaO: '39.32', SiO2: '29.27', MgO: '9.77', Al2O3: '19.72'}
             - row: '5'
               activity: '0.4236'
+              activity_as_printed: '0.4236'
               x_Mg_in_Sn: '0.001282'
+              x_Mg_in_Sn_as_printed: '0.001282'
+              T_C: '1599.85'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 2728, pdf_page_index: 4, table: '5'}
               composition_wt_pct: {CaO: '41.87', SiO2: '31.85', MgO: '4.63', Al2O3: '19.35'}
             - row: '6'
               activity: '0.4751'
+              activity_as_printed: '0.4751'
               x_Mg_in_Sn: '0.001438'
+              x_Mg_in_Sn_as_printed: '0.001438'
+              T_C: '1599.85'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 2728, pdf_page_index: 4, table: '5'}
               composition_wt_pct: {CaO: '40.64', SiO2: '30.98', MgO: '6.54', Al2O3: '19.31'}
             - row: '7'
               activity: '0.5716'
+              activity_as_printed: '0.5716'
               x_Mg_in_Sn: '0.001730'
+              x_Mg_in_Sn_as_printed: '0.001730'
+              T_C: '1599.85'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 2728, pdf_page_index: 4, table: '5'}
               composition_wt_pct: {CaO: '39.22', SiO2: '29.78', MgO: '8.30', Al2O3: '19.56'}
             - row: '8'
               activity: '0.6472'
+              activity_as_printed: '0.6472'
               x_Mg_in_Sn: '0.001959'
+              x_Mg_in_Sn_as_printed: '0.001959'
+              T_C: '1599.85'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1873'}
+                  locator: {published_page: 2728, pdf_page_index: 4, table: '5'}
               composition_wt_pct: {CaO: '38.58', SiO2: '29.83', MgO: '10.22', Al2O3: '19.61'}
 
   Mg:
@@ -180,3 +256,6 @@ species:
             - {x_Mg: '0.001438', a_Mg_R: '0.004559', gamma: '3.1704'}
             - {x_Mg: '0.001730', a_Mg_R: '0.005485', gamma: '3.1706'}
             - {x_Mg: '0.001959', a_Mg_R: '0.006211', gamma: '3.1703'}
+          gamma_first_column_as_printed: '3.1713'
+          gamma_fourth_column_as_printed: '3.1718'
+          gamma_eighth_column_as_printed: '3.1703'
