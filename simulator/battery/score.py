@@ -660,6 +660,13 @@ def no_headline_rail_reason(
     return f"no_headline_rail:{quantity.value}"
 
 
+# Spellings written by residual_key. Readers parse them with residual_key_slots.
+# A missing quantity in the key is not the refusal-detail reason of the same
+# spelling; that detail stays a refusal payload, not a key field.
+NO_HEADLINE_RAIL_TOKEN = "none"
+MISSING_QUANTITY_KEY_TOKEN = "quantity_unknown"
+
+
 def residual_key(
     *,
     reference_id: str,
@@ -670,13 +677,13 @@ def residual_key(
 ) -> str:
     """Stable comparison slot: lineage + quantity + identity T + rail + engine.
 
-    Run/version are excluded (v2.1 pin_key_map). No headline rail is the
-    token ``none``, never a borrowed vapour or SiO label.
+    Run/version are excluded (v2.1 pin_key_map). No headline rail is
+    ``NO_HEADLINE_RAIL_TOKEN``, never a borrowed vapour or SiO label.
     """
 
-    q = "quantity_unknown" if quantity is None else quantity.value
+    q = MISSING_QUANTITY_KEY_TOKEN if quantity is None else quantity.value
     t = "" if temperature_K is None else f":T={_dec_token(temperature_K)}"
-    rail_token = "none" if rail is None else rail.value
+    rail_token = NO_HEADLINE_RAIL_TOKEN if rail is None else rail.value
     return f"{reference_id}{t}::{q}::{rail_token}::{engine.value}"
 
 
@@ -685,6 +692,51 @@ def _dec_token(value: Decimal) -> str:
     if "." in text:
         text = text.rstrip("0").rstrip(".")
     return text or "0"
+
+
+def _residual_key_parts(key: object) -> tuple[str, str, str, str] | None:
+    """Split a residual key into head, quantity, rail, and engine.
+
+    None when the key is not four ``::`` fields. An empty quantity field
+    becomes ``MISSING_QUANTITY_KEY_TOKEN``.
+    """
+
+    parts = str(key or "").rsplit("::", 3)
+    if len(parts) != 4:
+        return None
+    head, quantity, rail, engine = parts
+    if not quantity:
+        quantity = MISSING_QUANTITY_KEY_TOKEN
+    return (head, quantity, rail, engine)
+
+
+def _temperature_token(head: str) -> Decimal | None:
+    """Identity temperature ``residual_key`` appends as ``:T=`` on the reference head."""
+
+    _prefix, marker, token = head.rpartition(":T=")
+    if not marker or not token:
+        return None
+    try:
+        value = Decimal(token)
+    except InvalidOperation:
+        return None
+    if not value.is_finite():
+        return None
+    return value
+
+
+def residual_key_slots(key: object) -> tuple[str, str, str, Decimal | None]:
+    """Return quantity, rail, engine, and identity temperature from a residual key.
+
+    A key that is not four ``::`` fields has no rail, engine, or temperature,
+    and its quantity is ``MISSING_QUANTITY_KEY_TOKEN``.
+    """
+
+    parts = _residual_key_parts(key)
+    if parts is None:
+        return (MISSING_QUANTITY_KEY_TOKEN, "", "", None)
+    head, quantity, rail, engine = parts
+    return (quantity, rail, engine, _temperature_token(head))
 
 
 def metric_operation(quantity: Quantity | None) -> MetricOperation | None:
@@ -10257,8 +10309,10 @@ class _AllNumericFact:
 def _residual_key_quantity(key: object) -> str:
     """Quantity token of a ``residual_key`` (``…::q::rail::engine``)."""
 
-    parts = str(key or "").rsplit("::", 3)
-    return parts[1] if len(parts) == 4 and parts[1] else "quantity_unknown"
+    parts = _residual_key_parts(key)
+    if parts is None:
+        return MISSING_QUANTITY_KEY_TOKEN
+    return parts[1]
 
 
 def _all_numeric_source_id(reference: str, observation: Observation | None) -> str:
@@ -10968,7 +11022,7 @@ class _ResidualRowsPayloadView:
             engine = _engine_of(residual)
             relation = residual.source_relation.value
             family_values[(family, quantity.value, engine, relation)].add(value)
-            rail = residual.rail.value if residual.rail else "none"
+            rail = residual.rail.value if residual.rail else NO_HEADLINE_RAIL_TOKEN
             if numeric.operation is MetricOperation.DEX and numeric.decision_band.unit == "dimensionless":
                 headline_values[("compilation", rail, engine)].add(value)
             if numeric.operation is not None:
@@ -12477,7 +12531,7 @@ class _ScorePayloadAccumulator:
             )
             family = ""
             tier_quantity = "unknown"
-            tier_rail = "none"
+            tier_rail = NO_HEADLINE_RAIL_TOKEN
             tier_uncertainty = ""
             family_quantity = None
             if is_compilation and observation is not None:
