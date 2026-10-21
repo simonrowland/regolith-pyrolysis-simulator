@@ -9,6 +9,8 @@ from tests.battery.test_migrate import _migrate_real_extract
 
 SID = "kems-012-sossi-2019"
 EXTRACT = f"{SID}.yaml"
+FEDKIN_SID = "kems-005-fedkin-2006"
+FEDKIN_EXTRACT = f"{FEDKIN_SID}.yaml"
 TABLE2_RUNS = {
     "sossi-2019-run-2m-16-07-16e": Decimal("848.9"),
     "sossi-2019-run-2m-16-07-16a": Decimal("742.5"),
@@ -82,4 +84,45 @@ def _assert_sossi_pins(result) -> None:
 def test_sossi_fitted_outputs_are_context_and_run_measurements_keep_conditions(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, EXTRACT)
     _assert_sossi_pins(result)
+
+
+def _assert_fedkin_pins(result) -> None:
+    assert result.validation.hard_issues == ()
+    expected = {
+        "fedkin_2006_na_yu_langmuir": Decimal("0.26"),
+        "fedkin_2006_k_yu_langmuir": Decimal("0.13"),
+    }
+    points = {
+        row.observation_id.rsplit("::T=", 1)[0].split("::")[-1]: row
+        for row in result.observations.values()
+        if row.value.kind is ValueKind.POINT
+        and row.observation_id.rsplit("::T=", 1)[0].split("::")[-1] in expected
+    }
+    assert set(points) == set(expected)
+    for observation_id, value in expected.items():
+        row = points[observation_id]
+        assert row.value.point == value
+        assert row.identity.temperature_K.is_value
+        assert row.identity.temperature_K.value == Decimal("1723.0")
+        assert row.point_conditions["temperature_K"].state.value == Decimal("1723.0")
+        assert row.point_conditions["total_pressure_Pa"].state.value.point == Decimal("1.0")
+
+    contexts = [
+        context
+        for records in result.context_by_work.values()
+        for context in records
+        if context.get("source_id") == FEDKIN_SID
+    ]
+    table3 = next(context for context in contexts if context.get("table") == "3")
+    assert table3["locator"]["page"] == 8
+    assert {row["element"] for row in table3["rows"]} == {"Fe", "Mg", "SiO"}
+    assert all(len(row["temperature_values"]) == 4 for row in table3["rows"])
+    table4 = next(context for context in contexts if context.get("table") == "4")
+    assert table4["locator"]["page"] == 14
+    assert len(table4["rows"]) == 4
+
+
+def test_fedkin_table3_fit_outputs_are_context_and_yu_runs_keep_conditions(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, FEDKIN_EXTRACT)
+    _assert_fedkin_pins(result)
 
