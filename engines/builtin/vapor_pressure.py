@@ -114,6 +114,7 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     single_cation_mole_fractions,
 )
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K  # noqa: E402
+from simulator.melt_backend import openimcc_bridge  # noqa: E402
 from simulator.physical_constants import (  # noqa: E402
     GAS_CONSTANT,
     MELT_DISSOCIATION_PO2_MAX_BAR,
@@ -572,7 +573,6 @@ _EXTRAPOLATION_CAP_L1: dict[str, float] = {
 _TEMPERATURE_BRIDGE_OFFSETS_K = (25.0, 50.0, 75.0)
 _TEMPERATURE_BRIDGE_MAX_CALLS = 6
 _TEMPERATURE_BRIDGE_CAP_K = 75.0
-_TEMPERATURE_BRIDGE_DOMAIN_K = (1700.0, 3000.0)
 
 # One diagnostic-tier data table. This is the warning threshold suggested
 # by d-175, not an accuracy calibration or a ceiling on projected solves.
@@ -905,7 +905,7 @@ def _same_composition_temperature_bridge(
 
     points: list[tuple[float, dict[str, float]]] = []
     attempted: list[float] = []
-    domain_low, domain_high = _TEMPERATURE_BRIDGE_DOMAIN_K
+    domain_low, domain_high = openimcc_bridge._temperature_domain_K()
 
     def bracketed() -> bool:
         return any(probe_T < temperature_K for probe_T, _gammas in points) and any(
@@ -1041,7 +1041,7 @@ def _build_high_t_melt_activity_authority(
             cleaned = evaluate_cleaned_melt(
                 composition_mol=solve_composition,
                 temperature_K=temperature_K,
-                allow_extrapolation=temperature_K > 3000.0,
+                allow_extrapolation=temperature_K > openimcc_bridge._temperature_domain_K()[1],
             )
         except OpenImccCompositionPolicyRefusal as policy_refusal:
             if policy_refusal.code != "openimcc_projection_over_threshold":
@@ -1094,7 +1094,7 @@ def _build_high_t_melt_activity_authority(
             cleaned = evaluate_cleaned_melt(
                 composition_mol=solve_composition,
                 temperature_K=temperature_K,
-                allow_extrapolation=temperature_K > 3000.0,
+                allow_extrapolation=temperature_K > openimcc_bridge._temperature_domain_K()[1],
             )
     except expected_refusal_types as exc:
         code = str(getattr(exc, "code", "openimcc_evaluation_refused"))
@@ -1370,7 +1370,7 @@ def _build_high_t_melt_activity_authority(
             "openimcc_acid_sink_ratio": bridge.acid_sink_ratio,
             "temperature_domain_status": (
                 "predict_and_flag_extrapolated"
-                if temperature_K > 3000.0
+                if temperature_K > openimcc_bridge._temperature_domain_K()[1]
                 else "in_domain"
             ),
         }
