@@ -60873,15 +60873,14 @@ species:
         figure: '3'
         note: Figure 3 caption identifies the combined vacuum and finite-hydrogen fit.
       T_range_K:
-      - 1873.0
-      - 2173.0
+      - 1773.15
+      - 2173.15
       applies_to_experiments:
       - cai-r-11
       - cai-r-18
       - cai-r-2
       - cai-r-3
       - cai-r-4
-      - cai-r-7
       - cai-r-8
       - cai-r-9
       - cai-r2-1
@@ -60915,7 +60914,14 @@ species:
         gas_species: Mg(g)
         material: Type_B_CAI_like_liquid
         standard_state: "Berman CMAS activities for saturation vapor pressure; vacuum free evaporation, not a Knudsen cell."
-        model_dependence: "Evaporation coefficients are calculated from measured rates and saturation vapor pressures; Figure 3 combines vacuum data with the cited finite-hydrogen data."
+        model_dependence: >-
+          Evaporation coefficients are calculated from measured rates and saturation
+          vapor pressures. Figure 3 combines the Figure 2 vacuum rates for the
+          2.5 mm and 6 mm samples with the Richter et al. (2002) hydrogen runs
+          BCAI-ss1, BCAI-ss2, BCAI-s1, BCAI-s3, BCAI-m1, and BCAI-m2 at 1500 °C
+          and 1.87 × 10⁻⁴ bar H2. The local applies_to_experiments list names
+          these vacuum runs only; it is not a complete coverage claim for the
+          combined fit because the 2002 run ids are owned by kems-037-richter-2002.
         alpha_form:
           type: arrhenius
           expression: gamma = gamma_o * exp(-E/(R*T))
@@ -62119,15 +62125,14 @@ species:
         figure: '3'
         note: Figure 3 caption identifies the combined vacuum and finite-hydrogen fit.
       T_range_K:
-      - 1873.0
-      - 2173.0
+      - 1773.15
+      - 2173.15
       applies_to_experiments:
       - cai-r-11
       - cai-r-18
       - cai-r-2
       - cai-r-3
       - cai-r-4
-      - cai-r-7
       - cai-r-8
       - cai-r-9
       - cai-r2-1
@@ -62161,7 +62166,14 @@ species:
         gas_species: SiO(g)
         material: Type_B_CAI_like_liquid
         standard_state: "Berman CMAS activities for saturation vapor pressure; vacuum free evaporation."
-        model_dependence: "Evaporation coefficients are calculated from measured rates and saturation vapor pressures; Figure 3 combines vacuum data with the cited finite-hydrogen data."
+        model_dependence: >-
+          Evaporation coefficients are calculated from measured rates and saturation
+          vapor pressures. Figure 3 combines the Figure 2 vacuum rates for the
+          2.5 mm and 6 mm samples with the Richter et al. (2002) hydrogen runs
+          BCAI-ss1, BCAI-ss2, BCAI-s1, BCAI-s3, BCAI-m1, and BCAI-m2 at 1500 °C
+          and 1.87 × 10⁻⁴ bar H2. The local applies_to_experiments list names
+          these vacuum runs only; it is not a complete coverage claim for the
+          combined fit because the 2002 run ids are owned by kems-037-richter-2002.
         alpha_form:
           type: arrhenius
           expression: gamma = gamma_o * exp(-E/(R*T))

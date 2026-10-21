@@ -21,7 +21,7 @@ TABLE2_RUNS = {
     "sossi-2019-run-2m-16-07-16b": Decimal("739.9"),
 }
 RICHTER07_FIT_EXPERIMENTS = {
-    "cai-r-11", "cai-r-18", "cai-r-2", "cai-r-3", "cai-r-4", "cai-r-7",
+    "cai-r-11", "cai-r-18", "cai-r-2", "cai-r-3", "cai-r-4",
     "cai-r-8", "cai-r-9", "cai-r2-1", "cai-r2-10", "cai-r2-11", "cai-r2-12",
     "cai-r2-16", "cai-r2-2", "cai-r2-3", "cai-r2-4", "cai-r2-5", "cai-r3-1",
     "cai-r3-10", "cai-r3-11", "cai-r3-13", "cai-r3-14", "cai-r3-15",
@@ -296,9 +296,14 @@ def _assert_richter07_pins(result) -> None:
         assert fit["type"] == "best_fit_model_context"
         assert fit["locator"]["published_page"] == 5553
         assert fit["locator"]["figure"] == "3"
-        assert fit["T_range_K"] == [1873.0, 2173.0]
+        assert fit["T_range_K"] == [1773.15, 2173.15]
         assert set(fit["applies_to_experiments"]) == RICHTER07_FIT_EXPERIMENTS
-        assert len(fit["applies_to_experiments"]) == 32
+        assert "cai-r-7" not in fit["applies_to_experiments"]
+        assert len(fit["applies_to_experiments"]) == 31
+        model_dependence = fit["values"]["model_dependence"]
+        assert "BCAI-ss1, BCAI-ss2, BCAI-s1, BCAI-s3, BCAI-m1, and BCAI-m2" in model_dependence
+        assert "1.87 × 10⁻⁴ bar H2" in model_dependence
+        assert "not a complete coverage claim" in model_dependence
         alpha_form = fit["values"]["alpha_form"]
         assert Decimal(str(alpha_form["c0"])) == c0
         assert Decimal(str(alpha_form["E_J_per_mol"])) == energy
