@@ -662,7 +662,7 @@ function updateKnudsenIndicator() {
     const kn = meanFreePathM / config.characteristicLengthM;
     indicator.textContent = `Kn: ${kn.toExponential(2)}`
         + (kn >= config.continuumBufferKn
-            ? ' - molecular flow / coating risk'
+            ? ' - non-continuum transport / model uncertainty'
             : ' - viscous transport');
     indicator.classList.toggle('config-warning', kn >= config.continuumBufferKn);
 }

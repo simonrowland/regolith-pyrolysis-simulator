@@ -2282,12 +2282,12 @@ def _knudsen_config_payload(
             'source_campaign': 'C2A_continuous',
             'min': pressure_low,
             'max': pressure_high,
-            'label': 'viscous-flow band',
+            'label': 'design-default pressure band',
             'warning_message': (
                 'pN2 sweep outside '
                 f'{_format_compact_number(pressure_low)}-'
                 f'{_format_compact_number(pressure_high)} mbar '
-                'viscous-flow band'
+                'design-default pressure band'
             ),
         },
     }

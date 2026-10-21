@@ -1,16 +1,10 @@
 """Known defect (b): a run starts, then STALLS — the owner saw it sit on an
 OUT_OF_DOMAIN state that arrives over socket.io, not the HTTP access log.
 
-Framing (controller correction, 2026-08-28): the terminal refusal this test
-reproduces — `viscous_p_bulk_transport_out_of_domain` at C4 — is CORRECT,
-DELIBERATE fail-closed behaviour: viscous Poiseuille P_bulk is invalid in the
-transitional Knudsen band, so pyrolysis extraction refuses rather than
-extrapolate (Stage 0 bakeout is the compute-and-mark regime; see
-simulator/evaporation.py viscous_p_bulk_out_of_domain_diagnostic). The test
-still FAILS on it because the happy-path journey genuinely does not complete —
-but the harness reports it as a lawful model-coverage refusal, never as a
-crash or hang. A *true* stall (no state change for STALL_THRESHOLD_MS with no
-terminal state and no unanswered decision) remains a defect. So this watchdog:
+d-209 (2026-10-20) removes the former transitional-regime refusal rule.
+The existing continuum extension predicts with a visible uncertainty flag;
+regime alone must not halt this journey. A true no-progress stall remains a
+failure. The watchdog:
 
   * starts a run at max speed; the server must answer within START_ACK_MS,
   * then requires continuous forward progress (no no-progress window longer
@@ -93,13 +87,6 @@ def _stall_report(evidence, last_hour: float) -> str:
     return "\n".join(parts)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "viscous_p_bulk_transport_out_of_domain is a known product gap pending "
-        "low-pressure transport support"
-    ),
-)
 @pytest.mark.timeout(300)
 def test_run_does_not_stall(page, evidence):
     page.goto(f"{BASE_URL}/", wait_until="domcontentloaded", timeout=PAGE_LOAD_MS)

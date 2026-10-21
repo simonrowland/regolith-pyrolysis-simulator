@@ -420,7 +420,7 @@ def test_runtime_pipe_diameter_updates_segment_transport_geometry():
     assert {segment.inner_diameter_m for segment in model.pipe_segments} == {0.25}
 
 
-def test_unknown_campaign_refuses_viscous_flow_policy():
+def test_unknown_campaign_refuses_transport_diagnostic():
     model = CondensationModel(CondensationTrain.create_default())
 
     with pytest.raises(ValueError, match="unknown campaign"):
@@ -438,7 +438,7 @@ def test_idle_campaign_is_known_and_does_not_require_viscous_flow():
         campaign_name="IDLE",
     )
 
-    assert model._viscous_flow_required is False
+    assert model._current_knudsen_diagnostic()["viscous_flow_required"] is False
 
 
 def test_pyrolysis_simulator_uses_instance_isolation_not_module_mutation():

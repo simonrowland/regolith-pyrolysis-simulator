@@ -47,7 +47,7 @@ The registry's accepted species per stage are: Stage 1 Fe condenser `Fe`; Stage 
 
 `shuttle_refusal_history` is an append-only list of C3 shuttle dispatches the S1b T-acceptance gate refused. Empty list means every step was thermodynamically accepted at its dispatch T. Each entry carries the engine's structured diagnostic: `reaction_family` (`C3_K` or `C3_NA`), `reagent`, `hour`, `campaign_hour`, `temperature_C`, plus `diagnostic.k_reduction_margin_kJ_per_mol_O2` and (for Na) `diagnostic.thermo_deltaG_kJ_per_mol_O2`.
 
-Per-step refusals leave the run `status` at `ok` or `partial`. Only whole-run halts (e.g. `KnudsenRegimeRefusal` for a viscous-flow violation) escalate to `status="refused"`.
+Per-step refusals leave the run `status` at `ok` or `partial`. Only whole-run halts (e.g. `KnudsenRegimeRefusal` for unusable transport inputs) escalate to `status="refused"`.
 
 Under JANAF-4th multiphase Ellingham (2026-07-09 re-ground):
 
@@ -59,8 +59,8 @@ Under JANAF-4th multiphase Ellingham (2026-07-09 re-ground):
 `run_metadata.knudsen_regime_diagnostic` reports the transport-regime check per pipe segment:
 
 - `status: "ok"`, `regime: "viscous"` — Kn < 0.01, sweep gas drives directional transport. Default operating condition for the 5–15 mbar pN₂ band.
-- `status: "warning"`, `regime: "transitional"` — Kn between 0.01 and 10; F3 still computes attenuated HKL flux (`regime_factor = Kn / (Kn + 0.01)`) but you are losing transport-directed condensation and the simulator's stage-yield numbers should be read as a lower bound (see [`docs/model-limitations.md`](model-limitations.md) on viscous-regime mass transfer).
-- `status: "refused"`, `regime: "free_molecular"` — Kn ≥ 10 on at least one segment; `KnudsenRegimeRefusal` escalates the run to `status="refused"`. Recipe is unrunnable at this pN₂; increase sweep gas pressure.
+- `status: "warning"`, `regime: "transitional"` — Kn between 0.01 and 10; evaporation uses a flagged continuum extension and wall deposition uses a continuity correction. These are model uncertainties, not recipe exclusions.
+- `status: "warning"`, `regime: "free_molecular"` — Kn ≥ 10; free-molecular surface transport is computed with uncertainty flags. Pressure is preserved. Only missing or unusable transport inputs refuse.
 
 ## Evaporation alpha
 

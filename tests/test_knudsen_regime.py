@@ -233,56 +233,19 @@ def test_typed_refusal_diagnostics_deep_copy_caller_payloads() -> None:
     assert knudsen.diagnostic["nested"]["status"] == "original"
 
 
-def test_c2a_knudsen_pressure_floor_recovers_stranded_setpoint():
+@pytest.mark.parametrize("campaign", ["C0", "C2A", "C4", "C6"])
+def test_free_molecular_pressure_is_preserved_and_flagged(campaign):
     model = CondensationModel(CondensationTrain.create_default())
-
-    adjustment = model.adjust_c2a_pressure_setpoint(
-        requested_p_total_mbar=1.0e-6,
-        pO2_mbar=0.0,
-        gas_temperature_C=1600.0,
-        pipe_diameter_m=0.12,
-        pN2_min_mbar=5.0,
-        pN2_max_mbar=15.0,
-        carrier_gas="N2",
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1e-6, gas_temperature_C=1600.0,
+        pipe_diameter_m=0.12, carrier_gas="N2", campaign_name=campaign,
     )
-
-    assert adjustment["status"] == "applied"
-    assert adjustment["requested_p_total_mbar"] == pytest.approx(1.0e-6)
-    assert adjustment["minimum_pressure_mbar"] < 5.0
-    assert adjustment["applied_pN2_mbar"] == pytest.approx(5.0)
-    assert adjustment["applied_p_total_mbar"] == pytest.approx(5.0)
-    assert adjustment["formula"] == (
-        "k_B*T/(sqrt(2)*pi*d^2*L*Kn_ceiling)"
-    )
-    applied_kn = condensation_module._knudsen_number(
-        adjustment["applied_p_total_mbar"] * 100.0,
-        1600.0 + 273.15,
-        adjustment["controlling_characteristic_length_m"],
-    )
-    assert applied_kn < condensation_module.FREE_MOLECULAR_KNUDSEN_MIN
-
-
-def test_c2a_knudsen_pressure_floor_uses_continuous_transport_for_empty_band():
-    model = CondensationModel(CondensationTrain.create_default())
-
-    adjustment = model.adjust_c2a_pressure_setpoint(
-        requested_p_total_mbar=1.0e-6,
-        pO2_mbar=0.0,
-        gas_temperature_C=1600.0,
-        pipe_diameter_m=1.0e-8,
-        pN2_min_mbar=5.0,
-        pN2_max_mbar=15.0,
-        carrier_gas="N2",
-    )
-
-    assert adjustment["status"] == "warning"
-    assert adjustment["reason"] == (
-        "c2a_knudsen_pressure_window_continuous_transport"
-    )
-    assert adjustment["required_pN2_mbar"] > 15.0
-    assert "applied_pN2_mbar" not in adjustment
-    assert "applied_p_total_mbar" not in adjustment
-    assert adjustment["band_max_pN2_mbar"] == pytest.approx(15.0)
+    diagnostic = model._enforce_knudsen_regime()
+    assert model.overhead_pressure_mbar == 1e-6
+    assert diagnostic["regime"] == "free_molecular"
+    assert diagnostic["status"] == "warning"
+    assert diagnostic["warnings"]
+    assert diagnostic["viscous_flow_required"] is False
 
 
 def test_unknown_carrier_knudsen_diagnostic_fails_loud():

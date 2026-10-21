@@ -1,10 +1,8 @@
 """Pinned VPR-P0a transport-regime formulas and applicability.
 
 Classification (KnudsenRegime / classify_knudsen_regime) is shared with the
-live condensation path. Continuum-formula validity is NOT a global fail-closed:
-it is load-bearing only where viscous sweep of metal/SiO vapor is the answer
-being computed (pyrolysis extraction). Stage 0 volatile bakeout is a different
-regime; below the continuum threshold is category-2 compute-and-mark.
+live condensation path. Out-of-domain continuum formulas compute and flag their
+extension in every campaign (d-209); invalid inputs still refuse.
 """
 
 from __future__ import annotations
@@ -19,7 +17,6 @@ from simulator.physical_constants import BOLTZMANN, GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.silent_zero import (
     CATEGORY_MARK,
-    CATEGORY_REFUSE,
     ZeroBecause,
     note_dict,
 )
@@ -93,8 +90,7 @@ _STAGE0_BAKEOUT_CAMPAIGNS = frozenset({
     "C0B",
     "C0b_p_cleanup",
 })
-# Metal / SiO vapor extraction: the mandate viscous-flow invariant (Kn << 0.01)
-# is load-bearing so evolved vapor is swept to a designated condenser.
+# Metal / SiO extraction is recorded for transport-model provenance.
 _PYROLYSIS_EXTRACTION_CAMPAIGNS = frozenset({
     "C2A",
     "C2A_continuous",
@@ -221,14 +217,7 @@ def resolve_process_regime(
 def continuum_transport_is_load_bearing(
     process_regime: ProcessRegime | str,
 ) -> bool:
-    """True iff leaving Kn < 0.01 must fail-close for the question asked.
-
-    The mandate viscous-flow invariant exists so evolved metal/SiO vapor is
-    swept to a designated condenser instead of crossing ballistically to a
-    cold wall. The sole carve-out is Stage 0 volatile bakeout, where low
-    overhead pressure is the intent. Missing/unknown/idle/electrolysis keep
-    the fail-closed default so omitting a campaign cannot drop the guard.
-    """
+    """Whether the process answer depends on transport-model accuracy."""
 
     regime = (
         process_regime
@@ -275,8 +264,8 @@ def assess_continuum_formula_validity(
 
     Viscous Kn is in-domain. Free-molecular Kn uses the reconstructible HKL
     path, not continuum P_bulk. Transitional Kn is out-of-domain for viscous
-    Poiseuille P_bulk: refuse where that formula is load-bearing, otherwise
-    compute-and-mark.
+    Poiseuille P_bulk: compute-and-mark its existing extension, including
+    where transport accuracy is load-bearing. Regime alone never refuses.
     """
 
     regime = resolve_process_regime(
@@ -343,37 +332,14 @@ def assess_continuum_formula_validity(
         f"free-molecular Kn >= {FREE_MOLECULAR_KNUDSEN_MIN:g} keeps the "
         "HKL upper-bound path"
     )
-    if load_bearing:
-        note = note_dict(
-            ZeroBecause.REFUSED_UPSTREAM,
-            site=str(asking_site),
-            field="continuum_p_bulk",
-            detail=(
-                f"{detail}; process_regime={regime.value}; "
-                f"stage={asked_stage!r}; continuum transport is load-bearing"
-            ),
-            doctrine_category=CATEGORY_REFUSE,
-        )
-        return ContinuumFormulaValidity(
-            action=ContinuumValidityAction.REFUSE,
-            process_regime=regime,
-            knudsen_number=kn,
-            campaign_name=None if campaign_name is None else str(campaign_name),
-            stage=asked_stage,
-            asking_site=str(asking_site),
-            in_domain=False,
-            load_bearing=True,
-            note=note,
-            detail=detail,
-        )
     note = note_dict(
         ZeroBecause.OUT_OF_DOMAIN_MARKED,
         site=str(asking_site),
         field="continuum_p_bulk",
         detail=(
             f"{detail}; process_regime={regime.value}; "
-            f"stage={asked_stage!r}; continuum formula is not load-bearing "
-            "for this stage (category-2 compute-and-mark)"
+            f"stage={asked_stage!r}; flagged continuum extension "
+            "(d-209; kinetic lane t-1396/t-1397)"
         ),
         doctrine_category=CATEGORY_MARK,
     )
@@ -385,7 +351,7 @@ def assess_continuum_formula_validity(
         stage=asked_stage,
         asking_site=str(asking_site),
         in_domain=False,
-        load_bearing=False,
+        load_bearing=load_bearing,
         note=note,
         detail=detail,
     )
@@ -407,7 +373,7 @@ def refuse_continuum_formula_if_load_bearing(
     stage: str | None = None,
     asking_site: str,
 ) -> ContinuumFormulaValidity:
-    """Raise TransportRegimeRefusal only when continuum transport is load-bearing."""
+    """Raise TransportRegimeRefusal for invalid transport inputs only."""
 
     assessment = assess_continuum_formula_validity(
         knudsen_number,

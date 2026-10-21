@@ -132,15 +132,9 @@ def viscous_p_bulk_out_of_domain_diagnostic(
     flow, and true vacuum (Kn = +inf), which is a determined state rather than
     an invalid input.
 
-    Transitional Kn at nonzero overhead is out-of-domain for viscous
-    Poiseuille P_bulk. Applicability lives in
-    ``simulator.transport_regime.assess_continuum_formula_validity``:
-    pyrolysis extraction fail-closes (status=refused); Stage 0 bakeout
-    computes and marks (status=out_of_domain). Missing campaign is
-    UNKNOWN and still refuses so the pyrolysis guard cannot be dropped
-    by omitting the stage. The 0.6.3 optimizer floor (~1 mbar, Kn≈0.004)
-    never enters this domain; t-379 (0.7) lifts pyrolysis refusals with
-    transitional/molecular conductance.
+    Transitional Kn at nonzero overhead uses the existing continuum extension,
+    flagged for missing certified transitional transport (kinetic t-1396/t-1397).
+    The flow regime is a design choice (d-209), not a refusal condition.
     """
     from simulator.transport_constants import (
         FREE_MOLECULAR_KNUDSEN_MIN,
@@ -269,19 +263,19 @@ def viscous_p_bulk_out_of_domain_diagnostic(
         ),
         "authority_reason": (
             "viscous_p_bulk_transport_out_of_domain"
-            if refuses
+            if assessment.load_bearing
             else "continuum_formula_out_of_domain_marked"
         ),
         "reason": (
             "viscous_p_bulk_transport_out_of_domain"
-            if refuses
+            if assessment.load_bearing
             else "continuum_formula_out_of_domain_marked"
         ),
         "p_bulk_transport_domain": "out_of_domain_transitional",
         "ledger_yields_authorized": not refuses,
         "detail": (
-            f"{assessment.detail}; t-379 (0.7) supplies transitional/"
-            "molecular conductance"
+            f"{assessment.detail}; kinetic t-1396 supplies molecular pipe "
+            "conductance; t-1397 supplies transitional evaporation"
         ),
         "knudsen_number": kn,
         "model_domain": (
@@ -329,12 +323,11 @@ def refuse_viscous_p_bulk_out_of_domain(
     asking_site: str = "evaporation.viscous_p_bulk",
     stage: str | None = None,
 ) -> None:
-    """Typed refusal when ledger yields leave the viscous P_bulk domain.
+    """Typed refusal for invalid P_bulk transport inputs.
 
     TRANSPORT-MODEL VALIDITY DOMAIN (acceptance-matrix col 7) — NOT a Kn
     safety gate and NOT a coating gate. Hard-raises when the diagnostic helper
-    reports a load-bearing transitional refusal or an invalid Kn input.
-    Bakeout out-of-domain marks do not raise. The authoritative provider
+    reports an invalid Kn input. Out-of-domain regime marks do not raise. The authoritative provider
     returns a refused result from the same payload; bounded C7/native-Fe
     consumers apply their own explicitly tagged diagnostic-limited policy.
     """

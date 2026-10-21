@@ -32,10 +32,6 @@ from simulator.optimize.canonical import canonical_json_dumps
 from simulator.scalar_boundary import is_declared_real_scalar
 
 DEFAULT_ANCHOR_DELTA_FRACTION = 0.15
-# Mirrors the physical regulator band enforced by CampaignManager. Keeping the
-# sampler floor local avoids importing simulator.campaigns through the
-# simulator.optimize package during simulator.lab_schedule initialization.
-C2A_STAGED_PN2_SWEEP_MIN_MBAR = 5.0
 
 SCIPY_SOBOL_SAMPLER = "scipy-sobol"
 DEPENDENCY_FREE_LHC_SAMPLER = "dependency-free-lhc"
@@ -964,7 +960,7 @@ def _condition_pressure_pair_values(
         )
         if total_sampled and not po2_sampled:
             minimum_total = (
-                po2 + C2A_STAGED_PN2_SWEEP_MIN_MBAR
+                math.nextafter(po2, math.inf)
                 if requires_positive_carrier
                 else po2
             )
@@ -997,10 +993,10 @@ def _condition_pressure_pair_values(
         if requires_positive_carrier:
             feasible_high = min(
                 feasible_high,
-                total - C2A_STAGED_PN2_SWEEP_MIN_MBAR,
+                math.nextafter(total, -math.inf),
             )
             if total_sampled and feasible_high < po2_low:
-                # A refinement parent can predate the regulator-band contract.
+                # A refinement parent can have an infeasible pressure pair.
                 # Project its local pO2 interval down to the nearest globally
                 # legal value instead of aborting the whole staged study.
                 po2_low = max(float(po2_spec.low), feasible_high)

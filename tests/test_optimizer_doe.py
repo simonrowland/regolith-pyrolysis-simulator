@@ -8,7 +8,6 @@ import math
 import pytest
 
 import simulator.optimize.doe as doe_module
-from simulator.campaigns import C2A_STAGED_PN2_SWEEP_MIN_MBAR
 from simulator.optimize.doe import (
     ConditionalSubspaceExhausted,
     DEPENDENCY_FREE_LHC_SAMPLER,
@@ -290,10 +289,6 @@ def _assert_pressure_defaults_are_jointly_feasible(
                         total,
                         ".".join(mode_path),
                         mode,
-                    )
-                    assert (
-                        total - po2
-                        >= C2A_STAGED_PN2_SWEEP_MIN_MBAR - 1.0e-12
                     )
                     continue
             assert po2 <= total, (
@@ -1365,3 +1360,23 @@ def test_doe_spec_validates_anchor_eagerly() -> None:
             anchor=_anchor(),
             delta_fraction=-0.1,
         )
+
+
+def test_pn2_conditioning_allows_carrier_below_design_default_band():
+    schema = RecipeSchema()
+    default_low = _default_setpoint_value(
+        ("campaigns", "C2A_staged", "p_total_mbar")
+    )[0]
+    candidates = sample_recipe_candidates(
+        schema, n_samples=8, seed=19, sampler_name=SCIPY_SOBOL_SAMPLER,
+    )
+    carriers = []
+    for candidate in candidates:
+        values = candidate.patch.values
+        for po2_path, total_path in schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items():
+            if po2_path in values and total_path in values:
+                mode = values.get(po2_path[:-1] + ("gas_cover_mode",), "pn2_sweep")
+                if mode == "pn2_sweep":
+                    carriers.append(values[total_path] - values[po2_path])
+    assert carriers and all(carrier > 0.0 for carrier in carriers)
+    assert any(carrier < default_low for carrier in carriers)

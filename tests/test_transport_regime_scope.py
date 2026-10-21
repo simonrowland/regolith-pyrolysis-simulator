@@ -3,7 +3,7 @@
 Production path: ``_evaporation_flux_control_inputs`` threads campaign_name
 into the live EVAPORATION_FLUX provider, which consults
 ``assess_continuum_formula_validity``. Direct provider tests without a
-campaign still refuse (missing stage is category 1).
+campaign compute with an out-of-domain flag (d-209).
 """
 
 from __future__ import annotations
@@ -16,7 +16,6 @@ from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.evaporation import (
-    EvaporationFluxRefusal,
     refuse_viscous_p_bulk_out_of_domain,
     viscous_p_bulk_out_of_domain_diagnostic,
 )
@@ -200,7 +199,7 @@ def test_c0_production_controls_drive_provider_mark_not_refusal():
     )
 
 
-def test_viscous_p_bulk_helper_marks_bakeout_and_refuses_pyrolysis():
+def test_viscous_p_bulk_helper_marks_bakeout_and_pyrolysis():
     bakeout = viscous_p_bulk_out_of_domain_diagnostic(
         knudsen_number=0.1,
         overhead_pressure_pa=_TRANSITIONAL_PA,
@@ -222,16 +221,15 @@ def test_viscous_p_bulk_helper_marks_bakeout_and_refuses_pyrolysis():
         campaign_name="C0",
     )
 
-    with pytest.raises(EvaporationFluxRefusal) as exc_info:
-        refuse_viscous_p_bulk_out_of_domain(
-            knudsen_number=0.1,
-            overhead_pressure_pa=_TRANSITIONAL_PA,
-            pipe_diameter_m=_PIPE_M,
-            gas_temperature_K=_TRANSITIONAL_T_K,
-            campaign_name="C4",
-        )
-    assert exc_info.value.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert exc_info.value.diagnostic["campaign_name"] == "C4"
-    assert exc_info.value.diagnostic["process_regime"] == (
-        ProcessRegime.PYROLYSIS_EXTRACTION.value
+    refuse_viscous_p_bulk_out_of_domain(
+        knudsen_number=0.1, overhead_pressure_pa=_TRANSITIONAL_PA,
+        pipe_diameter_m=_PIPE_M, gas_temperature_K=_TRANSITIONAL_T_K,
+        campaign_name="C4",
     )
+    pyrolysis = viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=0.1, overhead_pressure_pa=_TRANSITIONAL_PA,
+        pipe_diameter_m=_PIPE_M, gas_temperature_K=_TRANSITIONAL_T_K,
+        campaign_name="C4",
+    )
+    assert pyrolysis["ledger_yields_authorized"] is True
+    assert pyrolysis["status"] == "out_of_domain"

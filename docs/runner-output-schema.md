@@ -308,8 +308,8 @@ it does not introduce a new schema version.
   "refusal_diagnostic": {                     // present only for a typed refusal
     "status": "refused",
     "reason": "c2a_staged_pn2_outside_operating_band",
-    "requested_pN2_mbar": 1.0,
-    "allowed_pN2_mbar": [5.0, 15.0]
+    "detail": "pN2 sweep pressure must be finite and positive"
+    // The legacy reason token is retained; positive out-of-band pressure is valid.
   },
   "knudsen_regime_diagnostic": {              // present after condensation routing
     "status": "ok" | "warning" | "refused",
@@ -323,7 +323,7 @@ it does not introduce a new schema version.
     "authority_reason": "missing-species-state-dependent-melt-transfer-inputs",
     "gate": {
       "no_warning_knudsen_threshold": 0.01,
-      "hard_refusal_knudsen_threshold": 10.0,
+      "hard_refusal_knudsen_threshold": 10.0, // legacy field: free-molecular boundary, diagnostic only
       "controlling_characteristic_length_m": 0.12
     },
     "current": {
@@ -380,7 +380,7 @@ it does not introduce a new schema version.
   the condensation train when a run reaches condensation routing.
 * `pressure_coating_pareto_diagnostic` is diagnostic-only. It replays the
   latest evaporation series-resistance inputs across the overhead-pressure
-  sweep, reports the actual Kn gate and characteristic length used by the
+  sweep, reports the diagnostic Kn thresholds and characteristic length used by the
   model, and exposes current absolute wall-deposit flux by species. With
   melt resistance disabled the replayed source flux is an HKL **upper bound**;
   the artifact carries machine-readable `authority_class: "upper-bound"` and

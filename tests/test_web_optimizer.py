@@ -668,8 +668,8 @@ def test_knudsen_config_exposes_condensation_model_constants(client) -> None:
         "source_campaign": "C2A_continuous",
         "min": 5.0,
         "max": 15.0,
-        "label": "viscous-flow band",
-        "warning_message": "pN2 sweep outside 5-15 mbar viscous-flow band",
+        "label": "design-default pressure band",
+        "warning_message": "pN2 sweep outside 5-15 mbar design-default pressure band",
     }
 
     html = client.get("/").get_data(as_text=True)
@@ -690,7 +690,7 @@ def test_knudsen_config_exposes_condensation_model_constants(client) -> None:
     assert 'data-default-pressure-band-max-mbar="15.0"' in html
     assert (
         'data-default-pressure-band-warning-message="pN2 sweep outside '
-        '5-15 mbar viscous-flow band"'
+        '5-15 mbar design-default pressure band"'
     ) in html
 
 

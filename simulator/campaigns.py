@@ -71,8 +71,6 @@ C2A_STAGED_GAS_COVER_MODES = frozenset({
     C2A_STAGED_GAS_COVER_PN2_SWEEP,
     C2A_STAGED_GAS_COVER_PO2_HOLD,
 })
-C2A_STAGED_PN2_SWEEP_MIN_MBAR = 5.0
-C2A_STAGED_PN2_SWEEP_MAX_MBAR = 15.0
 C2A_STAGED_PN2_BAND_REFUSAL_REASON = (
     'c2a_staged_pn2_outside_operating_band'
 )
@@ -92,14 +90,7 @@ C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
 
 
 class CampaignPressureSetpointRefusal(ValueError):
-    """Typed refusal for a campaign pressure request with an EMPTY feasible set.
-
-    SC-67 boundary: when the operating band is computable and non-empty, an
-    out-of-band request is adjusted to the band edge with loud provenance
-    (pn2_band_action) instead of raising. This refusal fires only when there
-    is nothing to recompute toward (empty/invalid band); run_executor maps it
-    into the structured failure envelope.
-    """
+    """Typed refusal for physically invalid campaign pressure inputs."""
 
     reason = C2A_STAGED_PN2_BAND_REFUSAL_REASON
 
@@ -1162,7 +1153,10 @@ class CampaignManager:
         value = self._float(stage.get(key), default) if present else float(default)
         if not math.isfinite(value):
             label = self._c2a_staged_stage_label(stage)
-            raise ValueError(f'C2A_staged.stages.{label}.{key} must be finite')
+            raise CampaignPressureSetpointRefusal({
+                'status': 'refused', 'stage_name': label,
+                'field': key, 'detail': f'{key} must be finite',
+            })
         return value, present
 
     def _c2a_staged_stage_gas_control(
@@ -1195,10 +1189,10 @@ class CampaignManager:
                 'must be finite and non-negative'
             )
         if p_total_mbar < 0.0:
-            raise ValueError(
-                f'C2A_staged.stages.{stage_name}.p_total_mbar '
-                'must be finite and non-negative'
-            )
+            raise CampaignPressureSetpointRefusal({
+                'status': 'refused', 'stage_name': stage_name,
+                'detail': 'p_total_mbar must be finite and non-negative',
+            })
         band_action = ''
         requested_p_total_mbar = p_total_mbar
         if mode == C2A_STAGED_GAS_COVER_PO2_HOLD:
@@ -1218,48 +1212,15 @@ class CampaignManager:
             pN2_mbar = max(0.0, p_total_mbar - pO2_mbar)
         else:
             pN2_mbar = p_total_mbar - pO2_mbar
-            if (
-                    not math.isfinite(C2A_STAGED_PN2_SWEEP_MIN_MBAR)
-                    or not math.isfinite(C2A_STAGED_PN2_SWEEP_MAX_MBAR)
-                    or C2A_STAGED_PN2_SWEEP_MIN_MBAR <= 0.0
-                    or C2A_STAGED_PN2_SWEEP_MAX_MBAR
-                    < C2A_STAGED_PN2_SWEEP_MIN_MBAR
-            ):
-                # SC-67 boundary: an EMPTY/INVALID feasible band is the one
-                # case where refusal (not adjustment) is correct — there is
-                # nothing to recompute toward. Typed so the runner failure
-                # envelope (run_executor) reports it structurally.
+            # d-209: the 5-15 mbar band is design margin, not a clamp.
+            if not math.isfinite(pN2_mbar) or pN2_mbar <= 0.0:
                 raise CampaignPressureSetpointRefusal({
                     'status': 'refused',
                     'reason': C2A_STAGED_PN2_BAND_REFUSAL_REASON,
                     'stage_name': stage_name,
                     'gas_cover_mode': mode,
-                    'detail': 'pN2 sweep operating band is empty or invalid',
-                    'allowed_pN2_mbar': [
-                        C2A_STAGED_PN2_SWEEP_MIN_MBAR,
-                        C2A_STAGED_PN2_SWEEP_MAX_MBAR,
-                    ],
+                    'detail': 'pN2 sweep pressure must be finite and positive',
                 })
-            # SC-67 recompute-and-adjust (t-185): the viscous-flow band is a
-            # computable, non-empty feasible set, so an out-of-band configured
-            # p_total adjusts to the nearest band edge like a physical
-            # regulator hitting its limit stop — LOUDLY: requested vs applied
-            # and the band action are recorded in the diagnostic
-            # (pn2_band_action / requested_p_total_mbar). The fail-loud
-            # doctrine targets SILENT coercion; this substitution is visible.
-            # Refusal is reserved for the empty-band case above.
-            clamped_pN2 = min(
-                C2A_STAGED_PN2_SWEEP_MAX_MBAR,
-                max(C2A_STAGED_PN2_SWEEP_MIN_MBAR, pN2_mbar),
-            )
-            if clamped_pN2 != pN2_mbar:
-                band_action = (
-                    'clamped_low'
-                    if pN2_mbar < C2A_STAGED_PN2_SWEEP_MIN_MBAR
-                    else 'clamped_high'
-                )
-                pN2_mbar = clamped_pN2
-                p_total_mbar = pO2_mbar + pN2_mbar
             atmosphere = Atmosphere.PN2_SWEEP
 
         diagnostic = {

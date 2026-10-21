@@ -56,19 +56,11 @@ def test_c7_enabled_routes_after_c6_with_explicit_proceed_decision():
     assert (DecisionType.C7_PROCEED, "yes") in record.decisions
 
 
-def test_c7_enabled_run_refuses_on_unfavorable_computed_margin_and_closes_mass(
+def test_c7_enabled_run_predicts_after_flagged_transport_and_closes_mass(
     tmp_path, monkeypatch
 ):
-    # V23 (pre-0.6): C7 no longer treats the configured thermo_margin scalar
-    # SIGN as thermodynamic proof -- the COMPUTED JANAF-Ellingham Al/Ca margin
-    # governs. Under the modeled hard-vacuum hold that margin is
-    # -153.94 kJ/mol O2 (unfavorable), so C7 correctly REFUSES and yields zero
-    # Ca metal even though the config default scalar (+1.0) is what the old
-    # sign-reading bug would have proceeded on. No 1100-1300 C reduction
-    # setpoint has a positive computed margin, so the honest integration
-    # contract here is the refusal path; the favorable-margin transition is
-    # covered synthetically at the provider unit level
-    # (tests/chemistry/test_builtin_ca_aluminothermic_step_provider.py).
+    # d-209 removes the regime-only transport zero. The computed JANAF
+    # margin (including product backpressure) now governs the actual extent.
     monkeypatch.setenv("MPLCONFIGDIR", str(tmp_path / "mpl"))
     run = PyrolysisRun(
         feedstock_id="targeted_super_kreep_ore",
@@ -97,45 +89,37 @@ def test_c7_enabled_run_refuses_on_unfavorable_computed_margin_and_closes_mass(
     assert worst <= MASS_BALANCE_HARD_GATE_PCT
     assert report["enabled"] is True
 
-    # Refusal => zero aluminothermic products; the feedstock stays as un-C7-
-    # enriched rump (REE fraction unchanged, no CaO removed).
+    # Removing Ca while retaining REEs enriches the terminal ceramic.
     products = report["products"]
-    assert products["Ca_metal"]["kg"] == 0.0
-    assert products["calcium_aluminate_cement_slag"]["kg"] == 0.0
+    assert products["Ca_metal"]["kg"] > 0.0
+    assert products["calcium_aluminate_cement_slag"]["kg"] > 0.0
     ree = products["residual_REE_enriched_terminal_ceramic"]
-    assert ree["REE_enrichment_factor"] == pytest.approx(1.0, rel=0.0, abs=1e-12)
+    assert ree["REE_enrichment_factor"] > 1.0
     assert ree["REE_retention_fraction"] == pytest.approx(1.0)
-    assert ree["mass_removal_extent_fraction"] == pytest.approx(0.0)
+    assert ree["mass_removal_extent_fraction"] > 0.0
     assert ree["REE_partition_source_ids"] == ["REF-056", "REF-057"]
     assert ree["REE_enrichment_derivation"] == (
         "E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0"
     )
-    assert ree["REE_oxides_wt_pct_after_C7"] == pytest.approx(
-        ree["REE_oxides_wt_pct_before_C7"], rel=0.0, abs=1e-12
-    )
+    assert ree["REE_oxides_wt_pct_after_C7"] > ree["REE_oxides_wt_pct_before_C7"]
 
-    # 2026-07-21 B1 re-baseline: the composed transport-domain gate refuses
-    # BEFORE the thermo-margin evaluation, and the two gates are structurally
-    # disjoint on 0.6.3 physics — the whole C7 vacuum envelope
-    # (C7_MIN..MAX_TOTAL_PRESSURE_MBAR = 0.01..0.1 mbar) sits in the
-    # transitional Kn band (0.01 < Kn < 10) at C7 geometry/temperature
-    # (probed empirically at 0.01/0.02/0.05/10 mbar: transitional refusal
-    # inside the envelope, envelope refusal outside it). The margin branch is
-    # unreachable at ANY valid C7 operating point until t-379 (0.7) lands
-    # transitional/molecular conductance. The honest integration contract is
-    # therefore the transport refusal; the V23 margin contract (computed
-    # JANAF margin governs, reported honestly) remains covered at provider
-    # unit level in tests/chemistry/test_builtin_ca_aluminothermic_step_provider.py.
-    refusal = document["c7_refusal_diagnostic"]
-    assert refusal["reason_refused"] == "viscous_p_bulk_transport_out_of_domain"
-    assert refusal["c7_transport_refusal"] == (
-        "viscous_p_bulk_transport_out_of_domain"
+    # The transport flag is visible; the unchanged thermodynamic resolver
+    # must independently authorize every committed reduction.
+    assert document["c7_refusal_diagnostic"] == {}
+    diagnostic = report["diagnostic"]
+    step = next(
+        row for row in diagnostic["raw_diagnostics"]
+        if "computed_thermo_margin_kj_per_mol_o2" in row
     )
-    assert refusal["r_transport"] == 0.0
-    assert refusal["transport_ca_mol"] == 0.0
-    assert refusal["c7_overhead_pressure_pa"] == pytest.approx(5.0)
+    assert step["computed_thermo_margin_kj_per_mol_o2"] > 0.0
+    assert diagnostic["r_transport"] > 0.0
+    assert diagnostic["transport_ca_mol"] > 0.0
+    assert diagnostic["c7_transport_refusal"] == ""
+    assert diagnostic["ledger_yields_authorized"] is True
+    assert diagnostic["p_bulk_transport_domain"] == "out_of_domain_transitional"
+    assert diagnostic["authority_reason"] == "viscous_p_bulk_transport_out_of_domain"
 
-    # Al credit was imported but stays undrawn because the reduction refused.
+    # The partial-extent request leaves some imported Al credit unused.
     assert report["diagnostic"]["c7_al_credit_input_kg"] == pytest.approx(20.0)
     assert report["diagnostic"]["c7_al_credit_unused_mol"] > 0.0
 
@@ -160,7 +144,7 @@ def test_c7_set_it_to_11_reports_campaign_knob_saturations(tmp_path, monkeypatch
     saturation = document["c7_product_report"]["diagnostic"]["c7_knob_saturation"]
     paths = {row["path"] for row in saturation}
 
-    # Same state-cap endpoint semantics as the direct C7 refusal pin above.
+    # Same state-cap endpoint semantics as the direct C7 prediction pin above.
     assert execution.status == "partial"
     assert "campaigns.C7.al_fraction" in paths
     assert "campaigns.C7.extent_fraction" in paths
