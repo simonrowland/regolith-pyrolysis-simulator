@@ -516,8 +516,7 @@ def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
 
 
 def main() -> None:
-    # Sparse seats omit docs-private. In that case only dynamic expansions are
-    # read from the committed manifest; all path declarations above are rescanned.
+    # Sparse seats omit docs-private, so dynamic expansions may be incomplete.
     print(json.dumps(derive_manifest(), indent=2))
 
 

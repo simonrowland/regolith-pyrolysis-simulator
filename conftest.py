@@ -154,10 +154,11 @@ if os.environ.get("REGOLITH_VAPOROCK_SESSION_WARM") is None:
 
 _SESSION_WATCHDOG: SessionWatchdog | None = None
 DOCS_PRIVATE_MANIFEST_STRICT_ENV = "REGOLITH_DOCS_PRIVATE_MANIFEST_STRICT"
+DOCS_PRIVATE_AUDIT_DIR_ENV = "REGOLITH_DOCS_PRIVATE_AUDIT_DIR"
 _DOCS_PRIVATE_AUDIT_ROOT: Path | None = None
-_DOCS_PRIVATE_MISSING_OPENS: set[tuple[str, str]] = set()
 _DOCS_PRIVATE_ACTIVE_TEST_NODEID: str | None = None
 _DOCS_PRIVATE_AUDIT_INSTALLED = False
+_DOCS_PRIVATE_AUDIT_SESSION_DIR: Path | None = None
 
 
 def _preflight_docs_private_inputs(repo_root: Path, manifest_path: Path) -> None:
@@ -218,6 +219,12 @@ def _preflight_docs_private_inputs(repo_root: Path, manifest_path: Path) -> None
 
 
 def _record_missing_docs_private_open(event: str, args: tuple[object, ...]) -> None:
+    """Log ordinary opens below docs-private; dir_fd opens are not resolved.
+
+    No repository caller uses ``os.open(..., dir_fd=...)``. The audit hook
+    cannot map that relative path to the repository root without extra state.
+    """
+
     if event != "open" or not args or _DOCS_PRIVATE_AUDIT_ROOT is None:
         return
 
@@ -226,14 +233,25 @@ def _record_missing_docs_private_open(event: str, args: tuple[object, ...]) -> N
     if isinstance(mode, str) and any(flag in mode for flag in "wax+"):
         return
     if mode is None and isinstance(flags, int):
-        if flags & os.O_ACCMODE != os.O_RDONLY:
+        if (flags & os.O_ACCMODE) != os.O_RDONLY:
             return
 
     try:
-        opened = Path(os.fsdecode(os.fspath(args[0])))
-        if not opened.is_absolute():
-            opened = Path.cwd() / opened
-        opened = opened.resolve()
+        raw_path = os.fsdecode(os.fspath(args[0]))
+        candidate = (
+            raw_path
+            if os.path.isabs(raw_path)
+            else os.path.join(os.getcwd(), raw_path)
+        )
+        candidate = os.path.abspath(candidate)
+        private_prefix = os.path.abspath(
+            str(_DOCS_PRIVATE_AUDIT_ROOT / "docs-private")
+        )
+        if candidate != private_prefix and not candidate.startswith(
+            private_prefix + os.sep
+        ):
+            return
+        opened = Path(candidate).resolve()
         private_root = (_DOCS_PRIVATE_AUDIT_ROOT / "docs-private").resolve()
         if not opened.is_relative_to(private_root) or opened.exists():
             return
@@ -242,7 +260,12 @@ def _record_missing_docs_private_open(event: str, args: tuple[object, ...]) -> N
         return
 
     nodeid = _DOCS_PRIVATE_ACTIVE_TEST_NODEID or "<session setup or collection>"
-    _DOCS_PRIVATE_MISSING_OPENS.add((relative_path, nodeid))
+    audit_dir = os.environ.get(DOCS_PRIVATE_AUDIT_DIR_ENV)
+    if audit_dir is None:
+        raise RuntimeError(f"{DOCS_PRIVATE_AUDIT_DIR_ENV} is not set")
+    record_path = Path(audit_dir) / f"{os.getpid()}.jsonl"
+    with record_path.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps({"path": relative_path, "nodeid": nodeid}) + "\n")
 
 
 def _install_docs_private_open_audit(repo_root: Path) -> bool:
@@ -253,6 +276,12 @@ def _install_docs_private_open_audit(repo_root: Path) -> bool:
     ):
         return False
 
+    audit_dir = os.environ.get(DOCS_PRIVATE_AUDIT_DIR_ENV)
+    if audit_dir is None or not Path(audit_dir).is_dir():
+        raise pytest.UsageError(
+            f"{DOCS_PRIVATE_MANIFEST_STRICT_ENV} is set, but "
+            f"{DOCS_PRIVATE_AUDIT_DIR_ENV} is unavailable"
+        )
     _DOCS_PRIVATE_AUDIT_ROOT = repo_root.resolve()
     sys.addaudithook(_record_missing_docs_private_open)
     _DOCS_PRIVATE_AUDIT_INSTALLED = True
@@ -260,12 +289,23 @@ def _install_docs_private_open_audit(repo_root: Path) -> bool:
 
 
 def _fail_on_missing_docs_private_opens(session: pytest.Session) -> str | None:
-    if not _DOCS_PRIVATE_MISSING_OPENS:
+    if os.environ.get("PYTEST_XDIST_WORKER"):
+        return None
+
+    audit_dir = os.environ.get(DOCS_PRIVATE_AUDIT_DIR_ENV)
+    if audit_dir is None:
+        return None
+    missing: set[tuple[str, str]] = set()
+    for record_file in sorted(Path(audit_dir).glob("*.jsonl")):
+        for line in record_file.read_text(encoding="utf-8").splitlines():
+            record = json.loads(line)
+            missing.add((record["path"], record["nodeid"]))
+    if not missing:
         return None
 
     details = "\n".join(
         f"  - {path} (opened by {nodeid})"
-        for path, nodeid in sorted(_DOCS_PRIVATE_MISSING_OPENS)
+        for path, nodeid in sorted(missing)
     )
     message = (
         "strict docs-private audit found missing docs-private inputs:\n"
@@ -289,6 +329,20 @@ def pytest_sessionstart(session: pytest.Session) -> None:
         repo_root,
         repo_root / "tests" / "docs_private_inputs.json",
     )
+    global _DOCS_PRIVATE_AUDIT_SESSION_DIR
+    if (
+        DOCS_PRIVATE_MANIFEST_STRICT_ENV in os.environ
+        and not os.environ.get("PYTEST_XDIST_WORKER")
+    ):
+        base_temp = getattr(session.config.option, "basetemp", None)
+        audit_parent = Path(base_temp) if base_temp else Path(tempfile.gettempdir())
+        audit_parent.mkdir(parents=True, exist_ok=True)
+        _DOCS_PRIVATE_AUDIT_SESSION_DIR = Path(
+            tempfile.mkdtemp(prefix="docs-private-audit-", dir=audit_parent)
+        )
+        os.environ[DOCS_PRIVATE_AUDIT_DIR_ENV] = str(
+            _DOCS_PRIVATE_AUDIT_SESSION_DIR
+        )
     _install_docs_private_open_audit(repo_root)
     if os.environ.get("PYTEST_XDIST_WORKER"):
         return
@@ -357,8 +411,14 @@ def pytest_sessionfinish(
     session: pytest.Session,
     exitstatus: int | pytest.ExitCode,
 ) -> None:
+    global _DOCS_PRIVATE_AUDIT_SESSION_DIR
     del exitstatus
-    _fail_on_missing_docs_private_opens(session)
+    if not os.environ.get("PYTEST_XDIST_WORKER"):
+        _fail_on_missing_docs_private_opens(session)
+        if _DOCS_PRIVATE_AUDIT_SESSION_DIR is not None:
+            shutil.rmtree(_DOCS_PRIVATE_AUDIT_SESSION_DIR, ignore_errors=True)
+            _DOCS_PRIVATE_AUDIT_SESSION_DIR = None
+            os.environ.pop(DOCS_PRIVATE_AUDIT_DIR_ENV, None)
     # t-420: close warm engine pools before the b-093 watchdog disarms, so the
     # bounded-cleanup path still runs under session-safety supervision.
     # Drop the process-scoped VapoRock warm-boot cache first so its pools are
