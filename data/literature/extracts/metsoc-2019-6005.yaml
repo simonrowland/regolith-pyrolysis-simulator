@@ -67,25 +67,28 @@ fidelity_samples:
   field: delta_fH_kJ_mol_as_printed
   value: -39.88
   locator:
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
     section: Results and discussion
-    note: "enthalpy … of perovskite formation equal to −39.88±0.54 kJ/mol"
+    note: "enthalpy and entropy of perovskite formation equal to −39.88±0.54 kJ/mol"
 - species: CaTiO3
   observable: gibbs_table
   observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fS
   field: delta_fS_J_mol_K_as_printed
   value: 3.15
   locator:
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
     section: Results and discussion
     note: "entropy of perovskite formation equal to … 3.15±0.28 J/(mol×K)"
 - species: CaTiO3
   observable: transition_point
   observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_melting
-  field: melting_enthalpy_kJ_mol_as_printed
+  field: value
   value: 47.61
   locator:
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
     section: Results and discussion
     note: "melting enthalpy of perovskite at 2241±10 K, equal to 47.61±1.84 kJ/mol"
 - species: 'O'
@@ -154,9 +157,15 @@ species:
       experiment: shornikov-2019-mo-kems
       type: gibbs_table
       locator:
-        pdf_page_index: 1
+        page: 1
+        pdf_page_index: 0
         section: Results and discussion
-        note: formation enthalpy from oxide activities / partial pressures
+        note: >-
+          Single printed page, Results and discussion: "the enthalpy and entropy
+          of perovskite formation equal to −39.88±0.54 kJ/mol and 3.15±0.28
+          J/(mol×K), respectively". Determined from the CaO, TiO2 and CaTiO3
+          activities. Missing quantity: enthalpy of formation from the oxides,
+          not delta_fH.
       phase: solid_perovskite
       standard_state: enthalpy of perovskite formation as printed (per 1 mol compound)
       regime: knudsen_cell_mass_spectrometry_CaO_TiO2
@@ -172,15 +181,21 @@ species:
         delta_fH_uncertainty_kJ_mol_as_printed: 0.54
         basis_as_printed: per 1 mol compound
         note: >-
-          Derived by authors from CaO, TiO2, CaTiO3 activities calculated from
-          measured partial pressures; central printed value retained.
+          Missing quantity: enthalpy of formation from the oxides (CaO + TiO2 =
+          CaTiO3), not delta_fH. The same sentence gives the oxide activities,
+          calculated from the partial pressures, as the source of the mixing
+          energy and of this formation enthalpy. Central printed value retained.
     - observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fS
       experiment: shornikov-2019-mo-kems
       type: gibbs_table
       locator:
-        pdf_page_index: 1
+        page: 1
+        pdf_page_index: 0
         section: Results and discussion
-        note: formation entropy from oxide activities / partial pressures
+        note: >-
+          Single printed page, Results and discussion: "3.15±0.28 J/(mol×K)".
+          Missing quantity: entropy of formation from the oxides, not S and not
+          entropy_of_fusion.
       phase: solid_perovskite
       standard_state: entropy of perovskite formation as printed (per 1 mol compound)
       regime: knudsen_cell_mass_spectrometry_CaO_TiO2
@@ -195,34 +210,45 @@ species:
         delta_fS_J_mol_K_as_printed: 3.15
         delta_fS_uncertainty_J_mol_K_as_printed: 0.28
         basis_as_printed: per 1 mol compound
+        note: >-
+          Missing quantity: entropy of formation from the oxides, not S and not
+          entropy_of_fusion. Same Results sentence as the formation enthalpy.
     - observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_melting
       experiment: shornikov-2019-mo-kems
       type: transition_point
       locator:
-        pdf_page_index: 1
+        page: 1
+        pdf_page_index: 0
         section: Results and discussion
-        note: melting enthalpy at printed melting temperature
+        note: >-
+          Single printed page, Results and discussion: "the melting enthalpy of
+          perovskite at 2241±10 K, equal to 47.61±1.84 kJ/mol (per 1 mol
+          compound)". heat_of_fusion at the stated 2241 K.
       T_range_K:
       - 2241
       - 2241
       phase: solid_to_liquid_perovskite
       standard_state: melting of perovskite as printed (per 1 mol compound)
       regime: knudsen_cell_mass_spectrometry_CaO_TiO2
-      units: kJ/mol and K as printed
+      units: kJ/mol
       uncertainty:
         melting_T_K: 10
         melting_enthalpy_kJ_mol: 1.84
         as_printed: 2241±10 K; 47.61±1.84 kJ/mol
       values:
-        quantity: melting_enthalpy_and_temperature
+        quantity: heat_of_fusion
         method_class: measured_reduced
         evidence_class: authors_own_KEMS
+        value: 47.61
+        T_K: 2241
         melting_T_K_as_printed: 2241
         melting_T_uncertainty_K_as_printed: 10
-        melting_enthalpy_kJ_mol_as_printed: 47.61
         melting_enthalpy_uncertainty_kJ_mol_as_printed: 1.84
         basis_as_printed: per 1 mol compound
-        T_K: 2241
+        note: >-
+          Mapped from the combined melting-enthalpy-and-temperature printing.
+          The paper gives both: 47.61±1.84 kJ/mol at 2241±10 K. This is fusion,
+          so the quantity is heat_of_fusion at that T.
     - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c11'
       type: 'equilibrium_phase_composition'
       locator:
