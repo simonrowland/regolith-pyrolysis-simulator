@@ -106,6 +106,40 @@ def test_printed_table_pins_and_fidelity_guard_detect_mutation() -> None:
         _assert_printed_table_cells(mutated)
 
 
+def _assert_water_gas_cp_extension(document: dict) -> None:
+    observation = next(
+        row
+        for row in document["species"]["water_gas"]["context"]
+        if row["observation_id"] == "berman1988_water_gas_table3a_cp"
+    )
+    extension = observation["values"]["equation_extension"]
+    assert extension["footnote_as_printed"].endswith(
+        "-0.002062 T + 51055.16 T^-1."
+    )
+    assert extension["additional_terms"][0]["coefficient"] == -0.002062
+    assert extension["additional_terms"][1]["coefficient"] == 51055.16
+    assert extension["equation_form_as_printed"] == (
+        "Eq. 4 extended by -0.002062 T + 51055.16 T^-1"
+    )
+
+
+def test_water_gas_cp_extension_printed_pin_detects_mutation() -> None:
+    document = _document()
+    _assert_water_gas_cp_extension(document)
+
+    mutated = deepcopy(document)
+    observation = next(
+        row
+        for row in mutated["species"]["water_gas"]["context"]
+        if row["observation_id"] == "berman1988_water_gas_table3a_cp"
+    )
+    observation["values"]["equation_extension"]["additional_terms"][0][
+        "coefficient"
+    ] = -0.0002062
+    with pytest.raises(AssertionError):
+        _assert_water_gas_cp_extension(mutated)
+
+
 def test_isolated_migration_preserves_every_scored_point_and_table2_conditions() -> None:
     document = _document()
     migrator = migrate_one_extract(root=ROOT, path=EXTRACT, index={}, aliases={})
