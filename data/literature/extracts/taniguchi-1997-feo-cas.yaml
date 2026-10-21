@@ -1,0 +1,1760 @@
+schema_version: literature_extract.v1
+source_id: taniguchi-1997-feo-cas
+source:
+  citation: Taniguchi, Y., Morita, K. and Sano, N. (1997). Activities of FeO in CaO-Al2O3-SiO2-FeO and CaO-Al2O3-CaF2-FeO
+    slags. ISIJ International, 37(10), 956-961.
+  year: 1997
+  corpus_asset: raw/taniguchi-1997-feo-cas/taniguchi-1997-feo-cas.pdf
+extraction:
+  method: MinerU table-tool drafts and mappings for Tables 1-5, checked against layout pdftotext and 600 dpi PDF
+    renders; text values transcribed from the paper. Table 4’s merged temperatures and all row labels/compositions
+    were checked on the page render. Direct oxygen partial pressures are preserved in atm as printed; no fO2 conversion
+    is made. Figures 2-9 are inventory records only; figure markers were not digitised.
+  date: '2026-10-21'
+  worker: codex-resume-32763-1792554222
+  provenance_path: data/literature/extracts/audits/taniguchi-1997-feo-cas.mapping.yaml
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[taniguchi_1997_table1_fe_activity_coefficient].values.series[0].gamma
+  value: '15.8'
+  locator:
+    page: 2
+    published_page: 957
+    pdf_page_index: 1
+    table: '1'
+    row: '101'
+- path: species.FeO.observations[taniguchi_1997_table4_feo_activity_coefficient_1673k].values.series[0].gamma
+  value: '2.91'
+  locator:
+    page: 4
+    published_page: 959
+    pdf_page_index: 3
+    table: '4'
+    row: '201'
+- path: species.FeO.observations[taniguchi_1997_table5_feo_activity_coefficient].values.series[6].gamma
+  value: '33.2'
+  locator:
+    page: 6
+    published_page: 961
+    pdf_page_index: 5
+    table: '5'
+    row: '407'
+experiments:
+- experiment_id: taniguchi-1997-fe-activity-1673k
+  method: gas_metal_equilibration
+  method_as_printed: Cu-Fe alloy equilibrated in a FeO-Cr2O3/Cr2O3 crucible under CO-CO2 at 1673 K for 40 h, then
+    rapidly cooled and analysed by atomic absorption spectrometry.
+  locator:
+    page: 2
+    published_page: 957
+    pdf_page_index: 1
+    section: Experimental Procedures
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+    quench: rapid cooling
+    oxygen_condition: CO-CO2 atmosphere; pO2 varies by sample and is recorded per row as printed.
+- experiment_id: taniguchi-1997-feo-slag-1673-1873k
+  method: quench_equilibration
+  method_as_printed: Slag and molten Cu-Fe alloy equilibrated in a molybdenum crucible at 1673-1873 K under CO-CO2
+    for 16-24 h; both phases were exposed to the atmosphere and the slag/metal/gas equilibrium was established.
+    After rapid cooling the slag and metal were analysed.
+  locator:
+    page: 2
+    published_page: 957
+    pdf_page_index: 1
+    section: Experimental Procedures
+  conditions:
+    quench: rapid cooling
+    crucible: molybdenum
+    oxygen_condition: CO-CO2 atmosphere; pO2 as printed per temperature and recorded per row.
+- experiment_id: taniguchi-1997-feo-caf2-slag-1723k
+  method: quench_equilibration
+  method_as_printed: CaO-Al2O3-CaF2-FeO slag and molten Cu-Fe alloy equilibrated in molybdenum crucible under CO-CO2
+    at 1723 K for 16-24 h, then rapidly cooled and analysed.
+  locator:
+    page: 6
+    published_page: 961
+    pdf_page_index: 5
+    section: 3.3 Effect of CaF2 Addition
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723'
+      locator:
+        page: 6
+        published_page: 961
+        pdf_page_index: 5
+        table: '5'
+    quench: rapid cooling
+    crucible: molybdenum
+    oxygen_condition: CO-CO2 atmosphere; pO2=5.69×10^-12 atm as printed.
+species:
+  Fe:
+    observations:
+    - observation_id: taniguchi_1997_table1_fe_activity_coefficient
+      experiment: taniguchi-1997-fe-activity-1673k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 measured activity coefficients of Fe in Cu-Fe alloy; row-specific pO2 and iron mass fraction
+          retained.
+      units: dimensionless
+      standard_state: The activity of Fe is referred to pure liquid Fe (paper, Eqs. (1)-(2), p. 957).
+      regime: quench_equilibration
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        series:
+        - sample_id_as_printed: '101'
+          T_K: '1673'
+          gamma: '15.8'
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          oxygen_partial_pressure:
+            value: '9.14e-11'
+            units: atm
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              row: '101'
+          composition_mass_percent_as_printed:
+            Fe_mass_pct: '0.437'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: incomplete_composition
+              locator:
+                page: 2
+                published_page: 957
+                pdf_page_index: 1
+                table: '1'
+                row: '101'
+        - sample_id_as_printed: '102'
+          T_K: '1673'
+          gamma: '11.5'
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              row: '102'
+          composition_mass_percent_as_printed:
+            Fe_mass_pct: '2.42'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: incomplete_composition
+              locator:
+                page: 2
+                published_page: 957
+                pdf_page_index: 1
+                table: '1'
+                row: '102'
+        - sample_id_as_printed: '103'
+          T_K: '1673'
+          gamma: '12.4'
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          oxygen_partial_pressure:
+            value: '1.02e-11'
+            units: atm
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              row: '103'
+          composition_mass_percent_as_printed:
+            Fe_mass_pct: '1.67'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: incomplete_composition
+              locator:
+                page: 2
+                published_page: 957
+                pdf_page_index: 1
+                table: '1'
+                row: '103'
+        - sample_id_as_printed: '104'
+          T_K: '1673'
+          gamma: '13.5'
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          oxygen_partial_pressure:
+            value: '2.82e-11'
+            units: atm
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              row: '104'
+          composition_mass_percent_as_printed:
+            Fe_mass_pct: '0.921'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: incomplete_composition
+              locator:
+                page: 2
+                published_page: 957
+                pdf_page_index: 1
+                table: '1'
+                row: '104'
+        - sample_id_as_printed: '105'
+          T_K: '1673'
+          gamma: '10.6'
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          oxygen_partial_pressure:
+            value: '3.66e-12'
+            units: atm
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              row: '105'
+          composition_mass_percent_as_printed:
+            Fe_mass_pct: '3.27'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: incomplete_composition
+              locator:
+                page: 2
+                published_page: 957
+                pdf_page_index: 1
+                table: '1'
+                row: '105'
+        - sample_id_as_printed: '106'
+          T_K: '1673'
+          gamma: '12.6'
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          oxygen_partial_pressure:
+            value: '7.05e-12'
+            units: atm
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              row: '106'
+          composition_mass_percent_as_printed:
+            Fe_mass_pct: '1.97'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: incomplete_composition
+              locator:
+                page: 2
+                published_page: 957
+                pdf_page_index: 1
+                table: '1'
+                row: '106'
+        - sample_id_as_printed: '107'
+          T_K: '1673'
+          gamma: '12.9'
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          oxygen_partial_pressure:
+            value: '1.35e-11'
+            units: atm
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              row: '107'
+          composition_mass_percent_as_printed:
+            Fe_mass_pct: '1.39'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: incomplete_composition
+              locator:
+                page: 2
+                published_page: 957
+                pdf_page_index: 1
+                table: '1'
+                row: '107'
+    - observation_id: taniguchi_1997_table2_fe_infinite_dilution_present
+      experiment: taniguchi-1997-fe-activity-1673k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 958
+        pdf_page_index: 2
+        table: '2'
+        note: Table 2 present result.
+      units: dimensionless
+      standard_state: The activity of Fe is referred to pure liquid Fe (paper, Eqs. (1)-(2), p. 957).
+      regime: quench_equilibration
+      values:
+        quantity: activity_coefficient
+        method_class: directly_reduced_measurement
+        evidence_class: measured_reduced
+        series:
+        - sample_id_as_printed: Present work
+          T_K: '1673'
+          gamma: '15.8'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          locator:
+            page: 3
+            published_page: 958
+            pdf_page_index: 2
+            table: '2'
+            row: Present work
+    - observation_id: taniguchi_1997_table2_fe_infinite_dilution_kulkarni
+      experiment: taniguchi-1997-fe-activity-1673k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 958
+        pdf_page_index: 2
+        table: '2'
+        note: Table 2 values attributed to Kulkarni [5].
+      units: dimensionless
+      standard_state: The activity of Fe is referred to pure liquid Fe (paper, Eqs. (1)-(2), p. 957).
+      regime: quench_equilibration
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        series:
+        - sample_id_as_printed: Kulkarni [5]
+          T_K: '1373'
+          gamma: '49.2'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Kulkarni [5]
+          locator:
+            page: 3
+            published_page: 958
+            pdf_page_index: 2
+            table: '2'
+            row: Kulkarni [5]
+        - sample_id_as_printed: Kulkarni [5]
+          T_K: '1473'
+          gamma: '32.3'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Kulkarni [5]
+          locator:
+            page: 3
+            published_page: 958
+            pdf_page_index: 2
+            table: '2'
+            row: Kulkarni [5]
+    - observation_id: taniguchi_1997_table3_fe_infinite_dilution_activity
+      experiment: taniguchi-1997-fe-activity-1673k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 958
+        pdf_page_index: 2
+        table: '3'
+        note: Table 3 literature values at 1873 K; estimated value is retained separately as model context.
+      units: dimensionless
+      standard_state: The activity of Fe is referred to pure liquid Fe (paper, Eqs. (1)-(2), p. 957).
+      regime: quench_equilibration
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        series:
+        - sample_id_as_printed: Batalin et al. [6]
+          T_K: '1873'
+          gamma: '10.3'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Batalin et al. [6]
+          locator:
+            page: 3
+            published_page: 958
+            pdf_page_index: 2
+            table: '3'
+            row: Batalin et al. [6]
+        - sample_id_as_printed: Choudary et al. [7]
+          T_K: '1873'
+          gamma: '6.62'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Choudary et al. [7]
+          locator:
+            page: 3
+            published_page: 958
+            pdf_page_index: 2
+            table: '3'
+            row: Choudary et al. [7]
+        - sample_id_as_printed: Timberg et al. [8]
+          T_K: '1873'
+          gamma: '6.23'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Timberg et al. [8]
+          locator:
+            page: 3
+            published_page: 958
+            pdf_page_index: 2
+            table: '3'
+            row: Timberg et al. [8]
+        - sample_id_as_printed: Maruyama et al. [9]
+          T_K: '1873'
+          gamma: '11.2'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Maruyama et al. [9]
+          locator:
+            page: 3
+            published_page: 958
+            pdf_page_index: 2
+            table: '3'
+            row: Maruyama et al. [9]
+    context: []
+  FeO:
+    observations:
+    - observation_id: taniguchi_1997_table4_feo_activity_coefficient_1673k
+      experiment: taniguchi-1997-feo-slag-1673-1873k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 959
+        pdf_page_index: 3
+        table: '4'
+        note: Table 4 measured FeO activity coefficients at 1673 K; T.Fe and composition cells retained as printed.
+      units: dimensionless
+      standard_state: FeO(l), pure liquid stoichiometric composition of wustite, as explicitly defined after Eq.
+        (9), p. 958.
+      regime: quench_equilibration
+      values:
+        quantity: activity_coefficient
+        method_class: directly_reduced_measurement
+        evidence_class: measured_reduced
+        series:
+        - sample_id_as_printed: '201'
+          T_K: '1673'
+          gamma: '2.91'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '201'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.974'
+            CaO: '31.0'
+            Al2O3: '14.1'
+            SiO2: '52.6'
+            T.Fe: '1.76'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '201'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '201'
+        - sample_id_as_printed: '202'
+          T_K: '1673'
+          gamma: '3.21'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '202'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '2.08'
+            CaO: '33.7'
+            Al2O3: '14.4'
+            SiO2: '48.1'
+            T.Fe: '2.94'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '202'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '202'
+        - sample_id_as_printed: '203'
+          T_K: '1673'
+          gamma: '3.50'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '203'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '2.74'
+            CaO: '42.5'
+            Al2O3: '15.7'
+            SiO2: '37.5'
+            T.Fe: '3.26'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '203'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '203'
+        - sample_id_as_printed: '204'
+          T_K: '1673'
+          gamma: '4.06'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '204'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '3.28'
+            CaO: '45.5'
+            Al2O3: '14.6'
+            SiO2: '35.8'
+            T.Fe: '3.17'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '204'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '204'
+        - sample_id_as_printed: '205'
+          T_K: '1673'
+          gamma: '2.85'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '205'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '1.38'
+            CaO: '22.2'
+            Al2O3: '25.2'
+            SiO2: '49.7'
+            T.Fe: '2.27'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '205'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '205'
+        - sample_id_as_printed: '206'
+          T_K: '1673'
+          gamma: '2.99'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '206'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '1.21'
+            CaO: '31.8'
+            Al2O3: '23.5'
+            SiO2: '42.2'
+            T.Fe: '1.98'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '206'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '206'
+        - sample_id_as_printed: '207'
+          T_K: '1673'
+          gamma: '3.13'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '207'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '1.28'
+            CaO: '28.7'
+            Al2O3: '24.4'
+            SiO2: '44.3'
+            T.Fe: '1.96'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '207'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '207'
+        - sample_id_as_printed: '208'
+          T_K: '1673'
+          gamma: '3.22'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '208'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.981'
+            CaO: '35.9'
+            Al2O3: '24.8'
+            SiO2: '37.3'
+            T.Fe: '1.53'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '208'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '208'
+        - sample_id_as_printed: '209'
+          T_K: '1673'
+          gamma: '3.43'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '209'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '1.60'
+            CaO: '36.9'
+            Al2O3: '27.4'
+            SiO2: '32.9'
+            T.Fe: '2.14'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '209'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '209'
+        - sample_id_as_printed: '210'
+          T_K: '1673'
+          gamma: '2.88'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '210'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '1.08'
+            CaO: '25.8'
+            Al2O3: '21.2'
+            SiO2: '50.5'
+            T.Fe: '1.87'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '210'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '210'
+        - sample_id_as_printed: '211'
+          T_K: '1673'
+          gamma: '2.90'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '211'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '3.78'
+            CaO: '28.3'
+            Al2O3: '18.7'
+            SiO2: '47.1'
+            T.Fe: '4.63'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '211'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '211'
+        - sample_id_as_printed: '212'
+          T_K: '1673'
+          gamma: '3.54'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '212'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '3.38'
+            CaO: '34.3'
+            Al2O3: '20.1'
+            SiO2: '36.5'
+            T.Fe: '7.09'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '212'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '212'
+        - sample_id_as_printed: '213'
+          T_K: '1673'
+          gamma: '3.66'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '213'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '3.19'
+            CaO: '39.5'
+            Al2O3: '16.7'
+            SiO2: '6.52'
+            T.Fe: '6.77'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '213'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '213'
+        - sample_id_as_printed: '214'
+          T_K: '1673'
+          gamma: '5.33'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.71e-12'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '214'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '2.81'
+            CaO: '51.7'
+            Al2O3: '7.75'
+            SiO2: '37.6'
+            T.Fe: '2.28'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '214'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '214'
+    - observation_id: taniguchi_1997_table4_feo_activity_coefficient_1873k
+      experiment: taniguchi-1997-feo-slag-1673-1873k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 959
+        pdf_page_index: 3
+        table: '4'
+        note: Table 4 measured FeO activity coefficients at 1873 K; T.Fe and composition cells retained as printed.
+      units: dimensionless
+      standard_state: FeO(l), pure liquid stoichiometric composition of wustite, as explicitly defined after Eq.
+        (9), p. 958.
+      regime: quench_equilibration
+      values:
+        quantity: activity_coefficient
+        method_class: directly_reduced_measurement
+        evidence_class: measured_reduced
+        series:
+        - sample_id_as_printed: '301'
+          T_K: '1873'
+          gamma: '1.45'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '1.90e-10'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '301'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.474'
+            CaO: '37.1'
+            Al2O3: '52.8'
+            SiO2: '9.25'
+            T.Fe: '0.729'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '301'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '301'
+        - sample_id_as_printed: '302'
+          T_K: '1873'
+          gamma: '1.98'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '1.90e-10'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '302'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.553'
+            CaO: '31.6'
+            Al2O3: '50.8'
+            SiO2: '16.8'
+            T.Fe: '0.623'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '302'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '302'
+        - sample_id_as_printed: '303'
+          T_K: '1873'
+          gamma: '1.57'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '1.90e-10'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '303'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.406'
+            CaO: '22.6'
+            Al2O3: '53.0'
+            SiO2: '23.7'
+            T.Fe: '0.576'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '303'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '303'
+        - sample_id_as_printed: '304'
+          T_K: '1873'
+          gamma: '1.14'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '1.90e-10'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '304'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '1.17'
+            CaO: '14.9'
+            Al2O3: '50.2'
+            SiO2: '32.2'
+            T.Fe: '2.10'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '304'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '304'
+        - sample_id_as_printed: '305'
+          T_K: '1873'
+          gamma: '1.68'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '1.90e-10'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '305'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.232'
+            CaO: '35.9'
+            Al2O3: '51.8'
+            SiO2: '12.0'
+            T.Fe: '0.319'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '305'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '305'
+        - sample_id_as_printed: '306'
+          T_K: '1873'
+          gamma: '2.04'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '1.90e-10'
+            units: atm
+            locator:
+              page: 4
+              published_page: 959
+              pdf_page_index: 3
+              table: '4'
+              row: '306'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.355'
+            CaO: '30.7'
+            Al2O3: '46.7'
+            SiO2: '22.0'
+            T.Fe: '0.405'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 4
+                published_page: 959
+                pdf_page_index: 3
+                table: '4'
+                row: '306'
+          locator:
+            page: 4
+            published_page: 959
+            pdf_page_index: 3
+            table: '4'
+            row: '306'
+    - observation_id: taniguchi_1997_table5_feo_activity_coefficient
+      experiment: taniguchi-1997-feo-caf2-slag-1723k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 6
+        published_page: 961
+        pdf_page_index: 5
+        table: '5'
+        note: Table 5 measured FeO activity coefficients in CaO-Al2O3-CaF2-FeO melts.
+      units: dimensionless
+      standard_state: FeO(l), pure liquid stoichiometric composition of wustite, as explicitly defined after Eq.
+        (9), p. 958.
+      regime: quench_equilibration
+      values:
+        quantity: activity_coefficient
+        method_class: directly_reduced_measurement
+        evidence_class: measured_reduced
+        series:
+        - sample_id_as_printed: '401'
+          T_K: '1723'
+          gamma: '1.75'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.69e-12'
+            units: atm
+            locator:
+              page: 6
+              published_page: 961
+              pdf_page_index: 5
+              table: '5'
+              row: '401'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.323'
+            CaO: '39.9'
+            Al2O3: '59.6'
+            CaF2: '0'
+            T.Fe: '0.435'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 6
+                published_page: 961
+                pdf_page_index: 5
+                table: '5'
+                row: '401'
+          locator:
+            page: 6
+            published_page: 961
+            pdf_page_index: 5
+            table: '5'
+            row: '401'
+        - sample_id_as_printed: '402'
+          T_K: '1723'
+          gamma: '2.09'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.69e-12'
+            units: atm
+            locator:
+              page: 6
+              published_page: 961
+              pdf_page_index: 5
+              table: '5'
+              row: '402'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.286'
+            CaO: '39.4'
+            Al2O3: '58.9'
+            CaF2: '1.33'
+            T.Fe: '0.323'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 6
+                published_page: 961
+                pdf_page_index: 5
+                table: '5'
+                row: '402'
+          locator:
+            page: 6
+            published_page: 961
+            pdf_page_index: 5
+            table: '5'
+            row: '402'
+        - sample_id_as_printed: '403'
+          T_K: '1723'
+          gamma: '3.78'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.69e-12'
+            units: atm
+            locator:
+              page: 6
+              published_page: 961
+              pdf_page_index: 5
+              table: '5'
+              row: '403'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.423'
+            CaO: '39.2'
+            Al2O3: '58.6'
+            CaF2: '1.89'
+            T.Fe: '0.260'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 6
+                published_page: 961
+                pdf_page_index: 5
+                table: '5'
+                row: '403'
+          locator:
+            page: 6
+            published_page: 961
+            pdf_page_index: 5
+            table: '5'
+            row: '403'
+        - sample_id_as_printed: '404'
+          T_K: '1723'
+          gamma: '5.97'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.69e-12'
+            units: atm
+            locator:
+              page: 6
+              published_page: 961
+              pdf_page_index: 5
+              table: '5'
+              row: '404'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.735'
+            CaO: '39.1'
+            Al2O3: '58.5'
+            CaF2: '2.01'
+            T.Fe: '0.275'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 6
+                published_page: 961
+                pdf_page_index: 5
+                table: '5'
+                row: '404'
+          locator:
+            page: 6
+            published_page: 961
+            pdf_page_index: 5
+            table: '5'
+            row: '404'
+        - sample_id_as_printed: '405'
+          T_K: '1723'
+          gamma: '10.5'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.69e-12'
+            units: atm
+            locator:
+              page: 6
+              published_page: 961
+              pdf_page_index: 5
+              table: '5'
+              row: '405'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.730'
+            CaO: '38.7'
+            Al2O3: '57.9'
+            CaF2: '3.20'
+            T.Fe: '0.155'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 6
+                published_page: 961
+                pdf_page_index: 5
+                table: '5'
+                row: '405'
+          locator:
+            page: 6
+            published_page: 961
+            pdf_page_index: 5
+            table: '5'
+            row: '405'
+        - sample_id_as_printed: '406'
+          T_K: '1723'
+          gamma: '17.4'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.69e-12'
+            units: atm
+            locator:
+              page: 6
+              published_page: 961
+              pdf_page_index: 5
+              table: '5'
+              row: '406'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.787'
+            CaO: '38.5'
+            Al2O3: '57.5'
+            CaF2: '6.35'
+            T.Fe: '0.102'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 6
+                published_page: 961
+                pdf_page_index: 5
+                table: '5'
+                row: '406'
+          locator:
+            page: 6
+            published_page: 961
+            pdf_page_index: 5
+            table: '5'
+            row: '406'
+        - sample_id_as_printed: '407'
+          T_K: '1723'
+          gamma: '33.2'
+          method_class: directly_reduced_measurement
+          evidence_class: directly_reduced_measurement
+          oxygen_partial_pressure:
+            value: '5.69e-12'
+            units: atm
+            locator:
+              page: 6
+              published_page: 961
+              pdf_page_index: 5
+              table: '5'
+              row: '407'
+          composition_mass_percent_as_printed:
+            Fe in Cu: '0.788'
+            CaO: '36.8'
+            Al2O3: '55.1'
+            CaF2: '8.01'
+            T.Fe: '0.0524'
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: partial_composition
+              locator:
+                page: 6
+                published_page: 961
+                pdf_page_index: 5
+                table: '5'
+                row: '407'
+          locator:
+            page: 6
+            published_page: 961
+            pdf_page_index: 5
+            table: '5'
+            row: '407'
+    context:
+    - observation_id: taniguchi_1997_figure_2_deferred
+      type: figure_record
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        figure: '2'
+      phase: liquid alloy
+      units: axes as printed; no numeric points
+      values:
+        quantity: activity_coefficient
+        species: Fe
+        formula: Fe
+        temperature_K: 1673
+        axes:
+          y: ln gamma_Fe
+          x: N_Fe
+        caption: Activity coefficient of iron in copper-iron alloy at 1673 K
+        panel: single panel
+        series:
+        - label: present work
+          marker: filled circle
+          marker_count: 7
+        attribution: present work except comparison series as labelled
+        digitisation: deferred to a figure pass
+    - observation_id: taniguchi_1997_figure_3_deferred
+      type: figure_record
+      locator:
+        page: 3
+        published_page: 958
+        pdf_page_index: 2
+        figure: '3'
+      phase: liquid alloy
+      units: axes as printed; no numeric points
+      values:
+        quantity: activity_coefficient
+        species: Fe
+        formula: Fe
+        temperature_K: varies as shown
+        axes:
+          y: log gamma_Fe at infinite dilution
+          x: 1/T (K^-1) x 10^4
+        caption: Relationship between log gamma_Fe at infinite dilution and temperature
+        panel: single panel
+        series:
+        - label: present work
+          marker: filled circle
+          marker_count: 1
+        - label: Kulkarni et al. [5]
+          marker: open circle
+          marker_count: 2
+        attribution: present work except comparison series as labelled
+        digitisation: deferred to a figure pass
+    - observation_id: taniguchi_1997_figure_4_deferred
+      type: figure_record
+      locator:
+        page: 3
+        published_page: 958
+        pdf_page_index: 2
+        figure: '4'
+      phase: liquid
+      units: axes as printed; no numeric points
+      values:
+        quantity: activity_coefficient
+        species: FeO
+        formula: FeO
+        temperature_K: 1673
+        axes:
+          y: a_FeO
+          x: N_FeO
+        caption: Relationship between N_FeO and a_FeO at 1673 K
+        panel: single panel
+        series:
+        - label: four printed CaO-Al2O3-SiO2 compositions
+          marker: filled/open circles and triangles
+          marker_count: 16
+        attribution: present work except comparison series as labelled
+        digitisation: deferred to a figure pass
+    - observation_id: taniguchi_1997_figure_5_deferred
+      type: figure_record
+      locator:
+        page: 4
+        published_page: 959
+        pdf_page_index: 3
+        figure: '5'
+      phase: liquid
+      units: axes as printed; no numeric points
+      values:
+        quantity: slag composition
+        species: FeO
+        formula: FeO
+        temperature_K: 1673
+        axes:
+          y: slag composition
+          x: CaO-Al2O3-SiO2 mole-fraction coordinates
+        caption: Slag compositions plotted in CaO-Al2O3-SiO2 phase diagram at 1673 K
+        panel: single panel
+        series:
+        - label: present-work slag samples
+          marker: filled circle
+          marker_count: 14
+        attribution: present work except comparison series as labelled
+        digitisation: deferred to a figure pass
+    - observation_id: taniguchi_1997_figure_6_deferred
+      type: figure_record
+      locator:
+        page: 4
+        published_page: 959
+        pdf_page_index: 3
+        figure: '6'
+      phase: liquid
+      units: axes as printed; no numeric points
+      values:
+        quantity: activity_coefficient
+        species: FeO
+        formula: FeO
+        temperature_K: 1673
+        axes:
+          y: gamma_FeO
+          x: N_CaO/N_SiO2
+        caption: Relationship between N_CaO/N_SiO2 and gamma_FeO at 1673 K in the high SiO2 region
+        panel: upper phase-composition diagram and lower activity-coefficient plot
+        series:
+        - label: N_Al2O3=0.16
+          marker: filled circle
+          marker_count: 5
+        - label: N_Al2O3=0.125
+          marker: triangle
+          marker_count: 5
+        - label: N_Al2O3=0.09
+          marker: square
+          marker_count: 4
+        attribution: present work except comparison series as labelled
+        digitisation: deferred to a figure pass
+    - observation_id: taniguchi_1997_figure_7_deferred
+      type: figure_record
+      locator:
+        page: 4
+        published_page: 959
+        pdf_page_index: 3
+        figure: '7'
+      phase: liquid
+      units: axes as printed; no numeric points
+      values:
+        quantity: activity_coefficient
+        species: FeO
+        formula: FeO
+        temperature_K: 1673
+        axes:
+          y: gamma_FeO
+          x: N_SiO2
+        caption: Relationship between SiO2 content and gamma_FeO in the low SiO2 region
+        panel: single panel
+        series:
+        - label: N_CaO/N_Al2O3=1.78
+          marker: filled circle
+          marker_count: 7
+        attribution: present work except comparison series as labelled
+        digitisation: deferred to a figure pass
+    - observation_id: taniguchi_1997_figure_8_deferred
+      type: figure_record
+      locator:
+        page: 5
+        published_page: 960
+        pdf_page_index: 4
+        figure: '8'
+      phase: liquid
+      units: axes as printed; no numeric points
+      values:
+        quantity: activity_coefficient
+        species: FeO
+        formula: FeO
+        temperature_K: 1873
+        axes:
+          y: gamma_FeO
+          x: N_CaO/N_SiO2
+        caption: Relationship between N_CaO/N_SiO2 and gamma_FeO at 1873 K
+        panel: single panel
+        series:
+        - label: present work
+          marker: filled circle
+          marker_count: 6
+        - label: Suito [14]
+          marker: open circle
+          marker_count: 3
+        - label: Hino et al. [15]
+          marker: triangle
+          marker_count: 7
+        attribution: present work except comparison series as labelled
+        digitisation: deferred to a figure pass
+    - observation_id: taniguchi_1997_figure_9_deferred
+      type: figure_record
+      locator:
+        page: 6
+        published_page: 961
+        pdf_page_index: 5
+        figure: '9'
+      phase: liquid
+      units: axes as printed; no numeric points
+      values:
+        quantity: activity_coefficient
+        species: FeO
+        formula: FeO
+        temperature_K: 1723
+        axes:
+          y: gamma_FeO
+          x: N_CaF2
+        caption: Relationship between gamma_FeO and CaF2 added to 40 mass% CaO-Al2O3 melt at 1723 K
+        panel: single panel
+        series:
+        - label: present work
+          marker: filled circle
+          marker_count: 7
+        attribution: present work except comparison series as labelled
+        digitisation: deferred to a figure pass
+    - observation_id: taniguchi_1997_table3_model_estimate
+      type: table_record
+      locator:
+        page: 3
+        published_page: 958
+        pdf_page_index: 2
+        table: '3'
+        row: estimated from Eq. (7)
+      units: dimensionless
+      values:
+        quantity_as_printed: infinite-dilution activity coefficient of Fe in liquid Cu-Fe alloy
+        quantity_token: activity_coefficient
+        method_class: model_derived
+        evidence_class: model_derived
+        value_as_printed: '9.11'
+        temperature_K: 1873
+        basis_as_printed: estimated from Eq. (7); model estimate, not a measurement
+        system_as_printed: Cu-Fe alloy
+        reason_not_scored: fitted/extrapolated estimate; no measured value
+    - observation_id: taniguchi_1997_table4_sample213_composition_note
+      type: table_record
+      locator:
+        page: 4
+        published_page: 959
+        pdf_page_index: 3
+        table: '4'
+        row: '213'
+      units: mass%
+      values:
+        quantity_as_printed: slag composition and total iron for sample 213
+        method_class: measured_direct
+        evidence_class: measured_direct
+        values_as_printed:
+          CaO: '39.5'
+          Al2O3: '16.7'
+          SiO2: '6.52'
+          T.Fe: '6.77'
+        transcription_note: The rendered table prints SiO2 as 6.52. Preserved verbatim; no completion or correction.
