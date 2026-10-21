@@ -13,10 +13,11 @@ budget expired — BRANCH_ONE_TWO had not been offered yet. That is a longer
 campaign, not a UI defect; this journey therefore overrides only the
 branch.
 
-Expected chain with C5/MRE default-off (apply_decision in simulator/core.py):
+Expected chain with C5/MRE default-off after d-212:
 
     PATH_AB = A_staged  -> C2A_STAGED -> C3_NA
-    BRANCH  = one       -> complete (skip C4; C5 is off)
+    default C4.skip     -> final C2A (the branch modal is not offered)
+    BRANCH  = one       -> final C2A when the modal is offered (C5 off)
 
 A different or worse yield than Branch Two is correct behaviour, not a
 defect. Taking C4 anyway, stalling, or a crash is a finding.
@@ -276,13 +277,20 @@ def test_alternate_branch_journey(page, evidence, artifacts_dir):
         )
 
     branch_choice = _choice_for(decisions, BRANCH_DECISION)
-    if branch_choice is None:
+    default_c4_skipped = branch_choice is None and "C4" not in chain
+    if branch_choice is None and "C4" in chain:
         record(
             "6-branch-one",
             False,
-            f"BRANCH_ONE_TWO never offered at Hour: {last_hour} "
-            f"(verdict={verdict!r}, stalled={stalled}, exhausted={exhausted_total}). "
+            f"BRANCH_ONE_TWO was not offered and C4 still ran. "
             f"chain={chain_text}; decisions={decisions!r}; detail={detail}",
+        )
+    elif branch_choice is None:
+        record(
+            "6-branch-one",
+            True,
+            "d-212 default C4.skip: branch modal not offered and C4 absent "
+            f"from chain={chain_text}",
         )
     elif branch_choice != CHOSEN_BRANCH:
         record(
@@ -323,6 +331,13 @@ def test_alternate_branch_journey(page, evidence, artifacts_dir):
             f"{last_wait_ms // 1000}s (loop elapsed "
             f"{time.monotonic() - loop_started:.0f}s); "
             f"status-text={status_now!r}; campaign={campaign_now!r}; chain={chain_text}",
+        )
+    elif exhausted_total and default_c4_skipped and "C3_NA" in chain:
+        record(
+            "7-results",
+            True,
+            "final C2A 82 h minimum still running when the advance loop "
+            f"ended at Hour: {last_hour}; C4 was not entered. chain={chain_text}",
         )
     elif exhausted_total:
         record(

@@ -10,8 +10,8 @@ plane POST /api/runs/<id>/cancel from the page itself (same-origin
 cookies), then asserts the dashboard hands the controls back — the same
 contract already tested in-process for refused/error terminals.
 
-Does not wait for Complete: the default recipe refuses at C4
-(owner-gated). This journey leaves after the second run's first hour.
+Does not wait for Complete. d-212 skips the default C4 hold; this
+journey leaves after the second run's first hour.
 """
 
 from __future__ import annotations

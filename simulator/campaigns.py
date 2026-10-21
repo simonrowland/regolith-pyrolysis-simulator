@@ -82,6 +82,14 @@ CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON = (
     'campaign_depletion_signal_invalid'
 )
 C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON = 'c4_target_window_not_acquired'
+# setpoints.yaml C4.max_target_acquisition_hr is 60 h: 42 h to climb
+# from this handoff to temp_range_C[0] at 10 C/h, plus 18 h of
+# latent-cooling margin. A shortened or skipped C3 can hand C4 the
+# melt near the C2A exit instead. The extra climb is added only when
+# the configured budget still covers that design nominal; a shorter
+# cap is an operator limit and is not extended.
+C4_DESIGN_HANDOFF_TEMPERATURE_C = 1160.0
+C4_PREHEAT_RAMP_C_PER_HR = 10.0
 C4_PROCESS_WINDOW_LOST_REFUSAL_REASON = 'c4_process_window_lost'
 C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
     'c4_process_wall_clock_exhausted'
@@ -326,6 +334,7 @@ class CampaignManager:
         self._active_post_mg_c2a_overrides: dict | None = None
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
         self.last_c4_termination: dict[str, object] | None = None
+        self._c4_entry_temperature_C: float | None = None
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -826,6 +835,63 @@ class CampaignManager:
                 'C4.max_target_acquisition_hr must be finite and positive'
             )
         return limit, 'setpoint:C4.max_target_acquisition_hr'
+
+    def _c4_handoff_temperature_C(
+        self,
+        melt: MeltState,
+        c4_snapshots: list,
+    ) -> float:
+        """Temperature C4 actually started from.
+
+        ``configure_campaign`` records the handoff. A bare
+        ``check_endpoint`` call falls back to the first C4 snapshot,
+        then to the live melt temperature.
+        """
+        recorded = self._c4_entry_temperature_C
+        if recorded is not None and math.isfinite(recorded):
+            return float(recorded)
+        if c4_snapshots:
+            return float(c4_snapshots[0].temperature_C)
+        return float(melt.temperature_C)
+
+    def _c4_acquisition_allowance_hr(
+        self,
+        entry_temperature_C: float,
+    ) -> tuple[float, str]:
+        """Hours of preheat opportunity before ``c4_target_window_not_acquired``.
+
+        Premise: the published limit budgets the climb from
+        ``C4_DESIGN_HANDOFF_TEMPERATURE_C`` (1160 C) to ``temp_range_C[0]``
+        at ``C4_PREHEAT_RAMP_C_PER_HR`` (10 C/h), plus whatever margin the
+        setpoint adds. At the default window that nominal is
+        (1580 - 1160) / 10 = 42 h, and 60 h leaves an 18 h margin.
+
+        Algebra: when ``limit >= design_nominal`` and the handoff is
+        colder than 1160 C,
+        allowance = limit + (1160 - T_entry) / 10.
+        A limit below the design nominal is an operator cap and is
+        returned unchanged. A handoff at or above 1160 C keeps ``limit``.
+
+        Units: hours and °C. Sanity: entry 475 C and limit 60 h →
+        extra 68.5 h, allowance 128.5 h, which still covers
+        (1580 - 475) / 10 = 110.5 h plus the same 18 h margin.
+        Entry 1220 C and limit 2 h → no extra, refuses at 2 h.
+        """
+        limit_hr, source = self._c4_target_acquisition_limit()
+        window_low_C, _window_high_C = self._c4_temperature_window()
+        design_nominal_hr = (
+            window_low_C - C4_DESIGN_HANDOFF_TEMPERATURE_C
+        ) / C4_PREHEAT_RAMP_C_PER_HR
+        if (
+            limit_hr < design_nominal_hr
+            or not math.isfinite(entry_temperature_C)
+            or entry_temperature_C >= C4_DESIGN_HANDOFF_TEMPERATURE_C
+        ):
+            return limit_hr, source
+        extra_hr = (
+            C4_DESIGN_HANDOFF_TEMPERATURE_C - entry_temperature_C
+        ) / C4_PREHEAT_RAMP_C_PER_HR
+        return limit_hr + extra_hr, f'{source}+cold_handoff'
 
     def _c4_process_wall_clock_limit(self) -> tuple[float, str]:
         value = self._campaign_config(CampaignPhase.C4).get(
@@ -1470,6 +1536,7 @@ class CampaignManager:
             self.last_c2a_staged_termination = None
         elif campaign == CampaignPhase.C4:
             self.last_c4_termination = None
+            self._c4_entry_temperature_C = float(melt.temperature_C)
 
         if campaign == CampaignPhase.C0:
             ambient_pressure = max(
@@ -2498,9 +2565,6 @@ class CampaignManager:
             rate = evap_flux.species_kg_hr.get(species, 0.0)
             window_low_C, window_high_C = self._c4_temperature_window()
             requested_window_C = [window_low_C, window_high_C]
-            acquisition_limit_hr, acquisition_limit_source = (
-                self._c4_target_acquisition_limit()
-            )
             process_limit_hr, process_limit_source = (
                 self._c4_process_wall_clock_limit()
             )
@@ -2509,6 +2573,11 @@ class CampaignManager:
                 for snapshot in record.snapshots
                 if snapshot.campaign == CampaignPhase.C4
             ]
+            acquisition_limit_hr, acquisition_limit_source = (
+                self._c4_acquisition_allowance_hr(
+                    self._c4_handoff_temperature_C(melt, c4_snapshots),
+                )
+            )
             prior_acquisition_indexes = [
                 index
                 for index, snapshot in enumerate(c4_snapshots)
@@ -2871,6 +2940,59 @@ class CampaignManager:
             return value.strip().lower() in {'1', 'true', 'yes', 'on'}
         return bool(value)
 
+    def _phase_skipped(self, phase: CampaignPhase) -> bool:
+        """Recipe skip flag. Absent means the phase runs.
+
+        Overrides win over the setpoints value when both name ``skip``.
+        ``max_hours`` 0 is not a skip: that cap falls through.
+        """
+        ovr = self._campaign_overrides(phase)
+        cfg = self._campaign_config(phase)
+        if 'skip' in ovr:
+            return self._truthy_config(ovr['skip'])
+        if 'skip' in cfg:
+            return self._truthy_config(cfg['skip'])
+        return False
+
+    def _c3_skipped(self) -> bool:
+        return self._phase_skipped(CampaignPhase.C3_K)
+
+    def _c4_skipped(self) -> bool:
+        return self._phase_skipped(CampaignPhase.C4)
+
+    def _arm_final_c2a(self, record: BatchRecord) -> None:
+        """Install the post-shuttle C2A clocks and the anti-loop path marker.
+
+        The 82 h minimum is 12 h for 1150→1320 °C at 15 °C/h plus 70 h for
+        1320→1843 °C at 7.5 °C/h. The 160 h cap is the slow-band schedule.
+        Neither number is retuned here (t-1393 is measuring them). C4's
+        10 °C/h bridge is not required: this C2A ramp is the temperature
+        path. On a double skip the entry can be ~475 °C. From there,
+        15 °C/h up to 1320 °C then 7.5 °C/h needs about 174 h to reach
+        2200 °C, so the 160 h cap does not reach the ceiling. 82 h
+        remains a minimum. Those clocks are unchanged.
+        """
+        self._pending_post_mg_c2a_overrides = {
+            'min_hold_hr': 82.0,
+            'max_hours': 160.0,
+        }
+        if record.path != 'B':
+            record.path = 'A_post_mg_boiloff'
+
+    def _route_skipping_c3(self, record: BatchRecord) -> CampaignPhase:
+        """C2A/C2B exit when the C3 recipe skip is set.
+
+        C4 still opted in goes to C4 (branch two). C4 also skipped arms
+        the final C2A instead of ending the batch.
+        """
+        if self._c4_skipped():
+            self._arm_final_c2a(record)
+            return CampaignPhase.C2A
+        record.branch = 'two'
+        self._record_auto_decision(
+            record, DecisionType.BRANCH_ONE_TWO, 'two')
+        return CampaignPhase.C4
+
     def _c7_enabled(self, record: BatchRecord) -> bool:
         if getattr(record, 'branch', '') != 'two':
             return False
@@ -2933,10 +3055,14 @@ class CampaignManager:
                 # branch 'two' offers/auto-decides C6_PROCEED, everything
                 # else completes as before.
                 return self._get_next_after_c5(record)
+            if self._c3_skipped():
+                return self._route_skipping_c3(record)
             # After Path A C2A → C3 (K phase)
             return CampaignPhase.C3_K
 
         elif current == CampaignPhase.C2A_STAGED:
+            if self._c3_skipped():
+                return self._route_skipping_c3(record)
             # Staged Path A cools before handing residual FeO to the V1c
             # Na-only cleanup window. K/FeO is refused at this temperature.
             scoped = self._c2a_staged_c3_na_scoped_overrides()
@@ -2945,6 +3071,8 @@ class CampaignManager:
             return CampaignPhase.C3_NA
 
         elif current == CampaignPhase.C2B:
+            if self._c3_skipped():
+                return self._route_skipping_c3(record)
             # After Path B C2B → C3 (K phase)
             return CampaignPhase.C3_K
 
@@ -2955,6 +3083,11 @@ class CampaignManager:
             return CampaignPhase.C3_NA
 
         elif current == CampaignPhase.C3_NA:
+            # C4 skip is a recipe choice: continue to the final C2A, do not
+            # end the batch and do not take the debug C4 shortcut.
+            if self._c4_skipped():
+                self._arm_final_c2a(record)
+                return CampaignPhase.C2A
             # After C3 → Branch decision needed
             if self._is_noninteractive_test_batch(record):
                 record.branch = 'two'
@@ -2966,23 +3099,9 @@ class CampaignManager:
         elif current == CampaignPhase.C4:
             if self.c5_enabled:
                 return CampaignPhase.C5
-            # Canonical no-MRE path: Mg is selectively recovered before the
-            # final high-temperature pyrolysis ramp.  Reuse C2A physics with a
-            # scoped, derived schedule.  The configured band midpoints need
-            # 12 h for the catalogued 1150->1320 C post-shuttle floor at
-            # 15 C/h and 70 h for 1320->1843 C at 7.5 C/h.  The 160 h hard
-            # cap is the conservative slow-band schedule (132 h) plus the
-            # existing 28 h extraction window.  The path marker prevents a C3
-            # loop.
-            self._pending_post_mg_c2a_overrides = {
-                'min_hold_hr': 82.0,
-                'max_hours': 160.0,
-            }
-            # Mark A-family paths for the final-pass C2A successor above;
-            # path 'B' keeps its operator-chosen record (the marker used to
-            # clobber it, corrupting the reported path).
-            if record.path != 'B':
-                record.path = 'A_post_mg_boiloff'
+            # Opt-in C4 still hands the final ramp to C2A. The 10 °C/h C4
+            # bridge is not required for that ramp; see _arm_final_c2a.
+            self._arm_final_c2a(record)
             return CampaignPhase.C2A
 
         elif current == CampaignPhase.C5:
@@ -3032,18 +3151,19 @@ class CampaignManager:
                     'electrode life 5-10x.'
                 )
             branch_one_context = (
-                'Branch One (fallback): skip C4 and complete pyrolysis-only '
-                'when optional C5/MRE is disabled.'
+                'Branch One (fallback): skip C4 and continue to the final '
+                'C2A boiloff when optional C5/MRE is disabled.'
             )
             if self.c5_enabled:
                 branch_one_context = (
                     'Branch One (fallback): skip C4, full MRE to 2.5 V, '
                     '~2650-4050 kWh/t, electrode life 2-3x.'
                 )
+            recommendation = 'one' if self._c4_skipped() else 'two'
             return DecisionPoint(
                 decision_type=DecisionType.BRANCH_ONE_TWO,
                 options=['two', 'one'],
-                recommendation='two',
+                recommendation=recommendation,
                 context=(
                     f'{branch_two_context} {branch_one_context}'
                 ),

@@ -90,13 +90,19 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
+    # Recomputed 2026-10-20 (d-212). Three setpoints leaves moved, nothing else:
+    #   campaigns.C3.alkali_dosing.Na_kg 0.0 -> null
+    #   campaigns.C3.alkali_dosing.K_kg  0.0 -> null
+    #   campaigns.C3.skip false and campaigns.C4.skip true were added
+    # null is the credit-line default (plant-band midpoint × charge/1000).
     assert hashlib.sha256(resolved).hexdigest() == (
-        "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
+        "4192d5f16c70924a74854ee5d45819afc80990b9c8ae45d0506b054de7e5d8e0"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
+    # d-212 added campaigns.C3.skip and campaigns.C4.skip to that digest.
     assert schema.bounds_digest == (
-        "21c0c4905a878d30051332ef69cc25cbd395a52ed5fd0f9a68484280efa7e0dc"
+        "b92fa77041b1de66cc921f481d63f09f45547fa6467279cd8e6c09621241f903"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -104,8 +110,10 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # Moves with bounds_digest above -- that is the POINT of this test's name
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
+    # Recomputed 2026-10-20 (d-212): recipe_id includes bounds_digest, so the
+    # two new skip knobs move the empty patch's id. Its own bytes stay [].
     assert empty.recipe_id(schema) == (
-        "be70d44b9d30688788e535c9e84b42d51111956487b2b7e962deb1a70790d95e"
+        "11a961708f8102a416466aa912cc709fe1f4ecc564d24c65a938171162077d0e"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -117,8 +125,9 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
+    # Recomputed 2026-10-20 (d-212): bounds_digest plus the two skip search paths.
     assert identity_digest == (
-        "0cfae3821a514712c36151ca997fd5d9381191deeccca66ceb807628e179b160"
+        "68ee38fda9cd3fab4ca28316190619bdcddda3b9a1d14650d88361d7141a2b9a"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -562,10 +571,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    assert len(paths) == 65
+    # d-212: C3.skip and C4.skip are searchable categoricals. Conditional
+    # subspace digests stay put; this unguarded path list grows by those two.
+    assert len(paths) == 67
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
+        == "d655edcbb85620a44012f69ad94fcfe2ad7dcfb8340405ac01a6554f7ac0eb1e"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -1697,9 +1708,11 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # difference between two moving numbers, written down as a constant, goes
     # stale every time either moves. It is now evaluated, not pinned. Recomputed
     # 2026-09-29 for C2 loader-scalar pressure coupling.
+    # 2026-10-20 d-212: C3.skip and C4.skip enter the bounds digest, which
+    # recipe_id hashes. Recomputed from RecipePatch({PO2_DEFAULT: 9.0}).
     assert (
         first.recipe_id()
-                == "cb77c9b93e43903f3820c491df51dce7a7a3d4f8784d9b55121f64906bca7b6d"
+                == "dc85d0d4bbd0059d21f48ed998b0daf91489ac1a1ee6c21c690a6ec2aea11210"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

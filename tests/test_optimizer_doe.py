@@ -50,7 +50,8 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         )
         for index in range(8)
     )
-    assert [len(item.patch.values) for item in batch] == [59, 65] * 4
+    # d-212 added unguarded C3.skip and C4.skip, so each subspace grew by 2.
+    assert [len(item.patch.values) for item in batch] == [61, 67] * 4
     assert [item.patch.canonical_json() for item in batch] == [
         item.patch.canonical_json() for item in indexed
     ]
@@ -93,9 +94,10 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
     # Restoring the eight numeric bounds recovers the previous digest
     # 85eb0ad69e593c8b1f6089ad0cc27ad403e81d5e68500109c12daf028a9b3757; no other
     # patch path, mask, subspace digest, or effective pin differs.
+    # d-212: each sample also carries campaigns.C3.skip and campaigns.C4.skip.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "dc098af5a43044412f15665c955a96ed036840ef0528c4f26f9f3869122d9efb"
+    ).hexdigest() == "c0888abc350551c18f10351a701a2e29d1deb041b85681245314f38b135bee50"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -125,9 +127,10 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
     # bounds recovers
     # 1983fce535aade41fcf064c3d7ca6fa1552ded02de6bacefac124478d7051cd7. C3's
     # two disabled search paths also change this sampled stream.
+    # d-212: each sample also carries campaigns.C3.skip and campaigns.C4.skip.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "1b92c2122fda21526afea93379dd6619991ff0aa7f4d7fb9cdfa077bb85a6028"
+    ).hexdigest() == "f2d01714b1326007a01e5e7675187525ac0778776d2a3566d95f3cad64fda5b7"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():

@@ -87,8 +87,9 @@ CONTROL_JOURNEY_TIMEOUT_S = (CONTROL_JOURNEY_BUDGET_MS + JOURNEY_MARGIN_MS) // 1
 
 # Alternate decision-branch journey: land + feedstock + start + first tick +
 # advance loop to a terminal. Does NOT visit /optimizer or /thermal-train.
-# PATH_AB stays A_staged; BRANCH_ONE_TWO = one (skip C4; complete when C5 is
-# off). Same advance-loop total as the happy path so a run that keeps moving
+# PATH_AB stays A_staged. d-212 skips C4 by default, so the branch modal
+# is not offered and the run continues into the final C2A. Same advance-loop
+# total as the happy path so a run that keeps moving
 # is reported here, not killed by the outer pytest timeout.
 #
 #   land 30 + feedstock 15 + socket 20 + status 30 + ack 60

@@ -26,6 +26,7 @@ from simulator.condensation_routing import (
 )
 from simulator.config_flags import bool_feature_flag
 from simulator.melt_regime import MeltRegime, melt_regime
+from simulator.recipe import resolve_c3_alkali_credit_dose_kg
 from simulator.state import (
     FARADAY,
     GAS_CONSTANT,
@@ -299,31 +300,11 @@ class ExtractionMixin:
         )
 
     def _c3_alkali_requested_dose_kg(self, species: str) -> float:
-        campaigns = getattr(self, 'setpoints', {}).get('campaigns', {})
-        if not isinstance(campaigns, Mapping):
+        setpoints = getattr(self, 'setpoints', {}) or {}
+        if not isinstance(setpoints, Mapping):
             return 0.0
-        c3 = campaigns.get('C3', {})
-        if not isinstance(c3, Mapping):
-            return 0.0
-        dosing = c3.get('alkali_dosing', {})
-        if dosing in (None, {}):
-            return 0.0
-        if not isinstance(dosing, Mapping):
-            raise ValueError('campaigns.C3.alkali_dosing must be a mapping')
-        key = f'{species}_kg'
-        if key not in dosing or dosing[key] is None:
-            return 0.0
-        try:
-            requested_kg = float(dosing[key])
-        except (TypeError, ValueError) as exc:
-            raise ValueError(
-                f'campaigns.C3.alkali_dosing.{key} must be numeric'
-            ) from exc
-        if not math.isfinite(requested_kg) or requested_kg < 0.0:
-            raise ValueError(
-                f'campaigns.C3.alkali_dosing.{key} must be finite and non-negative'
-            )
-        return requested_kg
+        charge_kg = float(getattr(self.record, 'batch_mass_kg', 0.0) or 0.0)
+        return resolve_c3_alkali_credit_dose_kg(setpoints, species, charge_kg)
 
     def _record_c3_alkali_credit_draw(self, species: str, kg: float) -> None:
         if kg <= self._LEDGER_KG_TOL:
@@ -2677,13 +2658,11 @@ class ExtractionMixin:
                     liquid_fraction=liquid_fraction,
                 )
             elif campaign == CampaignPhase.C3_NA:
-                target_stage = (
-                    'feo_cleanup'
-                    if self.record.path == 'A_staged'
-                    else 'cr_ti'
-                )
+                # d-212: the default Na shuttle reduces FeO. cr_ti stays an
+                # explicit request; both the staged and unstaged dispatches
+                # use the cool FeO window.
                 self._shuttle_inject_Na(
-                    target_stage=target_stage,
+                    target_stage='feo_cleanup',
                     liquid_fraction=liquid_fraction,
                 )
         else:
@@ -2730,7 +2709,7 @@ class ExtractionMixin:
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from engines.builtin.metallothermic_step import REACTION_FAMILY_C3_K
 
-        if self.shuttle_K_inventory_kg <= 0.01:
+        if self.shuttle_K_inventory_kg <= 0.0:
             return  # No K available
 
         # F-B1: dispatch + commit through the shared helper.  The
@@ -2778,9 +2757,14 @@ class ExtractionMixin:
                 'dt_hr': 1.0,
             },
         )
-        # The stirred melt makes feedstock and reagent K one well-mixed pool.
-        # Partial withdrawals attribute K to its live origins pro rata.
+        # The stirred melt and the overhead gas are each one well-mixed
+        # volume. Dosed K and native K vapour share process.overhead_gas.K;
+        # condensation then withdraws only the captured part. That partial
+        # withdrawal is pro rata across the live origins (pool_ratio), which
+        # is the allocator that already closes exactly. A second gas account
+        # would split one physical species balance.
         self.atom_ledger.mark_amalgamated_pool('process.cleaned_melt', ('K',))
+        self.atom_ledger.mark_amalgamated_pool('process.overhead_gas', ('K',))
         self._record_stage_routed_metal_credits('C3', transition)
         self._apply_transition_redox_source_terms(
             transition,
@@ -2851,7 +2835,7 @@ class ExtractionMixin:
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from engines.builtin.metallothermic_step import REACTION_FAMILY_C3_NA
 
-        if self.shuttle_Na_inventory_kg <= 0.01:
+        if self.shuttle_Na_inventory_kg <= 0.0:
             return
 
         # F-B1: dispatch + commit through the shared helper.
@@ -2900,6 +2884,10 @@ class ExtractionMixin:
                 'dt_hr': 1.0,
             },
         )
+        # Same well-mixed pools as the K shuttle. Na2O joins feedstock Na
+        # in the melt, and the vapor of both origins shares overhead_gas.Na.
+        self.atom_ledger.mark_amalgamated_pool('process.cleaned_melt', ('Na',))
+        self.atom_ledger.mark_amalgamated_pool('process.overhead_gas', ('Na',))
         self._record_stage_routed_metal_credits('C3', transition)
         self._apply_transition_redox_source_terms(
             transition,

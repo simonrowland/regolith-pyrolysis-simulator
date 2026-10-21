@@ -275,7 +275,8 @@ def test_branch_decision_context_matches_c5_default_off():
     context = manager.get_decision(CampaignPhase.C3_NA, record).context
 
     assert "C4 Mg pyrolysis + final C2A boiloff" in context
-    assert "complete pyrolysis-only" in context
+    assert "continue to the final" in context
+    assert "C2A boiloff" in context
     assert "C5 limited MRE" not in context
     assert "full MRE to 2.5 V" not in context
 
@@ -292,7 +293,14 @@ def test_branch_one_completes_when_c5_default_off():
 
     sim.apply_decision(DecisionType.BRANCH_ONE_TWO, "one")
 
-    assert sim.melt.campaign == CampaignPhase.COMPLETE
+    assert sim.melt.campaign == CampaignPhase.C2A
+    assert sim.record.path == "A_post_mg_boiloff"
+    assert sim.campaign_mgr._campaign_overrides(CampaignPhase.C2A)["min_hold_hr"] == (
+        82.0
+    )
+    assert sim.campaign_mgr._campaign_overrides(CampaignPhase.C2A)["max_hours"] == (
+        160.0
+    )
 
 
 def test_normal_batches_still_pause_for_branching_decisions():
