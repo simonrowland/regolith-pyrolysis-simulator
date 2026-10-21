@@ -2809,7 +2809,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '1.08'
         value_as_published: '1.08'
         T_K: '2000'
@@ -2844,6 +2844,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c05]
+
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c06
       type: partial_pressure
       locator:
@@ -2857,7 +2862,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.71'
         value_as_published: '0.71'
         T_K: '2000'
@@ -2892,6 +2897,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c05]
+
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c06
       type: partial_pressure
       locator:
@@ -2905,7 +2915,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.73'
         value_as_published: '0.73'
         T_K: '2000'
@@ -2940,6 +2950,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c05]
+
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c06
       type: partial_pressure
       locator:
@@ -2953,7 +2968,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.76'
         value_as_published: '0.76'
         T_K: '2000'
@@ -2988,6 +3003,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c05]
+
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c06
       type: partial_pressure
       locator:
@@ -3001,7 +3021,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.71'
         value_as_published: '0.71'
         T_K: '2000'
@@ -3036,6 +3056,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c05]
+
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c06
       type: partial_pressure
       locator:
@@ -3049,7 +3074,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.76'
         value_as_published: '0.76'
         T_K: '2000'
@@ -3084,6 +3109,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c05]
+
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c06
       type: partial_pressure
       locator:
@@ -3097,7 +3127,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.73'
         value_as_published: '0.73'
         T_K: '2000'
@@ -3132,6 +3162,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c05]
+
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c06
       type: partial_pressure
       locator:
@@ -3145,7 +3180,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.73'
         value_as_published: '0.73'
         T_K: '2000'
@@ -3180,6 +3215,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c05]
+
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c06
       type: partial_pressure
       locator:
@@ -3193,7 +3233,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.76'
         value_as_published: '0.76'
         T_K: '2000'
@@ -3228,6 +3268,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c05]
+
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c06
       type: partial_pressure
       locator:
@@ -3241,7 +3286,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.79'
         value_as_published: '0.79'
         T_K: '2000'
@@ -3276,6 +3321,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c05]
+
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c06
       type: partial_pressure
       locator:
@@ -3289,7 +3339,7 @@ species:
       mineru_flags: []
       values:
         quantity: partial_pressure
-        method_class: measured_direct
+        method_class: measured_reduced
         pressure_Pa: '0.91'
         value_as_published: '0.91'
         T_K: '2000'
@@ -3324,6 +3374,11 @@ species:
             page: 5
             pdf_page_index: 4
             table: '2'
+      derived_from: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c05]
+      derivation:
+        relation: Molecular oxygen partial pressure calculated from same-sample Sr, Ba, and SiO partial pressures using Eq. (10).
+        inputs: [balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c02, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c04, balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c05]
+
   SrO:
     observations:
     - observation_id: balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c08
@@ -4889,7 +4944,7 @@ species:
       units: g h−1
       values:
         quantity_as_printed: total mass loss Δm
-        quantity_token: unavailable
+        quantity_token: mass_loss_rate
         schema_gap: The reported total sample mass-loss rate is Hertz–Knudsen Eq. (11), retained in context; the mass_loss_rate token exists but this model-derived series is not scored here.
         temperature_as_printed: 2000 K
         composition_x_Sr_as_printed:
@@ -4966,6 +5021,35 @@ species:
         - '36.38'
         - '35.90'
         - '35.74'
+  unknown:
+    context:
+    - observation_id: balabanova_2025_table1_unit_cell_context
+      type: crystallographic_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+      units: Å and degrees
+      values:
+        carbonate_oxide_route:
+          a: '8.525'
+          b: '13.014'
+          c: '14.339'
+          beta: '115.08'
+        aluminosilicate_route:
+          a: '8.521'
+          b: '13.012'
+          c: '14.340'
+          beta: '115.18'
+    - observation_id: balabanova_2025_appearance_energies_context
+      type: mass_spectrometry_context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Experimental
+      units: eV
+      values:
+        appearance_energies: 'Sr 5.8 ± 0.3; Ba 5.4 ± 0.3; BaO 7.0 ± 0.3; SiO 11.5 ± 0.3'
 experiments:
 - experiment_id: balabanova-2025-srba-kems
   locator:
