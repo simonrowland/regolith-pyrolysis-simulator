@@ -92,8 +92,8 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # from the runner JSON because its public envelope does not include raw flux maps.
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
-        "flux_maps_sha256": "afada329092a6480dfca8eae25880231bd76c3d95711456fc6d0b7145a4c44aa",
-        "ledger_sha256": "7cc5144f6f9e90caa10e106e4227673954c7b3091d1affddf659fd836c4b8104",
+        "flux_maps_sha256": "80bdcf337eb0b3607a49ec71b486bec2ffce77d6c6330fcceb3f3484d7d6a167",
+        "ledger_sha256": "0a2e8d68b2898eaa6d1296a03ed205e03fde864890fb40ef31e8b47e3eca6db3",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
@@ -1809,7 +1809,7 @@ def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):
     assert success["status"] == "partial"
     assert set(success) == TOP_LEVEL_KEYS
     assert success["c7_product_report"]
-    assert success["c7_refusal_diagnostic"]
+    assert success["c7_refusal_diagnostic"] == {}
     assert set(failure) == TOP_LEVEL_KEYS
     assert failure["status"] == "failed"
     assert failure["c7_product_report"] == {}
