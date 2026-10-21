@@ -10,6 +10,7 @@ import yaml
 from simulator.battery.enums import EvidenceClass, Phase, Quantity
 from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import Migrator
+from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -85,8 +86,7 @@ def _assert_independent_printed_cells(document: dict) -> None:
 
 @pytest.fixture(scope="module")
 def migrated() -> Migrator:
-    migrator = Migrator(root=ROOT)
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(root=ROOT, path=EXTRACT)
     migrator.finalize()
     return migrator
 

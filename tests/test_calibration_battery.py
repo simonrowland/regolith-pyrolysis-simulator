@@ -61,6 +61,23 @@ def test_zero_uncertainty_placeholder_is_missing_and_true_zero_is_not_refusal(ob
     assert score["metrics"]["dex"]["zero_prediction_count"] == 1
 
 
+def test_source_uncertainty_status_cannot_override_reported_status():
+    row = envelope(
+        dataset_id="fixture",
+        observation_id="source-status",
+        species="Na",
+        observable="partial_pressure",
+        units="Pa",
+        measured=1.0,
+        predicted=2.0,
+        status="match",
+        conditions={},
+        raw={},
+        uncertainty={"sigma": 1, "status": "source-evidence-status"},
+    )
+    assert row["uncertainty"] == {"status": "reported", "sigma": 1}, row["uncertainty"]
+
+
 def test_measurement_kinds_units_and_splits_stay_separate(observation):
     rows = [envelope(**observation), envelope(**observation, evidence="model reference"),
             envelope(**observation, split="holdout"), envelope(**{**observation, "units": "K"})]
