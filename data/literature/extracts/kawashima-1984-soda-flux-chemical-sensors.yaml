@@ -1,0 +1,325 @@
+schema_version: literature_extract.v1
+source_id: kawashima-1984-soda-flux-chemical-sensors
+source:
+  citation: Kawashima, T., Yamaguchi, S., Nagata, K. & Goto, K. S. (1984), A Study of Dephosphorization of Pig Iron with Soda-based
+    Fluxes by Using Chemical Sensors, Journal of the Japan Institute of Metals 48(8):779-786.
+  year: 1984
+extraction:
+  method: Scanned paper machine text; printed prose values transcribed directly. Figures recorded with no digitised coordinates.
+    No numeric tables were printed.
+  date: '2026-10-20'
+  worker: fam34-1020
+review_status: draft
+species:
+  Na2O:
+    observations: []
+    context:
+    - observation_id: kawashima_1984_emf_derived_na2o_activities_schema_gap
+      type: relation
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+      units: dimensionless activity
+      values:
+        method_class: measured_reduced
+        quantity_as_printed: Na2O activity measured by galvanic-cell EMF
+        candidate_quantity_tokens:
+        - activity
+        schema_gap: 'Exact migration errors: type ''activity'' is not allowed (allowed record types include activity_coefficient);
+          with type activity_coefficient and method_class measured_reduced, migration reports ''derived observation requires
+          derived_from''. The EMF readings used to obtain these printed activities are not numerically printed, so no legal
+          source observation can be linked.'
+        reference_state_as_printed: Na2O(l), measured relative to reference slag Na2O-SiO2 + 20 mass% Fe2O3
+        temperature_as_printed: 1573 K ± 15 K
+        printed_points:
+        - flux: Na2O-SiO2 + 20 mass% Fe2O3
+          initial_metal_P_mass_percent: '0.50'
+          time_s: '2400'
+          activity_as_printed: 2 × 10^-5
+          fO2_Pa_as_printed: 3e-10
+        - flux: Na2O-SiO2 + 20 mass% Fe2O3
+          initial_metal_P_mass_percent: '0'
+          time_s: '350'
+          activity_as_printed: 2 × 10^-5
+          fO2_Pa_as_printed: null
+        - flux: Na2CO3
+          initial_metal_P_mass_percent: '0.35'
+          time_s: '0'
+          activity_as_printed: 3 × 10^-4
+          fO2_Pa_as_printed: 3e-13
+        - flux: Na2CO3
+          initial_metal_P_mass_percent: '2.52'
+          time_s: '0'
+          activity_as_printed: 2 × 10^-4
+          fO2_Pa_as_printed: 1e-13
+        - flux: Na2CO3
+          initial_metal_P_mass_percent: '2.52'
+          time_s: '1000'
+          activity_as_printed: 2 × 10^-6
+          fO2_Pa_as_printed: 1e-13
+        - flux: Na2CO3
+          initial_metal_P_mass_percent: '2.52'
+          time_s: '2400'
+          activity_as_printed: 3 × 10^-5
+          fO2_Pa_as_printed: 1e-9
+        - flux: Na2CO3
+          initial_metal_P_mass_percent: '0'
+          time_s: '0'
+          activity_as_printed: 3 × 10^-4
+          fO2_Pa_as_printed: 1e-13
+        - flux: 2Na2CO3 + Fe2O3
+          initial_metal_P_mass_percent: '0.55'
+          time_s: '0'
+          activity_as_printed: 1 × 10^-7
+          fO2_Pa_as_printed: 3e-12
+        note: Values preserved verbatim and not scored pending controller schema ruling; no activity values are converted
+          or inferred.
+    - observation_id: kawashima_1984_fig1_sensor_cell_diagram
+      type: figure_only
+      locator:
+        figure: '1'
+        page: 2
+        published_page: 780
+        pdf_page_index: 1
+      units: not applicable
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: galvanic cells for sodium oxide activity, interfacial oxygen pressure, and sodium vapour pressure
+          sensors
+        species: Na2O, O2, Na
+        phase: solid electrolyte, slag, gas
+        x_axis_as_printed: not applicable
+        y_axis_as_printed: not applicable
+        caption_as_printed: Schematic diagram of the galvanic cells with beta-alumina and ZrO2-MgO electrolyte tubes.
+        panel: single
+        series:
+        - name: sensor cell schematic
+          marker_count: 0
+        attribution: Kawashima et al. (1984)
+        digitisation: deferred to a figure pass
+    - observation_id: kawashima_1984_fig2_apparatus
+      type: figure_only
+      locator:
+        figure: '2'
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+      units: not applicable
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: experimental apparatus schematic
+        species: Na2O, O2, Na
+        phase: liquid iron, slag, gas
+        x_axis_as_printed: not applicable
+        y_axis_as_printed: not applicable
+        caption_as_printed: Schematic diagram of the experimental apparatus.
+        panel: single
+        series:
+        - name: experimental apparatus schematic
+          marker_count: 0
+        attribution: Kawashima et al. (1984)
+        digitisation: deferred to a figure pass
+    - observation_id: kawashima_1984_fig3_time_series
+      type: figure_only
+      locator:
+        figure: '3'
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+      units: Pa; activity; mass percent
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: interfacial pO2, slag Na2O activity, metal P and C during dephosphorization
+        species: O2, Na2O, P, C
+        phase: gas, liquid slag, liquid metal
+        temperature_as_printed: 1573 K ± 15 K
+        x_axis_as_printed: time (s)
+        y_axis_as_printed: log pO2 (Pa), Na2O activity, P and C mass percent
+        caption_as_printed: Change in pO2, aNa2O, mass % P and mass % C during dephosphorization of carbon-saturated iron
+          with initial phosphorus 0 and 0.50 mass % by Na2O-SiO2 + 20 mass % Fe2O3 flux.
+        panel: single
+        series:
+        - name: initial P = 0
+          marker_count: null
+        - name: initial P = 0.50 mass %
+          marker_count: null
+        attribution: Kawashima et al. (1984)
+        digitisation: deferred to a figure pass
+    - observation_id: kawashima_1984_fig4_time_series
+      type: figure_only
+      locator:
+        figure: '4'
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+      units: Pa; activity; mass percent
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: interfacial pO2, slag Na2O activity, metal P and C during dephosphorization
+        species: O2, Na2O, P, C
+        phase: gas, liquid slag, liquid metal
+        temperature_as_printed: 1573 K ± 15 K
+        x_axis_as_printed: time (s)
+        y_axis_as_printed: log pO2 (Pa), Na2O activity, P and C mass percent
+        caption_as_printed: Change in pO2, aNa2O, mass % P and mass % C during dephosphorization of carbon-saturated iron
+          with initial phosphorus 0, 0.35, and 2.52 mass % by Na2CO3 flux.
+        panel: single
+        series:
+        - name: initial P = 0
+          marker_count: null
+        - name: initial P = 0.35 mass %
+          marker_count: null
+        - name: initial P = 2.52 mass %
+          marker_count: null
+        attribution: Kawashima et al. (1984)
+        digitisation: deferred to a figure pass
+    - observation_id: kawashima_1984_fig5_na_pressure
+      type: figure_only
+      locator:
+        figure: '5'
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+      units: Pa
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: Na vapour pressure and interfacial pO2 during dephosphorization by Na2CO3 flux
+        species: Na and O2
+        phase: gas
+        temperature_as_printed: 1573 K ± 15 K
+        x_axis_as_printed: time (s)
+        y_axis_as_printed: Na partial pressure (Pa) and log pO2 (Pa)
+        caption_as_printed: Change in pNa and pO2 during dephosphorization by Na2CO3 flux.
+        panel: single
+        series:
+        - name: pNa
+          marker_count: null
+        - name: pO2
+          marker_count: null
+        attribution: Kawashima et al. (1984)
+        digitisation: deferred to a figure pass
+    - observation_id: kawashima_1984_fig6_na2co3_fe2o3
+      type: figure_only
+      locator:
+        figure: '6'
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+      units: Pa; activity; mass percent
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: interfacial pO2, slag Na2O activity, metal P and C during dephosphorization
+        species: O2, Na2O, P, C
+        phase: gas, liquid slag, liquid metal
+        temperature_as_printed: 1573 K ± 15 K
+        x_axis_as_printed: time (s)
+        y_axis_as_printed: log pO2 (Pa), Na2O activity, P and C mass percent
+        caption_as_printed: Change in pO2, aNa2O, mass % P and mass % C during dephosphorization of carbon-saturated iron
+          with initial phosphorus 0.55 mass % by 2Na2CO3 + Fe2O3 flux.
+        panel: single
+        series:
+        - name: initial P = 0.55 mass %
+          marker_count: null
+        attribution: Kawashima et al. (1984)
+        digitisation: deferred to a figure pass
+    - observation_id: kawashima_1984_fig7_na_pressure_comparison
+      type: figure_only
+      locator:
+        figure: '7'
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+      units: Pa
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: comparison of PNa during dephosphorization with Na2CO3 and 2Na2CO3 + Fe2O3 fluxes
+        species: Na
+        phase: gas
+        temperature_as_printed: 1573 K ± 15 K
+        x_axis_as_printed: time (s)
+        y_axis_as_printed: Na vapour pressure (Pa)
+        caption_as_printed: Comparison of PNa between dephosphorization by 2Na2CO3 + Fe2O3 flux and that by Na2CO3 flux.
+        panel: single
+        series:
+        - name: Na2CO3 flux
+          marker_count: null
+        - name: 2Na2CO3 + Fe2O3 flux
+          marker_count: null
+        attribution: Kawashima et al. (1984)
+        digitisation: deferred to a figure pass
+  Na:
+    observations: []
+    context:
+    - observation_id: kawashima_1984_na_vapor_partial_pressure
+      type: relation
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '5'
+        section: Experimental Results
+      units: Pa
+      values:
+        method_class: measured_reduced
+        quantity_as_printed: sodium vapour pressure measured by galvanic-cell EMF
+        candidate_quantity_tokens:
+        - p_partial
+        schema_gap: Measured PNa is derived from EMF; the numeric EMF input is not printed and cannot be linked as derived_from.
+        values_as_printed: 6 × 10^4 Pa (0.6 atm)
+        temperature_as_printed: '1573'
+        conditions_as_printed:
+          temperature_K:
+            state:
+              tag: value
+              value: '1573'
+            locator:
+              page: 5
+              published_page: 783
+              pdf_page_index: 4
+          fO2_Pa:
+            state:
+              tag: value
+              value: 3e-13
+            locator:
+              page: 5
+              published_page: 783
+              pdf_page_index: 4
+              section: Experimental Results
+        note: Printed as the nearly constant PNa during the low-pO2 dephosphorization interval; the numeric point is from
+          prose, not a digitised curve.
+    - observation_id: kawashima_1984_na_vapor_partial_pressure_with_fe2o3
+      type: relation
+      locator:
+        page: 6
+        published_page: 784
+        pdf_page_index: 5
+        figure: '7'
+        section: Discussion
+      units: Pa
+      values:
+        method_class: measured_reduced
+        quantity_as_printed: sodium vapour pressure measured by galvanic-cell EMF
+        candidate_quantity_tokens:
+        - p_partial
+        schema_gap: Measured PNa is derived from EMF; the numeric EMF input is not printed and cannot be linked as derived_from.
+        values_as_printed: 1 × 10^3 Pa
+        temperature_as_printed: '1573'
+        conditions_as_printed:
+          temperature_K:
+            state:
+              tag: value
+              value: '1573'
+            locator:
+              page: 6
+              published_page: 784
+              pdf_page_index: 5
+        note: Printed as the nearly constant sodium vapour pressure after addition of Fe2O3.
