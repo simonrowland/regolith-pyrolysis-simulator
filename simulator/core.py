@@ -7734,6 +7734,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
             DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
             EvaporationFluxConfigurationError,
+            _continuum_film_extrapolation_notice,
             _evaluate_alpha_control,
             _series_resistance_evaporation_flux_kg_m2_s,
         )
@@ -7857,13 +7858,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         except EvaporationFluxConfigurationError as exc:
             raise evaporation_flux_refusal_from_configuration_error(exc) from exc
-        # Transitional Kn domain: this bounded native-Fe projection suppresses
-        # capacity under its diagnostic-limited policy when continuum transport
-        # is load-bearing (pyrolysis). Stage 0 bakeout marks and keeps the
-        # computed HKL capacity. The authoritative EVAPORATION_FLUX provider
-        # refuses the pyrolysis case; t-379 lifts this suppression.
-        from simulator.transport_regime import continuum_validity_refuses
-
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
             knudsen_number=float(series_flux.knudsen_number),
             overhead_pressure_pa=overhead_pressure_pa,
@@ -7875,9 +7869,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ) or None,
             asking_site='core.native_fe_vapor_partition',
         )
+        continuation_notice = _continuum_film_extrapolation_notice(domain_diag)
+        domain_diag = continuation_notice or domain_diag
         _flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
-        if continuum_validity_refuses(domain_diag):
-            _flux_kg_s_m2 = 0.0
         capacity_kg_hr = max(
             0.0,
             _flux_kg_s_m2
@@ -7890,9 +7884,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pool = native_fe_available_mol
         series_diag = series_flux.as_diagnostic()
         if domain_diag is not None:
-            # Relabel series diagnostic with the typed continuum-validity
-            # vocabulary. Pyrolysis refusals still suppress flux; bakeout
-            # marks keep the computed HKL number.
+            # Preserve domain provenance with the shared continuation authority.
             series_diag = dict(series_diag)
             series_update = {
                 'authority_class': domain_diag['authority_class'],
@@ -7916,8 +7908,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'carrier_gas': domain_diag['carrier_gas'],
                 'framing': domain_diag['framing'],
             }
-            if continuum_validity_refuses(domain_diag):
-                series_update['flux_kg_s_m2'] = 0.0
             series_diag.update(series_update)
         diagnostic = {
             'native_fe_pool_mol': pool,
@@ -7975,6 +7965,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'asking_site': domain_diag.get('asking_site'),
                 }
             )
+        if continuation_notice is not None:
+            series_diag['continuum_extrapolation_notice'] = continuation_notice
+            diagnostic['continuum_extrapolation_notice'] = continuation_notice
         return diagnostic
 
     def _apply_native_fe_saturation_split(

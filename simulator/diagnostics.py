@@ -1481,7 +1481,10 @@ def _attach_pareto_source_notices(
                 entry["status"] = "extrapolated"
     for species, records in wall_notice.get("evaporation_transport_notices_by_species", {}).items():
         entry = by_species.setdefault(species, {"status": "unavailable", "reason": "evaporation_transport_unavailable"})
-        entry["evaporation_transport_notices"] = _plain_mapping(records)
+        entry["evaporation_transport_notices"] = {
+            **entry.get("evaporation_transport_notices", {}),
+            **_plain_mapping(records),
+        }
         authority = "extrapolated" if any(record.get("authority_level") == "extrapolated" for record in records.values()) else "unavailable"
         entry["authority_level"] = authority
         if entry.get("status") == "ok":
@@ -1710,7 +1713,6 @@ def pressure_coating_pareto_diagnostic(
             "cold_skull_envelope": _cold_skull_envelope_for_replay(series),
             "carrier_gas": carrier_gas,
             "T_gas_K": gas_temperature_K,
-            "extrapolate_continuum": bool(series.get("continuum_extrapolation_notice")),
             "melt_resistance_enabled": bool(
                 series.get("melt_resistance_enabled", False)
             ),
@@ -1734,6 +1736,7 @@ def pressure_coating_pareto_diagnostic(
         current_flux = flux_at(current_pressure_pa)
         flux_5mbar = flux_at(_CURRENT_SETPOINT_LOW_PA)
         flux_15mbar = flux_at(_CURRENT_SETPOINT_HIGH_PA)
+        sweep_fluxes = [(pressure, flux_at(pressure)) for pressure in pressure_points]
         alpha_authority_status = alpha_authority_status_by_species.get(name)
         by_species[name] = {
             "status": "ok" if name in latest_wall_flux else "unavailable",
@@ -1784,11 +1787,26 @@ def pressure_coating_pareto_diagnostic(
                         float(controlling["characteristic_length_m"]),
                         carrier_gas=carrier_gas,
                     ),
-                    "flux_kg_s_m2": flux_at(pressure_pa).flux_kg_s_m2,
+                    "flux_kg_s_m2": replay_flux.flux_kg_s_m2,
                 }
-                for pressure_pa in pressure_points
+                for pressure_pa, replay_flux in sweep_fluxes
             ],
         }
+        # Project the owner's notice through the existing aggregate surface:
+        # even a viscous current state can have extrapolated replay points.
+        for replay_flux in (current_flux, gate_flux, *(f for _, f in sweep_fluxes)):
+            replay_diag = replay_flux.as_diagnostic()
+            notice = replay_diag.get("continuum_extrapolation_notice")
+            if notice is not None:
+                by_species[name].update(
+                    authority_class=replay_diag["authority_class"],
+                    authority_level=notice["authority_level"],
+                    authority_reason=replay_diag["authority_reason"],
+                    evaporation_transport_notices={
+                        "continuum_extrapolation_notice": notice,
+                    },
+                )
+                break
 
     for name, records in wall_extrapolations.items():
         entry = by_species[name]

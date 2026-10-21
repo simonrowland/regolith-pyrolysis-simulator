@@ -677,3 +677,13 @@ def test_pressure_coating_current_kn_and_regime_share_controlling_segment(
             assert row["reason"] == "current_wall_deposition_quantity_unavailable"
         assert row["current_wall_deposit_flux_kg_hr"] == current_flux
         assert row["cumulative_wall_deposit_kg"] == cumulative_mass
+        if series_present:
+            # Even when the actual source is viscous, the pressure sweep
+            # contains transitional source-film predictions. Keep the owner's
+            # evaluated-Kn notice through the existing aggregate fields.
+            assert row["authority_class"] == "extrapolated"
+            notice = row["evaporation_transport_notices"][
+                "continuum_extrapolation_notice"
+            ]
+            assert notice["authority_level"] == "extrapolated"
+            assert 0.01 <= notice["knudsen_number"] < 10.0

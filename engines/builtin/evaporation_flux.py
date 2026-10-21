@@ -133,7 +133,7 @@ def _continuum_film_extrapolation_notice(
     """Keep the continuum prediction, explicitly outside its validated domain."""
     if (
         domain_diagnostic is None
-        or domain_diagnostic.get("reason") != "viscous_p_bulk_transport_out_of_domain"
+        or domain_diagnostic.get("p_bulk_transport_domain") != "out_of_domain_transitional"
     ):
         return None
     return {
@@ -173,7 +173,7 @@ class SeriesEvaporationFlux:
     d_ab_m2_s: float
     transport_length_m: float
 
-    def as_diagnostic(self) -> dict[str, float | str | bool]:
+    def as_diagnostic(self) -> dict[str, Any]:
         denominator = self.r_interface + self.r_gas + self.r_melt
         if math.isfinite(denominator) and denominator > 0.0:
             r_interface_fraction = self.r_interface / denominator
@@ -197,7 +197,7 @@ class SeriesEvaporationFlux:
             r_gas_fraction = 0.0
             r_melt_fraction = 0.0
             limiting_resistance_label = "none"
-        return {
+        diagnostic = {
             "flux_kg_s_m2": self.flux_kg_s_m2,
             "alpha_intrinsic": self.alpha_intrinsic,
             "alpha_effective": self.alpha_effective,
@@ -234,6 +234,28 @@ class SeriesEvaporationFlux:
                 "missing-species-state-dependent-melt-transfer-inputs"
             ),
         }
+        from simulator.transport_constants import (
+            FREE_MOLECULAR_KNUDSEN_MIN,
+            VISCOUS_KNUDSEN_MAX,
+        )
+
+        if (
+            self.gas_resistance_weight > 0.0
+            and VISCOUS_KNUDSEN_MAX <= self.knudsen_number < FREE_MOLECULAR_KNUDSEN_MIN
+        ):
+            notice = _continuum_film_extrapolation_notice({
+                "reason": "viscous_p_bulk_transport_out_of_domain",
+                "detail": "source gas film outside the continuum Kn domain",
+                "knudsen_number": self.knudsen_number,
+                "p_bulk_transport_domain": "out_of_domain_transitional",
+            })
+            diagnostic.update(
+                authority_class=notice["authority_class"],
+                authority_reason=notice["reason"],
+                ledger_yields_authorized=notice["ledger_yields_authorized"],
+                continuum_extrapolation_notice=notice,
+            )
+        return diagnostic
 
 
 def _coerce_alpha_by_species(alpha_control) -> dict[str, Any]:
@@ -544,7 +566,6 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     ),
     melt_surface_renewal_source: str = DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
     gas_resistance_enabled: bool = True,
-    extrapolate_continuum: bool = False,
 ) -> SeriesEvaporationFlux:
     """Series-resistance evaporation source in kg/(m^2*s).
 
@@ -666,7 +687,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             knudsen = float(knudsen_number)
         except (TypeError, ValueError):
             knudsen = math.inf
-    from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN, VISCOUS_KNUDSEN_MAX
+    from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
     if math.isnan(knudsen) or knudsen < 0.0:
         raise EvaporationFluxConfigurationError(
@@ -675,18 +696,16 @@ def _series_resistance_evaporation_flux_kg_m2_s(
 
     gas_weight = 0.0
     if gas_resistance_enabled:
-        if knudsen < VISCOUS_KNUDSEN_MAX or (
-            extrapolate_continuum
-            and VISCOUS_KNUDSEN_MAX <= knudsen < FREE_MOLECULAR_KNUDSEN_MIN
-        ):
+        if knudsen < FREE_MOLECULAR_KNUDSEN_MIN:
             gas_weight = 1.0
         # Premise: an open free-molecular vacuum has no stagnant carrier-gas
-        # film. Therefore R_g=0 locally. Continuum branch: k_g=M*Sh*D/(L*R*T)
-        # [s/m], R_g=1/k_g [m/s], only for Kn < VISCOUS_KNUDSEN_MAX (0.01).
-        # The provider and its Pareto replay may continue this same finite
-        # continuum expression into transitional Kn, carrying extrapolated
-        # authority. This is not a transitional conductance fit. Keep the
-        # existing free-molecular HKL branch and unflagged diagnostic sweeps.
+        # film, so R_g=0 there. Below Kn=10 every caller retains the same
+        # continuum k_g=M*Sh*D/(L*R*T) [s/m], R_g=1/k_g [m/s].
+        # At fixed T/carrier/stir, D~1/P and Kn~1/P, hence R_g~P~1/Kn.
+        # Dropping the film gives J_HK/J_series=1+R_g/R_HK (dimensionless).
+        # Its remaining Kn=10 step is therefore 1/1000 of the old Kn=.01
+        # resistance ratio. This is flagged extrapolation, not a new
+        # transitional law; as Kn grows, J approaches the HKL limit.
 
     r_gas = 0.0
     k_mt_kg_s_m2_pa = 0.0
@@ -1196,10 +1215,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 campaign_name=campaign_name,
                 asking_site="engines.builtin.evaporation_flux",
             )
-            if (
-                active_gas_transport_species
-                and continuum_validity_refuses(domain_refusal)
-            ):
+            if active_gas_transport_species:
                 continuum_extrapolation = _continuum_film_extrapolation_notice(
                     domain_refusal
                 )
@@ -1389,7 +1405,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     T_gas_K=gas_temperature_K,
                     melt_resistance_enabled=melt_resistance_enabled,
                     gas_resistance_enabled=uses_gas_resistance,
-                    extrapolate_continuum=continuum_extrapolation is not None,
                     melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                     melt_surface_renewal_source=melt_surface_renewal_source,
                 )
@@ -1558,7 +1573,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
             warning_messages.append(
                 "continuum_formula_out_of_domain_marked: "
-                "Stage 0 / non-pyrolysis path computed HKL flux below the "
+                "Stage 0 / non-pyrolysis path computed flagged continuum flux below the "
                 "Bernoulli continuum threshold"
             )
 
