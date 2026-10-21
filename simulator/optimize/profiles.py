@@ -349,7 +349,7 @@ def validate_profile(
     _validate_seed_recipes(
         profile["seed_recipes"],
         source=source,
-        schema=schema or RecipeSchema(),
+        schema=(schema or RecipeSchema()).for_feedstock(profile["feedstock"]),
     )
     if "early_tap_mode" in profile and not isinstance(profile["early_tap_mode"], bool):
         raise ProfileValidationError(f"{source}: early_tap_mode must be boolean")

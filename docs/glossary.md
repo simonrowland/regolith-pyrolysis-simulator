@@ -66,7 +66,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **Overhead** — gas headspace above the melt; carries total pressure, partial pressures, and sweep gas composition. The `overhead_headspace.enabled` toggle defaults ON and controls whether evaporation O₂ is routed through `process.overhead_gas` before bleeding to terminal accounts. Source: `data/setpoints.yaml` §14.
 
-**pN₂** — sweep gas partial pressure (canonical symbol; recommended lineup Kr + N₂, CO₂ on Mars feedstocks, Ar legacy-only because its boiling point sits a ~3 K knife-edge from LOX and fouls the downstream cryo cut, against Kr's 119.7 K — `simulator/transport_constants.py::COLLISION_DIAMETERS_M`, the Kr row's comment). Two load-bearing duties: viscous-flow transport control, and dilution of the condensables so walls stay clean. Target band 5–15 mbar. See [`docs/concepts.md`](concepts.md).
+**pN₂** — sweep gas partial pressure (canonical symbol; recommended lineup Kr + N₂, CO₂ on Mars feedstocks, Ar legacy-only because its boiling point sits a ~3 K knife-edge from LOX and fouls the downstream cryo cut, against Kr's 119.7 K — `simulator/transport_constants.py::COLLISION_DIAMETERS_M`, the Kr row's comment). Buffer gas provides transport control and condensable dilution where the design needs them. The 5–15 mbar band is a design default/margin; the model computes the flow regime. See [`docs/concepts.md`](concepts.md).
 
 **pO₂** — oxygen partial pressure; the control lever for the SiO₂ ⇌ SiO + ½O₂ equilibrium and for selective oxide reduction via the Ellingham ladder. See [`docs/concepts.md`](concepts.md).
 

@@ -77,6 +77,18 @@ def vacuum_floor_bar_for_body(body: object) -> float:
     return _BODY_VACUUM_FLOOR_BAR.get(canonical, DEFAULT_VACUUM_FLOOR_BAR)
 
 
+def numerical_pressure_floor_bar_for_body(body: object) -> float:
+    """Pressure resolution for admission; Mars ambient belongs to pump costing.
+
+    Airless-body floors already describe numerical vacuum resolution. Mars's
+    ambient is a pumping load, so retain the historical numerical resolution
+    there instead of forbidding the modelled subambient pressure choices.
+    """
+    if normalize_body_name(body) == "mars":
+        return DEFAULT_VACUUM_FLOOR_BAR
+    return vacuum_floor_bar_for_body(body)
+
+
 def vacuum_floor_bar_for_environment(
     *,
     body: object = None,

@@ -41,6 +41,7 @@ from simulator.furnace_materials import (
     setpoints_furnace_ceiling_C,
 )
 from simulator.recipe_errors import MalformedRecipeError
+from simulator.environment import numerical_pressure_floor_bar_for_body
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
@@ -1259,6 +1260,13 @@ class CampaignManager:
         if not isinstance(stage, Mapping):
             raise ValueError('C2A_staged.stages did not select a stage')
         atmosphere, diagnostic = self._c2a_staged_stage_gas_control(stage)
+        # A numerical resolution floor is distinct from ambient pump load.
+        floor_mbar = numerical_pressure_floor_bar_for_body(melt.body) / 1.0e-3
+        if float(diagnostic['p_total_mbar']) < floor_mbar:
+            raise CampaignPressureSetpointRefusal({
+                'status': 'refused', 'stage_name': self._c2a_staged_stage_label(stage),
+                'detail': f'p_total_mbar below numerical pressure floor {floor_mbar} mbar',
+            })
         melt.atmosphere = atmosphere
         melt.pO2_mbar = float(diagnostic['pO2_mbar'])
         melt.p_total_mbar = float(diagnostic['p_total_mbar'])

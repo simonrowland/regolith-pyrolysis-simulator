@@ -711,3 +711,19 @@ def test_c2a_staged_free_molecular_request_survives_simulator_tick():
     assert gas["p_total_mbar"] == 1e-6
     assert gas["pN2_mbar"] == 1e-6
     assert gas["pn2_band_action"] == ""
+
+
+@pytest.mark.parametrize("body", ["", "moon", "asteroid", "mars"])
+def test_c2a_staged_admission_uses_numerical_total_floor(body):
+    from simulator.environment import numerical_pressure_floor_bar_for_body
+
+    floor_mbar = numerical_pressure_floor_bar_for_body(body) / 1.0e-3
+    setpoints = deepcopy(_setpoints())
+    stage = _stage(setpoints, "alkali_early_fe")
+    stage.update(gas_cover_mode="pn2_sweep", pO2_mbar=0.0, p_total_mbar=floor_mbar)
+    melt = MeltState(body=body)
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    assert melt.p_total_mbar == floor_mbar
+    stage["p_total_mbar"] = math.nextafter(floor_mbar, 0.0)
+    with pytest.raises(CampaignPressureSetpointRefusal, match="numerical pressure floor"):
+        CampaignManager(setpoints).configure_campaign(MeltState(body=body), CampaignPhase.C2A_STAGED)

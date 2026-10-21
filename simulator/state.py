@@ -376,7 +376,7 @@ class Atmosphere(Enum):
     """Atmosphere above the melt."""
     HARD_VACUUM = auto()      # Body/environment vacuum floor (C0)
     CONTROLLED_O2 = auto()    # pO₂ managed by turbine + bleed (C2B, C3, C4)
-    PN2_SWEEP = auto()        # Recirculating N₂ at 5-15 mbar (C2A)
+    PN2_SWEEP = auto()        # Recirculating N₂; C2A design default 5-15 mbar
     O2_BACKPRESSURE = auto()  # O₂ at 0.01-0.1 bar (C5 MRE)
     CONTROLLED_O2_FLOW = auto()  # O₂ flow/sweep (C0b P-cleanup)
     CO2_BACKPRESSURE = auto()    # Mars surface CO₂ pressure floor during C0

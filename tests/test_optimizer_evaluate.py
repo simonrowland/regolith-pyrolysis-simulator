@@ -5742,3 +5742,22 @@ def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
     assert abs(baseline_metals - capped_metals) > abs(
         baseline_metals - repeated_metals
     ), "C4_HORIZON_RELATION: cap must change extracted metals beyond repeat variation"
+
+
+@pytest.mark.parametrize("label", ["transitional", "free_molecular", "", None])
+def test_knudsen_default_input_fallback_is_independent_of_regime_label(monkeypatch, label):
+    campaign = {"flow_regime": "viscous", "p_total_mbar_default": 0.1,
+                "gas_temperature_C": 1600.0}
+    monkeypatch.setattr(evaluate_module, "load_config_bundle", lambda _: SimpleNamespace(
+        setpoints={"campaigns": {"C2A_staged": campaign}},
+    ))
+    spec = SimpleNamespace(campaign="C2A_staged")
+    before = evaluate_module._knudsen_summary_from_eval_inputs(
+        spec=spec, profile=None, run_config=None,
+    )
+    assert before is not None
+    campaign["flow_regime"] = label
+    after = evaluate_module._knudsen_summary_from_eval_inputs(
+        spec=spec, profile=None, run_config=None,
+    )
+    assert after == before

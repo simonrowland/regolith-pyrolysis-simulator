@@ -728,7 +728,7 @@ def evaluate(
 ) -> ScoredResult:
     """Run one candidate and return feasibility plus any available objectives."""
 
-    active_schema = schema or RecipeSchema()
+    active_schema = (schema or RecipeSchema()).for_feedstock(feedstock_id)
     try:
         validated_patch = patch.validated(active_schema)
     except RecipeValidationError as exc:
@@ -1930,8 +1930,6 @@ def _default_campaign_setting(campaign: str, key: str) -> Any:
     campaign_config = (setpoints.get("campaigns", {}) or {}).get(campaign)
     if not isinstance(campaign_config, MappingABC):
         return None
-    if campaign_config.get("flow_regime") != "viscous":
-        return None
     return campaign_config.get(key)
 
 
@@ -2698,6 +2696,7 @@ def _build_eval_inputs_impl(
     bundle = load_config_bundle(DEFAULT_DATA_DIR)
     if feedstock_id not in bundle.feedstocks:
         raise EvaluationInputError(f"unknown feedstock_id {feedstock_id!r}")
+    schema = schema.for_feedstock(feedstock_id)
     _validate_eval_mass_basis(profile, fidelity)
     fidelity = str(canonical_backend_name(fidelity))
     patch = patch.validated(schema)

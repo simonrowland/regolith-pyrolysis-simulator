@@ -56,6 +56,7 @@ def build_manifest() -> dict[str, Any]:
                 "runtime_enabled": spec.runtime_enabled,
                 "guard": _guard(spec.guard),
                 "bounds_source": spec.bounds_source,
+                **({"admission": spec.admission} if spec.admission != "bounds" else {}),
                 "runtime_path": _path(runtime[0]) if runtime else _path(spec.path),
                 "runtime_transform": runtime[1] if runtime else "identity",
             }

@@ -565,7 +565,7 @@ def run(
         resource.getrusage(resource.RUSAGE_CHILDREN),
     )
     fidelity = str(canonical_backend_name(fidelity))
-    base_schema = schema or RecipeSchema()
+    base_schema = (schema or RecipeSchema()).for_feedstock(feedstock)
     config = StudyConfig(
         profile=profile,
         feedstock=feedstock,
@@ -1176,7 +1176,7 @@ def run_certify(
 ) -> StudyResult:
     """Re-evaluate one stored optimizer result with exact live-fill certification."""
 
-    base_schema = schema or RecipeSchema()
+    base_schema = (schema or RecipeSchema()).for_feedstock(feedstock)
     config = StudyConfig(
         profile=profile,
         feedstock=feedstock,
@@ -1754,6 +1754,7 @@ def _load_study_journal(
     feedstock = str(manifest.get("feedstock_id") or profile_payload.get("feedstock") or "")
     if not feedstock:
         raise StudyReplayError("study manifest missing feedstock_id")
+    base_schema = base_schema.for_feedstock(feedstock)
     resolved_profile = resolve_profile(
         profile_payload,
         expected_feedstock=feedstock,
