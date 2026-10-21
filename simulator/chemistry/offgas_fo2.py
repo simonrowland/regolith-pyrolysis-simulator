@@ -102,7 +102,6 @@ from simulator.vapour_rail.nasa_cea import (
     NasaCeaPolynomial,
     reaction_equilibrium_constant,
 )
-from simulator.physical_constants import PA_PER_BAR
 from simulator.yaml_cache import load_cached_safe_yaml
 
 #: Species whose CEA records this module needs. Both couples plus O2.
