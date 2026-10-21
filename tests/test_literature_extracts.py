@@ -55,6 +55,7 @@ import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
 from simulator.battery import migrate as battery_migrate  # noqa: E402
 from simulator.battery.waypoints import oxygen_condition  # noqa: E402
+from tests.battery import factories as battery_factories  # noqa: E402
 
 
 class _DuplicateRejectingLoader(yaml.SafeLoader):
@@ -238,12 +239,12 @@ def test_ohta_suito_1995_source_pins_reject_each_review_regression() -> None:
     source = EXTRACTS / "ohta-suito-1995-mno-activity-slags.yaml"
     extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
     _assert_ohta_suito_1995_review_pins(extract)
-    migrator = battery_migrate.Migrator(
-        root=REPO_ROOT,
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT,
+        source,
         index={source.stem: dict(extract["source"], source_id=source.stem)},
         aliases={},
     )
-    migrator._migrate_extract(source)
     migrator.finalize()
     assert len(migrator.result.experiments) == 11
     assert all(
@@ -408,8 +409,7 @@ def test_sato_1973_all_75_conversions_and_migration_consistency() -> None:
     assert sum(len(row["values"]["points"]) for row in rows) == 75
     _assert_sato_1973_table_pins(extract)
 
-    migrator = battery_migrate.Migrator(root=REPO_ROOT)
-    migrator._migrate_extract(source)
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
     migrator.finalize()
     result = migrator.result
     observations = [
@@ -574,8 +574,6 @@ def test_okazaki_container_helium_ratio_uncertainty_is_pinned() -> None:
 
 def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None:
     from simulator.battery.enums import Quantity
-    from simulator.battery.migrate import Migrator
-
     path = EXTRACTS / "banya-watanabe-1977-feto-p2o5-solid-iron.yaml"
     source = yaml.safe_load(path.read_text(encoding="utf-8"))
     source_table4 = next(
@@ -589,8 +587,9 @@ def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None
         == "0.00"
     )
 
-    migrator = Migrator(REPO_ROOT, index={}, aliases={})
-    migrator._migrate_extract(path)
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT, path, index={}, aliases={}
+    )
     migrator.finalize()
     result = migrator.result
 
@@ -650,8 +649,7 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
     assert len(table1) == 11
     assert all("condition_as_published" in row["values"] for row in table1)
 
-    migrator = battery_migrate.Migrator(root=REPO_ROOT)
-    migrator._migrate_extract(source)
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
     migrator.finalize()
     observations = list(migrator.result.observations.values())
     counts = {}
@@ -4293,8 +4291,9 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
     assert context["bennour_1996_experimental_method"]["locator"]["pdf_page_index"] == 3
     assert context["bennour_1996_experimental_temperature_limit"]["locator"]["pdf_page_index"] == 5
 
-    migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
-    migrator._migrate_extract(path)
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT, path, index={}, aliases={}
+    )
     migrator.finalize()
     migrated = [
         row for row in migrator.result.observations.values()
@@ -4342,8 +4341,9 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
             row["values"]["method_class"] = "measured_reduced"
     mutated_path = tmp_path / path.name
     mutated_path.write_text(yaml.safe_dump(mutated, sort_keys=False), encoding="utf-8")
-    reverted = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
-    reverted._migrate_extract(mutated_path)
+    reverted = battery_factories.migrate_one_extract(
+        REPO_ROOT, mutated_path, index={}, aliases={}
+    )
     reverted.finalize()
     assert any(
         issue.reason.value == "conditional_field"
@@ -4691,7 +4691,6 @@ def test_matzen_observations_resolve_printed_log_fo2():
     """Each Table 2 log fO2 lands on its observation and routes as printed."""
     from decimal import Decimal
 
-    from simulator.battery.migrate import Migrator
     from simulator.battery.waypoints import oxygen_condition
 
     path = EXTRACTS / "matzen-2022-martian-basalt-redox.yaml"
@@ -4702,8 +4701,9 @@ def test_matzen_observations_resolve_printed_log_fo2():
         )
         for row in doc["species"]["Fe"]["observations"]
     }
-    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
-    migrator._migrate_extract(path)
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT, path, index={}, aliases={}
+    )
     migrator.finalize()
     result = migrator.result
     observation_ids = result.observations_by_source[path.relative_to(REPO_ROOT).as_posix()]

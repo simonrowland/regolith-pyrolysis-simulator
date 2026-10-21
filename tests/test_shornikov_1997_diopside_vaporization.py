@@ -15,9 +15,10 @@ from simulator.battery.enums import (
     ReferenceStateConvention,
     ValueKind,
 )
-from simulator.battery.migrate import Migrator, convert_pressure_to_pa
+from simulator.battery.migrate import convert_pressure_to_pa
 from simulator.battery.records import AmountBasis
 from simulator.battery.validate import validate_corpus
+from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -26,9 +27,12 @@ EXTRACT = ROOT / "data/literature/extracts/shornikov-1997-diopside-vaporization.
 
 
 def _migrated(extract: Path = EXTRACT):
-    migrator = Migrator(root=ROOT, index={}, aliases={})
-    migrator._migrate_extract(extract)
-    return migrator.result
+    return migrate_one_extract(
+        root=ROOT,
+        path=extract,
+        index={},
+        aliases={},
+    ).result
 
 
 _TABLE1_PRESSURES_ATM = {
@@ -276,8 +280,7 @@ def test_mgo_activity_uses_the_source_stated_pure_solid_reference():
 
 
 def test_table4_lineage_resolves_to_same_source_table3_activity_rows():
-    migrator = Migrator(root=ROOT)
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(root=ROOT, path=EXTRACT)
     migrator._retarget_exploded_parents()
     migrator.finalize()
     result = migrator.result

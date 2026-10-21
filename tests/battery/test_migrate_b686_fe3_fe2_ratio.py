@@ -33,7 +33,6 @@ from simulator.battery.enums import (
 from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
-    Migrator,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     fe3_fe2_ratio_reduction,
@@ -42,6 +41,7 @@ from simulator.battery.migrate import (
     select_declared_source,
 )
 from simulator.battery.records import Evidence, Locator, State
+from tests.battery.factories import migrate_one_extract
 
 REPO = Path(__file__).resolve().parents[2]
 AITHALA = REPO / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
@@ -71,8 +71,7 @@ PREFIX = "aithala-2026-magmatic-iron-redox-to-2100c::"
 
 
 def _migrate(path: Path):
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(root=REPO, path=path)
     migrator.finalize()
     return migrator.result
 

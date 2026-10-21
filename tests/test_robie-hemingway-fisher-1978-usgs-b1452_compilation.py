@@ -7,11 +7,9 @@ import re
 import shutil
 import subprocess
 from functools import lru_cache
-from pathlib import Path
 
 import pytest
-
-from tests.tools._corpus_root import corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
     COMPILATION_ROOT,
     ROLE,
@@ -40,18 +38,15 @@ MINERU_CHUNKS = [
 ]
 
 
-_CORPUS = corpus_root()
-_CORPUS_OR_MISSING = (
-    _CORPUS if _CORPUS is not None else Path("missing-regolith-corpus")
-)
+CORPUS_CHECKOUT = regolith_corpus_root()
 MINERU_ROOT = (
-    _CORPUS_OR_MISSING
+    CORPUS_CHECKOUT
     / "text"
     / "robie-hemingway-fisher-1978-usgs-b1452"
     / "mineru"
 )
 SOURCE_PDF = (
-    _CORPUS_OR_MISSING
+    CORPUS_CHECKOUT
     / "raw"
     / "robie-hemingway-fisher-1978-usgs-b1452"
     / "robie-hemingway-fisher-1978-usgs-b1452.pdf"

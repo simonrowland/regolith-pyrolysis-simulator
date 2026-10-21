@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.tools._corpus_root import corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root
 from tools import mineru_table_qa as qa
 
 
@@ -209,8 +209,8 @@ def test_calibration_tsv_matches_live_scores_and_ranks_mangled_tables(tmp_path: 
     env["PYTHONPATH"] = os.pathsep.join(
         part for part in (repo_path, env.get("PYTHONPATH", "")) if part
     )
-    checkout = corpus_root()
-    if checkout is None or not checkout.is_dir():
+    checkout = regolith_corpus_root()
+    if not checkout.is_dir():
         pytest.skip("regolith-corpus checkout is absent")
 
     subprocess.run(

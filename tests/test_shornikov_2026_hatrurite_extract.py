@@ -9,9 +9,10 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.migrate import Migrator, REPO_ROOT, convert_pressure_to_pa
+from simulator.battery.migrate import REPO_ROOT, convert_pressure_to_pa
 from simulator.battery.enums import EvidenceClass, IdentityEqualKind, Quantity
 from simulator.battery.identity import identity_equal
+from tests.battery.factories import migrate_one_extract
 
 TOOLS = REPO_ROOT / "tools"
 if str(TOOLS) not in sys.path:
@@ -28,8 +29,7 @@ EXTRACT = (
 
 def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(REPO_ROOT, EXTRACT, index=None, aliases={})
     migrator.finalize()
     result = migrator.result
     records = list(result.observations.values())

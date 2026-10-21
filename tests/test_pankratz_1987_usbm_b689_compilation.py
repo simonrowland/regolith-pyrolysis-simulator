@@ -12,9 +12,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-from tests.tools._corpus_root import corpus_root
 from simulator import reference_data
 from simulator.reference_data import pankratz_1987_usbm_b689_loader as loader
+from tests.helpers.corpus_paths import regolith_corpus_root
 from tools import ingest_pankratz_1987_usbm_b689 as harvest
 
 
@@ -444,8 +444,8 @@ def test_valid_but_wrong_continuation_formula_cannot_certify():
 
 @pytest.fixture
 def corpus():
-    path = corpus_root()
-    if path is None or not (path / "raw" / harvest.SOURCE_ID).exists():
+    path = regolith_corpus_root()
+    if not (path / "raw" / harvest.SOURCE_ID).exists():
         pytest.skip("B689 source corpus unavailable")
     return path
 

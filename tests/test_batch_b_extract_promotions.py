@@ -3,7 +3,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.migrate import Migrator
+from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -18,12 +18,12 @@ def _migrate(name: str):
         document, expected_source_id=path.stem, check_fidelity_match=True
     ) == []
     source_id = document["source_id"]
-    migrator = Migrator(
+    migrator = migrate_one_extract(
         root=ROOT,
+        path=path,
         index={source_id: dict(document["source"], source_id=source_id)},
         aliases={},
     )
-    migrator._migrate_extract(path)
     migrator.finalize()
     return migrator.result
 

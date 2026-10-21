@@ -163,6 +163,10 @@ CODE_INPUTS = (
 #     store. A full regen at a571c4a70 was byte-identical to store commit
 #     d6fad0b93 (rows_in=51641 observations=128946 works=371 experiments=3863
 #     queue=88788 hard_issues=3268; git diff empty under store outputs).
+#   f74ef7a6f: scan-only parser; corpus census 24 source_form strings, 0 verdict changes.
+#     The census compared 29 occurrences across repo data and battery store
+#     inputs with the green implementation. This is the store-neutrality
+#     receipt for this entry; no store regeneration was run.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "80fad2bfa",
     "09c498b65",
@@ -177,6 +181,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "2e69a5faa", "4f9402dea", "31bb956c5", "cdd49ec85",
     "9364d3828",
     "b1d82d91d", "a571c4a70",
+    "f74ef7a6f",
 })
 
 

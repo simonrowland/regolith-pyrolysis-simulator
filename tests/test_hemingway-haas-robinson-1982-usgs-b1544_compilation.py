@@ -2,13 +2,11 @@
 
 import copy
 from decimal import Decimal
-from pathlib import Path
 
 import pytest
 import yaml
 
-from tests.tools._corpus_root import corpus_root
-
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader import (
     COMPILATION_ROOT,
     EXPECTED_PDF_SHA256,
@@ -28,13 +26,11 @@ from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader imp
     sha256_file,
 )
 
-# The source PDF lives in the regolith-corpus checkout, not in the simulator repository.
-_CORPUS = corpus_root()
-PDF = (
-    _CORPUS / "raw" / "hemingway-haas-robinson-1982-usgs-b1544" / SOURCE_PDF_NAME
-    if _CORPUS is not None
-    else Path("missing-regolith-corpus") / SOURCE_PDF_NAME
-)
+# The source PDF lives in the private corpus repository, not in the simulator repository.
+# REGOLITH_CORPUS_ROOT points a gate at a corpus checkout (same default as the extract mirror test).
+# Callers skip when that file is absent, including on a worktree whose home has no checkout.
+CORPUS_CHECKOUT = regolith_corpus_root()
+PDF = CORPUS_CHECKOUT / "raw" / "hemingway-haas-robinson-1982-usgs-b1544" / SOURCE_PDF_NAME
 
 PRINTED_CP_REVERSALS = (
     ("usgs-b1544-al2sio5-reference", "153.47", "153.27", 29),

@@ -5,12 +5,13 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
-from tests.tools._corpus_root import corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-# REGOLITH_CORPUS_ROOT, else the sibling regolith-corpus checkout. See corpus_root.
-CORPUS_ROOT = corpus_root()
+# The corpus checkout to compare against. REGOLITH_CORPUS_ROOT lets a gate point at a
+# specific clone (the controller's, or a CI-provisioned one) instead of the default path.
+# A missing checkout skips; it is not a failure.
+CORPUS_ROOT = regolith_corpus_root()
 
 
 @pytest.mark.skipif(

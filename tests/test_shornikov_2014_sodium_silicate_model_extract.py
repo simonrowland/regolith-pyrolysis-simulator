@@ -4,7 +4,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from simulator.battery.enums import Quantity
-from simulator.battery.migrate import Migrator
+from tests.battery.factories import migrate_one_extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,8 +12,7 @@ EXTRACT = ROOT / "data/literature/extracts/shornikov-2014-sodium-silicate-model.
 
 
 def test_shornikov_table_2_printed_temperatures_migrate() -> None:
-    migrator = Migrator(root=ROOT, index={}, aliases={})
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
 
     observations = {

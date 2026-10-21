@@ -40,6 +40,7 @@ _ADVISORY_HARNESS = (
 )
 _ADVISORY_SCRIPT = _ROOT / "web/static/js/simulator-advisory.js"
 _START = {
+    "payload_version": 4,
     "feedstock": "lunar_mare_low_ti",
     "mass_kg": 1000,
     "backend": "internal-analytical",
@@ -168,7 +169,9 @@ def _drive(
                 decision = event["args"][0]
                 if perturb_every_gate:
                     client.emit("pause_simulation")
-                    client.emit("resume_simulation")
+                    client.emit("resume_simulation", {
+                        "payload_version": 4,
+                    })
                     events.extend(client.get_received())
                 if reject_first and not rejected:
                     client.emit("make_decision", {"choice": "not-an-option"})

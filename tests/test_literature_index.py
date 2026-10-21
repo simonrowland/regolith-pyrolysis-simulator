@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
-import os
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -13,8 +12,7 @@ from pathlib import Path
 import re
 import yaml
 import pytest
-
-from tests.tools._corpus_root import corpus_root
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BUILDER = REPO_ROOT / "data" / "literature" / "build_index.py"
@@ -817,9 +815,7 @@ def test_source_files_do_not_register_absent_layers():
 
 def _nist_janaf_txt_corpus_absent() -> bool:
     """The NIST .txt cache is an external snapshot, not a checked-in fixture."""
-    corpus = corpus_root()
-    if corpus is None or not corpus.is_dir():
-        return True
+    corpus = regolith_corpus_root()
     return not (corpus / "raw" / "janaf-nist-txt").is_dir()
 
 

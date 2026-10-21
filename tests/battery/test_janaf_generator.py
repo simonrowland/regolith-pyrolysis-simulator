@@ -16,10 +16,10 @@ import pytest
 import yaml
 
 from simulator.battery.enums import QUANTITY_UNITS, Phase, Quantity
-from tests.tools._corpus_root import corpus_root
 from simulator.battery.generators import janaf as generator
 from simulator.battery.migrate import iter_observation_store_paths
 from tests.battery import compilation_shard_observation_count
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.identity import (
     Identity,
     identity_equal,
@@ -1199,12 +1199,7 @@ _NON_DATA_MARKER_LINES = (
     ("Cu-021", (21,)),
     ("S-021", (18,)),
 )
-_CORPUS = corpus_root()
-_JANAF_SOURCE_DIR = (
-    _CORPUS / "raw" / "janaf-nist-txt"
-    if _CORPUS is not None
-    else Path("missing-regolith-corpus") / "raw" / "janaf-nist-txt"
-)
+_JANAF_SOURCE_DIR = regolith_corpus_root() / "raw" / "janaf-nist-txt"
 
 
 def _raw_table_path(table_id: str) -> Path:

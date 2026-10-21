@@ -23,7 +23,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
 )
-from simulator.battery.migrate import Migrator, load_yaml, write_outputs
+from simulator.battery.migrate import load_yaml, write_outputs
 from simulator.battery.score import (
     ScoreContext,
     comparison_candidates,
@@ -33,6 +33,7 @@ from simulator.battery.score import (
 )
 from simulator.battery.records import Located, Locator, State, Value
 from simulator.battery.score import headline_payload_records, residual_to_plain
+from tests.battery.factories import migrate_one_extract
 
 
 _AITHALA_REDOX_EXPERIMENTS = {
@@ -303,8 +304,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
     source = load_yaml(extract)
-    migrator = Migrator(root)
-    migrator._migrate_extract(extract)
+    migrator = migrate_one_extract(root, extract)
     migrator.finalize()
     result = migrator.result
     source_rows = source["species"]["Fe"]["observations"]
@@ -499,8 +499,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
 def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_path):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
-    migrator = Migrator(root)
-    migrator._migrate_extract(extract)
+    migrator = migrate_one_extract(root, extract)
     migrator.finalize()
     result = migrator.result
     context = ScoreContext(
@@ -715,8 +714,7 @@ def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_pat
 def test_kress91_redox_flags_oxide_outside_its_converter_domain():
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
-    migrator = Migrator(root)
-    migrator._migrate_extract(extract)
+    migrator = migrate_one_extract(root, extract)
     migrator.finalize()
     result = migrator.result
     row4 = result.observations[
@@ -757,8 +755,7 @@ def test_kress91_redox_flags_oxide_outside_its_converter_domain():
 def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, monkeypatch):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
-    migrator = Migrator(root)
-    migrator._migrate_extract(extract)
+    migrator = migrate_one_extract(root, extract)
     migrator.finalize()
     result = migrator.result
     reference = result.observations[
@@ -834,8 +831,7 @@ def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, 
 def test_aithala_redox_rows_score_only_when_composition_is_printed():
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
-    migrator = Migrator(root)
-    migrator._migrate_extract(extract)
+    migrator = migrate_one_extract(root, extract)
     migrator.finalize()
     result = migrator.result
     redox_rows = [

@@ -95,6 +95,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         self._thermoengine_import_error = None
         self._unavailable_reason = None
         self._model = str(config.get('model', self._model))
+        self._initialize_vapor_transport(config)
         raw_health_timeout_s = config.get(
             'thermoengine_health_timeout_s',
             THERMOENGINE_HEALTH_TIMEOUT_S,
@@ -330,6 +331,8 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         species_formula_registry: Optional[Mapping[str, object]] = None,
         redox_mode: Optional[str] = None,
         call_timeout_s: Optional[float] = None,
+        vapor_transport_pO2_bar: Optional[float] = None,
+        vapor_transport_floor_bar: Optional[float] = None,
     ) -> EquilibriumResult:
         return super().equilibrate(
             temperature_C=temperature_C,
@@ -341,6 +344,8 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             species_formula_registry=species_formula_registry,
             redox_mode=redox_mode,
             call_timeout_s=call_timeout_s,
+            vapor_transport_pO2_bar=vapor_transport_pO2_bar,
+            vapor_transport_floor_bar=vapor_transport_floor_bar,
         )
 
     def _equilibrate_prepared(
