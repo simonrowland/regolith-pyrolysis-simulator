@@ -1,9 +1,9 @@
-"""E3 — Knudsen-regime warning sticker on HourSnapshot.
+"""E3 — Knudsen-regime diagnostic on HourSnapshot.
 
-The F3 work added a hard refusal at ``Kn >= 10`` (`refused outside
-viscous flow`). E3 surfaces an EARLIER-WARNING diagnostic on the
-per-tick HourSnapshot so an operator can see when the regime is
-approaching the boundary BEFORE the F3 refusal fires.
+The former F3 contract refused runs at ``Kn >= 10`` ("refused outside
+viscous flow"). That explanation was superseded by d-209: Kn is now a
+reported diagnostic, with flagged approximations for transitional and
+free-molecular results. E3 surfaces the per-tick diagnostic on HourSnapshot.
 
 These tests pin:
 1. The new ``HourSnapshot.knudsen_regime_summary`` field exists +

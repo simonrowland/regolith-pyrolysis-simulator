@@ -7049,7 +7049,7 @@ def minimum_pressure_mbar_for_knudsen(
     carrier_gas: str = DEFAULT_CARRIER_GAS,
     knudsen_ceiling: float = FREE_MOLECULAR_KNUDSEN_MIN,
 ) -> dict[str, Any]:
-    """Return the total-pressure floor set by the controlling pipe diameter."""
+    """Return the total-pressure diagnostic threshold for the selected Kn."""
 
     if not is_declared_real_scalar(
         gas_temperature_C,
@@ -7100,7 +7100,8 @@ def minimum_pressure_mbar_for_knudsen(
     collision = _carrier_collision_diameter_diagnostic(carrier_gas)
     collision_diameter_m = float(collision['carrier_collision_diameter_m'])
 
-    # Premise: the typed refusal starts at Kn=lambda/L >= Kn_ceiling.
+    # Premise: this reports the pressure where Kn=lambda/L reaches the
+    # selected diagnostic threshold; regime alone does not cause refusal.
     # Algebra: lambda=k_B*T/(sqrt(2)*pi*d^2*P), hence
     # P_min=k_B*T/(sqrt(2)*pi*d^2*L*Kn_ceiling). Unit check: (J/K*K)/m^3
     # = N/m^2 = Pa; /100 gives mbar. Sanity: hotter gas or a smaller pipe
