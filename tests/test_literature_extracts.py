@@ -574,7 +574,7 @@ def test_okazaki_container_helium_ratio_uncertainty_is_pinned() -> None:
 
 def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None:
     from simulator.battery.enums import Quantity
-    from simulator.battery.migrate import Migrator
+    from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 
     path = EXTRACTS / "banya-watanabe-1977-feto-p2o5-solid-iron.yaml"
     source = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -617,15 +617,30 @@ def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None
         if "banya77_t3_run_" in row.get("observation_id", "")
     }
     for row in table3:
-        assert "composition" not in row.point_conditions
         printed = row.point_conditions["printed_composition"]
         assert printed.state.is_value
         source_id = row.observation_id.rsplit("::", 1)[-1]
-        source_values = source_table3[source_id]["values"]["composition_wt_pct"]
+        source_row = source_table3[source_id]
+        source_values = source_row["values"]["composition_wt_pct"]
         assert dict(printed.state.value) == {
             oxide: format(Decimal(str(value)).normalize(), "f")
             for oxide, value in source_values.items()
         }
+        # Table 3 declares datum_state (published p.1813): the measured slag
+        # composition at the datum, on the point and not the starting charge.
+        # Green already expected a point composition here. This test restores
+        # that expectation after 76e0f428e and adds the role, proxy, conversion
+        # and no-initial checks.
+        assert source_row["values"]["composition_role"]["value"] == "datum_state"
+        composition = row.point_conditions["composition"]
+        assert composition.state.is_value
+        assert composition.state.value.proxy_flag is None
+        assert composition.state.value.components == wt_pct_to_mole_fraction(
+            {oxide: Decimal(str(value)) for oxide, value in source_values.items()}
+        ).components
+        assert (
+            result.experiments[row.experiment_id].sample.initial_composition is None
+        )
 
     first_activity = next(
         row for row in table4 if row.observation_id.endswith("xp2o5_0_00")
