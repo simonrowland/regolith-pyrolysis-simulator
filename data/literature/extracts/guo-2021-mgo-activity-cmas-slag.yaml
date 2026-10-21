@@ -59,30 +59,6 @@ fidelity_samples:
       pdf_page_index: 4
       table: '5'
       note: Row 8 activity cell
-  - path: species.Mg.observations[guo_2021_table6_mg_activity_coefficients_1873k].values.points[0].gamma_as_printed
-    value: '3.1713'
-    note: Table 6 first activity-coefficient column
-    locator:
-      published_page: 2730
-      pdf_page_index: 6
-      table: '6'
-      note: First x[Mg] column gamma cell
-  - path: species.Mg.observations[guo_2021_table6_mg_activity_coefficients_1873k].values.points[3].gamma_as_printed
-    value: '3.1718'
-    note: Table 6 fourth activity-coefficient column
-    locator:
-      published_page: 2730
-      pdf_page_index: 6
-      table: '6'
-      note: Fourth x[Mg] column gamma cell
-  - path: species.Mg.observations[guo_2021_table6_mg_activity_coefficients_1873k].values.points[7].gamma_as_printed
-    value: '3.1703'
-    note: Table 6 eighth activity-coefficient column
-    locator:
-      published_page: 2730
-      pdf_page_index: 6
-      table: '6'
-      note: Eighth x[Mg] column gamma cell
 experiments:
   - experiment_id: guo_slag_metal_equilibrium_1873k
     method: quench_equilibration
@@ -139,9 +115,22 @@ species:
         units: dimensionless activity
         uncertainty:
           note: No numeric uncertainty is printed for the Table 5 activity cells.
+        derived_from:
+          - tables:guo-2021-mgo-activity-cmas-slag
+        derivation:
+          relation: >-
+            a(MgO) = a_ref(MgO) × a[Mg] / a_ref[Mg] (Eq. 5, p. 2725);
+            under the stated Henry's-law assumption, a[Mg] = x[Mg] and
+            a_ref[Mg] = x_ref[Mg], giving a(MgO) = x[Mg] / x_ref[Mg] (Eq. 6,
+            p. 2725). Table 5 rows 1–8 use each row's printed x_Mg_in_Sn and
+            a_MgO cells in t5.csv; x_ref_Mg_average and a_ref_MgO come from
+            row 1 of t4.csv.
+          inputs:
+            - tables:guo-2021-mgo-activity-cmas-slag
+          page: 2725
         values:
           quantity: activity
-          method_class: directly_reduced_measurement
+          method_class: measured_reduced
           evidence_class: measured_reduced
           admission_status: admitted
           reference_state_as_printed: relative to pure solid
@@ -204,7 +193,7 @@ species:
           points:
             - row_as_printed: '1'
               admission_status: admitted
-              method_class: directly_reduced_measurement
+              method_class: measured_reduced
               evidence_class: measured_reduced
               T_K: '1873'
               activity: '0.4478'
@@ -231,7 +220,7 @@ species:
                 note: Row 1; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
             - row_as_printed: '2'
               admission_status: admitted
-              method_class: directly_reduced_measurement
+              method_class: measured_reduced
               evidence_class: measured_reduced
               T_K: '1873'
               activity: '0.5121'
@@ -258,7 +247,7 @@ species:
                 note: Row 2; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
             - row_as_printed: '3'
               admission_status: admitted
-              method_class: directly_reduced_measurement
+              method_class: measured_reduced
               evidence_class: measured_reduced
               T_K: '1873'
               activity: '0.5379'
@@ -285,7 +274,7 @@ species:
                 note: Row 3; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
             - row_as_printed: '4'
               admission_status: admitted
-              method_class: directly_reduced_measurement
+              method_class: measured_reduced
               evidence_class: measured_reduced
               T_K: '1873'
               activity: '0.6376'
@@ -312,7 +301,7 @@ species:
                 note: Row 4; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
             - row_as_printed: '5'
               admission_status: admitted
-              method_class: directly_reduced_measurement
+              method_class: measured_reduced
               evidence_class: measured_reduced
               T_K: '1873'
               activity: '0.4236'
@@ -339,7 +328,7 @@ species:
                 note: Row 5; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
             - row_as_printed: '6'
               admission_status: admitted
-              method_class: directly_reduced_measurement
+              method_class: measured_reduced
               evidence_class: measured_reduced
               T_K: '1873'
               activity: '0.4751'
@@ -366,7 +355,7 @@ species:
                 note: Row 6; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
             - row_as_printed: '7'
               admission_status: admitted
-              method_class: directly_reduced_measurement
+              method_class: measured_reduced
               evidence_class: measured_reduced
               T_K: '1873'
               activity: '0.5716'
@@ -393,7 +382,7 @@ species:
                 note: Row 7; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
             - row_as_printed: '8'
               admission_status: admitted
-              method_class: directly_reduced_measurement
+              method_class: measured_reduced
               evidence_class: measured_reduced
               T_K: '1873'
               activity: '0.6472'
@@ -419,9 +408,10 @@ species:
                 table: '5'
                 note: Row 8; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
   Mg:
-    observations:
+    observations: []
+    context:
       - observation_id: guo_2021_table6_mg_activity_coefficients_1873k
-        type: activity_coefficient
+        type: table_record
         locator:
           published_page: 2730
           pdf_page_index: 6
