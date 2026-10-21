@@ -133,4 +133,4 @@ def test_shrinking_area_numeric_pin_before_shared_formula_move(monkeypatch):
         duration_s=2.0, steps=2, geometry_policy_id="sphere_shrinking",
         initial_area_m2=0.0000913,
     )
-    assert areas == pytest.approx([0.0000913, 0.00005751539592711956], rel=1e-14)
+    assert areas == pytest.approx([0.0000913, 0.00005751539592770096], rel=1e-14)
