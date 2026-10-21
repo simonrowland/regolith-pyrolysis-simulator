@@ -1514,9 +1514,19 @@ class CampaignManager:
             # for a Kr carrier (double-counted buffer). Stamp the configured
             # carrier; the condensation resolver reads the same config, so
             # its answer is unchanged (golden-neutral for the pN2 default).
-            default_carrier = 'Ar' if campaign == CampaignPhase.C6 else 'pN2'
-            melt.background_gas_species = _canonical_carrier_gas_key(
-                str(cfg.get('carrier_gas', default_carrier) or default_carrier))
+            default_carrier = 'Kr' if campaign == CampaignPhase.C6 else 'pN2'
+            carrier = str(cfg.get('carrier_gas', default_carrier) or default_carrier)
+            if campaign == CampaignPhase.C6:
+                try:
+                    carrier = _canonical_carrier_gas_key(carrier)
+                except ValueError as exc:
+                    raise MalformedRecipeError(
+                        'd-203/d-210: C6 carrier must be Kr or Ar') from exc
+                if carrier not in {'Kr', 'Ar'}:
+                    raise MalformedRecipeError(
+                        'd-203/d-210: C6 carrier must be Kr or Ar; '
+                        f'got {carrier!r}')
+            melt.background_gas_species = _canonical_carrier_gas_key(carrier)
             melt.pO2_mbar = self._pressure_config_float(
                 cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
             melt.p_total_mbar = self._pressure_config_float(

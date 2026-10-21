@@ -87,8 +87,8 @@ def test_continuum_pressure_bounds_are_derived_from_operating_point(campaign_nam
     campaign = setpoints["campaigns"][campaign_name]
     continuum = campaign["continuum_pressure_bounds"]
     gas = continuum["carrier_gas"]
-    assert gas == ("Ar" if campaign_name == "C6" else "N2")
-    band_key = "p_total_mbar" if gas == "Ar" else "pN2_mbar"
+    assert gas == ("Kr" if campaign_name == "C6" else "N2")
+    band_key = "p_total_mbar" if campaign_name == "C6" else "pN2_mbar"
     lower_mbar, upper_mbar = continuum[band_key]
     floor_key = f"derived_p{gas}_floor_mbar"
     at_floor = transport_regime_module.single_species_mean_free_path(

@@ -132,9 +132,9 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
-    # d-203: regenerated from resolved setpoints after C6 changed to Ar.
+    # d-210: regenerated from resolved setpoints with C6 Kr default and floor metadata.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "327e99f01bc88a7f462398968db5c2dbe8bea06e5e0ee577328962791c76bf50"
+        "97ccb54b0b047a09c7171ed38904e8728fbab608a7cf5204fcd27ebd6f6d94bc"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.

@@ -182,15 +182,29 @@ def test_passive_exchange_respeciation_settles_same_buffer_once(absorbing) -> No
     diagnostic = sim._apply_fe_redox_respeciation()
     assert diagnostic["o2_account"] == "reservoir.fo2_buffer"
     assert diagnostic["direction"] == ("oxidizing" if absorbing else "reducing")
-    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) == after_exchange_gas
+    gas_credit = diagnostic.get("overhead_o2_credit_mol", 0.0)
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) == pytest.approx(after_exchange_gas + gas_credit)
     assert after_exchange_gas - before_gas == pytest.approx(exchange.exchange_o2_mol, abs=1e-12)
     buffer_delta = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0) - before_buffer
     assert buffer_delta == pytest.approx(
-        diagnostic.get("o2_credit_mol", 0.0) - diagnostic.get("o2_debit_mol", 0.0), abs=1e-12,
+        diagnostic.get("buffer_o2_credit_mol", 0.0) - diagnostic.get("o2_debit_mol", 0.0), abs=1e-12,
     )
     if absorbing:
         assert diagnostic["applied_o2_mol"] == pytest.approx(-exchange.exchange_o2_mol)
         assert diagnostic["unfunded_o2_mol"] > 0.0  # Differential step != finite split.
+    else:
+        assert 0.0 <= diagnostic["buffer_o2_credit_mol"] <= exchange.exchange_o2_mol
+        assert diagnostic["o2_credit_mol"] == pytest.approx(buffer_delta + gas_credit)
+    # Repeated repartition in this hour must not settle the same parcel twice.
+    buffer_after = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0)
+    repeated = sim._apply_fe_redox_respeciation(
+        fO2_log_override=None if absorbing else -20.0)
+    if not absorbing:
+        # Force another real reduction, not a no-op at the previous target.
+        assert repeated["direction"] == "reducing"
+        assert repeated["overhead_o2_credit_mol"] > 0.0
+        assert repeated["buffer_o2_credit_mol"] == 0.0
+    assert sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0) == pytest.approx(buffer_after, abs=1e-12)
     after_o = math.fsum(
         sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
         for account in sim.atom_ledger.mol_by_account()

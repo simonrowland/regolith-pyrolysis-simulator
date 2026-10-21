@@ -6241,6 +6241,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._fe_redox_respeciation_diagnostics_this_hr = []
         self._fe_redox_internal_o2_capacity_mol_this_hr = 0.0
         self._fe_redox_internal_o2_consumed_mol_this_hr = 0.0
+        self._fe_redox_passive_o2_replenished_mol_this_hr = 0.0
 
     def _ledger_ferric_fraction_diagnostic(self) -> Dict[str, Any]:
         melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
@@ -6385,9 +6386,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # and this buffer. The finite Fe split must settle that same move,
             # not draw/release gas again. Select by the signed exchange, not a
             # positive balance: release may have depleted the buffer to zero.
-            # The existing provider caps uptake by real buffer mol and flags
-            # any finite Kress demand beyond the differential exchange step.
+            # Reducing credit is bounded by this hour's actual exchange;
+            # unmatched finite reduction products go to ordinary overhead.
             oxygen_source = FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER
+        passive_settlement = (
+            oxygen_source == FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER
+            and internal_o2_capacity_mol is None
+        )
+        # A released passive parcel can be replenished only once per hour.
+        # Explicit injections retain their existing independent funding.
+        replenished_mol = getattr(
+            self, '_fe_redox_passive_o2_replenished_mol_this_hr', 0.0)
+        exchange_release_mol = max(
+            0.0, self.melt.oxygen_reservoir.exchange_o2_mol - replenished_mol
+        ) if passive_settlement else 0.0
         buffer_capacity_mol = 0.0
         if internal_o2_capacity_mol is not None:
             buffer_capacity_mol = max(0.0, float(internal_o2_capacity_mol))
@@ -6398,11 +6410,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         elif oxygen_source == FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER:
             buffer_capacity_mol = max(0.0, float(
                 self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
-                    OXYGEN_SPECIES,
-                    0.0,
-                )
-                or 0.0
-            ))
+                    OXYGEN_SPECIES, 0.0)))
         if not math.isfinite(buffer_capacity_mol):
             raise AccountingError(
                 'Fe redox respeciation buffer oxygen capacity must be finite; '
@@ -6459,6 +6467,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             'oxygen_source': oxygen_source,
             'internal_o2_capacity_mol': buffer_capacity_mol,
+            'exchange_o2_mol': exchange_release_mol,
         }
         result = self._dispatch_only(
             ChemistryIntent.FE_REDOX_RESPECIATION,
@@ -6467,6 +6476,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         diagnostic = dict(result.diagnostic or {})
         diagnostic['status'] = str(result.status)
+        if (self.melt.campaign == CampaignPhase.C6
+                and diagnostic.get('overhead_o2_credit_mol', 0.0)
+                > OXYGEN_RESERVOIR_NOOP_MOL):
+            # With Mg present, Mg/MgO would scavenge free O2 (pO2 ~1e-26 bar).
+            # That Mg-vapour/scavenging pathway is absent (t-1390): retain the
+            # released atoms as gas for OVERHEAD_BLEED and expose the limitation.
+            diagnostic['notice'] = (
+                't-1390: Fe-redox O2 routed to overhead bleed; Mg-vapour/'
+                'O2 scavenging is not modeled (Mg/MgO pO2 ~1e-26 bar).')
         diagnostic['gate_authority'] = (
             self._melt_redox_gate_authority_provenance(gate_authority)
         )
@@ -6487,6 +6505,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             diagnostic['transition_name'] = transition.name
             self._project_cleaned_melt_from_atom_ledger()
+            if passive_settlement:
+                self._fe_redox_passive_o2_replenished_mol_this_hr = (
+                    replenished_mol + diagnostic.get('buffer_o2_credit_mol', 0.0))
             if oxygen_source == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS:
                 self._fe_redox_internal_o2_consumed_mol_this_hr = (
                     float(

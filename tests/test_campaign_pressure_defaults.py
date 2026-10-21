@@ -107,14 +107,42 @@ def test_c6_continuum_derivation_uses_selected_static_hold_temperature():
     assert campaign["default_hold_T_C"] == 1400
     assert campaign["temp_range_C"] == [1380, 1450]
 
-    assert continuum["carrier_gas"] == "Ar"
-    assert continuum["derived_pAr_floor_mbar"] == pytest.approx(
+    assert continuum["carrier_gas"] == "Kr"
+    assert continuum["derived_pKr_floor_mbar"] == pytest.approx(
         _continuum_floor_mbar(continuum), abs=5e-7
     )
-    assert campaign["carrier_gas"] == "Ar"
+    assert campaign["carrier_gas"] == "Kr"
     assert campaign["p_total_mbar"] == [5, 15]
     assert "pO2_mbar" not in campaign
     assert "pO2_mbar_default" not in campaign
+
+
+@pytest.mark.parametrize("carrier", ["Kr", "pKr", "Ar", "pAr"])
+def test_c6_allows_only_approved_inert_carriers(carrier):
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C6"]["carrier_gas"] = carrier
+    melt = MeltState()
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C6)
+    assert melt.background_gas_species == carrier.removeprefix("p")
+    assert melt.pO2_mbar == 0.0
+
+
+@pytest.mark.parametrize("carrier", ["N2", "pN2", "O2", "CO2", "He", "unknown"])
+def test_c6_refuses_unapproved_carriers_in_campaign_owner(carrier):
+    from simulator.recipe_errors import MalformedRecipeError
+
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C6"]["carrier_gas"] = carrier
+    with pytest.raises(MalformedRecipeError, match="d-203/d-210"):
+        CampaignManager(setpoints).configure_campaign(MeltState(), CampaignPhase.C6)
+
+
+def test_c6_defaults_to_kr_when_carrier_is_omitted():
+    setpoints = _setpoints()
+    del setpoints["campaigns"]["C6"]["carrier_gas"]
+    melt = MeltState()
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C6)
+    assert melt.background_gas_species == "Kr"
 
 
 def test_c6_refuses_retired_oxygen_atmosphere():
@@ -157,7 +185,7 @@ def test_c6_entry_bleeds_carried_oxygen_before_mg_contact(carried_o2_mol):
             break
     sim.atom_ledger.assert_balanced()
     assert len(contacts) == 1
-    assert sim.melt.background_gas_species == "Ar"
+    assert sim.melt.background_gas_species == "Kr"
     assert sim.melt.pO2_mbar == 0.0
     assert sum(s.c6_at_hold_target for s in snapshots) == len(contacts)
     assert contacts[0] == len(snapshots) - len(contacts)
@@ -218,7 +246,7 @@ def test_declared_continuum_floor_matches_its_own_derivation(campaign_name):
 
 
 def test_campaign_default_pressure_versus_its_own_continuum_floor():
-    """C4 remains below its declared floor; d-203 resolves C6 with Ar."""
+    """C4 remains below its declared floor; d-203/d-210 resolve C6 with Kr."""
     known_violations = {"C4"}
 
     violations = {}

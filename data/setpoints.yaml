@@ -572,19 +572,19 @@ campaigns:
     default_hold_T_C: 1400
     dT_dt_C_per_hr: null                 # reaction-controlled
     atmosphere: "recirculating_inert_sweep" # oxygen-free cover; purge before Mg contact
-    carrier_gas: "Ar"                    # N2 excluded: exposed Al can form AlN
+    carrier_gas: "Kr"                    # d-210: Kr default; Ar allowed; N2 excluded with hot Mg/Al
     p_total_mbar: [5, 15]
     p_total_mbar_default: 10.0
-    # Ar hard-sphere viscous floor: lambda=k_B*T/(sqrt(2)*pi*sigma_Ar^2*p),
-    # Kn=lambda/D <=0.01 => p_min=k_B*T/(sqrt(2)*pi*sigma_Ar^2*D*Kn_max).
-    # Poling sigma_Ar=3.542e-10 m (transport_constants), T=1673.15 K, D=0.12 m:
-    # p_min=34.5362 Pa=0.345362 mbar. J/m^3=Pa; /100 converts Pa to mbar.
-    # Kn decreases as pressure rises; at 5 mbar Kn=0.0006907 (<0.01).
+    # Informational only (d-209: no viscous rule): Kr hard-sphere floor: lambda=k_B*T/(sqrt(2)*pi*sigma_Kr^2*p),
+    # Kn=lambda/D <=0.01 => p_min=k_B*T/(sqrt(2)*pi*sigma_Kr^2*D*Kn_max).
+    # Poling sigma_Kr=3.655e-10 m (transport_constants), T=1673.15 K, D=0.12 m:
+    # p_min=32.4338 Pa=0.324338 mbar. J/m^3=Pa; /100 converts Pa to mbar.
+    # Kn decreases as pressure rises; at 5 mbar Kn=0.0006487 (<0.01).
     continuum_pressure_bounds:
       p_total_mbar: [5.0, 15.0]
-      derived_pAr_floor_mbar: 0.345362
+      derived_pKr_floor_mbar: 0.324338
       knudsen_max: 0.01
-      carrier_gas: "Ar"
+      carrier_gas: "Kr"
       gas_temperature_C: 1400
       pipe_diameter_m: 0.12
     target_species: ["Al"]
