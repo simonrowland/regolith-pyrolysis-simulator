@@ -111,3 +111,26 @@ def test_sourced_alpha_reports_implementation_limit_without_inventing_missing_da
     detail = json.loads(prediction.refusal_detail["detail"])
     assert detail["sourced_alphas"]["Mg"]["alpha"] == pytest.approx(0.12780152611500154)
     assert detail["unsourced_bound_fraction"] is None
+
+
+def test_shrinking_area_numeric_pin_before_shared_formula_move(monkeypatch):
+    import simulator.battery.residue as residue
+
+    areas = []
+
+    def half_inventory(inventory, _channels, _pressure, **kwargs):
+        areas.append(kwargs["area_evolution_m2"][0])
+        removed = inventory["MgO"] / 2.0
+        return residue.ResidueInventoryResult(
+            residue_mol={"MgO": removed},
+            evaporated_mol={"Mg": removed, "O2": removed / 2.0},
+            pO2_bar_by_step=(None,), atom_closure_mol={"Mg": 0.0, "O": 0.0},
+        )
+
+    monkeypatch.setattr(residue, "integrate_residue_inventory", half_inventory)
+    residue._hashimoto_integrate_geometry(
+        {"MgO": 1.0}, (), lambda *_: {}, temperature_K=2073.15,
+        duration_s=2.0, steps=2, geometry_policy_id="sphere_shrinking",
+        initial_area_m2=0.0000913,
+    )
+    assert areas == pytest.approx([0.0000913, 0.00005751539592711956], rel=1e-14)
