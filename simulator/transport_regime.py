@@ -111,6 +111,78 @@ def compressible_poiseuille_mass_flow(
     return numerator / denominator
 
 
+def pipe_mass_flow_kg_s(d, L, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa):
+    """Isothermal circular pipe capacity, kg/s; diffuse, non-sticking walls.
+
+    Premise: Knudsen's semi-empirical long-capillary conductance adds viscous
+    and rarefied transport, with a measured transitional correction. Knudsen
+    (1909), Ann. Phys. 333, 75-130, doi:10.1002/andp.19093330106;
+    explicit SI form and constants: Odnoralov (2005), RBAV 24(2), 110-116,
+    Eqs. (2)-(5), https://www.sbvacuo.org.br/rbav/article/download/101/101.
+    Algebra: Q = Q_v + C_m*(P1-P2)*(1+2.507*x)/(1+3.095*x),
+    x = P_mean*d/eta * sqrt(M/(2*pi*R*T)). Q is pV throughput, NOT
+    volumetric flow: [Pa*m^3/s]. Since n_dot=Q/(RT), m_dot=M*Q/(RT).
+    x is dimensionless: [Pa*m/(Pa*s)] * [s/m] = 1.
+
+    Molecular C_m = (A*v_mean/4)*tau [m^2*m/s = m^3/s], where tau
+    is the Clausing transmission probability for a straight circular tube.
+    Use Santeler's published approximation at every aspect ratio, avoiding
+    a discontinuous short/long switch. For L/d -> infinity, tau -> 4d/(3L)
+    and C_m -> pi*d^3*v_mean/(12L). For L/d -> 0, tau -> 1 (aperture).
+    At P_mean -> 0, x -> 0, Q_v=O(P^2), Q_m=O(P), hence C -> C_m;
+    at high P, the correction -> 2.507/3.095 and Q_v dominates exactly
+    as the existing compressible Poiseuille limit (relative error O(1/P)).
+
+    The bridge is INTERPOLATED authority, not a kinetic-theory solution.
+    Finite-length molecular correction + long-capillary Knudsen bridge is
+    an engineering extension for short tubes, not a validated short-tube
+    transitional solution. Viscous flow remains laminar/fully developed;
+    choking, turbulent and entrance losses are outside this model. The
+    caller supplies viscosity (runtime retains its provisional N2-like law).
+    """
+    pressure_delta = max(0.0, p_upstream_Pa - p_downstream_Pa)
+    if pressure_delta == 0.0:
+        return 0.0
+    molecular_conductance = molecular_tube_conductance_m3_s(
+        d, L, T_K, M_avg,
+        transmission_probability=clausing_transmission_probability(d, L),
+        # This is the molecular COMPONENT's limiting conductance, irrespective
+        # of the actual regime; the Knudsen bridge supplies the pressure term.
+        knudsen_number=math.inf,
+    )
+    x = _pipe_knudsen_parameter(d, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa)
+    molecular_throughput = molecular_conductance * pressure_delta
+    correction = (1.0 + 2.507 * x) / (1.0 + 3.095 * x)
+    return compressible_poiseuille_mass_flow(
+        d, L, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa,
+    ) + molecular_throughput * correction * M_avg / (PIPE_GAS_CONSTANT_J_MOL_K * T_K)
+
+
+def _pipe_knudsen_parameter(d, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa):
+    """The published bridge parameter, shared by flow and authority classification."""
+    return (0.5 * (p_upstream_Pa + p_downstream_Pa) * d / eta
+            * math.sqrt(M_avg / (2.0 * math.pi * PIPE_GAS_CONSTANT_J_MOL_K * T_K)))
+
+
+def pipe_conductance_authority_notice(d, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa):
+    """Classify the actual pipe calculation, not a condensation wall segment.
+
+    Viscosity-based mean free path lambda_eta = eta/P*sqrt(pi*RT/(2M));
+    multiplying by x/d gives 1/2, so Kn_eta=lambda_eta/d=1/(2x).
+    Both are dimensionless and use the pipe's arithmetic MEAN pressure.
+    """
+    x = _pipe_knudsen_parameter(d, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa)
+    knudsen_number = 0.5 / x if x > 0.0 else math.inf
+    if (p_upstream_Pa > p_downstream_Pa
+            and classify_knudsen_regime(knudsen_number) is KnudsenRegime.TRANSITIONAL):
+        return (
+            'Pipe conductance authority=interpolated: Knudsen (1909) '
+            'semi-empirical bridge with Santeler/Clausing molecular transmission; '
+            'short-tube transition and provisional N2-like viscosity are unvalidated.'
+        )
+    return None
+
+
 class KnudsenRegime(str, Enum):
     VISCOUS = "viscous"
     TRANSITIONAL = "transitional"
@@ -700,6 +772,30 @@ def long_tube_clausing_transmission(
     return 4.0 * diameter_m / (3.0 * length_m)
 
 
+def clausing_transmission_probability(diameter_m: float, length_m: float) -> float:
+    """Santeler approximation to Clausing's diffuse-wall integral equation.
+
+    Chiggiato, CERN vacuum-technology notes, Eq. (21), reports <0.7% error:
+    https://indico.cern.ch/event/471931/contributions/1149644/attachments/
+    1226014/1794769/JUAS-Notes_Vacuum_Tech-Chiggiato.pdf
+    Santeler, J. Vac. Sci. Technol. A 4, 338 (1986).
+    With radius r=d/2, tau = 1/[1+3L/(8r)*(1+1/(3*(1+L/(7r))))].
+    All terms are dimensionless. tau -> 1 at zero length; tau -> 4d/(3L)
+    for long tubes. Thus 0 < tau <= 1, including short tubes where the
+    long-tube asymptote would give an impossible transmission > 1.
+    """
+    diameter_m = _require_positive(
+        diameter_m, name="diameter_m", category="invalid_geometry",
+    )
+    length_m = _require_nonnegative(
+        length_m, name="length_m", category="invalid_geometry",
+    )
+    length_over_radius = 2.0 * length_m / diameter_m
+    return 1.0 / (1.0 + 3.0 * length_over_radius / 8.0 * (
+        1.0 + 1.0 / (3.0 * (1.0 + length_over_radius / 7.0))
+    ))
+
+
 def molecular_tube_conductance_m3_s(
     diameter_m: float,
     length_m: float,
@@ -1082,4 +1178,21 @@ def pipe_pressure_pa_for_mass_flow(d, L, M_avg, eta, T_K, F_kg_s, p_downstream_P
     pressure_Pa = math.sqrt(  # Pa — upstream pressure from pressure-square balance
         max(0.0, numerator / denominator + p_downstream_Pa**2)
     )
-    return pressure_Pa
+    # The viscous-only pressure is an upper bound: the molecular term is
+    # nonnegative. Bracket from P_down (zero forward flow) and invert the ONE
+    # forward law. Its molecular term is monotone: with x=k*(P1+P2)/2 and
+    # f=(1+a*x)/(1+b*x), d[(P1-P2)*f]/dP1 equals
+    # a/b + (1-a/b)*(1+b*k*P2)/(1+b*x)^2 > 0 (0<a=2.507<b=3.095).
+    # Both bounds have units Pa. At vanishing rarefaction this recovers the
+    # Poiseuille root; in molecular flow pressure drop becomes linear in flow.
+    low, high = p_downstream_Pa, pressure_Pa
+    for _ in range(64):  # binary64 pressure resolution, not a physics tolerance
+        middle = low + (high - low) / 2.0
+        if middle == low or middle == high:
+            break
+        flow = pipe_mass_flow_kg_s(d, L, M_avg, eta, T_K, middle, p_downstream_Pa)
+        if flow < F_kg_s:
+            low = middle
+        else:
+            high = middle
+    return low + (high - low) / 2.0

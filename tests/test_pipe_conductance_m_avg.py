@@ -25,6 +25,9 @@ from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.condensation import CondensationModel
 from simulator.core import PyrolysisSimulator
 from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.transport_regime import (
+    compressible_poiseuille_mass_flow, gas_dynamic_viscosity_Pa_s, pipe_mass_flow_kg_s,
+)
 from simulator.equipment import EquipmentDesigner
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.overhead import (
@@ -39,7 +42,6 @@ from simulator.state import (
     CampaignPhase,
     CondensationTrain,
     EvaporationFlux,
-    GAS_CONSTANT,
     MOLAR_MASS,
     MeltState,
 )
@@ -258,7 +260,7 @@ def _make_model() -> OverheadGasModel:
     return model
 
 
-def test_pipe_conductance_no_kwarg_uses_fallback_with_256_law():
+def test_pipe_conductance_no_kwarg_uses_fallback_with_shared_law():
     """Callers without a species mix retain the documented 0.040 kg/mol
     fallback while using the corrected compressible Poiseuille law."""
     model = _make_model()
@@ -267,12 +269,9 @@ def test_pipe_conductance_no_kwarg_uses_fallback_with_256_law():
     actual = model._pipe_conductance(p_Pa, T_C)
     T_K = T_C + 273.15
     eta = 1.8e-5 * (T_K / 300.0) ** 0.7
-    expected = (
-        math.pi
-        * model.pipe_diameter_m**4
-        * DEFAULT_PIPE_M_AVG_KG_MOL
-        * p_Pa**2
-        / (256.0 * eta * model.pipe_length_m * GAS_CONSTANT * T_K)
+    expected = pipe_mass_flow_kg_s(
+        model.pipe_diameter_m, model.pipe_length_m, DEFAULT_PIPE_M_AVG_KG_MOL,
+        eta, T_K, p_Pa, 0.0,
     )
     assert actual == pytest.approx(expected, rel=1e-12)
 
@@ -289,7 +288,11 @@ def test_pipe_conductance_uses_downstream_pressure_square_delta():
     )
 
     assert finite_downstream == pytest.approx(
-        vacuum * (p_upstream_Pa**2 - p_downstream_Pa**2) / p_upstream_Pa**2,
+        pipe_mass_flow_kg_s(
+            model.pipe_diameter_m, model.pipe_length_m, DEFAULT_PIPE_M_AVG_KG_MOL,
+            gas_dynamic_viscosity_Pa_s(1773.15), 1773.15,
+            p_upstream_Pa, p_downstream_Pa,
+        ),
         rel=1e-12,
     )
     assert model._pipe_conductance(
@@ -347,7 +350,7 @@ def test_pipe_conductance_alkali_sweep_lower_density_than_legacy():
     )
     ratio = C_na / C_default
     expected = (MOLAR_MASS["Na"] / 1000.0) / DEFAULT_PIPE_M_AVG_KG_MOL
-    assert ratio == pytest.approx(expected, rel=1e-9)
+    assert expected < ratio < math.sqrt(expected)
     assert ratio < 0.6  # Sanity check on the documented direction
 
 
@@ -365,7 +368,7 @@ def test_pipe_conductance_fe_vapor_higher_density_than_legacy():
     )
     ratio = C_fe / C_default
     expected = (MOLAR_MASS["Fe"] / 1000.0) / DEFAULT_PIPE_M_AVG_KG_MOL
-    assert ratio == pytest.approx(expected, rel=1e-9)
+    assert math.sqrt(expected) < ratio < expected
     assert ratio > 1.0
 
 
@@ -461,19 +464,16 @@ def test_pipe_conductance_nonfinite_geometry_fails_closed(geometry_field):
     assert math.isfinite(result)
 
 
-def test_pipe_conductance_legal_inputs_match_compressible_closed_form():
+def test_pipe_conductance_legal_inputs_match_shared_owner():
     model = _make_model()
     # Reference value computed manually:
     p_Pa = 1000.0
     T_C = 1500.0
     T_K = T_C + 273.15
     eta = 1.8e-5 * (T_K / 300.0) ** 0.7
-    expected = (
-        math.pi
-        * model.pipe_diameter_m**4
-        * DEFAULT_PIPE_M_AVG_KG_MOL
-        * p_Pa**2
-        / (256.0 * eta * model.pipe_length_m * GAS_CONSTANT * T_K)
+    expected = pipe_mass_flow_kg_s(
+        model.pipe_diameter_m, model.pipe_length_m, DEFAULT_PIPE_M_AVG_KG_MOL,
+        eta, T_K, p_Pa, 0.0,
     )
     actual = model._pipe_conductance(p_Pa, T_C)
     assert actual == pytest.approx(expected, rel=1e-12)
@@ -500,7 +500,7 @@ def test_estimate_transport_state_threads_evap_flux_species_through():
     assert state_fe["pipe_conductance_kg_hr"] > state_na["pipe_conductance_kg_hr"]
     ratio = state_fe["pipe_conductance_kg_hr"] / state_na["pipe_conductance_kg_hr"]
     expected = MOLAR_MASS["Fe"] / MOLAR_MASS["Na"]
-    assert ratio == pytest.approx(expected, rel=1e-6)
+    assert math.sqrt(expected) < ratio < expected
 
 
 @pytest.mark.parametrize(
@@ -805,7 +805,7 @@ def test_legacy_headspace_conductance_alias_survives_new_none_key():
     assert model._resolve_bleed_conductance(1.0, None) == pytest.approx(0.25)
 
 
-def test_vapor_pressure_matches_closed_form_known_case():
+def test_vapor_pressure_below_viscous_known_case():
     throat_area_m2 = math.pi * 0.04**2
     model = OverheadGasModel(
         {},
@@ -814,30 +814,16 @@ def test_vapor_pressure_matches_closed_form_known_case():
     model.pipe_length_m = 2.0
     F_kg_s = 0.003
     T_C = 1200.0
-    T_K = T_C + 273.15
     species = {"SiO": 1.0}
-    M_avg = MOLAR_MASS["SiO"] / 1000.0
-    eta = model._gas_dynamic_viscosity_Pa_s(T_K)
-
-    expected_mbar = (
-        math.sqrt(
-            256.0
-            * eta
-            * model.pipe_length_m
-            * GAS_CONSTANT
-            * T_K
-            * F_kg_s
-            / (math.pi * M_avg * model.pipe_diameter_m**4)
-        )
-        / 100.0
-    )
 
     actual_mbar = model._vapor_pressure_mbar_from_flux(
         F_kg_s,
         T_C,
         species_kg_for_M_avg=species,
     )
-    assert actual_mbar == pytest.approx(expected_mbar, rel=1e-12)
+    # Pre-change worked Poiseuille case: 426.45 Pa. Rarefied transport lowers
+    # the required pressure; the forward/inverse closure is tested separately.
+    assert 0.0 < actual_mbar < 4.2645
     assert math.isfinite(actual_mbar)
     assert actual_mbar > 0.0
 
@@ -891,11 +877,11 @@ def test_vapor_pressure_inverse_matches_forward_capacity_at_operating_point():
         species_kg_for_M_avg=species,
     )
 
-    assert required_mbar == pytest.approx(4.2645, rel=1.0e-5)
+    assert 0.0 < required_mbar < 4.2645
     assert recovered_kg_s == pytest.approx(target_kg_s, rel=1.0e-12)
 
 
-def test_vapor_pressure_scales_with_square_root_of_flux():
+def test_vapor_pressure_scaling_lies_between_molecular_and_viscous_limits():
     model = _make_model()
     melt = MeltState()
     melt.atmosphere = Atmosphere.PN2_SWEEP
@@ -912,9 +898,8 @@ def test_vapor_pressure_scales_with_square_root_of_flux():
     )
 
     assert base["vapor_pressure_mbar"] > 0.0
-    assert doubled["vapor_pressure_mbar"] / base["vapor_pressure_mbar"] == (
-        pytest.approx(math.sqrt(2.0), rel=1e-12)
-    )
+    ratio = doubled["vapor_pressure_mbar"] / base["vapor_pressure_mbar"]
+    assert math.sqrt(2.0) < ratio < 2.0
 
 
 def test_loop3_vacuum_overcapacity_exceeds_100_and_throttles_ramp():
@@ -972,8 +957,9 @@ def test_sc333_equipment_overhead_pipe_transport_numeric_pins():
     )
     expected_conductance_hex = "0x1.c4f75c42aeb21p-4"
 
-    assert equipment_conductance.hex() == expected_conductance_hex
-    assert overhead_conductance.hex() == expected_conductance_hex
+    viscous = float.fromhex(expected_conductance_hex)
+    assert viscous < equipment_conductance < viscous * 1.01
+    assert viscous < overhead_conductance < viscous * 1.01
     assert equipment_conductance == overhead_conductance
 
 
@@ -983,10 +969,13 @@ def test_sc333_equipment_overhead_pipe_transport_numeric_pins():
     (10.0, "0x1.7311e874e2ab4p-17", "0x1.abb7f27b646a1p-4"),
     (1000.0, "0x1.c4f75c42aeb21p-4", "0x1.40005ed1888aep+3"),
 ])
-def test_t1396_pre_move_pipe_numeric_pin(pressure_pa, capacity_hex, inverse_hex):
+def test_t1396_viscous_component_retains_pre_move_pin(pressure_pa, capacity_hex, inverse_hex):
     """Bitwise relocation evidence captured on a4608882d, before changing physics."""
     model = _make_model()
-    assert model._pipe_conductance(pressure_pa, 1500.0).hex() == capacity_hex
+    assert compressible_poiseuille_mass_flow(
+        model.pipe_diameter_m, model.pipe_length_m, DEFAULT_PIPE_M_AVG_KG_MOL,
+        gas_dynamic_viscosity_Pa_s(1773.15), 1773.15, pressure_pa, 0.0,
+    ).hex() == capacity_hex
     assert model._vapor_pressure_mbar_from_flux(
         1e-6, 1500.0, p_downstream_bar=pressure_pa / 1e5,
-    ).hex() == inverse_hex
+    ) < float.fromhex(inverse_hex)

@@ -3963,6 +3963,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             configured = self._overhead_headspace_config.get(
                 'conductance_kg_s_per_bar')
         if configured is not None:
+            self.overhead_model.last_pipe_conductance_authority_notice = None
             if isinstance(configured, bool):
                 return configured
             try:
@@ -3974,7 +3975,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return value
         if species_kg_for_M_avg is None:
             species_kg_for_M_avg = self._overhead_holdup_species_kg()
-        p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
+        p_mean_Pa = float(self.melt.p_total_mbar) * 100.0
         # This is the upstream-to-vacuum carrying limit C0. Controlled-pO2
         # runtime passes it through the provider-owned flow-capacity result;
         # pressure-bound modes retain the provider's finite-P2 derate.
@@ -14863,6 +14864,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 pass
         warnings = diag.get('warnings', ())
         summary['warnings'] = tuple(str(w) for w in warnings)
+        notice = getattr(
+            getattr(self, '_overhead_model', None),
+            'last_pipe_conductance_authority_notice', None,
+        )
+        if notice:
+            summary['warnings'] += (notice,)
         return summary
 
     @staticmethod

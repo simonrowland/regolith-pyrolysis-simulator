@@ -17,7 +17,7 @@ state and the post-routing evaporation flux. For the equilibrium:
 the equilibrium solver outside this module applies the pO₂
 dependence; this module transports the resulting flux.
 
-Pipe transport (isothermal compressible Poiseuille flow at mbar pressures):
+Pipe transport (viscous component of the regime-spanning Knudsen law):
     ṁ = π × d⁴ × M × (P₁² - P₂²) / (256 × η × L × R × T) [PIPE-1]
 
 where:
@@ -34,7 +34,11 @@ volumetric flow varies as 1/P. Integrating circular Poiseuille flow
 therefore replaces the incompressible pressure difference with
 (P₁²-P₂²)/2, giving the denominator 256. Unit check:
 [m⁴·Pa²·kg/mol]/[(Pa·s)·m·(Pa·m³/(mol·K))·K] = kg/s.
-Sanity check: d=0.12 m, L=1 m, T=1773.15 K, pure SiO, P₁=1000 Pa,
+The transport_regime owner adds finite-length Clausing molecular transport
+and Knudsen's published transitional correction; this expression is the
+high-pressure limit. Transitional authority is flagged in the existing
+per-hour Knudsen warnings.
+Sanity check of the viscous component: d=0.12 m, L=1 m, T=1773.15 K, pure SiO, P₁=1000 Pa,
 and P₂=0 gives 0.121878 kg/s; P₁=P₂ gives zero flow.
 
 Feedback quantities exposed:
@@ -71,8 +75,13 @@ from engines.builtin.overhead_bleed import (
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET  # K — Celsius-to-Kelvin offset
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.transport_regime import (
+    # Preserve the previously exported viscous helper/constant; physics lives
+    # in transport_regime and both live capacity callers use pipe_mass_flow.
+    COMPRESSIBLE_POISEUILLE_DENOMINATOR,
     compressible_poiseuille_mass_flow,
+    pipe_mass_flow_kg_s,
     gas_dynamic_viscosity_Pa_s,
+    pipe_conductance_authority_notice,
     pipe_pressure_pa_for_mass_flow,
 )
 
@@ -695,7 +704,7 @@ class OverheadGasModel:
         p_downstream_bar: Optional[float] = None,
         effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
     ) -> dict[str, float]:
-        """Estimate pipe pressure/capacity with the existing Poiseuille model."""
+        """Estimate pipe pressure/capacity with the shared regime-spanning model."""
 
         conductance_temperature_C = _required_finite_float(
             melt.temperature_C,
@@ -714,7 +723,9 @@ class OverheadGasModel:
             'melt.p_total_mbar',
         )  # mbar — caller-supplied total-pressure ceiling
         pipe_temperature_C = self.resolve_pipe_temperature_C(melt)  # °C — active pipe/liner wall temperature
-        allowed_pressure_Pa = max(allowed_pressure_mbar * 100.0, 1.0)  # Pa — allowed upstream pressure; mbar -> Pa with 1 Pa floor
+        # Pa = mbar*100. A numerical pressure floor would evaluate rarefied
+        # capacity at the wrong physical input (and invent flow at P1=P2=0).
+        allowed_pressure_Pa = allowed_pressure_mbar * 100.0
         controlled_flow = effective_transport_capacity is not None
         downstream_pressure_Pa = (
             _required_finite_nonnegative_float(
@@ -724,7 +735,7 @@ class OverheadGasModel:
             if controlled_flow
             else self._resolve_downstream_pressure(melt, p_downstream_bar) * 1.0e5
         )  # Pa — derived or explicit downstream/reference pressure; bar -> Pa
-        # Preserve the existing gas-transport path: Poiseuille conductance has
+        # Preserve the existing gas-temperature basis: pipe conductance has
         # historically used melt/gas temperature. The liner trajectory controls
         # wall deposition and Kn diagnostics without changing evaporation totals.
         # 0.5.4 W7 (CW5): pass the live evap-flux mixture so the
@@ -749,8 +760,15 @@ class OverheadGasModel:
                 species_kg_for_M_avg=evap_flux.species_kg_hr,  # kg/hr by species — composition basis for M_avg
             )
             pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
-        if not controlled_flow and conductance > 0.0:
-            vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, sqrt(Poiseuille balance)
+        if not controlled_flow and (
+            conductance > 0.0
+            or (allowed_pressure_Pa == 0.0 and downstream_pressure_Pa == 0.0)
+        ):
+            # A zero pressure CEILING has zero capacity, but a positive gas
+            # source still develops the pressure required to leave an open
+            # pipe into vacuum. Invert that source without inventing a 1 Pa
+            # floor; its load/capacity remains infinite and throttles heating.
+            vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, inverted pipe balance
                 total_evap_kg_hr / 3600.0,  # kg/s — evaporation mass flow
                 conductance_temperature_C,
                 p_downstream_bar=downstream_pressure_Pa / 1.0e5,
@@ -762,7 +780,7 @@ class OverheadGasModel:
             # until the allowed headspace pressure is reached and backpressure
             # suppresses the next tick's net HKL source.  Algebra is the closed
             # boundary P_vapor=P_up.  Unit check: Pa/100=mbar.  Limits: any
-            # positive conductance uses the Poiseuille inversion above; at
+            # positive conductance uses the shared inversion above; at
             # P_down->P_up this full-upstream state makes the following live
             # flux (and therefore saturation) recover instead of relatching.
             vapor_pressure_mbar = allowed_pressure_Pa / 100.0
@@ -779,17 +797,10 @@ class OverheadGasModel:
             )  # percent — load / capacity at allowed upstream pressure
         else:
             pipe_capacity_used_pct = math.inf
-        # Premise: PIPE-1 mass flow is C * max(P_up^2 - P_down^2, 0) with C
-        # independent of pressure. The value below is that capacity at the
-        # allowed upstream pressure (the p_mean_Pa compatibility key in this
-        # dict) and the resolved downstream pressure.
-        # Algebra: treating the arithmetic mean as if it were P_up, with
-        # P_down=0, substitutes P_up/2 and yields C*(P_up/2)^2 = C*P_up^2/4.
-        # Unit check: C is kg/(s·Pa^2); times Pa^2 is kg/s. The number is a
-        # mass-flow capacity, not a per-pressure coefficient (the
-        # conductance_kg_s_per_bar alias is the same kg/s value).
-        # Sanity: vacuum downstream, default geometry, 1500 °C, P_up=1000 Pa
-        # vs 500 Pa returns exactly 4x.
+        # Capacity is evaluated at the allowed UPSTREAM pressure and resolved
+        # downstream pressure. The historical p_mean_Pa key below is an alias
+        # for the upstream pressure, not their arithmetic mean. Units: kg/s;
+        # conductance_kg_s_per_bar remains the same historical kg/s alias.
         return {
             'pipe_temperature_C': pipe_temperature_C,  # °C — active pipe/liner wall temperature
             'conductance_temperature_C': conductance_temperature_C,  # °C — gas temperature used for conductance
@@ -833,7 +844,8 @@ class OverheadGasModel:
             'O2_BACKPRESSURE',
         }:
             return None
-        allowed_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
+        allowed_pressure_Pa = float(melt.p_total_mbar) * 100.0
+        self.last_pipe_conductance_authority_notice = None
         pipe_capacity_kg_hr = (
             max(0.0, float(self._conductance_override)) * 3600.0
             if self._conductance_override is not None
@@ -1386,7 +1398,7 @@ class OverheadGasModel:
             return max(0.0, float(self._conductance_override))  # kg/s — configured bleed mass-flow capacity
         if self._bleed_model == 'constant':
             return max(0.0, float(derived_kg_s))  # kg/s — constant bleed mass-flow capacity
-        return max(0.0, float(derived_kg_s))  # kg/s — derived Poiseuille bleed mass-flow capacity
+        return max(0.0, float(derived_kg_s))  # kg/s — derived pipe bleed mass-flow capacity
 
     def _resolve_downstream_pressure(self, melt: MeltState,
                                      explicit: Optional[float]) -> float:  # bar or None — explicit downstream pressure
@@ -1436,10 +1448,10 @@ class OverheadGasModel:
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
     ) -> float:
         """
-        Compressible Poiseuille mass-flow capacity of the collection pipe.
+        Regime-spanning mass-flow capacity of the collection pipe.
 
-        At millibar pressures and 1400+°C, the flow is in the
-        viscous regime (Knudsen number Kn << 0.01).
+        Knudsen interpolation joins compressible Poiseuille to molecular
+        transport with finite-length Clausing transmission.
 
         Args:
             p_upstream_Pa: Allowed upstream pressure in the pipe (Pa)
@@ -1464,6 +1476,7 @@ class OverheadGasModel:
         species mixture; legacy callers without the kwarg get the
         documented fallback.
         """
+        self.last_pipe_conductance_authority_notice = None
         d = self.pipe_diameter_m  # m — pipe inner diameter
         L = self.pipe_length_m  # m — pipe length
 
@@ -1511,16 +1524,12 @@ class OverheadGasModel:
             ),
             species_formula_registry=self.species_formula_registry,
         )
-        # F-112 derivation:
-        # premise: compressible laminar pipe mass flow is proportional to
-        # (P_up^2 - P_down^2), not P_up^2 unless the downstream reference is
-        # vacuum.
-        # algebra: capacity = C * max(P_up^2 - P_down^2, 0).
-        # unit check: Pa^2 enters the Poiseuille numerator and the remaining
-        # constants reduce the result to kg/s.
-        # sanity: P_down=0 preserves the legacy vacuum result; P_down>=P_up
-        # yields zero forward capacity instead of imaginary/negative flow.
-        return compressible_poiseuille_mass_flow(
+        # The transport owner derives both limits, the finite-length Clausing
+        # term and the published Knudsen bridge; both pressures are absolute Pa.
+        self.last_pipe_conductance_authority_notice = pipe_conductance_authority_notice(
+            d, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa,
+        )
+        return pipe_mass_flow_kg_s(
             d,
             L,
             M_avg,
@@ -1542,7 +1551,7 @@ class OverheadGasModel:
         p_downstream_bar: float = 0.0,  # bar — downstream/reference pressure
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
     ) -> float:
-        """Invert the shared compressible Poiseuille law."""
+        """Invert the shared regime-spanning pipe law."""
 
         try:
             F_kg_s = float(total_evap_kg_s)  # kg/s — candidate vapor mass throughput
@@ -1579,5 +1588,14 @@ class OverheadGasModel:
         p_downstream_Pa = max(0.0, p_downstream_bar) * 1.0e5  # Pa — bar -> Pa
         pressure_Pa = pipe_pressure_pa_for_mass_flow(
             d, L, M_avg, eta, T_K, F_kg_s, p_downstream_Pa,
+        )
+        # Capacity at the design ceiling and pressure inferred from the live
+        # source may be in different regimes. Preserve either interpolation
+        # notice for the snapshot; estimate_transport_state starts a fresh
+        # capacity calculation each tick, so this does not latch across ticks.
+        self.last_pipe_conductance_authority_notice = (
+            pipe_conductance_authority_notice(
+                d, M_avg, eta, T_K, pressure_Pa, p_downstream_Pa,
+            ) or getattr(self, 'last_pipe_conductance_authority_notice', None)
         )
         return pressure_Pa / 100.0  # mbar — Pa -> mbar
