@@ -4864,6 +4864,28 @@ def predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         ),
                     )
+            source_phase = coefficients.get("phase")
+            if (
+                source_phase in {"solid", "alpha_solid", "crystal", "crystalline"}
+                and reservoir[1] != Phase.CR.value
+            ):
+                # A sublimation relation's temperature band certifies its
+                # solid reference only. Mg/Ca have no qualified liquid fit
+                # at these cold temperatures; retain a flagged phase proxy,
+                # never certify a (possibly supercooled) liquid from it.
+                authority = Authority.EXTRAPOLATED
+                notices += (
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(Quantity.P_SAT,),
+                        reason="pure_component_antoine_phase_mismatch",
+                        origin=observation.observation_id,
+                        source=source_phase,
+                        destination=reservoir[1],
+                        band=f"condensed_phase={source_phase}",
+                        authority=Authority.EXTRAPOLATED,
+                    ),
+                )
             sidecar_sources = expand_coefficient_sources(("antoine_sidecar",))
             return EnginePrediction(
                 engine=engine,

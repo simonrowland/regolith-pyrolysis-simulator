@@ -19,7 +19,7 @@ from simulator.condensation import (
     _species_vapor_data,
     _wall_deposition_driving_pressure_pa,
 )
-from simulator.battery.enums import Authority, Engine, MethodToken, Phase
+from simulator.battery.enums import Authority, Engine, MethodToken, NoticeKind, Phase
 from simulator.battery.score import predict_with_engine
 from tests.battery import factories as F
 
@@ -65,19 +65,32 @@ def test_published_solid_surface_anchors(species, temperature, pressure):
 @pytest.mark.parametrize(("species", "temperature", "expected"), [
     ("Mg", "500", 4.06446e-5), ("Ca", "600", 2.38232e-5),
 ])
-def test_static_pressure_scoring_uses_solid_surface_band(species, temperature, expected):
+@pytest.mark.parametrize("reservoir_phase", [Phase.CR, Phase.L, Phase.SUPERCOOLED_L])
+def test_static_pressure_scoring_uses_solid_surface_band(
+    species, temperature, expected, reservoir_phase,
+):
     temperature = Decimal(temperature)
     experiment = F.tabulation_experiment(
         method=MethodToken.STATIC_EQUILIBRIUM, T_K=temperature)
-    identity = F.psat_identity(species, T_K=temperature, reservoir_phase=Phase.CR)
+    identity = F.psat_identity(species, T_K=temperature, reservoir_phase=reservoir_phase)
     reference = F.observation(
         "solid-surface", experiment.experiment_id, identity,
         Decimal(str(expected)), source_id="primary-solid-reference")
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment)
     assert float(prediction.value) == pytest.approx(expected, rel=2e-6)
-    assert prediction.authority is Authority.CERTIFIED
-    assert prediction.notices == ()
+    assert prediction.identity is identity
+    if reservoir_phase is Phase.CR:
+        assert prediction.authority is Authority.CERTIFIED
+        assert prediction.notices == ()
+    else:
+        assert prediction.authority is Authority.EXTRAPOLATED
+        notice, = prediction.notices
+        assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        assert "phase_mismatch" in notice.reason
+        assert notice.source == ("solid" if species == "Mg" else "alpha_solid")
+        assert notice.destination == reservoir_phase.value
+        assert notice.authority is Authority.EXTRAPOLATED
     low, high = prediction.certified_band["temperature_K"]
     assert low <= temperature <= high
 
