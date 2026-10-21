@@ -1,0 +1,206 @@
+schema_version: literature_extract.v1
+source_id: kayahara-1981-liquid-cu-o
+source:
+  citation: 'Kayahara, Y., Ono, K., Oishi, T. & Moriyama, J. (1981), Thermodynamic Study of the Liquid Cu-O System, Transactions of the Japan Institute of Metals 22(7):493-500.'
+  year: 1981
+extraction:
+  method: 'Scanned paper machine text (pdftotext and MinerU); no numeric tables. Figures are recorded without digitised points; printed text values are retained in context.'
+  date: '2026-10-20'
+  worker: fam34-1020
+review_status: draft
+species:
+  Cu:
+    observations: []
+    context:
+      - observation_id: kayahara_1981_printed_measurement_ranges
+        type: relation
+        locator: {page: 1, published_page: 494, pdf_page_index: 0, section: Introduction}
+        units: K; atomic percent O; dimensionless
+        values:
+          method_class: measured_direct
+          quantity_as_printed: printed experimental ranges and phase-transition temperatures
+          candidate_quantity_tokens: [activity, activity_coefficient, p_partial, delta_fG, partial_molar_enthalpy]
+          printed_values:
+            - 'oxygen concentration range: 3 to 34 at% O'
+            - 'emf experiments: 1370 to 1600 K'
+            - 'monotectic temperature from emf: 1495 K'
+            - 'miscibility gap appears to disappear above 1620 K'
+            - 'emf relationship at 1573 K'
+            - 'Cu2O standard formation-energy equations apply over the experimental temperature range 1370 to 1600 K'
+            - 'intersection of solid and liquid Cu2O formation-energy lines: 1499 K'
+            - 'oxygen partial pressure over the concentration range 3 to 34 at% and 1423 to 1600 K: 10^-3.0 to 10^-4.5 pO2/p°O2'
+          note: Values are prose summaries or fit results without row-level conditions; Cu-O oxygen activity, copper activity, oxygen solubility, and partial entropy series have no fitting token in this extract context. The Cu2O formation energies are printed linear fits, not point observations.
+      - observation_id: kayahara_1981_delta_g_fits
+        type: relation
+        locator: {page: 6, published_page: 499, pdf_page_index: 5, section: Results}
+        units: kJ/mol
+        values:
+          method_class: model_derived
+          quantity_as_printed: standard Gibbs free-energy formation fits for Cu2O
+          candidate_quantity_tokens: [delta_fG]
+          equations_as_printed:
+            - 'ΔG°Cu2O(s) = -194.85 + 91.96 × 10^-3 T (kJ/mol)'
+            - 'ΔG°Cu2O(l) = -121.34 + 42.92 × 10^-3 T (kJ/mol)'
+          temperature_as_printed: 1370-1600 K
+          note: Printed linear fit coefficients are retained as model-derived context and are not expanded into values at unprinted temperatures.
+      - observation_id: kayahara_1981_fig1_phase_diagram
+        type: figure_only
+        locator: {figure: '1', page: 1, published_page: 494, pdf_page_index: 0}
+        units: at% O; K
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: equilibrium phase diagram for Cu-O system
+          species: Cu-O
+          phase: liquid copper, liquid copper oxide and solids as shown
+          temperature_as_printed: plotted temperature range
+          x_axis_as_printed: oxygen concentration (at%)
+          y_axis_as_printed: temperature (K)
+          caption_as_printed: 'Equilibrium phase diagram for the Cu-O system.'
+          panel: single
+          series: [{name: 'phase boundaries and experimental phase points', marker_count: null}]
+          attribution: Kayahara et al. (1981), with earlier comparison data identified in the figure
+          digitisation: deferred to a figure pass
+      - observation_id: kayahara_1981_fig2_cell_arrangement
+        type: figure_only
+        locator: {figure: '2', page: 2, published_page: 495, pdf_page_index: 1}
+        units: not applicable
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: galvanic cell arrangement
+          species: Cu-O
+          phase: not applicable
+          x_axis_as_printed: not applicable
+          y_axis_as_printed: not applicable
+          caption_as_printed: 'Cell arrangement.'
+          panel: single
+          series: [{name: 'cell schematic', marker_count: 0}]
+          attribution: Kayahara et al. (1981)
+          digitisation: deferred to a figure pass
+      - observation_id: kayahara_1981_fig3_emf_copper
+        type: figure_only
+        locator: {figure: '3', page: 3, published_page: 496, pdf_page_index: 2}
+        units: mV
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: emf variation with temperature for liquid Cu-O alloys
+          species: O
+          phase: liquid Cu-O alloy
+          temperature_as_printed: 1370-1600 K
+          x_axis_as_printed: temperature (K)
+          y_axis_as_printed: emf (mV)
+          caption_as_printed: 'Variation of emf with temperature for the cell, Ni, NiO/ZrO2(+CaO)/Cu-O liquid alloys.'
+          panel: single
+          series: [{name: 'nine oxygen concentrations; heating and cooling readings', marker_count: null}]
+          attribution: Kayahara et al. (1981)
+          digitisation: deferred to a figure pass
+      - observation_id: kayahara_1981_fig4_emf_oxide
+        type: figure_only
+        locator: {figure: '4', page: 3, published_page: 496, pdf_page_index: 2}
+        units: mV
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: emf variation with temperature for liquid copper oxides
+          species: O
+          phase: liquid copper oxide
+          temperature_as_printed: 1370-1600 K
+          x_axis_as_printed: temperature (K)
+          y_axis_as_printed: emf (mV)
+          caption_as_printed: 'Variation of emf with temperature for the cell, Ni, NiO/ZrO2(+CaO)/Cu-O liquid oxides.'
+          panel: single
+          series: [{name: 'liquid copper oxide emf series', marker_count: null}]
+          attribution: Kayahara et al. (1981)
+          digitisation: deferred to a figure pass
+      - observation_id: kayahara_1981_fig5_emf_mole_fraction
+        type: figure_only
+        locator: {figure: '5', page: 4, published_page: 497, pdf_page_index: 3}
+        units: mV
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: emf as a function of oxygen mole fraction
+          species: O
+          phase: liquid Cu-O alloy and liquid copper oxide
+          temperature_as_printed: 1573 K
+          x_axis_as_printed: mole fraction oxygen, N_O
+          y_axis_as_printed: emf (mV)
+          caption_as_printed: 'Relationship between emf and N_O at 1573 K.'
+          panel: single
+          series: [{name: 'present study and comparison data from Osterwald et al. and Sadat-Darbandi', marker_count: null}]
+          attribution: Kayahara et al. (1981), including attributed prior-work series
+          digitisation: deferred to a figure pass
+      - observation_id: kayahara_1981_fig6_activities
+        type: figure_only
+        locator: {figure: '6', page: 5, published_page: 498, pdf_page_index: 4}
+        units: dimensionless
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: activities of oxygen and copper in liquid Cu-O system
+          species: O and Cu
+          phase: liquid
+          temperature_as_printed: 1573 K
+          x_axis_as_printed: oxygen concentration (at%)
+          y_axis_as_printed: activity
+          caption_as_printed: 'Activities of oxygen and copper in the liquid Cu-O system at 1573 K. Standard states of oxygen and copper are pure gas at 101325 Pa and pure liquid copper, respectively.'
+          panel: single
+          series: [{name: 'oxygen activity', marker_count: null}, {name: 'copper activity', marker_count: null}]
+          attribution: Kayahara et al. (1981)
+          digitisation: deferred to a figure pass
+      - observation_id: kayahara_1981_fig7_cu2o_formation_energy
+        type: figure_only
+        locator: {figure: '7', page: 5, published_page: 498, pdf_page_index: 4}
+        units: kJ/mol
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: standard Gibbs free energy of formation of Cu2O
+          species: Cu2O
+          phase: solid and liquid
+          temperature_as_printed: 1370-1600 K
+          x_axis_as_printed: temperature (K)
+          y_axis_as_printed: ΔG° formation (kJ/mol)
+          caption_as_printed: 'Standard free energy of formation of Cu2O.'
+          panel: single
+          series: [{name: 'Cu2O(s) and Cu2O(l) fits with comparison literature data', marker_count: null}]
+          attribution: Kayahara et al. (1981), with cited comparison studies
+          digitisation: deferred to a figure pass
+      - observation_id: kayahara_1981_fig8_partial_entropy
+        type: figure_only
+        locator: {figure: '8', page: 6, published_page: 499, pdf_page_index: 5}
+        units: J/(mol K)
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: relative partial molar entropy of oxygen versus oxygen mole fraction
+          species: O
+          phase: liquid Cu-O
+          temperature_as_printed: 1573 K
+          x_axis_as_printed: mole fraction oxygen, N_O
+          y_axis_as_printed: relative partial molar entropy of oxygen (J/(mol K))
+          caption_as_printed: 'Relationships between ΔS° and N_O at 1573 K.'
+          panel: single
+          series: [{name: 'relative partial molar entropy of oxygen', marker_count: null}]
+          attribution: Kayahara et al. (1981)
+          digitisation: deferred to a figure pass
+      - observation_id: kayahara_1981_fig9_oxygen_potential
+        type: figure_only
+        locator: {figure: '9', page: 6, published_page: 499, pdf_page_index: 5}
+        units: log10(pO2/p°O2)
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: oxygen potential-temperature-composition diagram for Cu-O system
+          species: O2
+          phase: gas in equilibrium with condensed Cu-O phases
+          temperature_as_printed: plotted temperature range
+          x_axis_as_printed: oxygen concentration (at%) and temperature (K)
+          y_axis_as_printed: log(pO2/p°O2)
+          caption_as_printed: 'Oxygen potential-temperature-composition diagram for the Cu-O system.'
+          panel: single
+          series: [{name: 'oxygen potential phase boundaries', marker_count: 0}]
+          attribution: Kayahara et al. (1981)
+          digitisation: deferred to a figure pass
