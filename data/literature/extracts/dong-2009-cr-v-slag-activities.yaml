@@ -44,6 +44,25 @@ species:
             Abstract and procedure values are experimental conditions, not independent
             numeric observations. No measured data table is printed. The cited Figures 3 and 4
             are referenced in the text but their plots are absent from the supplied PDF pages.
+      - observation_id: dong_2009_equations_5_6_standard_reaction_free_energies
+        type: thermodynamic_equations
+        locator: {page: 3, pdf_page_index: 2}
+        units: (J)
+        values:
+          method_class: quoted_attributed
+          quantity_as_printed: standard reaction free-energy expressions for reactions (1) and (2)
+          reactions:
+            - reaction_number: '1'
+              equation_number: '5'
+              reaction_as_printed: 'Cr(Pt)(s) + 1/2 O2(g) = CrO(l)'
+              delta_G0_as_printed: '−334218 + 63.81 T'
+            - reaction_number: '2'
+              equation_number: '6'
+              reaction_as_printed: 'V(Pt)(s) + 3/4 O2(g) = VO1.5(s)'
+              delta_G0_as_printed: '−600405 + 112.97 T'
+          note: >-
+            Expressions are retained as printed context; no value is evaluated at a
+            selected temperature and no species formation free energy is emitted.
       - observation_id: dong_2009_fig3_equilibration_time
         type: figure
         locator: {page: 5, pdf_page_index: 4, figure: '3', section: Results — Equilibrium Time}

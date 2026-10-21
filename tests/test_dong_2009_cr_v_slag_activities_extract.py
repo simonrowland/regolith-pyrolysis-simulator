@@ -13,6 +13,28 @@ EXTRACT = ROOT / "data/literature/extracts/dong-2009-cr-v-slag-activities.yaml"
 
 def test_dong_2009_figure_records_are_deferred_and_migrate_as_context() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    equations = next(
+        row
+        for row in document["species"]["Cr"]["context"]
+        if row["observation_id"] == "dong_2009_equations_5_6_standard_reaction_free_energies"
+    )
+    assert equations["locator"] == {"page": 3, "pdf_page_index": 2}
+    assert equations["units"] == "(J)"
+    assert equations["values"]["reactions"] == [
+        {
+            "reaction_number": "1",
+            "equation_number": "5",
+            "reaction_as_printed": "Cr(Pt)(s) + 1/2 O2(g) = CrO(l)",
+            "delta_G0_as_printed": "−334218 + 63.81 T",
+        },
+        {
+            "reaction_number": "2",
+            "equation_number": "6",
+            "reaction_as_printed": "V(Pt)(s) + 3/4 O2(g) = VO1.5(s)",
+            "delta_G0_as_printed": "−600405 + 112.97 T",
+        },
+    ]
+    assert "temperature" in equations["values"]["note"]
     expected = {
         "dong_2009_fig3_equilibration_time": ("3", 5, "concentration_series"),
         "dong_2009_fig4_pt_cross_section": ("4", 5, "concentration_series"),
@@ -66,6 +88,6 @@ def test_dong_2009_figure_records_are_deferred_and_migrate_as_context() -> None:
         for row in rows
         if row["context_id"].startswith(f"{EXTRACT.stem}::context::")
     ]
-    assert len(contexts) == 11
+    assert len(contexts) == 12
     assert not result.validation.hard_issues
 
