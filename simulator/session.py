@@ -652,8 +652,12 @@ class SimSession:
                 )
                 if field_name == "pO2_mbar" and finite_value < 0.0:
                     raise ValueError("pO2_mbar must be non-negative")
+                if field_name == "sweep_mol_per_m2_s":
+                    finite_value = sim.campaign_mgr._validated_sweep_flow(finite_value)
                 target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
                 target[field_name] = finite_value
+            if field_name == "sweep_mol_per_m2_s" and sim.melt.campaign.name == campaign_name:
+                sim._apply_sweep_flow_control()
             if field_name == "pO2_mbar" and sim.melt.campaign.name == campaign_name:
                 # 0.5.4 W5 (post-push P2 convergent finding, codex
                 # review + codex challenge 2026-05-28): mirror the

@@ -649,6 +649,131 @@ def water_gas_shift_log10_K(
     )
 
 
+def co2_dissociation_partials_bar(
+    T_K: float, p_CO2_initial_bar: float, p_O2_ledger_bar: float,
+    *, total_pressure_bar: float | None = None, p_inert_initial_bar: float = 0.0,
+) -> dict[str, Any]:
+    """Closed gas-phase CO2 ⇌ CO + 1/2 O2 at the transport gas temperature.
+
+    Uses the SAME NASA Glenn/CEA CO/CO2/O2 Gibbs records and K owner as the
+    offgas couple, reversed; no graphite, Boudouard fit, or kinetic model.
+    This pressure projection does not book cover-gas oxygen as melt product.
+    """
+    T = _coerce_T_K(T_K)
+    if T <= 0.0:
+        raise OffgasFO2Unavailable("CO2 dissociation gas temperature must be positive")
+    try:
+        c, b = float(p_CO2_initial_bar), float(p_O2_ledger_bar)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise OffgasFO2Unavailable("CO2 and ledger O2 partial pressures are required") from exc
+    if not all(math.isfinite(p) and p >= 0.0 for p in (c, b)):
+        raise OffgasFO2Unavailable("CO2 and ledger O2 partial pressures must be finite and >= 0")
+    inert = 0.0
+    if total_pressure_bar is not None:
+        if isinstance(total_pressure_bar, bool) or isinstance(p_inert_initial_bar, bool):
+            raise OffgasFO2Unavailable("pressure inputs must be numbers, not booleans")
+        try:
+            total_pressure_bar = float(total_pressure_bar)
+            inert = float(p_inert_initial_bar)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise OffgasFO2Unavailable("total pressure and inert partial pressure are required") from exc
+        if not all(math.isfinite(p) and p >= 0.0 for p in (total_pressure_bar, inert)):
+            raise OffgasFO2Unavailable("total pressure and inert partial pressure must be finite and >= 0")
+        if (c + b + inert > 0.0) != (total_pressure_bar > 0.0):
+            raise OffgasFO2Unavailable("nonzero total pressure requires a nonzero gas boundary")
+        if not math.isfinite(1.5 * c + b + inert):
+            raise OffgasFO2Unavailable("aggregate gas boundary pressure must be finite")
+    if c == 0.0:
+        result = {"p_O2_bar": b, "p_CO_bar": 0.0, "p_CO2_bar": 0.0, "notices": []}
+        if total_pressure_bar is not None:
+            denominator = b + inert
+            result.update(
+                p_O2_bar=b / denominator * total_pressure_bar if denominator else 0.0,
+                p_inert_bar=inert / denominator * total_pressure_bar if denominator else 0.0,
+            )
+        return result
+    polys = load_buffer_polynomials()
+    reference_bar = polys["O2"].reference_pressure_Pa / 100_000.0
+    if any(polys[s].reference_pressure_Pa != polys["O2"].reference_pressure_Pa
+           for s in ("CO", "CO2")):
+        raise OffgasFO2Unavailable("CO2/CO/O2 records have different standard pressures")
+    # Premise: fixed V,T, initially CO2 pressure c and ledger O2 pressure b,
+    # no initial CO. Let x=p_O2 and q=p_CO=2(x-b); carbon conservation gives
+    # p_CO2=c-q. Dimensionless Kd=exp[-(G_CO+G_O2/2-G_CO2)/(RT)]. Thus
+    #   2(x-b)*sqrt(x/p°) - Kd*[c-2(x-b)] = 0, b <= x <= b+c/2.
+    # Each term has units bar (p° is 1 bar for the shipped CEA records).
+    # The residual increases strictly, giving one physical root. Solve in
+    # q/c to retain small dissociation even when b dominates x numerically.
+    # Limits: b >> dissociation O2 => x~b (the added q/2 vanishes relatively);
+    # b=0, q<<c => x=(Kd*c*sqrt(p°)/2)^(2/3), units bar^(3/2)^(2/3)=bar.
+    lo_T, hi_T = _effective_domain_K(polys, _COUPLE_RECORDS['CO'])
+    evaluated_T = min(hi_T, max(lo_T, T))
+    ln_Kd = -_log10_K_couple(polys, "CO", evaluated_T) * math.log(10.0)
+    notices = []
+    if evaluated_T != T:
+        # Out of domain: predict with the boundary enthalpy tangent, flagged.
+        # van't Hoff d(ln Kd)/d(1/T)=-ΔH/R; hold ΔH at the nearest
+        # CEA boundary, so ln Kd(T)=ln Kd(Tb)-(ΔH/R)_b*(1/T-1/Tb).
+        # H/(RT) is dimensionless; multiplying by Tb gives ΔH/R in K,
+        # cancelling inverse kelvin. T=Tb recovers the exact owner value;
+        # cooling an endothermic dissociation drives Kd toward zero.
+        dH_over_R = evaluated_T * (
+            polys['CO'].evaluate(evaluated_T).h_over_RT
+            + 0.5 * polys['O2'].evaluate(evaluated_T).h_over_RT
+            - polys['CO2'].evaluate(evaluated_T).h_over_RT
+        )
+        ln_Kd -= dH_over_R * (1.0 / T - 1.0 / evaluated_T)
+        notices.append({
+            'code': 'co2_dissociation_thermo_extrapolated',
+            'status': 'extrapolated_boundary_enthalpy',
+            'temperature_K': T,
+            'certified_band_K': [lo_T, hi_T],
+            'reason': 'van\'t Hoff boundary enthalpy extension of the existing CEA CO couple',
+        })
+    Kd = math.exp(ln_Kd)
+    # At fixed final P, reaction extent q adds q/2 to the initial total
+    # c+b+i, so multiply ALL partials by s=P/(c+b+i+q/2). The same Kd
+    # residual uses sqrt[s*(b+q/2)/p°]; q/(c-q) is scale-invariant.
+    # s is dimensionless (bar/bar), final partials sum to P. q=0 recovers
+    # the inlet composition; i->infinity makes the reacting gas dilute.
+    lo, hi = 0.0, (1.0 if Kd > 0.0 else 0.0)
+    for _ in range(1075):  # binary64 fraction, including subnormals
+        fraction = (lo + hi) / 2.0
+        if fraction == lo or fraction == hi:
+            break
+        q = c * fraction
+        oxygen = b + q / 2.0
+        if total_pressure_bar is not None:
+            oxygen = oxygen / (c + b + inert + q / 2.0) * total_pressure_bar
+        residual = fraction * math.sqrt(oxygen / reference_bar) - Kd * (1.0 - fraction)
+        if residual > 0.0:
+            hi = fraction
+        else:
+            lo = fraction
+    q = c * ((lo + hi) / 2.0)
+    result = {
+        "p_O2_bar": b + q / 2.0,
+        "p_CO_bar": q,
+        "p_CO2_bar": c - q,
+        # Thermodynamics establishes no kinetic temperature cutoff. Flag the
+        # assumption at EVERY T, including cold gas where fast equilibration
+        # is particularly unsupported; neither residence time nor catalysis is
+        # an input. Do not invent a rate or a falsely certified hot-T threshold.
+        "notices": notices + [{
+            "code": "co2_dissociation_equilibrium_assumption_unverified",
+            "status": COMPUTED_ASSUMPTION_UNVERIFIED,
+            "temperature_K": T,
+            "reason": "Fast CO2/CO/O2 equilibration assumed; residence time and catalysis unverified, especially in cold gas",
+        }],
+    }
+    if total_pressure_bar is not None:
+        denominator = c + b + inert + q / 2.0
+        for key in ('p_O2_bar', 'p_CO_bar', 'p_CO2_bar'):
+            result[key] = result[key] / denominator * total_pressure_bar
+        result['p_inert_bar'] = inert / denominator * total_pressure_bar
+    return result
+
+
 def shift_extent(
     n_CO: float, n_H2O: float, n_CO2: float, n_H2: float, K: float
 ) -> float:

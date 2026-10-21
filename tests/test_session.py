@@ -832,3 +832,29 @@ def test_pause_resume_are_result_neutral_pacing_flags():
         unpaused_results.append(unpaused.advance().per_hour_summary)
 
     assert paused_results == unpaused_results
+
+
+@pytest.mark.parametrize('campaign_name', ['C2A', 'C2B'])
+@pytest.mark.parametrize('existing_override', [False, True])
+def test_rejected_sweep_adjustment_preserves_state_and_next_hour(campaign_name, existing_override):
+    from copy import deepcopy
+
+    setpoints = _load_yaml('setpoints.yaml')
+    setpoints['campaigns']['C2A_continuous']['sweep_mol_per_m2_s'] = 0.001
+    overrides = ({campaign_name: {'sweep_mol_per_m2_s': 0.002}} if existing_override else {})
+    session = SimSession().start(_config(feedstock_id='mars_basalt', campaign='C2A',
+        additives_kg={'C': 30.0}, setpoints=setpoints, runtime_campaign_overrides=overrides))
+    sim = session.simulator
+    before_snapshot = deepcopy(session.snapshot())
+    before_overrides = deepcopy({name: dict(fields) for name, fields in sim.campaign_mgr.overrides.items()})
+    before_flow = sim.melt.sweep_mol_per_s
+
+    with pytest.raises(ValueError, match='sweep_mol_per_m2_s'):
+        session.adjust('campaign_override', -1.0, campaign=campaign_name, field='sweep_mol_per_m2_s')
+
+    assert {name: dict(fields) for name, fields in sim.campaign_mgr.overrides.items()} == before_overrides
+    assert sim.melt.sweep_mol_per_s == before_flow
+    assert session.snapshot() == before_snapshot
+    sim.step()
+    assert sim.melt.hour == 1
+    assert sim.melt.sweep_mol_per_s == before_flow

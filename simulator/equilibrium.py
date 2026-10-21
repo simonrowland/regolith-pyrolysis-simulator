@@ -25,7 +25,14 @@ from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
     kress91_furnace_activity_pressure_bar,
 )
-from simulator.environment import vacuum_floor_bar_for_environment
+from simulator.environment import (
+    controlled_background_partial_pressure,
+    cover_gas_partial_pressures,
+    normalize_body_name,
+    oxygen_numerical_floor_bar_for_body,
+    vacuum_floor_bar_for_environment,
+)
+from simulator.chemistry.offgas_fo2 import co2_dissociation_partials_bar
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, Atmosphere
@@ -103,6 +110,7 @@ class EquilibriumMixin:
         )
 
     def _vacuum_floor_bar(self) -> float:
+        """Total-pressure feasibility limit; never an oxygen partial pressure."""
         ambient_pressure_bar = (
             float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0)
             / 1000.0
@@ -113,6 +121,71 @@ class EquilibriumMixin:
                 ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
             ),
         )
+
+    def _oxygen_numerical_floor_bar(self) -> float:
+        return oxygen_numerical_floor_bar_for_body(getattr(self.melt, 'body', ''))
+
+    def _headspace_equilibrated_pO2_bar(self, ledger_pO2_bar: float) -> float:
+        """Add declared cover-gas oxygen and solve its coupled CO2 equilibrium."""
+        self._headspace_co2_dissociation_diagnostic = {}
+        mode = str(getattr(self.melt.atmosphere, 'name', '') or '')
+        if mode in {'PN2_SWEEP', 'ARGON_FLOW'}:
+            declaration = str(getattr(self.melt, 'background_gas_species', '') or '')
+            declaration = declaration or ('Ar' if mode == 'ARGON_FLOW' else 'N2')
+            total_bar = float(self.melt.p_total_mbar) / 1000.0
+        elif mode == 'CO2_BACKPRESSURE':
+            declaration = str(getattr(self.melt, 'ambient_atmosphere', '') or '')
+            total_bar = float(self.melt.p_total_mbar) / 1000.0
+        elif self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
+            # These modes explicitly command an O2 partial, not a pure-O2
+            # total. Their setpoint has already been applied by the caller.
+            # Lab schedules can additionally declare a CO2 background fraction.
+            declaration = str(getattr(self.melt, 'background_gas_species', '') or '')
+            if not declaration or declaration.upper() == 'O2':
+                return float(ledger_pO2_bar)
+            total_bar = controlled_background_partial_pressure(
+                float(self.melt.p_total_mbar), float(self.melt.pO2_mbar),
+                float(self.melt.background_gas_mole_fraction),
+            ) / 1000.0
+        else:
+            declaration = str(getattr(self.melt, 'ambient_atmosphere', '') or '')
+            total_bar = float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0) / 1000.0
+            if normalize_body_name(getattr(self.melt, 'body', '')) == 'mars':
+                # An isolated pumped chamber has no declared ambient inflow.
+                return float(ledger_pO2_bar)
+        partials = cover_gas_partial_pressures(declaration, total_bar)
+        oxygen_bar = float(ledger_pO2_bar) + partials.get('O2', 0.0)
+        co2_bar = partials.get('CO2', 0.0)
+        if co2_bar <= 0.0:
+            return oxygen_bar
+        # Same gas-temperature owner as ledger nRT/V and transport conductance:
+        # configured melt/lumped model plus the headspace temperature offset.
+        fixed_pressure = {}
+        if normalize_body_name(getattr(self.melt, 'body', '')) == 'mars':
+            if self._overhead_holdup_mol().get('CO', 0.0) > 0.0:
+                from simulator.campaigns import CampaignPressureSetpointRefusal
+                raise CampaignPressureSetpointRefusal({
+                    'status': 'missing_input', 'reason': 'missing_input',
+                    'detail': 'reactive CO/CO2 boundary required for ambient CO2 cleanup',
+                    'requested_pressure_pa': self.melt.p_total_mbar * 100.0,
+                    'achieved_pressure_pa': total_bar * 1e5,
+                })
+            cover_total_bar = total_bar
+            if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
+                cover_total_bar = controlled_background_partial_pressure(
+                    self.melt.p_total_mbar, self.melt.pO2_mbar, 1.0,
+                ) / 1000.0
+            fixed_pressure = {
+                'total_pressure_bar': self.melt.p_total_mbar / 1000.0,
+                # Unspecified cover balance is inert for this pressure-only
+                # projection, never invented as O2 or credited to the ledger.
+                'p_inert_initial_bar': max(0.0, cover_total_bar - sum(partials.values())),
+            }
+        diagnostic = co2_dissociation_partials_bar(
+            self._headspace_temperature_K(), co2_bar, oxygen_bar, **fixed_pressure,
+        )
+        self._headspace_co2_dissociation_diagnostic = diagnostic
+        return float(diagnostic['p_O2_bar'])
 
     def _commanded_pO2_bar(self) -> float:
         """
@@ -134,7 +207,7 @@ class EquilibriumMixin:
             carried O₂ above the environmental floor still controls
             equilibrium. It does not collapse to the vacuum floor for the
             whole campaign.
-          - A hard numerical floor (``self._vacuum_floor_bar()``) guards the
+          - A hard numerical floor (``self._oxygen_numerical_floor_bar()``) guards the
             1/√pO₂ and K/pO₂ divisions; it is not a setpoint.
 
         With finite headspace enabled, melt-offgas O₂ remains in
@@ -142,6 +215,8 @@ class EquilibriumMixin:
         to melt-offgas terminal bins, so this helper sees real carried
         headspace pO₂ instead of a synthetic vacuum-floor setpoint.
         """
+        if self.melt.sweep_mol_per_s is not None:
+            return self._physical_sweep_boundary()['partials_bar'].get('O2', 0.0)
         enabled = getattr(self, '_overhead_headspace_enabled', lambda: False)()
         if enabled:
             diagnostic = getattr(
@@ -162,7 +237,8 @@ class EquilibriumMixin:
             # floor alone.
             if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
                 pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-            return max(pO2_bar, self._vacuum_floor_bar())
+            physical = self._headspace_equilibrated_pO2_bar(pO2_bar)
+            return physical if self.melt.body == 'mars' else max(physical, self._oxygen_numerical_floor_bar())
 
         upstream_partials = getattr(
             self,
@@ -175,19 +251,24 @@ class EquilibriumMixin:
         )
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
             pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-        return max(pO2_bar, self._vacuum_floor_bar())
+        physical = self._headspace_equilibrated_pO2_bar(pO2_bar)
+        return physical if self.melt.body == 'mars' else max(physical, self._oxygen_numerical_floor_bar())
 
     def _headspace_transport_pO2_bar(self) -> float:
         """O2 transport reservoir pO2 consumed by SiO/vapor transport."""
 
+        if self.melt.sweep_mol_per_s is not None:
+            return self._physical_sweep_boundary()['partials_bar'].get('O2', 0.0)
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         if reservoir is not None:
             pO2_bar = float(
                 getattr(reservoir, 'headspace_transport_pO2_bar', 0.0)
                 or 0.0
             )
+            if self.melt.body == 'mars':
+                return pO2_bar
             if pO2_bar > 0.0:
-                return max(pO2_bar, self._vacuum_floor_bar())
+                return max(pO2_bar, self._oxygen_numerical_floor_bar())
         return self._commanded_pO2_bar()
 
     # --- Ellingham thermodynamic data for oxide equilibrium ---        [ELLI]
@@ -479,7 +560,7 @@ class EquilibriumMixin:
         # coupled but distinct channels: Fe redox reads the melt reservoir;
         # SiO suppression reads the headspace reservoir.
         pO2_bar = self._headspace_transport_pO2_bar()
-        vacuum_floor_bar = self._vacuum_floor_bar()
+        vacuum_floor_bar = self._oxygen_numerical_floor_bar()
         reservoir = getattr(self.melt, "oxygen_reservoir", None)
         intrinsic_fO2_value = getattr(
             reservoir, "melt_intrinsic_fO2_log", None
@@ -1108,7 +1189,7 @@ class EquilibriumMixin:
 
             # a_M(row basis) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
             dissociation_pO2_bar = (
-                pO2_bar if parent_oxide == 'FeO' else melt_dissociation_pO2_bar
+                max(pO2_bar, vacuum_floor_bar) if parent_oxide == 'FeO' else melt_dissociation_pO2_bar
             )
             # Premise: this fallback solves the melt-supported source pressure;
             # the later surface-flux layer owns overhead species backpressure.
@@ -1284,7 +1365,8 @@ class EquilibriumMixin:
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
                 P_sat = _require_finite_vapor_value(
-                    P_sat * (pO2_bar / pO2_reference_bar) ** pO2_exponent,
+                    P_sat * ((max(pO2_bar, vacuum_floor_bar) if pO2_exponent < 0.0 else pO2_bar)
+                             / pO2_reference_bar) ** pO2_exponent,
                     species=name,
                     field="P_sat_pO2",
                 )

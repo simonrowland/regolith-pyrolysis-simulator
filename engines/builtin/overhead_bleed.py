@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from engines.builtin._common import (
@@ -22,6 +23,7 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.account_ids import OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
 from simulator.thermal_train import OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL
 from simulator.transport_regime import (
@@ -175,6 +177,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
 
     name = "builtin-overhead-bleed"
     DECLARED_ACCOUNTS = frozenset({
+        'reservoir.reagent.sweep_gas',
         PROCESS_OVERHEAD_GAS_ACCOUNT,
         TERMINAL_OFFGAS_ACCOUNT,
         OXYGEN_MELT_OFFGAS_ACCOUNT,
@@ -220,6 +223,12 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             ).items()
             if max(0.0, float(mol)) > 0.0
         }
+        inlet_mol = dict(request.account_view.accounts.get('reservoir.reagent.sweep_gas', {}) or {})
+        if inlet_mol and 'sweep_outflow_species_mol' not in controls:
+            return IntentResult(intent=ChemistryIntent.OVERHEAD_BLEED, status='unsupported',
+                                diagnostic={'reason': 'sweep source requires integrated sweep outflow'})
+        for species, mol in inlet_mol.items():
+            holdup_mol[species] = holdup_mol.get(species, 0.0) + mol
         if not holdup_mol:
             return IntentResult(
                 intent=ChemistryIntent.OVERHEAD_BLEED,
@@ -250,12 +259,36 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 diagnostic={"bled_species_mol": {}},
             )
 
-        candidate_bled_mol = self._bled_species_mol(
-            holdup_mol,
-            total_mol=total_mol,
-            total_kg=total_kg,
-            controls=controls,
-        )
+        if 'sweep_outflow_species_mol' in controls:
+            candidate_bled_mol = dict(controls['sweep_outflow_species_mol'])
+            if any(n > holdup_mol.get(s, 0.0) + 1e-12 * max(1.0, holdup_mol.get(s, 0.0))
+                   for s, n in candidate_bled_mol.items()):
+                return IntentResult(intent=ChemistryIntent.OVERHEAD_BLEED, status='unsupported',
+                                    diagnostic={'reason': 'sweep outflow exceeds available species inventory plus inlet'})
+            candidate_bled_mol = {s: min(n, holdup_mol.get(s, 0.0))
+                                  for s, n in candidate_bled_mol.items() if n > 0.0}
+            allowed = self._bled_species_mol(
+                holdup_mol, total_mol=total_mol, total_kg=total_kg, controls=controls,
+            )
+            allowed_mass = sum(n * molar_mass[s] for s, n in allowed.items())
+            requested_mass = sum(n * molar_mass[s] for s, n in candidate_bled_mol.items())
+            if requested_mass > allowed_mass + 1e-12 * max(1.0, requested_mass):
+                # Capacity failure is reported, never converted into a fictitious
+                # constant-pressure outlet. nRT/V gives the undrained boundary.
+                # mol * (Pa m3/mol/K) * K / m3 = Pa; full drainage gives zero.
+                residual_mol = sum(holdup_mol.values()) - sum(allowed.values())
+                achieved = (residual_mol * GAS_CONSTANT * float(controls['headspace_temperature_K'])
+                            / float(controls['headspace_volume_m3']))
+                return IntentResult(intent=ChemistryIntent.OVERHEAD_BLEED, status='unsupported',
+                                    diagnostic={'reason': 'integrated sweep outlet exceeds line capacity',
+                                                'achieved_pressure_pa': achieved})
+        else:
+            candidate_bled_mol = self._bled_species_mol(
+                holdup_mol,
+                total_mol=total_mol,
+                total_kg=total_kg,
+                controls=controls,
+            )
         credits: dict[str, dict[str, float]] = {}
         offgas: dict[str, float] = {}
 
@@ -266,13 +299,24 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             controls,
             overhead_o2_mol,
         )
-        external_o2_bled_mol = (
-            min(
-                bled_o2_mol,
-                bled_o2_mol * external_o2_holdup_mol / overhead_o2_mol,
-            )
-            if bled_o2_mol > 0.0 and overhead_o2_mol > 0.0
-            else 0.0
+        integrated_external = controls.get('sweep_external_o2_outflow_mol')
+        if 'sweep_outflow_species_mol' in controls:
+            if external_o2_holdup_mol > 0.0 and integrated_external is None:
+                return IntentResult(intent=ChemistryIntent.OVERHEAD_BLEED, status='unsupported',
+                                    diagnostic={'reason': 'missing_input: source-separated external O2 sweep outlet'})
+            if integrated_external is not None and (
+                integrated_external > bled_o2_mol or integrated_external > external_o2_holdup_mol
+                or bled_o2_mol - integrated_external > overhead_o2_mol - external_o2_holdup_mol
+                + 1e-12 * max(1.0, overhead_o2_mol)
+            ):
+                return IntentResult(intent=ChemistryIntent.OVERHEAD_BLEED, status='unsupported',
+                                    diagnostic={'reason': 'source-separated sweep outlet exceeds available O2 class'})
+        from simulator.capacity_coupling import external_oxygen_outlet_mol
+
+        external_o2_bled_mol = external_oxygen_outlet_mol(
+            bled_o2_mol=bled_o2_mol, overhead_o2_mol=overhead_o2_mol,
+            external_o2_holdup_mol=external_o2_holdup_mol,
+            integrated_external_o2_mol=integrated_external,
         )
         melt_o2_bled_mol = max(0.0, bled_o2_mol - external_o2_bled_mol)
         capacity = controls.get("cold_train_capacity")
@@ -318,6 +362,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                     bled_o2_mol=bled_o2_mol,
                     overhead_o2_mol=overhead_o2_mol,
                     external_o2_holdup_mol=external_o2_holdup_mol,
+                    integrated_external_o2_mol=integrated_external,
                     capacity=capacity,
                     dt_hr=float(controls.get("dt_hr", 1.0)),
                     p_o2_Pa=float(controls.get("p_ref_Pa", 0.0)),
@@ -385,7 +430,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         if offgas:
             credits[TERMINAL_OFFGAS_ACCOUNT] = offgas
 
-        if not debited_mol:
+        if not debited_mol and not inlet_mol:
             return IntentResult(
                 intent=ChemistryIntent.OVERHEAD_BLEED,
                 status="ok",
@@ -397,7 +442,18 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                     "o2_held_mol": o2_held_mol,
                 },
             )
-        debits = {PROCESS_OVERHEAD_GAS_ACCOUNT: debited_mol}
+        # Only this transition admits delivered carrier into the chamber and
+        # removes integrated outlet. Net each species against the inlet so a
+        # tick may discharge more than the old chamber stock without overdraft.
+        chamber_debits = {s: n - inlet_mol.get(s, 0.0)
+                          for s, n in debited_mol.items() if n > inlet_mol.get(s, 0.0)}
+        chamber_credits = {s: n - debited_mol.get(s, 0.0)
+                           for s, n in inlet_mol.items() if n > debited_mol.get(s, 0.0)}
+        debits = {PROCESS_OVERHEAD_GAS_ACCOUNT: chamber_debits} if chamber_debits else {}
+        if inlet_mol:
+            debits['reservoir.reagent.sweep_gas'] = inlet_mol
+        if chamber_credits:
+            credits[PROCESS_OVERHEAD_GAS_ACCOUNT] = chamber_credits
         atom_proof = build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula
         )
@@ -522,6 +578,21 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
 
     @staticmethod
     def _invalid_destructive_control(controls: dict) -> str | None:
+        if 'sweep_external_o2_outflow_mol' in controls:
+            value = controls['sweep_external_o2_outflow_mol']
+            if ('sweep_outflow_species_mol' not in controls or not is_declared_real_scalar(value)
+                    or not math.isfinite(float(value)) or float(value) < 0.0):
+                return 'sweep_external_o2_outflow_mol requires an integrated sweep and finite non-negative mol'
+        if 'sweep_outflow_species_mol' in controls:
+            vector = controls['sweep_outflow_species_mol']
+            if not isinstance(vector, Mapping) or any(
+                not isinstance(s, str) or isinstance(n, bool) or not isinstance(n, (int, float))
+                or not math.isfinite(n) or n < 0.0 for s, n in vector.items()
+            ):
+                return 'sweep_outflow_species_mol must contain finite non-negative mol per species per step'
+            for name in ('headspace_volume_m3', 'headspace_temperature_K'):
+                if not is_declared_real_scalar(controls.get(name)) or not math.isfinite(float(controls[name])) or float(controls[name]) <= 0.0:
+                    return f'{name} must be positive and finite for integrated sweep transport'
         for legacy_name in ("o2_vented_kg", "max_o2_flow_kg_hr"):
             if legacy_name in controls:
                 return f"{legacy_name} is retired; OVERHEAD_BLEED owns partitioning"

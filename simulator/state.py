@@ -510,6 +510,7 @@ class MeltState:
     atmosphere: Atmosphere = Atmosphere.HARD_VACUUM
     pO2_mbar: float = 0.0          # Controlled oxygen partial pressure
     p_total_mbar: float = 0.0      # Total pressure above melt
+    sweep_mol_per_s: float | None = None  # Derived mol/s = campaign intensity * designer melt area; None is undeclared.
     fO2_log: float = -9.0          # log₁₀(fO₂/bar) for MELTS calc
     # SSO-R intrinsic melt redox state, log10(fO2/bar); seeded from the
     # legacy intrinsic estimate, then advanced by the oxygen reservoir.

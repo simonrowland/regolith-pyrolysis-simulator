@@ -1,4 +1,7 @@
-"""Diagnostic sub-ambient pumping-cost sidecar for pressure-lever economics.
+"""Process-pressure admission and sub-ambient compression work.
+
+Runtime and optimizer share the resolved run environment and throughput owner.
+Chamber load includes captured gas; compression billing uses actual pump outflow.
 
 Purpose (KNOB-COST-PRESSURE, #52): report first-order compression energy and a
 fail-closed holding-pressure diagnostic when a recipe asks to hold an overhead
@@ -51,90 +54,6 @@ MARS_DATUM_AMBIENT_PA = MARS_DATUM_PRESSURE_BAR * _PA_PER_BAR
 MARS_OLYMPUS_SUMMIT_AMBIENT_PA = MARS_OLYMPUS_PRESSURE_BAR * _PA_PER_BAR
 MOON_AMBIENT_PA = MOON_VACUUM_FLOOR_BAR * _PA_PER_BAR
 ASTEROID_AMBIENT_PA = ASTEROID_VACUUM_FLOOR_BAR * _PA_PER_BAR
-
-_PUMPING_BODY_BY_FEEDSTOCK = {
-    # Lunar feedstocks and simulants.
-    **{
-        feedstock_id: "moon"
-        for feedstock_id in (
-            "lunar_mare_low_ti",
-            "lunar_mare_high_ti",
-            "lunar_highland",
-            "lunar_pkt_kreep_average",
-            "lunar_spa_kreep_influenced",
-            "targeted_super_kreep_ore",
-            "lunar_highlands_lhs1",
-            # Yu et al. 2025 Table 1 identifies this reproduction-only LHS-1
-            # feed as a lunar simulant, so the lunar ambient remains grounded.
-            "lunar_highlands_lhs1_yu_2025_reference",
-            "lunar_mare_lms1",
-            "lunar_mare_oprl2n",
-            "lunar_highlands_nuw_lht_5m",
-            "lunar_mare_jsc_1a_legacy",
-            "lunar_eac_1a",
-            "lunar_mls_1a",
-            "lunar_highlands_nu_lht_2m",
-        )
-    },
-    # Airless/deep-space small-body feedstocks.
-    **{
-        feedstock_id: "asteroid"
-        for feedstock_id in (
-            "s_type_asteroid_silicate",
-            "m_type_metallic_phase",
-            "m_type_silicate_phase",
-            "v_type_vesta_hed",
-            "e_type_enstatite_aubrite",
-            "ci_carbonaceous_chondrite",
-            "cm_carbonaceous_chondrite",
-            "ceres_regolith",
-            "comet_nucleus",
-        )
-    },
-    **{
-        feedstock_id: "mars"
-        for feedstock_id in (
-            "mars_global_mgs1",
-            "mars_basalt",
-            "mars_sulfate_rich",
-            "mars_phyllosilicate_clay",
-            "mars_perchlorate_rich",
-        )
-    },
-}
-
-_PUMPING_AMBIENT_PA_BY_BODY = {
-    "moon": MOON_AMBIENT_PA,
-    "asteroid": ASTEROID_AMBIENT_PA,
-    "mars": MARS_DATUM_AMBIENT_PA,
-}
-
-
-def pumping_environment_for_feedstock(feedstock_id: object) -> dict[str, Any]:
-    """Return the pumping-only body/ambient map for a configured feedstock."""
-
-    key = str(feedstock_id or "").strip()
-    body = _PUMPING_BODY_BY_FEEDSTOCK.get(key, "")
-    if not body:
-        return {
-            "schema_version": "pumping-feedstock-environment-v1",
-            "status": "refused",
-            "reason": "unsupported-feedstock",
-            "feedstock_id": key,
-            "body": "",
-            "ambient_pressure_pa": math.nan,
-        }
-    return {
-        "schema_version": "pumping-feedstock-environment-v1",
-        "status": "ok",
-        "feedstock_id": key,
-        "body": body,
-        "ambient_pressure_pa": _PUMPING_AMBIENT_PA_BY_BODY[body],
-        "ambient_pressure_source": (
-            f"pumping-feedstock-map-v1:{key}->{body}"
-        ),
-    }
-
 
 @dataclass(frozen=True)
 class PumpingCostParameter:
@@ -413,6 +332,9 @@ def estimate_subambient_pump_cost(
     # r and N stages, r_s=r**(1/N), and w=N*w_s/eta_s. As N -> infinity,
     # N*(r**((gamma-1)/(gamma*N))-1) -> ((gamma-1)/gamma)*ln(r),
     # recovering the isothermal lower bound R*T*ln(r).
+    # Equivalently integrate dW/n=RT dP/P: W/n=RT ln(P_amb/P)/eta,
+    # eta=eta_s*eta_md. RT is J/mol; log and eta are dimensionless.
+    # At ambient work is zero; at finite flow it diverges as P -> 0.
     # MOTOR/DRIVE PREMISE: DOE AMO's 2014 motor-and-drive sourcebook Table B-1
     # lists 95.4% for a 100 hp, 1800 rpm NEMA Premium motor; its adjustable-speed
     # drive table gives at least 95% at full load. Conservatively round the
@@ -482,8 +404,8 @@ def estimate_subambient_pump_cost(
         # Pump and line conductance are in series at the chamber:
         # 1/S_eff = 1/S_pump + 1/C_line. The supplied C_line is required to
         # have already passed the applicable Knudsen-regime correlation.
-        effective_speed_ceiling_m3_s = 1.0 / (
-            1.0 / speed_ceiling + 1.0 / line_conductance_m3_s
+        effective_speed_ceiling_m3_s = _effective_pump_speed_m3_s(
+            speed_ceiling, line_conductance_m3_s,
         )
         feasible = (
             math.isfinite(required_speed_m3_s)
@@ -496,7 +418,10 @@ def estimate_subambient_pump_cost(
         ambient_pressure_pa=ambient_pressure_pa,
         offgas_mol_per_s=offgas_mol_per_s,
         gas_temperature_K=gas_temperature_K,
-        max_pump_speed_m3_s=speed_ceiling,
+        max_pump_speed_m3_s=(
+            effective_speed_ceiling_m3_s
+            if math.isfinite(effective_speed_ceiling_m3_s) else speed_ceiling
+        ),
         max_stage_pressure_ratio=stage_ratio_ceiling,
     )
     return SubambientPumpCost(
@@ -516,6 +441,78 @@ def estimate_subambient_pump_cost(
     )
 
 
+def process_pressure_state(
+    *, requested_pressure_pa: float, ambient_pressure_pa: float,
+    chamber_mol_per_s: float, chamber_temperature_K: float,
+    pumping: Mapping[str, Any], transport_pressure_pa: float = 0.0,
+) -> dict[str, Any]:
+    """Admit a process request against chamber throughput, before capture.
+
+    Work and speed use the existing staged-compressor owner. Gas in the hot
+    chamber sets throughput; its independently declared cooled inlet sets work.
+    """
+    # The canonical EOS/report boundary returns bar -> mbar -> Pa after
+    # PV/RT startup. Binary64 round trips can add a few ulps (1500 Pa
+    # becomes 1500.0000000000005 Pa). Admit only this relative 4*eps
+    # band; preserve raw achieved pressure and the strict pump-speed limit.
+    transport_admitted = transport_pressure_pa <= requested_pressure_pa or math.isclose(
+        transport_pressure_pa, requested_pressure_pa, rel_tol=4 * math.ulp(1.0), abs_tol=0.0,
+    )
+    diagnostic = {
+        "requested_pressure_pa": requested_pressure_pa,
+        "achieved_pressure_pa": requested_pressure_pa,
+        "chamber_mol_per_s": chamber_mol_per_s,
+        "chamber_temperature_K": chamber_temperature_K,
+        "status": "ok" if transport_admitted else "infeasible",
+    }
+    diagnostic['achieved_pressure_pa'] = max(requested_pressure_pa, transport_pressure_pa)
+    if diagnostic['status'] != 'ok':
+        diagnostic['reason'] = 'finite_inventory_or_pipe_pressure_exceeds_request'
+    if requested_pressure_pa >= ambient_pressure_pa:
+        return diagnostic
+    for field in ("inlet_temperature_K", "max_pump_speed_m3_s",
+                  "validated_line_conductance_m3_s"):
+        value = pumping.get(field)
+        if value is None:
+            return {**diagnostic, "status": "missing_input",
+                    "reason": f"overhead_headspace.pumping.{field}",
+                    "achieved_pressure_pa": None}
+        if isinstance(value, bool) or not math.isfinite(_float_or_nan(value)) or float(value) <= 0:
+            return {**diagnostic, "status": "invalid_input",
+                    "reason": f"overhead_headspace.pumping.{field}",
+                    "achieved_pressure_pa": None}
+    result = estimate_subambient_pump_cost(
+        requested_pressure_pa, chamber_mol_per_s, 3600.0,
+        ambient_pressure_pa=ambient_pressure_pa,
+        gas_temperature_K=chamber_temperature_K,
+        max_pump_speed_m3_s=pumping["max_pump_speed_m3_s"],
+        validated_line_conductance_m3_s=pumping["validated_line_conductance_m3_s"],
+    )
+    # Q=n_dot RT [Pa m3/s], P_min=Q/S_eff [Pa]. The helper's series
+    # speed already includes 1/S_eff=1/S_pump+1/C_line. S->infinity
+    # recovers an unbounded sink; n_dot=0 recovers zero load pressure.
+    minimum_pa = _characterised_speed_floor_pa(
+        offgas_mol_per_s=chamber_mol_per_s,
+        gas_temperature_K=chamber_temperature_K,
+        max_pump_speed_m3_s=_effective_pump_speed_m3_s(
+            float(pumping['max_pump_speed_m3_s']),
+            float(pumping['validated_line_conductance_m3_s']),
+        ),
+    ) if chamber_mol_per_s > 0.0 else 0.0
+    diagnostic.update({
+        "achieved_pressure_pa": max(requested_pressure_pa, minimum_pa, transport_pressure_pa),
+        "required_pump_speed_m3_s": result.required_pump_speed_m3_s,
+        "effective_speed_ceiling_m3_s": _effective_pump_speed_m3_s(
+            float(pumping['max_pump_speed_m3_s']),
+            float(pumping['validated_line_conductance_m3_s']),
+        ),
+        "status": "ok" if result.feasible and transport_admitted else "infeasible",
+        "reason": result.status if transport_admitted else "finite_inventory_or_pipe_pressure_exceeds_request",
+        "transient_feasibility": "unresolved_hourly_average_load",
+    })
+    return diagnostic
+
+
 def pumping_context_from_sim(
     sim: Any,
     snapshots: Any,
@@ -529,131 +526,60 @@ def pumping_context_from_sim(
         if feedstock_id_override is not None
         else getattr(record, "feedstock_key", "") or ""
     )
-    mapped_environment = (
-        pumping_environment_for_feedstock(feedstock_id)
-        if feedstock_id
-        else None
-    )
-    if mapped_environment is not None:
-        if mapped_environment["status"] != "ok":
-            return _pumping_context_refusal(
-                str(mapped_environment["reason"]),
-                feedstock_id=feedstock_id,
-            )
-        body = str(mapped_environment["body"])
-        ambient_pressure_pa = float(mapped_environment["ambient_pressure_pa"])
-        ambient_pressure_source = str(
-            mapped_environment["ambient_pressure_source"]
-        )
-    else:
-        body = normalize_body_name(getattr(melt, "body", ""))
-        ambient_pressure_mbar = _float_or_nan(
+    body = normalize_body_name(getattr(melt, "body", ""))
+    ambient_pressure_pa = _ambient_pressure_pa(
+        ambient_pressure_mbar=_float_or_nan(
             getattr(melt, "ambient_pressure_mbar", math.nan)
-        )
-        ambient_pressure_pa = _ambient_pressure_pa(
-            ambient_pressure_mbar=ambient_pressure_mbar,
-        )
-        ambient_pressure_source = "melt.ambient_pressure_mbar"
-    if not math.isfinite(ambient_pressure_pa) or ambient_pressure_pa <= 0.0:
+        ),
+    )
+    ambient_pressure_source = "melt.ambient_pressure_mbar"
+    if not math.isfinite(ambient_pressure_pa) or ambient_pressure_pa < 0.0:
         return _pumping_context_refusal(
-            "missing-ambient-pressure",
-            body=body,
-            feedstock_id=feedstock_id,
+            "missing-ambient-pressure", body=body, feedstock_id=feedstock_id,
         )
-    if body and body not in {"mars", "moon", "asteroid"}:
-        return _pumping_context_refusal("unsupported-body", body=body)
+    refusal = getattr(sim, '_process_pressure_diagnostic', {}) or {}
+    if refusal.get('status') not in (None, 'ok'):
+        return _pumping_context_refusal(
+            str(refusal.get('reason') or refusal['status']),
+            body=body, feedstock_id=feedstock_id,
+            ambient_pressure_pa=ambient_pressure_pa,
+            ambient_pressure_source=ambient_pressure_source,
+        )
     rows: list[dict[str, Any]] = []
     try:
         iterable = tuple(snapshots or ())
     except TypeError:
         iterable = ()
     for snapshot in iterable:
-        # The two O2 source fields follow different ledger paths. Melt/offgas
-        # O2 enters process.overhead_gas, then its turbine-compressed fraction
-        # is already booked as EnergyRecord.turbine_kWh. MRE-anode O2 is instead
-        # credited directly to terminal.oxygen_mre_anode_stored; it never
-        # traverses this chamber-overhead pump. Adding either stream here would
-        # charge the wrong device. Only the melt/offgas fraction that bypassed
-        # the turbine and was vented still needs target->Mars-ambient pumping,
-        # so this sidecar uses O2_vented_mol_hr alone.
-        overhead = getattr(snapshot, "overhead", None)
-        # ★ AN ABSENT FIELD IS NOT A ZERO FLOW. This read used to default to
-        # 0.0, so a carrier WITHOUT the field was indistinguishable from one
-        # reporting a genuine zero: both skipped the row silently and the
-        # recipe's pumping load was understated on a number the optimizer ranks
-        # by. Meanwhile an explicit NaN or a negative value refused -- the
-        # function was careful about a bad VALUE and careless about a missing
-        # FIELD.
-        #
-        # Refusing on absence cannot fire on correct work, which is why it is
-        # safe to make it a refusal rather than a warning: HourSnapshot declares
-        # `O2_vented_mol_hr: float = 0.0` (simulator/state.py:931,1101), a typed
-        # float with a default that production never sets to None. A real
-        # snapshot always carries it, so an absent attribute means the object is
-        # not a snapshot at all -- a missing input, which refuses, and is
-        # reported distinctly from an invalid one.
-        raw_uncompressed_o2 = getattr(snapshot, "O2_vented_mol_hr", None)
-        if raw_uncompressed_o2 is None:
+        pressure = (getattr(snapshot, "oxygen_reservoir", {}) or {}).get("process_pressure")
+        if pressure is None:
+            if ambient_pressure_pa == 0.0:
+                continue
             return _pumping_context_refusal(
-                "missing-o2-vented-flow",
-                body=body,
-                feedstock_id=feedstock_id,
+                "missing-process-pressure", body=body, feedstock_id=feedstock_id,
                 ambient_pressure_pa=ambient_pressure_pa,
                 ambient_pressure_source=ambient_pressure_source,
             )
-        uncompressed_o2_mol_hr = _float_or_nan(raw_uncompressed_o2)
-        if (
-            not math.isfinite(uncompressed_o2_mol_hr)
-            or uncompressed_o2_mol_hr < 0.0
-        ):
-            return _pumping_context_refusal(
-                "invalid-o2-vented-flow",
-                body=body,
-                feedstock_id=feedstock_id,
-                hour=int(getattr(snapshot, "hour", len(rows))),
-                ambient_pressure_pa=ambient_pressure_pa,
-                ambient_pressure_source=ambient_pressure_source,
-            )
-        if uncompressed_o2_mol_hr == 0.0:
+        if pressure["requested_pressure_pa"] >= ambient_pressure_pa:
             continue
-        pressure_mbar = _float_or_nan(getattr(overhead, "pressure_mbar", math.nan))
-        if not math.isfinite(pressure_mbar) or pressure_mbar <= 0.0:
+        if pressure.get("status") != "ok":
             return _pumping_context_refusal(
-                "missing-target-pressure",
-                body=body,
-                feedstock_id=feedstock_id,
-                hour=int(getattr(snapshot, "hour", len(rows))),
+                str(pressure.get("reason", "unresolved-process-pressure")),
+                body=body, feedstock_id=feedstock_id,
                 ambient_pressure_pa=ambient_pressure_pa,
                 ambient_pressure_source=ambient_pressure_source,
             )
-        target_pressure_pa = pressure_mbar * _PA_PER_MBAR
-        gas_temperature_K = _float_or_nan(
-            getattr(overhead, "headspace_temperature_K", math.nan)
-        )
-        if not math.isfinite(gas_temperature_K) or gas_temperature_K <= 0.0:
-            temperature_C = _float_or_nan(getattr(snapshot, "temperature_C", math.nan))
-            gas_temperature_K = temperature_C + 273.15
-        offgas_mol_per_s = uncompressed_o2_mol_hr / _SECONDS_PER_HOUR
-        row = {
+        rows.append({**pressure["pumping"],
             "hour": int(getattr(snapshot, "hour", len(rows))),
-            "target_pressure_pa": target_pressure_pa,
-            "offgas_mol_per_s": offgas_mol_per_s,
-            "duration_s": _SECONDS_PER_HOUR,
-            "gas_temperature_K": gas_temperature_K,
-        }
-        validated_line_conductance = getattr(
-            overhead,
-            "validated_line_conductance_m3_s",
-            None,
-        )
-        if validated_line_conductance is not None:
-            row["validated_line_conductance_m3_s"] = validated_line_conductance
-        # The live pipe_conductance_kg_hr field is a mass-throughput cap, not a
-        # regime-validated volumetric line conductance, so it is deliberately
-        # not converted here. Without the explicit certified field above, Mars
-        # sub-ambient rows remain unresolved and refuse under the conductance
-        # fence instead of claiming false feasibility.
-        rows.append(row)
+            "target_pressure_pa": pressure["achieved_pressure_pa"],
+            "offgas_mol_per_s": pressure["device_mol_per_s"],
+            "duration_s": float(getattr(snapshot, "duration_h", 1.0)) * _SECONDS_PER_HOUR,
+            "gas_temperature_K": pressure["pumping"]["inlet_temperature_K"],
+            "chamber_mol_per_s": pressure["chamber_mol_per_s"],
+            "chamber_temperature_K": pressure["chamber_temperature_K"],
+            "transient_feasibility": pressure.get("transient_feasibility"),
+        })
+
     return {
         "schema_version": "pumping-context-v1",
         "status": "ok",
@@ -662,7 +588,7 @@ def pumping_context_from_sim(
         "ambient_pressure_pa": ambient_pressure_pa,
         "ambient_pressure_source": ambient_pressure_source,
         "energy_accounting_policy": (
-            "uncompressed_o2_only; turbine-compressed_o2_is_already_charged"
+            "actual_pump_stream; turbine-compressed_o2_is_already_charged"
         ),
         "rows": tuple(rows),
     }
@@ -904,3 +830,9 @@ def _exp_or_inf(log_value: float) -> float:
         return math.exp(log_value)
     except OverflowError:
         return math.inf
+
+
+def _effective_pump_speed_m3_s(pump_speed: float, line_conductance: float) -> float:
+    # Series transport resistances: 1/S_eff=1/S_pump+1/C_line.
+    # All speeds are m3/s; C->infinity recovers S_pump.
+    return 1.0 / (1.0 / pump_speed + 1.0 / line_conductance)

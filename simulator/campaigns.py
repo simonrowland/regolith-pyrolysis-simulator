@@ -113,9 +113,11 @@ class CampaignPressureSetpointRefusal(ValueError):
     """Typed refusal for physically invalid campaign pressure inputs."""
 
     reason = C2A_STAGED_PN2_BAND_REFUSAL_REASON
+    terminal_refusal = True
 
     def __init__(self, diagnostic: Mapping[str, object]):
         self.diagnostic = dict(diagnostic)
+        self.reason = str(self.diagnostic.get('reason') or self.reason)
         detail = self.diagnostic.get('detail')
         super().__init__(
             f'{self.reason}: {detail}' if detail else self.reason
@@ -361,6 +363,7 @@ class CampaignManager:
         'runtime_override',
     })
     _COMMON_OVERRIDE_FIELDS = frozenset({
+        'sweep_mol_per_m2_s',
         'condenser_geometry',
         'duration_h',
         'freeze_gate',
@@ -1331,11 +1334,73 @@ class CampaignManager:
             diagnostic['max_hold_adjustment'] = dict(adjustment)
         return atmosphere, diagnostic
 
+    def _campaign_carrier(self, campaign: CampaignPhase, melt: MeltState) -> str:
+        cfg = self._campaign_config(campaign)
+        default_carrier = 'Kr' if campaign == CampaignPhase.C6 else 'pN2'
+        raw_carrier = str(cfg.get('carrier_gas', default_carrier) or default_carrier)
+        try:
+            carrier = _canonical_carrier_gas_key(raw_carrier)
+        except ValueError as exc:
+            if campaign == CampaignPhase.C6:
+                raise MalformedRecipeError(
+                    'd-203/d-210: C6 carrier must be Kr or Ar') from exc
+            raise
+        if campaign == CampaignPhase.C6:
+            if carrier not in {'Kr', 'Ar'}:
+                raise MalformedRecipeError(
+                    'd-203/d-210: C6 carrier must be Kr or Ar; '
+                    f'got {carrier!r}')
+            return carrier
+        # The shipped pN2 declaration is the cross-body legacy default.
+        # Mars uses Ar; an explicit CO2 campaign declaration wins.
+        return 'Ar' if melt.body == 'mars' and carrier == 'N2' else carrier
+
+    def _campaign_sweep_flow(self, campaign: CampaignPhase, stage=None) -> float | None:
+        raw = self._campaign_overrides(campaign).get(
+            'sweep_mol_per_m2_s', (stage or {}).get(
+                'sweep_mol_per_m2_s', self._campaign_config(campaign).get('sweep_mol_per_m2_s'),
+            ),
+        )
+        return self._validated_sweep_flow(raw)
+
+    @staticmethod
+    def _validated_sweep_flow(raw) -> float | None:
+        if raw is None:
+            return None
+        if not is_declared_real_scalar(raw, allow_numeric_str=True):
+            raise ValueError('sweep_mol_per_m2_s must be numeric')
+        value = float(raw)
+        if not math.isfinite(value) or value < 0.0:
+            raise ValueError('sweep_mol_per_m2_s must be finite and non-negative')
+        return value
+
+    def apply_sweep_flow_control(self, melt: MeltState, campaign: CampaignPhase | None = None) -> Mapping | None:
+        active = campaign if campaign is not None else melt.campaign
+        stage = None
+        if active == CampaignPhase.C2A_STAGED:
+            stages = self._campaign_config(active).get('stages')
+            if isinstance(stages, list) and stages:
+                stage = self._c2a_staged_active_stage(melt.campaign_hour)
+                if not isinstance(stage, Mapping):
+                    raise ValueError('C2A_staged.stages did not select a stage')
+        flow_per_area = self._campaign_sweep_flow(active, stage)
+        atmosphere = self._c2a_staged_stage_gas_control(stage)[0] if stage is not None else melt.atmosphere
+        if flow_per_area is None and melt.body == 'mars' and atmosphere in {
+                Atmosphere.PN2_SWEEP, Atmosphere.ARGON_FLOW}:
+            flow_per_area = self._validated_sweep_flow(
+                self.setpoints.get('overhead_headspace', {}).get('sweep_mol_per_m2_s_default'))
+        # q = q_A A_melt: (mol m^-2 s^-1) m^2 = mol/s. The designer
+        # owns A_melt (~charge mass^(2/3)); zero intensity gives zero flow.
+        melt.sweep_mol_per_s = (None if flow_per_area is None else
+                                flow_per_area * melt.melt_surface_area_m2)
+        return stage
+
     def apply_c2a_staged_gas_controls(
             self,
             melt: MeltState,
             campaign: CampaignPhase | None = None) -> None:
         active_campaign = campaign if campaign is not None else melt.campaign
+        stage = self.apply_sweep_flow_control(melt, active_campaign)
         if active_campaign != CampaignPhase.C2A_STAGED:
             self.last_c2a_staged_gas_control = None
             return
@@ -1343,14 +1408,9 @@ class CampaignManager:
         # (e.g. composition-only runs). There is no per-stage gas cover to
         # apply, so no-op and preserve the pre-schedule default gas cover
         # rather than raising during configure_campaign.
-        cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
-        stages = cfg.get('stages') if isinstance(cfg, Mapping) else None
-        if not isinstance(stages, list) or not stages:
+        if stage is None:
             self.last_c2a_staged_gas_control = None
             return
-        stage = self._c2a_staged_active_stage(melt.campaign_hour)
-        if not isinstance(stage, Mapping):
-            raise ValueError('C2A_staged.stages did not select a stage')
         atmosphere, diagnostic = self._c2a_staged_stage_gas_control(stage)
         self._validate_campaign_total_pressure(
             melt, active_campaign, float(diagnostic['p_total_mbar']),
@@ -1361,16 +1421,7 @@ class CampaignManager:
         melt.p_total_mbar = float(diagnostic['p_total_mbar'])
         pN2_mbar = float(diagnostic['pN2_mbar'])
         if pN2_mbar > 0.0:
-            # Kr audit 2026-07-25: hard-coded 'N2' here silently overwrote a
-            # configured campaigns.C2A_staged.carrier_gas (e.g. pKr) every
-            # hour — accepted at the input gate, discarded downstream. Stamp
-            # the CONFIGURED carrier, canonically resolved (raises on an
-            # unknown carrier, so a typo fails loudly instead of running
-            # mislabelled). Default remains pN2 -> 'N2' (golden-neutral).
-            melt.background_gas_species = _canonical_carrier_gas_key(
-                str(cfg.get('carrier_gas', 'pN2') or 'pN2')
-                if isinstance(cfg, Mapping) else 'pN2'
-            )
+            melt.background_gas_species = self._campaign_carrier(active_campaign, melt)
             melt.background_gas_mole_fraction = 1.0
         else:
             melt.background_gas_species = ''
@@ -1560,25 +1611,7 @@ class CampaignManager:
                 raise MalformedRecipeError(
                     'd-203: C6.atmosphere must be recirculating_inert_sweep')
             melt.atmosphere = Atmosphere.PN2_SWEEP
-            # Kr audit 2026-07-25: overhead's sweep branch keys the buffer
-            # partial off melt.background_gas_species; continuous mode left
-            # it empty and overhead hard-wrote a phantom 'N2' partial even
-            # for a Kr carrier (double-counted buffer). Stamp the configured
-            # carrier; the condensation resolver reads the same config, so
-            # its answer is unchanged (golden-neutral for the pN2 default).
-            default_carrier = 'Kr' if campaign == CampaignPhase.C6 else 'pN2'
-            carrier = str(cfg.get('carrier_gas', default_carrier) or default_carrier)
-            if campaign == CampaignPhase.C6:
-                try:
-                    carrier = _canonical_carrier_gas_key(carrier)
-                except ValueError as exc:
-                    raise MalformedRecipeError(
-                        'd-203/d-210: C6 carrier must be Kr or Ar') from exc
-                if carrier not in {'Kr', 'Ar'}:
-                    raise MalformedRecipeError(
-                        'd-203/d-210: C6 carrier must be Kr or Ar; '
-                        f'got {carrier!r}')
-            melt.background_gas_species = _canonical_carrier_gas_key(carrier)
+            melt.background_gas_species = self._campaign_carrier(campaign, melt)
             melt.pO2_mbar = self._pressure_config_float(
                 cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
             melt.p_total_mbar = self._pressure_config_float(
@@ -1634,6 +1667,11 @@ class CampaignManager:
 
         # Apply runtime overrides (pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
+        if melt.body == 'mars' and campaign not in {
+            CampaignPhase.C0, CampaignPhase.C0B,
+            CampaignPhase.C5, CampaignPhase.MRE_BASELINE,
+        }:
+            melt.background_gas_species = self._campaign_carrier(campaign, melt)
         if 'pO2_mbar' in ovr:
             # An O2 override can raise total pressure below; it must not conceal
             # an invalid configured total. Staged gas controls resolve their own

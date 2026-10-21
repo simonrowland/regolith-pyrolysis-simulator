@@ -2479,6 +2479,7 @@ mars_global_mgs1:
     report_placement: "measurement_sidecar"
     text: "MGS-1 is a Mars simulant, not real Mars regolith; nanophase Fe oxides, hydrated phases, perchlorates, and sulfate/halide salts require explicit sidecar data."
   environment:
+    body: mars
     surface_pressure_mbar: 6
     atmosphere: "96% CO2"
     constraint: "Mars material is not processed as hard-vacuum regolith"
@@ -2572,6 +2573,7 @@ mars_basalt:
       source: "Leshin L.A. et al. 2013, Science 341, DOI 10.1126/science.1238937 (Rocknest fines, MSL SAM EGA)."
       basis: "Adsorbed/bound H2O in global-dust-derived fines. INVENTORY-ONLY (FB-33, adopted 2026-07-07, t-052): NOT in composition_wt_pct -- adding it changes mass balance and is the golden-affecting kernel-wiring step."
   environment:
+    body: mars
     surface_pressure_mbar: 6    # range 0.7 (Olympus Mons) to 11 (Hellas)
     atmosphere: "96% CO2"
     constraint: "no deep vacuum possible"
@@ -2669,6 +2671,7 @@ mars_sulfate_rich:
       source: "Leshin L.A. et al. 2013, Science 341, DOI 10.1126/science.1238937 (Rocknest fines, MSL SAM EGA)."
       basis: "Adsorbed/bound H2O; sulfate hydration water may add above the fines baseline. INVENTORY-ONLY (FB-33, adopted 2026-07-07, t-052): NOT in composition_wt_pct pending kernel wiring."
   environment:
+    body: mars
     surface_pressure_mbar: 6
     atmosphere: "96% CO2"
   potential_products:
@@ -2740,6 +2743,7 @@ mars_phyllosilicate_clay:
       source: "REF-029 Ehlmann B.L. et al. 2008, Science 322:1828, DOI 10.1126/science.1164759; Morris R.V. et al. 2010, Science 328:421, DOI 10.1126/science.1189667; Bandfield J.L. et al. 2003, Science 301:1084."
       basis: "Clay/regional altered regolith uses the 3-15 wt% modeling interval; Comanche/Nili 16-34 wt% remains an explicit outcrop endmember."
   environment:
+    body: mars
     surface_pressure_mbar: 6.0
     atmosphere: "96% CO2"
   structural_water:
@@ -2817,6 +2821,7 @@ mars_perchlorate_rich:
       source: "Leshin L.A. et al. 2013, Science 341, DOI 10.1126/science.1238937 (Rocknest fines, MSL SAM EGA)."
       basis: "Adsorbed/bound H2O in fines. INVENTORY-ONLY (FB-33, adopted 2026-07-07, t-052): NOT in composition_wt_pct pending kernel wiring."
   environment:
+    body: mars
     surface_pressure_mbar: 6
     atmosphere: "96% CO2"
   potential_products:

@@ -133,7 +133,6 @@ from simulator.optimize.worker_runtime import get_worker_runtime
 from simulator.pumping_cost import (
     estimate_subambient_pump_cost,
     pumping_context_from_sim,
-    pumping_environment_for_feedstock,
 )
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
@@ -4276,6 +4275,7 @@ def _pumping_diagnostic_for_gate(
             mismatch = _pumping_diagnostic_environment_mismatch(
                 diagnostic,
                 feedstock_id=feedstock_id,
+                sim=sim,
             )
             if mismatch is not None:
                 return {
@@ -4314,8 +4314,9 @@ def _pumping_diagnostic_environment_mismatch(
     diagnostic: Mapping[str, Any],
     *,
     feedstock_id: str,
+    sim: Any,
 ) -> dict[str, Any] | None:
-    expected = pumping_environment_for_feedstock(feedstock_id)
+    expected = pumping_context_from_sim(sim, (), feedstock_id_override=feedstock_id)
     expected_body = str(expected.get("body", ""))
     expected_ambient = _finite_optional_float(expected.get("ambient_pressure_pa"))
     observed_feedstock = str(diagnostic.get("feedstock_id", ""))
@@ -4361,9 +4362,8 @@ def _pumping_diagnostic_is_certified_pass(
         diagnostic.get("pumping_electrical_kWh")
     )
     if (
-        body not in {"mars", "moon", "asteroid"}
-        or ambient_pressure_pa is None
-        or ambient_pressure_pa <= 0.0
+        ambient_pressure_pa is None
+        or ambient_pressure_pa < 0.0
         or not isinstance(raw_rows, (tuple, list))
         or diagnostic.get("feasible") is not True
         or observed_energy_kWh is None
@@ -4371,6 +4371,8 @@ def _pumping_diagnostic_is_certified_pass(
     ):
         return False
     if status == "no_rows":
+        # A resolved zero ambient proves vent-free operation independently of
+        # sample origin. Identity is checked against the live run above.
         return not raw_rows and observed_energy_kWh == 0.0
     if status != "ok" or not raw_rows:
         return False
@@ -4387,7 +4389,7 @@ def _pumping_diagnostic_is_certified_pass(
             target_pressure_pa is None
             or target_pressure_pa <= 0.0
             or offgas_mol_per_s is None
-            or offgas_mol_per_s <= 0.0
+            or offgas_mol_per_s < 0.0
             or duration_s is None
             or duration_s <= 0.0
             or gas_temperature_K is None
@@ -4401,8 +4403,11 @@ def _pumping_diagnostic_is_certified_pass(
             "duration_s": duration_s,
             "gas_temperature_K": gas_temperature_K,
         }
+        context_row.update({key: row[key] for key in (
+            "max_pump_speed_m3_s", "chamber_mol_per_s", "chamber_temperature_K", "transient_feasibility",
+        ) if key in row})
         line_conductance = _finite_optional_float(
-            row.get("line_conductance_m3_s")
+            row.get("validated_line_conductance_m3_s", row.get("line_conductance_m3_s"))
         )
         if target_pressure_pa < ambient_pressure_pa:
             if line_conductance is None or line_conductance <= 0.0:
@@ -4449,8 +4454,7 @@ def _pumping_pressure_proposal(diagnostic: Mapping[str, Any]) -> dict[str, Any]:
     rows = tuple(raw_rows) if isinstance(raw_rows, (tuple, list)) else ()
     if (
         ambient_pressure_pa is None
-        or ambient_pressure_pa <= 0.0
-        or body not in {"mars", "moon", "asteroid"}
+        or ambient_pressure_pa < 0.0
     ):
         explicitly_empty = (
             diagnostic.get("status") == "empty_feasible_set"
@@ -4511,7 +4515,7 @@ def _pumping_pressure_proposal(diagnostic: Mapping[str, Any]) -> dict[str, Any]:
             target_pressure_pa is None
             or target_pressure_pa <= 0.0
             or offgas_mol_per_s is None
-            or offgas_mol_per_s <= 0.0
+            or offgas_mol_per_s < 0.0
             or duration_s is None
             or duration_s <= 0.0
             or gas_temperature_K is None

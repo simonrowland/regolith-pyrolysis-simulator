@@ -23,6 +23,8 @@ from simulator.cost_energy import (
     unavailable_reason_of,
 )
 from simulator.pumping_cost import (
+    DEFAULT_MAX_PUMP_SPEED_M3_S,
+    process_pressure_state,
     EXTRAPOLATED_AUTHORITY,
     estimate_subambient_pump_cost,
     pumping_cost_parameters,
@@ -1302,12 +1304,38 @@ def run_pumping_input_cost(
             duration_s=_finite(raw_row.get("duration_s"), math.nan),
             ambient_pressure_pa=ambient_pressure_pa,
             gas_temperature_K=_finite(raw_row.get("gas_temperature_K"), math.nan),
+            max_pump_speed_m3_s=_finite(
+                raw_row.get("max_pump_speed_m3_s"),
+                DEFAULT_MAX_PUMP_SPEED_M3_S.value,
+            ),
             validated_line_conductance_m3_s=(
                 None
                 if line_conductance is None
                 else _finite(line_conductance, math.nan)
             ),
         )
+        if "chamber_mol_per_s" in raw_row:
+            from dataclasses import replace
+            admission = process_pressure_state(
+                requested_pressure_pa=_finite(raw_row.get("target_pressure_pa"), math.nan),
+                ambient_pressure_pa=ambient_pressure_pa,
+                chamber_mol_per_s=_finite(raw_row.get("chamber_mol_per_s"), math.nan),
+                chamber_temperature_K=_finite(raw_row.get("chamber_temperature_K"), math.nan),
+                pumping={
+                    "inlet_temperature_K": raw_row.get("gas_temperature_K"),
+                    "max_pump_speed_m3_s": raw_row.get("max_pump_speed_m3_s"),
+                    "validated_line_conductance_m3_s": line_conductance,
+                },
+            )
+            result = replace(
+                result, feasible=(
+                    None if admission['status'] == 'ok' and raw_row.get('transient_feasibility')
+                    else admission['status'] == 'ok'
+                ),
+                status=admission['status'],
+                required_pump_speed_m3_s=admission.get('required_pump_speed_m3_s', math.nan),
+                effective_speed_ceiling_m3_s=admission.get('effective_speed_ceiling_m3_s', math.nan),
+            )
         if result.energy_kWh is None:
             if unavailable_reason is None:
                 unavailable_reason = str(result.status or "unavailable-pumping-energy")
@@ -1321,6 +1349,10 @@ def run_pumping_input_cost(
         if result.notice:
             row_notices.append(result.notice)
         rows.append({
+            **{key: raw_row[key] for key in (
+                "max_pump_speed_m3_s", "validated_line_conductance_m3_s",
+                "chamber_mol_per_s", "chamber_temperature_K", "transient_feasibility",
+            ) if key in raw_row},
             "hour": int(_finite(raw_row.get("hour"), len(rows))),
             "target_pressure_pa": json_safe_number(
                 raw_row.get("target_pressure_pa"), reason=row_reason, units="Pa"

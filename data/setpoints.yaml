@@ -1739,6 +1739,16 @@ mre_stepped_voltage_holds:
 # 14. OVERHEAD FINITE HEADSPACE (migration toggle)
 # ============================================================================
 overhead_headspace:
+  # d-215 reference design: canonical_lunar_full_yield.yaml, lunar_mare_low_ti,
+  # 1000 kg, internal-analytical, 2026-10-20 source run at 1ce3c3277;
+  # peak hour 32 (C3_NA): evolved condensables + co-evolved O2 =
+  # 0.2930553684202749 mol/s. EquipmentDesigner.size_crucible(1000) gives
+  # A_ref = 0.41006003303200633 m^2. The declared carrier:vapour target is 10:1:
+  # q_A = 10 * n_dot_vapour,peak / A_ref = 7.146645486354949 mol/(m^2 s).
+  # Units: (mol/s)/m^2. q_A*A_ref recovers 10*n_dot_peak; q tends to
+  # zero with melt area. This design-point target is not a transient guarantee.
+  # Applied only to undeclared Mars inert sweeps; other bodies keep legacy flow.
+  sweep_mol_per_m2_s_default: 7.146645486354949
   # 0.5.3 Phase A1 (2026-05-28): default-on global flip. Per docs-private/
   # goal-finite-headspace-2026-05-21.md Q1 pinned decision  --  finite headspace
   # is DEFAULT-ON GLOBALLY; every campaign gets the backpressure-floor

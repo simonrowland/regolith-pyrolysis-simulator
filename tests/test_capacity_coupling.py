@@ -1917,3 +1917,15 @@ def test_overhead_model_leaves_provider_partition_mirrors_unset(
     assert gas.O2_vented_kg_hr == 0.0
     assert gas.turbine_flow_kg_hr == 0.0
     assert gas.melt_offgas_O2_mol_hr == pytest.approx(1.0 / M_O2)
+
+
+def test_legacy_external_oxygen_batch_partition_binary64_pin():
+    # Pre-R3 pin for the shared batch split, before consolidating its copies.
+    # This deliberately records the legacy uniform-batch approximation;
+    # continuous source attribution has a separate physical integral test.
+    result = partition_melt_oxygen(bled_o2_mol=1.4323323583816936,
+        overhead_o2_mol=2.0, external_o2_holdup_mol=1.0,
+        capacity=FiniteCapacity(1.0), dt_hr=1.0, p_o2_Pa=0.0,
+        k_relief_kg_hr_Pa=0.0, p_open_Pa=0.0, molar_mass_kg_mol=M_O2)
+    assert result.external_mol == 0.7161661791908468
+    assert result.admitted_mol == 0.7161661791908468

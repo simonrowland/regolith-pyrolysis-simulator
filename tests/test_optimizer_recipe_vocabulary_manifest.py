@@ -54,7 +54,6 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         "campaigns.vacuum_dissociation",
         "condensation_train.ballistic_condenser",
         "overhead_headspace.cover_gas",
-        "campaigns.C7",
         "campaigns.reducing_gas",
     )
     assert not any(
@@ -62,4 +61,9 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         for path in paths
         for prefix in forbidden_future_prefixes
     )
-    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [53, 59]
+    # The generic d-205/d-215 sweep actuator is the sole C7 control;
+    # the chemistry-specific C7 recipe surface remains unexposed.
+    assert {path for path in paths if path.startswith("campaigns.C7.")} == {
+        "campaigns.C7.sweep_mol_per_m2_s",
+    }
+    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [59, 65]
