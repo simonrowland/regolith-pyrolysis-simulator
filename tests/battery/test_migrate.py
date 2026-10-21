@@ -2390,10 +2390,8 @@ def test_merge_located_mapping_order_is_hash_seed_stable() -> None:
 
 
 def test_lineage_parents_from_source_never_invents_pointer() -> None:
-    """b-549 / b-979: a printed string is kept verbatim as a parent. It must
-    not gain a source prefix — that id was never written. The prose return
-    names that same string so a caller who cannot store the derivation can
-    still retain it.
+    """b-549 / b-979: a printed string is prose, not a parent. Prefixing it
+    would mint an id the source did not write, and storing it would dangle.
     """
 
     printed = "author geometric calculation from assumed cube dimensions"
@@ -2403,9 +2401,8 @@ def test_lineage_parents_from_source_never_invents_pointer() -> None:
         "src",
         set(),
     )
-    assert parents == (printed,)
+    assert parents == ()
     assert prose == (printed,)
-    assert not parents[0].startswith("src::")
 
     parents, prose = lineage_parents_from_source(
         {"derived_from": ["local_a", "other::obs", "prose note", "src::local_b"]},
@@ -2413,7 +2410,7 @@ def test_lineage_parents_from_source_never_invents_pointer() -> None:
         "src",
         {"local_a", "local_b"},
     )
-    assert parents == ("src::local_a", "other::obs", "prose note", "src::local_b")
+    assert parents == ("src::local_a", "other::obs", "src::local_b")
     assert prose == ("prose note",)
 
     parents, prose = lineage_parents_from_source(
@@ -2475,10 +2472,37 @@ def _issue_pairs(result, observation) -> set[tuple[str, str]]:
     }
 
 
+def _printed_lineage_detail(text: str) -> str:
+    return (
+        f"derived_from {text!r} is prose, not a resolvable "
+        "observation id; retained here, never minted as a pointer"
+    )
+
+
+def _assert_printed_lineage_flagged(result, text: str, field: str) -> None:
+    """Printed text stays off pointer fields and is flagged, not dropped."""
+
+    assert any(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD
+        and issue.path.endswith(f".{field}")
+        and issue.detail == _printed_lineage_detail(text)
+        for issue in result.validation.hard_issues
+    )
+    assert any(entry.why == _printed_lineage_detail(text) for entry in result.queue)
+    assert not any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY and text in issue.detail
+        for issue in result.validation.hard_issues
+    )
+    for obs in result.observations.values():
+        assert text not in (obs.derived_from or ())
+        if obs.derivation is not None:
+            assert text not in obs.derivation.inputs
+
+
 def test_printed_derived_from_is_kept_and_flagged(tmp_path: Path) -> None:
-    """b-979: a printed derived_from stays on the record verbatim. It is not
-    queued as an unminted note. An unresolved parent is referential_integrity,
-    and a derived class with no resolvable parent is still conditional_field.
+    """b-979: a printed derived_from is not stored as a pointer. It is a hard
+    conditional_field and a page-grounding queue entry, both with the
+    verbatim text. referential_integrity stays clear.
     """
 
     printed = "author estimate from assumed grain population"
@@ -2490,16 +2514,19 @@ def test_printed_derived_from_is_kept_and_flagged(tmp_path: Path) -> None:
     rows = _rows_for(result, "na_psat")
     assert rows
     for obs in rows:
-        assert obs.derived_from == (printed,)
-        assert not obs.derived_from[0].startswith("fixture-source::")
-        assert ("derived_from", "referential_integrity") in _issue_pairs(result, obs)
-        assert ("derived_from", "conditional_field") in _issue_pairs(result, obs)
-    assert not any(printed in entry.why and "never minted" in entry.why for entry in result.queue)
+        assert obs.derived_from is None
+    _assert_printed_lineage_flagged(result, printed, "derived_from")
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    assert not any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY for issue in report.hard_issues
+    )
 
 
 def test_citation_parent_model_derived_keeps_typed_lineage(tmp_path: Path) -> None:
-    """b-979: a model_derived value whose parent is a printed citation keeps
-    that citation as derivation.inputs. The derivation is not nulled.
+    """b-979: a printed citation does not enter derivation.inputs. The
+    derivation is not nulled, and the citation is a conditional_field.
     """
 
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
@@ -2519,14 +2546,12 @@ def test_citation_parent_model_derived_keeps_typed_lineage(tmp_path: Path) -> No
     assert rows
     for obs in rows:
         assert obs.derivation is not None
-        assert obs.derivation.inputs == (_PRINTED_CITATION,)
+        assert obs.derivation.inputs == ()
         assert obs.derived_from
         assert all(
             "parent_meas" in parent and " " not in parent for parent in obs.derived_from
         )
-        assert _issue_pairs(result, obs) == {
-            ("derivation.inputs", "referential_integrity")
-        }
+    _assert_printed_lineage_flagged(result, _PRINTED_CITATION, "derivation.inputs")
 
 
 def test_observation_id_derivation_parent_is_unchanged(tmp_path: Path) -> None:
@@ -2560,12 +2585,12 @@ def test_observation_id_derivation_parent_is_unchanged(tmp_path: Path) -> None:
 
 
 def test_restoring_the_printed_lineage_drop_fails(tmp_path: Path) -> None:
-    """b-979 mutant: restoring either historical drop fails.
+    """b-979 mutant: nulling the derivation, or storing the printed string, fails.
 
-    A derivation whose only input is printed text must stay (the old code
-    nulled it). A printed input beside a resolvable observation id must stay
-    in inputs, in source order (the old code stripped it). A non-citation
-    printed string is the same rule: no year or 'et al' test.
+    A derivation whose only input is printed text stays, with empty pointer
+    inputs. A printed input beside a resolvable observation id stays off
+    inputs. Both strings are conditional_field plus a queue entry. No year
+    or 'et al' test. referential_integrity stays clear.
     """
 
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
@@ -2596,25 +2621,20 @@ def test_restoring_the_printed_lineage_drop_fails(tmp_path: Path) -> None:
     assert prose_only
     for obs in prose_only:
         assert obs.derivation is not None
-        assert obs.derivation.inputs == (_PRINTED_NON_CITATION,)
-        assert _issue_pairs(result, obs) == {
-            ("derivation.inputs", "referential_integrity")
-        }
+        assert obs.derivation.inputs == ()
+    _assert_printed_lineage_flagged(result, _PRINTED_NON_CITATION, "derivation.inputs")
 
     cited = "thermodynamic data cited as [19]"
     mixed = _rows_for(result, "child_mixed")
     assert mixed
     for obs in mixed:
         assert obs.derivation is not None
-        assert obs.derivation.inputs[-1] == cited
-        assert obs.derivation.inputs[:-1] == obs.derived_from
+        assert obs.derivation.inputs == obs.derived_from
         assert obs.derived_from
         assert all(
             parent.startswith("fixture-source::parent_meas::") for parent in obs.derived_from
         )
-        assert _issue_pairs(result, obs) == {
-            ("derivation.inputs", "referential_integrity")
-        }
+    _assert_printed_lineage_flagged(result, cited, "derivation.inputs")
 
 
 def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
@@ -9835,11 +9855,11 @@ def test_registered_unknown_placeholder_resolves_as_lineage(tmp_path: Path) -> N
 def test_measured_reduced_derivation_printed_input_is_kept_and_flagged(
     tmp_path: Path,
 ) -> None:
-    """b-979: printed derivation inputs stay on the record.
+    """b-979: printed derivation inputs are not stored as pointers.
 
-    This used to be test_measured_reduced_derivation_prose_input_is_queued_not_pointed.
-    That test required a prose queue entry and forbade referential_integrity.
-    It pinned the silent drop: the input left the derivation and was only queued.
+    The derivation stays. Each printed input is a conditional_field and a
+    queue entry carrying the same verbatim text. referential_integrity
+    stays clear, including on validate_corpus of the stored rows.
     """
 
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
@@ -9862,28 +9882,18 @@ def test_measured_reduced_derivation_printed_input_is_kept_and_flagged(
     )
     assert observation.derived_from is None
     assert observation.derivation is not None
-    assert observation.derivation.inputs == (
+    assert observation.derivation.inputs == ()
+    assert observation.locator
+    for printed in (
         "Table 2 DSC Cp points",
         "Table 3 drop-calorimetric heat contents",
-    )
-    assert observation.locator
-    assert not any(
-        "Table 2 DSC Cp points" in (entry.why or "")
-        and "never minted" in (entry.why or "")
-        for entry in result.queue
-    )
+    ):
+        _assert_printed_lineage_flagged(result, printed, "derivation.inputs")
     report = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )
-    flagged = {
-        issue.detail
-        for issue in report.hard_issues
-        if issue.path.startswith(f"observation[{observation.observation_id}].")
-        and issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
-    }
-    assert any("Table 2 DSC Cp points" in detail for detail in flagged)
-    assert any(
-        "Table 3 drop-calorimetric heat contents" in detail for detail in flagged
+    assert not any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY for issue in report.hard_issues
     )
 
 

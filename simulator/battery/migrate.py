@@ -6231,13 +6231,11 @@ def lineage_parents_from_source(
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
     """Source-stated lineage as (parents, prose), without inventing pointers.
 
-    Every well-formed string is a parent. A local observation id is qualified
-    with ``source_id::``. A printed citation or other unresolved text is kept
-    verbatim: prefixing it would mint an id the source did not write.
-    Validation then raises referential_integrity (d-053: flagged, not
-    discarded). ``prose`` is that printed subset, not a second destination.
-    A caller that cannot keep the derivation still retains the text from
-    ``prose``; a caller that stores the parent must not queue it again.
+    A local observation id is qualified with ``source_id::``. A ``pdf:`` or
+    other asset id, and a colon token with no whitespace, stay parents for
+    store validation. Printed text is not a parent: storing it would dangle.
+    ``prose`` keeps that text verbatim. The caller flags it as a hard
+    ``conditional_field`` and queues the same string for page-grounding.
     """
 
     raw = values.get("derived_from")
@@ -6269,8 +6267,7 @@ def lineage_parents_from_source(
             # the store validator checks them against registered assets.
             parents.append(item)
         else:
-            # Printed text is lineage. Do not mint ``source_id::`` around it.
-            parents.append(item)
+            # Printed text is not a pointer. Do not mint ``source_id::``.
             prose.append(item)
     return tuple(parents), tuple(prose)
 
@@ -13776,8 +13773,11 @@ class Migrator:
         if method_class is None:
             measured.absent_classes += 1
         source_asset_ids = {asset.asset_id for asset in work.source_files.files}
+        derived_from_prose: tuple[str, ...] = ()
+        derivation_prose: tuple[str, ...] = ()
+        lineage_errors: tuple[str, ...] = ()
         try:
-            derived_parents, derived_prose = lineage_parents_from_source(
+            derived_parents, derived_from_prose = lineage_parents_from_source(
                 obs,
                 values,
                 source_id,
@@ -13785,7 +13785,8 @@ class Migrator:
                 source_asset_ids,
             )
         except ValueError as exc:
-            derived_parents, derived_prose = (), (str(exc),)
+            derived_parents = ()
+            lineage_errors = (str(exc),)
             self.result.registry_issues.append(ValidationIssue(
                 path=f"observations.{obs_id}.derived_from",
                 reason=RefusalReason.INVALID_SOURCE,
@@ -13815,19 +13816,26 @@ class Migrator:
                 local_ids,
                 source_asset_ids,
             )
-            derived_prose = tuple(dict.fromkeys((*derived_prose, *derivation_prose)))
             if derivation_parents:
                 source_derivation = replace(
                     source_derivation, inputs=derivation_parents
                 )
+            elif derivation_prose:
+                # Printed inputs do not resolve. Keep the derivation and
+                # leave the text off the pointer fields.
+                source_derivation = replace(source_derivation, inputs=())
             elif source_derivation.raw_inputs is None:
-                # No input was stated. An unresolved printed input is a parent
-                # and must not be cleared here.
+                # No input was stated.
                 source_derivation = None
             # Invalid declarations stay attached for validate_corpus to report.
-            if not derived_prose:
-                if source_derivation is not None:
-                    self._author_derivations[obs_id] = source_derivation
+            # Printed prose blocks author-reduction registration, as on green.
+            if (
+                source_derivation is not None
+                and not derived_from_prose
+                and not derivation_prose
+                and not lineage_errors
+            ):
+                self._author_derivations[obs_id] = source_derivation
         evidence, ev_reason = self._evidence_for(
             method_class,
             evaluator_family=values.get("evaluator_family"),
@@ -14550,20 +14558,41 @@ class Migrator:
         stored_lineage = set(derived_from or ())
         if value_derivation is not None:
             stored_lineage.update(value_derivation.inputs)
-        for prose_item in derived_prose:
-            if prose_item in stored_lineage:
-                continue
+        queued_prose: set[str] = set()
+
+        def queue_printed(prose_item: str) -> str:
+            detail = (
+                f"derived_from {prose_item!r} is prose, not a resolvable "
+                "observation id; retained here, never minted as a pointer"
+            )
+            if prose_item in stored_lineage or prose_item in queued_prose:
+                return detail
             self.result.add_queue(
                 work.work_id,
                 locator,
                 ["derived_from"],
-                (
-                    f"derived_from {prose_item!r} is prose, not a resolvable "
-                    "observation id; retained here, never minted as a pointer"
-                ),
+                detail,
                 source=source_key,
                 observation_id=obs_id,
             )
+            queued_prose.add(prose_item)
+            return detail
+
+        for field, prose_item in (
+            *[("derived_from", item) for item in derived_from_prose],
+            *[("derivation.inputs", item) for item in derivation_prose],
+        ):
+            if prose_item in stored_lineage:
+                continue
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observation[{obs_id}].{field}",
+                    reason=RefusalReason.CONDITIONAL_FIELD,
+                    detail=queue_printed(prose_item),
+                )
+            )
+        for prose_item in lineage_errors:
+            queue_printed(prose_item)
         yield_key, yield_items = _yield_table_items(values)
         if (
             yield_items is None

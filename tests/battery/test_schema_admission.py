@@ -328,9 +328,8 @@ def test_review_author_provenance_matrix(tmp_path, method, shape, case):
     else:
         assert evidence.is_unknown
     if case == "partial_prose":
-        # "not an observation" used to leave the record, so this case had no
-        # hard issue. That pinned the drop. The printed derived_from stays,
-        # and the existing referential_integrity issue flags it.
+        # Printed derived_from is not a pointer. It is a conditional_field
+        # and a queue entry. Storing it would raise referential_integrity.
         printed = "not an observation"
         children = [
             obs for obs in result.observations.values()
@@ -338,18 +337,22 @@ def test_review_author_provenance_matrix(tmp_path, method, shape, case):
             or obs.observation_id.startswith("fixture-source::child::")
         ]
         assert children
-        assert all(printed in obs.derived_from for obs in children)
-        assert {
-            (issue.path, issue.reason, issue.detail)
+        assert all(printed not in (obs.derived_from or ()) for obs in children)
+        detail = (
+            f"derived_from {printed!r} is prose, not a resolvable "
+            "observation id; retained here, never minted as a pointer"
+        )
+        assert any(
+            issue.reason is RefusalReason.CONDITIONAL_FIELD
+            and issue.path == "observation[fixture-source::child].derived_from"
+            and issue.detail == detail
             for issue in result.validation.hard_issues
-        } == {
-            (
-                f"observation[{obs.observation_id}].derived_from",
-                RefusalReason.REFERENTIAL_INTEGRITY,
-                f"derived_from {printed!r} does not resolve",
-            )
-            for obs in children
-        }
+        )
+        assert any(entry.why == detail for entry in result.queue)
+        assert not any(
+            issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+            for issue in result.validation.hard_issues
+        )
     else:
         assert not result.validation.hard_issues
 
@@ -937,11 +940,13 @@ _WIMPENNY_TABLE = "wimpenny_2019_table1_experimental_zn_rows"
 
 
 def _printed_lineage_issue(source: str, local_id: str, field: str, text: str):
-    noun = "derived_from" if field == "derived_from" else "derivation input"
     return (
         f"observation[{source}::{local_id}].{field}",
-        RefusalReason.REFERENTIAL_INTEGRITY,
-        f"{noun} {text!r} does not resolve",
+        RefusalReason.CONDITIONAL_FIELD,
+        (
+            f"derived_from {text!r} is prose, not a resolvable "
+            "observation id; retained here, never minted as a pointer"
+        ),
     )
 
 
@@ -950,13 +955,12 @@ def _printed_lineage_issue(source: str, local_id: str, field: str, text: str):
     "wimpenny-2019-zn-isotope-evaporation-extreme-t",
 ])
 def test_ancestry_lookup_preserves_nonconditional_derivation_emission(source):
-    """Kept printed lineage is referential_integrity, not a silent drop.
+    """Printed lineage is a conditional_field, not a stored pointer.
 
-    This assertion used to forbid every referential_integrity issue. That
-    pinned the drop: Itoh's two printed derivation inputs were removed, so
-    the fixture raised none. They stay on derivation.inputs and are flagged.
-    Boulliung and Wimpenny share this parameter and keep their printed
-    parents the same way. No other referential_integrity issue is allowed.
+    Storing the text raised referential_integrity and failed the store
+    guard, which allows only conditional_field on lineage fields. The
+    derivation stays. The printed string is in the issue detail and is
+    absent from derived_from and derivation.inputs.
     """
 
     migrator = F.migrate_one_extract(
@@ -964,11 +968,10 @@ def test_ancestry_lookup_preserves_nonconditional_derivation_emission(source):
         M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml",
     )
     migrator.finalize()
-    referential = {
-        (issue.path, issue.reason, issue.detail)
-        for issue in migrator.result.validation.hard_issues
-        if issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
-    }
+    hard = migrator.result.validation.hard_issues
+    assert not any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY for issue in hard
+    )
     if source == "itoh-hino-banya-1998-spinel":
         expected = {
             _printed_lineage_issue(
@@ -980,6 +983,14 @@ def test_ancestry_lookup_preserves_nonconditional_derivation_emission(source):
                 "derivation.inputs", _ITOH_PRESENT,
             ),
         }
+        for local_id in (
+            "itoh_1998_spinel_equilibrium_constants",
+            "itoh_1998_spinel_interaction_parameters",
+        ):
+            observation = migrator.result.observations[f"{source}::{local_id}"]
+            assert observation.derivation is not None
+            assert _ITOH_KNACKE not in observation.derivation.inputs
+            assert _ITOH_PRESENT not in observation.derivation.inputs
     elif source == "boulliung-2025-mercury-volatile-metals-magmatic":
         expected = {
             _printed_lineage_issue(source, local_id, field, text)
@@ -995,4 +1006,12 @@ def test_ancestry_lookup_preserves_nonconditional_derivation_emission(source):
             )
             for field in ("derived_from", "derivation.inputs")
         }
-    assert referential == expected
+        observation = migrator.result.observations[
+            f"{source}::wimpenny_2019_zn_fractionation_summary"
+        ]
+        assert observation.derivation is not None
+        assert _WIMPENNY_TABLE not in (observation.derived_from or ())
+        assert _WIMPENNY_TABLE not in observation.derivation.inputs
+    assert expected <= {
+        (issue.path, issue.reason, issue.detail) for issue in hard
+    }
