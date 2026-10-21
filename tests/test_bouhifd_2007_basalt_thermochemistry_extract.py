@@ -103,6 +103,9 @@ def test_isolated_migration_preserves_values_species_and_temperature() -> None:
         assert record.value.point == Decimal(temperature)
         condition = record.point_conditions["temperature_K"]
         assert str(condition.state.value) == temperature
+    spinel = by_source_id["bouhifd_2007_sfb_spinel_first_liquidus_phase"]
+    assert spinel.point_conditions["atmosphere"].state.value == "air"
+    assert spinel.point_conditions["atmosphere"].locator is not None
 
     table1 = document["species"]["unknown"]["context"][0]["values"]
     assert table1["sfb_glass_density_g_cm3"] == "2.862"
