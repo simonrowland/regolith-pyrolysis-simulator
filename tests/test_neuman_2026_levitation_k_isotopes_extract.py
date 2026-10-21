@@ -345,6 +345,19 @@ def test_derived_supplementary_mass_loss_rows_migrate_and_pin_values() -> None:
     assert all(row.derived_from == (f"tables:{SID}",) for row in mass_loss)
     assert all(row.identity.temperature_K.is_value for row in mass_loss)
     assert all(row.point_conditions for row in mass_loss)
+    derived_points = [
+        point
+        for observation_id, (_, observation) in _source_observations(document).items()
+        if observation_id.startswith("neuman_2026_supplementary_table_s1_")
+        and observation_id.endswith("mass_loss_fraction")
+        for point in observation["values"]["points"]
+    ]
+    assert len(derived_points) == 49
+    assert all(
+        {"starting_weight_g_as_printed", "ending_weight_g_as_printed"}
+        <= point.get("derivation_parameters", {}).keys()
+        for point in derived_points
+    )
     assert all(
         row.point_conditions["duration_s"].state.is_value
         and row.point_conditions["duration_s"].locator is not None
