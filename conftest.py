@@ -119,6 +119,7 @@ def magemin_openmpi_tmpdir(
         yield tmpdir
     finally:
         environment.undo()
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 @pytest.fixture(autouse=True)

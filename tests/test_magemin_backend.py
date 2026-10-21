@@ -3679,8 +3679,8 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(
     binary_arg = Path(captured["args"][0])
     assert binary_arg.is_absolute()
     assert binary_arg == fake_binary.resolve()
-    # OpenMPI uses TMPDIR for session files. Keeping it under pytest's basetemp
-    # lets pytest retention remove it even if the test process is interrupted.
+    # OpenMPI uses TMPDIR for session files. Normal teardown removes this
+    # fixture-owned directory; pytest retention handles an interrupted run.
     expected_openmpi_tmpdir = (
         tmp_path_factory.getbasetemp() / "magemin-openmpi"
     ).resolve()
