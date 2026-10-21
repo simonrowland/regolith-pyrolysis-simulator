@@ -2976,7 +2976,12 @@ species:
         published_page: 621
         pdf_page_index: 13
         table: '6'
-        note: This-study row. Reaction [CaSiO3] = (CaSiO3).
+        note: >-
+          Published page 621, Table 6, this-study row. Reaction [CaSiO3] =
+          (CaSiO3). Table header: "Enthalpies and entropies of reactions".
+          ΔrHT = 771 ± 13 kJ/mol. Missing quantity: reaction enthalpy of a
+          stated reaction, not delta_fH and not a labeled 2nd-law or 3rd-law
+          enthalpy of vaporization.
       T_range_K:
       - 1812
       - 2187
@@ -2990,6 +2995,13 @@ species:
         delta_rH_kJ_per_mol: 771
         delta_rH_uncertainty_as_printed: ± 13
         not_a_formation_enthalpy: 771 kJ/mol is the printed reaction enthalpy. It is not stored as delta_fH.
+        note: >-
+          Missing quantity: reaction enthalpy ΔrH of the stated reaction
+          [CaSiO3] = (CaSiO3). Not delta_fH. Published page 619, Eq. (21):
+          "which allows determining the enthalpy (ΔrHT) and entropy (ΔrST) of
+          the reaction." Published page 621, Table 6 prints ΔrHT = 771 ± 13
+          kJ/mol at 1812–2187 K. The paper does not call this a 2nd-law or
+          3rd-law enthalpy of vaporization.
         derivation:
           relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants
             from Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals
@@ -3004,7 +3016,10 @@ species:
         published_page: 621
         pdf_page_index: 13
         table: '6'
-        note: This-study row. Reaction [CaSiO3] = (CaSiO3).
+        note: >-
+          Published page 621, Table 6, this-study row. Reaction [CaSiO3] =
+          (CaSiO3). ΔrST = 242 ± 5 J/(mol K). Missing quantity: reaction
+          entropy of a stated reaction, not S and not entropy_of_fusion.
       T_range_K:
       - 1812
       - 2187
@@ -3017,6 +3032,12 @@ species:
         reaction_as_printed: '[CaSiO3] = (CaSiO3)'
         delta_rS_J_per_mol_K: 242
         delta_rS_uncertainty_as_printed: ± 5
+        note: >-
+          Missing quantity: reaction entropy ΔrS of the stated reaction
+          [CaSiO3] = (CaSiO3). Not S and not entropy_of_fusion. Published page
+          619, Eq. (21): "which allows determining the enthalpy (ΔrHT) and
+          entropy (ΔrST) of the reaction." Published page 621, Table 6 prints
+          ΔrST = 242 ± 5 J/(mol K) at 1812–2187 K.
         derivation:
           relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants
             from Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals
@@ -3031,7 +3052,10 @@ species:
         published_page: 621
         pdf_page_index: 13
         table: '6'
-        note: This-study row. Reaction (CaSiO3) = (CaO) + (SiO2).
+        note: >-
+          Published page 621, Table 6, this-study row. Reaction (CaSiO3) =
+          (CaO) + (SiO2). ΔrHT = 479 ± 12 kJ/mol. Missing quantity: reaction
+          enthalpy of a stated gas-phase dissociation, not delta_fH.
       T_range_K:
       - 1910
       - 2187
@@ -3046,6 +3070,12 @@ species:
         delta_rH_uncertainty_as_printed: ± 12
         not_a_formation_enthalpy: 479 kJ/mol is the printed gas-phase dissociation enthalpy. It is not
           stored as delta_fH.
+        note: >-
+          Missing quantity: reaction enthalpy ΔrH of the stated reaction
+          (CaSiO3) = (CaO) + (SiO2). Not delta_fH. This is gas-phase
+          dissociation, not vaporization. Published page 621, Table 6 prints
+          ΔrHT = 479 ± 12 kJ/mol at 1910–2187 K. Eq. (21) on published page 619
+          defines ΔrHT as the enthalpy of the reaction.
         derivation:
           relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants
             from Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals
@@ -3060,7 +3090,11 @@ species:
         published_page: 621
         pdf_page_index: 13
         table: '6'
-        note: This-study row. Reaction (CaSiO3) = (CaO) + (SiO2).
+        note: >-
+          Published page 621, Table 6, this-study row. Reaction (CaSiO3) =
+          (CaO) + (SiO2). ΔrST = 47 ± 6 J/(mol K). Missing quantity: reaction
+          entropy of a stated gas-phase dissociation, not S and not
+          entropy_of_fusion.
       T_range_K:
       - 1910
       - 2187
@@ -3073,6 +3107,12 @@ species:
         reaction_as_printed: (CaSiO3) = (CaO) + (SiO2)
         delta_rS_J_per_mol_K: 47
         delta_rS_uncertainty_as_printed: ± 6
+        note: >-
+          Missing quantity: reaction entropy ΔrS of the stated reaction
+          (CaSiO3) = (CaO) + (SiO2). Not S and not entropy_of_fusion. Published
+          page 621, Table 6 prints ΔrST = 47 ± 6 J/(mol K) at 1910–2187 K.
+          Eq. (21) on published page 619 defines ΔrST as the entropy of the
+          reaction.
         derivation:
           relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants
             from Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals
