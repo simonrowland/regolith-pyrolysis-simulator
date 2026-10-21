@@ -26,24 +26,41 @@ species:
         section: Experimental Results
       phase: condensed_liquid
       T_range_K: [1558, 1588]
-      standard_state: Na2O(l)
+      standard_state_as_printed: Reference slag Na2O·SiO2 + 20 mass% Fe2O3, with a* predetermined; a pure-liquid standard is not printed.
       units: dimensionless activity
       derivation:
-        relation: 'Na2O activity calculated from measured E1 by equations (3) and (5); numeric EMF readings are not printed.'
+        relation: 'Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.'
         raw_inputs:
           state: {tag: value, value: not_printed}
           locator: {page: 4, published_page: 782, pdf_page_index: 3, section: Experimental Results}
       values:
         quantity: activity
         method_class: measured_reduced
-        reference_state_as_printed: Na2O(l), measured relative to reference slag Na2O-SiO2 + 20 mass% Fe2O3
+        reference_state_as_printed: Reference slag Na2O·SiO2 + 20 mass% Fe2O3 with a* predetermined; pure-liquid standard not printed.
         points:
+        - activity: 1.0e-5
+          activity_as_printed: '1 × 10^-5'
+          flux_as_printed: Na2O-SiO2 + 20 mass% Fe2O3
+          initial_metal_P_mass_percent: '0.50'
+          time_s: 0
+          point_conditions:
+            temperature_K: {state: {tag: value, value: 1573}, locator: {page: 3, published_page: 781, pdf_page_index: 2, section: Experimental Results}}
+            fO2_Pa: {state: {tag: value, value: 3e-10}, locator: {page: 4, published_page: 782, pdf_page_index: 3, figure: '3'}}
+            composition: {state: {tag: unknown, reason: full_liquid_composition_not_reported}, locator: {page: 4, published_page: 782, pdf_page_index: 3, figure: '3'}}
+        - activity: 1.0e-5
+          activity_as_printed: '1 × 10^-5'
+          flux_as_printed: Na2O-SiO2 + 20 mass% Fe2O3
+          initial_metal_P_mass_percent: '0'
+          time_s: 0
+          point_conditions:
+            temperature_K: {state: {tag: value, value: 1573}, locator: {page: 3, published_page: 781, pdf_page_index: 2, section: Experimental Results}}
+            fO2_Pa: {state: {tag: unknown, reason: not_reported_for_this_point}, locator: {page: 4, published_page: 782, pdf_page_index: 3, figure: '3'}}
+            composition: {state: {tag: unknown, reason: full_liquid_composition_not_reported}, locator: {page: 4, published_page: 782, pdf_page_index: 3, figure: '3'}}
         - activity: 2.0e-5
           activity_as_printed: '2 × 10^-5'
           flux_as_printed: Na2O-SiO2 + 20 mass% Fe2O3
           initial_metal_P_mass_percent: '0.50'
           time_s: 2400
-          T_C: 1299.85
           point_conditions:
             temperature_K: {state: {tag: value, value: 1573}, locator: {page: 3, published_page: 781, pdf_page_index: 2, section: Experimental Results}}
             fO2_Pa: {state: {tag: value, value: 3e-10}, locator: {page: 4, published_page: 782, pdf_page_index: 3, figure: '3'}}
@@ -53,7 +70,6 @@ species:
           flux_as_printed: Na2O-SiO2 + 20 mass% Fe2O3
           initial_metal_P_mass_percent: '0'
           time_s: 350
-          T_C: 1299.85
           point_conditions:
             temperature_K: {state: {tag: value, value: 1573}, locator: {page: 3, published_page: 781, pdf_page_index: 2, section: Experimental Results}}
             fO2_Pa: {state: {tag: unknown, reason: not_reported_for_this_point}, locator: {page: 4, published_page: 782, pdf_page_index: 3, figure: '3'}}
@@ -63,7 +79,6 @@ species:
           flux_as_printed: Na2CO3
           initial_metal_P_mass_percent: '0.35'
           time_s: 0
-          T_C: 1299.85
           point_conditions:
             temperature_K: {state: {tag: value, value: 1573}, locator: {page: 3, published_page: 781, pdf_page_index: 2, section: Experimental Results}}
             fO2_Pa: {state: {tag: value, value: 3e-13}, locator: {page: 5, published_page: 783, pdf_page_index: 4, figure: '4'}}
@@ -73,7 +88,6 @@ species:
           flux_as_printed: Na2CO3
           initial_metal_P_mass_percent: '2.52'
           time_s: 0
-          T_C: 1299.85
           point_conditions:
             temperature_K: {state: {tag: value, value: 1573}, locator: {page: 3, published_page: 781, pdf_page_index: 2, section: Experimental Results}}
             fO2_Pa: {state: {tag: value, value: 1e-13}, locator: {page: 5, published_page: 783, pdf_page_index: 4, figure: '4'}}
@@ -83,7 +97,6 @@ species:
           flux_as_printed: Na2CO3
           initial_metal_P_mass_percent: '2.52'
           time_s: 1000
-          T_C: 1299.85
           point_conditions:
             temperature_K: {state: {tag: value, value: 1573}, locator: {page: 3, published_page: 781, pdf_page_index: 2, section: Experimental Results}}
             fO2_Pa: {state: {tag: value, value: 1e-13}, locator: {page: 5, published_page: 783, pdf_page_index: 4, figure: '4'}}
@@ -93,7 +106,6 @@ species:
           flux_as_printed: Na2CO3
           initial_metal_P_mass_percent: '2.52'
           time_s: 2400
-          T_C: 1299.85
           point_conditions:
             temperature_K: {state: {tag: value, value: 1573}, locator: {page: 3, published_page: 781, pdf_page_index: 2, section: Experimental Results}}
             fO2_Pa: {state: {tag: value, value: 1e-9}, locator: {page: 5, published_page: 783, pdf_page_index: 4, figure: '4'}}
@@ -103,7 +115,6 @@ species:
           flux_as_printed: Na2CO3
           initial_metal_P_mass_percent: '0'
           time_s: 0
-          T_C: 1299.85
           point_conditions:
             temperature_K: {state: {tag: value, value: 1573}, locator: {page: 3, published_page: 781, pdf_page_index: 2, section: Experimental Results}}
             fO2_Pa: {state: {tag: value, value: 1e-13}, locator: {page: 5, published_page: 783, pdf_page_index: 4, figure: '4'}}
@@ -113,10 +124,9 @@ species:
           flux_as_printed: 2Na2CO3 + Fe2O3
           initial_metal_P_mass_percent: '0.55'
           time_s: 0
-          T_C: 1299.85
           point_conditions:
             temperature_K: {state: {tag: value, value: 1573}, locator: {page: 3, published_page: 781, pdf_page_index: 2, section: Experimental Results}}
-            fO2_Pa: {state: {tag: value, value: 3e-12}, locator: {page: 6, published_page: 784, pdf_page_index: 5, figure: '5'}}
+            fO2_Pa: {state: {tag: value, value: 3e-12}, locator: {page: 6, published_page: 784, pdf_page_index: 5, figure: '6'}}
             composition: {state: {tag: unknown, reason: full_liquid_composition_not_reported}, locator: {page: 6, published_page: 784, pdf_page_index: 5, figure: '5'}}
     context:
     - observation_id: kawashima_1984_fig1_sensor_cell_diagram
@@ -300,69 +310,47 @@ species:
         attribution: Kawashima et al. (1984)
         digitisation: deferred to a figure pass
   Na:
-    observations: []
-    context:
+    observations:
     - observation_id: kawashima_1984_na_vapor_partial_pressure
-      type: relation
+      type: partial_pressure
       locator:
         page: 5
         published_page: 783
         pdf_page_index: 4
         figure: '5'
         section: Experimental Results
+      phase: gas
+      regime: emf_cell
       units: Pa
       values:
-        method_class: measured_reduced
-        quantity_as_printed: sodium vapour pressure measured by galvanic-cell EMF
-        candidate_quantity_tokens:
-        - p_partial
-        schema_gap: Measured PNa is derived from EMF; the numeric EMF input is not printed and cannot be linked as derived_from.
-        values_as_printed: 6 × 10^4 Pa (0.6 atm)
-        temperature_as_printed: '1573'
-        conditions_as_printed:
-          temperature_K:
-            state:
-              tag: value
-              value: '1573'
-            locator:
-              page: 5
-              published_page: 783
-              pdf_page_index: 4
-          fO2_Pa:
-            state:
-              tag: value
-              value: 3e-13
-            locator:
-              page: 5
-              published_page: 783
-              pdf_page_index: 4
-              section: Experimental Results
-        note: Printed as the nearly constant PNa during the low-pO2 dephosphorization interval; the numeric point is from
-          prose, not a digitised curve.
+        method_class: measured_direct
+        quantity: p_partial
+        formula: Na
+        points:
+        - pressure_Pa: '6e4'
+          pressure_as_printed: '6 × 10^4 Pa (0.6 atm)'
+          temperature_K: '1573'
+          point_conditions:
+            temperature_K: {state: {tag: value, value: '1573'}, locator: {page: 5, published_page: 783, pdf_page_index: 4}}
+            fO2_Pa: {state: {tag: value, value: '3e-13'}, locator: {page: 5, published_page: 783, pdf_page_index: 4, section: Experimental Results}}
     - observation_id: kawashima_1984_na_vapor_partial_pressure_with_fe2o3
-      type: relation
+      type: partial_pressure
       locator:
         page: 6
         published_page: 784
         pdf_page_index: 5
         figure: '7'
         section: Discussion
+      phase: gas
+      regime: emf_cell
       units: Pa
       values:
-        method_class: measured_reduced
-        quantity_as_printed: sodium vapour pressure measured by galvanic-cell EMF
-        candidate_quantity_tokens:
-        - p_partial
-        schema_gap: Measured PNa is derived from EMF; the numeric EMF input is not printed and cannot be linked as derived_from.
-        values_as_printed: 1 × 10^3 Pa
-        temperature_as_printed: '1573'
-        conditions_as_printed:
-          temperature_K:
-            state:
-              tag: value
-              value: '1573'
-            locator:
-              page: 6
-              published_page: 784
-              pdf_page_index: 5
-        note: Printed as the nearly constant sodium vapour pressure after addition of Fe2O3.
+        method_class: measured_direct
+        quantity: p_partial
+        formula: Na
+        points:
+        - pressure_Pa: '1e3'
+          pressure_as_printed: '1 × 10^3 Pa'
+          temperature_K: '1573'
+          point_conditions:
+            temperature_K: {state: {tag: value, value: '1573'}, locator: {page: 6, published_page: 784, pdf_page_index: 5}}
