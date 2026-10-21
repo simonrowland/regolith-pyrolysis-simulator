@@ -8,14 +8,12 @@ source:
   year: 1974
 extraction:
   method: >-
-    MinerU text is the available source. The corpus and fallback review
-    directories contain no PDF for this source, so first-page metadata and
-    600 dpi render verification were unavailable. Numerical values read from
-    the printed Table 1 and Table 2 transcription are retained in context;
-    all plot figures are deferred without digitised points.
+    The corpus PDF was read with pdftotext and the printed Table 1 was checked
+    against a render of physical page 2. Table 1 and Table 2 values remain in
+    context; all plot figures are deferred without digitised points.
   date: '2026-10-20'
   worker: codex
-  provenance_path: text/hirashima-1974-cr-redox-phosphate-glass/mineru/p001-p009/out/hirashima-1974-cr-redox-phosphate-glass-p001-p009/vlm/hirashima-1974-cr-redox-phosphate-glass-p001-p009.md
+  provenance_path: raw/hirashima-1974-cr-redox-phosphate-glass/hirashima-1974-cr-redox-phosphate-glass.pdf
 review_status: draft
 species:
   Cr:

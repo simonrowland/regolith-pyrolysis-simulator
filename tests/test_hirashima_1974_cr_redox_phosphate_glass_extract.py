@@ -27,6 +27,8 @@ def _assert_table_pins(document):
 def test_hirashima_context_tables_and_deferred_figures_are_pinned():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     _assert_table_pins(document)
+    assert "corpus PDF was read with pdftotext" in document["extraction"]["method"]
+    assert document["extraction"]["provenance_path"].endswith("hirashima-1974-cr-redox-phosphate-glass.pdf")
 
 
 def test_hirashima_table_cell_mutation_fails_render_pin():
