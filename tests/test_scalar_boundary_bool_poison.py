@@ -26,10 +26,8 @@ from engines.builtin.evaporation_flux import (
     _validated_stir_factor,
 )
 from engines.builtin.ca_aluminothermic_step import _finite_float as ca_finite_float
-from engines.builtin.electrolysis_step import (
-    MRE_INVALID_CONTROL_REFUSAL,
-    BuiltinElectrolysisStepProvider,
-)
+from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
+from simulator.electrolysis import MRE_INVALID_CONTROL_REFUSAL
 from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
 from engines.builtin.oxygen_bubbler import _finite_nonnegative_control
 from simulator.accounting.queries import (
