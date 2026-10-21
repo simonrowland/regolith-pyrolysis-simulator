@@ -39,6 +39,8 @@ def test_printed_mass_loss_values_migrate_with_species_phase_temperature_and_atm
         assert row.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
         assert row.value.kind is ValueKind.POINT
         assert row.value.point == Decimal(expected)
+        assert row.identity.temperature_K.is_value
+        assert row.identity.temperature_K.value == Decimal("1873")
         temperature = row.point_conditions["temperature_K"]
         assert temperature.state.value == Decimal("1873")
         assert temperature.locator is not None
