@@ -79,7 +79,48 @@ species:
         method_class: measured_direct
         analytical_method: electron microprobe
         system_class: silicate_melt
+        composition_wt_pct:
+          MgO: '24.8'
+          Al2O3: '2.46'
+          SiO2: '33.8'
+          CaO: '2.04'
+          TiO2: '0.110'
+          FeO: '36.7'
+          locator:
+            page: 4
+            published_page: 482
+            pdf_page_index: 3
+            table: '1'
+            row: Starting comp.
+            column: b
+        starting_composition_details:
+          SigmaLn2O3_wt_pct: '0.142'
+          trace_elements_ppm:
+            La: '87.1'
+            Ce: '82.3'
+            Pr: '85.1'
+            Nd: '86.4'
+            Sm: '85.6'
+            Eu: '86.9'
+            Gd: '88.6'
+            Tb: '91.3'
+            Dy: '88.6'
+            Ho: '86.1'
+            Er: '90.2'
+            Tm: '87.7'
+            Yb: '88.4'
+            Lu: '88.5'
         series:
+        - mass_loss_pct: '0'
+          T_C_is_initial_composition: true
+          locator:
+            page: 4
+            published_page: 482
+            pdf_page_index: 3
+            table: '1'
+            row: Starting comp.
+            column: b
+            note: Table 1 starting composition calculated from reagent amounts weighed; no run temperature is printed.
         - sample: SC12
           T_C: '1400'
           t_min: '0'

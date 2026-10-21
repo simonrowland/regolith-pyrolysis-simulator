@@ -72,6 +72,33 @@ TABLE4_SAMPLES = [
     "SC7", "SC2", "SC16", "SC6", "SC3", "SC15", "SC10",
 ]
 TABLE4_EVAP = "0.38 3.43 7.58 21.80 32.15 36.68 52.54 57.29 60.38 69.17 72.06 82.91 86.34 88.59 89.61".split()
+STARTING_COMPOSITION_WT_PCT = {
+    "MgO": "24.8",
+    "Al2O3": "2.46",
+    "SiO2": "33.8",
+    "CaO": "2.04",
+    "TiO2": "0.110",
+    "FeO": "36.7",
+}
+STARTING_COMPOSITION_DETAILS = {
+    "SigmaLn2O3_wt_pct": "0.142",
+    "trace_elements_ppm": {
+        "La": "87.1",
+        "Ce": "82.3",
+        "Pr": "85.1",
+        "Nd": "86.4",
+        "Sm": "85.6",
+        "Eu": "86.9",
+        "Gd": "88.6",
+        "Tb": "91.3",
+        "Dy": "88.6",
+        "Ho": "86.1",
+        "Er": "90.2",
+        "Tm": "87.7",
+        "Yb": "88.4",
+        "Lu": "88.5",
+    },
+}
 TABLE4_RENDER = """
 17O/16O 0.0|0.5|1.2|3.1|4.0|4.8|8.4|8.3|10.2|12.6|13.8|19.4|22.1|22.8|28.0
 18O/16O 0.0|0.4|1.6|5.2|7.2|8.9|16.0|15.6|19.3|24.1|26.3|37.4|43.0|44.5|53.1
@@ -124,7 +151,7 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         assert len(expected_cells) == len(TABLE1_SAMPLES)
         for sample, raw_cell in zip(TABLE1_SAMPLES, expected_cells, strict=True):
             expected_value, expected_error = split_value_and_error(raw_cell)
-            point = next(point for point in points if point["sample"] == sample)
+            point = next(point for point in points if point.get("sample") == sample)
             assert point[value_field] == expected_value, (label, sample)
             if error_field is not None:
                 assert point.get(error_field) == expected_error, (label, sample)
@@ -143,9 +170,49 @@ def test_rendered_table_grids_and_cell_mutations() -> None:
         assert_table1_grid_matches_render(extract, changed_render)
 
     changed_extract = deepcopy(extract)
-    changed_extract["species"]["SiO2"]["observations"][0]["values"]["series"][0]["MgO_wt_pct"] = "999"
+    changed_sample = next(
+        row
+        for row in changed_extract["species"]["SiO2"]["observations"][0]["values"]["series"]
+        if row.get("sample") == "SC12"
+    )
+    changed_sample["MgO_wt_pct"] = "999"
     with pytest.raises(AssertionError):
         assert_table1_grid_matches_render(changed_extract, rendered)
+
+
+def test_starting_composition_is_separate_and_pinned_to_table1() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    observation = next(
+        row
+        for row in extract["species"]["SiO2"]["observations"]
+        if row["observation_id"] == "wang_2001_table1_electron_microprobe_residue_compositions"
+    )
+    values = observation["values"]
+    composition = values["composition_wt_pct"]
+    assert {key: value for key, value in composition.items() if key != "locator"} == STARTING_COMPOSITION_WT_PCT
+    assert set(composition) == {*STARTING_COMPOSITION_WT_PCT, "locator"}
+    assert composition["locator"] == {
+        "page": 4,
+        "published_page": 482,
+        "pdf_page_index": 3,
+        "table": "1",
+        "row": "Starting comp.",
+        "column": "b",
+    }
+    assert values["starting_composition_details"] == STARTING_COMPOSITION_DETAILS
+
+    initial_rows = [
+        row for row in values["series"] if row.get("T_C_is_initial_composition") is True
+    ]
+    assert len(initial_rows) == 1
+    initial_row = initial_rows[0]
+    assert initial_row["mass_loss_pct"] == "0"
+    assert not {"T_C", "T_K", "temperature_C", "temperature_K"}.intersection(initial_row)
+    assert all(
+        "T_C_is_initial_composition" not in row
+        for row in values["series"]
+        if row.get("sample") in TABLE1_SAMPLES
+    )
 
 
 def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
@@ -228,8 +295,47 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     assert not migrator.result.validation.hard_issues
-    observations = tuple(migrator.result.observations.values())
+    all_observations = tuple(migrator.result.observations.values())
+    initial_marker_observations = [
+        row
+        for row in all_observations
+        if row.locator.note and "Starting comp." in row.locator.note
+    ]
+    assert len(initial_marker_observations) == 1
+    assert initial_marker_observations[0].admission.reason == (
+        "initial composition is not a run-temperature mass-loss measurement"
+    )
+    observations = tuple(
+        row for row in all_observations if row not in initial_marker_observations
+    )
     assert len(observations) == 490
+    residue_observations = [
+        row
+        for row in observations
+        if row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert len(residue_observations) == 384
+    experiment_initial_compositions = [
+        experiment.sample.initial_composition
+        for experiment in migrator.result.experiments.values()
+        if experiment.sample.initial_composition is not None
+        and experiment.sample.initial_composition.state.is_value
+    ]
+    assert len(experiment_initial_compositions) == 1
+    expected_initial = experiment_initial_compositions[0].state.value
+    expected_initial_wt_pct = {
+        formula: Decimal(value)
+        for formula, value in STARTING_COMPOSITION_WT_PCT.items()
+    }
+    assert all(
+        row.identity.composition is not None and row.identity.composition.is_value
+        for row in residue_observations
+    )
+    assert all(
+        row.identity.composition.value == expected_initial
+        or row.identity.composition.value.as_map() == expected_initial_wt_pct
+        for row in residue_observations
+    )
 
     expected_by_quantity = {
         Quantity.RESIDUE_COMPONENT_COMPOSITION: {
