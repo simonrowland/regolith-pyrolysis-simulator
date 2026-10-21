@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
+import sys
 from types import SimpleNamespace
 
 import pytest
@@ -10,6 +12,7 @@ import conftest as project_conftest
 
 
 _STRICT_ENV = "REGOLITH_DOCS_PRIVATE_MANIFEST_STRICT"
+_REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _write_manifest(root: Path, entries: list[dict[str, object]]) -> None:
@@ -51,6 +54,11 @@ def test_strict_docs_private_preflight_errors_with_missing_manifest_entry(
 def test_strict_docs_private_preflight_accepts_present_glob_members(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    direct_file = tmp_path / "docs-private" / "direct.yaml"
+    direct_file.parent.mkdir(parents=True)
+    direct_file.write_text("present\n", encoding="utf-8")
+    required_directory = tmp_path / "docs-private" / "directory"
+    required_directory.mkdir()
     member = "docs-private/items/present.yaml"
     member_path = tmp_path / member
     member_path.parent.mkdir(parents=True)
@@ -58,6 +66,16 @@ def test_strict_docs_private_preflight_accepts_present_glob_members(
     _write_manifest(
         tmp_path,
         [
+            {
+                "kind": "file",
+                "path": "docs-private/direct.yaml",
+                "reader": "tests/example.py:5",
+            },
+            {
+                "kind": "directory",
+                "path": "docs-private/directory",
+                "reader": "tests/example.py:7",
+            },
             {
                 "kind": "glob",
                 "path": "docs-private/items/*.yaml",
@@ -89,3 +107,20 @@ def test_docs_private_preflight_is_inert_without_strict_environment(
     monkeypatch.delenv(_STRICT_ENV, raising=False)
 
     _invoke_sessionstart(tmp_path, monkeypatch)
+
+
+def test_docs_private_manifest_matches_reader_generator() -> None:
+    generated = subprocess.run(
+        [sys.executable, str(_REPO_ROOT / "scripts" / "derive_docs_private_inputs.py")],
+        cwd=_REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    committed = json.loads(
+        (_REPO_ROOT / "tests" / "docs_private_inputs.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert json.loads(generated.stdout) == committed

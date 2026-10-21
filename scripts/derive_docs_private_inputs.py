@@ -1,0 +1,551 @@
+"""Derive the docs-private test-input manifest from repository path readers."""
+
+from __future__ import annotations
+
+import ast
+import json
+import re
+from pathlib import Path, PurePosixPath
+from typing import Any
+
+
+ROOT = Path(__file__).resolve().parents[1]
+ROOT_NAMES = {"ROOT", "REPO_ROOT", "_REPO_ROOT"}
+MANIFEST_NAME = re.compile(r"manifest-c6-[a-z0-9-]+\.json\Z")
+PATH_READ_METHODS = {
+    "exists",
+    "is_file",
+    "is_dir",
+    "open",
+    "read_bytes",
+    "read_text",
+    "stat",
+}
+
+
+def _target_names(target: ast.expr) -> list[str]:
+    if isinstance(target, ast.Name):
+        return [target.id]
+    if isinstance(target, (ast.List, ast.Tuple)):
+        return [name for item in target.elts for name in _target_names(item)]
+    return []
+
+
+def _assignments(tree: ast.AST):
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            names = [name for target in node.targets for name in _target_names(target)]
+            yield names, node.value, node.lineno
+        elif isinstance(node, ast.AnnAssign) and node.value is not None:
+            yield _target_names(node.target), node.value, node.lineno
+
+
+def _resolve_path(node: ast.AST, aliases: dict[str, str]) -> str | None:
+    if isinstance(node, ast.Name):
+        if node.id in aliases:
+            return aliases[node.id]
+        return "" if node.id in ROOT_NAMES else None
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+        left = _resolve_path(node.left, aliases)
+        right = _resolve_path(node.right, aliases)
+        if left is None:
+            return right
+        if right is None:
+            return left
+        return (PurePosixPath(left) / right).as_posix()
+    if isinstance(node, ast.BoolOp) and isinstance(node.op, ast.Or):
+        return next(
+            (
+                path
+                for value in reversed(node.values)
+                if (path := _resolve_path(value, aliases)) is not None
+            ),
+            None,
+        )
+    if (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "Path"
+        and node.args
+    ):
+        return _resolve_path(node.args[0], aliases)
+    return None
+
+
+def _private_path(path: str | None) -> str | None:
+    if path is None:
+        return None
+    parts = PurePosixPath(path).parts
+    try:
+        index = parts.index("docs-private")
+    except ValueError:
+        return None
+    return PurePosixPath(*parts[index:]).as_posix()
+
+
+def _format_readers(readers: set[str]) -> str:
+    grouped: dict[str, set[int]] = {}
+    for reader in readers:
+        source, line_list = reader.rsplit(":", 1)
+        grouped.setdefault(source, set()).update(map(int, line_list.split(",")))
+    return "; ".join(
+        f"{source}:{','.join(map(str, sorted(lines)))}"
+        for source, lines in sorted(grouped.items())
+    )
+
+
+def _source_files(root: Path) -> list[Path]:
+    files = [root / "conftest.py"]
+    # This file uses synthetic docs-private paths to exercise the preflight.
+    files.extend(
+        path
+        for path in sorted((root / "tests").rglob("*.py"))
+        if path.relative_to(root).as_posix() != "tests/test_docs_private_preflight.py"
+    )
+    files.extend(
+        root / path
+        for path in (
+            "simulator/chemistry/phase_context.py",
+            "simulator/vapour_rail/u0_manifest.py",
+        )
+    )
+    return [path for path in files if path.is_file()]
+
+
+def _path_names_read_by_tests(tree: ast.AST) -> set[str]:
+    names: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if (
+            isinstance(node.func, ast.Attribute)
+            and node.func.attr in PATH_READ_METHODS
+            and isinstance(node.func.value, ast.Name)
+        ):
+            names.add(node.func.value.id)
+        elif (
+            isinstance(node.func, ast.Attribute)
+            and node.func.attr in PATH_READ_METHODS
+            and isinstance(node.func.value, ast.Call)
+            and isinstance(node.func.value.func, ast.Name)
+            and node.func.value.func.id == "Path"
+            and node.func.value.args
+            and isinstance(node.func.value.args[0], ast.Name)
+        ):
+            names.add(node.func.value.args[0].id)
+        elif isinstance(node.func, ast.Name) and node.func.id == "open" and node.args:
+            if isinstance(node.args[0], ast.Name):
+                names.add(node.args[0].id)
+    return names
+
+
+def _readers(
+    root: Path,
+) -> tuple[dict[str, set[str]], dict[Path, ast.AST], dict[Path, dict[str, str]]]:
+    paths: dict[str, set[str]] = {}
+    trees: dict[Path, ast.AST] = {}
+    aliases_by_file: dict[Path, dict[str, str]] = {}
+    for source in _source_files(root):
+        tree = ast.parse(source.read_text(encoding="utf-8"), filename=str(source))
+        aliases: dict[str, str] = {}
+        is_test = source.is_relative_to(root / "tests")
+        read_names = _path_names_read_by_tests(tree) if is_test else set()
+        paths_by_name: dict[str, set[str]] = {}
+        collection_names: set[str] = set()
+        trees[source] = tree
+        aliases_by_file[source] = aliases
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                names = [name for target in node.targets for name in _target_names(target)]
+                values = [node.value]
+                if isinstance(node.value, (ast.List, ast.Tuple)):
+                    collection_names.update(names)
+                    values = list(node.value.elts)
+                for value in values:
+                    if any(
+                        isinstance(child, ast.Name)
+                        and child.id in {"tmp_path", "tmpdir"}
+                        for child in ast.walk(value)
+                    ):
+                        continue
+                    path = _private_path(_resolve_path(value, aliases))
+                    if path is None:
+                        continue
+                    if (
+                        is_test
+                        and isinstance(value, ast.Constant)
+                        and isinstance(value.value, str)
+                        and not any(
+                            name.endswith("SUBPATH") or name in read_names
+                            for name in names
+                        )
+                    ):
+                        # Raw strings used as provenance labels are not file inputs.
+                        continue
+                    reference = f"{source.relative_to(root).as_posix()}:{node.lineno}"
+                    for name in names:
+                        paths.setdefault(path, set()).add(reference)
+                        paths_by_name.setdefault(name, set()).add(path)
+                        if isinstance(node, ast.Assign) and node in tree.body:
+                            aliases[name] = path
+            elif isinstance(node, ast.AnnAssign) and node.value is not None:
+                names = _target_names(node.target)
+                path = _private_path(_resolve_path(node.value, aliases))
+                if path is not None:
+                    reference = f"{source.relative_to(root).as_posix()}:{node.lineno}"
+                    for name in names:
+                        paths.setdefault(path, set()).add(reference)
+                        paths_by_name.setdefault(name, set()).add(path)
+                        if node in tree.body:
+                            aliases[name] = path
+
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Name) or not isinstance(node.ctx, ast.Load):
+                continue
+            name_paths = paths_by_name.get(node.id, set())
+            if len(name_paths) == 1 or node.id in collection_names:
+                for path in name_paths:
+                    paths[path].add(
+                        f"{source.relative_to(root).as_posix()}:{node.lineno}"
+                    )
+
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            if isinstance(node.func, ast.Attribute) and node.func.attr in PATH_READ_METHODS:
+                target = node.func.value
+            elif isinstance(node.func, ast.Name) and node.func.id == "open" and node.args:
+                target = node.args[0]
+            else:
+                continue
+            if any(
+                isinstance(child, ast.Name)
+                and child.id in {"tmp_path", "tmpdir"}
+                for child in ast.walk(target)
+            ):
+                continue
+            path = _private_path(_resolve_path(target, aliases))
+            if path is not None:
+                paths.setdefault(path, set()).add(
+                    f"{source.relative_to(root).as_posix()}:{node.lineno}"
+                )
+
+        # The corpus root is a module-level path string consumed by the glob
+        # reader; it is not itself a file to copy.
+        for names, value, line in _assignments(tree):
+            if not any(name.endswith("SUBPATH") for name in names):
+                continue
+            path = _private_path(_resolve_path(value, aliases))
+            if path is not None:
+                paths.setdefault(path, set()).add(
+                    f"{source.relative_to(root).as_posix()}:{line}"
+                )
+                for name in names:
+                    aliases[name] = path
+    return paths, trees, aliases_by_file
+
+
+def _glob_specs(
+    root: Path,
+    trees: dict[Path, ast.AST],
+    aliases_by_file: dict[Path, dict[str, str]],
+) -> list[tuple[str, Path, int]]:
+    specs = []
+    for source, tree in trees.items():
+        aliases = aliases_by_file[source]
+        subpaths = [
+            path
+            for name, path in aliases.items()
+            if name.endswith("SUBPATH") and path.startswith("docs-private/")
+        ]
+        for node in ast.walk(tree):
+            if not (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "glob"
+                and node.args
+                and isinstance(node.args[0], ast.Constant)
+                and isinstance(node.args[0].value, str)
+            ):
+                continue
+            pattern = node.args[0].value
+            if not any(char in pattern for char in "*?["):
+                continue
+            base = _private_path(_resolve_path(node.func.value, aliases))
+            if base is None and len(subpaths) == 1:
+                base = subpaths[0]
+            if base is not None:
+                specs.append(((PurePosixPath(base) / pattern).as_posix(), source, node.lineno))
+    return sorted(set(specs), key=lambda item: (item[0], str(item[1]), item[2]))
+
+
+def _old_expansions(manifest: dict[str, Any]) -> tuple[set[str], set[str], set[str]]:
+    c6, profiles, literature = set(), set(), set()
+    for entry in manifest["entries"]:
+        if entry["kind"] == "glob" and entry["path"] == "docs-private/grind/manifest-c6-*.json":
+            c6.update(item["path"] for item in entry["required"])
+        elif entry["kind"] == "glob" and entry["path"] == "docs-private/deep-research/literature/*/benchmark-fixture.yaml":
+            literature.update(item["path"] for item in entry["required"])
+        elif entry["kind"] == "file" and entry["path"].startswith("docs-private/grind/profiles/"):
+            profiles.add(entry["path"])
+    return c6, profiles, literature
+
+
+def _files(root: Path, pattern: str) -> set[str]:
+    return {
+        path.relative_to(root).as_posix()
+        for path in root.glob(pattern)
+        if path.is_file()
+    }
+
+
+def _tracked_papers(root: Path) -> set[str]:
+    return {
+        path.parent.name
+        for path in (root / "tests" / "fixtures" / "corpus").glob(
+            "*/benchmark-fixture.yaml"
+        )
+    }
+
+
+def _profile_paths(
+    root: Path, manifest_paths: set[str], fallback: set[str], grind_dir: str
+) -> set[str]:
+    if not manifest_paths or not all((root / path).is_file() for path in manifest_paths):
+        return fallback
+    profiles = set()
+    try:
+        for path in manifest_paths:
+            payload = json.loads((root / path).read_text(encoding="utf-8"))
+            profiles.update(
+                (PurePosixPath(grind_dir) / job["profile"]).as_posix()
+                for job in payload.get("jobs", [])
+            )
+    except (OSError, KeyError, TypeError, json.JSONDecodeError):
+        return fallback
+    return profiles or fallback
+
+
+def _reader_lines(tree: ast.AST, method: str) -> set[int]:
+    return {
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == method
+    }
+
+
+def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
+    manifest_path = root / "tests" / "docs_private_inputs.json"
+    previous = json.loads(manifest_path.read_text(encoding="utf-8"))
+    old_c6, old_profiles, old_literature = _old_expansions(previous)
+    path_readers, trees, aliases = _readers(root)
+    globs = _glob_specs(root, trees, aliases)
+    c6_pattern = next(
+        path for path, _source, _line in globs
+        if path == "docs-private/grind/manifest-c6-*.json"
+    )
+    literature_pattern = next(
+        path for path, _source, _line in globs
+        if path == "docs-private/deep-research/literature/*/benchmark-fixture.yaml"
+    )
+    c6_reader_source = next(source for path, source, _line in globs if path == c6_pattern)
+    literature_source = next(source for path, source, _line in globs if path == literature_pattern)
+    c6_tree = trees[c6_reader_source]
+    literature_tree = trees[literature_source]
+
+    c6_names = {
+        node.value
+        for node in ast.walk(c6_tree)
+        if isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and MANIFEST_NAME.fullmatch(node.value)
+    }
+    c6_paths = {
+        (PurePosixPath("docs-private/grind") / name).as_posix()
+        for name in c6_names
+    } | _files(root, c6_pattern) | old_c6
+
+    c6_manifest_paths = {
+        path
+        for path in path_readers
+        if path.startswith("docs-private/grind/manifest-c6-") and path.endswith(".json")
+    }
+    profiles = old_profiles | _profile_paths(
+        root, c6_manifest_paths, old_profiles, "docs-private/grind"
+    )
+    profile_test_lines = {
+        node.lineno
+        for node in ast.walk(c6_tree)
+        if isinstance(node, ast.Subscript)
+        and isinstance(node.slice, ast.Constant)
+        and node.slice.value == "profile"
+    }
+    epoch_path = root / "scripts" / "epoch_grind.py"
+    epoch_tree = ast.parse(epoch_path.read_text(encoding="utf-8"))
+    profile_epoch_lines = {
+        node.lineno
+        for node in ast.walk(epoch_tree)
+        if isinstance(node, ast.Attribute)
+        and node.attr == "profile"
+        and isinstance(node.value, ast.Name)
+        and node.value.id == "job"
+    } | {
+        node.lineno
+        for node in ast.walk(epoch_tree)
+        if isinstance(node, ast.Call)
+        and (
+            isinstance(node.func, ast.Name)
+            and node.func.id == "_file_sha256"
+            or isinstance(node.func, ast.Name)
+            and node.func.id == "_load_mapping"
+            and node.args
+            and isinstance(node.args[0], ast.Name)
+            and node.args[0].id == "profile_path"
+        )
+    }
+    profile_reader = "; ".join(
+        (
+            f"{c6_reader_source.relative_to(root).as_posix()}:{','.join(map(str, sorted(profile_test_lines)))}",
+            f"scripts/epoch_grind.py:{','.join(map(str, sorted(profile_epoch_lines)))}",
+        )
+    )
+
+    tracked = _tracked_papers(root)
+    corpus_files = {
+        path
+        for path in _files(root, literature_pattern)
+        if PurePosixPath(path).parent.name not in tracked
+    }
+    literature = corpus_files | old_literature
+    corpus_read_lines = _reader_lines(literature_tree, "read_text")
+    corpus_call_line = next(
+        line for path, source, line in globs if path == literature_pattern and source == literature_source
+    )
+    corpus_reader = (
+        f"{literature_source.relative_to(root).as_posix()}:"
+        f"{','.join(map(str, sorted(corpus_read_lines | {corpus_call_line})))}"
+    )
+
+    entries: list[dict[str, Any]] = []
+    corpus_root = PurePosixPath(literature_pattern).parts[:-2]
+    corpus_root_path = PurePosixPath(*corpus_root).as_posix()
+    if corpus_root_path in path_readers:
+        entries.append(
+            {
+                "kind": "directory",
+                "path": f"{corpus_root_path}/",
+                "reader": corpus_reader,
+                "copy": False,
+            }
+        )
+
+    for path, readers in sorted(path_readers.items()):
+        if path in c6_paths or path in profiles or path in literature:
+            continue
+        if path.startswith("docs-private/deep-research/literature/") and path.endswith(
+            "/benchmark-fixture.yaml"
+        ) and PurePosixPath(path).parent.name in tracked:
+            continue
+        if PurePosixPath(path).suffix:
+            entries.append(
+                {"kind": "file", "path": path, "reader": _format_readers(readers)}
+            )
+
+    c6_call_line = next(line for path, _source, line in globs if path == c6_pattern)
+    c6_required_reader = f"{c6_reader_source.relative_to(root).as_posix()}:44,203"
+    entries.append(
+        {
+            "kind": "glob",
+            "path": c6_pattern,
+            "reader": f"{c6_reader_source.relative_to(root).as_posix()}:{c6_call_line},203",
+            "required": [
+                {
+                    "path": path,
+                    "reader": _format_readers(
+                        path_readers.get(path, set()) | {c6_required_reader}
+                    ),
+                }
+                for path in sorted(c6_paths)
+            ],
+        }
+    )
+    entries.extend(
+        {"kind": "file", "path": path, "reader": profile_reader}
+        for path in sorted(profiles)
+    )
+    entries.append(
+        {
+            "kind": "glob",
+            "path": literature_pattern,
+            "reader": f"{literature_source.relative_to(root).as_posix()}:{corpus_call_line}",
+            "required": [
+                {"path": path, "reader": corpus_reader} for path in sorted(literature)
+            ],
+        }
+    )
+    known_patterns = {c6_pattern, literature_pattern}
+    previous_globs = {
+        entry["path"]: entry
+        for entry in previous["entries"]
+        if entry["kind"] == "glob"
+    }
+    extra_patterns = sorted(
+        {pattern for pattern, _source, _line in globs} - known_patterns
+    )
+    for pattern in extra_patterns:
+        prior = previous_globs.get(pattern, {})
+        required_readers = {
+            item["path"]: item["reader"] for item in prior.get("required", [])
+        }
+        required_paths = set(required_readers) | _files(root, pattern)
+        readers = {
+            f"{source.relative_to(root).as_posix()}:{line}"
+            for candidate, source, line in globs
+            if candidate == pattern
+        }
+        entries.append(
+            {
+                "kind": "glob",
+                "path": pattern,
+                "reader": _format_readers(readers),
+                "required": [
+                    {
+                        "path": path,
+                        "reader": required_readers.get(
+                            path, _format_readers(readers)
+                        ),
+                    }
+                    for path in sorted(required_paths)
+                ],
+            }
+        )
+    entries.sort(key=lambda entry: (entry["path"], entry["kind"]))
+
+    conftest = trees[root / "conftest.py"]
+    strict_env = next(
+        node.value
+        for names, value, _line in _assignments(conftest)
+        if "DOCS_PRIVATE_MANIFEST_STRICT_ENV" in names
+        for node in [value]
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    )
+    return {
+        "schema_version": 1,
+        "strict_env": f"{strict_env}=1",
+        "entries": entries,
+    }
+
+
+def main() -> None:
+    # Sparse seats omit docs-private. In that case only dynamic expansions are
+    # read from the committed manifest; all path declarations above are rescanned.
+    print(json.dumps(derive_manifest(), indent=2))
+
+
+if __name__ == "__main__":
+    main()
