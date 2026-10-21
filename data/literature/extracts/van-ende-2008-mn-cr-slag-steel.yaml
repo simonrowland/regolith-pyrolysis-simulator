@@ -1,0 +1,347 @@
+schema_version: literature_extract.v1
+source_id: van-ende-2008-mn-cr-slag-steel
+source:
+  citation: >-
+    Van Ende, M.-A., Guo, M., Jones, P. T., Blanpain, B. and Wollants, P. (2008),
+    “Manganese and Chromium Distribution between CaO–SiO2–MgOsat.–CrO1.5–MnO Slags
+    and Fe–Cr–Mn Stainless Steel,” ISIJ International 48(10), 1331–1338.
+  doi: 10.2355/isijinternational.48.1331
+  url: https://doi.org/10.2355/isijinternational.48.1331
+  year: 2008
+  corpus_source_id: van-ende-2008-mn-cr-slag-steel
+extraction:
+  method: >-
+    Born-digital pdftotext-layout.txt was the primary text source. Tables 1–4 and all
+    figure captions were checked against 600 dpi page renders. No table values were
+    emitted as observations: the tables contain steelmaking interaction parameters,
+    initial and equilibrated phase-composition vectors, and Mn/Cr distribution ratios;
+    these do not match a quantity token for slag activity. Activity coefficients and
+    activities are calculated quantities, and every plot remains deferred without
+    digitisation. No plotted values were estimated.
+  date: '2026-10-21'
+  worker: fam37-1021
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: van_ende_2008_table_1_steel_interaction_coefficients
+        type: composition
+        locator: {page: 2, pdf_page_index: 1, published_page: '1332', table: '1'}
+        units: interaction coefficients, as printed
+        values:
+          method_class: quoted_attributed
+          quantity_as_printed: first-order oxygen interaction coefficients in liquid steel
+          candidate_tokens: [interaction_parameter]
+          attribution: reference 30, as cited in the paper
+          phase_system: liquid Fe–Cr–Mn stainless steel
+          printed_rows_csv: |
+            i,j,e_i^j
+            O,Cr,-0.04
+            O,Mn,-0.021
+            O,O,-0.20
+          note: >-
+            These steel oxygen-activity parameters are quoted from reference 30 and are
+            not slag activity data; retained as context rather than scored.
+      - observation_id: van_ende_2008_table_2_initial_steel_composition
+        type: composition
+        locator: {page: 3, pdf_page_index: 2, published_page: '1333', table: '2'}
+        units: mass% as printed
+        values:
+          method_class: measured_tabulated
+          quantity_as_printed: charged stainless-steel master-alloy composition
+          candidate_tokens: [residue_component_composition, equilibrium_phase_composition]
+          phase_system: Fe–Cr–Mn stainless steel
+          printed_rows_csv: |
+            Mn,Cr,C,Ni,Si,N,Al
+            11.8,17.5,0.15,0.5,0.3,0.26,0.008
+          note: >-
+            This is an initial alloy-composition vector. equilibrium_phase_composition
+            is scalar-only and the available residue composition quantity does not
+            describe this charged steel alloy.
+      - observation_id: van_ende_2008_table_3_initial_slag_compositions_and_conditions
+        type: composition
+        locator: {page: 3, pdf_page_index: 2, published_page: '1333', table: '3'}
+        units: mass%, h, °C, as printed
+        values:
+          method_class: measured_tabulated
+          quantity_as_printed: experimental conditions and initial slag compositions
+          candidate_tokens: [residue_component_composition, equilibrium_phase_composition]
+          temperature_C: 1600 for experiments 1–5; 1550 for 6-1; 1580 for 6-2
+          shared_conditions: >-
+            MgO=10 mass%; groups 1–3 have MnO=10 mass%; group 4 has MnO=20 mass%;
+            group 5 has MnO=10 mass%; group 6 has MnO=10 mass%. Group-shared cells
+            are printed as merged cells in Table 3.
+          printed_rows_csv: |
+            experiment,equilibration_h,T_C,MgO,MnO,CrO1.5,CaO,SiO2,CaO/SiO2
+            1-1,10,1600,10,10,10,42.0,28.0,1.5
+            1-2,15,1600,10,10,10,42.0,28.0,1.5
+            1-3,20,1600,10,10,10,42.0,28.0,1.5
+            1-4,2,1600,10,10,10,46.7,23.3,1.5
+            2-1,30,1600,10,10,10,23.3,46.7,0.5
+            2-2,30,1600,10,10,10,35.0,35.0,1.0
+            2-3,30,1600,10,10,10,42.0,28.0,1.5
+            3-1,20,1600,10,10,5,25.0,50.0,0.5
+            3-2,20,1600,10,10,5,37.5,37.5,1.0
+            3-3,20,1600,10,10,5,45.0,30.0,1.5
+            3-4,20,1600,10,10,5,50.0,25.0,2.0
+            4-1,20,1600,10,20,5,25.0,50.0,0.5
+            4-2,20,1600,10,20,5,32.5,32.5,1.0
+            4-3,20,1600,10,20,5,39.0,26.0,1.5
+            4-4,20,1600,10,20,5,43.3,21.7,2.0
+            5-1,20,1600,10,10,2,26.0,52.0,0.5
+            5-2,20,1600,10,10,2,46.8,31.2,1.5
+            6-1,20,1550,10,10,5,45.0,30.0,1.5
+            6-2,20,1580,10,10,5,45.0,30.0,1.5
+          note: >-
+            Initial mixtures are not the analysed equilibrated liquid slag. No composition
+            vector token represents these experiment inputs.
+      - observation_id: van_ende_2008_table_4_equilibrated_phase_compositions_and_distribution_ratios
+        type: composition
+        locator: {page: 4, pdf_page_index: 3, published_page: '1334', table: '4'}
+        units: mass% for steel and slag contents; LMn and LCr dimensionless
+        values:
+          method_class: measured_tabulated
+          quantity_as_printed: >-
+            coexisting steel and slag analyses and measured Mn and Cr distribution ratios
+          candidate_tokens: [residue_component_composition, equilibrium_phase_composition]
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 slag with liquid Fe–Cr–Mn stainless steel
+          temperature_K: 1873 for experiments 1–5; 1823 for 6-1; 1853 for 6-2
+          equilibrium_conditions: >-
+            Ar atmosphere at 1 atm; 20 h equilibration for the reported runs; samples
+            water-quenched before slag and steel analysis. Experiment groups 1–5 were
+            conducted at 1873 K, 6-1 at 1823 K, and 6-2 at 1853 K.
+          printed_rows_csv: |
+            experiment,steel_Mn_mass_percent,steel_Cr_mass_percent,steel_O_ppm,slag_MgO_mass_percent,slag_MnO_mass_percent,slag_CrO1.5_mass_percent,slag_CaO_mass_percent,slag_SiO2_mass_percent,B,LMn,LCr
+            1-1,7.8,18.1,—,11.8,14.8,5.3,40.4,26.0,2.01,1.47,0.200
+            1-2,7.2,17.6,126.2,13.8,14.5,4.3,39.0,26.2,2.02,1.56,0.167
+            1-3,6.9,19.2,134.7,15.2,13.7,5.7,39.2,24.6,2.21,1.54,0.203
+            1-4,9.9,17.5,154.1,12.1,14.5,9.0,41.5,27.1,1.98,1.13,0.352
+            2-1,5.8,20.2,103.0,36.7,11.2,1.8,10.8,37.7,1.26,1.50,0.061
+            2-2,4.2,20.0,60.6,8.9,8.7,0.6,33.2,48.6,0.87,1.60,0.021
+            2-3,4.8,20.1,119.7,12.6,9.4,1.1,38.8,37.9,1.36,1.52,0.037
+            3-1,5.1,20.2,67.5,25.3,8.2,0.7,28.5,37.3,1.44,1.25,0.024
+            3-2,5.7,20.7,80.7,23.0,10.3,1.6,27.6,36.6,1.38,1.40,0.053
+            3-3,7.3,19.4,100.3,12.2,10.6,2.1,43.3,29.2,1.90,1.12,0.074
+            3-4,8.3,19.8,68.3,13.4,8.7,2.5,46.9,27.7,2.18,0.81,0.086
+            4-1,6.1,19.6,92.8,22.2,11.5,1.8,26.8,37.7,1.30,1.46,0.063
+            4-2,7.7,19.5,95.2,16.8,13.0,1.7,30.3,36.8,1.28,1.31,0.060
+            4-3,9.3,19.0,136.6,10.1,14.7,2.9,41.7,28.4,1.82,1.22,0.104
+            4-4,8.7,19.6,140.2,15.9,12.6,3.0,43.1,24.9,2.37,1.12,0.105
+            5-1,6.5,19.2,51.3,24.7,8.4,0.6,26.6,39.6,1.30,1.00,0.021
+            5-2,10.6,18.6,47.0,10.7,7.5,0.9,48.2,31.9,1.85,0.55,0.033
+            6-1,9.2,19.8,98.2,11.4,8.0,1.4,46.6,31.4,1.85,0.67,0.048
+            6-2,8.4,19.5,141.0,12.2,8.8,1.8,44.5,30.8,1.84,0.81,0.063
+          note: >-
+            The measured phase-composition vectors have no compatible composition token:
+            equilibrium_phase_composition is scalar only, while residue_component_composition
+            does not represent coexisting slag and steel analyses. LMn and LCr are measured
+            mass-percent distribution ratios, for which the store has no quantity token.
+      - observation_id: van_ende_2008_fig2_equilibration_time
+        type: figure
+        locator: {page: 4, pdf_page_index: 3, published_page: '1334', figure: '2'}
+        units: LMn and LCr dimensionless as plotted; time h
+        values:
+          method_class: figure_only
+          typed_quantity: manganese and chromium slag/steel distribution ratios
+          quantity_as_printed: LMn and LCr versus equilibration time
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 slag and liquid Fe–Cr–Mn steel
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: equilibration time (h)
+          y_axis_as_printed: LMn and LCr
+          caption_as_printed: LMn and LCr as a function of equilibration time.
+          panel: single
+          series: [{name: LMn, marker: circle, marker_count: unknown}, {name: LCr, marker: triangle, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig3_mn_partition_basicity
+        type: figure
+        locator: {page: 4, pdf_page_index: 3, published_page: '1334', figure: '3'}
+        units: LMn dimensionless as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: manganese slag/steel distribution ratio
+          quantity_as_printed: LMn versus slag basicity B
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 slag and liquid Fe–Cr–Mn steel
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: B={(mass% CaO)+(mass% MgO)}/(mass% SiO2)
+          y_axis_as_printed: LMn
+          caption_as_printed: LMn as a function of slag basicity B at 1 873 K (see also Table 4).
+          panel: single
+          series: [{name: present experiments, marker: circle, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig4_mn_activity_model
+        type: figure
+        locator: {page: 4, pdf_page_index: 3, published_page: '1334', figure: '4'}
+        units: activity dimensionless as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: manganese activity in liquid Fe–Cr–Mn alloy
+          quantity_as_printed: aMn versus XMn
+          phase_system: liquid Fe–Cr–Mn alloy
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: XMn
+          y_axis_as_printed: aMn
+          caption_as_printed: Variation of aMn with XMn in the Fe–Mn–Cr melt at 1 873 K (corresponding Cr content in Table 2).
+          panel: single
+          series: [{name: Thermo-Calc calculated relation, marker: line, marker_count: 0}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig5_mno_activity
+        type: figure
+        locator: {page: 4, pdf_page_index: 3, published_page: '1334', figure: '5'}
+        units: dimensionless activity as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: MnO activity in liquid slag
+          quantity_as_printed: aMnO versus XMnO
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 liquid slag
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: XMnO
+          y_axis_as_printed: aMnO
+          caption_as_printed: Relation between aMnO and XMnO at 1 873 K; present results with Morales and Ding data.
+          panel: single
+          series: [{name: present work and cited works, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig6_mno_activity_coefficient
+        type: figure
+        locator: {page: 5, pdf_page_index: 4, published_page: '1335', figure: '6'}
+        units: dimensionless activity coefficient as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: Raoultian MnO activity coefficient
+          quantity_as_printed: gamma MnO versus MnO content in slag
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 liquid slag
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: MnO content in slag (mass%)
+          y_axis_as_printed: gamma MnO
+          caption_as_printed: Variation of gamma MnO with the MnO content in the slag at 1 873 K.
+          panel: single
+          series: [{name: present work and cited works, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig7_mno_activity_coefficient_basicity
+        type: figure
+        locator: {page: 5, pdf_page_index: 4, published_page: '1335', figure: '7'}
+        units: dimensionless activity coefficient as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: Raoultian MnO activity coefficient
+          quantity_as_printed: gamma MnO versus slag basicity B
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 liquid slag
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: B
+          y_axis_as_printed: gamma MnO
+          caption_as_printed: Variation of gamma MnO with the basicity B of CaO–SiO2–MgOsat.–MnO–CrO1.5 slags at 1 873 K.
+          panel: single
+          series: [{name: present work and cited works, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig8_cr_partition_basicity
+        type: figure
+        locator: {page: 5, pdf_page_index: 4, published_page: '1335', figure: '8'}
+        units: LCr dimensionless as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: chromium slag/steel distribution ratio
+          quantity_as_printed: LCr versus slag basicity B
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 slag and Fe–(4.2–10.6 mass% Mn)–(18.6–20.2 mass% Cr) steel
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: B
+          y_axis_as_printed: LCr
+          caption_as_printed: LCr between the slag and Fe–[4.2 to 10.6 mass%]Mn–[18.6 to 20.2 mass%]Cr alloys at 1 873 K as a function of slag basicity B.
+          panel: single
+          series: [{name: present experiments, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig9_cro15_activity_coefficient
+        type: figure
+        locator: {page: 6, pdf_page_index: 5, published_page: '1336', figure: '9'}
+        units: dimensionless activity coefficient as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: CrO1.5 activity coefficient in liquid slag
+          quantity_as_printed: gamma CrO1.5 versus slag basicity B
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 liquid slag
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: B
+          y_axis_as_printed: gamma CrO1.5
+          caption_as_printed: Variation of gamma CrO1.5 with the basicity B of the slag at 1 873 K.
+          panel: single
+          series: [{name: present work, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig10_cro15_activity_coefficient_basicity_ratio
+        type: figure
+        locator: {page: 6, pdf_page_index: 5, published_page: '1336', figure: '10'}
+        units: dimensionless activity coefficient as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: CrO1.5 activity coefficient in liquid slag
+          quantity_as_printed: gamma CrO1.5 versus (XCaO+XMgO)/XSiO2
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 liquid slag and cited slag systems
+          temperature_as_printed: 1873 K for present work; cited datasets include other conditions
+          x_axis_as_printed: (XCaO+XMgO)/XSiO2
+          y_axis_as_printed: gamma CrO1.5
+          caption_as_printed: gamma CrO1.5 as a function of (XCaO+XMgO)/XSiO2.
+          panel: single
+          series: [{name: present work and cited works, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig11_mn_partition_cro15_content
+        type: figure
+        locator: {page: 6, pdf_page_index: 5, published_page: '1336', figure: '11'}
+        units: LMn dimensionless as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: manganese slag/steel distribution ratio
+          quantity_as_printed: LMn versus CrO1.5 content
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 liquid slag and liquid Fe–Cr–Mn steel
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: CrO1.5 content in slag
+          y_axis_as_printed: LMn
+          caption_as_printed: Variation of LMn with CrO1.5 content in the slag at 1 873 K.
+          panel: single
+          series: [{name: present experiments at different basicity, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig12_cr_partition_mno_content
+        type: figure
+        locator: {page: 7, pdf_page_index: 6, published_page: '1337', figure: '12'}
+        units: LCr dimensionless as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: chromium slag/steel distribution ratio
+          quantity_as_printed: LCr versus MnO content
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 slag and Fe–Cr–Mn steel
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: MnO content in slag
+          y_axis_as_printed: LCr
+          caption_as_printed: LCr between slag and Fe–[4.2 to 10.6 mass%]Mn–[18.6 to 20.2 mass%]Cr alloy at 1 873 K as a function of MnO content.
+          panel: single
+          series: [{name: present experiments at different basicity, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig13_steel_composition_basicity
+        type: figure
+        locator: {page: 7, pdf_page_index: 6, published_page: '1337', figure: '13'}
+        units: mass% as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: manganese and chromium concentrations in liquid steel
+          quantity_as_printed: steel Mn and Cr content versus slag basicity B
+          phase_system: Fe–Cr–Mn liquid steel equilibrated with CaO–SiO2–MgOsat.–MnO–CrO1.5 slag
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: B
+          y_axis_as_printed: steel Mn content (panel a); steel Cr content (panel b)
+          caption_as_printed: Changes in the (a) Mn content and (b) Cr content in liquid steel as a function of slag basicity B at 1 873 K.
+          panel: a (Mn), b (Cr)
+          series: [{name: steel Mn content, panel: a, marker: symbols, marker_count: unknown}, {name: steel Cr content, panel: b, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
+      - observation_id: van_ende_2008_fig14_partition_temperature
+        type: figure
+        locator: {page: 7, pdf_page_index: 6, published_page: '1337', figure: '14'}
+        units: LMn and LCr dimensionless as plotted
+        values:
+          method_class: figure_only
+          typed_quantity: manganese and chromium slag/steel distribution ratios
+          quantity_as_printed: LMn and LCr versus temperature
+          phase_system: CaO–SiO2–MgOsat.–MnO–CrO1.5 slag and Fe–Cr–Mn steel
+          temperature_as_printed: 1823–1873 K
+          x_axis_as_printed: temperature (K)
+          y_axis_as_printed: LMn and LCr
+          caption_as_printed: Influence of temperature on LMn and LCr.
+          panel: single
+          series: [{name: LMn, marker: symbols, marker_count: unknown}, {name: LCr, marker: symbols, marker_count: unknown}]
+          digitisation: deferred to a figure pass
