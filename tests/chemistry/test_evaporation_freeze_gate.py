@@ -3493,9 +3493,16 @@ def test_shared_freeze_gate_curve_cache_uses_registered_authoritative_supplier(
         )
         sim.melt.temperature_C = 1600.0
         sim.melt.p_total_mbar = 10.0
+        # EC sampling reads equilibrate().liquid_fraction, not the finder
+        # result's liquid_fraction field. The helper's 0.8 sits below the
+        # liquid band at the declared liquidus, so the freeze gate refuses
+        # the curve. This supplier declares a liquidus, so the sample there
+        # is fully liquid.
+        equilibrium = _build_equilibrium_for_basalt()
+        equilibrium.liquid_fraction = 1.0
         backend = RegisteredAlphaBackend(
             mode='python_api',
-            equilibrium=_build_equilibrium_for_basalt(),
+            equilibrium=equilibrium,
             finder_result=LiquidusSolidusResult(
                 liquidus_T_C=liquidus,
                 solidus_T_C=1000.0,
