@@ -747,6 +747,30 @@ class CampaignManager:
             return scalar_value
         return self._float(config.get(default_key), default)
 
+    def _validate_campaign_total_pressure(
+            self,
+            melt: MeltState,
+            campaign: CampaignPhase,
+            pressure_mbar: float,
+            *,
+            stage_name: str | None = None) -> None:
+        # Numerical resolution, not ambient pump load or a flow-regime bound.
+        # 1 mbar = 1e-3 bar, so divide the environment's bar floor by 1e-3.
+        floor_mbar = numerical_pressure_floor_bar_for_body(melt.body) / 1.0e-3
+        if (not math.isfinite(pressure_mbar)
+                or pressure_mbar <= 0.0 or pressure_mbar < floor_mbar):
+            diagnostic = {
+                'status': 'refused',
+                'campaign': self._campaign_config_key(campaign),
+                'detail': (
+                    'p_total_mbar must be finite and positive and at least '
+                    f'the numerical pressure floor {floor_mbar} mbar'
+                ),
+            }
+            if stage_name is not None:
+                diagnostic['stage_name'] = stage_name
+            raise CampaignPressureSetpointRefusal(diagnostic)
+
     def _configured_max_hold_hr(self,
                                 campaign: CampaignPhase,
                                 *path: str) -> float:
@@ -1260,13 +1284,10 @@ class CampaignManager:
         if not isinstance(stage, Mapping):
             raise ValueError('C2A_staged.stages did not select a stage')
         atmosphere, diagnostic = self._c2a_staged_stage_gas_control(stage)
-        # A numerical resolution floor is distinct from ambient pump load.
-        floor_mbar = numerical_pressure_floor_bar_for_body(melt.body) / 1.0e-3
-        if float(diagnostic['p_total_mbar']) < floor_mbar:
-            raise CampaignPressureSetpointRefusal({
-                'status': 'refused', 'stage_name': self._c2a_staged_stage_label(stage),
-                'detail': f'p_total_mbar below numerical pressure floor {floor_mbar} mbar',
-            })
+        self._validate_campaign_total_pressure(
+            melt, active_campaign, float(diagnostic['p_total_mbar']),
+            stage_name=self._c2a_staged_stage_label(stage),
+        )
         melt.atmosphere = atmosphere
         melt.pO2_mbar = float(diagnostic['pO2_mbar'])
         melt.p_total_mbar = float(diagnostic['p_total_mbar'])
@@ -1536,6 +1557,11 @@ class CampaignManager:
         # Apply runtime overrides (pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
         if 'pO2_mbar' in ovr:
+            # An O2 override can raise total pressure below; it must not conceal
+            # an invalid configured total. Staged gas controls resolve their own
+            # effective pressure; C0's explicit hard-vacuum mode permits zero.
+            if campaign not in (CampaignPhase.C0, CampaignPhase.C2A_STAGED):
+                self._validate_campaign_total_pressure(melt, campaign, melt.p_total_mbar)
             # 0.5.4 W5 milestone-review P1 (codex /challenge
             # 2026-05-28): mirror the active-path atmosphere switch
             # at ``simulator/session.py:276-298`` here too. Pre-fix
@@ -1616,6 +1642,8 @@ class CampaignManager:
                 # explicitly named axial — whole-dataclass replace.
                 melt.stir_state = new_state
 
+        if campaign not in (CampaignPhase.C0, CampaignPhase.IDLE, CampaignPhase.COMPLETE):
+            self._validate_campaign_total_pressure(melt, campaign, melt.p_total_mbar)
         melt.validate_melt_pressures()
 
     # ------------------------------------------------------------------

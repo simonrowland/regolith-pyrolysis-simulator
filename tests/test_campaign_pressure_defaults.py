@@ -727,3 +727,92 @@ def test_c2a_staged_admission_uses_numerical_total_floor(body):
     stage["p_total_mbar"] = math.nextafter(floor_mbar, 0.0)
     with pytest.raises(CampaignPressureSetpointRefusal, match="numerical pressure floor"):
         CampaignManager(setpoints).configure_campaign(MeltState(body=body), CampaignPhase.C2A_STAGED)
+
+
+RECIPE_PRESSURE_CAMPAIGNS = (
+    CampaignPhase.C0B, CampaignPhase.C2A, CampaignPhase.C2A_STAGED,
+    CampaignPhase.C2B, CampaignPhase.C3_K, CampaignPhase.C3_NA,
+    CampaignPhase.C4, CampaignPhase.C5, CampaignPhase.C6,
+    CampaignPhase.C7_CA_ALUMINOTHERMIC, CampaignPhase.MRE_BASELINE,
+)
+
+
+def _set_campaign_pressure(setpoints, campaign, pressure):
+    key = CampaignManager(setpoints)._campaign_config_key(campaign)
+    config = setpoints['campaigns'][key]
+    config.update(pO2_mbar=0.0, pO2_mbar_default=0.0,
+                  p_total_mbar=pressure, p_total_mbar_default=pressure)
+    if campaign == CampaignPhase.C2A_STAGED:
+        _stage(setpoints, 'alkali_early_fe').update(
+            gas_cover_mode='pn2_sweep', pO2_mbar=0.0, p_total_mbar=pressure,
+        )
+
+
+@pytest.mark.parametrize('campaign', RECIPE_PRESSURE_CAMPAIGNS)
+@pytest.mark.parametrize('pressure', [0.0, 1e-20, -1.0, math.nan, math.inf, -math.inf])
+def test_all_recipe_pressure_campaigns_retain_typed_physical_admission(campaign, pressure):
+    setpoints = deepcopy(_setpoints())
+    _set_campaign_pressure(setpoints, campaign, pressure)
+    with pytest.raises(CampaignPressureSetpointRefusal):
+        CampaignManager(setpoints).configure_campaign(MeltState(body='moon'), campaign)
+
+
+@pytest.mark.parametrize('body', ['', 'moon', 'asteroid', 'mars'])
+def test_c2a_continuous_runtime_pressure_floor_boundary(body):
+    from simulator.environment import numerical_pressure_floor_bar_for_body
+
+    floor = numerical_pressure_floor_bar_for_body(body) / 1e-3
+    setpoints = deepcopy(_setpoints())
+    _set_campaign_pressure(setpoints, CampaignPhase.C2A, floor)
+    melt = MeltState(body=body)
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C2A)
+    assert melt.p_total_mbar == floor
+    _set_campaign_pressure(setpoints, CampaignPhase.C2A, math.nextafter(floor, 0.0))
+    with pytest.raises(CampaignPressureSetpointRefusal, match='numerical pressure floor'):
+        CampaignManager(setpoints).configure_campaign(MeltState(body=body), CampaignPhase.C2A)
+
+
+@pytest.mark.parametrize('pressure', [0.01, 1000.0])
+def test_c2a_continuous_runtime_pressure_outside_search_envelope_is_preserved(pressure):
+    setpoints = deepcopy(_setpoints())
+    _set_campaign_pressure(setpoints, CampaignPhase.C2A, pressure)
+    melt = MeltState(body='moon')
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C2A)
+    assert melt.p_total_mbar == pressure
+
+
+@pytest.mark.parametrize('pressure', [0.0, 1e-20])
+def test_c2a_continuous_invalid_pressure_refuses_before_simulator_tick(pressure):
+    run = PyrolysisRun(
+        feedstock_id='lunar_mare_low_ti', campaign='C2A_continuous', hours=1,
+        allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+        setpoints_patch={'campaigns': {'C2A_continuous': {
+            'pO2_mbar': 0.0, 'p_total_mbar': pressure,
+            'p_total_mbar_default': pressure,
+        }}},
+    )
+    execution = RunExecutor().execute(run._session_config())
+    assert execution.status == 'refused'
+    assert execution.reason == CampaignPressureSetpointRefusal.reason
+    assert execution.per_hour == ()
+    assert execution.snapshots == ()
+
+
+def test_c2a_continuous_o2_override_does_not_repair_invalid_total():
+    setpoints = deepcopy(_setpoints())
+    _set_campaign_pressure(setpoints, CampaignPhase.C2A, 0.0)
+    manager = CampaignManager(setpoints)
+    manager.overrides['C2A'] = {'pO2_mbar': 1.0}
+    with pytest.raises(CampaignPressureSetpointRefusal):
+        manager.configure_campaign(MeltState(body='moon'), CampaignPhase.C2A)
+
+
+@pytest.mark.parametrize('stages', [None, []])
+def test_c2a_staged_without_schedule_retains_total_pressure_admission(stages):
+    setpoints = deepcopy(_setpoints())
+    _set_campaign_pressure(setpoints, CampaignPhase.C2A_STAGED, 1e-20)
+    setpoints['campaigns']['C2A_staged']['stages'] = stages
+    with pytest.raises(CampaignPressureSetpointRefusal):
+        CampaignManager(setpoints).configure_campaign(
+            MeltState(body='moon'), CampaignPhase.C2A_STAGED,
+        )
