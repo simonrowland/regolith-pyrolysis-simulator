@@ -12,6 +12,7 @@ from tools.validate_literature_extracts import validate_extract_document
 
 
 EXTRACT = REPO_ROOT / "data/literature/extracts/kems-055-kambayashi-1983.yaml"
+TABLE2_MGO_ACTIVITY_03 = Decimal("0.138")
 
 
 def test_extract_covers_table_values_and_migrates_every_typed_row_as_a_point() -> None:
@@ -52,6 +53,9 @@ def test_extract_covers_table_values_and_migrates_every_typed_row_as_a_point() -
     assert migrator.result.observations[
         f"{EXTRACT.stem}::kambayashi_1983_table2_mgo_activity_10"
     ].value.point == Decimal("1")
+    assert migrator.result.observations[
+        f"{EXTRACT.stem}::kambayashi_1983_table2_mgo_activity_03"
+    ].value.point == TABLE2_MGO_ACTIVITY_03
 
 
 def test_table1_ratio_and_table2_activity_rows_are_complete() -> None:
