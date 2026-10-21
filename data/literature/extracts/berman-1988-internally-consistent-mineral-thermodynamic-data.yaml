@@ -193,11 +193,12 @@ fidelity_samples:
     pdf_page_index: 19
     table: 3b
 source_notes:
-  table2_full_cell_audit: The per-cell comparison is in the task notes audit CSV. The generic Albite row differs
-    from the CHNOSZ row named albite for delta_fG (printed -3703.293; aid -3711.715 kJ/mol), delta_fH (printed
-    -3921.618; aid -3935.100 kJ/mol), and S (printed 224.412; aid 207.443 J/(mol K)). The printed values are
-    retained; they align with the separate low-Albite row in the aid. The four fluid rows are absent from the
-    CHNOSZ transcription, so their printed values are used.
+  table2_full_cell_audit: The per-cell comparison is in the task notes audit CSV. The printed generic Albite row is
+    the high (disordered) row and equals CHNOSZ albite,high (-3703.293 kJ/mol delta_fG; -3921.618 kJ/mol delta_fH;
+    224.412 J/(mol K) S; V 10.083 J/bar/mol). The aid's generic albite row is the printed Albite (low) row
+    (-3711.715 kJ/mol delta_fG; -3935.100 kJ/mol delta_fH; 207.443 J/(mol K) S; V 10.043 J/bar/mol). The printed
+    values are retained. The four fluid rows are absent from the CHNOSZ transcription, so their printed values are
+    used.
   CHNOSZ_aid: Third-party CHNOSZ transcription, 67 rows; energies stored in J/mol while Table 2 prints kJ/mol. The
     printed tables remain authoritative. CHNOSZ uses an extended winTWQ Cp representation with k4-k6 zero; these
     are aid-side extension fields and are not added to the printed four-term parameter set.
@@ -18128,6 +18129,8 @@ species:
         temperature_K: 298.15
         pressure_Pa: 100000
         units: J bar^-1 mol^-1
+        interpretation: Printed Table 2 placeholder, not the volume to integrate. Equation (7) gives the CO2
+          equation of state from Kerrick & Jacobs (1981).
     - observation_id: berman1988_carbon_dioxide_gas_table3a_cp
       type: table_parameter_context
       locator:
@@ -18342,6 +18345,8 @@ species:
         temperature_K: 298.15
         pressure_Pa: 100000
         units: J bar^-1 mol^-1
+        interpretation: Printed Table 2 placeholder, not the volume to integrate. Equation (7) gives the H2O equation
+          of state from Haar et al. (1984) below 10 kb and Delany & Helgeson (1978) above 10 kb.
   water_gas:
     observations:
     - observation_id: berman1988_water_gas_delta_fG
@@ -18503,6 +18508,8 @@ species:
         temperature_K: 298.15
         pressure_Pa: 100000
         units: J bar^-1 mol^-1
+        interpretation: Printed Table 2 placeholder, not the volume to integrate. Equation (7) gives the H2O equation
+          of state from Haar et al. (1984) below 10 kb and Delany & Helgeson (1978) above 10 kb.
     - observation_id: berman1988_water_gas_table3a_cp
       type: table_parameter_context
       locator:
@@ -18548,6 +18555,9 @@ species:
         equation_extension:
           footnote_marker: ¶
           equation_number: 4
+          footnote_as_printed: For all calculations presented in this paper, the Cp of water was calculated with
+            the Haar et al. (1984) equation of state. In the alternate representation given here, Eq. 4 is extended
+            to include the terms -0.0002062 T + 51055.16 T^-1.
           additional_terms:
           - coefficient: -0.0002062
             temperature_power: 1
@@ -18717,3 +18727,6 @@ species:
         temperature_K: 298.15
         pressure_Pa: 100000
         units: J bar^-1 mol^-1
+        interpretation: Printed Table 2 placeholder, not the volume to integrate. Equation (7) replaces gas volume
+          integration with Haar et al. (1984) for H2O below 10 kb, Delany & Helgeson (1978) for H2O above 10 kb, and
+          Kerrick & Jacobs (1981) for CO2.
