@@ -1,0 +1,54 @@
+schema_version: literature_extract.v1
+source_id: colson-keedy-1990-lpsc-redox-relationships
+source:
+  citation: >-
+    Colson, R. O., & Keedy, C. R. (1990). Redox relationships in silicate
+    melts and silicate melt structure. Lunar and Planetary Science Conference
+    XXI, 216–217.
+  year: 1990
+extraction:
+  method: >-
+    LPSC abstract and its printed Table 1 transcribed from the publisher scan;
+    figures are deferred. Table 1 reports reaction enthalpy and entropy for
+    redox changes in different compositions. These are reaction properties,
+    not a supported species formation or partial-molar token, so the measured
+    values remain context.
+  date: '2026-10-20'
+  worker: codex
+  provenance_path: text/colson-keedy-1990-lpsc-redox-relationships/mineru/p001-p002/out/colson-keedy-1990-lpsc-redox-relationships-p001-p002/vlm/colson-keedy-1990-lpsc-redox-relationships-p001-p002.md
+review_status: draft
+species:
+  Cr:
+    observations: []
+    context:
+      - observation_id: colson_keedy_1990_table1_redox_reaction_thermodynamics
+        type: measured_table_context
+        locator: {page: 2, pdf_page_index: 1, published_page: 217, table: '1'}
+        units: ΔH* kcal/mol; ΔS* cal/mol; 1450°C; pO2=1 atm
+        reason: >-
+          Candidate tokens considered: partial_molar_enthalpy, heat_of_fusion,
+          and entropy_of_fusion. None describes the composition-dependent
+          reduction-reaction ΔH*/ΔS* in this table. The abstract identifies the
+          values as reaction properties; no species thermodynamic value is
+          inferred.
+        values:
+          quantity_as_printed: reduction_reaction_enthalpy_and_entropy_change_between_diopsidic_and_basalt_like_compositions
+          conditions_as_printed: 1450°C and pO2=1 atm
+          rows:
+            - {cation: Cr, basalt_like_delta_H_kcal_mol: '34.5±13', basalt_like_delta_S_cal_mol: '9.6±7', diopsidic_delta_H_kcal_mol: '28.9±3', diopsidic_delta_S_cal_mol: '6.7±2'}
+            - {cation: Ni, basalt_like_delta_H_kcal_mol: '31.8±12', basalt_like_delta_S_cal_mol: '10.6±7', diopsidic_delta_H_kcal_mol: '47.6', diopsidic_delta_S_cal_mol: '17.0¹'}
+            - {cation: In, basalt_like_delta_H_kcal_mol: '51.0±12', basalt_like_delta_S_cal_mol: '19.5±7', diopsidic_delta_H_kcal_mol: '78.3±8', diopsidic_delta_S_cal_mol: '32.6±5'}
+            - {cation: Eu, basalt_like_delta_H_kcal_mol: '33.4±13', basalt_like_delta_S_cal_mol: '10.3±7', diopsidic_delta_H_kcal_mol: '30.7±5', diopsidic_delta_S_cal_mol: '5.3±3'}
+          quoted_attribution: 'Ni diopsidic ΔS*: data from reference [4]'
+      - observation_id: colson_keedy_1990_figures_1_2
+        type: figure
+        locator: {page: 2, pdf_page_index: 1, published_page: 217, figure: '1'}
+        units: figure-only; no numeric points
+        reason: Figures contain plotted reduction potentials; digitisation is deferred by the family rule.
+        values:
+          quantity: redox_potential_comparison_and_polymerization_dependence
+          method_class: figure_only
+          figures:
+            - {figure: '1', caption: 'Change in reduction potential for several cations between diopsidic and basalt-like melts.', panel: main, species: Cr, phase: melt, T: '1450°C', axes_as_printed: {x: E*(diopsidic), y: avg(E*(diopsidic)−E*(composition))}, series: [Cr, Ni, In, Eu], marker_counts: not_counted, locator: {page: 2, pdf_page_index: 1, published_page: 217}, attribution: this_work, digitisation: deferred to a figure pass}
+            - {figure: '2', caption: 'Dependence of reduction potential on melt polymerization.', panel: main, species: Cr, phase: melt, T: '1450°C', axes_as_printed: {x: 'ln[(nbo)^2/(bo)]', y: 'avg(E*(diopsidic)−E*(composition))'}, series: ['this study', 'FAD [10]', 'FAS [10]', 'diopsidic melt'], marker_counts: not_counted, locator: {page: 2, pdf_page_index: 1, published_page: 217}, attribution: mixed, digitisation: deferred to a figure pass}
+          digitisation: deferred to a figure pass
