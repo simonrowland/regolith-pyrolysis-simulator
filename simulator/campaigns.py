@@ -1296,6 +1296,10 @@ class CampaignManager:
                 'sweep_mol_per_s', self._campaign_config(campaign).get('sweep_mol_per_s'),
             ),
         )
+        return self._validated_sweep_flow(raw)
+
+    @staticmethod
+    def _validated_sweep_flow(raw) -> float | None:
         if raw is None:
             return None
         if not is_declared_real_scalar(raw, allow_numeric_str=True):
