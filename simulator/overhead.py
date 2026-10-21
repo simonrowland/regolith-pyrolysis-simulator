@@ -99,6 +99,38 @@ DEFAULT_PIPE_M_AVG_KG_MOL = 0.040  # kg/mol — fallback mole-weighted pipe gas 
 # kg/s require P1=426.45 Pa against vacuum; the forward law returns
 # 0.003000 kg/s. Both capacity and pressure inversion use this one factor.
 COMPRESSIBLE_POISEUILLE_DENOMINATOR = 256.0  # dimensionless — integrated mean-pressure factor
+
+
+def gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
+    """Return the provisional N₂-like dynamic viscosity at temperature T_K."""
+    return 1.8e-5 * (T_K / 300.0) ** 0.7
+
+
+def compressible_poiseuille_mass_flow(
+    d: float,
+    L: float,
+    M_avg: float,
+    eta: float,
+    T_K: float,
+    p_upstream_Pa: float,
+    p_downstream_Pa: float,
+) -> float:
+    """Return compressible Poiseuille mass flow in kg/s."""
+    pressure_square_delta_Pa2 = max(
+        0.0,
+        p_upstream_Pa**2 - p_downstream_Pa**2,
+    )
+    numerator = math.pi * d**4 * M_avg * pressure_square_delta_Pa2
+    denominator = (
+        COMPRESSIBLE_POISEUILLE_DENOMINATOR
+        * eta
+        * L
+        * GAS_CONSTANT
+        * T_K
+    )
+    return numerator / denominator
+
+
 DEFAULT_INITIAL_THROAT_AREA_M2 = math.pi * 0.06**2  # m² — 12 cm diameter throat back-compat anchor
 DEFAULT_CONDENSER_STAGE_AREA_RATIOS = {
     'fe_stage1': 4.0,
@@ -1532,23 +1564,19 @@ class OverheadGasModel:
         # constants reduce the result to kg/s.
         # sanity: P_down=0 preserves the legacy vacuum result; P_down>=P_up
         # yields zero forward capacity instead of imaginary/negative flow.
-        pressure_square_delta_Pa2 = max(
-            0.0,
-            p_upstream_Pa**2 - p_downstream_Pa**2,
-        )  # Pa² — compressible pressure-square driving term
-        numerator = math.pi * d**4 * M_avg * pressure_square_delta_Pa2
-        denominator = (
-            COMPRESSIBLE_POISEUILLE_DENOMINATOR
-            * eta
-            * L
-            * GAS_CONSTANT
-            * T_K
+        return compressible_poiseuille_mass_flow(
+            d,
+            L,
+            M_avg,
+            eta,
+            T_K,
+            p_upstream_Pa,
+            p_downstream_Pa,
         )
-        return numerator / denominator  # kg/s — capacity at allowed upstream pressure
 
     @staticmethod
     def _gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
-        return 1.8e-5 * (T_K / 300.0) ** 0.7  # Pa·s — 1.8e-5 Pa·s at 300 K, exponent dimensionless
+        return gas_dynamic_viscosity_Pa_s(T_K)
 
     def _vapor_pressure_mbar_from_flux(
         self,

@@ -777,8 +777,7 @@ def test_areal_unit_routes_agree(unit, factor):
 ])
 def test_real_source_evidence_arms(source, recipes):
     path = M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml"
-    migrator = M.Migrator(M.REPO_ROOT)
-    migrator._migrate_extract(path)
+    migrator = F.migrate_one_extract(M.REPO_ROOT, path)
     migrator.finalize()
     result = migrator.result
     transforms = [e.sample.initial_composition for e in result.experiments.values()
@@ -807,8 +806,10 @@ def test_real_sample_volume_and_unadopted_fugacity_are_preserved():
     from simulator.battery.identity import quantity_token
 
     for source in ("kems-120-ueshima-1984", "thomas-2022-chlorine-bonding-silicate-melts"):
-        migrator = M.Migrator(M.REPO_ROOT)
-        migrator._migrate_extract(M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml")
+        migrator = F.migrate_one_extract(
+            M.REPO_ROOT,
+            M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml",
+        )
         migrator.finalize()
         result = migrator.result
         if source.startswith("kems"):
@@ -863,8 +864,7 @@ def test_geometry_context_keeps_original_source_record():
     source_row = next(row for _, row in M.iter_extract_observations(raw)
                       if row["observation_id"] == "yakovlev_shornikov_2011_Po2_table_bar_calculated")
     printed_rows = source_row["values"]["points"]
-    migrator = M.Migrator(M.REPO_ROOT)
-    migrator._migrate_extract(source)
+    migrator = F.migrate_one_extract(M.REPO_ROOT, source)
     migrator.finalize()
     result = migrator.result
     prefix = f"{raw['source_id']}::{source_row['observation_id']}::"
@@ -893,8 +893,10 @@ def test_geometry_context_keeps_original_source_record():
     "wimpenny-2019-zn-isotope-evaporation-extreme-t",
 ])
 def test_ancestry_lookup_preserves_nonconditional_derivation_emission(source):
-    migrator = M.Migrator(M.REPO_ROOT)
-    migrator._migrate_extract(M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml")
+    migrator = F.migrate_one_extract(
+        M.REPO_ROOT,
+        M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml",
+    )
     migrator.finalize()
     assert not any(issue.reason.value == "referential_integrity"
                    for issue in migrator.result.validation.hard_issues)

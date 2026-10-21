@@ -1,13 +1,13 @@
 from pathlib import Path
 
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.waypoints import WaypointAuthority, oxygen_condition
+from tests.battery.factories import migrate_one_extract
 
 
 def test_matzen_2022_table_2_oxygen_values_migrate_to_all_observation_waypoints():
     extract = Path(__file__).resolve().parents[2] / "data/literature/extracts/matzen-2022-martian-basalt-redox.yaml"
-    migrator = Migrator()
-    migrator._migrate_extract(extract)
+    migrator = migrate_one_extract(REPO_ROOT, extract)
     migrator.finalize()
     result = migrator.result
 

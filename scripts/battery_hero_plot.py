@@ -747,10 +747,11 @@ def read_scores(
                 numeric = row.get("numeric")
                 if not isinstance(numeric, Mapping) or numeric.get("value") is None:
                     continue
+                selected_rail = rail in selected
                 if rail not in retained_rails:
                     continue
                 if numeric.get("operation") != "dex":
-                    if rail in selected:
+                    if selected_rail:
                         summary.non_dex_rows += 1
                     continue
                 if rail in HERO_RAILS:
@@ -760,7 +761,7 @@ def read_scores(
 
                 identity = _row_identity(row)
                 if not identity:
-                    if rail in selected:
+                    if selected_rail:
                         summary.missing_identity_rows += 1
                     continue
                 quantity = _state_value(identity.get("quantity"))
@@ -781,9 +782,8 @@ def read_scores(
                     )
                     if has_calibration_notice:
                         # Use the scorer's d-139 output marker; do not infer calibration here.
-                        if rail in selected:
-                            summary.excluded_d139_rows += 1
-                            summary.excluded_d139_by_rail[rail] += 1
+                        summary.excluded_d139_rows += 1
+                        summary.excluded_d139_by_rail[rail] += 1
                         continue
                 formula = _species_formula(identity)
                 temperature_raw = _state_value(identity.get("temperature_K"))

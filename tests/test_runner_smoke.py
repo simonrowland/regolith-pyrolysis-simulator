@@ -47,7 +47,11 @@ from simulator.optimize.recipe import (
     RecipeSchema,
 )
 from simulator.run_executor import RunExecutor, _json_safe
-from simulator.state import CampaignPhase, HourSnapshot
+from simulator.state import (
+    CampaignPhase,
+    HourSnapshot,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
+)
 from simulator.runner import (
     EngineBugAbort,
     NOT_APPLICABLE_UNTIL_P0,
@@ -283,6 +287,50 @@ def test_completed_run_preserves_success_when_yield_disposition_raises(
     assert payload["status"] == "ok"
     assert payload["yield_disposition"] is None
     assert payload["terminal_product_taxonomy"] is not None
+
+
+def test_completed_run_reports_unresolved_wall_species_without_aborting(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import runner as runner_module
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    species = "unregistered-wall-species"
+    original_final_state = runner_module._final_state_from_ledger
+
+    def add_unresolved_deposit(sim):
+        state = original_final_state(sim)
+        state[f"{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}review_input"] = {
+            species: 0.25,
+        }
+        return state
+
+    monkeypatch.setattr(
+        runner_module,
+        "_final_state_from_ledger",
+        add_unresolved_deposit,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert species not in payload["final"]["wall_deposit_by_species_kg"]
+    assert payload["run_metadata"]["refusal_diagnostic"][
+        "wall_deposit_report"
+    ] == {
+        "status": "refused",
+        "reason": "unknown_species_formula",
+        "unresolved_wall_deposit_species": [
+            {"species": species, "mol": 0.25},
+        ],
+    }
 
 
 def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():

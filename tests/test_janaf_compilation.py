@@ -13,11 +13,11 @@ from copy import deepcopy
 from decimal import Decimal
 import hashlib
 import json
-import os
 
 import pytest
 import yaml
 
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.yaml_cache import load_cached_safe_yaml
 import simulator.reference_data.janaf as janaf_reference
 
@@ -63,9 +63,7 @@ EXPECTED_UNREPAIRED_TAILS = (
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data" / "literature" / "extracts" / "janaf-4th.yaml"
-CORPUS_ROOT = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS_ROOT = regolith_corpus_root()
 JANAF_SOURCE_DIR = CORPUS_ROOT / "raw" / "janaf-nist-txt"
 LIVE_TXT_SAMPLE = (
     "Aluminum, Ion (Al+)\tAl1+(g)\n"
