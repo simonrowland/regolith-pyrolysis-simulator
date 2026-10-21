@@ -3669,12 +3669,10 @@ def throughput_per_furnace_hour_summary(
     """Report captured-product throughput using the classifier's class masses.
 
     The unit-economics premise is captured saleable product per furnace-hour;
-    the refractory rump is separate.  FoM = (metals + O2 + pure silica glass +
-    industrial mixed glass) / furnace_time_h, in kg / h. For a fixed-mass
-    check, class totals 3 + 1 + 2 kg over 2 h yield 6 / 2 = 3 kg / h;
+    the refractory rump is separate. FoM uses captured metals, stored/captured
+    O2, pure silica glass and industrial mixed glass. For a fixed-mass check,
+    captured class totals 3 + 1 + 2 kg over 2 h yield 6 / 2 = 3 kg / h;
     charge-normalized throughput divides that same numerator by batch mass too.
-    The 225 h hero's class breakdown was not committed at a4608882d, so its
-    numerator cannot be stated from the available artifact.
     This excludes unmodelled cool-down/turnaround, and its charge-normalized
     value applies only at the simulated melt geometry because evaporation scales
     with melt area.
@@ -3715,7 +3713,6 @@ def throughput_per_furnace_hour_summary(
             raise ObjectiveComputationError(
                 f"{metric} is unavailable; classifier flag={flag!r}"
             )
-    numerator_kg = sum(float(value) for value in masses.values())
     furnace_time_h = _metric_value(
         "furnace_time_h", sim, product_ledger, classes, **metric_args
     )
@@ -3728,7 +3725,6 @@ def throughput_per_furnace_hour_summary(
         raise ObjectiveComputationError(
             f"charge mass must be positive, got {charge_kg!r}"
         )
-    rate = numerator_kg / furnace_time_h
     metals = classes.get("metals_plus_O2")
     metals_by_species = (
         metals.get("metals_kg", {}) if isinstance(metals, Mapping) else {}
@@ -3737,29 +3733,93 @@ def throughput_per_furnace_hour_summary(
     silica_by_species = (
         silica.get("stage_3_kg_by_species", {}) if isinstance(silica, Mapping) else {}
     )
+    excluded_metals: dict[str, float] = {}
+    atom_ledger = getattr(sim, "atom_ledger", None)
+    project_account_kg = getattr(atom_ledger, "project_account_kg", None)
+    if callable(project_account_kg):
+        for account in ("terminal.offgas", "process.overhead_gas"):
+            account_masses = project_account_kg(account)
+            if isinstance(account_masses, Mapping):
+                for species, value in account_masses.items():
+                    species = str(species)
+                    excluded_metals[species] = (
+                        excluded_metals.get(species, 0.0)
+                        + _finite_float(value, f"{account}[{species!r}]")
+                    )
+    oxygen_partition = (
+        metals.get("O2_partition_kg", {})
+        if isinstance(metals, Mapping)
+        else {}
+    )
+    captured_oxygen_kg = (
+        sum(
+            _finite_float(oxygen_partition.get(key, 0.0), f"O2_partition_kg.{key}")
+            for key in ("stored", "captured")
+        )
+        if isinstance(oxygen_partition, Mapping)
+        and ("stored" in oxygen_partition or "captured" in oxygen_partition)
+        else _finite_float(metals.get("O2_kg", 0.0), "metals_plus_O2.O2_kg")
+    )
+    metals_total_kg = _finite_float(
+        metals.get(
+            "metals_total_kg",
+            _finite_float(
+                metals.get("class_total_kg", 0.0),
+                "metals_plus_O2.class_total_kg",
+            )
+            - _finite_float(
+                metals.get("O2_kg", 0.0), "metals_plus_O2.O2_kg"
+            ),
+        ),
+        "metals_plus_O2.metals_total_kg",
+    )
+    captured_metal_kg = max(
+        metals_total_kg
+        - sum(excluded_metals.get(str(species), 0.0) for species in metals_by_species),
+        0.0,
+    )
+    numerator_kg = captured_metal_kg + captured_oxygen_kg + sum(
+        float(masses[metric])
+        for metric in ("pure_silica_glass_kg", "industrial_mixed_glass_kg")
+    )
+    rate = numerator_kg / furnace_time_h
     rump = classes.get("refractory_ceramic_rump")
     if not isinstance(metals_by_species, Mapping) or not isinstance(
         silica_by_species, Mapping
     ):
         raise ObjectiveComputationError("product classifier species masses are missing")
     species_masses = {
-        "Fe_kg_per_furnace_h": _finite_float(
-            metals_by_species.get("Fe", 0.0), "Fe_kg"
+        "Fe_kg_per_furnace_h": max(
+            _finite_float(metals_by_species.get("Fe", 0.0), "Fe_kg")
+            - excluded_metals.get("Fe", 0.0), 0.0
         ),
-        "O2_kg_per_furnace_h": _nested_float(classes, ("metals_plus_O2", "O2_kg")),
+        "O2_kg_per_furnace_h": captured_oxygen_kg,
         "Na_plus_K_kg_per_furnace_h": sum(
-            _finite_float(metals_by_species.get(species, 0.0), f"{species}_kg")
+            max(
+                _finite_float(metals_by_species.get(species, 0.0), f"{species}_kg")
+                - excluded_metals.get(species, 0.0), 0.0
+            )
             for species in ("Na", "K")
         ),
-        "SiO_glass_kg_per_furnace_h": _finite_float(
-            silica_by_species.get("SiO", 0.0),
-            "pure_silica_glass.stage_3_kg_by_species.SiO",
+        "SiO_glass_kg_per_furnace_h": (
+            _finite_float(
+                silica_by_species.get("SiO", 0.0),
+                "pure_silica_glass.stage_3_kg_by_species.SiO",
+            )
+            if isinstance(silica, Mapping)
+            and _finite_float(
+                silica.get("class_total_kg", 0.0),
+                "pure_silica_glass.class_total_kg",
+            ) > 0.0
+            else 0.0
         ),
-        "Mg_kg_per_furnace_h": _finite_float(
-            metals_by_species.get("Mg", 0.0), "Mg_kg"
+        "Mg_kg_per_furnace_h": max(
+            _finite_float(metals_by_species.get("Mg", 0.0), "Mg_kg")
+            - excluded_metals.get("Mg", 0.0), 0.0
         ),
-        "Ca_kg_per_furnace_h": _finite_float(
-            metals_by_species.get("Ca", 0.0), "Ca_kg"
+        "Ca_kg_per_furnace_h": max(
+            _finite_float(metals_by_species.get("Ca", 0.0), "Ca_kg")
+            - excluded_metals.get("Ca", 0.0), 0.0
         ),
     }
     if not isinstance(rump, Mapping) or rump.get("rump_total_kg") is None:
@@ -3857,7 +3917,12 @@ def _throughput_feasibility_summary(
             "threshold": purity.threshold.value,
         },
     }
-    overall = "infeasible" if purity_status == "infeasible" else "unavailable"
+    gate_statuses = tuple(gate["status"] for gate in gates.values())
+    overall = (
+        "infeasible" if "infeasible" in gate_statuses
+        else "unavailable" if "unavailable" in gate_statuses
+        else "feasible"
+    )
     return MappingProxyType({"status": overall, "gates": MappingProxyType(gates)})
 
 

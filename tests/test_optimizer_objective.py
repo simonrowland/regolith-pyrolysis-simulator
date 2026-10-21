@@ -2393,6 +2393,36 @@ def test_throughput_per_furnace_hour_is_hand_computed_from_class_masses() -> Non
         "reason": "d-045 coating gate not on this base (b-585 pending)",
     }
     assert gates["delivered_stream_purity"]["status"] == "feasible"
+    assert summary["feasibility"]["status"] == "unavailable"
+
+
+def test_throughput_excludes_offgas_and_overhead_metals() -> None:
+    execution, classes = _throughput_fixture()
+    execution.simulator.atom_ledger = SimpleNamespace(
+        project_account_kg=lambda account: {
+            "terminal.offgas": {"Na": 0.2},
+            "process.overhead_gas": {"Fe": 0.4},
+        }.get(account, {})
+    )
+
+    summary = objective_module.throughput_per_furnace_hour_summary(
+        execution, product_classes=classes
+    )
+
+    assert summary["separated_product_kg"] == 5.4
+    assert summary["per_product_kg_per_furnace_h"]["Fe"] == 0.3
+    assert summary["per_product_kg_per_furnace_h"]["Na_plus_K"] == 0.15
+
+
+def test_throughput_sio_rate_requires_pure_silica_product() -> None:
+    execution, classes = _throughput_fixture()
+    classes["pure_silica_glass"]["class_total_kg"] = 0.0
+
+    summary = objective_module.throughput_per_furnace_hour_summary(
+        execution, product_classes=classes
+    )
+
+    assert summary["per_product_kg_per_furnace_h"]["SiO_glass"] == 0.0
 
 
 def test_throughput_per_furnace_hour_refuses_zero_hours_and_missing_charge() -> None:
