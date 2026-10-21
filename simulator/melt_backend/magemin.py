@@ -284,11 +284,13 @@ def _bootstrap_magemin_subprocess_worker(
     binary_path: str,
     database: str,
     config: Mapping[str, Any],
+    environment_overrides: Mapping[str, str],
 ):
     backend = MAGEMinBackend()
     backend._binary_path = Path(binary_path)
     backend._database = str(database)
     backend._config = dict(config)
+    backend._magemin_env_overrides = dict(environment_overrides)
     backend._bridge = 'subprocess'
     backend._available = True
     return backend, str(binary_path)
@@ -1061,6 +1063,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         self._last_error: Optional[str] = None
         self._subprocess_pool: Optional[EngineWorkerPool] = None
         self._ompi_tmpdir: Optional[str] = None
+        self._magemin_env_overrides: Optional[Dict[str, str]] = None
+        self._ompi_cleanup_registered = False
 
     # ------------------------------------------------------------------
     # MeltBackend interface
@@ -1145,6 +1149,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             if pool_size <= 0:
                 raise ValueError('MAGEMin warm_pool_size must be positive')
 
+            self._prepare_magemin_environment()
+
             def worker_factory(index: int) -> WarmEngineWorker:
                 return WarmEngineWorker(
                     name=f'MAGEMin subprocess pool slot {index}',
@@ -1154,6 +1160,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         str(binary_path.resolve()),
                         self._database,
                         self._config,
+                        dict(self._magemin_env_overrides or {}),
                     ),
                     startup_timeout_s=startup_timeout_s,
                     call_timeout_s=warm_timeout_s,
@@ -1161,30 +1168,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         f'{diagnostic_path.stem}-{index}{diagnostic_path.suffix}'
                     ),
                 )
-            previous_ompi_tmpdir = os.environ.get(
-                'OMPI_MCA_orte_tmpdir_base'
-            )
-            previous_prte_tmpdir = os.environ.get(
-                'PRTE_MCA_prte_tmpdir_base'
-            )
-            if previous_ompi_tmpdir is None and previous_prte_tmpdir is None:
-                self._ompi_tmpdir = tempfile.mkdtemp(
-                    prefix='regolith-ompi-'
-                )
-                atexit.register(
-                    shutil.rmtree, self._ompi_tmpdir, ignore_errors=True
-                )
-                os.environ['OMPI_MCA_orte_tmpdir_base'] = self._ompi_tmpdir
-                os.environ['PRTE_MCA_prte_tmpdir_base'] = self._ompi_tmpdir
-            else:
-                if previous_ompi_tmpdir is not None:
-                    os.environ.setdefault(
-                        'PRTE_MCA_prte_tmpdir_base', previous_ompi_tmpdir
-                    )
-                if previous_prte_tmpdir is not None:
-                    os.environ.setdefault(
-                        'OMPI_MCA_orte_tmpdir_base', previous_prte_tmpdir
-                    )
             try:
                 self._subprocess_pool = EngineWorkerPool(
                     worker_factory,
@@ -1196,32 +1179,79 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'{exc.detail}'
                 )
                 self._subprocess_pool = None
-                if self._ompi_tmpdir is not None:
-                    shutil.rmtree(self._ompi_tmpdir, ignore_errors=True)
-                    self._ompi_tmpdir = None
+                self.close()
                 return False
-            finally:
-                if previous_ompi_tmpdir is None:
-                    os.environ.pop('OMPI_MCA_orte_tmpdir_base', None)
-                else:
-                    os.environ['OMPI_MCA_orte_tmpdir_base'] = previous_ompi_tmpdir
-                if previous_prte_tmpdir is None:
-                    os.environ.pop('PRTE_MCA_prte_tmpdir_base', None)
-                else:
-                    os.environ['PRTE_MCA_prte_tmpdir_base'] = previous_prte_tmpdir
+            except BaseException:
+                self.close()
+                raise
+
+        if (
+            bridge == 'subprocess'
+            and self._magemin_env_overrides is None
+        ):
+            self._prepare_magemin_environment()
 
         self._available = True
         return True
 
     def close(self) -> None:
-        try:
-            if self._subprocess_pool is not None:
-                self._subprocess_pool.close(cancel_pending=True)
-                self._subprocess_pool = None
-        finally:
-            if self._ompi_tmpdir is not None:
-                shutil.rmtree(self._ompi_tmpdir, ignore_errors=True)
-                self._ompi_tmpdir = None
+        if self._subprocess_pool is not None:
+            self._subprocess_pool.close(cancel_pending=True)
+            self._subprocess_pool = None
+        if self._ompi_cleanup_registered:
+            atexit.unregister(self.close)
+            self._ompi_cleanup_registered = False
+        if self._ompi_tmpdir is not None:
+            shutil.rmtree(self._ompi_tmpdir, ignore_errors=True)
+            self._ompi_tmpdir = None
+        self._magemin_env_overrides = None
+
+    def _prepare_magemin_environment(self) -> Dict[str, str]:
+        """Capture per-backend overrides used by every MAGEMin launch.
+
+        Open MPI's singleton reads TMPDIR before TEMP and TMP; the MCA
+        variables alone do not relocate its session directory. An explicit
+        MCA path selects the caller's session directory and opts out of
+        backend ownership because TMPDIR is normally ambient process state.
+        If both MCA paths are set, the Open MPI spelling takes precedence for
+        TMPDIR while both caller values remain unchanged.
+        """
+        if self._magemin_env_overrides is not None:
+            return self._magemin_env_overrides
+
+        parent_environment = os.environ.copy()
+        selected_tmpdir = (
+            parent_environment.get('OMPI_MCA_orte_tmpdir_base')
+            or parent_environment.get('PRTE_MCA_prte_tmpdir_base')
+        )
+        environment_overrides: Dict[str, str] = {}
+        if selected_tmpdir is None:
+            selected_tmpdir = tempfile.mkdtemp(prefix='regolith-ompi-')
+            self._ompi_tmpdir = selected_tmpdir
+            atexit.register(self.close)
+            self._ompi_cleanup_registered = True
+            environment_overrides['OMPI_MCA_orte_tmpdir_base'] = (
+                selected_tmpdir
+            )
+            environment_overrides['PRTE_MCA_prte_tmpdir_base'] = (
+                selected_tmpdir
+            )
+        else:
+            for name in (
+                'OMPI_MCA_orte_tmpdir_base',
+                'PRTE_MCA_prte_tmpdir_base',
+            ):
+                if name in parent_environment:
+                    environment_overrides[name] = parent_environment[name]
+
+        environment_overrides['TMPDIR'] = selected_tmpdir
+        self._magemin_env_overrides = environment_overrides
+        return environment_overrides
+
+    def _magemin_subprocess_environment(self) -> Dict[str, str]:
+        env = os.environ.copy()
+        env.update(self._prepare_magemin_environment())
+        return env
 
     def is_available(self) -> bool:
         return self._available
@@ -1900,6 +1930,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         self._database,
                     ],
                     cwd=tmpdir,
+                    env=self._magemin_subprocess_environment(),
                     capture_output=True,
                     text=True,
                     timeout=5,
@@ -2819,6 +2850,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     completed = subprocess.run(  # noqa: S603 - adapter-built
                         args,
                         cwd=tmpdir,
+                        env=self._magemin_subprocess_environment(),
                         capture_output=True,
                         text=True,
                         timeout=remaining_timeout_s,
@@ -3338,6 +3370,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     completed = subprocess.run(  # noqa: S603 - adapter-built
                         args,
                         cwd=tmpdir,
+                        env=self._magemin_subprocess_environment(),
                         capture_output=True,
                         text=True,
                         timeout=timeout_s,

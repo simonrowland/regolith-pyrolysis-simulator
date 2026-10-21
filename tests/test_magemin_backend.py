@@ -883,24 +883,132 @@ def test_magemin_reinitialize_closes_existing_warm_pool(monkeypatch):
     assert backend._subprocess_pool is None
 
 
-@pytest.mark.parametrize("caller_tmpdir", [None, "caller-selected-ompi-dir"])
-def test_magemin_worker_pool_inherits_ompi_tmpdir_and_cleans_owned_dir(
-    monkeypatch, caller_tmpdir
+@pytest.mark.parametrize(
+    "caller_mca",
+    [
+        None,
+        pytest.param(
+            ("OMPI_MCA_orte_tmpdir_base", "caller-selected-ompi-dir"),
+            id="ompi-explicit-path",
+        ),
+        pytest.param(
+            ("PRTE_MCA_prte_tmpdir_base", "caller-selected-prte-dir"),
+            id="prte-explicit-path",
+        ),
+    ],
+)
+def test_magemin_worker_start_and_respawn_use_captured_environment(
+    monkeypatch, caller_mca
 ):
     import simulator.melt_backend.magemin as magemin_module
 
     observed = {}
+    started_environments = []
+    registered_cleanup = []
+    unregistered_cleanup = []
+    original_atexit_register = magemin_module.atexit.register
+    original_atexit_unregister = magemin_module.atexit.unregister
+
+    def record_atexit_register(callback):
+        registered_cleanup.append(callback)
+        return original_atexit_register(callback)
+
+    def record_atexit_unregister(callback):
+        unregistered_cleanup.append(callback)
+        return original_atexit_unregister(callback)
 
     class FakePool:
-        def __init__(self, _worker_factory, *, size):
+        def __init__(self, worker_factory, *, size):
             observed["size"] = size
-            observed["ompi"] = os.environ.get("OMPI_MCA_orte_tmpdir_base")
-            observed["prte"] = os.environ.get("PRTE_MCA_prte_tmpdir_base")
+            self.worker = worker_factory(0)
+            observed["environment"] = self.worker._bootstrap_args[-1]
 
         def close(self, *, cancel_pending=False):
             assert cancel_pending is True
+            self.worker.close()
+
+    class FakeConnection:
+        def __init__(self, messages, *, parent):
+            self.messages = messages
+            self.parent = parent
+
+        def send(self, message):
+            if self.parent and message is not None:
+                self.messages.append(("ok", {"respawned": True}))
+            else:
+                self.messages.append(message)
+
+        def poll(self, _timeout):
+            return bool(self.messages)
+
+        def recv(self):
+            return self.messages.pop(0)
+
+        def close(self):
+            pass
+
+    class FakeProcess:
+        next_pid = 100
+
+        def __init__(self, *, target, args, daemon):
+            self.target = target
+            self.args = args
+            self.daemon = daemon
+            self.pid = FakeProcess.next_pid
+            FakeProcess.next_pid += 1
+            self.alive = False
+
+        def start(self):
+            self.target(*self.args)
+            self.alive = True
+
+        def is_alive(self):
+            return self.alive
+
+        def join(self, timeout=None):
+            self.alive = False
+
+    class FakeSpawnContext:
+        def __init__(self):
+            self.processes = []
+
+        def Pipe(self, *, duplex):
+            assert duplex is True
+            messages = []
+            return (
+                FakeConnection(messages, parent=True),
+                FakeConnection(messages, parent=False),
+            )
+
+        def Process(self, *, target, args, daemon):
+            process = FakeProcess(target=target, args=args, daemon=daemon)
+            self.processes.append(process)
+            return process
+
+    spawn_context = FakeSpawnContext()
+
+    def fake_worker_entry(
+        connection, bootstrap, _handler, bootstrap_args, *_rest
+    ):
+        resource, ready_payload = bootstrap(*bootstrap_args)
+        started_environments.append(
+            resource._magemin_subprocess_environment()
+        )
+        connection.send(("ready", ready_payload))
 
     monkeypatch.setattr(magemin_module, "EngineWorkerPool", FakePool)
+    monkeypatch.setattr(
+        magemin_module.atexit, "register", record_atexit_register
+    )
+    monkeypatch.setattr(
+        magemin_module.atexit, "unregister", record_atexit_unregister
+    )
+    monkeypatch.setattr(
+        engine_pool.multiprocessing,
+        "get_context",
+        lambda _method: spawn_context,
+    )
+    monkeypatch.setattr(engine_pool, "_run_engine_worker", fake_worker_entry)
     monkeypatch.setattr(
         MAGEMinBackend,
         "_locate_binary",
@@ -913,29 +1021,143 @@ def test_magemin_worker_pool_inherits_ompi_tmpdir_and_cleans_owned_dir(
     )
     monkeypatch.delenv("OMPI_MCA_orte_tmpdir_base", raising=False)
     monkeypatch.delenv("PRTE_MCA_prte_tmpdir_base", raising=False)
-    if caller_tmpdir is not None:
-        monkeypatch.setenv("OMPI_MCA_orte_tmpdir_base", caller_tmpdir)
+    caller_tmpdir = None
+    if caller_mca is not None:
+        caller_mca_name, caller_tmpdir = caller_mca
+        monkeypatch.setenv(caller_mca_name, caller_tmpdir)
 
+    parent_environment = {
+        key: os.environ.get(key)
+        for key in (
+            "TMPDIR",
+            "TEMP",
+            "TMP",
+            "OMPI_MCA_orte_tmpdir_base",
+            "PRTE_MCA_prte_tmpdir_base",
+        )
+    }
     backend = MAGEMinBackend()
     assert backend.initialize({}) is True
     assert observed["size"] == 1
-    if caller_tmpdir is None:
-        assert observed["ompi"] == backend._ompi_tmpdir
-        assert observed["prte"] == backend._ompi_tmpdir
+    expected_environment = observed["environment"]
+    assert expected_environment["TMPDIR"] == (
+        backend._ompi_tmpdir if caller_mca is None else caller_tmpdir
+    )
+    if caller_mca is None:
         assert backend._ompi_tmpdir is not None
+        assert expected_environment["OMPI_MCA_orte_tmpdir_base"] == (
+            backend._ompi_tmpdir
+        )
+        assert expected_environment["PRTE_MCA_prte_tmpdir_base"] == (
+            backend._ompi_tmpdir
+        )
         owned_tmpdir = Path(backend._ompi_tmpdir)
         assert owned_tmpdir.is_dir()
     else:
-        assert observed["ompi"] == caller_tmpdir
-        assert observed["prte"] == caller_tmpdir
+        assert expected_environment.get(caller_mca_name) == caller_tmpdir
+        other_mca_name = (
+            "PRTE_MCA_prte_tmpdir_base"
+            if caller_mca_name == "OMPI_MCA_orte_tmpdir_base"
+            else "OMPI_MCA_orte_tmpdir_base"
+        )
+        assert expected_environment.get(other_mca_name) is None
         assert backend._ompi_tmpdir is None
         owned_tmpdir = None
-    assert os.environ.get("OMPI_MCA_orte_tmpdir_base") == caller_tmpdir
-    assert os.environ.get("PRTE_MCA_prte_tmpdir_base") is None
+    assert {
+        key: os.environ.get(key) for key in parent_environment
+    } == parent_environment
+
+    worker = backend._subprocess_pool.worker
+    worker.start()
+    spawn_context.processes[-1].alive = False
+    assert worker.call({"simulated": "respawn"}) == {"respawned": True}
+    assert len(spawn_context.processes) == 2
+    assert [process.args[3][-1] for process in spawn_context.processes] == [
+        expected_environment,
+        expected_environment,
+    ]
+    assert len(started_environments) == 2
+    for environment in started_environments:
+        assert environment["TMPDIR"] == expected_environment["TMPDIR"]
+        assert environment.get("TEMP") == parent_environment["TEMP"]
+        assert environment.get("TMP") == parent_environment["TMP"]
+        for name in (
+            "OMPI_MCA_orte_tmpdir_base",
+            "PRTE_MCA_prte_tmpdir_base",
+        ):
+            if name in expected_environment:
+                assert environment[name] == expected_environment[name]
+            else:
+                assert environment.get(name) is None
 
     backend.close()
     if owned_tmpdir is not None:
         assert not owned_tmpdir.exists()
+        assert len(registered_cleanup) == 1
+        assert len(unregistered_cleanup) == 1
+        assert unregistered_cleanup == registered_cleanup
+        assert backend.initialize({}) is True
+        assert len(registered_cleanup) == 2
+        assert len(unregistered_cleanup) == 1
+        backend.close()
+        assert len(unregistered_cleanup) == 2
+        assert unregistered_cleanup == registered_cleanup
+
+
+@pytest.mark.parametrize("failure_kind", ["remote", "unexpected"])
+def test_magemin_initialize_failure_removes_owned_tmpdir(
+    monkeypatch, failure_kind
+):
+    import simulator.melt_backend.magemin as magemin_module
+
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda _explicit: Path("/fake/MAGEMin")),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("subprocess", None),
+    )
+    monkeypatch.delenv("OMPI_MCA_orte_tmpdir_base", raising=False)
+    monkeypatch.delenv("PRTE_MCA_prte_tmpdir_base", raising=False)
+    created_dirs = []
+    original_mkdtemp = magemin_module.tempfile.mkdtemp
+
+    def record_mkdtemp(*args, **kwargs):
+        path = original_mkdtemp(*args, **kwargs)
+        created_dirs.append(Path(path))
+        return path
+
+    class FailedPool:
+        def __init__(self, _worker_factory, *, size):
+            assert size == 1
+            if failure_kind == "remote":
+                raise EngineWorkerRemoteError(
+                    "MAGEMinStartError", "worker failed", "traceback"
+                )
+            raise RuntimeError("unexpected pool initialization failure")
+
+    monkeypatch.setattr(magemin_module.tempfile, "mkdtemp", record_mkdtemp)
+    monkeypatch.setattr(magemin_module, "EngineWorkerPool", FailedPool)
+    backend = MAGEMinBackend()
+
+    if failure_kind == "remote":
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            assert backend.initialize({}) is False
+    else:
+        with pytest.raises(
+            RuntimeError, match="unexpected pool initialization failure"
+        ):
+            backend.initialize({})
+
+    assert len(created_dirs) == 1
+    assert not created_dirs[0].exists()
+    assert backend._ompi_tmpdir is None
+    assert backend._magemin_env_overrides is None
+    assert backend._ompi_cleanup_registered is False
 
 
 def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request):
@@ -3363,6 +3585,10 @@ def test_magemin_live_smoke_runs_real_binary(request, monkeypatch):
     # Shadow posture: MAGEMin holds no AtomLedger authority, ever.
     assert result.ledger_transition is None
     assert backend.ledger_account_policies() == ()
+    assert set(pool_ompi_tmpdir.glob("ompi.*")), (
+        "Open MPI session directory was not created under the backend-owned "
+        "TMPDIR"
+    )
     assert set(system_tmpdir.glob("ompi.*")) == existing_ompi_dirs
     backend.close()
     assert not pool_ompi_tmpdir.exists()
@@ -3713,6 +3939,8 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
         "_import_magemin_bridge",
         lambda self, *, requested: ("subprocess", None),
     )
+    monkeypatch.delenv("OMPI_MCA_orte_tmpdir_base", raising=False)
+    monkeypatch.delenv("PRTE_MCA_prte_tmpdir_base", raising=False)
     import simulator.melt_backend.magemin as magemin_module
     monkeypatch.setattr(
         magemin_module.subprocess, "run", fake_subprocess_run
@@ -3740,6 +3968,83 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
     binary_arg = Path(captured["args"][0])
     assert binary_arg.is_absolute()
     assert binary_arg == fake_binary.resolve()
+    backend.close()
+
+
+def test_magemin_parent_launch_sites_use_captured_environment(
+    monkeypatch, tmp_path
+):
+    import simulator.engine_local_config as engine_local_config
+    import simulator.melt_backend.magemin as magemin_module
+
+    monkeypatch.delenv("OMPI_MCA_orte_tmpdir_base", raising=False)
+    monkeypatch.delenv("PRTE_MCA_prte_tmpdir_base", raising=False)
+    monkeypatch.setattr(
+        engine_local_config, "cache_version_for", lambda _engine: None
+    )
+    monkeypatch.setattr(
+        engine_local_config, "warn_legacy_once", lambda *_args: None
+    )
+    monkeypatch.setattr(
+        magemin_module,
+        "_MAGEMIN_SUBPROCESS_LOCK_DIR",
+        tmp_path,
+    )
+    monkeypatch.setattr(
+        magemin_module,
+        "_MAGEMIN_SUBPROCESS_LOCK",
+        tmp_path / "magemin-subprocess.lock",
+    )
+    captured_environments = []
+
+    def fake_subprocess_run(args, **kwargs):
+        captured_environments.append(kwargs["env"])
+        if "--out_matlab=1" in args:
+            output_dir = Path(kwargs["cwd"]) / "output"
+            output_dir.mkdir()
+            (output_dir / "_matlab_output.txt").write_text(
+                "test output", encoding="utf-8"
+            )
+        return subprocess.CompletedProcess(
+            args,
+            0,
+            stdout="Phase : liq\nMode  : 1.000\n",
+            stderr="",
+        )
+
+    monkeypatch.setattr(magemin_module.subprocess, "run", fake_subprocess_run)
+    backend = MAGEMinBackend()
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+    backend._config = {"timeout_s": 5.0}
+
+    backend.get_engine_version()
+    projection = backend._build_db_bulk_projection({"SiO2": 100.0})
+    backend._call_magemin_subprocess(
+        bulk_projection=projection,
+        temperature_C=1500.0,
+        pressure_kbar=0.001,
+        fO2_log=-8.0,
+    )
+    backend._run_pure_phase_probe(
+        bulk_wt_ig={"SiO2": 100.0},
+        temperature_C=1500.0,
+        pressure_kbar=0.001,
+    )
+
+    assert len(captured_environments) == 3
+    assert backend._ompi_tmpdir is not None
+    for environment in captured_environments:
+        assert environment["TMPDIR"] == backend._ompi_tmpdir
+        assert environment.get("TEMP") == os.environ.get("TEMP")
+        assert environment.get("TMP") == os.environ.get("TMP")
+        assert environment["OMPI_MCA_orte_tmpdir_base"] == (
+            backend._ompi_tmpdir
+        )
+        assert environment["PRTE_MCA_prte_tmpdir_base"] == (
+            backend._ompi_tmpdir
+        )
+    backend.close()
 
 
 def test_magemin_subprocess_launches_are_serialized_across_callers(
