@@ -188,6 +188,28 @@ def refractory_log10_kf(
     )
 
 
+def _carrier_pressures_pa(gas_formulas, gas_log10_kf, activity_logs, oxygen_log):
+    """JANAF formation law shared by pure and supplied-activity boundaries.
+
+    p_i/p0 = Kf_i product(a_j**n_ij) (pO2/p0)**(n_O/2).
+    All factors inside the power are dimensionless; multiplying by p0 gives
+    Pa. Zero cation activity suppresses that carrier. Preserve the pure
+    solver's exponent guard and arithmetic order exactly.
+    """
+    pressures = {}
+    for name, formula in gas_formulas.items():
+        log_ratio = gas_log10_kf[name]
+        for element, activity in activity_logs.items():
+            count = float(formula.elements.get(element, 0.0))
+            if count:
+                log_ratio += count * activity
+        log_ratio += 0.5 * float(formula.elements.get("O", 0.0)) * oxygen_log
+        pressures[name] = STANDARD_PRESSURE_PA * 10.0 ** max(
+            -300.0, min(300.0, log_ratio)
+        ) if log_ratio != -math.inf else 0.0
+    return pressures
+
+
 def solve_congruent_vaporization(
     material: str,
     temperature_K: float,
@@ -326,16 +348,12 @@ def solve_congruent_vaporization(
                 f"{metal_activity_log:.6g}"
             )
         activities = {metal_element: metal_activity_log}
-        pressures: dict[str, float] = {}
+        pressures = _carrier_pressures_pa(
+            gas_formulas, gas_log10_kf, activities, oxygen_log,
+        )
         fluxes: dict[str, float] = {}
         for name, formula in gas_formulas.items():
-            log_ratio = gas_log10_kf[name]
-            for element in metal_elements:
-                log_ratio += float(formula.elements.get(element, 0.0)) * activities[element]
-            log_ratio += 0.5 * float(formula.elements.get("O", 0.0)) * oxygen_log
-            pressure = STANDARD_PRESSURE_PA * 10.0 ** max(
-                -300.0, min(300.0, log_ratio)
-            )
+            pressure = pressures[name]
             bulk_pressure = (
                 float(imposed_pO2_pa)
                 if oxygen_mode == "imposed" and name == "O2"
