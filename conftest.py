@@ -32,7 +32,9 @@ from collections.abc import Iterator
 
 import os
 import re
+import secrets
 import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -61,6 +63,8 @@ def _safe_worker_id(worker_id: str) -> str:
 
 
 _WORKER_CACHE_OWNER_FILE = ".regolith-pytest-worker-cache-owner-pid"
+# Cache names are worker IDs, this project tag, and a 128-bit hex token.
+_WORKER_CACHE_DIR_RE = re.compile(r"[A-Za-z0-9_.-]+-regolith-[0-9a-f]{32}\Z")
 
 
 def _worker_cache_root() -> Path:
@@ -71,25 +75,67 @@ def _worker_cache_root() -> Path:
     return Path(os.environ.get("REGOLITH_PYTEST_WORKER_CACHE_ROOT", default_cache_root))
 
 
+def _process_start_times(pids: set[int]) -> dict[int, str]:
+    if not pids:
+        return {}
+    try:
+        # Fixed locale and timezone keep lstart comparable across runs.
+        result = subprocess.run(
+            ["ps", "-o", "pid=,lstart=", "-p", ",".join(map(str, sorted(pids)))],
+            capture_output=True,
+            check=False,
+            env={**os.environ, "LC_ALL": "C", "TZ": "UTC"},
+            text=True,
+            timeout=5,
+        )
+    except (OSError, UnicodeError, subprocess.TimeoutExpired):
+        return {}
+    if result.returncode != 0:
+        return {}
+
+    start_times: dict[int, str] = {}
+    for line in result.stdout.splitlines():
+        try:
+            raw_pid, start_time = line.split(maxsplit=1)
+            pid = int(raw_pid)
+        except ValueError:
+            continue
+        if pid > 0 and start_time.strip():
+            start_times[pid] = start_time.strip()
+    return start_times
+
+
 def _cleanup_dead_worker_caches(cache_root: Path) -> None:
-    """Remove only marked worker caches whose owning process has exited."""
+    """Remove only named worker caches whose marked PID/start time no longer matches."""
+
+    if cache_root.is_symlink() or not cache_root.is_dir():
+        return
 
     try:
         worker_roots = tuple(cache_root.iterdir())
     except OSError:
         return
 
+    live_worker_roots: list[tuple[Path, int, str]] = []
     for worker_root in worker_roots:
-        if worker_root.is_symlink() or not worker_root.is_dir():
+        if (
+            not _WORKER_CACHE_DIR_RE.fullmatch(worker_root.name)
+            or worker_root.is_symlink()
+            or not worker_root.is_dir()
+        ):
             continue
         owner_file = worker_root / _WORKER_CACHE_OWNER_FILE
         if owner_file.is_symlink() or not owner_file.is_file():
             continue
         try:
-            owner_pid = int(owner_file.read_text(encoding="ascii").strip())
+            owner_text = owner_file.read_text(encoding="ascii").strip()
+            raw_owner_pid, separator, owner_start_time = owner_text.partition("\t")
+            if not separator or not owner_start_time.strip():
+                continue
+            owner_pid = int(raw_owner_pid)
         except (OSError, UnicodeError, ValueError):
             continue
-        if owner_pid <= 0 or owner_pid == os.getpid():
+        if owner_pid <= 0:
             continue
         try:
             os.kill(owner_pid, 0)
@@ -99,6 +145,18 @@ def _cleanup_dead_worker_caches(cache_root: Path) -> None:
             # A permission or lookup error other than ESRCH cannot prove the
             # owner is gone, so leave the cache in place.
             continue
+        else:
+            live_worker_roots.append((worker_root, owner_pid, owner_start_time.strip()))
+
+    if not live_worker_roots:
+        return
+    current_start_times = _process_start_times(
+        {owner_pid for _, owner_pid, _ in live_worker_roots}
+    )
+    for worker_root, owner_pid, owner_start_time in live_worker_roots:
+        current_start_time = current_start_times.get(owner_pid)
+        if current_start_time is not None and current_start_time != owner_start_time:
+            shutil.rmtree(worker_root, ignore_errors=True)
 
 
 def _configure_worker_cache_isolation() -> None:
@@ -111,9 +169,17 @@ def _configure_worker_cache_isolation() -> None:
     worker_id = _safe_worker_id(raw_worker_id)
     cache_root = _worker_cache_root()
     cache_root.mkdir(parents=True, exist_ok=True)
-    worker_root = Path(tempfile.mkdtemp(prefix=f"{worker_id}-", dir=cache_root))
+    while True:
+        worker_root = cache_root / f"{worker_id}-regolith-{secrets.token_hex(16)}"
+        try:
+            worker_root.mkdir(mode=0o700)
+        except FileExistsError:
+            continue
+        break
+    owner_pid = os.getpid()
+    owner_start_time = _process_start_times({owner_pid}).get(owner_pid, "")
     (worker_root / _WORKER_CACHE_OWNER_FILE).write_text(
-        f"{os.getpid()}\n", encoding="ascii"
+        f"{owner_pid}\t{owner_start_time}\n", encoding="ascii"
     )
 
     tmp_dir = worker_root / "tmp"
