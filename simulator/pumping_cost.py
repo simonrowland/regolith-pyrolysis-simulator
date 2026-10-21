@@ -451,12 +451,19 @@ def process_pressure_state(
     Work and speed use the existing staged-compressor owner. Gas in the hot
     chamber sets throughput; its independently declared cooled inlet sets work.
     """
+    # The canonical EOS/report boundary returns bar -> mbar -> Pa after
+    # PV/RT startup. Binary64 round trips can add a few ulps (1500 Pa
+    # becomes 1500.0000000000005 Pa). Admit only this relative 4*eps
+    # band; preserve raw achieved pressure and the strict pump-speed limit.
+    transport_admitted = transport_pressure_pa <= requested_pressure_pa or math.isclose(
+        transport_pressure_pa, requested_pressure_pa, rel_tol=4 * math.ulp(1.0), abs_tol=0.0,
+    )
     diagnostic = {
         "requested_pressure_pa": requested_pressure_pa,
         "achieved_pressure_pa": requested_pressure_pa,
         "chamber_mol_per_s": chamber_mol_per_s,
         "chamber_temperature_K": chamber_temperature_K,
-        "status": "ok" if transport_pressure_pa <= requested_pressure_pa else "infeasible",
+        "status": "ok" if transport_admitted else "infeasible",
     }
     diagnostic['achieved_pressure_pa'] = max(requested_pressure_pa, transport_pressure_pa)
     if diagnostic['status'] != 'ok':
@@ -499,8 +506,8 @@ def process_pressure_state(
             float(pumping['max_pump_speed_m3_s']),
             float(pumping['validated_line_conductance_m3_s']),
         ),
-        "status": "ok" if result.feasible and transport_pressure_pa <= requested_pressure_pa else "infeasible",
-        "reason": result.status if transport_pressure_pa <= requested_pressure_pa else "finite_inventory_or_pipe_pressure_exceeds_request",
+        "status": "ok" if result.feasible and transport_admitted else "infeasible",
+        "reason": result.status if transport_admitted else "finite_inventory_or_pipe_pressure_exceeds_request",
         "transient_feasibility": "unresolved_hourly_average_load",
     })
     return diagnostic

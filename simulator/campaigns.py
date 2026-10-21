@@ -1305,11 +1305,24 @@ class CampaignManager:
             raise ValueError('sweep_mol_per_s must be finite and non-negative')
         return value
 
+    def apply_sweep_flow_control(self, melt: MeltState, campaign: CampaignPhase | None = None) -> Mapping | None:
+        active = campaign if campaign is not None else melt.campaign
+        stage = None
+        if active == CampaignPhase.C2A_STAGED:
+            stages = self._campaign_config(active).get('stages')
+            if isinstance(stages, list) and stages:
+                stage = self._c2a_staged_active_stage(melt.campaign_hour)
+                if not isinstance(stage, Mapping):
+                    raise ValueError('C2A_staged.stages did not select a stage')
+        melt.sweep_mol_per_s = self._campaign_sweep_flow(active, stage)
+        return stage
+
     def apply_c2a_staged_gas_controls(
             self,
             melt: MeltState,
             campaign: CampaignPhase | None = None) -> None:
         active_campaign = campaign if campaign is not None else melt.campaign
+        stage = self.apply_sweep_flow_control(melt, active_campaign)
         if active_campaign != CampaignPhase.C2A_STAGED:
             self.last_c2a_staged_gas_control = None
             return
@@ -1317,15 +1330,9 @@ class CampaignManager:
         # (e.g. composition-only runs). There is no per-stage gas cover to
         # apply, so no-op and preserve the pre-schedule default gas cover
         # rather than raising during configure_campaign.
-        cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
-        stages = cfg.get('stages') if isinstance(cfg, Mapping) else None
-        if not isinstance(stages, list) or not stages:
+        if stage is None:
             self.last_c2a_staged_gas_control = None
             return
-        stage = self._c2a_staged_active_stage(melt.campaign_hour)
-        if not isinstance(stage, Mapping):
-            raise ValueError('C2A_staged.stages did not select a stage')
-        melt.sweep_mol_per_s = self._campaign_sweep_flow(active_campaign, stage)
         atmosphere, diagnostic = self._c2a_staged_stage_gas_control(stage)
         melt.atmosphere = atmosphere
         melt.pO2_mbar = float(diagnostic['pO2_mbar'])
@@ -1458,7 +1465,6 @@ class CampaignManager:
         Called when starting a new campaign phase.
         """
         self._reset_stage_background_gas(melt)
-        melt.sweep_mol_per_s = self._campaign_sweep_flow(campaign)
         self._materialized_target_T_C_by_phase.pop(campaign, None)
         materialized_target = self._materialize_target_from_delta(campaign)
         if materialized_target is not None:

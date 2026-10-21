@@ -312,11 +312,24 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             controls,
             overhead_o2_mol,
         )
+        integrated_external = controls.get('sweep_external_o2_outflow_mol')
+        if 'sweep_outflow_species_mol' in controls:
+            if external_o2_holdup_mol > 0.0 and integrated_external is None:
+                return IntentResult(intent=ChemistryIntent.OVERHEAD_BLEED, status='unsupported',
+                                    diagnostic={'reason': 'missing_input: source-separated external O2 sweep outlet'})
+            if integrated_external is not None and (
+                integrated_external > bled_o2_mol or integrated_external > external_o2_holdup_mol
+                or bled_o2_mol - integrated_external > overhead_o2_mol - external_o2_holdup_mol
+                + 1e-12 * max(1.0, overhead_o2_mol)
+            ):
+                return IntentResult(intent=ChemistryIntent.OVERHEAD_BLEED, status='unsupported',
+                                    diagnostic={'reason': 'source-separated sweep outlet exceeds available O2 class'})
         from simulator.capacity_coupling import external_oxygen_outlet_mol
 
         external_o2_bled_mol = external_oxygen_outlet_mol(
             bled_o2_mol=bled_o2_mol, overhead_o2_mol=overhead_o2_mol,
             external_o2_holdup_mol=external_o2_holdup_mol,
+            integrated_external_o2_mol=integrated_external,
         )
         melt_o2_bled_mol = max(0.0, bled_o2_mol - external_o2_bled_mol)
         capacity = controls.get("cold_train_capacity")
@@ -362,6 +375,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                     bled_o2_mol=bled_o2_mol,
                     overhead_o2_mol=overhead_o2_mol,
                     external_o2_holdup_mol=external_o2_holdup_mol,
+                    integrated_external_o2_mol=integrated_external,
                     capacity=capacity,
                     dt_hr=float(controls.get("dt_hr", 1.0)),
                     p_o2_Pa=float(controls.get("p_ref_Pa", 0.0)),
@@ -574,6 +588,11 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
 
     @staticmethod
     def _invalid_destructive_control(controls: dict) -> str | None:
+        if 'sweep_external_o2_outflow_mol' in controls:
+            value = controls['sweep_external_o2_outflow_mol']
+            if ('sweep_outflow_species_mol' not in controls or not is_declared_real_scalar(value)
+                    or not math.isfinite(float(value)) or float(value) < 0.0):
+                return 'sweep_external_o2_outflow_mol requires an integrated sweep and finite non-negative mol'
         if 'sweep_outflow_species_mol' in controls:
             vector = controls['sweep_outflow_species_mol']
             if not isinstance(vector, Mapping) or any(

@@ -105,7 +105,7 @@ def test_sweep_source_split_distinguishes_consumption_then_replacement():
                                (ledger.credit_mol("terminal.offgas", {"O2": 1.0}),))
     produced = LedgerTransition("produce", (ledger.debit_mol("reservoir.reagent.O2", {"O2": 1.0}),),
                                (ledger.credit_mol("process.overhead_gas", {"O2": 1.0}),))
-    old, generated = sweep_source_split({"O2": 1.0}, [consumed, produced], ledger.registry)
+    old, generated, _, _ = sweep_source_split({"O2": 1.0}, [consumed, produced], ledger.registry)
     assert old["O2"] == 0.0
     assert generated["O2"] == 1.0
 
@@ -240,3 +240,126 @@ def test_declared_non_mars_flow_executes_the_same_physical_balance():
     assert snapshot.overhead.composition["Ar"] == pytest.approx(6.0)
     assert snapshot.oxygen_reservoir["headspace_transport_pO2_bar"] == 0.0
     assert sim.atom_ledger.mol_by_account("reservoir.reagent.sweep_gas") == {}
+
+
+@pytest.mark.parametrize('flow', [0.0, 0.001])
+def test_fifteen_mbar_isothermal_startup_is_attainable(monkeypatch, flow):
+    sim = mars_sim(pressure_mbar=15.0, sweep=flow)
+    sim._overhead_headspace_config['volume_m3'] = 0.1
+    sim.melt.temperature_C += 500.0 - sim._headspace_temperature_K()
+    monkeypatch.setattr(sim, '_update_temperature', lambda: None)
+    sim.step()
+    assert sim.melt.hour == 1
+    assert sim._process_pressure_diagnostic['status'] == 'ok'
+    assert sim.overhead.pressure_mbar == pytest.approx(15.0, rel=4 * math.ulp(1.0))
+
+
+@pytest.mark.parametrize('initial_flow', [None, 0.0])
+def test_live_continuous_campaign_flow_adjustment_is_applied(initial_flow):
+    from simulator.runner import PyrolysisRun
+    from simulator.session import SimSession
+
+    patch = ({'campaigns': {'C2A_continuous': {'sweep_mol_per_s': initial_flow}}}
+             if initial_flow is not None else {})
+    run = PyrolysisRun(feedstock_id='mars_basalt', campaign='C2A', hours=0,
+                      additives_kg={'C': 30.0}, setpoints_patch=patch)
+    session = SimSession().start(run._session_config())
+    session.adjust('campaign_override', 0.001, campaign='C2A', field='sweep_mol_per_s')
+    sim = session.simulator
+    assert sim.melt.sweep_mol_per_s == 0.001
+    sim.step()
+    assert sim.melt.hour == 1
+    session.adjust('campaign_override', 0.002, campaign='C2A', field='sweep_mol_per_s')
+    assert sim.melt.sweep_mol_per_s == 0.002
+    sim.step()
+    assert sim.melt.hour == 2
+
+
+@pytest.mark.parametrize('external_initial,external_generated,expected_external', [
+    (0.0, 1.0, 0.5676676416183064),
+    (1.0, 0.0, 0.8646647167633873),
+])
+def test_continuous_outlet_separates_old_and_new_oxygen_sources(
+    external_initial, external_generated, expected_external,
+):
+    result = continuous_sweep_balance({'O2': 1.0}, {'O2': 1.0}, carrier='Ar',
+        sweep_mol_per_s=1.0, dt_s=1.0, pressure_bar=GAS_CONSTANT * 300.0 / 1e5,
+        volume_m3=1.0, temperature_K=300.0,
+        initial_external_o2_mol=external_initial, generated_external_o2_mol=external_generated)
+    assert result['external_o2_outflow_mol'] == pytest.approx(expected_external, rel=1e-14)
+    assert result['outflow_species_mol']['O2'] == pytest.approx(1.4323323583816936, rel=1e-14)
+
+
+def test_source_split_keeps_external_classes_through_consumption_and_replacement():
+    from simulator.accounting import AtomLedger, LedgerTransition
+    from simulator.overhead import sweep_source_split
+    from engines.builtin.oxygen_bubbler import TRANSITION_NAME
+
+    ledger = AtomLedger()
+    external = LedgerTransition(TRANSITION_NAME,
+        (ledger.debit_mol('reservoir.fo2_buffer', {'O2': 1.0}),),
+        (ledger.credit_mol('process.overhead_gas', {'O2': 1.0}),))
+    consumed = LedgerTransition('consume',
+        (ledger.debit_mol('process.overhead_gas', {'O2': 1.0}),),
+        (ledger.credit_mol('terminal.offgas', {'O2': 1.0}),))
+    melt_source = LedgerTransition('melt_source',
+        (ledger.debit_mol('reservoir.reagent.O2', {'O2': 1.0}),),
+        (ledger.credit_mol('process.overhead_gas', {'O2': 1.0}),))
+    old, generated, external_old, external_new = sweep_source_split(
+        {'O2': 1.0}, [external, consumed, melt_source], ledger.registry,
+        initial_external_o2_mol=0.0)
+    assert old['O2'] == 0.5
+    assert generated['O2'] == 1.5
+    assert external_old == 0.0
+    assert external_new == 0.5
+
+
+@pytest.mark.parametrize('old_external', [False, True])
+def test_runtime_sweep_routes_source_integrals_and_retains_external_inventory(monkeypatch, old_external):
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.accounting import LedgerTransition
+
+    # PV/RT=1 mol and one hour: one mol delivered + one generated gives
+    # two residence times. These published ODE integrals are independent
+    # of the production transport helper (review-of-record R1).
+    sim = mars_sim(pressure_mbar=GAS_CONSTANT * 500.0 / 0.1 / 100.0, sweep=1.0 / 3600.0)
+    sim._overhead_headspace_config['volume_m3'] = 0.1
+    sim.melt.temperature_C += 500.0 - sim._headspace_temperature_K()
+    monkeypatch.setattr(sim, '_update_temperature', lambda: None)
+    monkeypatch.setattr(sim, '_apply_oxygen_reservoir_exchange', lambda: None)
+    sim.atom_ledger.load_external_mol('process.overhead_gas', {'O2': 1.0},
+                                    source='old O2', material_origin='reagent' if old_external else 'feedstock')
+    sim._o2_bubbler_external_o2_in_overhead_mol = float(old_external)
+    # The ledger requires an explicitly mixed pool for partial withdrawals
+    # of shared-element origins; source-species attribution is independent.
+    sim.atom_ledger.mark_amalgamated_pool('process.overhead_gas', ['O'])
+    def source():
+        if old_external:
+            sim.atom_ledger.load_external_mol('reservoir.reagent.O2', {'O2': 1.0},
+                                            source='new melt proxy', material_origin='feedstock')
+            sim.atom_ledger.apply(LedgerTransition('new_melt_oxygen',
+                (sim.atom_ledger.debit_mol('reservoir.reagent.O2', {'O2': 1.0}),),
+                (sim.atom_ledger.credit_mol('process.overhead_gas', {'O2': 1.0}),)))
+        else:
+            sim.atom_ledger.load_external_mol('reservoir.fo2_buffer', {'O2': 1.0},
+                                            source='new external O2', material_origin='reagent')
+            sim._dispatch_and_commit(ChemistryIntent.OXYGEN_BUBBLER, control_inputs={
+                'passthrough_mol': 1.0, 'injected_mol': 1.0, 'absorbed_mol': 0.0,
+            })
+    monkeypatch.setattr(sim, '_apply_o2_bubbler', source)
+    sim.step()
+    expected_external = 0.8646647167633873 if old_external else 0.5676676416183064
+    expected_melt = 0.5676676416183064 if old_external else 0.8646647167633873
+    assert sim.atom_ledger.mol_by_account('terminal.oxygen_melt_offgas_stored')['O2'] == pytest.approx(expected_melt, rel=1e-13)
+    assert sim.atom_ledger.mol_by_account('terminal.oxygen_bubbler_external_vented_to_vacuum')['O2'] == pytest.approx(expected_external, rel=1e-13)
+    assert sim._o2_bubbler_external_o2_overhead_mol() == pytest.approx(1.0 - expected_external, rel=1e-13)
+
+
+@pytest.mark.parametrize('flow', [0.001, 1.0, 10.0])
+@pytest.mark.parametrize('initial_o2', [0.0, 1.0])
+def test_wholly_external_oxygen_cannot_become_melt_product_by_rounding(flow, initial_o2):
+    result = continuous_sweep_balance({'O2': initial_o2}, {'O2': 1.0}, carrier='Ar',
+        sweep_mol_per_s=flow, dt_s=1.0, pressure_bar=GAS_CONSTANT * 300.0 / 1e5,
+        volume_m3=1.0, temperature_K=300.0,
+        initial_external_o2_mol=initial_o2, generated_external_o2_mol=1.0)
+    assert result['external_o2_outflow_mol'] == result['outflow_species_mol']['O2']

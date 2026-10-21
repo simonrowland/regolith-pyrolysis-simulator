@@ -59,7 +59,13 @@ The overhead transport owner integrates the continuous, well-mixed mol balance
 at the admitted pressure. Its internal `OVERHEAD_BLEED` control
 `sweep_outflow_species_mol` contains mol per species per step; it is never a
 recipe knob. The bleed provider validates availability plus delivered carrier
-from `reservoir.reagent.sweep_gas`, then commits one conserved transition. Carrier O2
+from `reservoir.reagent.sweep_gas`, then commits one conserved transition.
+The companion internal `sweep_external_o2_outflow_mol` is external O2 in mol per
+step, integrated separately for carried inventory and continuous sources by
+the same owner. The bleed provider validates both source classes before
+routing melt O2 to product and external O2 to its vent; no outlet fraction
+is inferred from post-source holdup. Neither internal control is a recipe knob.
+Carrier O2
 from the CO2 equilibrium pressure projection is not credited as melt product.
 The declared Mars ambient CO2 boundary also uses fixed-final-pressure
 normalization and preserves raw physical pO2. That pressure projection supplies

@@ -1104,3 +1104,67 @@ def test_co2_pressure_projection_does_not_create_product_oxygen(
     assert sweep_boundary_partials_bar(inventory, pressure_bar=0.006,
                                        temperature_K=1800.0)["partials_bar"]["O2"] > 0.0
     assert sim.atom_ledger.mol_by_account("terminal.oxygen_melt_offgas_stored") == {}
+
+
+@pytest.mark.parametrize('external_initial,external_generated,expected_external,expected_melt', [
+    (0.0, 1.0, 0.5676676416183064, 0.8646647167633873),
+    (1.0, 0.0, 0.8646647167633873, 0.5676676416183064),
+    (1.0, 1.0, 1.4323323583816936, 0.0),
+])
+@pytest.mark.parametrize('finite_cold_train', [False, True])
+def test_source_integrated_sweep_commits_distinct_oxygen_outlets(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+    external_initial, external_generated, expected_external, expected_melt, finite_cold_train,
+):
+    from simulator.overhead import continuous_sweep_balance
+    from simulator.state import GAS_CONSTANT
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data, feedstocks_data, setpoints_data)
+    plan = continuous_sweep_balance({'O2': 1.0}, {'O2': 1.0}, carrier='Ar',
+        sweep_mol_per_s=1.0, dt_s=1.0, pressure_bar=GAS_CONSTANT * 300.0 / 1e5,
+        volume_m3=1.0, temperature_K=300.0,
+        initial_external_o2_mol=external_initial, generated_external_o2_mol=external_generated)
+    sim.atom_ledger.load_external_mol('process.overhead_gas', {'O2': 2.0},
+                                    source='post-source mixed O2', material_origin='feedstock')
+    external_total = external_initial + external_generated
+    sim._o2_bubbler_external_o2_in_overhead_mol = external_total
+    sim.atom_ledger.load_external_mol('reservoir.reagent.sweep_gas', plan['inlet_species_mol'],
+                                    source='delivered Ar', material_origin='reagent')
+    controls = {
+        'sweep_outflow_species_mol': plan['outflow_species_mol'],
+        'sweep_external_o2_outflow_mol': plan['external_o2_outflow_mol'],
+        'external_o2_in_overhead_mol': external_total, 'force_drain_all': True,
+        'headspace_volume_m3': 1.0, 'headspace_temperature_K': 300.0,
+    }
+    if finite_cold_train:
+        controls.update(cold_train_capacity=FiniteCapacity(1.0), p_ref_Pa=0.0,
+                        k_relief_kg_hr_Pa=1e-9, p_open_Pa=1.0, vessel_rating_Pa=1e6)
+    count = len(sim.atom_ledger.transitions)
+    result = sim._dispatch_and_commit(ChemistryIntent.OVERHEAD_BLEED, control_inputs=controls)
+    assert result.status == 'ok'
+    assert len(sim.atom_ledger.transitions) == count + 1
+    melt_product = sim.atom_ledger.mol_by_account('terminal.oxygen_melt_offgas_stored').get('O2', 0.0)
+    assert melt_product == pytest.approx(expected_melt, rel=1e-14)
+    if expected_melt == 0.0:
+        assert melt_product == 0.0
+    assert sim.atom_ledger.mol_by_account('terminal.oxygen_bubbler_external_vented_to_vacuum')['O2'] == pytest.approx(expected_external, rel=1e-14)
+    assert sim._o2_bubbler_external_o2_overhead_mol() == pytest.approx(external_total - expected_external, rel=1e-14)
+    assert all(abs(n) < 1e-12 for n in result.transition.atom_balance_proof.values())
+
+
+@pytest.mark.parametrize('external_outlet', [None, 0.0, 1.1, float('nan'), True])
+def test_sweep_rejects_missing_or_unavailable_external_source_outlet(
+    vapor_pressure_data, feedstocks_data, setpoints_data, external_outlet,
+):
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim.atom_ledger.load_external_mol('process.overhead_gas', {'O2': 2.0},
+                                    source='mixed inventory', material_origin='feedstock')
+    controls = {'sweep_outflow_species_mol': {'O2': 1.4323323583816936},
+                'external_o2_in_overhead_mol': 1.0, 'force_drain_all': True,
+                'headspace_volume_m3': 1.0, 'headspace_temperature_K': 300.0}
+    if external_outlet is not None:
+        controls['sweep_external_o2_outflow_mol'] = external_outlet
+    before = sim.atom_ledger.mol_by_account()
+    result = sim._dispatch_and_commit(ChemistryIntent.OVERHEAD_BLEED, control_inputs=controls)
+    assert result.status == 'unsupported'
+    assert result.transition is None
+    assert sim.atom_ledger.mol_by_account() == before

@@ -3358,7 +3358,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             account='process.overhead_gas',
             species=OXYGEN_SPECIES,
         )
-        if overhead_debit_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+        if intent == ChemistryIntent.OVERHEAD_BLEED:
+            # The committed species bin records the integrated external outlet.
+            # A continuous outlet cannot use a post-source batch fraction.
+            external_o2_mol = max(0.0, external_o2_mol - self._transition_species_mol(
+                transition, side='credits', account=OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
+                species=OXYGEN_SPECIES,
+            ))
+        elif overhead_debit_mol > OXYGEN_RESERVOIR_NOOP_MOL:
             external_before_mol = min(external_o2_mol, overhead_before_mol)
             if (
                 external_before_mol > OXYGEN_RESERVOIR_NOOP_MOL
@@ -4317,7 +4324,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         volume = self._headspace_volume_m3()
         step = getattr(self, '_sweep_transport_step', None)
         if step is not None:
-            initial, generated = sweep_source_split(
+            initial, generated, _, _ = sweep_source_split(
                 step['initial_species_mol'], self.atom_ledger.transitions[step['transition_start']:],
                 self.atom_ledger.registry,
             )
@@ -6910,6 +6917,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         capacity_result=None,
         effective_transport_capacity=None,
         sweep_outflow_species_mol=None,
+        sweep_external_o2_outflow_mol=None,
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
@@ -6944,6 +6952,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         if sweep_outflow_species_mol is not None:
             controls['sweep_outflow_species_mol'] = sweep_outflow_species_mol
+            if sweep_external_o2_outflow_mol is not None:
+                controls['sweep_external_o2_outflow_mol'] = sweep_external_o2_outflow_mol
         if effective_transport_capacity is not None:
             controls['effective_transport_capacity'] = (
                 effective_transport_capacity
@@ -14099,6 +14109,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         sweep_initial_mol = self._overhead_holdup_mol() if self.melt.sweep_mol_per_s is not None else None
         sweep_transition_start = len(self.atom_ledger.transitions)
         self._sweep_transport_step = ({'initial_species_mol': sweep_initial_mol,
+                                       'initial_external_o2_mol': self._o2_bubbler_external_o2_overhead_mol(),
                                        'transition_start': sweep_transition_start}
                                       if sweep_initial_mol is not None else None)
         self._apply_o2_bubbler()
@@ -14260,7 +14271,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             chamber_flow = None
             if sweep_initial_mol is not None:
                 from simulator.overhead import sweep_source_split
-                _, generated = sweep_source_split(
+                _, generated, _, _ = sweep_source_split(
                     sweep_initial_mol, self.atom_ledger.transitions[sweep_transition_start:],
                     self.atom_ledger.registry,
                 )
@@ -14338,15 +14349,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if sweep_initial_mol is not None:
             from simulator.overhead import continuous_sweep_balance, sweep_source_split
 
-            initial, generated = sweep_source_split(
+            initial, generated, external_initial, external_generated = sweep_source_split(
                 sweep_initial_mol, self.atom_ledger.transitions[sweep_transition_start:],
                 self.atom_ledger.registry,
+                initial_external_o2_mol=self._sweep_transport_step['initial_external_o2_mol'],
             )
             sweep_plan = continuous_sweep_balance(
                 initial, generated, carrier=self._resolve_condensation_carrier_gas(),
                 sweep_mol_per_s=self.melt.sweep_mol_per_s, dt_s=3600.0,
                 pressure_bar=self.melt.p_total_mbar / 1000.0,
                 volume_m3=self._headspace_volume_m3(), temperature_K=self._headspace_temperature_K(),
+                initial_external_o2_mol=external_initial, generated_external_o2_mol=external_generated,
             )
             self._admit_process_pressure(chamber_mol_per_s=max(
                 self._process_pressure_diagnostic.get('chamber_mol_per_s', 0.0),
@@ -14368,6 +14381,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 capacity_result=capacity_result,
                 effective_transport_capacity=effective_transport_capacity,
                 sweep_outflow_species_mol=sweep_plan['outflow_species_mol'] if sweep_plan else None,
+                sweep_external_o2_outflow_mol=sweep_plan['external_o2_outflow_mol'] if sweep_plan else None,
             )
             self._sweep_transport_step = None
             self._attribute_o2_bubbler_vented_from_bleed(bleed_result)

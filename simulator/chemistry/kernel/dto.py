@@ -362,6 +362,9 @@ class IntentRequest:
     overhead transport. It is not an operator input. The bleed provider
     validates inventory plus delivered carrier in ``reservoir.reagent.sweep_gas``
     and emits the single conserved chamber/outlet transition.
+    Its companion ``sweep_external_o2_outflow_mol`` is the external-O2
+    contribution in mol per step, source-integrated by the same transport
+    owner; it is required when external O2 is present, never an operator input.
     """
 
     intent: ChemistryIntent

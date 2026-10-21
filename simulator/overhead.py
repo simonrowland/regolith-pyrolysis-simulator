@@ -169,7 +169,8 @@ def continuous_sweep_balance(
     generated_species_mol: Mapping[str, float],
     *, carrier: str, sweep_mol_per_s: float, dt_s: float,
     pressure_bar: float, volume_m3: float, temperature_K: float,
-) -> dict[str, dict[str, float]]:
+    initial_external_o2_mol: float = 0.0, generated_external_o2_mol: float = 0.0,
+) -> dict[str, Any]:
     """Integrated well-mixed, constant-pressure overhead balance (mol/step)."""
     flow = _required_finite_nonnegative_float(sweep_mol_per_s, 'sweep_mol_per_s')
     duration = _required_finite_nonnegative_float(dt_s, 'dt_s')
@@ -180,6 +181,10 @@ def continuous_sweep_balance(
         raise OverheadConfigurationError('sweep requires a supported carrier and an external-O2 inlet boundary for oxygen feed')
     initial = {s: _required_finite_nonnegative_float(n, s) for s, n in initial_species_mol.items()}
     generated = {s: _required_finite_nonnegative_float(n, s) for s, n in generated_species_mol.items()}
+    external_initial = _required_finite_nonnegative_float(initial_external_o2_mol, 'initial_external_o2_mol')
+    external_generated = _required_finite_nonnegative_float(generated_external_o2_mol, 'generated_external_o2_mol')
+    if external_initial > initial.get('O2', 0.0) or external_generated > generated.get('O2', 0.0):
+        raise OverheadConfigurationError('external O2 source exceeds its O2 inventory or generation')
     # Premise: ideal gas at fixed P,V,T, hence N=PV/RT mol. Startup fills
     # a deficit with carrier or purges excess in the initial composition.
     # Constant source g_i and carrier F require outlet B=F+sum(g_i).
@@ -219,13 +224,32 @@ def continuous_sweep_balance(
         if retained > final[s]:
             outflow = min(available, math.nextafter(outflow, math.inf))
         outlet[s] = outflow
-    return {'inlet_species_mol': inlet, 'outflow_species_mol': outlet, 'final_species_mol': final}
+    # Source superposition: each O2 class obeys dn/dt=g-(B/N)n.
+    # Old external inventory retains n0*exp(-Bt/N), while a continuous
+    # external source retains g*(1-exp(-Bt/N))/(B/N). Startup purge scales
+    # only n0. Thus each integrated outlet is n0+g*t-n(t), in mol; its
+    # fraction is NOT the post-source inventory fraction. For N=t=1,
+    # B=2, old=1 and new=1 mol: outlets are 1-exp(-2)=0.86466471676
+    # and 1-(1-exp(-2))/2=0.56766764162 mol. B->0 retains both sources.
+    external_final = external_initial * (min(1.0, target / initial_total) if initial_total else 0.0) * survival
+    if total_dose:
+        external_final += target * (external_generated / total_dose) * replaced
+    external_outlet = min(outlet.get('O2', 0.0), max(0.0, external_initial + external_generated - external_final))
+    if external_initial == initial.get('O2', 0.0) and external_generated == generated.get('O2', 0.0):
+        # An exact source identity must survive the outlet's ULP correction:
+        # rounding cannot turn wholly external O2 into a melt product.
+        external_outlet = outlet.get('O2', 0.0)
+    return {'inlet_species_mol': inlet, 'outflow_species_mol': outlet, 'final_species_mol': final,
+            'external_o2_outflow_mol': external_outlet}
 
 
-def sweep_source_split(initial_species_mol, transitions, registry):
+def sweep_source_split(initial_species_mol, transitions, registry, *, initial_external_o2_mol=0.0):
     """Derive surviving carry-in and generation from the committed journal."""
     initial = dict(initial_species_mol)
     generated = {}
+    external_initial = min(initial.get('O2', 0.0), initial_external_o2_mol)
+    external_generated = 0.0
+    from engines.builtin.oxygen_bubbler import TRANSITION_NAME as OXYGEN_BUBBLER_TRANSITION_NAME
     # Chemistry is applied before the transport operator. A chemical debit
     # consumes a well-mixed share of surviving carry-in and new gas. Tracking
     # the journal distinguishes replacement (consume 1, generate 1) from no
@@ -238,11 +262,16 @@ def sweep_source_split(initial_species_mol, transitions, registry):
                 old, new = initial.get(s, 0.0), generated.get(s, 0.0)
                 fraction = max(0.0, 1.0 - n / (old + new)) if old + new else 0.0
                 initial[s], generated[s] = old * fraction, new * fraction
+                if s == 'O2':
+                    external_initial *= fraction
+                    external_generated *= fraction
         for lot in transition.credits:
             if lot.account == 'process.overhead_gas':
                 for s, n in lot.species_moles_for(registry).items():
                     generated[s] = generated.get(s, 0.0) + n
-    return initial, generated
+                    if s == 'O2' and transition.name == OXYGEN_BUBBLER_TRANSITION_NAME:
+                        external_generated += n
+    return initial, generated, external_initial, external_generated
 
 
 def sweep_boundary_partials_bar(species_mol: Mapping[str, float], *, pressure_bar: float,

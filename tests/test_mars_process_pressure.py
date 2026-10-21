@@ -153,3 +153,13 @@ def test_post_bleed_pressure_excess_rolls_back_the_whole_hour(monkeypatch):
     assert sim.atom_ledger.mol_by_account() == before
     assert sim.melt.hour == 0
     assert sim._poisoned_hour is None
+
+
+@pytest.mark.parametrize('excess_eps,expected', [(2.0, 'ok'), (8.0, 'infeasible')])
+def test_pressure_roundtrip_admission_is_bounded_to_four_eps(excess_eps, expected):
+    import math
+    actual = 1500.0 * (1.0 + excess_eps * math.ulp(1.0))
+    state = process_pressure_state(requested_pressure_pa=1500.0, ambient_pressure_pa=600.0,
+        chamber_mol_per_s=0.0, chamber_temperature_K=500.0, pumping={}, transport_pressure_pa=actual)
+    assert state['status'] == expected
+    assert state['achieved_pressure_pa'] == actual
