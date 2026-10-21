@@ -1065,8 +1065,8 @@ species:
           outside_labelled_ticks: false
           inside_nearer_line_printed_T: true
         - id: 2a-27
-          decision: defer
-          reason: 0.10 to 0.18 dex off the nearer Table line
+          decision: refuse
+          reason: stroke artifact; distance transform at this pixel is 8.0 px, not the recorded 14.3. The centre is the fitted line, 50 px below the triangle
           series: null
           series_nearer: 3
           series_second: 2
@@ -1077,7 +1077,7 @@ species:
           T_K: '1624.3'
           cx_px: '3373.7'
           cy_px: '2133.7'
-          dt_px: '14.3'
+          dt_px: '8.0'
           dpi: 1200
           nearer_offset_dex: '0.125'
           second_offset_abs_dex: '0.134'
@@ -1729,6 +1729,45 @@ species:
           nearer_offset_dex: '0.104'
           second_offset_abs_dex: '0.126'
           outside_labelled_ticks: true
+          inside_nearer_line_printed_T: false
+
+        - id: 2a-103
+          decision: refuse
+          reason: more than 0.18 dex from every Table line; filled triangle
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-6.048'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6157'
+          T_K: '1624.1'
+          cx_px: '3375.0'
+          cy_px: '2084.0'
+          dt_px: '15.0'
+          dpi: 1200
+          nearer_offset_dex: '0.264'
+          second_offset_abs_dex: '0.274'
+          outside_labelled_ticks: false
+          inside_nearer_line_printed_T: false
+        - id: 2a-104
+          decision: defer
+          reason: 0.10 to 0.18 dex off the nearer Table line; filled triangle
+          series: null
+          series_nearer: 3
+          series_second: 2
+          log10_p_ef: '-6.137'
+          uncertainty_dex: '0.06'
+          uncertainty_1000_over_T: '0.002'
+          x_1000_over_T: '0.6159'
+          T_K: '1623.6'
+          cx_px: '3378.0'
+          cy_px: '2116.0'
+          dt_px: '15.3'
+          dpi: 1200
+          nearer_offset_dex: '0.181'
+          second_offset_abs_dex: '0.191'
+          outside_labelled_ticks: false
           inside_nearer_line_printed_T: false
 
     - observation_id: sh99_fig4a

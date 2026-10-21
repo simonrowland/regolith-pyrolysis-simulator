@@ -109,7 +109,7 @@ Series 1 and 2 differ by −640/T + 0.39 dex, so they cross near 1641 K and stay
 | 2a-24 | defer | series 3 and 2 both within 0.10 dex and not separable | 3 or 2 | -5.118 | 0.06 | 0.5688 | 1758.0 | 2653.8 | 1755.7 | 23.0 | -0.068 | 2 | 0.073 | none |
 | 2a-25 | defer | series 3 and 2 both within 0.10 dex and not separable | 3 or 2 | -5.132 | 0.06 | 0.5711 | 1751.0 | 2688.8 | 1760.2 | 28.3 | -0.021 | 2 | 0.025 | none |
 | 2a-26 | defer | series 3 and 2 both within 0.10 dex and not separable | 3 or 2 | -5.512 | 0.06 | 0.5860 | 1706.3 | 2918.6 | 1895.1 | 27.0 | 0.002 | 2 | 0.002 | none |
-| 2a-27 | defer | 0.10 to 0.18 dex off the nearer Table line | unassigned | -6.186 | 0.06 | 0.6156 | 1624.3 | 3373.7 | 2133.7 | 14.3 | 0.125 | 2 | 0.134 | T outside the nearer line's printed interval |
+| 2a-27 | refuse | stroke artifact; distance transform at this pixel is 8.0 px, not the recorded 14.3. The centre is the fitted line, 50 px below the triangle | unassigned | -6.186 | 0.06 | 0.6156 | 1624.3 | 3373.7 | 2133.7 | 8.0 | 0.125 | 2 | 0.134 | T outside the nearer line's printed interval |
 | 2a-31 | read | within 0.10 dex of one Table line | 4 | -5.642 | 0.06 | 0.5132 | 1948.7 | 1797.6 | 1954.5 | 15.5 | -0.068 | 3 | 2.092 | outside labelled ticks; T outside the nearer line's printed interval |
 | 2a-32 | read | within 0.10 dex of one Table line | 4 | -5.964 | 0.06 | 0.5291 | 1890.1 | 2042.4 | 2067.9 | 20.6 | 0.032 | 3 | 1.984 | none |
 | 2a-33 | read | within 0.10 dex of one Table line | 4 | -5.955 | 0.06 | 0.5307 | 1884.4 | 2067.0 | 2064.4 | 21.2 | 0.083 | 3 | 1.932 | none |
@@ -147,6 +147,8 @@ Series 1 and 2 differ by −640/T + 0.39 dex, so they cross near 1641 K and stay
 | 2a-100 | refuse | more than 0.18 dex from every Table line | unassigned | -6.686 | 0.06 | 0.6188 | 1616.1 | 3422.0 | 2314.0 | 23.4 | -0.275 | 2 | 0.281 | T outside the nearer line's printed interval |
 | 2a-101 | defer | isolated triangle; not assigned to a Table line | unassigned | -6.723 | 0.06 | 0.5494 | 1820.2 | 2355.0 | 2339.0 | 14.2 | -0.190 | 3 | 2.197 | none |
 | 2a-102 | defer | 0.10 to 0.18 dex off the nearer Table line | unassigned | -7.264 | 0.06 | 0.6549 | 1526.9 | 3978.0 | 2517.0 | 14.4 | 0.104 | 2 | 0.126 | outside labelled ticks; T outside the nearer line's printed interval |
+| 2a-103 | refuse | more than 0.18 dex from every Table line; filled triangle | unassigned | -6.048 | 0.06 | 0.6157 | 1624.1 | 3375.0 | 2084.0 | 15.0 | 0.264 | 2 | 0.274 | T outside the nearer line's printed interval |
+| 2a-104 | defer | 0.10 to 0.18 dex off the nearer Table line; filled triangle | unassigned | -6.137 | 0.06 | 0.6159 | 1623.6 | 3378.0 | 2116.0 | 15.3 | 0.181 | 2 | 0.191 | T outside the nearer line's printed interval |
 
 Fit-stroke peaks on panel 2a: 5 peaks with dt < 10 px and |log10 p − nearer Table line| ≤ 0.10 dex. They are the line, not markers, and they are not given values.
 
@@ -295,11 +297,14 @@ Bare stretches of at least 100 px, with no separable mark:
 | 4 | 2322 | 2444 | 122 |
 
 
+
+The core at (3375, 2084), radius 15, is a filled downward triangle and is not 2a-27. 2a-27's stored centre (3373.7, 2133.7) is 50 px lower. That pixel is black, and its distance transform is 8.0 px, the fitted-line width, not the recorded 14.3. The judged crop is the 1200 dpi page `pdftoppm -r 1200 -f 5 -l 5 -x 100 -y 700 -W 5200 -H 9800` at x 3348–3410, y 2060–2160, file `/tmp/goal-flight-501/dispatch/t1372-w2-w9-t1.scratch/renders/2a27-zoom-1200.png`. The upper body's corners are (3352, 2070), (3400, 2073), and (3367, 2103). That triangle's incenter is (3371.1, 2083.2), 4 px from the distance-transform peak, so 2a-103 stores the peak. Table 1 prints `log p_ef(SiO) = -A/T + B` and, for this-work molybdenum, T 1623–1930 K, A = 27880±612, B = 10.84±0.15. It prints no point at 1624 K. 2a-103 is an independent figure point, 0.264 dex from series 3, 0.274 from series 2, and 0.278 from series 1, and is refused. The silhouette widens again below a 19 px waist: a second filled body, peak (3378, 2116), radius 15.3, 32 px from the first. The inscribed circles do not overlap, so it is 2a-104, deferred at 0.181 dex from series 3. The core at (3372, 2148), radius 10, remains the stroke and stays on the refused 2a-27.
+
 ### Fig. 2 round-2 core list
 
 Dark pixels are gray below 110 on the 1200 dpi crop. A core is a local maximum of the distance transform with radius at least 8 px. Maxima within 10 px, or within 0.42 of the smaller radius, are one core. A filled marker on this render has radius at least 14 px and a compact thick core. A core under that radius is the fit stroke (about 8 px), the axis bar, a tick, or a numeral. The two junction rows 2c-32 and 2c-35 are not cores: the pixels measure radius 0 and 4.1. The triangle above them is 2c-34.
 
-Panel 2a: 149 cores. 37 match an existing row, 23 are new decision rows, 89 are refused.
+Panel 2a: 149 cores. 37 match an existing row, 25 are new decision rows, 87 are refused.
 
 | cx | cy | r px | colour | matched row |
 | --- | --- | --- | --- | --- |
@@ -369,13 +374,13 @@ Panel 2a: 149 cores. 37 match an existing row, 23 are new decision rows, 89 are 
 | 2079 | 2062 | 19.0 | black | 2a-33 |
 | 2048 | 2068 | 21.2 | black | 2a-32 |
 | 3073 | 2077 | 23.0 | black | 2a-98 |
-| 3375 | 2084 | 15.0 | black | refused: same marker as 2a-27 |
+| 3375 | 2084 | 15.0 | black | 2a-103 |
 | 1592 | 2089 | 9.2 | black | refused: y-axis stroke or tick; radius is not a filled marker |
 | 1494 | 2092 | 8.1 | black | refused: y-axis stroke or tick; radius is not a filled marker |
 | 3053 | 2102 | 8.0 | black | refused: radius is the fit stroke or a numeral, not a filled marker |
 | 1538 | 2106 | 8.0 | black | refused: y-axis stroke or tick; radius is not a filled marker |
 | 3203 | 2113 | 23.0 | black | 2a-17 |
-| 3378 | 2116 | 15.3 | black | refused: same marker as 2a-27 |
+| 3378 | 2116 | 15.3 | black | 2a-104 |
 | 3372 | 2148 | 10.0 | black | 2a-27 |
 | 3301 | 2168 | 24.0 | black | 2a-12 |
 | 3579 | 2185 | 8.0 | black | 2a-30 |
