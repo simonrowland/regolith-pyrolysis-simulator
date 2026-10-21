@@ -366,3 +366,29 @@ def test_stated_bulk_uncertainty_refuses_even_below_one_percent(
     detail = json.loads(prediction.refusal_detail["detail"])
     assert detail["fraction_clause_passed"] is True
     assert detail["uncertainty_clause_passed"] is False
+
+
+@pytest.mark.parametrize("form,alpha_hex,sigma_hex", [
+    ({"gamma_o": 143, "E_J_per_mol": 121000, "R_J_per_mol_K": 8.314,
+      "E_uncertainty_J_per_mol": 53000},
+     ("0x1.eec3fbf5ff535p-5", "0x1.b818c322ef810p-4", "0x1.698b064c7fb81p-3"),
+     ("0x1.a4f3c23ed36b9p-3", "0x1.5aad7e22815d5p-2", "0x1.0923fc8a275e8p-1")),
+    ({"c0": 25.3, "E_J_per_mol": 92000},
+     ("0x1.19d9db6ff80cbp-4", "0x1.b4be9afd749d5p-4", "0x1.3e87259e3b9b5p-3"), None),
+    ({"A": 0.52, "B_K": 1000, "gamma_o": 143, "E_J_per_mol": 121000},
+     ("0x1.38367f4e2cfeep-2", "0x1.44d18a45bd852p-2", "0x1.501774da11cc7p-2"), None),
+])
+def test_reproduction_arrhenius_numeric_pin_before_owner_move(form, alpha_hex, sigma_hex):
+    from simulator.diagnostic_helpers.extract_reproduction import _literature_alpha_points
+
+    # Golden binary outputs captured before moving the existing evaluator.
+    points, reason, drops = _literature_alpha_points(SimpleNamespace(
+        values={"alpha_form": form}, T_range_K=(1873.15, 2173.15),
+    ))
+    assert reason is None and drops == []
+    assert [p["T_K"] for p in points] == [1873.15, 2023.15, 2173.15]
+    for i, point in enumerate(points):
+        assert point["alpha"] == float.fromhex(alpha_hex[i])
+        assert point["sigma"] == (None if sigma_hex is None else float.fromhex(sigma_hex[i]))
+        assert point["T_provenance"] == "alpha_form_synthetic"
+        assert point["series_name"] == "alpha_form"
