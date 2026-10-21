@@ -6154,7 +6154,11 @@ def candidate_observation(
     )
 
 
-_HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
+def _hashimoto_source_id() -> str:
+    """Source id of the work that declares the common-unity alpha convention."""
+    from simulator.battery.residue import HASHIMOTO_COMMON_UNITY_SOURCE_ID
+
+    return HASHIMOTO_COMMON_UNITY_SOURCE_ID
 
 
 def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
@@ -6171,7 +6175,7 @@ def _hashimoto_residue_prediction(
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
-    cache_key = (_HASHIMOTO_SOURCE_ID, engine)
+    cache_key = (_hashimoto_source_id(), engine)
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
@@ -6184,8 +6188,8 @@ def _hashimoto_residue_prediction(
             observations = [
                 row
                 for row in context.observations.values()
-                if row.source_id == _HASHIMOTO_SOURCE_ID
-                and row.observation_id.startswith(_HASHIMOTO_SOURCE_ID + "::")
+                if row.source_id == _hashimoto_source_id()
+                and row.observation_id.startswith(_hashimoto_source_id() + "::")
                 and isinstance(row.identity, Identity)
                 and quantity_token(row.identity)
                 is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -6202,7 +6206,8 @@ def _hashimoto_residue_prediction(
                 )
             source_path = (
                 REPO_ROOT
-                / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
+                / "data/literature/extracts"
+                / f"{_hashimoto_source_id()}.yaml"
             )
             source = load_yaml(source_path)
             geometry = next(
@@ -7756,7 +7761,7 @@ def _score_store_with_decisions(
                             predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
-                            and point.source_id == _HASHIMOTO_SOURCE_ID
+                            and point.source_id == _hashimoto_source_id()
                             and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
                         ):
                             prediction = _hashimoto_residue_prediction(

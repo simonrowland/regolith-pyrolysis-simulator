@@ -42,6 +42,8 @@ _HASHIMOTO_COMMON_UNITY_SOURCE = (
     "Hashimoto assumed alpha_i/alpha_j = 1 only; absolute alpha=1 is a "
     "declared sensitivity choice, not an author-established kinetic model"
 )
+# Source id of the only work whose scorer dispatch declares this convention.
+HASHIMOTO_COMMON_UNITY_SOURCE_ID = "kems-015-hashimoto-1983"
 
 
 class ResidueInventoryRefusal(ValueError):
@@ -1841,7 +1843,7 @@ def _predict_hashimoto_residue_cohort(
             }
             provenance = {
                 "experiment_id": experiment_id,
-                "source_id": "kems-015-hashimoto-1983",
+                "source_id": HASHIMOTO_COMMON_UNITY_SOURCE_ID,
                 "run_locator": dict(experiment.get("locator") or {}),
                 "temperature_K": temperature_K,
                 "duration_s": duration_s,
