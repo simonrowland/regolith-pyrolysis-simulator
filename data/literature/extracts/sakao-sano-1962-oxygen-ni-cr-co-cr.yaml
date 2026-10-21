@@ -1,0 +1,176 @@
+schema_version: literature_extract.v1
+source_id: sakao-sano-1962-oxygen-ni-cr-co-cr
+source:
+  citation: 'Sakao, H. & Sano, K. (1962), Activity of Oxygen in Liquid Ni-Cr and Co-Cr Alloys, volume 26, pp. 240-244.'
+  year: 1962
+extraction:
+  method: 'Scanned Japanese paper with English abstract; pdftotext and MinerU machine text. Table 1 cells were transcribed and checked against the 600 dpi render of physical page 4. Figure data deferred.'
+  date: '2026-10-20'
+  worker: fam34-1020
+review_status: draft
+species:
+  O:
+    observations: []
+    context:
+      - observation_id: sakao_sano_1962_table1_negative_log_activity_coefficients
+        type: relation
+        locator: {page: 4, published_page: 243, pdf_page_index: 3, table: '1'}
+        units: negative log10 activity coefficient
+        values:
+          method_class: model_derived
+          quantity_as_printed: negative log10 oxygen activity coefficient in liquid nickel and cobalt at 1600 C, calculated from equations 5 and 7
+          candidate_quantity_tokens: [activity_coefficient]
+          schema_gap: 'The store has activity_coefficient but no scalar printed_form for a negative log10 activity coefficient; values stay context rather than being converted or relabelled.'
+          chromium_mass_percent: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+          minus_log10_fO_in_Ni_as_printed: ['0.29', '0.49', '0.64', '0.78', '0.90', '1.01', '1.11', '1.21', '1.30', '1.39', '1.54', '1.69', '1.82', '1.94', '2.05', '2.16', '2.26', '2.35', '2.44', '2.52']
+          minus_log10_fO_in_Co_as_printed: ['0.28', '0.41', '0.53', '0.62', '0.71', '0.79', '0.86', '0.93', '1.00', '1.06', '1.17', '1.28', '1.38', '1.48', '1.57', '1.65', '1.73', '1.81', '1.89', '1.96']
+          note: 'The table is explicitly calculated from the fitted equations; each displayed cell was render-checked. The printed standard state is oxygen at infinite dilution on a wt% scale in the respective solvent.'
+      - observation_id: sakao_sano_1962_activity_coefficient_fits
+        type: relation
+        locator: {page: 2, published_page: 241, pdf_page_index: 1, section: Results}
+        units: log10 activity coefficient; at% Cr
+        values:
+          method_class: model_derived
+          quantity_as_printed: chromium dependence of oxygen activity coefficient in liquid Ni-Cr and Co-Cr alloys
+          candidate_quantity_tokens: [activity_coefficient]
+          equations_as_printed:
+            - 'Ni-Cr-O: log fO(Ni) = 11.96 NCr - 15.73 NCr²'
+            - 'Co-Cr-O: log fO(Co) = 0.45 NCr - 4.12 NCr^0.6'
+          condition_as_printed: '1600 °C; fit range through approximately 30 at% Cr for Ni-Cr and 30 at% Cr for Co-Cr'
+          schema_gap: 'No activity-coefficient log-form token; equations remain model-derived context.'
+      - observation_id: sakao_sano_1962_interaction_parameters
+        type: relation
+        locator: {page: 4, published_page: 243, pdf_page_index: 3, section: Results}
+        units: dimensionless interaction parameters
+        values:
+          method_class: model_derived
+          quantity_as_printed: approximate first interaction parameters at chromium below 5 wt%
+          candidate_quantity_tokens: [activity_coefficient]
+          values_as_printed: 'epsilon_O(Ni) = -0.20; epsilon_O(Co) = -0.17; at 1600 °C'
+          note: These are interaction parameters, not activity coefficients or measured equilibrium points.
+      - observation_id: sakao_sano_1962_figure1_phase_equilibrium
+        type: figure_only
+        locator: {figure: '1', page: 2, published_page: 241, pdf_page_index: 1}
+        units: at% Cr; log equilibrium constant
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: equilibrium of H2-H2O gas mixture with liquid Ni-Cr alloy and its oxide at 1600 C
+          species: O in Ni-Cr
+          phase: liquid alloy plus oxide phase
+          temperature_as_printed: 1600 C
+          x_axis_as_printed: chromium content (at% Cr)
+          y_axis_as_printed: log K_NiCr
+          caption_as_printed: 'Equilibrium on the reaction of H2-H2O gas mixture with liquid nickel-chromium alloy and its oxide at 1600 C.'
+          panel: single
+          series: [{name: 'measured equilibrium data', marker_count: null}]
+          attribution: Sakao and Sano (1962)
+          digitisation: deferred to a figure pass
+      - observation_id: sakao_sano_1962_figure2_equilibrium_constants
+        type: figure_only
+        locator: {figure: '2', page: 3, published_page: 242, pdf_page_index: 2}
+        units: log equilibrium constant
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: equilibrium constants in Ni-Cr-O and Co-Cr-O systems
+          species: O in Ni-Cr and Co-Cr
+          phase: liquid alloy plus oxide phase
+          temperature_as_printed: 1600 C
+          x_axis_as_printed: chromium content
+          y_axis_as_printed: log equilibrium constant
+          caption_as_printed: 'Chromium dependence of equilibrium constants for Ni-Cr-O and Co-Cr-O systems.'
+          panel: single
+          series: [{name: 'Ni-Cr-O', marker_count: null}, {name: 'Co-Cr-O', marker_count: null}]
+          attribution: Sakao and Sano (1962)
+          digitisation: deferred to a figure pass
+      - observation_id: sakao_sano_1962_figure3_oxide_equilibrium
+        type: figure_only
+        locator: {figure: '3', page: 3, published_page: 242, pdf_page_index: 2}
+        units: log equilibrium constant
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: equilibrium between oxide and H2-H2O gas in Ni-Cr-O system
+          species: O in Ni-Cr
+          phase: liquid alloy plus oxide phase
+          temperature_as_printed: 1600 C
+          x_axis_as_printed: chromium content
+          y_axis_as_printed: log K'
+          caption_as_printed: 'Equilibrium of the reaction of H2-H2O gas mixture with liquid nickel-chromium alloy and its oxide at 1600 C.'
+          panel: single
+          series: [{name: 'Ni-Cr alloy/oxide equilibrium', marker_count: null}]
+          attribution: Sakao and Sano (1962)
+          digitisation: deferred to a figure pass
+      - observation_id: sakao_sano_1962_figure4_chromium_activity
+        type: figure_only
+        locator: {figure: '4', page: 3, published_page: 242, pdf_page_index: 2}
+        units: log activity coefficient
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: chromium effect on oxygen activity coefficient in liquid nickel and cobalt
+          species: O in Ni-Cr and Co-Cr
+          phase: liquid alloy
+          temperature_as_printed: 1600 C
+          x_axis_as_printed: chromium concentration
+          y_axis_as_printed: log fO
+          caption_as_printed: 'Effect of chromium on the activity coefficient of oxygen in liquid nickel and cobalt at 1600 C.'
+          panel: single
+          series: [{name: 'Ni-Cr', marker_count: null}, {name: 'Co-Cr', marker_count: null}]
+          attribution: Sakao and Sano (1962)
+          digitisation: deferred to a figure pass
+      - observation_id: sakao_sano_1962_figure5_co_fit
+        type: figure_only
+        locator: {figure: '5', page: 4, published_page: 243, pdf_page_index: 3}
+        units: log activity coefficient per chromium mole fraction
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: validity of the fitted relation for Co-Cr-O system
+          species: O in Co-Cr
+          phase: liquid alloy
+          temperature_as_printed: 1600 C
+          x_axis_as_printed: N_Cr^(x-1)
+          y_axis_as_printed: log fO/N_Cr
+          caption_as_printed: 'Validity of the relation log fO = a·NCr + b·NCr^x for Co-Cr-O system at 1600 C.'
+          panel: single
+          series: [{name: 'measured values and fitted relation', marker_count: null}]
+          attribution: Sakao and Sano (1962)
+          digitisation: deferred to a figure pass
+      - observation_id: sakao_sano_1962_figure6_solvent_comparison
+        type: figure_only
+        locator: {figure: '6', page: 4, published_page: 243, pdf_page_index: 3}
+        units: log activity coefficient
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: effect of chromium on oxygen activity coefficient in liquid iron, nickel and cobalt
+          species: O in Fe-Cr, Ni-Cr, Co-Cr
+          phase: liquid alloys
+          temperature_as_printed: 1600 C
+          x_axis_as_printed: atomic fraction chromium
+          y_axis_as_printed: log fO
+          caption_as_printed: 'Effect of chromium on the activity coefficient of oxygen in liquid iron, nickel and cobalt at 1600 C.'
+          panel: single
+          series: [{name: 'Fe-Cr-O', marker_count: 0}, {name: 'Ni-Cr-O', marker_count: 0}, {name: 'Co-Cr-O', marker_count: 0}]
+          attribution: Sakao and Sano (1962), including prior Fe-Cr work
+          digitisation: deferred to a figure pass
+      - observation_id: sakao_sano_1962_figure7_oxygen_solubility
+        type: figure_only
+        locator: {figure: '7', page: 5, published_page: 244, pdf_page_index: 4}
+        units: mass % oxygen
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: calculated oxygen solubility in nickel-chromium alloy
+          species: O in Ni-Cr
+          phase: liquid alloy
+          temperature_as_printed: 1600 C
+          x_axis_as_printed: chromium content (mass %)
+          y_axis_as_printed: oxygen solubility (mass %)
+          caption_as_printed: 'Solubility of oxygen in nickel-chromium alloy at 1600 C.'
+          panel: single
+          series: [{name: 'present work calculated solubility; prior-work comparison', marker_count: null}]
+          attribution: Sakao and Sano (1962), with prior data comparison
+          digitisation: deferred to a figure pass
