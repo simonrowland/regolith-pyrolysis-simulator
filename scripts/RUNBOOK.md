@@ -237,3 +237,40 @@ host/table and ignores canonical-key replays:
 The command prints pulled, inserted, conflict-skipped, source-total, and
 accumulator-total counts. Harvest can run at any cadence without stopping the
 daemon.
+
+## Battery residual diagnostics
+
+`scripts/battery_residuals_report.py` reads a `residuals.jsonl` ledger one
+line at a time. It does not score the store. A temperature band is half-open
+in kelvin, `t-min <= T < t-max`, using the identity temperature stored on the
+residual key. Rows with no identity temperature are outside every band.
+
+```bash
+python scripts/battery_residuals_report.py funnel data/battery/residuals.jsonl \
+  --engine openimcc --t-min 1000 --t-max 1500
+
+python scripts/battery_residuals_report.py rowdiff \
+  data/battery/residuals-base.jsonl data/battery/residuals-tip.jsonl
+
+python scripts/battery_residuals_report.py band data/battery/residuals.jsonl \
+  --t-min 1000 --t-max 1500
+```
+
+`funnel` counts rows by status, rail, engine, refusal reason, and the stored
+refusal-detail reason. `rowdiff` reports status transitions, numeric value
+changes, keys that moved between refused and scored, and keys added or
+removed. It keeps one map of distinct keys and folds the second ledger into
+that map. `band` stores numeric values in a float64 array and reports
+per-engine status counts and the median and root-mean-square inside the band.
+The median and root-mean-square are the score report's statistics.
+
+## JUnit outcome compare
+
+`scripts/junit_compare.py` reports new failures, new passes, and other
+outcome changes between two junit XML files. Failure text is compared after
+redacting volatile paths, worker ids, addresses, and timings. The command
+exits 0 whether or not the tip has new failures.
+
+```bash
+python scripts/junit_compare.py base-junit.xml tip-junit.xml
+```

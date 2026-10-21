@@ -25,7 +25,7 @@ from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Iterable, Literal, Mapping, Sequence
+from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Sequence
 
 import yaml
 
@@ -8011,29 +8011,45 @@ def write_residuals_jsonl(
     path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
 
 
-def load_residuals_jsonl(path: Path) -> tuple[dict[str, object], ...]:
-    rows: list[dict[str, object]] = []
-    if not path.is_file():
-        return ()
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        payload = json.loads(line)
-        if isinstance(payload, dict) and not is_store_stamp_payload(payload):
-            rows.append(payload)
-    return tuple(rows)
+def iter_residual_payloads(
+    path: Path, *, strict: bool = False
+) -> Iterator[tuple[int, dict[str, object]]]:
+    """Yield ``(line_number, object)`` for one residual ledger.
 
+    Blank lines and the store-stamp line are skipped. A missing file yields
+    nothing. ``strict`` raises ``ValueError`` naming ``path:line`` when a
+    line is not JSON or not an object. Otherwise a non-object line is
+    skipped and invalid JSON propagates as ``JSONDecodeError``.
+    """
 
-def _iter_residuals_jsonl(path: Path) -> Iterable[dict[str, object]]:
     if not path.is_file():
         return
     with path.open(encoding="utf-8") as stream:
-        for line in stream:
+        for number, line in enumerate(stream, start=1):
             if not line.strip():
                 continue
-            payload = json.loads(line)
-            if isinstance(payload, dict) and not is_store_stamp_payload(payload):
-                yield payload
+            try:
+                payload = json.loads(line)
+            except json.JSONDecodeError as exc:
+                if strict:
+                    raise ValueError(f"{path}:{number}: {exc.msg}") from exc
+                raise
+            if not isinstance(payload, dict):
+                if strict:
+                    raise ValueError(f"{path}:{number}: residual row is not an object")
+                continue
+            if is_store_stamp_payload(payload):
+                continue
+            yield number, payload
+
+
+def load_residuals_jsonl(path: Path) -> tuple[dict[str, object], ...]:
+    return tuple(payload for _number, payload in iter_residual_payloads(path))
+
+
+def _iter_residuals_jsonl(path: Path) -> Iterable[dict[str, object]]:
+    for _number, payload in iter_residual_payloads(path):
+        yield payload
 
 
 @dataclass(frozen=True)
@@ -8106,6 +8122,23 @@ def _rms(values: Sequence[Decimal]) -> Decimal | None:
     if not values:
         return None
     return (sum((value * value for value in values), Decimal(0)) / Decimal(len(values))).sqrt()
+
+
+def _median_rms_from_float64(values: Sequence[float]) -> tuple[Decimal, Decimal] | None:
+    """``_median`` and ``_rms`` for one ``array('d')`` group.
+
+    The resident store is float64. This builds one Decimal per sample so the
+    two definitions stay in ``_median`` and ``_rms``, then drops that vector.
+    """
+
+    if not values:
+        return None
+    decimals = tuple(Decimal(str(value)) for value in values)
+    median = _median(decimals)
+    rms = _rms(decimals)
+    if median is None or rms is None:
+        return None
+    return median, rms
 
 
 def _iqr(values: Sequence[Decimal]) -> Decimal | None:
@@ -10313,6 +10346,42 @@ def _residual_key_quantity(key: object) -> str:
     if parts is None:
         return MISSING_QUANTITY_KEY_TOKEN
     return parts[1]
+
+
+def numeric_comparison_available(status: object) -> bool:
+    """Whether this residual status stored a numeric comparison.
+
+    Match, mismatch, and no_band did. Refused did not, and neither did a
+    status that is not a ``ResidualStatus``. This is not score eligibility.
+    """
+
+    try:
+        token = status if isinstance(status, ResidualStatus) else ResidualStatus(str(status))
+    except ValueError:
+        return False
+    return token is not ResidualStatus.REFUSED
+
+
+def numeric_comparison_transition(base_status: object, tip_status: object) -> str | None:
+    """Name a refused/numeric status change.
+
+    ``"scored"`` when a refusal gains a numeric comparison, ``"refused"``
+    when a numeric comparison becomes a refusal. Any other pair, including
+    an unknown status, returns None.
+    """
+
+    base_refused = (
+        base_status is ResidualStatus.REFUSED
+        or base_status == ResidualStatus.REFUSED.value
+    )
+    tip_refused = (
+        tip_status is ResidualStatus.REFUSED or tip_status == ResidualStatus.REFUSED.value
+    )
+    if base_refused and numeric_comparison_available(tip_status):
+        return "scored"
+    if numeric_comparison_available(base_status) and tip_refused:
+        return "refused"
+    return None
 
 
 def _all_numeric_source_id(reference: str, observation: Observation | None) -> str:
