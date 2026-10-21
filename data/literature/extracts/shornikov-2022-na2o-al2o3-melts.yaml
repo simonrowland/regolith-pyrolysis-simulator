@@ -1,0 +1,195 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2022-na2o-al2o3-melts
+source:
+  citation: Shornikov, S. I., O. I. Yakovlev, and V. S. Minaev (2022), “Thermodynamic properties of the
+    Na2O–Al2O3 melts,” Experiment in Geosciences 28(1), 69–71.
+  year: 2022
+  corpus_asset: raw/shornikov-2022-na2o-al2o3-melts/shornikov-2022-na2o-al2o3-melts.pdf
+extraction:
+  method: No MinerU table. The three cited NaAlO2 melting temperatures were read from the text layer and
+    checked on the 600 dpi render of PDF page 3 (published page 69). Mixing-energy minima are context.
+    Figures were not digitised.
+  date: '2026-10-20'
+  worker: t1372-w2-w8-t1
+review_status: draft
+fidelity_samples:
+- species: NaAlO2
+  observable: transition_point
+  observation_id: na2o_2022_naalO2_tm_matignon
+  field: value
+  value: '1923'
+  locator: &id001
+    page: 3
+    pdf_page_index: 2
+    published_page: 69
+    section: Introduction
+- species: NaAlO2
+  observable: transition_point
+  observation_id: na2o_2022_naalO2_tm_weber
+  field: value
+  value: '2140'
+  locator: *id001
+experiments:
+- experiment_id: shornikov-2022-na2o-al2o3-model
+  kind: thermodynamic_model
+  locator: &id005
+    page: 4
+    pdf_page_index: 3
+    published_page: 70
+    section: Discussion
+  method: Semi-empirical model cited to Shornikov (2019). Activities and mixing energies are calculated,
+    not tabulated.
+species:
+  NaAlO2:
+    observations:
+    - observation_id: na2o_2022_naalO2_tm_matignon
+      type: transition_point
+      locator: &id002
+        page: 3
+        pdf_page_index: 2
+        published_page: 69
+        section: Introduction
+        note: 'Cited melting temperature of NaAlO2: Matignon (1923).'
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        value: '1923'
+        value_as_printed: 1923±20 K
+        attribution: Matignon (1923)
+        property_kind: melting_point
+        T_K: '1923'
+        phase_basis: The sentence is the melting temperature of NaAlO2. The solid that melts is crystalline.
+          The paper does not choose among the three cited values.
+      phase: cr
+      uncertainty:
+        kind: printed
+        value: '20'
+        verbatim: 1923±20 K
+        confidence_level: not_stated
+        basis: One printed ±. The paper does not state the confidence level.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1923'
+          locator: *id002
+    - observation_id: na2o_2022_naalO2_tm_schairer
+      type: transition_point
+      locator: &id003
+        page: 3
+        pdf_page_index: 2
+        published_page: 69
+        section: Introduction
+        note: 'Cited melting temperature of NaAlO2: Schairer and Bowen (1956).'
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        value: '2123'
+        value_as_printed: 2123±30 K
+        attribution: Schairer and Bowen (1956)
+        property_kind: melting_point
+        T_K: '2123'
+        phase_basis: The sentence is the melting temperature of NaAlO2. The solid that melts is crystalline.
+          The paper does not choose among the three cited values.
+      phase: cr
+      uncertainty:
+        kind: printed
+        value: '30'
+        verbatim: 2123±30 K
+        confidence_level: not_stated
+        basis: One printed ±. The paper does not state the confidence level.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2123'
+          locator: *id003
+    - observation_id: na2o_2022_naalO2_tm_weber
+      type: transition_point
+      locator: &id004
+        page: 3
+        pdf_page_index: 2
+        published_page: 69
+        section: Introduction
+        note: 'Cited melting temperature of NaAlO2: Weber and Venero (1970).'
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        value: '2140'
+        value_as_printed: 2140±6 K
+        attribution: Weber and Venero (1970)
+        property_kind: melting_point
+        T_K: '2140'
+        phase_basis: The sentence is the melting temperature of NaAlO2. The solid that melts is crystalline.
+          The paper does not choose among the three cited values.
+      phase: cr
+      uncertainty:
+        kind: printed
+        value: '6'
+        verbatim: 2140±6 K
+        confidence_level: not_stated
+        basis: One printed ±. The paper does not state the confidence level.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2140'
+          locator: *id004
+  Na2O:
+    observations: []
+    context:
+    - observation_id: na2o_2022_mixing_minimum_1450
+      type: mixing_energy_minimum
+      locator: *id005
+      units: kJ/mol
+      values:
+        value_as_printed: -77 kJ/mol
+        T_K: '1450'
+        composition_as_printed: compositions close to the NaAlO2 compound
+        method_class: model_derived
+        standard_state: 'Published page 70: oxide activities and mixing energies in the Na2O–Al2O3 melts
+          were calculated in the present study from accepted standard Gibbs energies of formation of the
+          simple oxides and the sodium aluminates in the crystalline and liquid state. The paper does
+          not state whether a(Na2O) and a(Al2O3) are referred to the pure solid oxide or the pure liquid
+          oxide.'
+        reason_not_scored: No mixing-energy quantity. The composition is not a numeric mole fraction.
+          Parents are not printed.
+    - observation_id: na2o_2022_mixing_minimum_2300
+      type: mixing_energy_minimum
+      locator: *id005
+      units: kJ/mol
+      values:
+        value_as_printed: -60 kJ/mol
+        T_K: '2300'
+        composition_as_printed: the melt
+        method_class: model_derived
+        standard_state: 'Published page 70: oxide activities and mixing energies in the Na2O–Al2O3 melts
+          were calculated in the present study from accepted standard Gibbs energies of formation of the
+          simple oxides and the sodium aluminates in the crystalline and liquid state. The paper does
+          not state whether a(Na2O) and a(Al2O3) are referred to the pure solid oxide or the pure liquid
+          oxide.'
+        reason_not_scored: No mixing-energy quantity. Parents are not printed.
+    - observation_id: na2o_2022_activity_reference_unstated
+      type: activity_reference_unstated
+      locator: *id005
+      units: as reported
+      values:
+        standard_state: 'Published page 70: oxide activities and mixing energies in the Na2O–Al2O3 melts
+          were calculated in the present study from accepted standard Gibbs energies of formation of the
+          simple oxides and the sodium aluminates in the crystalline and liquid state. The paper does
+          not state whether a(Na2O) and a(Al2O3) are referred to the pure solid oxide or the pure liquid
+          oxide.'
+        expected_migration_phase: unknown
+        pNa_ratio_as_printed: pNa over Na2O exceeds pNa over NaAlO2 by 10^3 (Fig. 4). A ratio of curves,
+          not a partial pressure.
+        reason_not_scored: Fig. 2 and Fig. 3 activities are curves. No discrete present-study marker was
+          read.

@@ -1,0 +1,968 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2014-complex-oxide-vapor
+source:
+  citation: Shornikov, S. I., and Yakovlev, O. I. (2014). A Study of Complex Gaseous
+    Oxides over the CaO–MgO–Al2O3–TiO2–SiO2 Melts. 45th Lunar and Planetary Science
+    Conference, abstract 1624.
+  year: 2014
+  corpus_asset: raw/shornikov-2014-complex-oxide-vapor/shornikov-2014-complex-oxide-vapor.pdf
+  corpus_sha256: be60bd75c6223243d72831c61ec50decb339ebc2ea1bd7c0922ded2a18900126
+  duplicate_of: shornikov-2015-complex-oxide-vapor
+extraction:
+  method: Conference abstract of the 2015 Geochemistry International paper. Fig. 1 circles
+    were counted at 600 dpi from pure-color cores. No log p was read. The journal extract
+    already holds the 1% bound, the 1500–2500 K span, and Table 2.
+  date: '2026-10-20'
+  worker: t1372-w2-w9-t1
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables: []
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: sh14_duplicate_of_2015
+      type: conference_abstract_of_journal
+      locator:
+        page: 1
+        pdf_page_index: 0
+        note: Header prints 45th Lunar and Planetary Science Conference (2014) 1624.pdf.
+          Both pages were read from pdftotext and from the 120 dpi renders.
+      units: as printed
+      standard_state: Equation (8) writes p(AlSiO) as proportional to a(Al2O3) to the
+        power 1/2 times a(SiO2), divided by p(O) to the power 5/2. The abstract does
+        not state whether either activity is referred to a solid oxide, a liquid oxide,
+        or a polymorph.
+      values:
+        duplicate_of: shornikov-2015-complex-oxide-vapor
+        evidence: Same authors, same Vernadsky affiliation, same system, and the same
+          1% Knudsen-cell bound at 1500–2500 K for (CaAlO), (CaSiO3), (MgAlO), (AlSiO),
+          and (CaTiO3). The journal paper (Geochemistry International 53(8), 690–699,
+          received 20 March 2014) is the full article.
+        repeated_in_the_journal: the 1% bound and the 1500–2500 K span
+        labels_the_journal_does_not_print:
+        - Fig. 1 is calculated at 2200 K. The journal Fig. 1 labels the Al2O3–SiO2
+          panel at 2300 K and the CaO–SiO2 panel at 2100 K.
+        - Fig. 3 is calculated at 2200 K. The journal Fig. 2 labels the mullite panel
+          at 2000 K.
+        - Fig. 2 cites Shornikov 2003, Herald of the Earth Sciences Department of RAS,
+          21, No. 1. The journal spinel temperature panel cites Shornikov 2001.
+        expected_migration_phase: unknown
+    - observation_id: sh14_fig1_calculated_2200
+      type: figure_series_refusal
+      locator:
+        page: 1
+        pdf_page_index: 0
+        figure: '1'
+        note: >
+          Fig. 1 at 600 dpi. Curves 1-4 are sequences of filled circles. There is no square. Curve 5 has no circle. The circles are calculated at 2200 K from [2, 3] and were not read as log p. Coordinates are the crop pdftoppm -r 600 -f 1 -l 1 -x 2100 -y 600 -W 2100 -H 1800. Page pixel = crop pixel + (2100, 600). Circles with crop x above 2100 were measured on pdftoppm -r 600 -f 1 -l 1 -x 1900 -y 400 -W 2800 -H 2200 and converted by subtracting (200, 200).
+      units: as printed
+      values:
+        temperature_K: 2200
+        attribution: calculated from experimental data [2, 3], Shornikov et al. 1994 and Shornikov and Archakov 2000
+        symbols_as_printed: 1 (SiO), 2 (Al), 3 (O2), 4 (AlSiO), 5 total vapor pressure
+        decision: context_not_read
+        circle_counts:
+          1_SiO: 21
+          2_Al: 22
+          3_O2: 22
+          4_AlSiO: 21
+          5_total: 0
+        reason: Calculated curves. Every circle is listed. No log p was digitized.
+        markers:
+        - id: fig1-s1-01
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 971
+          cy_px: 751
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s1-02
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1050
+          cy_px: 733
+          dt_px: 19.1
+          dpi: 600
+        - id: fig1-s1-03
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1116
+          cy_px: 709
+          dt_px: 19.3
+          dpi: 600
+        - id: fig1-s1-04
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1205
+          cy_px: 683
+          dt_px: 19.0
+          dpi: 600
+        - id: fig1-s1-05
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1282
+          cy_px: 664
+          dt_px: 15.7
+          dpi: 600
+        - id: fig1-s1-06
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1345
+          cy_px: 658
+          dt_px: 18.8
+          dpi: 600
+        - id: fig1-s1-07
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1422
+          cy_px: 646
+          dt_px: 16.1
+          dpi: 600
+        - id: fig1-s1-08
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1461
+          cy_px: 640
+          dt_px: 15.8
+          dpi: 600
+        - id: fig1-s1-09
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1504
+          cy_px: 642
+          dt_px: 20.1
+          dpi: 600
+        - id: fig1-s1-10
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1552
+          cy_px: 636
+          dt_px: 19.3
+          dpi: 600
+        - id: fig1-s1-11
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1602
+          cy_px: 631
+          dt_px: 18.2
+          dpi: 600
+        - id: fig1-s1-12
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1651
+          cy_px: 626
+          dt_px: 17.0
+          dpi: 600
+        - id: fig1-s1-13
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1707
+          cy_px: 622
+          dt_px: 16.0
+          dpi: 600
+        - id: fig1-s1-14
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1766
+          cy_px: 618
+          dt_px: 15.0
+          dpi: 600
+        - id: fig1-s1-15
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1829
+          cy_px: 614
+          dt_px: 15.0
+          dpi: 600
+        - id: fig1-s1-16
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1894
+          cy_px: 617
+          dt_px: 20.0
+          dpi: 600
+        - id: fig1-s1-17
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1961
+          cy_px: 614
+          dt_px: 19.4
+          dpi: 600
+        - id: fig1-s1-18
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 2029
+          cy_px: 611
+          dt_px: 19.0
+          dpi: 600
+        - id: fig1-s1-19
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2101
+          cy_px: 609
+          dt_px: 19.1
+          dpi: 600
+        - id: fig1-s1-20
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2171
+          cy_px: 607
+          dt_px: 19.0
+          dpi: 600
+        - id: fig1-s1-21
+          series: 1
+          species_as_printed: SiO
+          color: green
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2248
+          cy_px: 606
+          dt_px: 18.2
+          dpi: 600
+        - id: fig1-s2-01
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: y-axis clips this disk, so the radius is smaller than the other red circles; context, not read
+          cx_px: 834
+          cy_px: 990
+          dt_px: 11.0
+          dpi: 600
+        - id: fig1-s2-02
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 970
+          cy_px: 989
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s2-03
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1049
+          cy_px: 1012
+          dt_px: 21.2
+          dpi: 600
+        - id: fig1-s2-04
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1114
+          cy_px: 1053
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s2-05
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1205
+          cy_px: 1077
+          dt_px: 20.9
+          dpi: 600
+        - id: fig1-s2-06
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1282
+          cy_px: 1082
+          dt_px: 20.9
+          dpi: 600
+        - id: fig1-s2-07
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1345
+          cy_px: 1105
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s2-08
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1419
+          cy_px: 1109
+          dt_px: 21.4
+          dpi: 600
+        - id: fig1-s2-09
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1460
+          cy_px: 1111
+          dt_px: 21.1
+          dpi: 600
+        - id: fig1-s2-10
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1504
+          cy_px: 1132
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s2-11
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1551
+          cy_px: 1135
+          dt_px: 20.9
+          dpi: 600
+        - id: fig1-s2-12
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1601
+          cy_px: 1138
+          dt_px: 21.2
+          dpi: 600
+        - id: fig1-s2-13
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1653
+          cy_px: 1142
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s2-14
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1710
+          cy_px: 1145
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s2-15
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1769
+          cy_px: 1150
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s2-16
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1830
+          cy_px: 1154
+          dt_px: 20.9
+          dpi: 600
+        - id: fig1-s2-17
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1894
+          cy_px: 1178
+          dt_px: 20.9
+          dpi: 600
+        - id: fig1-s2-18
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1961
+          cy_px: 1183
+          dt_px: 21.1
+          dpi: 600
+        - id: fig1-s2-19
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 2029
+          cy_px: 1189
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s2-20
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2100
+          cy_px: 1196
+          dt_px: 21.8
+          dpi: 600
+        - id: fig1-s2-21
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2172
+          cy_px: 1203
+          dt_px: 21.9
+          dpi: 600
+        - id: fig1-s2-22
+          series: 2
+          species_as_printed: Al
+          color: red
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2245
+          cy_px: 1220
+          dt_px: 21.9
+          dpi: 600
+        - id: fig1-s3-00
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read; clipped by the y-axis
+          cx_px: 834
+          cy_px: 814
+          dt_px: 11.0
+          dpi: 600
+        - id: fig1-s3-01
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 970
+          cy_px: 815
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s3-02
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1049
+          cy_px: 789
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s3-03
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1114
+          cy_px: 747
+          dt_px: 14.8
+          dpi: 600
+        - id: fig1-s3-04
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1202
+          cy_px: 720
+          dt_px: 15.0
+          dpi: 600
+        - id: fig1-s3-05
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1282
+          cy_px: 714
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s3-06
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1345
+          cy_px: 695
+          dt_px: 16.0
+          dpi: 600
+        - id: fig1-s3-07
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1419
+          cy_px: 689
+          dt_px: 21.2
+          dpi: 600
+        - id: fig1-s3-08
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1460
+          cy_px: 689
+          dt_px: 21.2
+          dpi: 600
+        - id: fig1-s3-09
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1498
+          cy_px: 674
+          dt_px: 10.0
+          dpi: 600
+        - id: fig1-s3-10
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1549
+          cy_px: 672
+          dt_px: 13.0
+          dpi: 600
+        - id: fig1-s3-11
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1601
+          cy_px: 669
+          dt_px: 16.6
+          dpi: 600
+        - id: fig1-s3-12
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1653
+          cy_px: 666
+          dt_px: 19.3
+          dpi: 600
+        - id: fig1-s3-13
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1710
+          cy_px: 664
+          dt_px: 21.2
+          dpi: 600
+        - id: fig1-s3-14
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1768
+          cy_px: 664
+          dt_px: 21.2
+          dpi: 600
+        - id: fig1-s3-15
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1830
+          cy_px: 664
+          dt_px: 21.2
+          dpi: 600
+        - id: fig1-s3-16
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1897
+          cy_px: 650
+          dt_px: 10.2
+          dpi: 600
+        - id: fig1-s3-17
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1956
+          cy_px: 648
+          dt_px: 12.0
+          dpi: 600
+        - id: fig1-s3-18
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 2029
+          cy_px: 647
+          dt_px: 13.6
+          dpi: 600
+        - id: fig1-s3-19
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2100
+          cy_px: 646
+          dt_px: 15.8
+          dpi: 600
+        - id: fig1-s3-20
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2172
+          cy_px: 645
+          dt_px: 16.8
+          dpi: 600
+        - id: fig1-s3-21
+          series: 3
+          species_as_printed: O2
+          color: blue
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2243
+          cy_px: 644
+          dt_px: 17.0
+          dpi: 600
+        - id: fig1-s4-01
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 971
+          cy_px: 1475
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s4-02
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1049
+          cy_px: 1477
+          dt_px: 21.2
+          dpi: 600
+        - id: fig1-s4-03
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1114
+          cy_px: 1495
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s4-04
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1206
+          cy_px: 1492
+          dt_px: 21.2
+          dpi: 600
+        - id: fig1-s4-05
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1282
+          cy_px: 1475
+          dt_px: 21.1
+          dpi: 600
+        - id: fig1-s4-06
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1345
+          cy_px: 1494
+          dt_px: 21.1
+          dpi: 600
+        - id: fig1-s4-07
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1419
+          cy_px: 1484
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s4-08
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1460
+          cy_px: 1480
+          dt_px: 21.4
+          dpi: 600
+        - id: fig1-s4-09
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1504
+          cy_px: 1507
+          dt_px: 21.4
+          dpi: 600
+        - id: fig1-s4-10
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1551
+          cy_px: 1504
+          dt_px: 21.5
+          dpi: 600
+        - id: fig1-s4-11
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1601
+          cy_px: 1501
+          dt_px: 21.9
+          dpi: 600
+        - id: fig1-s4-12
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1653
+          cy_px: 1499
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s4-13
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1710
+          cy_px: 1497
+          dt_px: 21.4
+          dpi: 600
+        - id: fig1-s4-14
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1769
+          cy_px: 1496
+          dt_px: 21.4
+          dpi: 600
+        - id: fig1-s4-15
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1830
+          cy_px: 1495
+          dt_px: 21.2
+          dpi: 600
+        - id: fig1-s4-16
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1894
+          cy_px: 1528
+          dt_px: 21.4
+          dpi: 600
+        - id: fig1-s4-17
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 1961
+          cy_px: 1529
+          dt_px: 21.4
+          dpi: 600
+        - id: fig1-s4-18
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read
+          cx_px: 2029
+          cy_px: 1532
+          dt_px: 21.0
+          dpi: 600
+        - id: fig1-s4-19
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2100
+          cy_px: 1536
+          dt_px: 21.4
+          dpi: 600
+        - id: fig1-s4-20
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2172
+          cy_px: 1541
+          dt_px: 21.5
+          dpi: 600
+        - id: fig1-s4-21
+          series: 4
+          species_as_printed: AlSiO
+          color: black
+          decision: context_not_read
+          reason: calculated curve; context, not read; past the first crop, measured on the wide render
+          cx_px: 2245
+          cy_px: 1558
+          dt_px: 21.5
+          dpi: 600
+        series_4_numeral:
+          cx_px: 1647
+          cy_px: 1430
+          dt_px: 6.4
+          decision: refused_glyph
+
+    - observation_id: sh14_fig2_spinel_cited
+      type: figure_series_refusal
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '2'
+        note: 120 dpi render. Four lines of filled circles versus 1/T. The labelled
+          temperatures run from 2100 K down through 1900 K. No tick calibration was made.
+      units: as printed
+      values:
+        symbols_as_printed: 1 (Mg), 2 (O), 3 (AlO), 4 (MgAlO)
+        attribution: Knudsen effusion mass spectrometry [4], Shornikov 2003
+        decision: refused
+        reason: The caption assigns the points to Shornikov 2003. They were not read.
+    - observation_id: sh14_fig3_mullite_2200
+      type: figure_series_refusal
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '3'
+        note: 120 dpi render. Five continuous curves versus log p(O2). No data markers.
+      units: as printed
+      values:
+        temperature_K: 2200
+        compound_as_printed: mullite Al6Si2O13
+        attribution: calculated from experimental data [2, 3]
+        symbols_as_printed: 1 (SiO), 2 (Al), 3 (O), 4 (AlSiO), 5 total vapor pressure
+        decision: refused
+        reason: Calculated curves. No marker to read.

@@ -1,0 +1,46 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2012-vestnik-cmafs
+source:
+  citation: Shornikov, S. I. (2012), “Thermodynamic study of regularities in vapor composition over oxide
+    compounds (the CaO–MgO–Al2O3–FeO–SiO2 system),” Vestnik Otdelenia nauk o Zemle RAN 4, NZ9001, doi:10.2205/2012NZ_ASEMPG.
+  year: 2012
+  corpus_asset: raw/shornikov-2012-vestnik-cmafs/shornikov-2012-vestnik-cmafs.pdf
+extraction:
+  method: No MinerU table and no numeric table in the text layer. The 1% gas-fraction ceiling is context.
+    Figures were inspected on the 600 dpi pages and not digitised, because they replot Shornikov 2001
+    and 2002 or are calculations at 2200 K.
+  date: '2026-10-20'
+  worker: t1372-w2-w8-t1
+review_status: draft
+species:
+  AlSiO:
+    observations: []
+    context:
+    - observation_id: vestnik_2012_complex_oxide_ceiling
+      type: gas_fraction_ceiling
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: complex gaseous oxides
+      units: percent of total gas concentration
+      values:
+        ceiling_as_printed: does not exceed 1 %
+        T_range_as_printed: 1500–2500 K
+        species_as_printed: (CaAlO), (CaSiO), (CaSiO3), (MgAlO), (AlSiO)
+        attribution: Shornikov (2003), as cited in the paragraph.
+        reason_not_scored: One ceiling for five species over an unstated set of melts. Cited to an earlier
+          paper. Not a partial pressure at one composition.
+    - observation_id: vestnik_2012_figures_not_read
+      type: figure_series_refused
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: as reported
+      values:
+        fig_1: Calculated p(i) and x(i) over Al2O3–SiO2 at 2200 K, based on Shornikov (2002). Curves.
+        fig_2: Experimental temperature curves for mullite and spinel, cited to Shornikov (2002) and Shornikov
+          (2001). Those papers are already extracted. Not re-digitised.
+        fig_3: Calculated mullite curves at 2200 K versus p(O2), based on Shornikov (2002).
+        reason_not_scored: No discrete marker was given a value. Reading the curves would repeat extracted
+          2001 and 2002 data or digitise a model line.
