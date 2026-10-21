@@ -686,7 +686,10 @@ def openimcc_binding_selected_by_inputs(
     mode = normalize_high_t_melt_activity(
         controls.get("high_t_melt_activity", "openimcc")
     )
-    return not (temperature_K <= VAPOROCK_T_MAX_K or mode != "openimcc")
+    return (
+        mode == "openimcc"
+        and temperature_K >= openimcc_bridge._temperature_domain_K()[0]
+    )
 
 
 def _high_t_composition_vector(composition_mol: Mapping[str, float]) -> dict[str, float]:
@@ -1007,7 +1010,7 @@ def _build_high_t_melt_activity_authority(
         "requested": mode,
         "temperature_K": float(temperature_K),
         "vaporock_cap_K": float(VAPOROCK_T_MAX_K),
-        "above_vaporock_cap": True,
+        "above_vaporock_cap": temperature_K > VAPOROCK_T_MAX_K,
         "fallback": False,
         "provider": "openimcc",
         "composition_policy": {},

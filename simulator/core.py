@@ -522,7 +522,6 @@ from simulator.chemistry.kernel import (
     normalize_oxygen_sink_channel_mode,
 )
 from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
-from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 # BuiltinVaporPressureProvider is imported lazily inside
 # _build_chemistry_kernel: simulator/__init__.py -> simulator.core ->
 # engines.builtin.vapor_pressure -> simulator.chemistry.kernel ->
@@ -9973,7 +9972,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'stage0' if campaign_name in {'C0', 'C0B'} else 'hot_train'
         )
         high_t_control_inputs: dict[str, Any] = {}
-        if T_C + 273.15 > VAPOROCK_T_MAX_K:
+        from engines.builtin.vapor_pressure import openimcc_binding_selected_by_inputs
+
+        if openimcc_binding_selected_by_inputs(
+            temperature_K=T_C + 273.15, controls={},
+        ):
             high_t_control_inputs = {
                 'high_t_melt_activity': getattr(
                     self, '_high_t_melt_activity', 'openimcc'
@@ -9985,20 +9988,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     self, '_last_high_t_melt_activity', {}
                 ),
                 'simulation_hour': int(self.melt.hour) + 1,
-                'high_t_melt_activity_crossing': (
-                    getattr(
-                        self,
-                        '_last_high_t_melt_activity_temperature_K',
-                        None,
-                    )
-                    is not None
-                    and getattr(
-                        self,
-                        '_last_high_t_melt_activity_temperature_K',
-                        None,
-                    )
-                    <= VAPOROCK_T_MAX_K
-                ),
             }
         dispatch_kwargs = {
             'control_inputs': {

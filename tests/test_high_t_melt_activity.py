@@ -358,14 +358,63 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     ).hexdigest() == "0dbdc3673e0d640898dad7b848278f93322c0b48898050618b21811bd63c7e78"
 
 
-@pytest.mark.parametrize("mode", ["constant_gamma", "openimcc"])
-def test_1800_k_pre_switch_physics_pin(mode) -> None:
+def test_1800_k_pre_switch_physics_pin() -> None:
     result = _provider().dispatch(
-        _request(BASE_MELT_MOL, 1800.0, high_t_melt_activity=mode)
+        _request(BASE_MELT_MOL, 1800.0, high_t_melt_activity="constant_gamma")
     )
     assert hashlib.sha256(
         json.dumps(_physics(result), sort_keys=True).encode()
     ).hexdigest() == "ccdfb94254defeb15f302b251c93dc46ab420c1a83b43b3a78bd4ceb718c8368"
+
+
+@pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])
+def test_certified_edge_selects_openimcc(temperature_K, expected) -> None:
+    result = _provider().dispatch(
+        _request(BASE_MELT_MOL, temperature_K, high_t_melt_activity="openimcc")
+    )
+    high_t = result.diagnostic.get("high_t_melt_activity", {})
+    assert (high_t.get("provider") == "openimcc") is expected
+    assert high_t.get("above_vaporock_cap", False) is False
+    if not expected:
+        assert _physics(result) == _physics(_provider().dispatch(
+            _request(BASE_MELT_MOL, temperature_K, high_t_melt_activity="constant_gamma")
+        ))
+
+
+def test_binding_reads_lower_edge_from_default_pack(monkeypatch) -> None:
+    pack = openimcc_bridge_module._load_pack("default")
+    shifted_pack = SimpleNamespace(
+        kernel_datapack=SimpleNamespace(domains=((1850.0, 3000.0),)),
+    )
+    monkeypatch.setattr(openimcc_bridge_module, "_load_pack", lambda _: shifted_pack)
+    selected = vapor_pressure_module.openimcc_binding_selected_by_inputs
+    assert not selected(temperature_K=1800.0, controls={})
+    assert selected(temperature_K=1850.0, controls={})
+    monkeypatch.setattr(openimcc_bridge_module, "_load_pack", lambda _: pack)
+    assert selected(temperature_K=1800.0, controls={})
+    assert selected(
+        temperature_K=openimcc_bridge_module._temperature_domain_K()[0], controls={},
+    )
+
+
+def test_refused_openimcc_at_1800_k_keeps_existing_fallback_notice(monkeypatch) -> None:
+    def refuse(**_kwargs):
+        raise openimcc_bridge_module.OpenImccUnavailableError()
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate_cleaned_melt", refuse)
+    provider = _provider()
+    result = provider.dispatch(_request(BASE_MELT_MOL, 1800.0))
+    high_t = result.diagnostic["high_t_melt_activity"]
+    assert high_t["provider"] == "constant_gamma"
+    assert high_t["fallback"] is True
+    assert high_t["fallback_reason"]["code"] == "openimcc_not_importable"
+    assert any(n["code"] == "openimcc_not_importable" for n in high_t["notices"])
+    legacy = provider.dispatch(_request(
+        BASE_MELT_MOL, 1800.0, high_t_melt_activity="constant_gamma",
+    ))
+    assert result.diagnostic["vapor_pressures_Pa"] == legacy.diagnostic[
+        "vapor_pressures_Pa"
+    ]
 
 
 @pytest.mark.parametrize("gap_K, hour_gap", [
@@ -943,11 +992,12 @@ def test_isothermal_refusal_expires_on_composition_drift(
     assert activity.evidence_tier == "PREDICT_AND_FLAG"
 
 
-def test_below_cap_is_activity_source_parity_with_pre_c3_path() -> None:
+def test_below_certified_edge_is_activity_source_parity_with_pre_c3_path() -> None:
     provider = _provider()
-    legacy = provider.dispatch(_request(BASE_MELT_MOL, CAP_MINUS_T_K))
+    temperature_K = openimcc_bridge_module._temperature_domain_K()[0] - 0.1
+    legacy = provider.dispatch(_request(BASE_MELT_MOL, temperature_K))
     explicit_openimcc = provider.dispatch(
-        _request(BASE_MELT_MOL, CAP_MINUS_T_K, high_t_melt_activity="openimcc")
+        _request(BASE_MELT_MOL, temperature_K, high_t_melt_activity="openimcc")
     )
 
     assert _physics(legacy) == _physics(explicit_openimcc)
@@ -1625,7 +1675,10 @@ def test_recipe_default_and_constant_gamma_escape_are_threaded() -> None:
 
 
 @pytest.mark.parametrize("reset_kind", ["cold", "frozen"])
-def test_simulator_default_passes_openimcc_authority_into_flux_dispatch(reset_kind) -> None:
+@pytest.mark.parametrize("temperature_K", [1800.0, 2073.15])
+def test_simulator_default_passes_openimcc_authority_into_flux_dispatch(
+    reset_kind, temperature_K,
+) -> None:
     with (DATA_DIR / "feedstocks.yaml").open() as handle:
         feedstocks = yaml.safe_load(handle) or {}
     with (DATA_DIR / "setpoints.yaml").open() as handle:
@@ -1642,7 +1695,7 @@ def test_simulator_default_passes_openimcc_authority_into_flux_dispatch(reset_ki
     backend.initialize({})
     sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
-    sim.melt.temperature_C = 1800.0
+    sim.melt.temperature_C = temperature_K - 273.15
     result = SimpleNamespace(
         vapor_pressures_Pa={},
         vapor_pressures_source={},
@@ -2147,8 +2200,11 @@ print(json.dumps({
     }
 
 
-def test_cap_comparison_mutation_makes_above_cap_openimcc_test_red(monkeypatch) -> None:
-    monkeypatch.setattr(vapor_pressure_module, "VAPOROCK_T_MAX_K", float("inf"))
+def test_domain_edge_mutation_makes_openimcc_binding_test_red(monkeypatch) -> None:
+    monkeypatch.setattr(
+        openimcc_bridge_module, "_temperature_domain_K",
+        lambda: (float("inf"), float("inf")),
+    )
     result = _provider().dispatch(
         _request(BASE_MELT_MOL, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
     )
