@@ -9,7 +9,7 @@ from typing import Any, Mapping
 
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import parse_formula
-from simulator.account_ids import METAL_BOTTOM_POOL_ACCOUNT, METAL_FLOAT_LAYER_ACCOUNT
+from simulator.account_ids import CROWN_STATION_ACCOUNTS, METAL_BOTTOM_POOL_ACCOUNT, METAL_FLOAT_LAYER_ACCOUNT
 from simulator.state import MOLAR_MASS
 
 _EPS = 1.0e-12
@@ -24,6 +24,7 @@ _REQUIRED_CONTRACT_FIELDS = (
 )
 _VAPOR_TERMINAL_OFFGAS_ACCOUNT = "terminal.offgas"
 _VAPOR_PRODUCT_ACCOUNTS = (
+    *CROWN_STATION_ACCOUNTS.values(),
     "process.condensation_train",
     "process.overhead_gas",
     _VAPOR_TERMINAL_OFFGAS_ACCOUNT,
@@ -36,6 +37,7 @@ _VAPOR_RESIDUAL_ACCOUNTS = (
 _VAPOR_WALL_ACCOUNT = "process.wall_deposit_segment_*"
 _VAPOR_PROVENANCE_RULE = "narrow_account_feedstock_clean"
 TARGET_YIELD_PRODUCT_ACCOUNTS = (
+    *CROWN_STATION_ACCOUNTS.values(),
     _VAPOR_TERMINAL_OFFGAS_ACCOUNT,
     "terminal.stage0_salt_phase",
     "terminal.stage0_chloride_salt_phase",

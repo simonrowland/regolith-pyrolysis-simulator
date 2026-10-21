@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from collections.abc import Mapping
+import math
+
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 STAGE_KEY_BY_NUMBER: dict[int, str] = {
@@ -179,3 +183,76 @@ class CrownCarrierAllocation:
     oxidized_mol_s: float
     inventory_mol: float
 
+
+
+def crown_ledger_route(
+    accounts: Mapping[str, Mapping[str, float]],
+    *,
+    station: str,
+    operation: str,
+    allocations: Mapping[str, CrownCarrierAllocation],
+    parent_debit_mol: Mapping[str, float],
+    duration_s: float | None,
+) -> tuple[dict[str, dict[str, float]], dict[str, dict[str, float]]]:
+    """Translate a net station allocation into mol-native account movements.
+
+    Parent debits are the source owner's *net* MO release, integrated over
+    source area and tick duration. Returning atoms are already included there;
+    adding a separate return credit would count them twice. The kernel checks
+    the joint source/dish/sky atom balance and available stock before writing.
+    No surface chemistry or oxygen recombination is inferred by this route.
+    """
+    from simulator.account_ids import CROWN_STATION_ACCOUNTS, OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT
+
+    if station not in CROWN_STATION_ACCOUNTS:
+        raise CrownStationRefusal(f"unknown crown station: {station!r}")
+    dish = CROWN_STATION_ACCOUNTS[station]
+    stock = accounts.get(dish, {})
+    if operation == "harvest":
+        # Emptying this physical inventory once makes a second harvest a no-op.
+        # The existing C6 recovered-condensate path draws Mg from this account.
+        if allocations or parent_debit_mol:
+            raise CrownStationRefusal("harvest cannot also collect a source allocation")
+        product = {s: n for s, n in stock.items() if n > 0}
+        return ({dish: product}, {"process.condensation_train": product}) if product else ({}, {})
+    if operation != "collect":
+        raise CrownStationRefusal(f"unknown crown operation: {operation!r}")
+    if duration_s is None or not is_declared_real_scalar(duration_s) or not math.isfinite(duration_s) or duration_s <= 0:
+        raise CrownStationRefusal("duration_s must be finite and positive")
+
+    debits: dict[str, dict[str, float]] = {}
+    credits: dict[str, dict[str, float]] = {}
+
+    def movement(account: str, species: str, amount: float) -> None:
+        if not math.isfinite(amount):
+            raise CrownStationRefusal(f"{species}: nonfinite crown movement")
+        if amount:
+            side = credits if amount > 0 else debits
+            side.setdefault(account, {})[species] = abs(amount)
+
+    for parent, amount in parent_debit_mol.items():
+        if parent not in {"MgO", "CaO"} or not is_declared_real_scalar(amount):
+            raise CrownStationRefusal(f"unsupported crown parent debit: {parent!r}")
+        movement("process.cleaned_melt", parent, -amount)
+    for species, allocation in allocations.items():
+        if not isinstance(allocation, CrownCarrierAllocation):
+            raise CrownStationRefusal(f"{species}: missing station allocation")
+        if allocation.oxidized_mol_s != 0:
+            raise CrownStationRefusal("crown oxidation requires an explicit reaction allocation")
+        if allocation.sky_mol_s < 0 or allocation.inventory_mol < 0:
+            raise CrownStationRefusal(f"{species}: negative station disposition")
+        if not math.isclose(
+            allocation.net_source_mol_s,
+            allocation.dish_gain_mol_s + allocation.sky_mol_s,
+            rel_tol=1e-12, abs_tol=1e-15,
+        ):
+            raise CrownStationRefusal(f"{species}: station disposition does not close")
+        gain = allocation.dish_gain_mol_s * duration_s
+        if not math.isclose(stock.get(species, 0.0) + gain, allocation.inventory_mol,
+                            rel_tol=1e-12, abs_tol=1e-15):
+            raise CrownStationRefusal(f"{species}: stale or inconsistent dish inventory")
+        movement(dish, species, gain)
+        destination = (OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT
+                       if species == "O2" else "terminal.offgas")
+        movement(destination, species, allocation.sky_mol_s * duration_s)
+    return debits, credits

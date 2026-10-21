@@ -96,7 +96,7 @@ def test_provider_declares_only_evaporation_transition_intent():
 
 
 @pytest.mark.xdist_group("serial")
-def test_provider_declares_four_evaporation_accounts():
+def test_provider_declares_evaporation_and_outdoor_crown_accounts():
     provider = BuiltinEvaporationTransitionProvider()
     profile = provider.capability_profile()
     assert profile.declared_accounts == frozenset({
@@ -104,6 +104,10 @@ def test_provider_declares_four_evaporation_accounts():
         "process.overhead_gas",
         "process.condensation_train",
         "reservoir.fo2_buffer",
+        "process.mg_crown",
+        "process.ca_crown",
+        "terminal.offgas",
+        "terminal.oxygen_melt_offgas_vented_to_vacuum",
     })
 
 
@@ -167,6 +171,10 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         "process.overhead_gas",
         "process.condensation_train",
         "reservoir.fo2_buffer",
+        "process.mg_crown",
+        "process.ca_crown",
+        "terminal.offgas",
+        "terminal.oxygen_melt_offgas_vented_to_vacuum",
     })
     for accounts in seen_accounts:
         assert accounts == expected, (

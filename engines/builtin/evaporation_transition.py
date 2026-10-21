@@ -48,6 +48,13 @@ where ``ChemistryKernel.commit_batch`` actually engages -- atom-balance
 validation runs both at dispatch time (in ``validate_atom_balance``) and
 again at commit time (re-validated by ``commit_batch``).
 
+Outdoor crown calls supply ``crown_station`` (mg/ca), ``crown_operation``
+(collect/harvest), station-owner ``crown_allocations``, source-owner net
+``parent_debit_mol`` integrated over area/time, and ``duration_s``. Routing
+is owned by simulator.condensation_routing. The provider only wraps its
+mol account movements in the existing proposal DTO. Outdoor calls additionally
+declare the two dish inventories, terminal.offgas and the melt-O2 vent bin.
+
 Account declaration: ``process.cleaned_melt``, ``process.overhead_gas``,
 ``process.condensation_train``, ``reservoir.fo2_buffer``. The legacy
 :meth:`_credit_evaporation_transition` builds a single
@@ -106,6 +113,10 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         "process.overhead_gas",
         "process.condensation_train",
         "reservoir.fo2_buffer",
+        "process.mg_crown",
+        "process.ca_crown",
+        "terminal.offgas",
+        "terminal.oxygen_melt_offgas_vented_to_vacuum",
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -138,6 +149,31 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         control_audit = diagnostic_control_audit(request)
 
         controls = unpack_controls(request)
+        if "crown_station" in controls:
+            from simulator.condensation_routing import crown_ledger_route
+
+            debits, credits = crown_ledger_route(
+                request.account_view.accounts,
+                station=controls["crown_station"],
+                operation=controls.get("crown_operation", "collect"),
+                allocations=controls.get("crown_allocations", {}),
+                parent_debit_mol=controls.get("parent_debit_mol", {}),
+                duration_s=controls.get("duration_s"),
+            )
+            proposal = None
+            if debits or credits:
+                proposal = LedgerTransitionProposal(
+                    debits=debits, credits=credits,
+                    reason=f"crown_{controls.get('crown_operation', 'collect')}_{controls['crown_station']}",
+                    atom_balance_proof=build_atom_balance_proof(
+                        debits, credits, request.account_view.species_formula_registry,
+                        resolve_species_formula,
+                    ),
+                )
+            return IntentResult(
+                intent=request.intent, status="ok", transition=proposal,
+                control_audit=control_audit,
+            )
         species = str(controls.get("species") or "")
         if not species:
             return IntentResult(

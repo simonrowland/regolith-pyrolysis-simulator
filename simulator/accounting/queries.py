@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from simulator.account_ids import (
+    CROWN_STATION_ACCOUNTS,
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
@@ -62,6 +63,7 @@ FREE_ANALYZER_OXYGEN_ACCOUNTS = (
 )
 PLUME_PRODUCT_SIO2_SPECIES = "SiO2"
 PRODUCT_LEDGER_ACCOUNTS = (
+    *CROWN_STATION_ACCOUNTS.values(),
     "terminal.offgas",
     "terminal.stage0_salt_phase",
     "terminal.stage0_chloride_salt_phase",
@@ -219,6 +221,56 @@ class AccountingQueries:
     def __init__(self, sim: Any):
         self.sim = sim
         self.ledger = sim.atom_ledger
+
+    def crown_products_mol(self) -> dict[str, dict[str, Any]]:
+        """Physical dish stock and harvested products; no parallel inventory.
+
+        Purity is the elemental species' mass fraction of retained plus
+        harvested material, conditional on the supplied surface allocation.
+        It does not certify oxidation state or unavailable surface kinetics.
+        """
+        report = {}
+        for station, account in CROWN_STATION_ACCOUNTS.items():
+            inventory = self.ledger.project_account_mol(account)
+            harvested: dict[str, float] = {}
+            for transition in self.ledger.transitions:
+                if not any(lot.account == CONDENSATION_TRAIN_ACCOUNT
+                           for lot in transition.credits):
+                    continue
+                for lot in transition.debits:
+                    if lot.account == account:
+                        for species, amount in lot.species_moles_for(self.ledger.registry).items():
+                            harvested[species] = harvested.get(species, 0.0) + amount
+            products = dict(inventory)
+            for species, amount in harvested.items():
+                products[species] = products.get(species, 0.0) + amount
+            formulas = {s: resolve_species_formula(s, self.ledger.registry) for s in products}
+            masses = {s: n * formulas[s].molar_mass_kg_per_mol() for s, n in products.items()}
+            total = sum(masses.values())
+            metal = "Mg" if station == "mg" else "Ca"
+            elemental = sum(mass for s, mass in masses.items() if set(formulas[s].elements) == {metal})
+            report[station] = {
+                "account": account, "inventory_mol": inventory,
+                "harvested_mol": harvested, "products_mol": products,
+                "elemental_metal_mass_fraction": elemental / total if total else None,
+                "purity_status": "conditional_on_supplied_surface_allocation",
+            }
+        return report
+
+    def vented_free_oxygen_mol(self) -> dict[str, float]:
+        """Actual O/O2 carriers at terminal escape, and their O2 equivalent."""
+        offgas = self.ledger.project_account_mol(TERMINAL_ESCAPE_ACCOUNT)
+        vent = self.ledger.project_account_mol(OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT)
+        atomic = offgas.get("O", 0.0)
+        molecular = offgas.get("O2", 0.0) + vent.get("O2", 0.0)
+        # One O2 contains two O atoms: (mol O + 2 mol O2)/2 is mol O2
+        # equivalent, not an asserted recombination. Pure O2 returns itself.
+        atoms = sum(_oxygen_atom_mol_by_species(
+            {"O": atomic, "O2": molecular}, self.ledger.registry,
+        ).values())
+        return {"O_mol": atomic, "O2_mol": molecular,
+                "oxygen_atom_mol": atoms, "O2_equivalent_mol": atoms / 2,
+                "oxygen_kg": _oxygen_atom_mol_to_o2_equivalent_kg(atoms)}
 
     def thermal_train_report(self) -> dict[str, Any]:
         """Return a detached sizing diagnostic derived only from run history."""

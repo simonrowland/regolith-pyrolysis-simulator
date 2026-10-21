@@ -370,6 +370,7 @@ def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
         ) from exc
 
 from simulator.account_ids import (
+    CROWN_STATION_ACCOUNTS,
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
@@ -786,6 +787,7 @@ KRESS_CARMICHAEL_1991_REFERENCE = (
     'doi:10.1007/BF00307328'
 )
 FLOW_MASS_ACCOUNTS = (
+    *CROWN_STATION_ACCOUNTS.values(),
     'process.cleaned_melt',
     C7_AL_CREDIT_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,

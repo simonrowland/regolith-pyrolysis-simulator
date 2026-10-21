@@ -29,6 +29,7 @@ from dataclasses import replace
 from typing import Any, Optional
 
 from simulator.accounting.exceptions import AccountingError
+from simulator.account_ids import CROWN_STATION_ACCOUNTS
 from simulator.accounting.ledger import (
     _C7_TERMINAL_SLAG_REWORK_CAPABILITY,
     AtomLedger,
@@ -394,6 +395,7 @@ class ChemistryKernel:
                 weakref.ReferenceType[LedgerTransitionProposal],
                 ChemistryProvider,
                 ChemistryIntent,
+                dict[str, dict[str, float]],
             ],
         ] = {}
         self._oxygen_sink_channel_mode = normalize_oxygen_sink_channel_mode(
@@ -432,10 +434,12 @@ class ChemistryKernel:
         proposal: LedgerTransitionProposal,
         provider: ChemistryProvider,
         intent: ChemistryIntent,
+        account_view: ProviderAccountView,
+        crown_station: str | None,
     ) -> None:
         dead = [
             key
-            for key, (proposal_ref, _, _) in self._proposal_origins.items()
+            for key, (proposal_ref, _, _, _) in self._proposal_origins.items()
             if proposal_ref() is None
         ]
         for key in dead:
@@ -452,6 +456,14 @@ class ChemistryKernel:
             weakref.ref(proposal, forget_origin),
             provider,
             intent,
+            # A finite dish allocation is tied to its source/dish stock at
+            # solve time. Two proposals dispatched before either commits must
+            # not both spend that same stock. Existing account semantics stay
+            # unchanged; only the new crown accounts opt into this check.
+            {account: dict(account_view.accounts.get(account, {}))
+             for account in {CROWN_STATION_ACCOUNTS[crown_station],
+                             *(proposal.accounts_touched() & {"process.cleaned_melt"})}}
+            if crown_station in CROWN_STATION_ACCOUNTS else {},
         )
 
     def _stamp_proposal_origin(
@@ -482,7 +494,7 @@ class ChemistryKernel:
                 "proposal was not produced by this kernel dispatch path; "
                 "commit_batch accepts only live dispatch-bound proposals"
             )
-        proposal_ref, provider, dispatched_intent = entry
+        proposal_ref, provider, dispatched_intent, _ = entry
         if proposal_ref() is not proposal:
             self._proposal_origins.pop(id(proposal), None)
             raise UnauthorizedIntentError(
@@ -798,7 +810,10 @@ class ChemistryKernel:
                 diagnostic=result.diagnostic,
                 warnings=result.warnings,
             )
-            self._remember_proposal_origin(stamped_transition, provider, intent)
+            self._remember_proposal_origin(
+                stamped_transition, provider, intent, account_view,
+                request.control_inputs.get("crown_station"),
+            )
 
         # Tag the result so a trace consumer can tell whether the
         # authoritative or the fallback provider answered.  The kernel
@@ -877,6 +892,10 @@ class ChemistryKernel:
         """
 
         provider = self._bound_provider_for_commit(intent, proposal)
+        crown_stock = self._proposal_origins[id(proposal)][3]
+        for account, expected in crown_stock.items():
+            if self._ledger.project_account_mol(account) != expected:
+                raise ProposalRejected(f"stale crown allocation: {account} inventory changed since dispatch")
         proposal_was_dispatched = True
         profile = provider.capability_profile()
         # Re-check intent authority + account-filter at commit time so an
@@ -906,6 +925,8 @@ class ChemistryKernel:
             )
         except AccountingError as exc:
             raise ProposalRejected(str(exc)) from exc
+        if crown_stock:
+            self._proposal_origins.pop(id(proposal), None)
         return applied
 
     def _transition_lots_to_proposal_accounts(

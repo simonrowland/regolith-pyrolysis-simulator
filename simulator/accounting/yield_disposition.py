@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 from simulator.accounting.exceptions import OriginUnresolvedError
+from simulator.account_ids import CROWN_STATION_ACCOUNTS
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.lots import allocate_pool_withdrawal
 from simulator.accounting.queries import TERMINAL_RUMP_REFRACTORY_OXIDES
@@ -38,6 +39,7 @@ MELT_RETAINED_SUBDISPOSITIONS: tuple[str, ...] = (
 )
 
 _ACCOUNT_TO_BIN: Mapping[str, str] = {
+    **{account: "product_condensed" for account in CROWN_STATION_ACCOUNTS.values()},
     "process.cleaned_melt": "melt_retained",
     "process.c7_al_credit": "charge_unprocessed",
     "process.condensation_retained_holdup": "overhead_terminal_inventory",

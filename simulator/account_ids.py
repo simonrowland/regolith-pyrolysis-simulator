@@ -1,6 +1,10 @@
 """Shared process account identifiers."""
 
 OXYGEN_SPECIES = "O2"
+CROWN_STATION_ACCOUNTS = {
+    "mg": "process.mg_crown",
+    "ca": "process.ca_crown",
+}
 METAL_PHASE_ACCOUNT = "process.metal_phase"
 METAL_BOTTOM_POOL_ACCOUNT = "process.metal_phase_bottom_pool"
 METAL_FLOAT_LAYER_ACCOUNT = "process.metal_phase_float_layer"
