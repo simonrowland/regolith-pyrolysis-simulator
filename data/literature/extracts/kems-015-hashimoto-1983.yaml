@@ -13024,10 +13024,15 @@ species:
       experiment: hashimoto-1983-run-17c1
     context:
     - observation_id: hashimoto_1983_table6_janaf_values_context
-      kind: reference_thermochemistry_context
+      type: reference_thermochemistry_context
       table: '6'
+      locator:
+        published_page: 124
+        pdf_page_index: 14
+        table: '6'
+      units: Per-value units are given in the table rows.
       schema_gap: JANAF reference values have no supported scored quantity in this extract
-      rows:
+      values:
       - source_observation_id: hashimoto_1983_table6_feo_vaporization_enthalpies
         species: Fe
         observable: gibbs_table
@@ -13130,6 +13135,7 @@ species:
         reported_values:
           quantity: vaporization_reaction_enthalpies_JANAF
           semantics: janaf_enthalpy_compilation_not_species_rate
+          pin_reaction_18_delta_H_over_z_kcal_mol: 104.235
         note: null
       - source_observation_id: hashimoto_1983_table6_sio2_vaporization_enthalpies
         species: SiO
@@ -13178,9 +13184,14 @@ species:
           pin_reaction_13_delta_H_over_z_kcal_mol: 122.799
         note: null
     - observation_id: hashimoto_1983_derived_model_outputs_context
-      kind: derived_or_model_output_context
+      type: derived_or_model_output_context
+      locator:
+        published_page: 123
+        pdf_page_index: 13
+        section: RESULTS AND DISCUSSION
+      units: Per-value units are given in the row values.
       schema_gap: paper-derived or assumed model output; not a scored measurement
-      rows:
+      values:
       - source_observation_id: hashimoto_1983_derived_feo_activation_energy
         species: Fe
         observable: rate_series
@@ -32864,7 +32875,7 @@ fidelity_samples:
     pdf_page_index: 12
     table: '5'
     note: F at 1800 deg C is 1.6 x 10^-6 mol/s.
-- path: species.Mg.observations[hashimoto_1983_table6_mgo_vaporization_enthalpies_quoted].values.reactions[0].delta_H_over_z_kcal_mol
+- path: species.Fe.context[0].values[3].reported_values.pin_reaction_18_delta_H_over_z_kcal_mol
   value: 104.235
   note: Reaction 18 Delta H/z = 104.235 kcal/mol.
   locator:
