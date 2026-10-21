@@ -120,3 +120,56 @@ print(json.dumps({
         "REGOLITH_OPTIMIZER_WORKER_OUTPUT_DIR": str(worker_root / "optimizer-output"),
     }
     assert not worker_root.exists()
+
+
+def test_sessionstart_removes_only_worker_caches_from_dead_pids(tmp_path):
+    repo_root = Path(__file__).resolve().parents[1]
+    cache_root = tmp_path / "worker-cache"
+    cache_root.mkdir()
+
+    dead_owner = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+    dead_owner.terminate()
+    dead_owner.wait(timeout=5)
+
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(repo_root)
+    env["PYTEST_XDIST_WORKER"] = "gw-test"
+    env["REGOLITH_PYTEST_WORKER_CACHE_ROOT"] = str(cache_root)
+    env["TEST_DEAD_OWNER_PID"] = str(dead_owner.pid)
+    env["TEST_LIVE_OWNER_PID"] = str(os.getpid())
+
+    result = _run_import_conftest(
+        """
+import json
+import conftest
+import os
+from pathlib import Path
+
+cache_root = Path(os.environ["REGOLITH_PYTEST_WORKER_CACHE_ROOT"])
+owner_file = conftest._WORKER_CACHE_OWNER_FILE
+stale_root = cache_root / "gw-dead"
+stale_root.mkdir()
+(stale_root / owner_file).write_text(os.environ["TEST_DEAD_OWNER_PID"], encoding="ascii")
+live_root = cache_root / "gw-live"
+live_root.mkdir()
+(live_root / owner_file).write_text(os.environ["TEST_LIVE_OWNER_PID"], encoding="ascii")
+unmarked_root = cache_root / "unmarked"
+unmarked_root.mkdir()
+
+conftest.pytest_sessionstart(None)
+print(json.dumps({
+    "stale_exists": stale_root.exists(),
+    "live_exists": live_root.exists(),
+    "unmarked_exists": unmarked_root.exists(),
+    "current_exists": Path(os.environ["REGOLITH_PYTEST_WORKER_CACHE"]).exists(),
+}))
+""",
+        env,
+    )
+
+    assert result == {
+        "stale_exists": False,
+        "live_exists": True,
+        "unmarked_exists": True,
+        "current_exists": True,
+    }

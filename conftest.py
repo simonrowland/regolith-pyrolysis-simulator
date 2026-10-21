@@ -60,6 +60,47 @@ def _safe_worker_id(worker_id: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]", "_", worker_id) or "master"
 
 
+_WORKER_CACHE_OWNER_FILE = ".regolith-pytest-worker-cache-owner-pid"
+
+
+def _worker_cache_root() -> Path:
+    repo_root = Path(__file__).resolve().parent
+    default_cache_root = (
+        Path(tempfile.gettempdir()) / "regolith-pytest-worker-cache" / repo_root.name
+    )
+    return Path(os.environ.get("REGOLITH_PYTEST_WORKER_CACHE_ROOT", default_cache_root))
+
+
+def _cleanup_dead_worker_caches(cache_root: Path) -> None:
+    """Remove only marked worker caches whose owning process has exited."""
+
+    try:
+        worker_roots = tuple(cache_root.iterdir())
+    except OSError:
+        return
+
+    for worker_root in worker_roots:
+        if worker_root.is_symlink() or not worker_root.is_dir():
+            continue
+        owner_file = worker_root / _WORKER_CACHE_OWNER_FILE
+        if owner_file.is_symlink() or not owner_file.is_file():
+            continue
+        try:
+            owner_pid = int(owner_file.read_text(encoding="ascii").strip())
+        except (OSError, UnicodeError, ValueError):
+            continue
+        if owner_pid <= 0 or owner_pid == os.getpid():
+            continue
+        try:
+            os.kill(owner_pid, 0)
+        except ProcessLookupError:
+            shutil.rmtree(worker_root, ignore_errors=True)
+        except (OSError, OverflowError):
+            # A permission or lookup error other than ESRCH cannot prove the
+            # owner is gone, so leave the cache in place.
+            continue
+
+
 def _configure_worker_cache_isolation() -> None:
     """Keep xdist workers from sharing scratch/cache SQLite files."""
 
@@ -67,16 +108,13 @@ def _configure_worker_cache_isolation() -> None:
     if not raw_worker_id:
         return
 
-    repo_root = Path(__file__).resolve().parent
     worker_id = _safe_worker_id(raw_worker_id)
-    default_cache_root = (
-        Path(tempfile.gettempdir()) / "regolith-pytest-worker-cache" / repo_root.name
-    )
-    cache_root = Path(
-        os.environ.get("REGOLITH_PYTEST_WORKER_CACHE_ROOT", default_cache_root)
-    )
+    cache_root = _worker_cache_root()
     cache_root.mkdir(parents=True, exist_ok=True)
     worker_root = Path(tempfile.mkdtemp(prefix=f"{worker_id}-", dir=cache_root))
+    (worker_root / _WORKER_CACHE_OWNER_FILE).write_text(
+        f"{os.getpid()}\n", encoding="ascii"
+    )
 
     tmp_dir = worker_root / "tmp"
     xdg_cache = worker_root / "xdg-cache"
@@ -157,6 +195,7 @@ _SESSION_WATCHDOG: SessionWatchdog | None = None
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionstart(session: pytest.Session) -> None:
     del session
+    _cleanup_dead_worker_caches(_worker_cache_root())
     if os.environ.get("PYTEST_XDIST_WORKER"):
         return
     global _SESSION_WATCHDOG
