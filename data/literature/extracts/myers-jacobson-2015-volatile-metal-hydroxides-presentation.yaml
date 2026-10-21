@@ -22,9 +22,15 @@ species:
         phase: gas
         T_range_K: [298, 298]
         units: kJ/mol
+        derivation:
+          relation: 'Transpiration, Third Law'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 1, pdf_page_index: 0, section: 'Measurement of Equilibrium Pressures of Volatile Hydroxides', record: 'Si(OH)4 row method: transpiration, third law'}
         values:
           quantity: delta_fH
           method_class: measured_reduced
+          admission_status: admitted
           value: -1351.3
           value_as_printed: '-1351.3'
           method_as_printed: 'Transpiration, Third Law'
@@ -35,7 +41,24 @@ species:
           temperature_K:
             state: {tag: value, value: {kind: point, point: 298}}
             locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', column_header: ΔfH°298}
-    context: []
+    context:
+      - observation_id: myers_jacobson_2015_presentation_fig_sioh4_spectrum
+        type: figure_only
+        locator: {page: 1, pdf_page_index: 0, note: 'Poster panel: First Direct Observation of Si(OH)4(g)'}
+        units: intensity (arbitrary units); m/e
+        values:
+          method_class: figure_only
+          typed_quantity: ion_intensity
+          species: Si(OH)4(g)
+          phase: gas
+          temperature_as_printed: '1325°C; comparison trace 1260°C'
+          x_axis_as_printed: m/e
+          y_axis_as_printed: intensity (arbitrary units)
+          caption_as_printed: 'First Direct Observation of Si(OH)4(g)'
+          panel: single
+          series: [{name: Si(OH)4+ mass spectrum, marker_count: null}]
+          attribution: Myers & Jacobson (2015)
+          digitisation: deferred to a figure pass
   SiO(OH)2:
     observations:
       - observation_id: myers_jacobson_2015_presentation_siooh2_delta_fh_298
@@ -44,9 +67,15 @@ species:
         phase: gas
         T_range_K: [298, 298]
         units: kJ/mol
+        derivation:
+          relation: 'Transpiration, Second Law'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 1, pdf_page_index: 0, section: 'Measurement of Equilibrium Pressures of Volatile Hydroxides', record: 'SiO(OH)2 row method: transpiration, second law'}
         values:
           quantity: delta_fH
           method_class: measured_reduced
+          admission_status: admitted
           value: -836
           value_as_printed: '-836'
           method_as_printed: 'Transpiration, Second Law'
@@ -57,7 +86,26 @@ species:
           temperature_K:
             state: {tag: value, value: {kind: point, point: 298}}
             locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', column_header: ΔfH°298}
-    context: []
+    context:
+      - observation_id: myers_jacobson_2015_presentation_fig_sioh_h2o_stoichiometry
+        type: figure_only
+        locator: {page: 1, pdf_page_index: 0, note: 'Poster panel: Plot of log P(Si-OH) vs log P(H2O)'}
+        units: log P (Pa)
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: partial pressures versus water partial pressure, used to infer Si-O-H stoichiometry
+          candidate_quantity_tokens: [p_partial, log10_K_star]
+          species: Si-O-H volatile hydroxides
+          phase: gas
+          temperature_as_printed: '1673, 1473 and 1173 K'
+          x_axis_as_printed: log(P(H2O)/Pa)
+          y_axis_as_printed: log(P(Si-OH)/Pa)
+          caption_as_printed: 'Plot of log P(Si-OH) vs log P(H2O) to determine stoichiometry of Si-O-H species.'
+          panel: single
+          series: [{name: three temperature series, marker_count: null}]
+          attribution: 'Jacobson et al., J. Chem. Thermodynamics 37 (2005) 1130–1137, as printed beneath plot'
+          digitisation: deferred to a figure pass
   CrO2(OH)2:
     observations:
       - observation_id: myers_jacobson_2015_presentation_cro2oh2_delta_fh_298
@@ -66,9 +114,15 @@ species:
         phase: gas
         T_range_K: [298, 298]
         units: kJ/mol
+        derivation:
+          relation: 'Transpiration, Third Law'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 1, pdf_page_index: 0, section: 'Measurement of Equilibrium Pressures of Volatile Hydroxides', record: 'CrO2(OH)2 row method: transpiration, third law'}
         values:
           quantity: delta_fH
           method_class: measured_reduced
+          admission_status: admitted
           value: -741
           value_as_printed: '-741'
           method_as_printed: 'Transpiration, Third Law'
@@ -82,7 +136,7 @@ species:
     context:
       - observation_id: myers_jacobson_2015_presentation_cro2oh2_computational
         type: relation
-        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: CrO2(OH)2(g), computational line}
+        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: 'CrO2(OH)2(g), computational line'}
         units: kJ/mol
         values:
           method_class: model_derived
@@ -98,9 +152,15 @@ species:
         phase: gas
         T_range_K: [298, 298]
         units: kJ/mol
+        derivation:
+          relation: 'Transpiration, Third Law'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 1, pdf_page_index: 0, section: 'Measurement of Equilibrium Pressures of Volatile Hydroxides', record: 'TiO(OH)2 row method: transpiration, third law'}
         values:
           quantity: delta_fH
           method_class: measured_reduced
+          admission_status: admitted
           value: -403
           value_as_printed: '-403'
           method_as_printed: 'Transpiration, Third Law'
@@ -114,7 +174,7 @@ species:
     context:
       - observation_id: myers_jacobson_2015_presentation_tiooh2_computational
         type: relation
-        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: TiO(OH)2(g), computational line}
+        locator: {page: 1, pdf_page_index: 0, table: 'Enthalpies of Formation', row: 'TiO(OH)2(g), computational line'}
         units: kJ/mol
         values:
           method_class: model_derived
@@ -122,6 +182,23 @@ species:
           candidate_quantity_tokens: [delta_fH]
           printed_value: '-820±50'
           note: Computational value; presentation rule limits typed poster values to printed measurements.
+      - observation_id: myers_jacobson_2015_presentation_fig_tiooh2_geometry_and_frequencies
+        type: figure_only
+        locator: {page: 1, pdf_page_index: 0, note: 'Poster panel: Computed Geometry and Vibrational Frequencies used to compute gefs'}
+        units: cm-1
+        values:
+          method_class: figure_only
+          typed_quantity: molecular geometry and vibrational frequency
+          species: TiO(OH)2(g)
+          phase: gas
+          temperature_as_printed: not stated
+          x_axis_as_printed: vibrational mode
+          y_axis_as_printed: frequency (cm-1)
+          caption_as_printed: 'Computed Geometry for TiO(OH)2(g); VIBRATIONAL FREQUENCIES for TiO(OH)2(g)'
+          panel: single
+          series: [{name: computed molecular structure and vibrational modes, marker_count: 0}]
+          attribution: Myers & Jacobson (2015), computational
+          digitisation: deferred to a figure pass
   Al(OH)3:
     observations: []
     context:
@@ -136,6 +213,23 @@ species:
           candidate_quantity_tokens: [delta_fH]
           printed_value: 'ΔrH°1630=-210±20'
           note: The table heading gives ΔfH°298, but this row explicitly prints reaction enthalpy at 1630 K; it is not scored as formation enthalpy.
+      - observation_id: myers_jacobson_2015_presentation_fig_aloh3_spectrum
+        type: figure_only
+        locator: {page: 1, pdf_page_index: 0, note: 'Poster panel: First Direct Observation of Al(OH)3(g)'}
+        units: intensity (arbitrary units); m/e
+        values:
+          method_class: figure_only
+          typed_quantity: ion_intensity
+          species: Al(OH)3(g)
+          phase: gas
+          temperature_as_printed: '1315°C, 1350°C, 1372°C, 1378°C'
+          x_axis_as_printed: m/e
+          y_axis_as_printed: intensity (arbitrary units)
+          caption_as_printed: 'First Direct Observation of Al(OH)3(g)'
+          panel: single
+          series: [{name: Al(OH)3+ mass spectrum, marker_count: null}]
+          attribution: Myers & Jacobson (2015)
+          digitisation: deferred to a figure pass
   Ta(OH)5:
     observations: []
     context:
@@ -149,3 +243,64 @@ species:
           candidate_quantity_tokens: [delta_fH]
           printed_value: 'ΔrH°1600=-151'
           note: The table heading gives ΔfH°298, but this row explicitly prints reaction enthalpy at 1600 K; it is not scored as formation enthalpy.
+  O:
+    observations: []
+    context:
+      - observation_id: myers_jacobson_2015_presentation_fig_hydroxide_pressures
+        type: figure_only
+        locator: {page: 1, pdf_page_index: 0, note: 'Poster panel: Comparison of Ta(OH)5, Si(OH)4, TiO(OH)2, and Al(OH)3'}
+        units: log(P/atm); 1/T (K-1)
+        values:
+          method_class: figure_only
+          typed_quantity: p_partial
+          species: Ta(OH)5, Si(OH)4, TiO(OH)2, Al(OH)3
+          phase: gas
+          temperature_as_printed: plotted range
+          x_axis_as_printed: 1/T (K-1)
+          y_axis_as_printed: log P(MOy(OH)x)
+          caption_as_printed: 'Comparison of Ta(OH)5, Si(OH)4, TiO(OH)2, and Al(OH)3 with P(H2O) = 0.5 bar'
+          panel: single
+          series: [{name: 'Ta(OH)5', marker_count: null}, {name: 'Si(OH)4', marker_count: null}, {name: 'TiO(OH)2', marker_count: null}, {name: 'Al(OH)3', marker_count: null}]
+          attribution: Myers & Jacobson (2015)
+          digitisation: deferred to a figure pass
+      - observation_id: myers_jacobson_2015_presentation_fig_kp_si_oh
+        type: figure_only
+        locator: {page: 1, pdf_page_index: 0, note: 'Poster panel: equilibrium pressure plot adjacent to transpiration cell'}
+        units: log Kp; 10^4/T (K-1)
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: equilibrium constant log Kp versus reciprocal temperature
+          candidate_quantity_tokens: [log10_K_star]
+          species: CrO2(OH)2(g)
+          phase: gas
+          temperature_as_printed: plotted range
+          x_axis_as_printed: 10^4/T (K-1)
+          y_axis_as_printed: log Kp
+          caption_as_printed: 'Equilibrium pressure plot for CrO2(OH)2(g)'
+          panel: single
+          series: [{name: equilibrium constant series, marker_count: null}]
+          attribution: Opila et al., J. Am. Ceram. Soc. 90(4), 1009–1012 (2007), as printed beneath plot
+          digitisation: deferred to a figure pass
+  Ta2O5:
+    observations: []
+    context:
+      - observation_id: myers_jacobson_2015_presentation_fig_ta2o5_tga
+        type: figure_only
+        locator: {page: 1, pdf_page_index: 0, note: 'Poster panel: TGA results for Ta2O5 + H2O/Ar at 1250°C'}
+        units: weight loss; time (h)
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: weight loss versus time at 1250°C
+          candidate_quantity_tokens: [mass_loss_fraction, mass_loss_rate]
+          species: Ta2O5
+          phase: solid
+          temperature_as_printed: '1250°C'
+          x_axis_as_printed: time (h)
+          y_axis_as_printed: weight loss (%)
+          caption_as_printed: 'TGA results for Ta2O5 + H2O/Ar at 1250°C'
+          panel: single
+          series: [{name: Ta2O5 weight-loss trace, marker_count: null}]
+          attribution: Myers & Jacobson (2015)
+          digitisation: deferred to a figure pass
