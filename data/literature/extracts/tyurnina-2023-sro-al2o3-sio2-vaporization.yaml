@@ -1,0 +1,2581 @@
+schema_version: literature_extract.v1
+source_id: tyurnina-2023-sro-al2o3-sio2-vaporization
+source:
+  citation: 'Tyurnina, N. G., Lopatin, S. I., Shugurov, S. M., Tyurnina, Z. G., Polyakova,
+    I. G. & Balabanova, E. A. (2023). Vapor Formation and the Thermodynamic Properties
+    of the SrO–Al2O3–SiO2 System. Glass Physics and Chemistry, 49(1), 41–49. DOI:
+    10.1134/S1087659622600909.'
+  doi: 10.1134/S1087659622600909
+  year: 2023
+extraction:
+  method: MinerU table 3 cell mapping with pdftotext-layout row and column reconciliation.
+  date: '2026-10-20'
+  worker: codex-fam33-1020
+review_status: draft
+skipped_empty_or_dash:
+  total: 7
+  tables:
+  - page: 6
+    table_index: 2
+    count: 3
+  - page: 6
+    table_index: 2
+    count: 4
+species:
+  SiO:
+    observations:
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c06
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 10
+        column_header: $p_i$ , Pa SiO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '3.45'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 10
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.0'
+              - - Al2O3
+                - '0.6'
+              - - SiO2
+                - '0.4'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 10
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c06
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 1
+        column_header: $p_i$ , Pa SiO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '2.96'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.1'
+              - - Al2O3
+                - '0.54'
+              - - SiO2
+                - '0.36'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c06
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 2
+        column_header: $p_i$ , Pa SiO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '2.16'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.2'
+              - - Al2O3
+                - '0.48'
+              - - SiO2
+                - '0.32'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c06
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 3
+        column_header: $p_i$ , Pa SiO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '1.91'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.3'
+              - - Al2O3
+                - '0.42'
+              - - SiO2
+                - '0.28'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c06
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 4
+        column_header: $p_i$ , Pa SiO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '1.40'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.4'
+              - - Al2O3
+                - '0.36'
+              - - SiO2
+                - '0.24'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c06
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 5
+        column_header: $p_i$ , Pa SiO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.64'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.5'
+              - - Al2O3
+                - '0.3'
+              - - SiO2
+                - '0.2'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c06
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 6
+        column_header: $p_i$ , Pa SiO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.50'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.6'
+              - - Al2O3
+                - '0.24'
+              - - SiO2
+                - '0.16'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c06
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 7
+        column_header: $p_i$ , Pa SiO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.19'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.7'
+              - - Al2O3
+                - '0.18'
+              - - SiO2
+                - '0.12'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+  O:
+    observations:
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c07
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 10
+        column_header: $p_i$ , Pa O
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '2.07'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 10
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.0'
+              - - Al2O3
+                - '0.6'
+              - - SiO2
+                - '0.4'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 10
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c07
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 1
+        column_header: $p_i$ , Pa O
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '1.77'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.1'
+              - - Al2O3
+                - '0.54'
+              - - SiO2
+                - '0.36'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c07
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 2
+        column_header: $p_i$ , Pa O
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '1.29'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.2'
+              - - Al2O3
+                - '0.48'
+              - - SiO2
+                - '0.32'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c07
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 3
+        column_header: $p_i$ , Pa O
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '1.14'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.3'
+              - - Al2O3
+                - '0.42'
+              - - SiO2
+                - '0.28'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c07
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 4
+        column_header: $p_i$ , Pa O
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.84'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.4'
+              - - Al2O3
+                - '0.36'
+              - - SiO2
+                - '0.24'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c07
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 5
+        column_header: $p_i$ , Pa O
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.43'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.5'
+              - - Al2O3
+                - '0.3'
+              - - SiO2
+                - '0.2'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c07
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 6
+        column_header: $p_i$ , Pa O
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.31'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.6'
+              - - Al2O3
+                - '0.24'
+              - - SiO2
+                - '0.16'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c07
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 7
+        column_header: $p_i$ , Pa O
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.52'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.7'
+              - - Al2O3
+                - '0.18'
+              - - SiO2
+                - '0.12'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r11_c07
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 8
+        column_header: $p_i$ , Pa O
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.84'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 8
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.8'
+              - - Al2O3
+                - '0.12'
+              - - SiO2
+                - '0.08'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 8
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r12_c07
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 9
+        column_header: $p_i$ , Pa O
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '1.15'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 9
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.9'
+              - - Al2O3
+                - '0.06'
+              - - SiO2
+                - '0.04'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 9
+  Sr:
+    observations:
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c05
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 1
+        column_header: $p_i$ , Pa Sr
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.0047'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.1'
+              - - Al2O3
+                - '0.54'
+              - - SiO2
+                - '0.36'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c05
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 2
+        column_header: $p_i$ , Pa Sr
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.0079'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.2'
+              - - Al2O3
+                - '0.48'
+              - - SiO2
+                - '0.32'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c05
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 3
+        column_header: $p_i$ , Pa Sr
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.015'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.3'
+              - - Al2O3
+                - '0.42'
+              - - SiO2
+                - '0.28'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c05
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 4
+        column_header: $p_i$ , Pa Sr
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.061'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.4'
+              - - Al2O3
+                - '0.36'
+              - - SiO2
+                - '0.24'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c05
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 5
+        column_header: $p_i$ , Pa Sr
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.09300000000000001'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.5'
+              - - Al2O3
+                - '0.3'
+              - - SiO2
+                - '0.2'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c05
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 6
+        column_header: $p_i$ , Pa Sr
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.12'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.6'
+              - - Al2O3
+                - '0.24'
+              - - SiO2
+                - '0.16'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c05
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 7
+        column_header: $p_i$ , Pa Sr
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '0.93'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.7'
+              - - Al2O3
+                - '0.18'
+              - - SiO2
+                - '0.12'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r11_c05
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 8
+        column_header: $p_i$ , Pa Sr
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '1.96'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 8
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.8'
+              - - Al2O3
+                - '0.12'
+              - - SiO2
+                - '0.08'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 8
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r12_c05
+      type: partial_pressure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 9
+        column_header: $p_i$ , Pa Sr
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: Pa
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        pressure_Pa: '2.69'
+        T_K: '2000'
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 9
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.9'
+              - - Al2O3
+                - '0.06'
+              - - SiO2
+                - '0.04'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 9
+  SrO:
+    observations:
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c08
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 1
+        column_header: $a_i$  SrO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: 3e-06
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.1'
+              - - Al2O3
+                - '0.54'
+              - - SiO2
+                - '0.36'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+      derived_from: &id001
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c05
+      derivation:
+        relation: Activity from comparative-cell vapor pressure ratio in equation
+          (11).
+        inputs: *id001
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c08
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 2
+        column_header: $a_i$  SrO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '8.599999999999999e-06'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.2'
+              - - Al2O3
+                - '0.48'
+              - - SiO2
+                - '0.32'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+      derived_from: &id002
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c05
+      derivation:
+        relation: Activity from comparative-cell vapor pressure ratio in equation
+          (11).
+        inputs: *id002
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c08
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 3
+        column_header: $a_i$  SrO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '3.3e-05'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.3'
+              - - Al2O3
+                - '0.42'
+              - - SiO2
+                - '0.28'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+      derived_from: &id003
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c05
+      derivation:
+        relation: Activity from comparative-cell vapor pressure ratio in equation
+          (11).
+        inputs: *id003
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c08
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 4
+        column_header: $a_i$  SrO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.00051'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.4'
+              - - Al2O3
+                - '0.36'
+              - - SiO2
+                - '0.24'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+      derived_from: &id004
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c05
+      derivation:
+        relation: Activity from comparative-cell vapor pressure ratio in equation
+          (11).
+        inputs: *id004
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c08
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 5
+        column_header: $a_i$  SrO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.0012'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.5'
+              - - Al2O3
+                - '0.3'
+              - - SiO2
+                - '0.2'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+      derived_from: &id005
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c05
+      derivation:
+        relation: Activity from comparative-cell vapor pressure ratio in equation
+          (11).
+        inputs: *id005
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c08
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 6
+        column_header: $a_i$  SrO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.002'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.6'
+              - - Al2O3
+                - '0.24'
+              - - SiO2
+                - '0.16'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+      derived_from: &id006
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c05
+      derivation:
+        relation: Activity from comparative-cell vapor pressure ratio in equation
+          (11).
+        inputs: *id006
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c08
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 7
+        column_header: $a_i$  SrO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.12'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.7'
+              - - Al2O3
+                - '0.18'
+              - - SiO2
+                - '0.12'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+      derived_from: &id007
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c05
+      derivation:
+        relation: Activity from comparative-cell vapor pressure ratio in equation
+          (11).
+        inputs: *id007
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r11_c08
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 8
+        column_header: $a_i$  SrO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.53'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 8
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.8'
+              - - Al2O3
+                - '0.12'
+              - - SiO2
+                - '0.08'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 8
+      derived_from: &id008
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r11_c05
+      derivation:
+        relation: Activity from comparative-cell vapor pressure ratio in equation
+          (11).
+        inputs: *id008
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r12_c08
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 9
+        column_header: $a_i$  SrO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '1.00'
+        T_K: '2000'
+      phase: unknown
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 9
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.9'
+              - - Al2O3
+                - '0.06'
+              - - SiO2
+                - '0.04'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 9
+      derived_from: &id009
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r12_c05
+      derivation:
+        relation: Activity from comparative-cell vapor pressure ratio in equation
+          (11).
+        inputs: *id009
+    context:
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c08_context
+      type: activity_boundary
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '2'
+        row_label: sample 10
+        column_header: $a_i$  SrO
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      values:
+        quantity: activity
+        printed_value: 0
+        reason: 'Printed zero at x(SrO)=0 is the Gibbs-Duhem boundary; no same-sample
+          Sr partial-pressure observation exists. Candidate token: activity; retained
+          as unscored boundary because measured ancestry is absent.'
+      units: dimensionless
+  Al2O3:
+    observations:
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c09
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 10
+        column_header: $a_i$   $\mathrm{Al_2O_3}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.50'
+        T_K: '2000'
+      phase: unknown
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 10
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.0'
+              - - Al2O3
+                - '0.6'
+              - - SiO2
+                - '0.4'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 10
+      derived_from: &id010
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c08
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c08
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c08
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c08
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c08
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c08
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c08
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r11_c08
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r12_c08
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c10
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c10
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c10
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c10
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c10
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c10
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c10
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c10
+      derivation:
+        relation: Alumina activity calculated by Gibbs-Duhem integration over the
+          measured SrO and SiO2 activity series, equations (13)–(14).
+        inputs: *id010
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c09
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 1
+        column_header: $a_i$   $\mathrm{Al_2O_3}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.25'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.1'
+              - - Al2O3
+                - '0.54'
+              - - SiO2
+                - '0.36'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+      derived_from: *id010
+      derivation:
+        relation: Alumina activity calculated by Gibbs-Duhem integration over the
+          measured SrO and SiO2 activity series, equations (13)–(14).
+        inputs: *id010
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c09
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 2
+        column_header: $a_i$   $\mathrm{Al_2O_3}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.13'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.2'
+              - - Al2O3
+                - '0.48'
+              - - SiO2
+                - '0.32'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+      derived_from: *id010
+      derivation:
+        relation: Alumina activity calculated by Gibbs-Duhem integration over the
+          measured SrO and SiO2 activity series, equations (13)–(14).
+        inputs: *id010
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c09
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 3
+        column_header: $a_i$   $\mathrm{Al_2O_3}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.022000000000000002'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.3'
+              - - Al2O3
+                - '0.42'
+              - - SiO2
+                - '0.28'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+      derived_from: *id010
+      derivation:
+        relation: Alumina activity calculated by Gibbs-Duhem integration over the
+          measured SrO and SiO2 activity series, equations (13)–(14).
+        inputs: *id010
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c09
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 4
+        column_header: $a_i$   $\mathrm{Al_2O_3}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.0034'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.4'
+              - - Al2O3
+                - '0.36'
+              - - SiO2
+                - '0.24'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+      derived_from: *id010
+      derivation:
+        relation: Alumina activity calculated by Gibbs-Duhem integration over the
+          measured SrO and SiO2 activity series, equations (13)–(14).
+        inputs: *id010
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c09
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 5
+        column_header: $a_i$   $\mathrm{Al_2O_3}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.00018'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.5'
+              - - Al2O3
+                - '0.3'
+              - - SiO2
+                - '0.2'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+      derived_from: *id010
+      derivation:
+        relation: Alumina activity calculated by Gibbs-Duhem integration over the
+          measured SrO and SiO2 activity series, equations (13)–(14).
+        inputs: *id010
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c09
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 6
+        column_header: $a_i$   $\mathrm{Al_2O_3}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '3.6e-06'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.6'
+              - - Al2O3
+                - '0.24'
+              - - SiO2
+                - '0.16'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+      derived_from: *id010
+      derivation:
+        relation: Alumina activity calculated by Gibbs-Duhem integration over the
+          measured SrO and SiO2 activity series, equations (13)–(14).
+        inputs: *id010
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c09
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 7
+        column_header: $a_i$   $\mathrm{Al_2O_3}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: 2e-10
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.7'
+              - - Al2O3
+                - '0.18'
+              - - SiO2
+                - '0.12'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+      derived_from: *id010
+      derivation:
+        relation: Alumina activity calculated by Gibbs-Duhem integration over the
+          measured SrO and SiO2 activity series, equations (13)–(14).
+        inputs: *id010
+  SiO2:
+    observations:
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c10
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 10
+        column_header: $a_i$   $\mathrm{SiO_2}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.41'
+        T_K: '2000'
+      phase: unknown
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 10
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.0'
+              - - Al2O3
+                - '0.6'
+              - - SiO2
+                - '0.4'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 10
+      derived_from: &id011
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c06
+      derivation:
+        relation: Silica activity from comparative-cell SiO vapor pressure ratio in
+          equation (12).
+        inputs: *id011
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c10
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 1
+        column_header: $a_i$   $\mathrm{SiO_2}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.30'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.1'
+              - - Al2O3
+                - '0.54'
+              - - SiO2
+                - '0.36'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 1
+      derived_from: &id012
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c06
+      derivation:
+        relation: Silica activity from comparative-cell SiO vapor pressure ratio in
+          equation (12).
+        inputs: *id012
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c10
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 2
+        column_header: $a_i$   $\mathrm{SiO_2}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.16'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.2'
+              - - Al2O3
+                - '0.48'
+              - - SiO2
+                - '0.32'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 2
+      derived_from: &id013
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c06
+      derivation:
+        relation: Silica activity from comparative-cell SiO vapor pressure ratio in
+          equation (12).
+        inputs: *id013
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c10
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 3
+        column_header: $a_i$   $\mathrm{SiO_2}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.125'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.3'
+              - - Al2O3
+                - '0.42'
+              - - SiO2
+                - '0.28'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 3
+      derived_from: &id014
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r06_c06
+      derivation:
+        relation: Silica activity from comparative-cell SiO vapor pressure ratio in
+          equation (12).
+        inputs: *id014
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c10
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 4
+        column_header: $a_i$   $\mathrm{SiO_2}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.067'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.4'
+              - - Al2O3
+                - '0.36'
+              - - SiO2
+                - '0.24'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 4
+      derived_from: &id015
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r07_c06
+      derivation:
+        relation: Silica activity from comparative-cell SiO vapor pressure ratio in
+          equation (12).
+        inputs: *id015
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c10
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 5
+        column_header: $a_i$   $\mathrm{SiO_2}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.013999999999999999'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.5'
+              - - Al2O3
+                - '0.3'
+              - - SiO2
+                - '0.2'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 5
+      derived_from: &id016
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r08_c06
+      derivation:
+        relation: Silica activity from comparative-cell SiO vapor pressure ratio in
+          equation (12).
+        inputs: *id016
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c10
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 6
+        column_header: $a_i$   $\mathrm{SiO_2}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.0087'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.6'
+              - - Al2O3
+                - '0.24'
+              - - SiO2
+                - '0.16'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 6
+      derived_from: &id017
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r09_c06
+      derivation:
+        relation: Silica activity from comparative-cell SiO vapor pressure ratio in
+          equation (12).
+        inputs: *id017
+    - observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c10
+      type: gibbs_table
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        row_label: sample 7
+        column_header: $a_i$   $\mathrm{SiO_2}$
+        note: Table 3 row bound to sample number and printed oxide mole percentages.
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: '0.0013000000000000002'
+        T_K: '2000'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2000'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SrO
+                - '0.7'
+              - - Al2O3
+                - '0.18'
+              - - SiO2
+                - '0.12'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            table: '3'
+            row_label: sample 7
+      derived_from: &id018
+      - tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r10_c06
+      derivation:
+        relation: Silica activity from comparative-cell SiO vapor pressure ratio in
+          equation (12).
+        inputs: *id018
+experiments:
+- experiment_id: tyurnina-2023-sas-kems
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+  apparatus_family: High-temperature differential mass spectrometry; double single-temperature
+    tungsten Knudsen chamber
+  conditions_note: Table 3 values at 2000 K. Table 1 compositions are synthesized
+    by 1523 K solid-state reaction.
+fidelity_samples:
+- species: Sr
+  observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c05
+  field: pressure_Pa
+  value: '0.0047'
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    row_label: sample 1
+  note: Table 3 Sr(g) pressure for sample 1, whose printed composition is 10 mol%
+    SrO, 54 mol% Al2O3 and 36 mol% SiO2.
+scope_assessment:
+  document_type: High-temperature mass-spectrometric vaporization and thermodynamic
+    measurements in SrO–Al2O3–SiO2.
+  scored_observations: 53
+  note: Table 3 partial pressures and activities typed. The two 2023 corpus source
+    IDs resolve to one identical publication and are represented once. Table 3 Gibbs
+    energy columns are retained as context only because no store quantity token fits.
