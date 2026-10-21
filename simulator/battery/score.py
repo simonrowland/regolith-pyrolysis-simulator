@@ -75,6 +75,13 @@ from simulator.battery.identity import (
     profile_for,
     quantity_token,
 )
+from simulator.battery.source_oxygen import (
+    linked_source_pressure,
+    oxygen_pressure_point,
+    pressure_has_only_unit_conversion,
+    printed_source_pressure,
+    resolve_source_oxygen,
+)
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.battery.migrate import (
     REPO_ROOT,
@@ -3964,6 +3971,8 @@ def _comparison_identity(
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
+    source_pressure = _source_oxygen_pressure_for_score(reference)
+    resolved_oxygen = solved_oxygen_balance or source_pressure is not None
     redox = quantity_token(identity) is Quantity.FE3_FE2_RATIO
     fusion_polymorph_flag = (
         quantity_token(identity) in FUSION_QUANTITIES
@@ -3977,7 +3986,7 @@ def _comparison_identity(
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
     if (
-        not solved_oxygen_balance
+        not resolved_oxygen
         and not comparison_activity
         and not redox
         and not fusion_polymorph_flag
@@ -4007,13 +4016,15 @@ def _comparison_identity(
         point = _printed_point_composition(reference)
         if point is not None:
             updates["composition"] = point
-    if solved_oxygen_balance and (
+    if source_pressure is not None:
+        updates["fO2_Pa"] = State.of(source_pressure)
+    elif solved_oxygen_balance and (
         identity.fO2_Pa is None or not identity.fO2_Pa.is_value
     ):
         po2_bar = _solved_effusion_po2_bar(prediction)
         if po2_bar is not None:
             updates["fO2_Pa"] = State.of(Decimal(str(po2_bar)) * Decimal("1e5"))
-    if solved_oxygen_balance and (
+    if resolved_oxygen and (
         identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value
     ):
         quantity = quantity_token(identity)
@@ -4027,9 +4038,9 @@ def _comparison_identity(
 
 
 def _derived_fo2_condition(observation: Observation) -> bool:
-    point = (observation.point_conditions or {}).get("fO2_Pa")
+    point = oxygen_pressure_point(observation)
     if point is not None:
-        if point.inference is not None:
+        if point.inference is not None and not pressure_has_only_unit_conversion(point):
             return True
         note = point.locator.note if point.locator is not None else None
         if note is not None and "derived condition" in note.casefold():
@@ -4047,12 +4058,19 @@ def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
     fo2 = identity.fO2_Pa
     if fo2 is not None and fo2.is_value and fo2.value is not None:
         return True
-    point = (observation.point_conditions or {}).get("fO2_Pa")
-    return bool(
-        point is not None
-        and point.inference is None
-        and point.state.is_value
-    )
+    return printed_source_pressure(observation) is not None
+
+
+def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | None:
+    if quantity_token(observation.identity) not in _VAPOUR_EQUILIBRIUM:
+        return None
+    pressure = linked_source_pressure(observation)
+    if pressure is None and _has_printed_fo2(observation, observation.identity):
+        pressure = printed_source_pressure(observation)
+        identity_pressure = observation.identity.fO2_Pa
+        if pressure is not None and identity_pressure is not None and identity_pressure.is_value:
+            pressure = identity_pressure.value
+    return pressure
 
 
 def _predict_fe_redox(
@@ -5220,8 +5238,12 @@ def predict_with_engine(
             input_notices.append(pressure_notice)
 
     knudsen_vapour = _knudsen_vapour_equilibrium(quantity, experiment)
-    oxygen_balance_effusion = knudsen_vapour and not _has_printed_fo2(
-        observation, identity
+    source_pressure = _source_oxygen_pressure_for_score(observation)
+    if knudsen_vapour and source_pressure is not None:
+        identity = replace(identity, fO2_Pa=State.of(source_pressure))
+    oxygen_balance_effusion = (
+        knudsen_vapour and source_pressure is None
+        and not _has_printed_fo2(observation, identity)
     )
     if activity_payload is not None:
         # The contract's oxygen point, or none. Never an engine default.
@@ -5316,6 +5338,11 @@ def predict_with_engine(
                 mode=PO2_OXYGEN_BALANCE_EFFUSION,
                 po2_bar=None,
                 cell_material=modelled,
+            )
+            input_notices.append(
+                _omission_notice(
+                    quantity, "model assumption: vapour-only zero-storage closure"
+                )
             )
     else:
         decision = _oxygen_input_request(
@@ -5985,6 +6012,9 @@ def candidate_observation(
         source_id=reference.source_id,
         locator=reference.locator,
         read_from=reference.read_from,
+        point_conditions=(
+            reference.point_conditions if _source_oxygen_pressure_for_score(reference) is not None else None
+        ),
         engine=EngineTrace(
             name=prediction.engine,
             channel=prediction.channel,
@@ -6000,7 +6030,11 @@ def candidate_observation(
             dict(prediction.refusal_detail)
             if quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
             and prediction.value is not None
-            else None
+            else (
+                {"source_oxygen_condition": reference.provenance["source_oxygen_condition"]}
+                if reference.provenance and "source_oxygen_condition" in reference.provenance
+                else None
+            )
         ),
     )
 
@@ -6833,6 +6867,43 @@ def compile_residual(
 
     if prediction is None:
         predictor = predict or predict_with_engine
+        if (
+            predictor is predict_with_engine
+            and _knudsen_vapour_equilibrium(quantity, experiment)
+            and not _has_printed_fo2(reference, reference.identity)
+        ):
+            recorded = _bench_for_score(experiment, context.benches)
+            oxygen = resolve_source_oxygen(
+                reference,
+                point_observations if point_observations is not None else context.observations.values(),
+                recorded,
+            )
+            if oxygen is not None:
+                if reference.observation_id in oxygen.used_observations:
+                    return _refused(
+                        RefusalReason.UNSUPPORTED,
+                        {
+                            "reason": "used_as_scoring_condition",
+                            "derivation": to_plain(oxygen.observation.derivation),
+                            "derived_from": list(oxygen.observation.derived_from or ()),
+                        },
+                        execution=Execution(state=ExecutionState.NOT_PROBED),
+                    )
+                reference = replace(
+                    reference,
+                    point_conditions={
+                        **(reference.point_conditions or {}),
+                        "fO2_Pa": Located(
+                            State.of(oxygen.observation.value),
+                            locator=oxygen.observation.locator,
+                            inference=oxygen.observation.derivation,
+                        ),
+                    },
+                    provenance={
+                        **(reference.provenance or {}),
+                        "source_oxygen_condition": to_plain(oxygen.observation),
+                    },
+                )
         predictor_kwargs: dict[str, object] = {
             "handles": handles,
             "experiment": experiment,
