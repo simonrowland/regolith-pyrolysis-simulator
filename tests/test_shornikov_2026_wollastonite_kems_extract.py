@@ -10,12 +10,16 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, Quantity, UncertaintyKind, ValueKind
-from simulator.battery.migrate import Migrator, REPO_ROOT
-from tests.literature_extract_test_helpers import (
-    assert_no_unavailable_observation_values,
-    iter_locators,
+from simulator.battery.enums import (
+    EvidenceClass,
+    Phase,
+    Quantity,
+    RefusalReason,
+    UncertaintyKind,
+    ValueKind,
 )
+from simulator.battery.migrate import Migrator, REPO_ROOT
+from tests.literature_extract_test_helpers import iter_locators
 
 
 SID = "shornikov-2026-wollastonite-kems"
@@ -106,23 +110,89 @@ def test_table3_render_grid_and_both_cell_mutations_are_detected() -> None:
         assert _table3_grid(changed_extract) == TABLE3_RENDER
 
 
+def _local_id(observation_id: str) -> str:
+    return observation_id.split("::", 2)[1]
+
+
+def _family(local_id: str) -> str:
+    if "partial_pressure_table3" in local_id:
+        return "table3"
+    if "table4_p_o_" in local_id:
+        return "table4"
+    if local_id.startswith("shornikov_2026_table5_"):
+        return "table5"
+    if local_id.startswith("shornikov_2026_table6_"):
+        return "table6"
+    if local_id.startswith("shornikov_2026_table7_"):
+        return "table7"
+    return "other"
+
+
 def test_isolated_migration_carries_each_species_and_pressure_condition() -> None:
     document = _document()
     source_rows = _source_observations(document)
+    stored_ids = set(source_rows)
+    for record in (
+        block.get("context", []) for block in document["species"].values()
+    ):
+        stored_ids.update(item["observation_id"] for item in record)
+    for blocked in (
+        "shornikov_2026_CaO_activity_prose",
+        "shornikov_2026_SiO2_activity_prose",
+        "shornikov_2026_table4_atomic_oxygen_calculations",
+        "shornikov_2026_table5_pressure_fit_coefficients",
+        "shornikov_2026_table6_reaction_thermodynamics_schema_gap",
+    ):
+        assert blocked not in stored_ids
+    overlap = next(
+        record
+        for block in document["species"].values()
+        for record in block.get("context", [])
+        if record["observation_id"] == "shornikov_2026_overlap_with_2024_chapter"
+    )
+    shared = overlap["values"]["shared_record_ids_in_the_2024_extract"]
+    assert "shornikov_2024_cao_activity_prose" in shared
+    assert "shornikov_2024_sio2_activity_prose" in shared
+    assert "0.015" not in overlap["values"]["kept_here"]
+    assert "0.20" not in overlap["values"]["kept_here"]
+
+    sio_fit = source_rows["shornikov_2026_table5_sio_high"][1]
+    sio_relation = sio_fit["values"]["pressure_temperature_relation"]
+    assert sio_relation["B_as_printed"] == "9.280 ± 0.082"
+    assert Decimal(str(sio_relation["B"])) == Decimal("9.280")
+    assert Decimal(str(sio_relation["sigma_B"])) == Decimal("0.082")
+    casio3_fit = source_rows["shornikov_2026_table5_casio3_high"][1]
+    casio3_relation = casio3_fit["values"]["pressure_temperature_relation"]
+    assert casio3_relation["B_as_printed"] == "12.617 ± 0.110"
+    assert Decimal(str(casio3_relation["B"])) == Decimal("12.617")
+    assert Decimal(str(casio3_relation["sigma_B"])) == Decimal("0.110")
+
     migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     result = migrator.result
     migrated = [row for row in result.observations.values() if row.source_id == SID]
+    migrated_ids = {row.observation_id for row in migrated}
 
-    assert len(migrated) == 170
-    assert_no_unavailable_observation_values(migrated)
-    assert result.validation is not None and not result.validation.hard_issues
+    # 146 Table 3 cells + 90 Table 4 points + 15 Table 5 fits
+    # + 4 Table 6 refusals + 22 Table 7 literature rows.
+    # Prior migration 170 − 2 prose activities + 90 + 15 + 4 = 277.
+    assert len(migrated) == 277
     assert not result.registry_issues
+    families = {_family(_local_id(row.observation_id)): 0 for row in migrated}
+    for row in migrated:
+        families[_family(_local_id(row.observation_id))] += 1
+    assert families == {
+        "table3": 146,
+        "table4": 90,
+        "table5": 15,
+        "table6": 4,
+        "table7": 22,
+    }
 
     for row in migrated:
-        source_observation_id = row.observation_id.split("::", 2)[1]
-        container, source = source_rows[source_observation_id]
+        local_id = _local_id(row.observation_id)
+        container, source = source_rows[local_id]
         expected_formula = source["values"].get("formula", container)
         assert row.identity.species.formula == expected_formula
 
@@ -149,60 +219,105 @@ def test_isolated_migration_carries_each_species_and_pressure_condition() -> Non
         assert row.uncertainty.kind is UncertaintyKind.PRINTED
         assert row.uncertainty.verbatim["bound_value"] == "7%"
 
-    activities = [row for row in migrated if row.identity.quantity.value is Quantity.ACTIVITY]
-    assert len(activities) == 2
-    activity_values = {row.identity.species.formula: row.value for row in activities}
-    assert activity_values["CaO"].kind is ValueKind.POINT
-    assert activity_values["CaO"].point == Decimal("0.015")
-    assert activity_values["CaO"].approximate is True
-    assert activity_values["SiO2"].kind is ValueKind.POINT
-    assert activity_values["SiO2"].point == Decimal("0.20")
-    assert activity_values["SiO2"].approximate is True
-    expected_reference_phases = {"CaO": Phase.CR}
-    for row in activities:
-        formula = row.identity.species.formula
-        assert row.identity.species.phase.is_unknown
-        reference = row.identity.reference_state
-        assert reference.is_value
-        assert reference.value.convention.value == "raoultian_pure_endmember"
-        assert reference.value.endmember.formula == formula
-        if formula == "SiO2":
-            assert reference.value.endmember.phase.is_unknown
-            assert "cristobalite" in reference.value.endmember.phase.reason
-        else:
-            assert reference.value.endmember.phase.is_value
-            assert reference.value.endmember.phase.value is expected_reference_phases[formula]
-        assert row.identity.temperature_K.is_unknown
-        assert row.point_conditions is not None
-        activity_temperature = row.point_conditions["temperature_K"].state.value
-        assert activity_temperature.kind is ValueKind.INTERVAL
-        assert activity_temperature.interval_low == Decimal("1751")
-        assert activity_temperature.interval_high == Decimal("2087")
-        source_standard_state = next(
-            source["standard_state"]
-            for source_formula, block in document["species"].items()
-            for source in block.get("observations", [])
-            if source_formula == formula and source["values"].get("quantity") == "activity"
-        )
-        assert source_standard_state["inferred"] is True
-        assert source_standard_state["basis"]
-        if formula == "SiO2":
-            assert source_standard_state["state"]["value"]["endmember"]["phase"]["tag"] == "unknown"
-            assert "cristobalite" in source_standard_state["basis"].casefold()
-            assert "1999 K" in source_standard_state["basis"]
-            assert "crosses" in source_standard_state["basis"]
+    table4 = [row for row in migrated if _family(_local_id(row.observation_id)) == "table4"]
+    hertz_knudsen = [row for row in table4 if "table4_p_o_hk" in row.observation_id]
+    equilibrium = [row for row in table4 if "table4_p_o_eq" in row.observation_id]
+    assert len(hertz_knudsen) == 14
+    assert len(equilibrium) == 76
+    for row in hertz_knudsen:
+        assert row.evidence.class_.value is EvidenceClass.MEASURED_TABULATED
+        assert row.identity.temperature_K.is_value
+        assert row.point_conditions["temperature_K"].state.is_value
+        assert row.point_conditions["temperature_K"].locator is not None
+        assert row.identity.composition.is_value
+        assert set(row.identity.composition.value.as_map()) == {"CaO", "SiO2"}
+    for row in equilibrium:
+        assert row.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert row.identity.temperature_K.is_value
+        assert row.point_conditions["temperature_K"].state.is_value
+        assert row.point_conditions["temperature_K"].locator is not None
 
-    source_activities = [
-        observation
+    fits = [row for row in migrated if _family(_local_id(row.observation_id)) == "table5"]
+    assert len(fits) == 15
+    for row in fits:
+        local_id = _local_id(row.observation_id)
+        assert row.derived_from
+        assert all(parent in migrated_ids for parent in row.derived_from)
+        assert row.derivation is not None
+        assert row.value.kind is ValueKind.UNAVAILABLE
+        assert row.value.unavailable_reason is not None
+        assert "no mapped numeric p_partial selected" in row.value.unavailable_reason
+        assert "is a temperature domain, not the observable" in row.value.unavailable_reason
+        assert row.identity.temperature_K.is_unknown
+        assert row.identity.temperature_K.reason is not None
+        assert "T_range_K" in row.identity.temperature_K.reason
+        assert "no midpoint invented" in row.identity.temperature_K.reason
+        assert "temperature_K" not in (row.point_conditions or {})
+        assert row.identity.composition.is_value
+        if local_id in {"shornikov_2026_table5_o_low", "shornikov_2026_table5_o_high"}:
+            assert all("table4_p_o_hk" in parent for parent in row.derived_from)
+        else:
+            assert all("partial_pressure_table3" in parent for parent in row.derived_from)
+
+    reactions = [row for row in migrated if _family(_local_id(row.observation_id)) == "table6"]
+    assert {
+        _local_id(row.observation_id) for row in reactions
+    } == {
+        "shornikov_2026_table6_sublimation_enthalpy",
+        "shornikov_2026_table6_sublimation_entropy",
+        "shornikov_2026_table6_dissociation_enthalpy",
+        "shornikov_2026_table6_dissociation_entropy",
+    }
+    for row in reactions:
+        assert row.value.kind is ValueKind.UNAVAILABLE
+        reason = row.value.unavailable_reason or ""
+        assert "refusing to pick a number" in reason
+        assert "unsupported quantity" in reason
+        local_id = _local_id(row.observation_id)
+        if "enthalpy" in local_id:
+            assert "delta_rH" in reason
+        else:
+            assert "delta_rS" in reason
+        assert row.identity.temperature_K.is_unknown
+        assert row.identity.temperature_K.reason is not None
+        assert "T_range_K" in row.identity.temperature_K.reason
+        assert "no midpoint invented" in row.identity.temperature_K.reason
+        assert "temperature_K" not in (row.point_conditions or {})
+        assert row.identity.composition.is_value
+        assert set(row.identity.composition.value.as_map()) == {"CaO", "SiO2"}
+
+    literature = [row for row in migrated if _family(_local_id(row.observation_id)) == "table7"]
+    assert len(literature) == 22
+    for row in literature:
+        temperature = row.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.locator is not None
+
+    assert not any(
+        row.identity.quantity.is_value and row.identity.quantity.value is Quantity.ACTIVITY
+        for row in migrated
+    )
+    assert not any(
+        observation["values"].get("quantity") == "activity"
         for block in document["species"].values()
         for observation in block.get("observations", [])
-        if observation["values"].get("quantity") == "activity"
+    )
+
+    assert result.validation is not None
+    hard = result.validation.hard_issues
+    assert len(hard) == 84
+    assert {issue.reason for issue in hard} == {RefusalReason.CONDITIONAL_FIELD}
+    missing_parent = [
+        issue for issue in hard if issue.detail == "derived observation requires derived_from"
     ]
-    assert len(source_activities) == 2
-    # The schema has no `activity` observation type; the `activity_coefficient` family type
-    # carries the scored `values.quantity: activity` records.
-    assert all(observation["type"] == "activity_coefficient" for observation in source_activities)
-    assert all(observation["values"]["quantity"] == "activity" for observation in source_activities)
+    missing_derivation = [
+        issue for issue in hard if issue.detail == "derived observation requires derivation"
+    ]
+    assert len(missing_parent) == 80
+    assert len(missing_derivation) == 4
+    assert sum("table4_p_o_eq" in issue.path for issue in missing_parent) == 76
+    assert sum("table6_" in issue.path for issue in missing_parent) == 4
+    assert all("table6_" in issue.path for issue in missing_derivation)
 
 
 def test_every_deferred_figure_has_metadata_and_no_numeric_points() -> None:
@@ -237,6 +352,25 @@ def test_every_deferred_figure_has_metadata_and_no_numeric_points() -> None:
     assert "cristobalite" in figure_standard_state["basis"].casefold()
     assert "1999 K" in figure_standard_state["basis"]
     assert "crosses" in figure_standard_state["basis"]
+
+    cao_activity_figure = next(
+        record for record in figures if record["observation_id"] == "shornikov_2026_fig3_CaO_a"
+    )
+    cao_standard_state = cao_activity_figure["values"]["standard_state"]
+    cao_phase = cao_standard_state["state"]["value"]["endmember"]["phase"]
+    assert cao_phase["tag"] == "unknown"
+    assert cao_standard_state["inferred"] is False
+    assert "crystalline" not in cao_phase.get("reason", "").casefold()
+    assert "temperature" in cao_standard_state["basis"].casefold()
+
+    fig10 = next(
+        record
+        for record in figures
+        if record["observation_id"] == "shornikov_2026_fig10_oxygen_content_and_ratio"
+    )
+    assert fig10["values"]["axes_as_printed"]["y_a"] == "O + O2, mol %"
+    assert fig10["values"]["axes_as_printed"]["y_b"] == "O2 + O, mol %"
+    assert "O2/O ratio" in fig10["values"]["caption_as_printed"]
 
     for locator in iter_locators(document):
         if "pdf_page_index" in locator and "page" in locator:

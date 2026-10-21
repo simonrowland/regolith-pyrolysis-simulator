@@ -1483,6 +1483,138 @@ species:
         bound_value: 7%
         operator: no higher than
         notice: The paper states pressure errors are no higher than 7%; this is a bound, not a point uncertainty.
+    - T_range_K:
+      - 1751
+      - 1817
+      derived_from:
+      - shornikov_2026_Ca_partial_pressure_table3_row_01
+      - shornikov_2026_Ca_partial_pressure_table3_row_02
+      - shornikov_2026_Ca_partial_pressure_table3_row_03
+      - shornikov_2026_Ca_partial_pressure_table3_row_04
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_ca_low
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_Ca_partial_pressure_table3_row_01
+          - shornikov_2026_Ca_partial_pressure_table3_row_02
+          - shornikov_2026_Ca_partial_pressure_table3_row_03
+          - shornikov_2026_Ca_partial_pressure_table3_row_04
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval starts at 1751 K and ends at 1817
+            K. 1817 K is not a Table 3 or Table 4 row. The points on this side are 1751, 1783, 1800 and 1815
+            K. The parent is the tabulated pressure series for this species. The parent ids are the Table 3
+            cell rows at the temperatures on this side of the printed 1817 K split.'
+        formula: Ca
+        gas_species: Ca(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -29978
+          A_as_printed: -29978 ± 426
+          B: 7.397
+          B_as_printed: 7.397 ± 0.238
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 426
+          sigma_B: 0.238
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1751
+        - 1817
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1817
+      - 2087
+      derived_from:
+      - shornikov_2026_Ca_partial_pressure_table3_row_05
+      - shornikov_2026_Ca_partial_pressure_table3_row_06
+      - shornikov_2026_Ca_partial_pressure_table3_row_07
+      - shornikov_2026_Ca_partial_pressure_table3_row_08
+      - shornikov_2026_Ca_partial_pressure_table3_row_09
+      - shornikov_2026_Ca_partial_pressure_table3_row_10
+      - shornikov_2026_Ca_partial_pressure_table3_row_11
+      - shornikov_2026_Ca_partial_pressure_table3_row_12
+      - shornikov_2026_Ca_partial_pressure_table3_row_13
+      - shornikov_2026_Ca_partial_pressure_table3_row_14
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_ca_high
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_Ca_partial_pressure_table3_row_05
+          - shornikov_2026_Ca_partial_pressure_table3_row_06
+          - shornikov_2026_Ca_partial_pressure_table3_row_07
+          - shornikov_2026_Ca_partial_pressure_table3_row_08
+          - shornikov_2026_Ca_partial_pressure_table3_row_09
+          - shornikov_2026_Ca_partial_pressure_table3_row_10
+          - shornikov_2026_Ca_partial_pressure_table3_row_11
+          - shornikov_2026_Ca_partial_pressure_table3_row_12
+          - shornikov_2026_Ca_partial_pressure_table3_row_13
+          - shornikov_2026_Ca_partial_pressure_table3_row_14
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval is 1817-2087 K. 1817 K is not a tabulated
+            pressure row. The points on this side start at 1833 K. The parent is the tabulated pressure series
+            for this species. The parent ids are the Table 3 cell rows at the temperatures on this side of the
+            printed 1817 K split.'
+        formula: Ca
+        gas_species: Ca(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -27468
+          A_as_printed: -27468 ± 126
+          B: 6.007
+          B_as_printed: 6.007 ± 0.065
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 126
+          sigma_B: 0.065
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1817
+        - 2087
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
     context:
     - observation_id: shornikov_2026_fig6_Ca_a
       type: figure_record
@@ -2150,138 +2282,6 @@ species:
         bound_value: 7%
         operator: no higher than
         notice: The paper states pressure errors are no higher than 7%; this is a bound, not a point uncertainty.
-    - observation_id: shornikov_2026_CaO_activity_prose
-      type: activity_coefficient
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: 622
-        section: Wollastonite melting
-        note: The authors state the approximate calcium oxide activity after Eqs. (24)–(25).
-      experiment: shornikov-2026-wollastonite-kems-runset
-      phase: 'unresolved: the activity summary spans 1751–2087 K across wollastonite melting without phase-resolved
-        values'
-      T_range_K:
-      - 1751
-      - 2087
-      units: dimensionless activity
-      standard_state:
-        state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember:
-              formula: CaO
-              phase:
-                tag: value
-                value: cr
-              polymorph:
-                tag: unknown
-                reason: JANAF does not name a CaO polymorph.
-            component_basis: CaO
-        inferred: true
-        basis: JANAF Ca-027/Ca-029 gives CaO melting at 3200 ± 50 K; the 1751–2087 K reference interval is below
-          melting.
-        locator:
-          table_id: Ca-029
-          url: https://janaf.nist.gov/tables/Ca-029.html
-      values:
-        quantity: activity
-        method_class: measured_reduced
-        formula: CaO
-        method: Lewis partial-pressure relation, Eq. (24).
-        derivation:
-          relation: Lewis partial-pressure relation, Eq. (24); the approximate activity is retained as reported
-            and not recalculated. The authors also use atomic oxygen and pure-oxide reference partial pressures;
-            Table 4 atomic-oxygen calculations remain model context.
-          inputs:
-          - shornikov_2026_Ca_partial_pressure_table3_row_01
-          - shornikov_2026_Ca_partial_pressure_table3_row_02
-          - shornikov_2026_Ca_partial_pressure_table3_row_03
-          - shornikov_2026_Ca_partial_pressure_table3_row_04
-          - shornikov_2026_Ca_partial_pressure_table3_row_05
-          - shornikov_2026_Ca_partial_pressure_table3_row_06
-          - shornikov_2026_Ca_partial_pressure_table3_row_07
-          - shornikov_2026_Ca_partial_pressure_table3_row_08
-          - shornikov_2026_Ca_partial_pressure_table3_row_09
-          - shornikov_2026_Ca_partial_pressure_table3_row_10
-          - shornikov_2026_Ca_partial_pressure_table3_row_11
-          - shornikov_2026_Ca_partial_pressure_table3_row_12
-          - shornikov_2026_Ca_partial_pressure_table3_row_13
-          - shornikov_2026_Ca_partial_pressure_table3_row_14
-          - shornikov_2026_CaO_partial_pressure_table3_row_08
-          - shornikov_2026_CaO_partial_pressure_table3_row_09
-          - shornikov_2026_CaO_partial_pressure_table3_row_10
-          - shornikov_2026_CaO_partial_pressure_table3_row_11
-          - shornikov_2026_CaO_partial_pressure_table3_row_12
-          - shornikov_2026_CaO_partial_pressure_table3_row_13
-          - shornikov_2026_CaO_partial_pressure_table3_row_14
-        derived_from:
-        - shornikov_2026_Ca_partial_pressure_table3_row_01
-        - shornikov_2026_Ca_partial_pressure_table3_row_02
-        - shornikov_2026_Ca_partial_pressure_table3_row_03
-        - shornikov_2026_Ca_partial_pressure_table3_row_04
-        - shornikov_2026_Ca_partial_pressure_table3_row_05
-        - shornikov_2026_Ca_partial_pressure_table3_row_06
-        - shornikov_2026_Ca_partial_pressure_table3_row_07
-        - shornikov_2026_Ca_partial_pressure_table3_row_08
-        - shornikov_2026_Ca_partial_pressure_table3_row_09
-        - shornikov_2026_Ca_partial_pressure_table3_row_10
-        - shornikov_2026_Ca_partial_pressure_table3_row_11
-        - shornikov_2026_Ca_partial_pressure_table3_row_12
-        - shornikov_2026_Ca_partial_pressure_table3_row_13
-        - shornikov_2026_Ca_partial_pressure_table3_row_14
-        - shornikov_2026_CaO_partial_pressure_table3_row_08
-        - shornikov_2026_CaO_partial_pressure_table3_row_09
-        - shornikov_2026_CaO_partial_pressure_table3_row_10
-        - shornikov_2026_CaO_partial_pressure_table3_row_11
-        - shornikov_2026_CaO_partial_pressure_table3_row_12
-        - shornikov_2026_CaO_partial_pressure_table3_row_13
-        - shornikov_2026_CaO_partial_pressure_table3_row_14
-        sample_id: wollastonite (CaSiO3)
-        activity: '0.015'
-        approximate: true
-        activity_as_printed: approximately 0.015
-        phase_as_printed: Wollastonite; the reported interval crosses its melting transition and the prose does
-          not resolve the approximate activity by phase.
-        note: The prose says the activity increases slightly with temperature but gives no per-temperature numeric
-          values; the same approximate summary appears in the related 2024 proceedings paper, based on the same
-          core experiment. Published page 622, after Eqs. (24) and (25), calls p-degree the partial pressure
-          over the simple oxide (pure component) and does not say whether that oxide is crystalline or liquid.
-          The reference phase on this row is the stable-phase inference in standard_state. Fig. 3 series 23
-          reads are sibling context and are not a second copy of this approximate value.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: interval
-              interval_low: '1751'
-              interval_high: '2087'
-          locator:
-            page: 9
-            pdf_page_index: 8
-            published_page: 616
-            section: Experimental
-            note: Experimental temperature interval; no separate temperature values are printed for the approximate
-              activity prose.
-        composition:
-          state:
-            tag: value
-            value:
-              basis: printed_formula_stoichiometry
-              amount_basis: mol_inventory
-              components:
-              - - CaO
-                - '1'
-              - - SiO2
-                - '1'
-          locator:
-            page: 9
-            pdf_page_index: 8
-            published_page: 616
-            section: Experimental
-            note: Synthetic wollastonite (CaSiO3).
     - observation_id: shornikov_2026_table7_row_01_melting_temperature
       type: transition_point
       locator:
@@ -2832,6 +2832,72 @@ species:
         T_fus_uncertainty_K: '1'
         method: Thermochemical calculations
         attribution: Barin, 1995
+    - T_range_K:
+      - 1910
+      - 2087
+      derived_from:
+      - shornikov_2026_CaO_partial_pressure_table3_row_08
+      - shornikov_2026_CaO_partial_pressure_table3_row_09
+      - shornikov_2026_CaO_partial_pressure_table3_row_10
+      - shornikov_2026_CaO_partial_pressure_table3_row_11
+      - shornikov_2026_CaO_partial_pressure_table3_row_12
+      - shornikov_2026_CaO_partial_pressure_table3_row_13
+      - shornikov_2026_CaO_partial_pressure_table3_row_14
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_cao
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_CaO_partial_pressure_table3_row_08
+          - shornikov_2026_CaO_partial_pressure_table3_row_09
+          - shornikov_2026_CaO_partial_pressure_table3_row_10
+          - shornikov_2026_CaO_partial_pressure_table3_row_11
+          - shornikov_2026_CaO_partial_pressure_table3_row_12
+          - shornikov_2026_CaO_partial_pressure_table3_row_13
+          - shornikov_2026_CaO_partial_pressure_table3_row_14
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. CaO is printed only for 1910-2087 K. Those are the Table
+            3 rows in which p_CaO is not a dash. The parent is the tabulated pressure series for this species.
+            The parent ids are the Table 3 cell rows at the temperatures on this side of the printed 1817 K
+            split.'
+        formula: CaO
+        gas_species: CaO(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -35633
+          A_as_printed: -35633 ± 92
+          B: 7.061
+          B_as_printed: 7.061 ± 0.046
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 92
+          sigma_B: 0.046
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1910
+        - 2087
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
     context:
     - observation_id: shornikov_2026_fig1_CaSiO3_whole_figure
       type: figure_record
@@ -3071,8 +3137,8 @@ species:
           evidence_class: measured_reduced
         attribution: Attributions are listed in the printed caption and series labels.
         digitisation: deferred to a figure pass
-        note: This figure_record has no points. The prose approximate activity is typed once as the scored
-          value. The wave-2 600 dpi series-23 marker reads are sibling context and are not scored.
+        note: This figure_record has no points. The prose approximate activity is not scored here; the 2024
+          extract already holds it. The wave-2 600 dpi series-23 marker reads are sibling context and are not scored.
         standard_state:
           state:
             tag: value
@@ -3081,18 +3147,14 @@ species:
               endmember:
                 formula: CaO
                 phase:
-                  tag: value
-                  value: cr
+                  tag: unknown
+                  reason: Published page 622 names a pure-component reference and does not state its temperature, so the stable-phase-at-T rule leaves the phase unknown.
                 polymorph:
                   tag: unknown
-                  reason: JANAF does not name a CaO polymorph.
+                  reason: The paper does not name a CaO polymorph.
               component_basis: CaO
-          inferred: true
-          basis: JANAF Ca-027/Ca-029 gives CaO melting at 3200 ± 50 K; the 1751–2087 K reference interval is below
-            melting.
-          locator:
-            table_id: Ca-029
-            url: https://janaf.nist.gov/tables/Ca-029.html
+          inferred: false
+          basis: Page 622 identifies the reference as the pure component and does not give the temperature at which that pure component was measured or tabulated. The stable-phase-at-T rule does not select crystalline CaO.
       T_range_K:
       - 1751
       - 2087
@@ -3407,75 +3469,6 @@ species:
         schema_gap: This survey gives apparatus, temperature ranges, vapor-species lists, and result categories;
           it prints no numerical pressure, activity, or composition results.
         table_disposition: context_no_numeric_measurements
-    - observation_id: shornikov_2026_table6_reaction_thermodynamics_schema_gap
-      type: table_disposition
-      locator:
-        page: 14
-        pdf_page_index: 13
-        published_page: 621
-        table: '6'
-      units: kJ/mol and J/(mol K), as printed
-      values:
-        quantity_as_printed: reaction enthalpy and reaction entropy for gas-phase silicate reactions
-        candidate_tokens:
-        - partial_molar_enthalpy
-        - delta_fH
-        - H_minus_H298
-        - S
-        - heat_of_fusion
-        table_note: The asterisk on 472 ± 10 kJ/mol is explained as a value calculated at 0 K; the column header
-          itself is printed ΔrH298.
-        rows_as_printed:
-        - reaction: '[BaSiO3] = (BaSiO3)'
-          T_K: 1840–1970
-          delta_rH_T_kJ_mol: 728 ± 54
-          delta_rS_T_J_mol_K: 239 ± 28
-          evidence_class: quoted_attributed
-          attribution: Stolyarova et al., 2006; Tyurnina et al., 2006
-        - reaction: '[CaSiO3] = (CaSiO3)'
-          T_K: 1812–2187
-          delta_rH_T_kJ_mol: 771 ± 13
-          delta_rS_T_J_mol_K: 242 ± 5
-          evidence_class: model_derived
-          attribution: This study
-        - reaction: '[CaTiO3] = (CaTiO3)'
-          T_K: 1956–2182
-          delta_rH_T_kJ_mol: 1027 ± 10
-          delta_rS_T_J_mol_K: 297 ± 5
-          evidence_class: quoted_attributed
-          attribution: Shornikov, 2021
-        - reaction: (BaSiO3) = (BaO) + (SiO2)
-          calculated_delta_rH_298_kJ_mol: 472 ± 10*
-          calculation_reference: Stolyarova et al., 2006; Tyurnina et al., 2006
-          T_K: 2132–2263
-          delta_rH_T_kJ_mol: 573 ± 133
-          delta_rS_T_J_mol_K: 153 ± 61
-          evidence_class: quoted_attributed
-          attribution: Tyurnina et al., 2006
-        - reaction: (CaSiO3) = (CaO) + (SiO2)
-          calculated_delta_rH_298_kJ_mol: 437 ± 14
-          calculation_reference: Lopatin et al., 2008
-          T_K: 1910–2187
-          delta_rH_T_kJ_mol: 479 ± 12
-          delta_rS_T_J_mol_K: 47 ± 6
-          evidence_class: model_derived
-          attribution: This study
-        - reaction: (CaTiO3) = (CaO) + (TiO2)
-          calculated_delta_rH_298_kJ_mol: 545 ± 8
-          calculation_reference: Lopatin and Semenov, 2001
-          T_K: 1956–2182
-          delta_rH_T_kJ_mol: 287 ± 12
-          delta_rS_T_J_mol_K: 18 ± 6
-          evidence_class: quoted_attributed
-          attribution: Shornikov, 2021
-        schema_gap: >-
-          Missing quantity: reaction enthalpy and reaction entropy of the stated reactions.
-          Published page 619, Eq. (21), says the relation allows determining the enthalpy
-          (ΔrHT) and entropy (ΔrST) of the reaction. These rows are not delta_fH, not absolute
-          S, not heat_of_fusion, not entropy_of_fusion, and not a labeled 2nd-law or 3rd-law
-          enthalpy of vaporization. The Glushko et al. (1978-1982) constants used for Eq. (21)
-          are not printed here, so no parent is linked. The rows stay context.
-        table_disposition: context_no_token
     - observation_id: shornikov_2026_table7_this_study_melting_calculation
       type: calculated_melting_properties
       locator:
@@ -3572,7 +3565,7 @@ species:
         quantity: activity
         temperature_K: 1751.53
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1783.21
@@ -3619,7 +3612,7 @@ species:
         quantity: activity
         temperature_K: 1783.21
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1800.18
@@ -3665,7 +3658,7 @@ species:
         quantity: activity
         temperature_K: 1800.18
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1833.11
@@ -3711,7 +3704,7 @@ species:
         quantity: activity
         temperature_K: 1833.11
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1859.1
@@ -3757,7 +3750,7 @@ species:
         quantity: activity
         temperature_K: 1859.1
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1885.12
@@ -3803,7 +3796,7 @@ species:
         quantity: activity
         temperature_K: 1885.12
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1910.1
@@ -3849,7 +3842,7 @@ species:
         quantity: activity
         temperature_K: 1910.1
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1933.03
@@ -3894,7 +3887,7 @@ species:
         quantity: activity
         temperature_K: 1933.03
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1970.05
@@ -3939,7 +3932,7 @@ species:
         quantity: activity
         temperature_K: 1970.05
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1988.1
@@ -3984,7 +3977,7 @@ species:
         quantity: activity
         temperature_K: 1988.1
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 2024.99
@@ -4029,7 +4022,7 @@ species:
         quantity: activity
         temperature_K: 2024.99
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 2066.01
@@ -4074,7 +4067,7 @@ species:
         quantity: activity
         temperature_K: 2066.01
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 2086.59
@@ -4119,7 +4112,7 @@ species:
         quantity: activity
         temperature_K: 2086.59
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1815.22
@@ -4147,7 +4140,7 @@ species:
         reference_phase: unknown
         temperature_K: 1815.22
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - observation_id: shornikov_2026_overlap_with_2024_chapter
       type: prior_extract_overlap
@@ -4170,7 +4163,8 @@ species:
         - shornikov_2024_table1_current_melting_temperature
         - shornikov_2024_cao_activity_prose
         - shornikov_2024_sio2_activity_prose
-        kept_here: The page prints those values in this paper. The prose activities stay the scored pair. Table
+        kept_here: The page prints those values in this paper. The prose activities are not scored here;
+          shornikov_2024_cao_activity_prose and shornikov_2024_sio2_activity_prose already hold them. Table
           1 mixing rows and the Table 7 this-study melting calculation stay context. This record does not repeat
           their numbers.
 
@@ -5373,6 +5367,138 @@ species:
         bound_value: 7%
         operator: no higher than
         notice: The paper states pressure errors are no higher than 7%; this is a bound, not a point uncertainty.
+    - T_range_K:
+      - 1751
+      - 1817
+      derived_from:
+      - shornikov_2026_SiO_partial_pressure_table3_row_01
+      - shornikov_2026_SiO_partial_pressure_table3_row_02
+      - shornikov_2026_SiO_partial_pressure_table3_row_03
+      - shornikov_2026_SiO_partial_pressure_table3_row_04
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_sio_low
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_SiO_partial_pressure_table3_row_01
+          - shornikov_2026_SiO_partial_pressure_table3_row_02
+          - shornikov_2026_SiO_partial_pressure_table3_row_03
+          - shornikov_2026_SiO_partial_pressure_table3_row_04
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval starts at 1751 K and ends at 1817
+            K. 1817 K is not a Table 3 or Table 4 row. The points on this side are 1751, 1783, 1800 and 1815
+            K. The parent is the tabulated pressure series for this species. The parent ids are the Table 3
+            cell rows at the temperatures on this side of the printed 1817 K split.'
+        formula: SiO
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -27767
+          A_as_printed: -27767 ± 347
+          B: 10.104
+          B_as_printed: 10.104 ± 0.194
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 347
+          sigma_B: 0.194
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1751
+        - 1817
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1817
+      - 2087
+      derived_from:
+      - shornikov_2026_SiO_partial_pressure_table3_row_05
+      - shornikov_2026_SiO_partial_pressure_table3_row_06
+      - shornikov_2026_SiO_partial_pressure_table3_row_07
+      - shornikov_2026_SiO_partial_pressure_table3_row_08
+      - shornikov_2026_SiO_partial_pressure_table3_row_09
+      - shornikov_2026_SiO_partial_pressure_table3_row_10
+      - shornikov_2026_SiO_partial_pressure_table3_row_11
+      - shornikov_2026_SiO_partial_pressure_table3_row_12
+      - shornikov_2026_SiO_partial_pressure_table3_row_13
+      - shornikov_2026_SiO_partial_pressure_table3_row_14
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_sio_high
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_SiO_partial_pressure_table3_row_05
+          - shornikov_2026_SiO_partial_pressure_table3_row_06
+          - shornikov_2026_SiO_partial_pressure_table3_row_07
+          - shornikov_2026_SiO_partial_pressure_table3_row_08
+          - shornikov_2026_SiO_partial_pressure_table3_row_09
+          - shornikov_2026_SiO_partial_pressure_table3_row_10
+          - shornikov_2026_SiO_partial_pressure_table3_row_11
+          - shornikov_2026_SiO_partial_pressure_table3_row_12
+          - shornikov_2026_SiO_partial_pressure_table3_row_13
+          - shornikov_2026_SiO_partial_pressure_table3_row_14
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval is 1817-2087 K. 1817 K is not a tabulated
+            pressure row. The points on this side start at 1833 K. The parent is the tabulated pressure series
+            for this species. The parent ids are the Table 3 cell rows at the temperatures on this side of the
+            printed 1817 K split.'
+        formula: SiO
+        gas_species: SiO(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -26284
+          A_as_printed: -26284 ± 161
+          B: 9.28
+          B_as_printed: 9.280 ± 0.082
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 161
+          sigma_B: 0.082
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1817
+        - 2087
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
     context:
     - observation_id: shornikov_2026_fig6_SiO_b
       type: figure_record
@@ -6672,72 +6798,101 @@ species:
         bound_value: 7%
         operator: no higher than
         notice: The paper states pressure errors are no higher than 7%; this is a bound, not a point uncertainty.
-    - observation_id: shornikov_2026_SiO2_activity_prose
-      type: activity_coefficient
-      locator:
-        page: 15
-        pdf_page_index: 14
-        published_page: 622
-        section: Wollastonite melting
-        note: The authors state the approximate silicon dioxide activity after Eqs. (25)–(26).
-      experiment: shornikov-2026-wollastonite-kems-runset
-      phase: 'unresolved: the activity summary spans 1751–2087 K across wollastonite melting without phase-resolved
-        values'
-      T_range_K:
+    - T_range_K:
       - 1751
-      - 2087
-      units: dimensionless activity
-      standard_state:
-        state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember:
-              formula: SiO2
-              phase:
-                tag: unknown
-                reason: The reported interval includes solid cristobalite below its melting point and liquid above it.
-              polymorph:
-                tag: unknown
-                reason: The 1751–2087 K interval crosses cristobalite melting near 1999 K, so no single polymorph
-                  applies across it.
-            component_basis: SiO2
-        inferred: true
-        basis: JANAF O-037's 1696 K high-quartz transition is not the stable pure-SiO2 reference at 1751 K.
-          Cristobalite is stable at 1751 K and melts near 1999 K; the reported 1751–2087 K interval crosses that
-          melting point, so no single reference phase can be selected.
-        transition_notice: The reported 1751–2087 K interval crosses cristobalite melting near 1999 K.
-        locator:
-          table_id: O-037
-          url: https://janaf.nist.gov/tables/O-037.html
+      - 1817
+      derived_from:
+      - shornikov_2026_SiO2_partial_pressure_table3_row_01
+      - shornikov_2026_SiO2_partial_pressure_table3_row_02
+      - shornikov_2026_SiO2_partial_pressure_table3_row_03
+      - shornikov_2026_SiO2_partial_pressure_table3_row_04
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_sio2_low
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
       values:
-        quantity: activity
-        method_class: measured_reduced
-        formula: SiO2
-        method: Lewis partial-pressure relation, Eq. (25).
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
         derivation:
-          relation: Lewis partial-pressure relation, Eq. (25); the approximate activity is retained as reported
-            and not recalculated. The authors also use atomic oxygen and pure-oxide reference partial pressures;
-            Table 4 atomic-oxygen calculations remain model context.
           inputs:
-          - shornikov_2026_SiO_partial_pressure_table3_row_01
-          - shornikov_2026_SiO_partial_pressure_table3_row_02
-          - shornikov_2026_SiO_partial_pressure_table3_row_03
-          - shornikov_2026_SiO_partial_pressure_table3_row_04
-          - shornikov_2026_SiO_partial_pressure_table3_row_05
-          - shornikov_2026_SiO_partial_pressure_table3_row_06
-          - shornikov_2026_SiO_partial_pressure_table3_row_07
-          - shornikov_2026_SiO_partial_pressure_table3_row_08
-          - shornikov_2026_SiO_partial_pressure_table3_row_09
-          - shornikov_2026_SiO_partial_pressure_table3_row_10
-          - shornikov_2026_SiO_partial_pressure_table3_row_11
-          - shornikov_2026_SiO_partial_pressure_table3_row_12
-          - shornikov_2026_SiO_partial_pressure_table3_row_13
-          - shornikov_2026_SiO_partial_pressure_table3_row_14
           - shornikov_2026_SiO2_partial_pressure_table3_row_01
           - shornikov_2026_SiO2_partial_pressure_table3_row_02
           - shornikov_2026_SiO2_partial_pressure_table3_row_03
           - shornikov_2026_SiO2_partial_pressure_table3_row_04
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval starts at 1751 K and ends at 1817
+            K. 1817 K is not a Table 3 or Table 4 row. The points on this side are 1751, 1783, 1800 and 1815
+            K. The parent is the tabulated pressure series for this species. The parent ids are the Table 3
+            cell rows at the temperatures on this side of the printed 1817 K split.'
+        formula: SiO2
+        gas_species: SiO2(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -30893
+          A_as_printed: -30893 ± 209
+          B: 8.664
+          B_as_printed: 8.664 ± 0.117
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 209
+          sigma_B: 0.117
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1751
+        - 1817
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1817
+      - 2087
+      derived_from:
+      - shornikov_2026_SiO2_partial_pressure_table3_row_05
+      - shornikov_2026_SiO2_partial_pressure_table3_row_06
+      - shornikov_2026_SiO2_partial_pressure_table3_row_07
+      - shornikov_2026_SiO2_partial_pressure_table3_row_08
+      - shornikov_2026_SiO2_partial_pressure_table3_row_09
+      - shornikov_2026_SiO2_partial_pressure_table3_row_10
+      - shornikov_2026_SiO2_partial_pressure_table3_row_11
+      - shornikov_2026_SiO2_partial_pressure_table3_row_12
+      - shornikov_2026_SiO2_partial_pressure_table3_row_13
+      - shornikov_2026_SiO2_partial_pressure_table3_row_14
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_sio2_high
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
           - shornikov_2026_SiO2_partial_pressure_table3_row_05
           - shornikov_2026_SiO2_partial_pressure_table3_row_06
           - shornikov_2026_SiO2_partial_pressure_table3_row_07
@@ -6748,79 +6903,33 @@ species:
           - shornikov_2026_SiO2_partial_pressure_table3_row_12
           - shornikov_2026_SiO2_partial_pressure_table3_row_13
           - shornikov_2026_SiO2_partial_pressure_table3_row_14
-        derived_from:
-        - shornikov_2026_SiO_partial_pressure_table3_row_01
-        - shornikov_2026_SiO_partial_pressure_table3_row_02
-        - shornikov_2026_SiO_partial_pressure_table3_row_03
-        - shornikov_2026_SiO_partial_pressure_table3_row_04
-        - shornikov_2026_SiO_partial_pressure_table3_row_05
-        - shornikov_2026_SiO_partial_pressure_table3_row_06
-        - shornikov_2026_SiO_partial_pressure_table3_row_07
-        - shornikov_2026_SiO_partial_pressure_table3_row_08
-        - shornikov_2026_SiO_partial_pressure_table3_row_09
-        - shornikov_2026_SiO_partial_pressure_table3_row_10
-        - shornikov_2026_SiO_partial_pressure_table3_row_11
-        - shornikov_2026_SiO_partial_pressure_table3_row_12
-        - shornikov_2026_SiO_partial_pressure_table3_row_13
-        - shornikov_2026_SiO_partial_pressure_table3_row_14
-        - shornikov_2026_SiO2_partial_pressure_table3_row_01
-        - shornikov_2026_SiO2_partial_pressure_table3_row_02
-        - shornikov_2026_SiO2_partial_pressure_table3_row_03
-        - shornikov_2026_SiO2_partial_pressure_table3_row_04
-        - shornikov_2026_SiO2_partial_pressure_table3_row_05
-        - shornikov_2026_SiO2_partial_pressure_table3_row_06
-        - shornikov_2026_SiO2_partial_pressure_table3_row_07
-        - shornikov_2026_SiO2_partial_pressure_table3_row_08
-        - shornikov_2026_SiO2_partial_pressure_table3_row_09
-        - shornikov_2026_SiO2_partial_pressure_table3_row_10
-        - shornikov_2026_SiO2_partial_pressure_table3_row_11
-        - shornikov_2026_SiO2_partial_pressure_table3_row_12
-        - shornikov_2026_SiO2_partial_pressure_table3_row_13
-        - shornikov_2026_SiO2_partial_pressure_table3_row_14
-        sample_id: wollastonite (CaSiO3)
-        activity: '0.20'
-        approximate: true
-        activity_as_printed: approximately 0.20
-        phase_as_printed: Wollastonite; the reported interval crosses its melting transition and the prose does
-          not resolve the approximate activity by phase.
-        note: The prose says the activity increases slightly with temperature but gives no per-temperature numeric
-          values; the same approximate summary appears in the related 2024 proceedings paper, based on the same
-          core experiment. Published page 622, after Eqs. (24) and (25), calls p-degree the partial pressure
-          over the simple oxide (pure component) and does not say whether that oxide is crystalline or liquid.
-          The reference phase on this row is the stable-phase inference in standard_state. Fig. 3 series 23
-          reads are sibling context and are not a second copy of this approximate value.
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: interval
-              interval_low: '1751'
-              interval_high: '2087'
-          locator:
-            page: 9
-            pdf_page_index: 8
-            published_page: 616
-            section: Experimental
-            note: Experimental temperature interval; no separate temperature values are printed for the approximate
-              activity prose.
-        composition:
-          state:
-            tag: value
-            value:
-              basis: printed_formula_stoichiometry
-              amount_basis: mol_inventory
-              components:
-              - - CaO
-                - '1'
-              - - SiO2
-                - '1'
-          locator:
-            page: 9
-            pdf_page_index: 8
-            published_page: 616
-            section: Experimental
-            note: Synthetic wollastonite (CaSiO3).
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval is 1817-2087 K. 1817 K is not a tabulated
+            pressure row. The points on this side start at 1833 K. The parent is the tabulated pressure series
+            for this species. The parent ids are the Table 3 cell rows at the temperatures on this side of the
+            printed 1817 K split.'
+        formula: SiO2
+        gas_species: SiO2(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -29601
+          A_as_printed: -29601 ± 95
+          B: 7.964
+          B_as_printed: 7.964 ± 0.049
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 95
+          sigma_B: 0.049
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1817
+        - 2087
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
     context:
     - observation_id: shornikov_2026_fig3_SiO2_b
       type: figure_record
@@ -6853,8 +6962,8 @@ species:
           evidence_class: measured_reduced
         attribution: Attributions are listed in the printed caption and series labels.
         digitisation: deferred to a figure pass
-        note: This figure_record has no points. The prose approximate activity is typed once as the scored
-          value. The wave-2 600 dpi series-23 marker reads are sibling context and are not scored.
+        note: This figure_record has no points. The prose approximate activity is not scored here; the 2024
+          extract already holds it. The wave-2 600 dpi series-23 marker reads are sibling context and are not scored.
         standard_state:
           state:
             tag: value
@@ -7068,7 +7177,7 @@ species:
         quantity: activity
         temperature_K: 1750.52
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1782.52
@@ -7115,7 +7224,7 @@ species:
         quantity: activity
         temperature_K: 1782.52
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1799.53
@@ -7161,7 +7270,7 @@ species:
         quantity: activity
         temperature_K: 1799.53
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1832.6
@@ -7207,7 +7316,7 @@ species:
         quantity: activity
         temperature_K: 1832.6
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1858.72
@@ -7253,7 +7362,7 @@ species:
         quantity: activity
         temperature_K: 1858.72
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1884.8
@@ -7299,7 +7408,7 @@ species:
         quantity: activity
         temperature_K: 1884.8
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1909.98
@@ -7345,7 +7454,7 @@ species:
         quantity: activity
         temperature_K: 1909.98
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1932.99
@@ -7390,7 +7499,7 @@ species:
         quantity: activity
         temperature_K: 1932.99
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1970.28
@@ -7435,7 +7544,7 @@ species:
         quantity: activity
         temperature_K: 1970.28
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1988.43
@@ -7480,7 +7589,7 @@ species:
         quantity: activity
         temperature_K: 1988.43
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 2025.64
@@ -7525,7 +7634,7 @@ species:
         quantity: activity
         temperature_K: 2025.64
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 2066.67
@@ -7570,7 +7679,7 @@ species:
         quantity: activity
         temperature_K: 2066.67
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 2087.43
@@ -7615,7 +7724,7 @@ species:
         quantity: activity
         temperature_K: 2087.43
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - T_range_K:
       - 1814.59
@@ -7643,7 +7752,7 @@ species:
         reference_phase: unknown
         temperature_K: 1814.59
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
   Si2O2:
     observations:
@@ -8823,6 +8932,138 @@ species:
         bound_value: 7%
         operator: no higher than
         notice: The paper states pressure errors are no higher than 7%; this is a bound, not a point uncertainty.
+    - T_range_K:
+      - 1751
+      - 1817
+      derived_from:
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_01
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_02
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_03
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_04
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_si2o2_low
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_01
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_02
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_03
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_04
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval starts at 1751 K and ends at 1817
+            K. 1817 K is not a Table 3 or Table 4 row. The points on this side are 1751, 1783, 1800 and 1815
+            K. The parent is the tabulated pressure series for this species. The parent ids are the Table 3
+            cell rows at the temperatures on this side of the printed 1817 K split.'
+        formula: Si2O2
+        gas_species: Si2O2(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -30142
+          A_as_printed: -30142 ± 323
+          B: 8.781
+          B_as_printed: 8.781 ± 0.181
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 323
+          sigma_B: 0.181
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1751
+        - 1817
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1817
+      - 2087
+      derived_from:
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_05
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_06
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_07
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_08
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_09
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_10
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_11
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_12
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_13
+      - shornikov_2026_Si2O2_partial_pressure_table3_row_14
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_si2o2_high
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_05
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_06
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_07
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_08
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_09
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_10
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_11
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_12
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_13
+          - shornikov_2026_Si2O2_partial_pressure_table3_row_14
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval is 1817-2087 K. 1817 K is not a tabulated
+            pressure row. The points on this side start at 1833 K. The parent is the tabulated pressure series
+            for this species. The parent ids are the Table 3 cell rows at the temperatures on this side of the
+            printed 1817 K split.'
+        formula: Si2O2
+        gas_species: Si2O2(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -27068
+          A_as_printed: -27068 ± 270
+          B: 7.084
+          B_as_printed: 7.084 ± 0.139
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 270
+          sigma_B: 0.139
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1817
+        - 2087
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
     context:
     - observation_id: shornikov_2026_fig9_Si2O2_a_and_b
       type: figure_record
@@ -10042,6 +10283,138 @@ species:
         bound_value: 7%
         operator: no higher than
         notice: The paper states pressure errors are no higher than 7%; this is a bound, not a point uncertainty.
+    - T_range_K:
+      - 1751
+      - 1817
+      derived_from:
+      - shornikov_2026_O2_partial_pressure_table3_row_01
+      - shornikov_2026_O2_partial_pressure_table3_row_02
+      - shornikov_2026_O2_partial_pressure_table3_row_03
+      - shornikov_2026_O2_partial_pressure_table3_row_04
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_o2_low
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_O2_partial_pressure_table3_row_01
+          - shornikov_2026_O2_partial_pressure_table3_row_02
+          - shornikov_2026_O2_partial_pressure_table3_row_03
+          - shornikov_2026_O2_partial_pressure_table3_row_04
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval starts at 1751 K and ends at 1817
+            K. 1817 K is not a Table 3 or Table 4 row. The points on this side are 1751, 1783, 1800 and 1815
+            K. The parent is the tabulated pressure series for this species. The parent ids are the Table 3
+            cell rows at the temperatures on this side of the printed 1817 K split.'
+        formula: O2
+        gas_species: O2(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -29787
+          A_as_printed: -29787 ± 440
+          B: 5.792
+          B_as_printed: 5.792 ± 0.246
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 440
+          sigma_B: 0.246
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1751
+        - 1817
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1817
+      - 2087
+      derived_from:
+      - shornikov_2026_O2_partial_pressure_table3_row_05
+      - shornikov_2026_O2_partial_pressure_table3_row_06
+      - shornikov_2026_O2_partial_pressure_table3_row_07
+      - shornikov_2026_O2_partial_pressure_table3_row_08
+      - shornikov_2026_O2_partial_pressure_table3_row_09
+      - shornikov_2026_O2_partial_pressure_table3_row_10
+      - shornikov_2026_O2_partial_pressure_table3_row_11
+      - shornikov_2026_O2_partial_pressure_table3_row_12
+      - shornikov_2026_O2_partial_pressure_table3_row_13
+      - shornikov_2026_O2_partial_pressure_table3_row_14
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_o2_high
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_O2_partial_pressure_table3_row_05
+          - shornikov_2026_O2_partial_pressure_table3_row_06
+          - shornikov_2026_O2_partial_pressure_table3_row_07
+          - shornikov_2026_O2_partial_pressure_table3_row_08
+          - shornikov_2026_O2_partial_pressure_table3_row_09
+          - shornikov_2026_O2_partial_pressure_table3_row_10
+          - shornikov_2026_O2_partial_pressure_table3_row_11
+          - shornikov_2026_O2_partial_pressure_table3_row_12
+          - shornikov_2026_O2_partial_pressure_table3_row_13
+          - shornikov_2026_O2_partial_pressure_table3_row_14
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval is 1817-2087 K. 1817 K is not a tabulated
+            pressure row. The points on this side start at 1833 K. The parent is the tabulated pressure series
+            for this species. The parent ids are the Table 3 cell rows at the temperatures on this side of the
+            printed 1817 K split.'
+        formula: O2
+        gas_species: O2(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -30049
+          A_as_printed: -30049 ± 278
+          B: 5.929
+          B_as_printed: 5.929 ± 0.143
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 278
+          sigma_B: 0.143
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1817
+        - 2087
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
     context:
     - observation_id: shornikov_2026_fig9_O2_a_and_b
       type: figure_record
@@ -10359,7 +10732,7 @@ species:
           temperature_K: 2084.43
         quantity: total oxygen content, not a scored quantity
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
 
     - locator:
         figure: '10'
@@ -10497,7 +10870,7 @@ species:
           temperature_K: 2084.12
         quantity: O2/O, not a scored quantity
         reconciliation: Wave-2 600 dpi read, kept once in context. The figure_record for this figure stays point-free,
-          and these markers are not a second copy of the scored prose activities.
+          and these markers are not a second copy of the prose activities, which this extract does not score.
         caption_calls_this: O2/O ratio
 
   CaSiO3:
@@ -11678,6 +12051,290 @@ species:
         bound_value: 7%
         operator: no higher than
         notice: The paper states pressure errors are no higher than 7%; this is a bound, not a point uncertainty.
+    - T_range_K:
+      - 1751
+      - 1817
+      derived_from:
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_01
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_02
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_03
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_04
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_casio3_low
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_01
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_02
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_03
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_04
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval starts at 1751 K and ends at 1817
+            K. 1817 K is not a Table 3 or Table 4 row. The points on this side are 1751, 1783, 1800 and 1815
+            K. The parent is the tabulated pressure series for this species. The parent ids are the Table 3
+            cell rows at the temperatures on this side of the printed 1817 K split.'
+        formula: CaSiO3
+        gas_species: CaSiO3(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -44065
+          A_as_printed: -44065 ± 573
+          B: 14.687
+          B_as_printed: 14.687 ± 0.321
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 573
+          sigma_B: 0.321
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1751
+        - 1817
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1817
+      - 2087
+      derived_from:
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_05
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_06
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_07
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_08
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_09
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_10
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_11
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_12
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_13
+      - shornikov_2026_CaSiO3_partial_pressure_table3_row_14
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_casio3_high
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_05
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_06
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_07
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_08
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_09
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_10
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_11
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_12
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_13
+          - shornikov_2026_CaSiO3_partial_pressure_table3_row_14
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval is 1817-2087 K. 1817 K is not a tabulated
+            pressure row. The points on this side start at 1833 K. The parent is the tabulated pressure series
+            for this species. The parent ids are the Table 3 cell rows at the temperatures on this side of the
+            printed 1817 K split.'
+        formula: CaSiO3
+        gas_species: CaSiO3(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -40293
+          A_as_printed: -40293 ± 215
+          B: 12.617
+          B_as_printed: 12.617 ± 0.110
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 215
+          sigma_B: 0.11
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1817
+        - 2087
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1812
+      - 2187
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). Table header: "Enthalpies
+          and entropies of reactions". ΔrHT = 771 ± 13 kJ/mol. Missing quantity: reaction enthalpy of a stated
+          reaction, not delta_fH and not a labeled 2nd-law or 3rd-law enthalpy of vaporization.'
+        page: 14
+        pdf_page_index: 13
+        published_page: 621
+        table: '6'
+      observation_id: shornikov_2026_table6_sublimation_enthalpy
+      phase: gas
+      type: gibbs_table
+      uncertainty: ± 13 kJ/mol as printed; no confidence level is stated
+      units: kJ/mol
+      values:
+        delta_rH_kJ_per_mol: 771
+        delta_rH_uncertainty_as_printed: ± 13
+        derivation:
+          inputs:
+          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants from
+            Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals are not the
+            Table 3 interval, so the Table 3 pressures are not linked.
+        method_class: model_derived
+        not_a_formation_enthalpy: 771 kJ/mol is the printed reaction enthalpy. It is not stored as delta_fH.
+        note: 'Missing quantity: reaction enthalpy ΔrH of the stated reaction [CaSiO3] = (CaSiO3). Not delta_fH.
+          Published page 619, Eq. (21): "which allows determining the enthalpy (ΔrHT) and entropy (ΔrST) of
+          the reaction." Published page 621, Table 6 prints ΔrHT = 771 ± 13 kJ/mol at 1812–2187 K. The paper
+          does not call this a 2nd-law or 3rd-law enthalpy of vaporization.'
+        quantity: delta_rH
+        reaction_as_printed: '[CaSiO3] = (CaSiO3)'
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1812
+      - 2187
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: 'Published page 621, Table 6, this-study row. Reaction [CaSiO3] = (CaSiO3). ΔrST = 242 ± 5 J/(mol
+          K). Missing quantity: reaction entropy of a stated reaction, not S and not entropy_of_fusion.'
+        page: 14
+        pdf_page_index: 13
+        published_page: 621
+        table: '6'
+      observation_id: shornikov_2026_table6_sublimation_entropy
+      phase: gas
+      type: gibbs_table
+      uncertainty: ± 5 J/(mol K) as printed; no confidence level is stated
+      units: J/(mol K)
+      values:
+        delta_rS_J_per_mol_K: 242
+        delta_rS_uncertainty_as_printed: ± 5
+        derivation:
+          inputs:
+          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants from
+            Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals are not the
+            Table 3 interval, so the Table 3 pressures are not linked.
+        method_class: model_derived
+        note: 'Missing quantity: reaction entropy ΔrS of the stated reaction [CaSiO3] = (CaSiO3). Not S and
+          not entropy_of_fusion. Published page 619, Eq. (21): "which allows determining the enthalpy (ΔrHT)
+          and entropy (ΔrST) of the reaction." Published page 621, Table 6 prints ΔrST = 242 ± 5 J/(mol K) at
+          1812–2187 K.'
+        quantity: delta_rS
+        reaction_as_printed: '[CaSiO3] = (CaSiO3)'
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1910
+      - 2187
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrHT = 479 ±
+          12 kJ/mol. Missing quantity: reaction enthalpy of a stated gas-phase dissociation, not delta_fH.'
+        page: 14
+        pdf_page_index: 13
+        published_page: 621
+        table: '6'
+      observation_id: shornikov_2026_table6_dissociation_enthalpy
+      phase: gas
+      type: gibbs_table
+      uncertainty: ± 12 kJ/mol as printed; no confidence level is stated
+      units: kJ/mol
+      values:
+        delta_rH_kJ_per_mol: 479
+        delta_rH_uncertainty_as_printed: ± 12
+        derivation:
+          inputs:
+          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants from
+            Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals are not the
+            Table 3 interval, so the Table 3 pressures are not linked.
+        method_class: model_derived
+        not_a_formation_enthalpy: 479 kJ/mol is the printed gas-phase dissociation enthalpy. It is not stored
+          as delta_fH.
+        note: 'Missing quantity: reaction enthalpy ΔrH of the stated reaction (CaSiO3) = (CaO) + (SiO2). Not
+          delta_fH. This is gas-phase dissociation, not vaporization. Published page 621, Table 6 prints ΔrHT
+          = 479 ± 12 kJ/mol at 1910–2187 K. Eq. (21) on published page 619 defines ΔrHT as the enthalpy of the
+          reaction.'
+        quantity: delta_rH
+        reaction_as_printed: (CaSiO3) = (CaO) + (SiO2)
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1910
+      - 2187
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: 'Published page 621, Table 6, this-study row. Reaction (CaSiO3) = (CaO) + (SiO2). ΔrST = 47 ±
+          6 J/(mol K). Missing quantity: reaction entropy of a stated gas-phase dissociation, not S and not
+          entropy_of_fusion.'
+        page: 14
+        pdf_page_index: 13
+        published_page: 621
+        table: '6'
+      observation_id: shornikov_2026_table6_dissociation_entropy
+      phase: gas
+      type: gibbs_table
+      uncertainty: ± 6 J/(mol K) as printed; no confidence level is stated
+      units: J/(mol K)
+      values:
+        delta_rS_J_per_mol_K: 47
+        delta_rS_uncertainty_as_printed: ± 6
+        derivation:
+          inputs:
+          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          relation: Table 6 says these values were calculated using Eq. (21) with equilibrium constants from
+            Glushko et al. (1978-1982). Those constants are not printed. The temperature intervals are not the
+            Table 3 interval, so the Table 3 pressures are not linked.
+        method_class: model_derived
+        note: 'Missing quantity: reaction entropy ΔrS of the stated reaction (CaSiO3) = (CaO) + (SiO2). Not
+          S and not entropy_of_fusion. Published page 621, Table 6 prints ΔrST = 47 ± 6 J/(mol K) at 1910–2187
+          K. Eq. (21) on published page 619 defines ΔrST as the entropy of the reaction.'
+        quantity: delta_rS
+        reaction_as_printed: (CaSiO3) = (CaO) + (SiO2)
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
     context:
     - observation_id: shornikov_2026_fig6_CaSiO3_d
       type: figure_record
@@ -11825,113 +12482,6 @@ species:
       T_range_K:
       - 1751
       - 2087
-    - observation_id: shornikov_2026_table5_pressure_fit_coefficients
-      type: pressure_temperature_fit_table
-      locator:
-        page: 13
-        pdf_page_index: 12
-        published_page: 620
-        table: '5'
-      units: log pressure in atm; reciprocal-temperature fit coefficients
-      values:
-        quantity: partial_pressure
-        method_class: model_derived
-        candidate_tokens:
-        - p_partial
-        table_disposition: context_model
-        fit_as_printed: log p_i = a_i/T + b_i
-        method: Least-squares coefficients; fit parameters are model outputs, not measured pressure points.
-        rows_as_printed:
-        - species: O
-          T_range_K:
-          - 1751
-          - 1817
-          a: -27820 ± 392
-          b: 6.164 ± 0.219
-        - species: O
-          T_range_K:
-          - 1817
-          - 2087
-          a: -28311 ± 146
-          b: 6.444 ± 0.075
-        - species: O2
-          T_range_K:
-          - 1751
-          - 1817
-          a: -29787 ± 440
-          b: 5.792 ± 0.246
-        - species: O2
-          T_range_K:
-          - 1817
-          - 2087
-          a: -30049 ± 278
-          b: 5.929 ± 0.143
-        - species: Ca
-          T_range_K:
-          - 1751
-          - 1817
-          a: -29978 ± 426
-          b: 7.397 ± 0.238
-        - species: Ca
-          T_range_K:
-          - 1817
-          - 2087
-          a: -27468 ± 126
-          b: 6.007 ± 0.065
-        - species: CaO
-          T_range_K:
-          - 1910
-          - 2087
-          a: -35633 ± 92
-          b: 7.061 ± 0.046
-        - species: SiO
-          T_range_K:
-          - 1751
-          - 1817
-          a: -27767 ± 347
-          b: 10.104 ± 0.194
-        - species: SiO
-          T_range_K:
-          - 1817
-          - 2087
-          a: -26284 ± 161
-          b: 9.280 ± 0.082
-        - species: SiO2
-          T_range_K:
-          - 1751
-          - 1817
-          a: -30893 ± 209
-          b: 8.664 ± 0.117
-        - species: SiO2
-          T_range_K:
-          - 1817
-          - 2087
-          a: -29601 ± 95
-          b: 7.964 ± 0.049
-        - species: Si2O2
-          T_range_K:
-          - 1751
-          - 1817
-          a: -30142 ± 323
-          b: 8.781 ± 0.181
-        - species: Si2O2
-          T_range_K:
-          - 1817
-          - 2087
-          a: -27068 ± 270
-          b: 7.084 ± 0.139
-        - species: CaSiO3
-          T_range_K:
-          - 1751
-          - 1817
-          a: -44065 ± 573
-          b: 14.687 ± 0.321
-        - species: CaSiO3
-          T_range_K:
-          - 1817
-          - 2087
-          a: -40293 ± 215
-          b: 12.617 ± 0.110
   Mo:
     observations:
     - observation_id: shornikov_2026_Mo_partial_pressure_table3_row_02
@@ -16506,7 +17056,650 @@ species:
         operator: no higher than
         notice: The paper states pressure errors are no higher than 7%; this is a bound, not a point uncertainty.
   O:
-    observations: []
+    observations:
+    - T_range_K:
+      - 1751
+      - 2087
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Column (11)-(13). Hertz-Knudsen atomic-oxygen pressures. There is no p_O column in Table 3. 600
+          dpi rotated page.
+        page: 12
+        pdf_page_index: 11
+        published_page: 619
+        table: '4'
+      observation_id: shornikov_2026_table4_p_o_hk
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: 'Published page 617, immediately before Table 3: the partial pressures calculated using Eqs. (11)-(13)
+          have errors no higher than 7%. No confidence level is stated.'
+        relative_error_percent:
+          bound_operator: <=
+          bound_value: 7
+          units: '%'
+        verbatim: errors are no higher than 7%
+      units: atm
+      values:
+        column_as_printed: (11)-(13)
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        formula: O
+        gas_species: O(g)
+        method: Hertz-Knudsen reduction, Eqs. (11)-(13)
+        method_class: measured_tabulated
+        points:
+        - pressure_as_printed: '1.88e-10'
+          pressure_atm: 1.88e-10
+          temperature_K: 1751
+        - pressure_as_printed: '3.69e-10'
+          pressure_atm: 3.69e-10
+          temperature_K: 1783
+        - pressure_as_printed: '5.05e-10'
+          pressure_atm: 5.05e-10
+          temperature_K: 1800
+        - pressure_as_printed: '6.87e-10'
+          pressure_atm: 6.87e-10
+          temperature_K: 1815
+        - pressure_as_printed: '1.02e-9'
+          pressure_atm: 1.02e-09
+          temperature_K: 1833
+        - pressure_as_printed: '1.62e-9'
+          pressure_atm: 1.62e-09
+          temperature_K: 1859
+        - pressure_as_printed: '2.63e-9'
+          pressure_atm: 2.63e-09
+          temperature_K: 1885
+        - pressure_as_printed: '4.09e-9'
+          pressure_atm: 4.09e-09
+          temperature_K: 1910
+        - pressure_as_printed: '6.14e-9'
+          pressure_atm: 6.14e-09
+          temperature_K: 1933
+        - pressure_as_printed: '1.22e-8'
+          pressure_atm: 1.22e-08
+          temperature_K: 1970
+        - pressure_as_printed: '1.63e-8'
+          pressure_atm: 1.63e-08
+          temperature_K: 1988
+        - pressure_as_printed: '2.96e-8'
+          pressure_atm: 2.96e-08
+          temperature_K: 2025
+        - pressure_as_printed: '5.36e-8'
+          pressure_atm: 5.36e-08
+          temperature_K: 2066
+        - pressure_as_printed: '7.57e-8'
+          pressure_atm: 7.57e-08
+          temperature_K: 2087
+        pressure_unit: atm
+        quantity: partial_pressure
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1910
+      - 2087
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: 'Column (14). Equation as printed on the 600 dpi page: p_O = K_3(T) p_CaO / p_Ca. K(T) is taken
+          from Glushko et al. (1978-1982) and is not printed here, so no parent is linked.'
+        page: 12
+        pdf_page_index: 11
+        published_page: 619
+        table: '4'
+      observation_id: shornikov_2026_table4_p_o_eq14
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: The 7% bound is stated for Eqs. (11)-(13), not for column (14). This column has no printed uncertainty.
+      units: atm
+      values:
+        column_as_printed: (14)
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          relation: 'Eq. (14): p_O = K_3(T) p_CaO / p_Ca. The equilibrium constant is not printed in this paper,
+            so the printed pressure cannot be reproduced from a parent in this extract.'
+        equation_as_printed: p_O = K_3(T) p_CaO / p_Ca
+        formula: O
+        gas_species: O(g)
+        method_class: model_derived
+        points:
+        - pressure_as_printed: '4.09e-9'
+          pressure_atm: 4.09e-09
+          temperature_K: 1910
+        - pressure_as_printed: '6.04e-9'
+          pressure_atm: 6.04e-09
+          temperature_K: 1933
+        - pressure_as_printed: '1.21e-8'
+          pressure_atm: 1.21e-08
+          temperature_K: 1970
+        - pressure_as_printed: '1.62e-8'
+          pressure_atm: 1.62e-08
+          temperature_K: 1988
+        - pressure_as_printed: '2.98e-8'
+          pressure_atm: 2.98e-08
+          temperature_K: 2025
+        - pressure_as_printed: '5.35e-8'
+          pressure_atm: 5.35e-08
+          temperature_K: 2066
+        - pressure_as_printed: '7.57e-8'
+          pressure_atm: 7.57e-08
+          temperature_K: 2087
+        pressure_unit: atm
+        quantity: partial_pressure
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1751
+      - 2087
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: 'Column (15). Equation as printed on the 600 dpi page: p_O = K_4(T) p_SiO2 / p_SiO. K(T) is taken
+          from Glushko et al. (1978-1982) and is not printed here, so no parent is linked.'
+        page: 12
+        pdf_page_index: 11
+        published_page: 619
+        table: '4'
+      observation_id: shornikov_2026_table4_p_o_eq15
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: The 7% bound is stated for Eqs. (11)-(13), not for column (15). This column has no printed uncertainty.
+      units: atm
+      values:
+        column_as_printed: (15)
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          relation: 'Eq. (15): p_O = K_4(T) p_SiO2 / p_SiO. The equilibrium constant is not printed in this
+            paper, so the printed pressure cannot be reproduced from a parent in this extract.'
+        equation_as_printed: p_O = K_4(T) p_SiO2 / p_SiO
+        formula: O
+        gas_species: O(g)
+        method_class: model_derived
+        points:
+        - pressure_as_printed: '1.85e-10'
+          pressure_atm: 1.85e-10
+          temperature_K: 1751
+        - pressure_as_printed: '3.64e-10'
+          pressure_atm: 3.64e-10
+          temperature_K: 1783
+        - pressure_as_printed: '5.06e-10'
+          pressure_atm: 5.06e-10
+          temperature_K: 1800
+        - pressure_as_printed: '6.87e-10'
+          pressure_atm: 6.87e-10
+          temperature_K: 1815
+        - pressure_as_printed: '9.85e-10'
+          pressure_atm: 9.85e-10
+          temperature_K: 1833
+        - pressure_as_printed: '1.57e-9'
+          pressure_atm: 1.57e-09
+          temperature_K: 1859
+        - pressure_as_printed: '2.55e-9'
+          pressure_atm: 2.55e-09
+          temperature_K: 1885
+        - pressure_as_printed: '3.99e-9'
+          pressure_atm: 3.99e-09
+          temperature_K: 1910
+        - pressure_as_printed: '6.04e-9'
+          pressure_atm: 6.04e-09
+          temperature_K: 1933
+        - pressure_as_printed: '1.17e-8'
+          pressure_atm: 1.17e-08
+          temperature_K: 1970
+        - pressure_as_printed: '1.59e-8'
+          pressure_atm: 1.59e-08
+          temperature_K: 1988
+        - pressure_as_printed: '2.89e-8'
+          pressure_atm: 2.89e-08
+          temperature_K: 2025
+        - pressure_as_printed: '5.20e-8'
+          pressure_atm: 5.2e-08
+          temperature_K: 2066
+        - pressure_as_printed: '7.32e-8'
+          pressure_atm: 7.32e-08
+          temperature_K: 2087
+        pressure_unit: atm
+        quantity: partial_pressure
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1751
+      - 2087
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: 'Column (16). Equation as printed on the 600 dpi page: p_O = p_O2^(1/2) / K_5(T)^(1/2). K(T) is
+          taken from Glushko et al. (1978-1982) and is not printed here, so no parent is linked.'
+        page: 12
+        pdf_page_index: 11
+        published_page: 619
+        table: '4'
+      observation_id: shornikov_2026_table4_p_o_eq16
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: The 7% bound is stated for Eqs. (11)-(13), not for column (16). This column has no printed uncertainty.
+      units: atm
+      values:
+        column_as_printed: (16)
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          relation: 'Eq. (16): p_O = p_O2^(1/2) / K_5(T)^(1/2). The equilibrium constant is not printed in this
+            paper, so the printed pressure cannot be reproduced from a parent in this extract.'
+        equation_as_printed: p_O = p_O2^(1/2) / K_5(T)^(1/2)
+        formula: O
+        gas_species: O(g)
+        method_class: model_derived
+        points:
+        - pressure_as_printed: '1.89e-10'
+          pressure_atm: 1.89e-10
+          temperature_K: 1751
+        - pressure_as_printed: '3.72e-10'
+          pressure_atm: 3.72e-10
+          temperature_K: 1783
+        - pressure_as_printed: '5.03e-10'
+          pressure_atm: 5.03e-10
+          temperature_K: 1800
+        - pressure_as_printed: '6.90e-10'
+          pressure_atm: 6.9e-10
+          temperature_K: 1815
+        - pressure_as_printed: '1.02e-9'
+          pressure_atm: 1.02e-09
+          temperature_K: 1833
+        - pressure_as_printed: '1.62e-9'
+          pressure_atm: 1.62e-09
+          temperature_K: 1859
+        - pressure_as_printed: '2.62e-9'
+          pressure_atm: 2.62e-09
+          temperature_K: 1885
+        - pressure_as_printed: '4.11e-9'
+          pressure_atm: 4.11e-09
+          temperature_K: 1910
+        - pressure_as_printed: '6.16e-9'
+          pressure_atm: 6.16e-09
+          temperature_K: 1933
+        - pressure_as_printed: '1.23e-8'
+          pressure_atm: 1.23e-08
+          temperature_K: 1970
+        - pressure_as_printed: '1.64e-8'
+          pressure_atm: 1.64e-08
+          temperature_K: 1988
+        - pressure_as_printed: '2.86e-8'
+          pressure_atm: 2.86e-08
+          temperature_K: 2025
+        - pressure_as_printed: '5.10e-8'
+          pressure_atm: 5.1e-08
+          temperature_K: 2066
+        - pressure_as_printed: '7.11e-8'
+          pressure_atm: 7.11e-08
+          temperature_K: 2087
+        pressure_unit: atm
+        quantity: partial_pressure
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1783
+      - 2087
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: 'Column (17). Equation as printed on the 600 dpi page: p_O = K_8(T) p_MoO / p_Mo. K(T) is taken
+          from Glushko et al. (1978-1982) and is not printed here, so no parent is linked.'
+        page: 12
+        pdf_page_index: 11
+        published_page: 619
+        table: '4'
+      observation_id: shornikov_2026_table4_p_o_eq17
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: The 7% bound is stated for Eqs. (11)-(13), not for column (17). This column has no printed uncertainty.
+      units: atm
+      values:
+        column_as_printed: (17)
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          relation: 'Eq. (17): p_O = K_8(T) p_MoO / p_Mo. The equilibrium constant is not printed in this paper,
+            so the printed pressure cannot be reproduced from a parent in this extract.'
+        equation_as_printed: p_O = K_8(T) p_MoO / p_Mo
+        formula: O
+        gas_species: O(g)
+        method_class: model_derived
+        points:
+        - pressure_as_printed: '3.79e-10'
+          pressure_atm: 3.79e-10
+          temperature_K: 1783
+        - pressure_as_printed: '5.03e-10'
+          pressure_atm: 5.03e-10
+          temperature_K: 1800
+        - pressure_as_printed: '6.90e-10'
+          pressure_atm: 6.9e-10
+          temperature_K: 1815
+        - pressure_as_printed: '1.01e-9'
+          pressure_atm: 1.01e-09
+          temperature_K: 1833
+        - pressure_as_printed: '1.77e-9'
+          pressure_atm: 1.77e-09
+          temperature_K: 1859
+        - pressure_as_printed: '2.54e-9'
+          pressure_atm: 2.54e-09
+          temperature_K: 1885
+        - pressure_as_printed: '3.91e-9'
+          pressure_atm: 3.91e-09
+          temperature_K: 1910
+        - pressure_as_printed: '6.36e-9'
+          pressure_atm: 6.36e-09
+          temperature_K: 1933
+        - pressure_as_printed: '1.19e-8'
+          pressure_atm: 1.19e-08
+          temperature_K: 1970
+        - pressure_as_printed: '1.62e-8'
+          pressure_atm: 1.62e-08
+          temperature_K: 1988
+        - pressure_as_printed: '2.87e-8'
+          pressure_atm: 2.87e-08
+          temperature_K: 2025
+        - pressure_as_printed: '5.40e-8'
+          pressure_atm: 5.4e-08
+          temperature_K: 2066
+        - pressure_as_printed: '7.52e-8'
+          pressure_atm: 7.52e-08
+          temperature_K: 2087
+        pressure_unit: atm
+        quantity: partial_pressure
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1751
+      - 2087
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: 'Column (18). Equation as printed on the 600 dpi page: p_O = K_9(T) p_MoO2 / p_MoO. K(T) is taken
+          from Glushko et al. (1978-1982) and is not printed here, so no parent is linked.'
+        page: 12
+        pdf_page_index: 11
+        published_page: 619
+        table: '4'
+      observation_id: shornikov_2026_table4_p_o_eq18
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: The 7% bound is stated for Eqs. (11)-(13), not for column (18). This column has no printed uncertainty.
+      units: atm
+      values:
+        column_as_printed: (18)
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          relation: 'Eq. (18): p_O = K_9(T) p_MoO2 / p_MoO. The equilibrium constant is not printed in this
+            paper, so the printed pressure cannot be reproduced from a parent in this extract.'
+        equation_as_printed: p_O = K_9(T) p_MoO2 / p_MoO
+        formula: O
+        gas_species: O(g)
+        method_class: model_derived
+        points:
+        - pressure_as_printed: '1.85e-10'
+          pressure_atm: 1.85e-10
+          temperature_K: 1751
+        - pressure_as_printed: '3.71e-10'
+          pressure_atm: 3.71e-10
+          temperature_K: 1783
+        - pressure_as_printed: '4.95e-10'
+          pressure_atm: 4.95e-10
+          temperature_K: 1800
+        - pressure_as_printed: '7.18e-10'
+          pressure_atm: 7.18e-10
+          temperature_K: 1815
+        - pressure_as_printed: '1.04e-9'
+          pressure_atm: 1.04e-09
+          temperature_K: 1833
+        - pressure_as_printed: '1.47e-9'
+          pressure_atm: 1.47e-09
+          temperature_K: 1859
+        - pressure_as_printed: '2.64e-9'
+          pressure_atm: 2.64e-09
+          temperature_K: 1885
+        - pressure_as_printed: '4.28e-9'
+          pressure_atm: 4.28e-09
+          temperature_K: 1910
+        - pressure_as_printed: '6.34e-9'
+          pressure_atm: 6.34e-09
+          temperature_K: 1933
+        - pressure_as_printed: '1.13e-8'
+          pressure_atm: 1.13e-08
+          temperature_K: 1970
+        - pressure_as_printed: '1.56e-8'
+          pressure_atm: 1.56e-08
+          temperature_K: 1988
+        - pressure_as_printed: '2.80e-8'
+          pressure_atm: 2.8e-08
+          temperature_K: 2025
+        - pressure_as_printed: '5.25e-8'
+          pressure_atm: 5.25e-08
+          temperature_K: 2066
+        - pressure_as_printed: '7.61e-8'
+          pressure_atm: 7.61e-08
+          temperature_K: 2087
+        pressure_unit: atm
+        quantity: partial_pressure
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1751
+      - 2087
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: 'Column (19). Equation as printed on the 600 dpi page: p_O = K_10(T) p_MoO3 / p_MoO2. K(T) is
+          taken from Glushko et al. (1978-1982) and is not printed here, so no parent is linked.'
+        page: 12
+        pdf_page_index: 11
+        published_page: 619
+        table: '4'
+      observation_id: shornikov_2026_table4_p_o_eq19
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: The 7% bound is stated for Eqs. (11)-(13), not for column (19). This column has no printed uncertainty.
+      units: atm
+      values:
+        column_as_printed: (19)
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - Glushko et al. (1978-1982) equilibrium constants, not printed in this paper
+          relation: 'Eq. (19): p_O = K_10(T) p_MoO3 / p_MoO2. The equilibrium constant is not printed in this
+            paper, so the printed pressure cannot be reproduced from a parent in this extract.'
+        equation_as_printed: p_O = K_10(T) p_MoO3 / p_MoO2
+        formula: O
+        gas_species: O(g)
+        method_class: model_derived
+        points:
+        - pressure_as_printed: '1.80e-10'
+          pressure_atm: 1.8e-10
+          temperature_K: 1751
+        - pressure_as_printed: '3.35e-10'
+          pressure_atm: 3.35e-10
+          temperature_K: 1783
+        - pressure_as_printed: '5.04e-10'
+          pressure_atm: 5.04e-10
+          temperature_K: 1800
+        - pressure_as_printed: '6.85e-10'
+          pressure_atm: 6.85e-10
+          temperature_K: 1815
+        - pressure_as_printed: '9.46e-10'
+          pressure_atm: 9.46e-10
+          temperature_K: 1833
+        - pressure_as_printed: '1.64e-9'
+          pressure_atm: 1.64e-09
+          temperature_K: 1859
+        - pressure_as_printed: '2.62e-9'
+          pressure_atm: 2.62e-09
+          temperature_K: 1885
+        - pressure_as_printed: '4.17e-9'
+          pressure_atm: 4.17e-09
+          temperature_K: 1910
+        - pressure_as_printed: '5.98e-9'
+          pressure_atm: 5.98e-09
+          temperature_K: 1933
+        - pressure_as_printed: '1.18e-8'
+          pressure_atm: 1.18e-08
+          temperature_K: 1970
+        - pressure_as_printed: '1.56e-8'
+          pressure_atm: 1.56e-08
+          temperature_K: 1988
+        - pressure_as_printed: '2.87e-8'
+          pressure_atm: 2.87e-08
+          temperature_K: 2025
+        - pressure_as_printed: '5.59e-8'
+          pressure_atm: 5.59e-08
+          temperature_K: 2066
+        - pressure_as_printed: '7.83e-8'
+          pressure_atm: 7.83e-08
+          temperature_K: 2087
+        pressure_unit: atm
+        quantity: partial_pressure
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1751
+      - 1817
+      derived_from:
+      - shornikov_2026_table4_p_o_hk
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_o_low
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_table4_p_o_hk
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval starts at 1751 K and ends at 1817
+            K. 1817 K is not a Table 3 or Table 4 row. The points on this side are 1751, 1783, 1800 and 1815
+            K. The parent is the tabulated pressure series for this species.'
+        formula: O
+        gas_species: O(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -27820
+          A_as_printed: -27820 ± 392
+          B: 6.164
+          B_as_printed: 6.164 ± 0.219
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 392
+          sigma_B: 0.219
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1751
+        - 1817
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
+    - T_range_K:
+      - 1817
+      - 2087
+      derived_from:
+      - shornikov_2026_table4_p_o_hk
+      experiment: shornikov-2026-wollastonite-kems-runset
+      locator:
+        note: Eq. (20) on published page 619 and the Table 5 header both print log p_i = a_i/T + b_i. pdftotext
+          dropped the slash. The coefficients below are the printed values.
+        page: 13
+        pdf_page_index: 12
+        published_page: 620
+        table: '5'
+      observation_id: shornikov_2026_table5_o_high
+      phase: gas
+      regime: kems_effusion
+      type: partial_pressure
+      uncertainty:
+        note: Printed plus or minus widths on a_i and b_i. No confidence level is stated. An unweighted least-squares
+          refit of log10(p) = a/T + b to the parent pressures falls inside those widths. The recovered standard
+          errors are close to, and not identical with, the printed widths. The printed coefficients are stored.
+      units: log10(atm); printed a_i and b_i
+      values:
+        composition_as_printed: stoichiometric CaSiO3 wollastonite
+        derivation:
+          inputs:
+          - shornikov_2026_table4_p_o_hk
+          output_unit: log10(atm)
+          relation: 'Eq. (20): log p_i = a_i/T + b_i. The printed interval is 1817-2087 K. 1817 K is not a tabulated
+            pressure row. The points on this side start at 1833 K. The parent is the tabulated pressure series
+            for this species.'
+        formula: O
+        gas_species: O(g)
+        method_class: measured_reduced
+        pressure_temperature_relation:
+          A: -28311
+          A_as_printed: -28311 ± 146
+          B: 6.444
+          B_as_printed: 6.444 ± 0.075
+          log_base: 10
+          pressure_unit_as_printed: atm
+          relation_as_printed: log p_i = a_i/T + b_i
+          sigma_A: 146
+          sigma_B: 0.075
+        quantity: partial_pressure
+        temperature_range_K:
+        - 1817
+        - 2087
+        composition_mol:
+          basis: printed_formula_stoichiometry
+          amount_basis: mol_inventory
+          CaO: '1'
+          SiO2: '1'
     context:
     - observation_id: shornikov_2026_fig6_O_c
       type: figure_record
@@ -16584,159 +17777,3 @@ species:
       T_range_K:
       - 1751
       - 2087
-    - observation_id: shornikov_2026_table4_atomic_oxygen_calculations
-      type: calculated_pressure_table
-      locator:
-        page: 12
-        pdf_page_index: 11
-        published_page: 619
-        table: '4'
-      units: atm
-      values:
-        quantity: partial_pressure
-        method_class: model_derived
-        candidate_tokens:
-        - p_partial
-        table_disposition: context_model
-        species:
-        - O
-        temperature_unit: K
-        calculation: Atomic oxygen partial pressures calculated using Eqs. (11)–(19); the seven columns are the
-          printed calculation group (11)–(13) and reactions (14)–(19). These are equation outputs, not independent
-          pressure observations.
-        columns_as_printed:
-        - T, K
-        - (11)–(13)
-        - (14)
-        - (15)
-        - (16)
-        - (17)
-        - (18)
-        - (19)
-        rows_as_printed:
-        - T_K: 1751
-          values_atm:
-          - '1.88e-10'
-          - null
-          - '1.85e-10'
-          - '1.89e-10'
-          - null
-          - '1.85e-10'
-          - '1.80e-10'
-        - T_K: 1783
-          values_atm:
-          - '3.69e-10'
-          - null
-          - '3.64e-10'
-          - '3.72e-10'
-          - '3.79e-10'
-          - '3.71e-10'
-          - '3.35e-10'
-        - T_K: 1800
-          values_atm:
-          - '5.05e-10'
-          - null
-          - '5.06e-10'
-          - '5.03e-10'
-          - '5.03e-10'
-          - '4.95e-10'
-          - '5.04e-10'
-        - T_K: 1815
-          values_atm:
-          - '6.87e-10'
-          - null
-          - '6.87e-10'
-          - '6.90e-10'
-          - '6.90e-10'
-          - '7.18e-10'
-          - '6.85e-10'
-        - T_K: 1833
-          values_atm:
-          - '1.02e-9'
-          - null
-          - '9.85e-10'
-          - '1.02e-9'
-          - '1.01e-9'
-          - '1.04e-9'
-          - '9.46e-10'
-        - T_K: 1859
-          values_atm:
-          - '1.62e-9'
-          - null
-          - '1.57e-9'
-          - '1.62e-9'
-          - '1.77e-9'
-          - '1.47e-9'
-          - '1.64e-9'
-        - T_K: 1885
-          values_atm:
-          - '2.63e-9'
-          - null
-          - '2.55e-9'
-          - '2.62e-9'
-          - '2.54e-9'
-          - '2.64e-9'
-          - '2.62e-9'
-        - T_K: 1910
-          values_atm:
-          - '4.09e-9'
-          - '4.09e-9'
-          - '3.99e-9'
-          - '4.11e-9'
-          - '3.91e-9'
-          - '4.28e-9'
-          - '4.17e-9'
-        - T_K: 1933
-          values_atm:
-          - '6.14e-9'
-          - '6.04e-9'
-          - '6.04e-9'
-          - '6.16e-9'
-          - '6.36e-9'
-          - '6.34e-9'
-          - '5.98e-9'
-        - T_K: 1970
-          values_atm:
-          - '1.22e-8'
-          - '1.21e-8'
-          - '1.17e-8'
-          - '1.23e-8'
-          - '1.19e-8'
-          - '1.13e-8'
-          - '1.18e-8'
-        - T_K: 1988
-          values_atm:
-          - '1.63e-8'
-          - '1.62e-8'
-          - '1.59e-8'
-          - '1.64e-8'
-          - '1.62e-8'
-          - '1.56e-8'
-          - '1.56e-8'
-        - T_K: 2025
-          values_atm:
-          - '2.96e-8'
-          - '2.98e-8'
-          - '2.89e-8'
-          - '2.86e-8'
-          - '2.87e-8'
-          - '2.80e-8'
-          - '2.87e-8'
-        - T_K: 2066
-          values_atm:
-          - '5.36e-8'
-          - '5.35e-8'
-          - '5.20e-8'
-          - '5.10e-8'
-          - '5.40e-8'
-          - '5.25e-8'
-          - '5.59e-8'
-        - T_K: 2087
-          values_atm:
-          - '7.57e-8'
-          - '7.57e-8'
-          - '7.32e-8'
-          - '7.11e-8'
-          - '7.52e-8'
-          - '7.61e-8'
-          - '7.83e-8'

@@ -1,6 +1,6 @@
 # Shornikov 2026 wollastonite KEMS — extraction audit
 
-Source id `shornikov-2026-wollastonite-kems`. Title: Mass-Spectrometric Investigation of Evaporation Processes and Thermodynamic Properties of Wollastonite. S. I. Shornikov. Geochemistry International 64(8), 608–632. Received 3 April 2026, revised 5 May 2026, accepted 10 May 2026. DOI printed on the title page: 10.1134/S0016702926700035. Worker t1372-w2-w7-t1. Date 2026-10-20. review_status draft.
+Source id `shornikov-2026-wollastonite-kems`. Title: Mass-Spectrometric Investigation of Evaporation Processes and Thermodynamic Properties of Wollastonite. S. I. Shornikov. Geochemistry International 64(8), 608–632. Received 3 April 2026, revised 5 May 2026, accepted 10 May 2026. DOI printed on the title page: 10.1134/S0016702926700035. Transcription worker t1372-w2-w7-t1, 2026-10-20. Reconciled 2026-10-21: Tables 1, 2, 3 and 7 keep the cell coverage; Tables 4, 5 and 6 keep the observation-level typing; figure reads stay context. review_status draft.
 
 PDF page N is published page 607+N. PDF page 1 is published page 608. `pdf_page_index` is N−1.
 
@@ -30,8 +30,8 @@ The corpus text directory contains `pdftotext-layout.txt` only. There is no Mine
 | 3 | 618 | 146 partial pressures. CaO has 7 values (1910–2087 K). Mo has 13 values (the 1751 K cell is a dash). Nine other species have 14 values |
 | 4 | 619 | 14 Hertz–Knudsen p(O) values, column (11)–(13), plus 76 equilibrium-constant cells in columns (14)–(19). Eight printed dashes are omitted |
 | 5 | 620 | 15 coefficient rows. Each printed a_i and b_i falls inside its printed ± when refit to the parent pressures |
-| 6 | 621 | two this-study reactions only (enthalpy and entropy each). BaSiO3 and CaTiO3 rows are other work |
-| 7 | 623 | nothing. The this-study melting row duplicates the 2024 extract. The other rows are literature |
+| 6 | 621 | four this-study records: sublimation enthalpy, sublimation entropy, dissociation enthalpy, dissociation entropy. Each migrates UNAVAILABLE. BaSiO3 and CaTiO3 rows are other work and are not stored |
+| 7 | 623 | 22 literature melting-temperature and heat-of-fusion rows. The this-study melting calculation stays context; it duplicates the 2024 extract |
 
 Table 3 and Table 4 are rotated on the portrait page. pdftotext reading order matched a rotated 600 dpi render, including every mantissa, exponent, and dash that was checked.
 
@@ -41,17 +41,27 @@ Eq. (25) on the 600 dpi crop has no square on p_SiO. The pdftotext "p 2" is the 
 
 ## Counts
 
-63 scored observations. 236 pressure points: 146 from Table 3, 14 from Table 4 column (11)–(13), 76 from Table 4 columns (14)–(19). 15 Table 5 coefficient rows, linked. 4 Table 6 reaction rows, unlinked. 26 Fig. 3 series 23 activity points, figure_only. The two rankinite scalars are context, not scored observations.
+Isolated migration emits 277 observations.
 
-Two Fig. 3 markers inside 1818±7 K are context, deferred. Fig. 10 series 1 is context, not scored.
+146 Table 3 cells + 90 Table 4 points + 15 Table 5 fits + 4 Table 6 refusals + 22 Table 7 literature rows = 277.
+
+The 90 Table 4 points are 14 Hertz–Knudsen values, method_class measured_tabulated, and 76 equilibrium-constant cells, method_class model_derived. The 15 Table 5 fits keep their parent links. Oxygen's parent is the Table 4 Hertz–Knudsen series. Every other fit's parents are the Table 3 cells on that side of the printed 1817 K split. The 4 Table 6 records are explicit observations, not one collapsed context record.
+
+Against the previous 170-observation migration: 170 − 2 prose activities + 90 Table 4 points + 15 Table 5 fits + 4 Table 6 records = 277. Against the 281-observation typing: 281 − 26 Fig. 3 series-23 points, which stay context, + 22 Table 7 literature rows = 277.
+
+The prose activities are not scored. `shornikov_2024_cao_activity_prose` and `shornikov_2024_sio2_activity_prose` already hold them. The overlap record names those two ids and does not repeat the numbers. Rankinite stays the one context record. Tables 1 and 2 stay context. The Table 7 this-study melting calculation stays context.
+
+Fig. 3 series-23 marker reads, including the two markers inside 1818±7 K, stay context. Fig. 10 series 1 stays context. The printed Fig. 10 axes are `O + O2, mol %` on panel a and `O2 + O, mol %` on panel b. The caption still calls panel b the O2/O ratio.
+
+Hard issues on that migration: 84, all conditional_field. 76 are Table 4 model points whose Glushko equilibrium constants are not printed, so derived_from does not resolve; the unit conversion derivation is present. 8 are the four Table 6 records, each missing derived_from and a derivation, because delta_rH and delta_rS are not store quantities. That is the same 84 conditional_field class as the observation-level typing. It is expected. 19 values are UNAVAILABLE: the 15 fits have no numeric pressure, and the 4 Table 6 quantities are unsupported.
 
 ## Standard state
 
-Fig. 3 series 23 is admitted outside the melting band. The standard-state sentence does not contain "Raoultian" and does not name one liquid or solid endmember, so migration leaves the reference unknown.
+Fig. 3 series 23 stays context. The prose activities are not scored in this extract. The standard-state sentence does not contain "Raoultian" and does not name one liquid or solid endmember.
 
 The paper's sentence, published page 622 (PDF page 15), after Eqs. (24) and (25): p_i and p_i° are the partial pressures of the component of the gas phase over wollastonite and simple oxide (pure component), respectively.
 
-The paper does not state whether that pure component is crystalline or liquid. It does not state that p° was measured in this cell at the experiment temperature. Fig. 6 draws the pure-oxide comparison from other papers (Shornikov 2025 for CaO, Shornikov et al. 1998 for SiO2). The reference stays unknown. It is not inferred. The prose does not say Raoultian, pure liquid, or pure solid.
+Page 622 names a pure-component reference and does not state its temperature. The stable-phase-at-T rule leaves the CaO phase unknown. It is not crystalline, and the Fig. 3 CaO figure record stores inferred false. The paper does not state that p° was measured in this cell at the experiment temperature. Fig. 6 draws the pure-oxide comparison from other papers (Shornikov 2025 for CaO, Shornikov et al. 1998 for SiO2). The SiO2 figure reference stays the cristobalite-crossing unknown. The prose does not say Raoultian, pure liquid, or pure solid.
 
 The same sentence is stored on the overlap context row so the quote is in the extract. It is not copied onto the pressure rows. Pressure rows are gas partial pressures, not oxide activities.
 
@@ -59,7 +69,7 @@ The same sentence is stored on the overlap context row so the quote is in the ex
 
 ## Derivations
 
-Table 5. Unweighted least squares of log10(p) = a/T + b against the parent pressures. Low side uses 1751, 1783, 1800, 1815 K. High side uses 1833–2087 K. 1817 K is the printed split and is not a pressure row. CaO uses only 1910–2087 K. Every fitted coefficient falls inside the printed ±. The printed coefficients are stored, not the refit. The recovered standard errors are close to the printed widths and are not identical, so they are not stored as the printed uncertainty. Oxygen's parent is Table 4 column (11)–(13). Every other species' parent is its Table 3 series.
+Table 5. Unweighted least squares of log10(p) = a/T + b against the parent pressures. Low side uses 1751, 1783, 1800, 1815 K. High side uses 1833–2087 K. 1817 K is the printed split and is not a pressure row. CaO uses only 1910–2087 K. Every fitted coefficient falls inside the printed ±. The printed coefficients are stored, not the refit. The recovered standard errors are close to the printed widths and are not identical, so they are not stored as the printed uncertainty. Oxygen's parent is Table 4 column (11)–(13). Every other species' parents are its Table 3 cells on that side of the split. The page-resolved high-side B coefficients are SiO `9.280 ± 0.082` and CaSiO3 `12.617 ± 0.110`.
 
 Table 4 columns (14)–(19). Eqs. (14)–(19) as read on the 600 dpi page:
 
@@ -72,7 +82,7 @@ Table 4 columns (14)–(19). Eqs. (14)–(19) as read on the 600 dpi page:
 
 K_r(T) is cited to Glushko et al. (1978–1982) and is not printed. The rows are model_derived with no resolvable parent. `raw_inputs: not_printed` is not used, because that declaration is invalid for model_derived evidence.
 
-Table 6 this-study rows, render-checked: [CaSiO3] = (CaSiO3) at 1812–2187 K, 771±13 kJ/mol and 242±5 J/(mol K); (CaSiO3) = (CaO) + (SiO2) at 1910–2187 K, 479±12 kJ/mol and 47±6 J/(mol K). The intervals are not the Table 3 interval. Stored as delta_rH and delta_rS, not as delta_fH, because 771 kJ/mol is a reaction enthalpy. Parents are not linked.
+Table 6 this-study rows, render-checked: [CaSiO3] = (CaSiO3) at 1812–2187 K, 771±13 kJ/mol and 242±5 J/(mol K); (CaSiO3) = (CaO) + (SiO2) at 1910–2187 K, 479±12 kJ/mol and 47±6 J/(mol K). The intervals are not the Table 3 interval. Stored as four observations, quantity delta_rH or delta_rS, not as delta_fH, because 771 kJ/mol is a reaction enthalpy. Migration refuses both quantities, so the four values are UNAVAILABLE and the printed numbers are not a second scored copy. Parents are not linked. The Glushko constants are not printed.
 
 Rankinite, 600 dpi crop of published page 623: −42.63±0.63 kJ/mol and 2.39±0.35 J/(mol K) at 1600–1737 K, from Eqs. (31) and (32). The paper calls these the enthalpy and entropy of mixing. Eq. (32) uses orthosilicate activities from Shornikov 2026a, which are not printed here. No parent is linked. The schema has no mixing-enthalpy or mixing-entropy quantity, so both numbers are context, not delta_fH and not S. The printed entropy unit J/(mol K) is the unit in the context row. A read-only call of the unit owner maps J/(mol K) to no amount and maps J/mol/K to 2.39. That spelling is recorded on the context row and is not used to score an entropy. The phase (crystal or liquid) is not stated.
 
@@ -94,9 +104,9 @@ Fig. 3 panel (b), series 23, 14 filled red circles. Y is linear. Labelled ticks:
 
 Fig. 10 panel (a), series 1, 14 open circles in the lower band. Labelled ticks: 0.016 at y=1321.5, 0.014 at y=1471.5, 0.012 at y=1622.5, 0.010 at y=1773.0. mol % = 0.03355294 − 1.32846025×10⁻⁵·y. Residuals at most 0.000005. X ticks: 5.6 at x=1067.5, 5.4 at x=1389.5, 5.2 at x=1712.5, 5.0 at x=2037.0, 4.8 at x=2361.0. Read uncertainty ±0.00010 mol % and ±2 K, ±3 K left of the 5.6 tick. The printed top-axis temperature ticks disagree with T = 10000/(10⁴/T): 1800 reads 1792 K, 1900 reads 1884 K, 2000 reads 1986 K. The stored temperature is the bottom-axis conversion.
 
-Fig. 10 panel (b), series 1, 14 open circles. Labelled ticks: 0.045 at y=1300.5, 0.040 at y=1458.5, 0.035 at y=1616.5, 0.030 at y=1775.0. Residuals at most 0.000007. X ticks: 5.6 at x=3048.0, 5.4 at x=3370.5, 5.2 at x=3693.0, 5.0 at x=4017.5, 4.8 at x=4339.5. Read uncertainty ±0.00015 and ±2 K, ±3 K left of the 5.6 tick. The axis label is O₂/O, mol %. There is no scored quantity for that axis, so the reads stay in context.
+Fig. 10 panel (b), series 1, 14 open circles. Labelled ticks: 0.045 at y=1300.5, 0.040 at y=1458.5, 0.035 at y=1616.5, 0.030 at y=1775.0. Residuals at most 0.000007. X ticks: 5.6 at x=3048.0, 5.4 at x=3370.5, 5.2 at x=3693.0, 5.0 at x=4017.5, 4.8 at x=4339.5. Read uncertainty ±0.00015 and ±2 K, ±3 K left of the 5.6 tick. The printed axis label is `O2 + O, mol %`. Panel (a) prints `O + O2, mol %`. The caption still says O2/O ratio. There is no scored quantity for that axis, so the reads stay in context.
 
-Melting band is the printed Tm 1818±7 K, so 1811–1825 K. A marker in that band is deferred and the reference phase stays unknown.
+Melting band is the printed Tm 1818±7 K, so 1811–1825 K. A marker in that band is deferred and the reference phase stays unknown. In the marker table, figure_only names the read class. Those reads are context records, not scored observations.
 
 | figure | series | marker | centre px | read | decision |
 | --- | --- | --- | --- | --- | --- |
@@ -142,7 +152,7 @@ Melting band is the printed Tm 1818±7 K, so 1811–1825 K. A marker in that ban
 | 10a | 1 | 12 | 2125.53, 1342.61 | 0.01572 ± 0.00010 at 2022.15 ± 2 K | read, unscored |
 | 10a | 1 | 13 | 2253.94, 1395.61 | 0.01501 ± 0.00010 at 2055.15 ± 2 K | read, unscored |
 | 10a | 1 | 14 | 2364.48, 1304.72 | 0.01622 ± 0.00010 at 2084.43 ± 2 K | read, unscored, 3.5 px past the 4.8 tick |
-| 10b | 1 | 1 | 2856.26, 1715.38 | O2/O 0.03188 ± 0.00015 at 1748.70 ± 3 K | read, unscored, extrapolated left of 5.6 |
+| 10b | 1 | 1 | 2856.26, 1715.38 | O2 + O, mol % 0.03188 ± 0.00015 at 1748.70 ± 3 K | read, unscored, extrapolated left of 5.6 |
 | 10b | 1 | 2 | 3010.96, 1663.25 | 0.03353 ± 0.00015 at 1778.49 ± 3 K | read, unscored, extrapolated left of 5.6 |
 | 10b | 1 | 3 | 3069.16, 1642.58 | 0.03418 ± 0.00015 at 1789.96 ± 2 K | read, unscored |
 | 10b | 1 | 4 | 3139.47, 1616.63 | 0.03500 ± 0.00015 at 1804.02 ± 2 K | read, unscored |
