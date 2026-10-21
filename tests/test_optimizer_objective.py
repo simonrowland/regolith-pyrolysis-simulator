@@ -2320,6 +2320,171 @@ def test_product_summary_includes_input_output_yield_table_and_mass_closure() ->
     assert target_yield["targets"]["Fe"]["yield_fraction"] is not None
 
 
+def _throughput_fixture(*, furnace_h: float = 2.0, include_charge: bool = True):
+    record = SimpleNamespace(
+        cost_rollup={
+            "run_input_cost": {
+                "physical_cost": {"furnace_h": furnace_h},
+            }
+        }
+    )
+    if include_charge:
+        record.batch_mass_kg = 4.0
+    sim = SimpleNamespace(
+        record=record,
+        product_ledger=lambda: {"Fe": 1.0, "O2": 1.5},
+    )
+    execution = SimpleNamespace(simulator=sim, trace=SimpleNamespace(
+        snapshots=(object(),),
+        condensed_by_stage_species_delta=({(4, "Na"): 1.0},),
+    ))
+    classes = {
+        "metals_plus_O2": {
+            "class_total_kg": 3.0,
+            "metals_kg": {"Fe": 1.0, "Na": 0.2, "K": 0.3, "Mg": 0.1, "Ca": 0.1},
+            "O2_kg": 1.5,
+        },
+        "pure_silica_glass": {
+            "class_total_kg": 1.0,
+            "stage_3_kg_by_species": {"SiO": 0.8, "SiO2": 0.2},
+        },
+        "industrial_mixed_glass": {"class_total_kg": 2.0},
+        "refractory_ceramic_rump": {"rump_total_kg": 8.0},
+    }
+    return execution, classes
+
+
+def test_throughput_per_furnace_hour_is_hand_computed_from_class_masses() -> None:
+    execution, classes = _throughput_fixture()
+
+    summary = objective_module.throughput_per_furnace_hour_summary(
+        execution, product_classes=classes
+    )
+
+    assert summary["separated_product_kg"] == 6.0
+    assert summary["separated_product_kg_per_furnace_h"] == 3.0
+    assert summary["separated_product_kg_per_kg_charge_per_h"] == 0.75
+    assert summary["rump_kg_per_furnace_h"] == 4.0
+    assert summary["per_product_kg_per_furnace_h"] == {
+        "Fe": 0.5,
+        "O2": 0.75,
+        "Na_plus_K": 0.25,
+        "SiO_glass": 0.4,
+        "Mg": 0.05,
+        "Ca": 0.05,
+    }
+    assert _metric_value(
+        "separated_product_kg_per_furnace_h",
+        execution.simulator,
+        {},
+        classes,
+        run_execution=execution,
+    ) == 3.0
+    assert _metric_value(
+        "rump_kg_per_furnace_h",
+        execution.simulator,
+        {},
+        classes,
+        run_execution=execution,
+    ) == 4.0
+    gates = summary["feasibility"]["gates"]
+    assert gates["coating"] == {
+        "status": "unavailable",
+        "reason": "d-045 coating gate not on this base (b-585 pending)",
+    }
+    assert gates["delivered_stream_purity"]["status"] == "feasible"
+    assert summary["feasibility"]["status"] == "unavailable"
+
+
+def test_throughput_excludes_offgas_and_overhead_metals() -> None:
+    execution, classes = _throughput_fixture()
+    execution.simulator.atom_ledger = SimpleNamespace(
+        project_account_kg=lambda account: {
+            "terminal.offgas": {"Na": 0.2},
+            "process.overhead_gas": {"Fe": 0.4},
+        }.get(account, {})
+    )
+
+    summary = objective_module.throughput_per_furnace_hour_summary(
+        execution, product_classes=classes
+    )
+
+    assert summary["separated_product_kg"] == 5.4
+    assert summary["per_product_kg_per_furnace_h"]["Fe"] == 0.3
+    assert summary["per_product_kg_per_furnace_h"]["Na_plus_K"] == 0.15
+
+
+def test_throughput_excludes_vented_oxygen_when_partition_has_no_captured_bins() -> None:
+    execution, classes = _throughput_fixture()
+    classes["metals_plus_O2"]["O2_partition_kg"] = {
+        "vented": 1.5,
+        "total": 1.5,
+    }
+
+    summary = objective_module.throughput_per_furnace_hour_summary(
+        execution, product_classes=classes
+    )
+
+    assert summary["separated_product_kg"] == 4.5
+    assert summary["per_product_kg_per_furnace_h"]["O2"] == 0.0
+
+
+def test_throughput_sio_rate_requires_pure_silica_product() -> None:
+    execution, classes = _throughput_fixture()
+    classes["pure_silica_glass"]["class_total_kg"] = 0.0
+
+    summary = objective_module.throughput_per_furnace_hour_summary(
+        execution, product_classes=classes
+    )
+
+    assert summary["per_product_kg_per_furnace_h"]["SiO_glass"] == 0.0
+
+
+def test_throughput_per_furnace_hour_refuses_zero_hours_and_missing_charge() -> None:
+    execution, classes = _throughput_fixture(furnace_h=0.0)
+    with pytest.raises(ObjectiveComputationError, match="furnace_time_h must be positive"):
+        objective_module.throughput_per_furnace_hour_summary(
+            execution, product_classes=classes
+        )
+
+    execution, classes = _throughput_fixture(include_charge=False)
+    with pytest.raises(ObjectiveComputationError, match="run mass_kg is not numeric"):
+        objective_module.throughput_per_furnace_hour_summary(
+            execution, product_classes=classes
+        )
+
+
+def test_throughput_reports_product_purity_failure_without_dropping_fom() -> None:
+    execution, classes = _throughput_fixture()
+    execution.trace = SimpleNamespace(
+        snapshots=(object(),),
+        condensed_by_stage_species_delta=({(4, "Na"): 0.5, (4, "Fe"): 0.5},),
+    )
+
+    summary = objective_module.throughput_per_furnace_hour_summary(
+        execution,
+        {"constraints": {"stream_purity_min": 0.75}},
+        product_classes=classes,
+    )
+
+    assert summary["separated_product_kg_per_furnace_h"] == 3.0
+    assert summary["feasibility"]["status"] == "infeasible"
+    assert (
+        summary["feasibility"]["gates"]["delivered_stream_purity"]["status"]
+        == "infeasible"
+    )
+
+
+def test_throughput_rate_metric_requires_each_class_mass() -> None:
+    execution, classes = _throughput_fixture()
+    del classes["industrial_mixed_glass"]
+
+    with pytest.raises(ObjectiveComputationError, match="objective source missing"):
+        objective_module.throughput_per_furnace_hour_summary(
+            execution, product_classes=classes
+        )
+
+
 def test_product_summary_preserves_high_t_melt_activity_notice() -> None:
     notice = {
         "kind": "high_t_melt_activity_fallback",

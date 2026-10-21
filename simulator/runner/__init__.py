@@ -139,7 +139,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.9.0"
+RUNNER_SCHEMA_VERSION = "1.10.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -3482,7 +3482,7 @@ def _final_summary_report(
     species_formula_registry: Mapping[str, Any] | None,
     unresolved_species_mol_by_species: dict[str, float],
 ) -> dict[str, Any]:
-    return {
+    summary = {
         "wall_deposit_by_species_kg": _wall_deposit_report_kg(
             final_state,
             species_formula_registry,
@@ -3493,6 +3493,14 @@ def _final_summary_report(
         ),
         "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
     }
+    # Imported here because optimizer evaluation also imports this runner;
+    # the objective module owns the throughput derivation.
+    from simulator.optimize.objective import throughput_report_block
+
+    summary["throughput_per_furnace_hour"] = _json_safe(
+        throughput_report_block(execution)
+    )
+    return summary
 
 
 def _engine_commissioning_notice(sim: Any) -> dict[str, Any] | None:
@@ -5450,6 +5458,12 @@ def _runner_failure_result(
         _attach_wall_deposit_report_refusal(
             run_metadata,
             unresolved_wall_deposit_species_mol,
+        )
+    else:
+        from simulator.optimize.objective import throughput_report_block
+
+        final["throughput_per_furnace_hour"] = _json_safe(
+            throughput_report_block(execution)
         )
     stage_report = (
         _safe_failure_value(lambda: stage_purity_report(sim.train), {})

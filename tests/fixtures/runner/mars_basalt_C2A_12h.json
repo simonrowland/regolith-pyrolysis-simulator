@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "run_metadata": {
-    "schema_version": "1.9.0",
+    "schema_version": "1.10.0",
     "feedstock_id": "mars_basalt",
     "campaign": "C2A",
     "hours_requested": 12,
@@ -621,7 +621,44 @@
       "SiO": 0.0
     },
     "deposit_by_surface_species_kg": {},
-    "pump_outlet_by_species_kg": "not_applicable_until_p0"
+    "pump_outlet_by_species_kg": "not_applicable_until_p0",
+    "throughput_per_furnace_hour": {
+      "status": "available",
+      "separated_product_kg": 3.0629468311083095,
+      "furnace_time_h": 12.0,
+      "separated_product_kg_per_furnace_h": 0.2552455692590258,
+      "separated_product_kg_per_kg_charge_per_h": 0.0002552455692590258,
+      "rump_kg": 918.4722880363565,
+      "rump_kg_per_furnace_h": 76.53935733636304,
+      "per_product_kg_per_furnace_h": {
+        "Fe": 0.0,
+        "O2": 0.2552455692590258,
+        "Na_plus_K": 0.0,
+        "SiO_glass": 0.0,
+        "Mg": 0.0,
+        "Ca": 0.0
+      },
+      "feasibility": {
+        "status": "infeasible",
+        "gates": {
+          "coating": {
+            "status": "unavailable",
+            "reason": "d-045 coating gate not on this base (b-585 pending)"
+          },
+          "delivered_stream_purity": {
+            "status": "infeasible",
+            "reason": "zero delivered stream",
+            "margin": -0.95,
+            "observed": 0.0,
+            "threshold": 0.95
+          }
+        }
+      },
+      "caveats": [
+        "Cycle excludes unmodelled cool-down and turnaround.",
+        "Charge-normalized rate applies only at the simulated melt geometry; evaporation scales with melt area."
+      ]
+    }
   },
   "yield_disposition": {
     "schema_version": "5.0",

@@ -1119,7 +1119,7 @@ def _assert_schema_shape(payload: dict) -> None:
       this without picking a specific scenario.
     """
 
-    assert RUNNER_SCHEMA_VERSION == "1.9.0"
+    assert RUNNER_SCHEMA_VERSION == "1.10.0"
     assert set(payload) == TOP_LEVEL_KEYS, (
         f"top-level keys drift: {set(payload) - TOP_LEVEL_KEYS} extra, "
         f"{TOP_LEVEL_KEYS - set(payload)} missing"
@@ -1192,6 +1192,7 @@ def _assert_schema_shape(payload: dict) -> None:
         "wall_deposit_by_species_kg",
         "deposit_by_surface_species_kg",
         "pump_outlet_by_species_kg",
+        "throughput_per_furnace_hour",
     }
     assert isinstance(payload["final"]["wall_deposit_by_species_kg"], dict)
     assert isinstance(payload["final"]["deposit_by_surface_species_kg"], dict)
@@ -1199,6 +1200,12 @@ def _assert_schema_shape(payload: dict) -> None:
         payload["final"]["pump_outlet_by_species_kg"]
         == NOT_APPLICABLE_UNTIL_P0
     )
+    throughput = payload["final"]["throughput_per_furnace_hour"]
+    assert throughput["status"] in {"available", "unavailable"}
+    assert throughput["feasibility"]["gates"]["coating"] == {
+        "status": "unavailable",
+        "reason": "d-045 coating gate not on this base (b-585 pending)",
+    }
 
     assert isinstance(payload["stage_purity_report"], dict)
     for stage_key, stage in payload["stage_purity_report"].items():
