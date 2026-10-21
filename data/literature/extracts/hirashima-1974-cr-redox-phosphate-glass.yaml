@@ -1,0 +1,86 @@
+schema_version: literature_extract.v1
+source_id: hirashima-1974-cr-redox-phosphate-glass
+source:
+  citation: >-
+    Hirashima, H., Toyoda, H., & Yoshida, T. (1974). Redox Equilibria of
+    Chromium Ions in Glass Melts, RP2O6 (R; Mg, Ca, Ba), with Gas Phase.
+    Journal of the Ceramic Association, Japan, 82(946), 309–317.
+  year: 1974
+extraction:
+  method: >-
+    MinerU text is the available source. The corpus and fallback review
+    directories contain no PDF for this source, so first-page metadata and
+    600 dpi render verification were unavailable. Numerical values read from
+    the printed Table 1 and Table 2 transcription are retained in context;
+    all plot figures are deferred without digitised points.
+  date: '2026-10-20'
+  worker: codex
+  provenance_path: text/hirashima-1974-cr-redox-phosphate-glass/mineru/p001-p009/out/hirashima-1974-cr-redox-phosphate-glass-p001-p009/vlm/hirashima-1974-cr-redox-phosphate-glass-p001-p009.md
+review_status: draft
+species:
+  Cr:
+    observations: []
+    context:
+      - observation_id: hirashima1974_table1_nominal_phosphate_glass_compositions
+        type: measured_table_context
+        locator: {page: 2, pdf_page_index: 1, published_page: 310, table: '1'}
+        units: mol%
+        reason: >-
+          Table 1 gives nominal compositions, not a measured phase analysis;
+          composition vectors have no store token. Candidate redox quantity
+          tokens do not apply to this table.
+        values:
+          quantity_as_printed: nominal_composition
+          rows:
+            - {sample: Mg-1, Cr2O3: '2.5', MgP2O6: '97.5', CaP2O6: '...', BaP2O6: '...', Ca0.5KP2O6: '...'}
+            - {sample: Mg-2, Cr2O3: '5.0', MgP2O6: '95', CaP2O6: '...', BaP2O6: '...', Ca0.5KP2O6: '...'}
+            - {sample: Mg-3, Cr2O3: '10', MgP2O6: '90', CaP2O6: '...', BaP2O6: '...', Ca0.5KP2O6: '...'}
+            - {sample: Ca-1, Cr2O3: '2.5', MgP2O6: '...', CaP2O6: '97.5', BaP2O6: '...', Ca0.5KP2O6: '...'}
+            - {sample: Ca-2, Cr2O3: '5.0', MgP2O6: '...', CaP2O6: '95', BaP2O6: '...', Ca0.5KP2O6: '...'}
+            - {sample: Ba-1, Cr2O3: '2.5', MgP2O6: '...', CaP2O6: '...', BaP2O6: '97.5', Ca0.5KP2O6: '...'}
+            - {sample: Ba-2, Cr2O3: '5.0', MgP2O6: '...', CaP2O6: '...', BaP2O6: '95', Ca0.5KP2O6: '...'}
+            - {sample: Ba-3, Cr2O3: '10', MgP2O6: '...', CaP2O6: '...', BaP2O6: '90', Ca0.5KP2O6: '...'}
+            - {sample: Ba-4, Cr2O3: '15', MgP2O6: '...', CaP2O6: '...', BaP2O6: '85', Ca0.5KP2O6: '...'}
+            - {sample: CaK, Cr2O3: '2.5', MgP2O6: '...', CaP2O6: '...', BaP2O6: '...', Ca0.5KP2O6: '97.5'}
+      - observation_id: hirashima1974_table2_optical_transition_energies
+        type: measured_table_context
+        locator: {page: 7, pdf_page_index: 6, published_page: 315, table: '2'}
+        units: cm-1
+        reason: >-
+          Candidate token: valence_ratio does not describe optical transition
+          energies. The reported calculated columns are model-derived; observed
+          spectral energies remain context because no matching quantity token
+          exists.
+        values:
+          quantity_as_printed: Cr3+ optical transition energy
+          rows:
+            - {transition: '4Γ2→4Γ5', Mg_calculated: '15000', Mg_observed: '15000', Ca_calculated: '15100', Ca_observed: '15100'}
+            - {transition: '4Γ4', Mg_calculated: '21800', Mg_observed: '21600', Ca_calculated: '22000', Ca_observed: '21800'}
+            - {transition: '2Γ3', Mg_calculated: '14400', Mg_observed: '14300', Ca_calculated: '14500', Ca_observed: '14500'}
+            - {transition: '2Γ4', Mg_calculated: '15600', Mg_observed: '15600', Ca_calculated: '15700', Ca_observed: '15600'}
+            - {transition: '4Γ2→4Γ5', Ba_calculated: '15100', Ba_observed: '15100', aluminophosphate_quoted: '14500', soda_lime_silica_quoted: '15300'}
+            - {transition: '4Γ4', Ba_calculated: '22000', Ba_observed: '21900', aluminophosphate_quoted: '21600', soda_lime_silica_quoted: '22200'}
+            - {transition: '2Γ3', Ba_calculated: '14500', Ba_observed: '14500', aluminophosphate_quoted: '15100', soda_lime_silica_quoted: '14600'}
+            - {transition: '2Γ4', Ba_calculated: '15700', Ba_observed: '15600', aluminophosphate_quoted: '15750', soda_lime_silica_quoted: '15750'}
+      - observation_id: hirashima1974_figures_1_to_6
+        type: figure
+        locator: {page: 3, pdf_page_index: 2, published_page: 311, figure: '1'}
+        units: figure-only; no numeric points
+        reason: >-
+          The printed Cr redox ratios are plotted in Figures 1–3. Figure
+          digitisation is deferred; the chart values in MinerU details are not
+          treated as printed measurements.
+        values:
+          quantity: valence_ratio
+          method_class: figure_only
+          figures:
+            - {figure: '1', caption: "Reaction time to attain redox equilibrium in various melts at different oxygen partial pressures.", panel: main, species: Cr, phase: melt, T: 1200–1300°C, axes_as_printed: {x: reaction time (h), y: '[Cr2+]/total[Cr]'}, series: ['CaP2O6, 5 mol% Cr2O3, log pO2 -3.23, 1300°C', 'CaP2O6, 5 mol% Cr2O3, log pO2 -8.96, 1200°C', 'MgP2O6, 5 mol% Cr2O3, log pO2 -7.88, 1300°C', 'MgP2O6, 10 mol% Cr2O3, log pO2 -7.88, 1300°C'], marker_counts: not_counted, attribution: this_work, locator: {page: 3, pdf_page_index: 2, published_page: 311}, digitisation: deferred to a figure pass}
+            - {figure: '2', caption: "Effects of oxygen partial pressure on the redox equilibrium of chromium ions.", panel: main, species: Cr, phase: melt, T: 1200–1300°C, axes_as_printed: {x: -log pO2 (atm), y: 'log(Cr2+/Cr3+) or log(Cr3+/Cr6+)'}, series: [BaP2O6, CaP2O6, MgP2O6, Ca0.5KP2O6 systems], marker_counts: not_counted, attribution: this_work, locator: {page: 4, pdf_page_index: 3, published_page: 312}, digitisation: deferred to a figure pass}
+            - {figure: '3', caption: "Effects of total chromium concentration on redox equilibrium in alkaline-earth phosphate melts at 1300°C.", panel: main, species: Cr, phase: melt, T: '1300°C', axes_as_printed: {x: Cr2O3 concentration (mol%), y: 'log(Cr2+/Cr3+)'}, series: [MgP2O6, BaP2O6], marker_counts: not_counted, attribution: this_work, locator: {page: 5, pdf_page_index: 4, published_page: 313}, digitisation: deferred to a figure pass}
+            - {figure: '4(1)', caption: "Cr3+ absorption spectra in alkaline earth phosphate glasses.", panel: '4(1)', species: Cr3+, phase: glass, T: unknown, axes_as_printed: {x: wavelength, y: absorption}, series: [MgP2O6, CaP2O6, BaP2O6 glasses], marker_counts: not_counted, attribution: this_work, locator: {page: 6, pdf_page_index: 5, published_page: 314}, digitisation: deferred to a figure pass}
+            - {figure: '4(2)', caption: "Effect of Cr2O3 concentration on Cr3+ absorption spectra in MgP2O6 glasses.", panel: '4(2)', species: Cr3+, phase: glass, T: unknown, axes_as_printed: {x: wavelength, y: absorption}, series: [Cr2O3 concentration series], marker_counts: not_counted, attribution: this_work, locator: {page: 6, pdf_page_index: 5, published_page: 314}, digitisation: deferred to a figure pass}
+            - {figure: '4(3)', caption: "Molar extinction coefficient of Cr3+ in 10 Cr2O3·90 MgP2O6 glass.", panel: '4(3)', species: Cr3+, phase: glass, T: unknown, axes_as_printed: {x: wavelength, y: molar extinction coefficient}, series: [Cr3+], marker_counts: not_counted, attribution: this_work, locator: {page: 7, pdf_page_index: 6, published_page: 315}, digitisation: deferred to a figure pass}
+            - {figure: '5', caption: "Effects of Cr2O3 concentration on optical absorption in Cr2O3-MgP2O6 glasses.", panel: main, species: Cr, phase: glass, T: unknown, axes_as_printed: {x: wavelength, y: optical density}, series: [Cr2O3 concentration series], marker_counts: not_counted, attribution: this_work, locator: {page: 8, pdf_page_index: 7, published_page: 316}, digitisation: deferred to a figure pass}
+            - {figure: '6(1)', caption: "Optical absorption spectra of 10 Cr2O3·90 MgP2O6 glass containing Cr2+ and Cr3+ ions.", panel: '6(1)', species: Cr, phase: glass, T: unknown, axes_as_printed: {x: wavelength, y: absorption}, series: [Cr2+, Cr3+], marker_counts: not_counted, attribution: this_work, locator: {page: 8, pdf_page_index: 7, published_page: 316}, digitisation: deferred to a figure pass}
+            - {figure: '6(2)', caption: "Molar extinction coefficient of Cr2+ in 10 Cr2O3·90 MgP2O6 glass.", panel: '6(2)', species: Cr2+, phase: glass, T: unknown, axes_as_printed: {x: wavelength, y: molar extinction coefficient}, series: [Cr2+], marker_counts: not_counted, attribution: this_work, locator: {page: 9, pdf_page_index: 8, published_page: 317}, digitisation: deferred to a figure pass}
+          digitisation: deferred to a figure pass
