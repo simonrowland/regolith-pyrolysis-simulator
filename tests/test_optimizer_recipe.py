@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 
 import yaml
 import pytest
@@ -2073,9 +2074,20 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
     converted_setpoint_ranges = 0
     engineering_envelopes = 0
     grounded_sources = 0
+    disabled_unbounded = 0
 
     for spec in RecipeSchema().allowlist:
-        if spec.bounds_source.startswith("setpoints:"):
+        # Categorical controls have choices rather than numeric bounds and
+        # retain their existing provenance checks.
+        if spec.kind != "categorical" and spec.high is None:
+            assert spec.search_enabled is False, (
+                f"{'.'.join(spec.path)} unbounded numeric control must be search disabled"
+            )
+            assert spec.bounds_source.startswith("search disabled:") and re.search(
+                r"\b[tbd]-[0-9]+\b", spec.bounds_source,
+            ), f"{'.'.join(spec.path)} requires a ticketed disabling reason"
+            disabled_unbounded += 1
+        elif spec.bounds_source.startswith("setpoints:"):
             yaml_path = spec.bounds_source.removeprefix("setpoints:")
             yaml_value = _lookup_setpoint(setpoints, yaml_path)
             assert isinstance(yaml_value, list), (
@@ -2124,12 +2136,40 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
         + converted_setpoint_ranges
         + engineering_envelopes
         + grounded_sources
+        + disabled_unbounded
         == len(RecipeSchema().allowlist)
     )
     assert range_sourced == 41
     assert converted_setpoint_ranges == 2
     assert engineering_envelopes > 0
     assert grounded_sources > 0
+
+
+
+@pytest.mark.parametrize("changes", [
+    {"search_enabled": True},
+    {"bounds_source": ""},
+    {"bounds_source": "search disabled: carrier circulation cost unpriced"},
+    {"bounds_source": "engineering_envelope t-1407"},
+])
+def test_bounds_provenance_guard_rejects_invalid_unbounded_controls(monkeypatch, changes):
+    schema = _schema_with_replaced_spec(
+        RecipeSchema(), ("campaigns", "C0", "sweep_mol_per_m2_s"), **changes,
+    )
+    monkeypatch.setitem(globals(), "RecipeSchema", lambda: schema)
+    with pytest.raises(AssertionError):
+        test_knob_bounds_source_provenance_is_honest()
+
+
+@pytest.mark.parametrize("low", [0.0, None])
+@pytest.mark.parametrize("ticket", ["t-1407", "b-987", "d-215"])
+def test_bounds_provenance_guard_accepts_ticketed_disabled_unbounded_controls(monkeypatch, low, ticket):
+    schema = _schema_with_replaced_spec(
+        RecipeSchema(), ("campaigns", "C0", "sweep_mol_per_m2_s"),
+        low=low, bounds_source=f"search disabled: circulation cost unpriced ({ticket})",
+    )
+    monkeypatch.setitem(globals(), "RecipeSchema", lambda: schema)
+    test_knob_bounds_source_provenance_is_honest()
 
 
 def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
