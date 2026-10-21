@@ -17,6 +17,7 @@ from simulator.environment import (
     MARS_DATUM_PRESSURE_BAR,
     MARS_OLYMPUS_PRESSURE_BAR,
     MOON_VACUUM_FLOOR_BAR,
+    numerical_pressure_floor_bar_for_body,
     vacuum_floor_bar_for_body,
     vacuum_floor_bar_for_environment,
 )
@@ -88,6 +89,16 @@ def test_mars_environment_floor_uses_explicit_ambient_pressure() -> None:
         body="mars",
         ambient_pressure_bar=MARS_OLYMPUS_PRESSURE_BAR,
     ) == pytest.approx(MARS_OLYMPUS_PRESSURE_BAR)
+
+
+@pytest.mark.parametrize("body, expected", [
+    ("moon", MOON_VACUUM_FLOOR_BAR),
+    ("asteroid", ASTEROID_VACUUM_FLOOR_BAR),
+    ("mars", DEFAULT_VACUUM_FLOOR_BAR),
+    (None, DEFAULT_VACUUM_FLOOR_BAR),
+])
+def test_numerical_admission_floor_does_not_forbid_mars_pumping(body, expected):
+    assert numerical_pressure_floor_bar_for_body(body) == expected
 
 
 def test_resolve_transport_po2_accepts_lunar_nanotorr_floor() -> None:

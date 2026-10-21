@@ -3733,50 +3733,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             campaign_hour=float(self.melt.campaign_hour),
         )
 
-    def _apply_c2a_knudsen_pressure_adjustment(self) -> None:
-        if self.melt.campaign not in (
-            CampaignPhase.C2A,
-            CampaignPhase.C2A_STAGED,
-        ):
-            return
-
-        from simulator.campaigns import (
-            C2A_STAGED_PN2_SWEEP_MAX_MBAR,
-            C2A_STAGED_PN2_SWEEP_MIN_MBAR,
-        )
-
-        carrier_gas = self._resolve_condensation_carrier_gas()
-        adjustment = self.condensation_model.adjust_c2a_pressure_setpoint(
-            requested_p_total_mbar=float(self.melt.p_total_mbar),
-            pO2_mbar=float(self.melt.pO2_mbar),
-            # Knudsen conductance evaluates the vapor at the melt-side gas
-            # temperature; the scheduled pipe temperature is a wall state.
-            gas_temperature_C=float(self.melt.temperature_C),
-            pipe_diameter_m=self.overhead_model.pipe_diameter_m,
-            pN2_min_mbar=C2A_STAGED_PN2_SWEEP_MIN_MBAR,
-            pN2_max_mbar=C2A_STAGED_PN2_SWEEP_MAX_MBAR,
-            carrier_gas=carrier_gas,
-        )
-        if adjustment.get('status') != 'applied':
-            return
-
-        applied_pN2_mbar = float(adjustment['applied_pN2_mbar'])
-        applied_total_mbar = float(adjustment['applied_p_total_mbar'])
-        self.melt.p_total_mbar = applied_total_mbar
-        self.melt.background_gas_species = carrier_gas
-        self.melt.background_gas_mole_fraction = 1.0
-        self.overhead.composition[carrier_gas] = applied_pN2_mbar
-        self.overhead.pressure_mbar = max(
-            float(self.overhead.pressure_mbar),
-            applied_total_mbar,
-        )
-        staged_control = self.campaign_mgr.last_c2a_staged_gas_control
-        if isinstance(staged_control, dict):
-            staged_control['pN2_mbar'] = applied_pN2_mbar
-            staged_control['p_total_mbar'] = applied_total_mbar
-            staged_control['knudsen_pressure_adjustment'] = dict(adjustment)
-        self.melt.validate_melt_pressures()
-
     def _active_lab_schedule(self) -> Mapping[str, Any] | None:
         getter = getattr(self.campaign_mgr, "_lab_schedule", None)
         if not callable(getter):
@@ -7857,11 +7813,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         except EvaporationFluxConfigurationError as exc:
             raise evaporation_flux_refusal_from_configuration_error(exc) from exc
-        # Transitional Kn domain: this bounded native-Fe projection suppresses
-        # capacity under its diagnostic-limited policy when continuum transport
-        # is load-bearing (pyrolysis). Stage 0 bakeout marks and keeps the
-        # computed HKL capacity. The authoritative EVAPORATION_FLUX provider
-        # refuses the pyrolysis case; t-379 lifts this suppression.
+        # d-209: retain the finite HKL upper bound with its transport-domain
+        # flag; only unusable transport inputs suppress capacity.
         from simulator.transport_regime import continuum_validity_refuses
 
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
@@ -7891,8 +7844,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         series_diag = series_flux.as_diagnostic()
         if domain_diag is not None:
             # Relabel series diagnostic with the typed continuum-validity
-            # vocabulary. Pyrolysis refusals still suppress flux; bakeout
-            # marks keep the computed HKL number.
+            # vocabulary. Regime marks keep the computed HKL upper bound.
             series_diag = dict(series_diag)
             series_update = {
                 'authority_class': domain_diag['authority_class'],
@@ -13976,7 +13928,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # --- 2. Temperature ramp and carried-in passive exchange ---
         self._update_temperature()
-        self._apply_c2a_knudsen_pressure_adjustment()
         self._establish_melt_redox_gate_authority_for_current_hour()
         self._apply_oxygen_reservoir_exchange()
         self._apply_o2_bubbler()

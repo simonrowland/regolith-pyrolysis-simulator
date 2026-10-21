@@ -339,13 +339,7 @@ enhancement `Sh_eff = 3.66 × √max(1, radial_stir_factor)` (default radial 1.0
 <!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:654 — continuum R_g branch (Fuchs weight removed; 63df9bd) -->
 <!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1407 — radial Sherwood -->
 
-**Transport-model validity domain (not a Kn safety/coating gate).** Ledger-authoritative yields refuse
-when the flux evaluation's Kn exceeds `VISCOUS_KNUDSEN_MAX` at nonzero overhead, because evolved
-`P_bulk` still comes from the viscous-only Poiseuille model. The 0.6.3 optimizer floor (~1 mbar,
-Kn≈0.004) never enters that domain; t-379 (0.7) supplies transitional/molecular conductance and lifts
-the validity refusal. Coating remains the continuous rate→lifespan model. See
-[`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4 -> engines/builtin/evaporation_flux.py BuiltinEvaporationFluxProvider.dispatch:799 — viscous p_bulk domain refusal (63df9bd) -->
+**Transport-model validity domain.** The regime is computed, not required (d-209). Transitional Kn uses the existing finite continuum extension with its out-of-domain flag; free-molecular flux uses the HKL upper bound. Invalid inputs still refuse. Pipe capacity remains Poiseuille-only; kinetic t-1396 covers molecular pipe conductance, t-1397 transitional evaporation, and t-1398 transitional walls. Coating remains the continuous rate→lifespan model. See [`docs/model-limitations.md`](model-limitations.md).
 
 ### §4.1 Directional (two-axis) induction stirring
 

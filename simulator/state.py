@@ -376,7 +376,7 @@ class Atmosphere(Enum):
     """Atmosphere above the melt."""
     HARD_VACUUM = auto()      # Body/environment vacuum floor (C0)
     CONTROLLED_O2 = auto()    # pO₂ managed by turbine + bleed (C2B, C3, C4)
-    PN2_SWEEP = auto()        # Recirculating N₂ at 5-15 mbar (C2A)
+    PN2_SWEEP = auto()        # Recirculating N₂; C2A design default 5-15 mbar
     O2_BACKPRESSURE = auto()  # O₂ at 0.01-0.1 bar (C5 MRE)
     CONTROLLED_O2_FLOW = auto()  # O₂ flow/sweep (C0b P-cleanup)
     CO2_BACKPRESSURE = auto()    # Mars surface CO₂ pressure floor during C0
@@ -1244,14 +1244,13 @@ class HourSnapshot:
     #   - ``regime_factor`` (float): the F3 viscous-flow attenuation
     #     factor (0 → pure viscous; 1 → pure ballistic/free-molecular)
     #   - ``warnings`` (tuple[str, ...]): operator-facing strings
-    #     when Kn approaches the boundary (e.g., ``Kn=5e-3 near the
-    #     0.01 viscous-flow cutoff``); empty when state is clean
+    #     when Kn approaches a regime transition; empty when state is clean
     #
-    # Complements the F3 hard refusal at ``Kn ≥ 10`` with earlier-
-    # warning visibility: an operator who sees the warning surface
-    # before the refusal fires can lower ramp rates / adjust pN2
-    # sweep proactively. Empty dict on ticks that didn't trigger a
-    # condensation route (degenerate case).
+    # Under d-208/d-209, Kn is a reported diagnostic and never causes a
+    # regime refusal. Transitional and free-molecular results carry flagged
+    # approximations. Operators can use the warning surface to choose a
+    # different pressure or ramp rate. Empty dict when no condensation route
+    # ran on the tick (degenerate case).
 
     # --- Metal-projection drift audit (0.5.4 W8 / M2 closure) ---
     metal_projection_drift_kg: Dict[str, float] = field(default_factory=dict)

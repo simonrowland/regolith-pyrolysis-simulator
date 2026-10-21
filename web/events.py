@@ -438,22 +438,20 @@ def read_advisory_panel_detail_for_client(client_id: str, panel: str):
 # line read `refused - viscous_p_bulk_transport_out_of_domain`: a raw token with
 # no indication of whether the furnace broke, the app broke, or the model
 # declined to extrapolate. The owner reported exactly this as "the run stalled
-# on OUT_OF_DOMAIN". The run had not stalled; it had refused, correctly.
+# on OUT_OF_DOMAIN". That historical regime refusal is removed by d-209.
 #
 # These are explanations only. The machine-readable `reason` is unchanged and
 # stays authoritative -- nothing here decides anything, and an unmapped reason
 # still surfaces its token verbatim rather than being softened into prose.
 _REFUSAL_EXPLANATIONS = {
     'viscous_p_bulk_transport_out_of_domain': (
-        'Overhead pressure fell below the viscous-flow domain. The minimum '
-        'valid mbar threshold depends on the actual duct geometry and gas '
-        'temperature. The run stopped rather than extrapolate a Knudsen-domain '
-        'transport number it cannot support.'
+        'Transitional Knudsen transport uses a flagged extension outside the certified '
+        'continuum model. Its mbar edge is diagnostic. Flow regime is a design choice; kinetic t-1396/t-1397 '
+        'track molecular pipe conductance and transitional evaporation.'
     ),
     'knudsen_outside_viscous_flow': (
-        'The condensation train is outside its viscous-flow Knudsen domain. '
-        'The minimum valid mbar threshold depends on the actual duct geometry '
-        'and gas temperature; the model refused to extrapolate.'
+        'Free-molecular transport uses the surface model with uncertainty '
+        'flags. Flow regime is a design choice, not a recipe exclusion.'
     ),
     'knudsen_policy_unconfigured': (
         'The run has no configured Knudsen-regime policy, so condensation '
@@ -664,7 +662,7 @@ def _refusal_message(reason: str, diagnostic: object = None) -> str:
         return message
     minimum_mbar = float(basis['minimum_pressure_mbar'])
     return (
-        f'{message} For this geometry, the computed minimum is '
+        f'{message} For this geometry, the diagnostic continuum edge is '
         f'{minimum_mbar:.2f} mbar.'
     )
 

@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 import yaml
 
-import simulator.campaigns as campaigns_module
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.core import Atmosphere, CampaignPhase, MeltState
 from simulator.run_executor import RunExecutor
@@ -180,27 +179,7 @@ def test_declared_continuum_floor_matches_its_own_derivation(campaign_name):
 
 
 def test_campaign_default_pressure_versus_its_own_continuum_floor():
-    """Pins WHICH campaigns run a default below their own declared floor.
-
-    ★ This pins a DEFECT, not an expectation. b-326: C4 and C6 both declare a
-    continuum floor and both set p_total_mbar_default BELOW it --
-
-        C4  floor 0.348846 mbar   default 0.2   -> 1.74x below, implied Kn 0.0174
-        C6  floor 0.300374 mbar   default 0.2   -> 1.50x below, implied Kn 0.0150
-
-    against a declared knudsen_max of 0.01. The consequence is real: the
-    viscous-flow refusal that makes C4 unreachable is CORRECT -- the recipe is
-    asking for a pressure its own derivation forbids.
-
-    Resolving it is a physics call (either the 0.2 defaults are wrong, or these
-    campaigns knowingly operate transitional and need a conductance model
-    rather than a continuum P_bulk), so it is owner-gated and NOT fixed here.
-
-    Pinned as the exact violating SET rather than left red or xfailed, because
-    the set is what carries information: fixing one campaign, or a third
-    campaign regressing, both change it and both fail this test. An xfail would
-    stay silent through either.
-    """
+    """The continuum edge is informational; transitional defaults are valid."""
     known_violations = {"C4", "C6"}
 
     violations = {}
@@ -215,8 +194,8 @@ def test_campaign_default_pressure_versus_its_own_continuum_floor():
     assert set(violations) == known_violations, (
         f"the set of campaigns running below their own continuum floor has "
         f"CHANGED (b-326). Now {sorted(violations)}, previously "
-        f"{sorted(known_violations)}. If a campaign was fixed, drop it from "
-        f"known_violations; if a new one regressed, that is a live defect. "
+        f"{sorted(known_violations)}. If a default changed, update "
+        f"the diagnostic expectation. "
         f"Detail: "
         + "; ".join(
             f"{n}: default {d} mbar vs floor {f:.6f} mbar ({f / d:.2f}x below)"
@@ -540,16 +519,12 @@ def test_c2a_staged_pn2_sweep_trace_po2_is_not_silent_or_phantom_o2():
     assert gas["pn2_band_action"] == ""
 
 
-# SC-67 adjudication (t-185 x wave-06-pressure fold): an out-of-band configured
-# p_total is a strandable operating point with a COMPUTABLE non-empty feasible
-# band, so it adjusts to the nearest band edge with loud provenance
-# (pn2_band_action + requested_p_total_mbar) instead of refusing; the typed
-# refusal is reserved for the genuinely empty/invalid band (test below).
+# d-209: requested pressures are honoured outside the design-margin band.
 @pytest.mark.parametrize(
     ("p_total_mbar", "expected_pN2", "expected_action"),
-    [(1.25, 5.0, "clamped_low"), (20.25, 15.0, "clamped_high")],
+    [(1.25, 1.0, ""), (20.25, 20.0, ""), (0.250001, 0.000001, "")],
 )
-def test_c2a_staged_pn2_sweep_outside_operating_band_adjusts_with_provenance(
+def test_c2a_staged_pn2_sweep_outside_default_band_honours_request(
     p_total_mbar,
     expected_pN2,
     expected_action,
@@ -573,45 +548,17 @@ def test_c2a_staged_pn2_sweep_outside_operating_band_adjusts_with_provenance(
     assert gas["pn2_band_action"] == expected_action
 
 
-def test_c2a_staged_pn2_sweep_recovers_when_total_does_not_exceed_po2():
+@pytest.mark.parametrize("p_total_mbar", [0.0, 1.0, 2.0])
+def test_c2a_staged_pn2_sweep_refuses_nonpositive_carrier(p_total_mbar):
     setpoints = deepcopy(_setpoints())
     _stage(setpoints, "alkali_early_fe").update({
         "gas_cover_mode": "pn2_sweep",
         "pO2_mbar": 2.0,
-        "p_total_mbar": 1.0,
+        "p_total_mbar": p_total_mbar,
     })
-
-    manager = CampaignManager(setpoints)
-    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
-    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
-    gas = dict(manager.last_c2a_staged_gas_control or {})
-
-    assert gas["requested_p_total_mbar"] == pytest.approx(1.0)
-    assert gas["pN2_mbar"] == pytest.approx(5.0)
-    assert gas["p_total_mbar"] == pytest.approx(7.0)
-    assert gas["pn2_band_action"] == "clamped_low"
-    assert melt.p_total_mbar == pytest.approx(7.0)
-
-
-def test_c2a_staged_pn2_sweep_refuses_invalid_empty_clamp_band(monkeypatch):
-    setpoints = deepcopy(_setpoints())
-    _stage(setpoints, "alkali_early_fe").update({
-        "gas_cover_mode": "pn2_sweep",
-        "pO2_mbar": 2.0,
-        "p_total_mbar": 1.0,
-    })
-    monkeypatch.setattr(campaigns_module, "C2A_STAGED_PN2_SWEEP_MIN_MBAR", 15.0)
-    monkeypatch.setattr(campaigns_module, "C2A_STAGED_PN2_SWEEP_MAX_MBAR", 5.0)
-
-    # Empty feasible band = the SC-67 boundary case: typed refusal (feeds the
-    # runner failure envelope), not adjustment.
-    with pytest.raises(
-        CampaignPressureSetpointRefusal,
-        match="operating band is empty or invalid",
-    ):
+    with pytest.raises(CampaignPressureSetpointRefusal, match="finite and positive"):
         CampaignManager(setpoints).configure_campaign(
-            MeltState(),
-            CampaignPhase.C2A_STAGED,
+            MeltState(), CampaignPhase.C2A_STAGED,
         )
 
 
@@ -783,3 +730,137 @@ def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
 
     assert gas.composition.get("Ar", 0.0) == pytest.approx(8.0)
     assert gas.composition.get("N2", 0.0) == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize("pressure", [math.nan, math.inf, -math.inf, -1.0])
+def test_c2a_staged_invalid_pressure_retains_typed_refusal(pressure):
+    setpoints = deepcopy(_setpoints())
+    _stage(setpoints, "alkali_early_fe").update({
+        "gas_cover_mode": "pn2_sweep", "pO2_mbar": 0.0,
+        "p_total_mbar": pressure,
+    })
+    with pytest.raises(CampaignPressureSetpointRefusal):
+        CampaignManager(setpoints).configure_campaign(
+            MeltState(), CampaignPhase.C2A_STAGED,
+        )
+
+
+def test_c2a_staged_free_molecular_request_survives_simulator_tick():
+    stages = deepcopy(_setpoints()["campaigns"]["C2A_staged"]["stages"])
+    stages[0].update(gas_cover_mode="pn2_sweep", pO2_mbar=0.0, p_total_mbar=1e-6)
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C2A_staged", hours=1,
+        allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+        setpoints_patch={"campaigns": {"C2A_staged": {"stages": stages}}},
+    )
+    execution = RunExecutor().execute(run._session_config())
+    assert execution.status != "refused"
+    gas = execution.per_hour[0]["c2a_staged_gas"]
+    assert gas["p_total_mbar"] == 1e-6
+    assert gas["pN2_mbar"] == 1e-6
+    assert gas["pn2_band_action"] == ""
+
+
+@pytest.mark.parametrize("body", ["", "moon", "asteroid", "mars"])
+def test_c2a_staged_admission_uses_numerical_total_floor(body):
+    from simulator.environment import numerical_pressure_floor_bar_for_body
+
+    floor_mbar = numerical_pressure_floor_bar_for_body(body) / 1.0e-3
+    setpoints = deepcopy(_setpoints())
+    stage = _stage(setpoints, "alkali_early_fe")
+    stage.update(gas_cover_mode="pn2_sweep", pO2_mbar=0.0, p_total_mbar=floor_mbar)
+    melt = MeltState(body=body)
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    assert melt.p_total_mbar == floor_mbar
+    stage["p_total_mbar"] = math.nextafter(floor_mbar, 0.0)
+    with pytest.raises(CampaignPressureSetpointRefusal, match="numerical pressure floor"):
+        CampaignManager(setpoints).configure_campaign(MeltState(body=body), CampaignPhase.C2A_STAGED)
+
+
+RECIPE_PRESSURE_CAMPAIGNS = (
+    CampaignPhase.C0B, CampaignPhase.C2A, CampaignPhase.C2A_STAGED,
+    CampaignPhase.C2B, CampaignPhase.C3_K, CampaignPhase.C3_NA,
+    CampaignPhase.C4, CampaignPhase.C5, CampaignPhase.C6,
+    CampaignPhase.C7_CA_ALUMINOTHERMIC, CampaignPhase.MRE_BASELINE,
+)
+
+
+def _set_campaign_pressure(setpoints, campaign, pressure):
+    key = CampaignManager(setpoints)._campaign_config_key(campaign)
+    config = setpoints['campaigns'][key]
+    config.update(pO2_mbar=0.0, pO2_mbar_default=0.0,
+                  p_total_mbar=pressure, p_total_mbar_default=pressure)
+    if campaign == CampaignPhase.C2A_STAGED:
+        _stage(setpoints, 'alkali_early_fe').update(
+            gas_cover_mode='pn2_sweep', pO2_mbar=0.0, p_total_mbar=pressure,
+        )
+
+
+@pytest.mark.parametrize('campaign', RECIPE_PRESSURE_CAMPAIGNS)
+@pytest.mark.parametrize('pressure', [0.0, 1e-20, -1.0, math.nan, math.inf, -math.inf])
+def test_all_recipe_pressure_campaigns_retain_typed_physical_admission(campaign, pressure):
+    setpoints = deepcopy(_setpoints())
+    _set_campaign_pressure(setpoints, campaign, pressure)
+    with pytest.raises(CampaignPressureSetpointRefusal):
+        CampaignManager(setpoints).configure_campaign(MeltState(body='moon'), campaign)
+
+
+@pytest.mark.parametrize('body', ['', 'moon', 'asteroid', 'mars'])
+def test_c2a_continuous_runtime_pressure_floor_boundary(body):
+    from simulator.environment import numerical_pressure_floor_bar_for_body
+
+    floor = numerical_pressure_floor_bar_for_body(body) / 1e-3
+    setpoints = deepcopy(_setpoints())
+    _set_campaign_pressure(setpoints, CampaignPhase.C2A, floor)
+    melt = MeltState(body=body)
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C2A)
+    assert melt.p_total_mbar == floor
+    _set_campaign_pressure(setpoints, CampaignPhase.C2A, math.nextafter(floor, 0.0))
+    with pytest.raises(CampaignPressureSetpointRefusal, match='numerical pressure floor'):
+        CampaignManager(setpoints).configure_campaign(MeltState(body=body), CampaignPhase.C2A)
+
+
+@pytest.mark.parametrize('pressure', [0.01, 1000.0])
+def test_c2a_continuous_runtime_pressure_outside_search_envelope_is_preserved(pressure):
+    setpoints = deepcopy(_setpoints())
+    _set_campaign_pressure(setpoints, CampaignPhase.C2A, pressure)
+    melt = MeltState(body='moon')
+    CampaignManager(setpoints).configure_campaign(melt, CampaignPhase.C2A)
+    assert melt.p_total_mbar == pressure
+
+
+@pytest.mark.parametrize('pressure', [0.0, 1e-20])
+def test_c2a_continuous_invalid_pressure_refuses_before_simulator_tick(pressure):
+    run = PyrolysisRun(
+        feedstock_id='lunar_mare_low_ti', campaign='C2A_continuous', hours=1,
+        allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+        setpoints_patch={'campaigns': {'C2A_continuous': {
+            'pO2_mbar': 0.0, 'p_total_mbar': pressure,
+            'p_total_mbar_default': pressure,
+        }}},
+    )
+    execution = RunExecutor().execute(run._session_config())
+    assert execution.status == 'refused'
+    assert execution.reason == CampaignPressureSetpointRefusal.reason
+    assert execution.per_hour == ()
+    assert execution.snapshots == ()
+
+
+def test_c2a_continuous_o2_override_does_not_repair_invalid_total():
+    setpoints = deepcopy(_setpoints())
+    _set_campaign_pressure(setpoints, CampaignPhase.C2A, 0.0)
+    manager = CampaignManager(setpoints)
+    manager.overrides['C2A'] = {'pO2_mbar': 1.0}
+    with pytest.raises(CampaignPressureSetpointRefusal):
+        manager.configure_campaign(MeltState(body='moon'), CampaignPhase.C2A)
+
+
+@pytest.mark.parametrize('stages', [None, []])
+def test_c2a_staged_without_schedule_retains_total_pressure_admission(stages):
+    setpoints = deepcopy(_setpoints())
+    _set_campaign_pressure(setpoints, CampaignPhase.C2A_STAGED, 1e-20)
+    setpoints['campaigns']['C2A_staged']['stages'] = stages
+    with pytest.raises(CampaignPressureSetpointRefusal):
+        CampaignManager(setpoints).configure_campaign(
+            MeltState(body='moon'), CampaignPhase.C2A_STAGED,
+        )

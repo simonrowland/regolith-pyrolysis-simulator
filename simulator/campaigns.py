@@ -41,6 +41,7 @@ from simulator.furnace_materials import (
     setpoints_furnace_ceiling_C,
 )
 from simulator.recipe_errors import MalformedRecipeError
+from simulator.environment import numerical_pressure_floor_bar_for_body
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
@@ -71,8 +72,6 @@ C2A_STAGED_GAS_COVER_MODES = frozenset({
     C2A_STAGED_GAS_COVER_PN2_SWEEP,
     C2A_STAGED_GAS_COVER_PO2_HOLD,
 })
-C2A_STAGED_PN2_SWEEP_MIN_MBAR = 5.0
-C2A_STAGED_PN2_SWEEP_MAX_MBAR = 15.0
 C2A_STAGED_PN2_BAND_REFUSAL_REASON = (
     'c2a_staged_pn2_outside_operating_band'
 )
@@ -92,14 +91,7 @@ C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
 
 
 class CampaignPressureSetpointRefusal(ValueError):
-    """Typed refusal for a campaign pressure request with an EMPTY feasible set.
-
-    SC-67 boundary: when the operating band is computable and non-empty, an
-    out-of-band request is adjusted to the band edge with loud provenance
-    (pn2_band_action) instead of raising. This refusal fires only when there
-    is nothing to recompute toward (empty/invalid band); run_executor maps it
-    into the structured failure envelope.
-    """
+    """Typed refusal for physically invalid campaign pressure inputs."""
 
     reason = C2A_STAGED_PN2_BAND_REFUSAL_REASON
 
@@ -755,6 +747,30 @@ class CampaignManager:
             return scalar_value
         return self._float(config.get(default_key), default)
 
+    def _validate_campaign_total_pressure(
+            self,
+            melt: MeltState,
+            campaign: CampaignPhase,
+            pressure_mbar: float,
+            *,
+            stage_name: str | None = None) -> None:
+        # Numerical resolution, not ambient pump load or a flow-regime bound.
+        # 1 mbar = 1e-3 bar, so divide the environment's bar floor by 1e-3.
+        floor_mbar = numerical_pressure_floor_bar_for_body(melt.body) / 1.0e-3
+        if (not math.isfinite(pressure_mbar)
+                or pressure_mbar <= 0.0 or pressure_mbar < floor_mbar):
+            diagnostic = {
+                'status': 'refused',
+                'campaign': self._campaign_config_key(campaign),
+                'detail': (
+                    'p_total_mbar must be finite and positive and at least '
+                    f'the numerical pressure floor {floor_mbar} mbar'
+                ),
+            }
+            if stage_name is not None:
+                diagnostic['stage_name'] = stage_name
+            raise CampaignPressureSetpointRefusal(diagnostic)
+
     def _configured_max_hold_hr(self,
                                 campaign: CampaignPhase,
                                 *path: str) -> float:
@@ -1185,7 +1201,10 @@ class CampaignManager:
         value = self._float(stage.get(key), default) if present else float(default)
         if not math.isfinite(value):
             label = self._c2a_staged_stage_label(stage)
-            raise ValueError(f'C2A_staged.stages.{label}.{key} must be finite')
+            raise CampaignPressureSetpointRefusal({
+                'status': 'refused', 'stage_name': label,
+                'field': key, 'detail': f'{key} must be finite',
+            })
         return value, present
 
     def _c2a_staged_stage_gas_control(
@@ -1218,10 +1237,10 @@ class CampaignManager:
                 'must be finite and non-negative'
             )
         if p_total_mbar < 0.0:
-            raise ValueError(
-                f'C2A_staged.stages.{stage_name}.p_total_mbar '
-                'must be finite and non-negative'
-            )
+            raise CampaignPressureSetpointRefusal({
+                'status': 'refused', 'stage_name': stage_name,
+                'detail': 'p_total_mbar must be finite and non-negative',
+            })
         band_action = ''
         requested_p_total_mbar = p_total_mbar
         if mode == C2A_STAGED_GAS_COVER_PO2_HOLD:
@@ -1241,48 +1260,15 @@ class CampaignManager:
             pN2_mbar = max(0.0, p_total_mbar - pO2_mbar)
         else:
             pN2_mbar = p_total_mbar - pO2_mbar
-            if (
-                    not math.isfinite(C2A_STAGED_PN2_SWEEP_MIN_MBAR)
-                    or not math.isfinite(C2A_STAGED_PN2_SWEEP_MAX_MBAR)
-                    or C2A_STAGED_PN2_SWEEP_MIN_MBAR <= 0.0
-                    or C2A_STAGED_PN2_SWEEP_MAX_MBAR
-                    < C2A_STAGED_PN2_SWEEP_MIN_MBAR
-            ):
-                # SC-67 boundary: an EMPTY/INVALID feasible band is the one
-                # case where refusal (not adjustment) is correct — there is
-                # nothing to recompute toward. Typed so the runner failure
-                # envelope (run_executor) reports it structurally.
+            # d-209: the 5-15 mbar band is design margin, not a clamp.
+            if not math.isfinite(pN2_mbar) or pN2_mbar <= 0.0:
                 raise CampaignPressureSetpointRefusal({
                     'status': 'refused',
                     'reason': C2A_STAGED_PN2_BAND_REFUSAL_REASON,
                     'stage_name': stage_name,
                     'gas_cover_mode': mode,
-                    'detail': 'pN2 sweep operating band is empty or invalid',
-                    'allowed_pN2_mbar': [
-                        C2A_STAGED_PN2_SWEEP_MIN_MBAR,
-                        C2A_STAGED_PN2_SWEEP_MAX_MBAR,
-                    ],
+                    'detail': 'pN2 sweep pressure must be finite and positive',
                 })
-            # SC-67 recompute-and-adjust (t-185): the viscous-flow band is a
-            # computable, non-empty feasible set, so an out-of-band configured
-            # p_total adjusts to the nearest band edge like a physical
-            # regulator hitting its limit stop — LOUDLY: requested vs applied
-            # and the band action are recorded in the diagnostic
-            # (pn2_band_action / requested_p_total_mbar). The fail-loud
-            # doctrine targets SILENT coercion; this substitution is visible.
-            # Refusal is reserved for the empty-band case above.
-            clamped_pN2 = min(
-                C2A_STAGED_PN2_SWEEP_MAX_MBAR,
-                max(C2A_STAGED_PN2_SWEEP_MIN_MBAR, pN2_mbar),
-            )
-            if clamped_pN2 != pN2_mbar:
-                band_action = (
-                    'clamped_low'
-                    if pN2_mbar < C2A_STAGED_PN2_SWEEP_MIN_MBAR
-                    else 'clamped_high'
-                )
-                pN2_mbar = clamped_pN2
-                p_total_mbar = pO2_mbar + pN2_mbar
             atmosphere = Atmosphere.PN2_SWEEP
 
         diagnostic = {
@@ -1321,6 +1307,10 @@ class CampaignManager:
         if not isinstance(stage, Mapping):
             raise ValueError('C2A_staged.stages did not select a stage')
         atmosphere, diagnostic = self._c2a_staged_stage_gas_control(stage)
+        self._validate_campaign_total_pressure(
+            melt, active_campaign, float(diagnostic['p_total_mbar']),
+            stage_name=self._c2a_staged_stage_label(stage),
+        )
         melt.atmosphere = atmosphere
         melt.pO2_mbar = float(diagnostic['pO2_mbar'])
         melt.p_total_mbar = float(diagnostic['p_total_mbar'])
@@ -1590,6 +1580,11 @@ class CampaignManager:
         # Apply runtime overrides (pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
         if 'pO2_mbar' in ovr:
+            # An O2 override can raise total pressure below; it must not conceal
+            # an invalid configured total. Staged gas controls resolve their own
+            # effective pressure; C0's explicit hard-vacuum mode permits zero.
+            if campaign not in (CampaignPhase.C0, CampaignPhase.C2A_STAGED):
+                self._validate_campaign_total_pressure(melt, campaign, melt.p_total_mbar)
             # 0.5.4 W5 milestone-review P1 (codex /challenge
             # 2026-05-28): mirror the active-path atmosphere switch
             # at ``simulator/session.py:276-298`` here too. Pre-fix
@@ -1670,6 +1665,8 @@ class CampaignManager:
                 # explicitly named axial — whole-dataclass replace.
                 melt.stir_state = new_state
 
+        if campaign not in (CampaignPhase.C0, CampaignPhase.IDLE, CampaignPhase.COMPLETE):
+            self._validate_campaign_total_pressure(melt, campaign, melt.p_total_mbar)
         melt.validate_melt_pressures()
 
     # ------------------------------------------------------------------

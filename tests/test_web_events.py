@@ -6032,8 +6032,11 @@ def test_refusal_message_explains_without_replacing_the_machine_reason():
     read `refused - viscous_p_bulk_transport_out_of_domain` -- a raw token that
     cannot distinguish "the furnace broke" from "the model declined to
     extrapolate". It was reported as a stall. The run had not stalled; it had
-    correctly refused, because viscous Poiseuille P_bulk has no valid solution
-    in the transitional Knudsen band.
+    correctly refused under the former d-209 contract because viscous
+    Poiseuille P_bulk had no valid solution in the transitional Knudsen band.
+    That regime-refusal explanation was superseded by d-209; Kn is now a
+    diagnostic and transitional/free-molecular results carry flagged
+    approximations.
 
     Two properties matter and are both asserted here:
       1. the human message is prose, NOT the bare token;

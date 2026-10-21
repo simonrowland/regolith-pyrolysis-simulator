@@ -1176,7 +1176,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
             if (
                 active_gas_transport_species
-                and continuum_validity_refuses(domain_refusal)
+                and domain_refusal is not None
             ):
                 if domain_refusal.get("reason") == "viscous_p_bulk_transport_out_of_domain":
                     continuum_extrapolation = {
@@ -1545,8 +1545,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
             warning_messages.append(
                 "continuum_formula_out_of_domain_marked: "
-                "Stage 0 / non-pyrolysis path computed HKL flux below the "
-                "Bernoulli continuum threshold"
+                "flagged continuum extension computed outside the certified "
+                "continuum domain (kinetic t-1396/t-1397)"
             )
 
         return IntentResult(

@@ -2137,7 +2137,6 @@ class CondensationModel:
         self.regime_factor = 1.0
         self.knudsen_regime = KnudsenRegime.FREE_MOLECULAR
         self._knudsen_policy_configured = False
-        self._viscous_flow_required = True
         self.lab_geometry: LabGeometry | None = None
         self.pipe_segments = self._build_default_pipe_segments(
             float(wall_temperature_C))
@@ -2153,7 +2152,6 @@ class CondensationModel:
             'upstream_hot_wall_min_C': DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
         }
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
-        self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
         self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
         self.wall_temperature_input_refusals: dict[str, str] = {}
         self.last_transport_parameter_notice: dict[str, Any] = {}
@@ -2271,7 +2269,7 @@ class CondensationModel:
                 raise ValueError(
                     'overhead_pressure_mbar must be finite and non-negative'
                 )
-            _campaign_requires_viscous_flow(campaign_name)
+            _validate_knudsen_campaign(campaign_name)
         candidate_total_pressure_mbar = (
             float(overhead_pressure_mbar)
             if overhead_pressure_mbar is not None
@@ -2426,8 +2424,6 @@ class CondensationModel:
                 raise ValueError('overhead_pressure_mbar must be finite and non-negative')
             self.overhead_pressure_mbar = pressure_mbar
             self._knudsen_policy_configured = True
-            self._viscous_flow_required = _campaign_requires_viscous_flow(
-                campaign_name)
         if species_partial_pressures_mbar is not None:
             self.species_partial_pressures_mbar = {
                 str(species): float(partial_pressure)
@@ -3755,100 +3751,6 @@ class CondensationModel:
             ),
         )
 
-    def adjust_c2a_pressure_setpoint(
-        self,
-        *,
-        requested_p_total_mbar: float,
-        pO2_mbar: float,
-        gas_temperature_C: float,
-        pipe_diameter_m: float,
-        pN2_min_mbar: float,
-        pN2_max_mbar: float,
-        carrier_gas: str,
-        pressure_margin_fraction: float = 0.01,
-    ) -> dict[str, Any]:
-        """Repair a stranded C2A pressure setpoint or retain typed refusal."""
-
-        band_min = float(pN2_min_mbar)
-        band_max = float(pN2_max_mbar)
-        if (
-                not math.isfinite(band_min)
-                or not math.isfinite(band_max)
-                or band_min <= 0.0
-                or band_max < band_min
-        ):
-            raise ValueError('C2A pN2 operating band is empty or invalid')
-        current = knudsen_regime_diagnostic(
-            overhead_pressure_mbar=requested_p_total_mbar,
-            gas_temperature_C=gas_temperature_C,
-            pipe_diameter_m=pipe_diameter_m,
-            pipe_segments=self.pipe_segments,
-            carrier_gas=carrier_gas,
-        )
-        if current.get('regime') != KnudsenRegime.FREE_MOLECULAR.value:
-            prior = self.last_knudsen_pressure_adjustment
-            if (
-                    prior.get('status') == 'applied'
-                    and math.isclose(
-                        float(prior.get('applied_p_total_mbar', -1.0)),
-                        float(requested_p_total_mbar),
-                        rel_tol=0.0,
-                        abs_tol=1.0e-12,
-                    )
-            ):
-                return dict(prior)
-            self.last_knudsen_pressure_adjustment = {}
-            return {}
-
-        basis = minimum_pressure_mbar_for_knudsen(
-            gas_temperature_C=gas_temperature_C,
-            pipe_diameter_m=pipe_diameter_m,
-            pipe_segments=self.pipe_segments,
-            carrier_gas=carrier_gas,
-        )
-        pO2 = max(0.0, float(pO2_mbar))
-        minimum_total_with_margin_mbar = (
-            float(basis['minimum_pressure_mbar'])
-            * (1.0 + float(pressure_margin_fraction))
-        )
-        applied_pN2_mbar = max(
-            band_min,
-            minimum_total_with_margin_mbar - pO2,
-        )
-        diagnostic = {
-            'status': 'applied',
-            'reason': 'c2a_knudsen_pressure_floor',
-            'requested_p_total_mbar': float(requested_p_total_mbar),
-            'requested_pN2_mbar': max(
-                0.0,
-                float(requested_p_total_mbar) - pO2,
-            ),
-            'pO2_mbar': pO2,
-            'physical_pN2_band_mbar': [
-                band_min,
-                band_max,
-            ],
-            'pressure_margin_fraction': float(pressure_margin_fraction),
-            **basis,
-        }
-        if applied_pN2_mbar > band_max:
-            diagnostic.update({
-                'status': 'warning',
-                'reason': 'c2a_knudsen_pressure_window_continuous_transport',
-                'required_pN2_mbar': applied_pN2_mbar,
-                'band_max_pN2_mbar': band_max,
-                'band_max_p_total_mbar': pO2 + band_max,
-            })
-            self.last_knudsen_pressure_adjustment = dict(diagnostic)
-            return diagnostic
-
-        diagnostic.update({
-            'applied_pN2_mbar': applied_pN2_mbar,
-            'applied_p_total_mbar': pO2 + applied_pN2_mbar,
-        })
-        self.last_knudsen_pressure_adjustment = dict(diagnostic)
-        return diagnostic
-
     def _current_knudsen_diagnostic(self) -> dict[str, Any]:
         diagnostic = knudsen_regime_diagnostic(
             overhead_pressure_mbar=self.overhead_pressure_mbar,
@@ -3862,18 +3764,7 @@ class CondensationModel:
         diagnostic['stage_area_geometry_provenance_notice'] = dict(
             self.stage_area_geometry_provenance_notice)
         if self._knudsen_policy_configured:
-            if not self._viscous_flow_required:
-                relaxed = dict(diagnostic)
-                relaxed['status'] = 'ok'
-                relaxed['reason'] = ''
-                relaxed['warnings'] = []
-                relaxed['viscous_flow_required'] = False
-                return relaxed
-            diagnostic['viscous_flow_required'] = True
-            if self.last_knudsen_pressure_adjustment:
-                diagnostic['pressure_adjustment'] = dict(
-                    self.last_knudsen_pressure_adjustment
-                )
+            diagnostic['viscous_flow_required'] = False
             return diagnostic
         unconfigured = dict(diagnostic)
         unconfigured['status'] = 'refused'
@@ -7164,7 +7055,7 @@ def minimum_pressure_mbar_for_knudsen(
     carrier_gas: str = DEFAULT_CARRIER_GAS,
     knudsen_ceiling: float = FREE_MOLECULAR_KNUDSEN_MIN,
 ) -> dict[str, Any]:
-    """Return the total-pressure floor set by the controlling pipe diameter."""
+    """Return the total-pressure diagnostic threshold for the selected Kn."""
 
     if not is_declared_real_scalar(
         gas_temperature_C,
@@ -7215,7 +7106,8 @@ def minimum_pressure_mbar_for_knudsen(
     collision = _carrier_collision_diameter_diagnostic(carrier_gas)
     collision_diameter_m = float(collision['carrier_collision_diameter_m'])
 
-    # Premise: the typed refusal starts at Kn=lambda/L >= Kn_ceiling.
+    # Premise: this reports the pressure where Kn=lambda/L reaches the
+    # selected diagnostic threshold; regime alone does not cause refusal.
     # Algebra: lambda=k_B*T/(sqrt(2)*pi*d^2*P), hence
     # P_min=k_B*T/(sqrt(2)*pi*d^2*L*Kn_ceiling). Unit check: (J/K*K)/m^3
     # = N/m^2 = Pa; /100 gives mbar. Sanity: hotter gas or a smaller pipe
@@ -7466,7 +7358,7 @@ def knudsen_regime_diagnostic(
         status = 'warning'
         reason = KNUDSEN_REFUSAL_REASON
         warnings.append(
-            'Knudsen number is outside viscous-flow validity; continuous '
+            'Free-molecular flow: continuous '
             'free-molecular surface transport applied.'
         )
     elif worst_regime is KnudsenRegime.TRANSITIONAL:
@@ -7531,23 +7423,18 @@ def _stage0_hot_wall_min_C_from_setpoints(
     return low
 
 
-def _campaign_requires_viscous_flow(campaign_name: str | None) -> bool:
+def _validate_knudsen_campaign(campaign_name: str | None) -> None:
     if campaign_name is None:
-        return True
+        return
     name = str(campaign_name)
     if not name:
-        return True
+        return
     known_campaigns = {phase.name for phase in CampaignPhase} | {
         'C0b_p_cleanup', 'C2A_continuous', 'C2A_staged', 'C3',
     }
     if name not in known_campaigns:
-        raise ValueError(f'unknown campaign for viscous-flow policy: {name!r}')
-    return name in {
-        'C2A',
-        'C2A_continuous',
-        'C2A_STAGED',
-        'C2A_staged',
-    }
+        raise ValueError(f'unknown campaign for transport diagnostic: {name!r}')
+
 
 
 def _pressure_isolated_capture_budget_kg(

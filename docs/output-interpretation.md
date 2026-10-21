@@ -47,7 +47,7 @@ The registry's accepted species per stage are: Stage 1 Fe condenser `Fe`; Stage 
 
 `shuttle_refusal_history` is an append-only list of C3 shuttle dispatches the S1b T-acceptance gate refused. Empty list means every step was thermodynamically accepted at its dispatch T. Each entry carries the engine's structured diagnostic: `reaction_family` (`C3_K` or `C3_NA`), `reagent`, `hour`, `campaign_hour`, `temperature_C`, plus `diagnostic.k_reduction_margin_kJ_per_mol_O2` and (for Na) `diagnostic.thermo_deltaG_kJ_per_mol_O2`.
 
-Per-step refusals leave the run `status` at `ok` or `partial`. Only whole-run halts (e.g. `KnudsenRegimeRefusal` for a viscous-flow violation) escalate to `status="refused"`.
+Per-step refusals leave the run `status` at `ok` or `partial`. Only whole-run halts (e.g. `KnudsenRegimeRefusal` for unusable transport inputs) escalate to `status="refused"`.
 
 Under JANAF-4th multiphase Ellingham (2026-07-09 re-ground):
 
@@ -59,8 +59,8 @@ Under JANAF-4th multiphase Ellingham (2026-07-09 re-ground):
 `run_metadata.knudsen_regime_diagnostic` reports the transport-regime check per pipe segment:
 
 - `status: "ok"`, `regime: "viscous"` — Kn < 0.01, sweep gas drives directional transport. Default operating condition for the 5–15 mbar pN₂ band.
-- `status: "warning"`, `regime: "transitional"` — Kn between 0.01 and 10; F3 still computes attenuated HKL flux (`regime_factor = Kn / (Kn + 0.01)`) but you are losing transport-directed condensation and the simulator's stage-yield numbers should be read as a lower bound (see [`docs/model-limitations.md`](model-limitations.md) on viscous-regime mass transfer).
-- `status: "refused"`, `regime: "free_molecular"` — Kn ≥ 10 on at least one segment; `KnudsenRegimeRefusal` escalates the run to `status="refused"`. Recipe is unrunnable at this pN₂; increase sweep gas pressure.
+- `status: "warning"`, `regime: "transitional"` — Kn between 0.01 and 10; evaporation uses a flagged continuum extension and wall deposition uses a continuity correction. These are model uncertainties, not recipe exclusions.
+- `status: "warning"`, `regime: "free_molecular"` — Kn ≥ 10; free-molecular surface transport is computed with uncertainty flags. Pressure is preserved. Only missing or unusable transport inputs refuse.
 
 ## Evaporation alpha
 
@@ -98,6 +98,6 @@ The 0.5.4 release added two earlier-warning diagnostic surfaces to every `HourSn
 
 - **`metal_projection_drift_kg`** (W8 / M2 closure) — per-species `ledger_kg - projection_kg` across two like-for-like domains that share `train.stages[*].collected_kg`: the condensation-train/chromium ledger versus the UI remainder after source-tracked metal is removed, and stage-routed metal-phase ledger products versus their source-tracked UI share. Metal-phase products with no stage destination, including C6 Si, are intentionally outside the audit. A residual above `1×10⁻⁹ kg` in either domain is reported; if both domains drift for one species, the larger absolute residual is retained so opposite signs cannot cancel. Empty dict means every audited stage-collection domain is aligned. Negative values surface projection-only stale state. Under the runner's strict result contract, any nonempty drift fails the run with `reason="metal_projection_drift"`; interactive consumers preserve it as a diagnostic only. The historical field name remains for compatibility. The global `mass_balance_error_pct` ≤5×10⁻¹² % gate remains hard in every mode.
 
-- **`knudsen_regime_summary`** (0.5.4.1 E3) — per-tick Knudsen-regime visibility from the latest condensation pass. Carries `status` (`ok` / `warning` / `refused`), `knudsen_number` (float), `knudsen_regime` (`viscous` / `transition` / `free_molecular`), `regime_factor` (F3 viscous-flow attenuation), and `warnings` (operator-facing strings when Kn approaches the boundary). Complements the F3 hard refusal at `Kn ≥ 10` with earlier-warning visibility so operators can lower ramp rates or adjust pN₂ sweep proactively. Empty dict on ticks that didn't trigger a condensation route.
+- **`knudsen_regime_summary`** (0.5.4.1 E3) — per-tick Knudsen-regime visibility from the latest condensation pass. Carries `status` (`ok` / `warning` / `refused`), `knudsen_number` (float), `knudsen_regime` (`viscous` / `transition` / `free_molecular`), `regime_factor` (F3 viscous-flow attenuation), and `warnings` (operator-facing strings when Kn approaches the boundary). Free-molecular flow at `Kn ≥ 10` is a warning with requested pressure preserved; only unusable or unconfigured transport inputs refuse. Operators can use the diagnostic to adjust ramp rates or pN₂ sweep as a design choice. Empty dict on ticks that didn't trigger a condensation route.
 
 Stage 0 foulant reports should be read as diagnostics. They group contaminant disposition into trapped gases, refractory carbon, and other mineral contaminants, with warning flags for contaminant impact; they do not claim additional cleaned-melt yield or alter the mol-native ledger handed to later melt chemistry.

@@ -34,7 +34,7 @@ Source: `data/setpoints.yaml` campaign key `campaigns.C0b_p_cleanup`.
 ### C2A_continuous — Continuous Adaptive pN₂ Ramp (Path A default)
 
 **Temperature**: 1050–1600 °C, adaptive ramp.  
-**Atmosphere**: recirculating pN₂ sweep (5–15 mbar total, 8–12 mbar optimal); Fe-granule sorbent holds pO₂ < 1×10⁻⁸ bar.  
+**Atmosphere**: recirculating pN₂ sweep (5–15 mbar total design default/margin, typically 8–12 mbar); the model computes the regime at the requested pressure. Fe-granule sorbent holds pO₂ < 1×10⁻⁸ bar.
 **Target species**: Na, K, Fe, SiO, CrO₂.  
 **Typical duration**: 18–28 h.  
 **Endpoint**: Na/K/Fe signals decay to <5 % peak; SiO signal reaches target a(SiO₂) reduction.
@@ -214,7 +214,9 @@ REE-enriched feedstocks (KREEP variants, targeted super-KREEP ore) yield proport
 
 **Alkali dose** (`Na_additive_kg`, default 12 kg): the yield-ceiling lever for the cool C3_NA shuttle. The shuttle cannot reduce more FeO than the additive dose permits (subject to the Na₂O solubility cap of ~10 wt% in the melt). Increasing the dose raises the Fe extraction ceiling; decreasing it leaves more residual FeO for C5. (`K_additive_kg` is accepted by the runner but ignored by the post-V1c shuttle gate, which refuses K→FeO at any practical melt T.)
 
-**pN₂ setpoint** (5–15 mbar band): controls viscous-flow regime and transport capacity. The transport limit for the hot-wall pipe at 8–12 mbar is 7–16 g/s SiO. Reducing pN₂ below ~5 mbar risks transitioning into the molecular-flow regime where directional sweep fails and cold-wall fouling increases sharply.
+**pN₂ setpoint** (5–15 mbar design default/margin): controls transport, dilution, and gas-film resistance. Requests outside this band are honoured; the model computes the regime and prices evaporation and deposition with uncertainty flags. The current pipe-capacity model remains Poiseuille-only (molecular conductance: kinetic t-1396).
+
+The C2A optimizer samples total pressure log-uniformly over 0.1–15 mbar: an **engineering search envelope (d-209); widen as needed**, owned by the recipe schema. This search choice does not restrict admission: requested total pressure must be finite, positive, and at least the environment's numerical floor, with partial-pressure coupling and declared pump/hardware admission retained. Campaign-specific physical pressure bounds, such as C0B's commanded oxygen, still apply.
 
 ## Diagnostic patterns
 

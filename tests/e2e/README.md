@@ -105,11 +105,11 @@ omitted here; full 252 KB body is in
 `test_run_does_not_stall.evidence.json.gz`):
 
 ```
-status:  refused
+status:  refused  # historical evidence before d-209; now predicts and flags
 reason:  viscous_p_bulk_transport_out_of_domain
 p_bulk_transport_domain: out_of_domain_transitional
 ledger_yields_authorized: false
-knudsen_number: 0.015438003503065829   (viscous needs Kn < 0.01)
+knudsen_number: 0.015438003503065829   (viscous classification: Kn < 0.01)
 overhead_pressure_mbar: 0.2            (UI default C4 pO2)
 pipe_diameter_m: 0.12
 gas_temperature_C: 1160
@@ -122,6 +122,9 @@ detail: transitional Kn uses viscous Poiseuille / Bernoulli P_bulk
         keeps the HKL upper-bound path; t-379 (0.7) supplies
         transitional/molecular conductance
 ```
+
+This historical refusal is superseded by d-209: the existing continuum extension
+now predicts and flags. Kinetic t-1396/t-1397/t-1398 track missing certified models.
 
 Operator-visible consequence: status bar reads
 `refused — viscous_p_bulk_transport_out_of_domain`, the product ledger stays

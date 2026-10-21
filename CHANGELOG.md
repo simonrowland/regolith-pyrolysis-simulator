@@ -44,8 +44,9 @@ post-batch morning review (HOLD, V2O5 P1 → fixed inline).
 - **E3** — `HourSnapshot.knudsen_regime_summary` field carrying per-tick
   Knudsen-regime visibility from the latest condensation route
   (`status` / `knudsen_number` / `knudsen_regime` / `regime_factor` /
-  `warnings`). Complements the F3 hard refusal at `Kn ≥ 10` with
-  earlier-warning visibility.
+  `warnings`). The earlier F3 hard-refusal description was superseded by
+  d-209: Kn is diagnostic, and transitional/free-molecular results carry
+  flagged approximations.
 
 ### Fixed — post-push review findings
 

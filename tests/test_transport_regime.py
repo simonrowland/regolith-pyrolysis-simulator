@@ -533,7 +533,7 @@ def test_continuum_transport_is_load_bearing_except_stage0_bakeout():
     )
 
 
-def test_assess_continuum_validity_marks_bakeout_and_refuses_pyrolysis():
+def test_assess_continuum_validity_marks_every_transitional_campaign():
     bakeout = tr.assess_continuum_formula_validity(
         0.1,
         campaign_name="C0",
@@ -559,11 +559,11 @@ def test_assess_continuum_validity_marks_bakeout_and_refuses_pyrolysis():
     assert bakeout.note["doctrine_category"] == 2
     assert bakeout.stage == "C0"
 
-    assert pyrolysis.action is tr.ContinuumValidityAction.REFUSE
-    assert pyrolysis.note["doctrine_category"] == 1
+    assert pyrolysis.action is tr.ContinuumValidityAction.MARK
+    assert pyrolysis.note["doctrine_category"] == 2
     assert pyrolysis.stage == "C4"
 
-    assert missing.action is tr.ContinuumValidityAction.REFUSE
+    assert missing.action is tr.ContinuumValidityAction.MARK
     assert missing.process_regime is tr.ProcessRegime.UNKNOWN
 
     assert viscous.action is tr.ContinuumValidityAction.OK
@@ -578,19 +578,13 @@ def test_refuse_continuum_formula_if_load_bearing_names_stage():
     )
     assert bakeout.action is tr.ContinuumValidityAction.MARK
 
-    with pytest.raises(tr.TransportRegimeRefusal) as exc_info:
-        tr.refuse_continuum_formula_if_load_bearing(
-            0.1,
-            campaign_name="C4",
-            asking_site="tests.pyrolysis_guard",
-        )
-    assert exc_info.value.category == "continuum_formula_out_of_domain"
-    assert exc_info.value.stage == "C4"
-    assert exc_info.value.asking_site == "tests.pyrolysis_guard"
-    assert exc_info.value.process_regime == (
-        tr.ProcessRegime.PYROLYSIS_EXTRACTION.value
+    pyrolysis = tr.refuse_continuum_formula_if_load_bearing(
+        0.1, campaign_name="C4", asking_site="tests.pyrolysis_guard",
     )
-    assert "stage=C4" in str(exc_info.value)
+    assert pyrolysis.action is tr.ContinuumValidityAction.MARK
+    assert pyrolysis.stage == "C4"
+    assert pyrolysis.load_bearing is True
+    assert pyrolysis.note["doctrine_category"] == 2
 
 
 def test_kr_epsilon_over_k_exact_anchor():

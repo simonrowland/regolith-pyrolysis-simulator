@@ -12,12 +12,17 @@ from types import MappingProxyType
 from typing import Any, Literal, Mapping, Sequence
 import warnings
 
-from simulator.config import DEFAULT_DATA_DIR
+from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.chemistry.kernel.config import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
 )
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+from simulator.environment import (
+    DEFAULT_VACUUM_FLOOR_BAR,
+    feedstock_body,
+    numerical_pressure_floor_bar_for_body,
+)
 from simulator.canonical import canonical_json_dumps
 from simulator.state import CondensationTrain
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -425,6 +430,7 @@ class KnobSpec:
     choices: tuple[str, ...] | None = None
     units: str = ""
     bounds_source: str = ""
+    admission: Literal["bounds", "total_pressure", "partial_pressure"] = "bounds"
     search_enabled: bool = True
     runtime_enabled: bool = True
     scale: Literal["linear", "log", "log10", "ordinal", "zero-inflated"] = "linear"
@@ -441,6 +447,7 @@ def _knob(
     choices: tuple[str, ...] | None = None,
     units: str = "",
     bounds_source: str,
+    admission: Literal["bounds", "total_pressure", "partial_pressure"] = "bounds",
     search_enabled: bool = True,
     runtime_enabled: bool = True,
     scale: Literal["linear", "log", "log10", "ordinal", "zero-inflated"] = "linear",
@@ -455,11 +462,31 @@ def _knob(
         choices=choices,
         units=units,
         bounds_source=bounds_source,
+        admission=admission,
         search_enabled=search_enabled,
         runtime_enabled=runtime_enabled,
         scale=scale,
         guard=guard,
         _bound_types=_bound_types,
+    )
+
+
+C2A_PRESSURE_SEARCH_BOUNDS_MBAR = (0.1, 15.0)
+C2A_PRESSURE_SEARCH_SOURCE = (
+    "engineering_envelope: engineering search envelope (d-209); widen as needed"
+)
+
+
+def _c2a_total_pressure_knob(path: str) -> KnobSpec:
+    # Sampling bounds are a finite search choice, independent of admission.
+    return _knob(
+        path,
+        low=C2A_PRESSURE_SEARCH_BOUNDS_MBAR[0],
+        high=C2A_PRESSURE_SEARCH_BOUNDS_MBAR[1],
+        units="mbar",
+        bounds_source=C2A_PRESSURE_SEARCH_SOURCE,
+        admission="total_pressure",
+        scale="log",
     )
 
 
@@ -469,20 +496,13 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
         _knob(
             f"{prefix}.pO2_mbar",
             low=0.0,
-            high=15.0,
+            high=C2A_PRESSURE_SEARCH_BOUNDS_MBAR[1],
             units="mbar",
-            bounds_source=(
-                "engineering_envelope: per-stage pO2 lever for future "
-                "Atmosphere.CONTROLLED_O2 C2A_staged execution; bounded to "
-                "the 5-15 mbar gas-cover band for this optimizer slice"
-            ),
+            bounds_source=C2A_PRESSURE_SEARCH_SOURCE,
+            admission="partial_pressure",
         ),
-        _knob(
+        _c2a_total_pressure_knob(
             f"{prefix}.p_total_mbar",
-            units="mbar",
-            bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
-            scale="log",
-            _bound_types=(float, float),
         ),
         _knob(
             f"{prefix}.gas_cover_mode",
@@ -711,17 +731,11 @@ class RecipeSchema:
             bounds_source="setpoints:campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
             search_enabled=False,
         ),
-        _knob(
+        _c2a_total_pressure_knob(
             "campaigns.C2A_continuous.p_total_mbar",
-            units="mbar",
-            bounds_source="setpoints:campaigns.C2A_continuous.p_total_mbar",
-            scale="log",
         ),
-        _knob(
+        _c2a_total_pressure_knob(
             "campaigns.C2A_continuous.p_total_mbar_default",
-            units="mbar",
-            bounds_source="setpoints:campaigns.C2A_continuous.p_total_mbar",
-            scale="log",
         ),
         _knob(
             "campaigns.C2A_continuous.duration_hr",
@@ -757,17 +771,11 @@ class RecipeSchema:
             units="C",
             bounds_source="setpoints:campaigns.C2A_staged.temp_range_C",
         ),
-        _knob(
+        _c2a_total_pressure_knob(
             "campaigns.C2A_staged.p_total_mbar",
-            units="mbar",
-            bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
-            scale="log",
         ),
-        _knob(
+        _c2a_total_pressure_knob(
             "campaigns.C2A_staged.p_total_mbar_default",
-            units="mbar",
-            bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
-            scale="log",
         ),
         _knob(
             "campaigns.C2A_staged.depletion_flux_decay_fraction",
@@ -1373,7 +1381,13 @@ class RecipeSchema:
         recipe_schema_version: str | None = None,
         allowlist_version: str | None = None,
         pinned_paths: Sequence[str | KeyPath] | None = None,
+        vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
     ) -> None:
+        if not math.isfinite(vacuum_floor_bar) or vacuum_floor_bar <= 0.0:
+            raise ValueError("vacuum_floor_bar must be finite and positive")
+        # bar -> mbar; this admission floor never changes sampling bounds.
+        self.vacuum_floor_bar = vacuum_floor_bar
+        self.pressure_floor_mbar = vacuum_floor_bar / 1.0e-3
         self.setpoints = (
             _default_setpoints() if setpoints is None else setpoints
         )
@@ -1440,7 +1454,19 @@ class RecipeSchema:
             recipe_schema_version=self.recipe_schema_version,
             allowlist_version=self.allowlist_version,
             pinned_paths=pinned_paths,
+            vacuum_floor_bar=self.vacuum_floor_bar,
         )
+
+    def for_feedstock(self, feedstock_id: str) -> "RecipeSchema":
+        """Bind physical admission to the run environment, preserving search bounds."""
+        feedstock = load_config_bundle(DEFAULT_DATA_DIR).feedstocks.get(feedstock_id, {})
+        floor_bar = numerical_pressure_floor_bar_for_body(feedstock_body(feedstock))
+        if floor_bar == self.vacuum_floor_bar:
+            return self
+        contextual = copy.copy(self)
+        contextual.vacuum_floor_bar = floor_bar
+        contextual.pressure_floor_mbar = floor_bar / 1.0e-3
+        return contextual
 
     def spec_for(self, path: KeyPath) -> KnobSpec:
         normalized = _normalize_key_path(path)
@@ -2811,7 +2837,7 @@ def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:
     if spec.kind == "int":
         if isinstance(value, bool) or not isinstance(value, int):
             raise RecipeValidationError(f"{_format_path(spec.path)} requires int value")
-        _validate_numeric_bounds(spec, float(value))
+        _validate_numeric_bounds(schema, spec, float(value))
         return
     if spec.kind == "float":
         if spec.path == O2_BUBBLER_TARGET_FO2_LOG_PATH and value is None:
@@ -2831,7 +2857,7 @@ def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:
                     f"{_format_path(spec.path)} range low exceeds high"
                 )
             for item in numeric_values:
-                _validate_numeric_bounds(spec, item)
+                _validate_numeric_bounds(schema, spec, item)
             return
         numeric_value = _coerce_float(spec, value)
         if (
@@ -2839,7 +2865,7 @@ def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:
             and 0.0 <= numeric_value < C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR
         ):
             return
-        _validate_numeric_bounds(spec, numeric_value)
+        _validate_numeric_bounds(schema, spec, numeric_value)
         return
     raise RecipeValidationError(f"{_format_path(spec.path)} has unknown kind")
 
@@ -2855,7 +2881,14 @@ def _coerce_float(spec: KnobSpec, value: Any) -> float:
     return result
 
 
-def _validate_numeric_bounds(spec: KnobSpec, value: float) -> None:
+def _validate_numeric_bounds(schema: RecipeSchema, spec: KnobSpec, value: float) -> None:
+    if spec.admission != "bounds":
+        floor = schema.pressure_floor_mbar if spec.admission == "total_pressure" else 0.0
+        if value < floor:
+            raise RecipeValidationError(
+                f"{_format_path(spec.path)} value {value!r} below physical pressure floor {floor!r}"
+            )
+        return
     if spec.low is not None and value < spec.low:
         raise RecipeValidationError(
             f"{_format_path(spec.path)} value {value!r} below lower bound {spec.low!r}"

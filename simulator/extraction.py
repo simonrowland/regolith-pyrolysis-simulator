@@ -3721,13 +3721,8 @@ class ExtractionMixin:
                 raise evaporation_flux_refusal_from_configuration_error(
                     exc
                 ) from exc
-            # Kn-domain validity for viscous P_bulk applies here too: the
-            # C7 0.01–0.1 mbar shell-route band sits above VISCOUS_KNUDSEN_MAX
-            # at typical hold T / D, so the same transport-model validity
-            # C7-specific diagnostic-limited policy suppresses
-            # ledger-authoritative extent. The authoritative EVAPORATION_FLUX
-            # provider refuses this state. Not a Kn safety/coating gate;
-            # t-379 (0.7) lifts the missing-model restriction.
+            # d-209: retain the finite HKL upper bound with the shared
+            # transport-domain flag (kinetic t-1396/t-1397).
         else:
             try:
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(
@@ -3756,7 +3751,7 @@ class ExtractionMixin:
         )
         flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
         if continuum_validity_refuses(domain_diag):
-            # C7-specific diagnostic-limited suppression; not provider parity.
+            # Suppression is reserved for unusable transport inputs.
             flux_kg_s_m2 = 0.0
         ca_transport_mol = (
             flux_kg_s_m2
