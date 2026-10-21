@@ -6231,9 +6231,13 @@ def lineage_parents_from_source(
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
     """Source-stated lineage as (parents, prose), without inventing pointers.
 
-    Unqualified prose is returned separately for queueing. Namespaced
-    references are kept for store validation, which checks them against the
-    observation's Work assets and observation ids.
+    Every well-formed string is a parent. A local observation id is qualified
+    with ``source_id::``. A printed citation or other unresolved text is kept
+    verbatim: prefixing it would mint an id the source did not write.
+    Validation then raises referential_integrity (d-053: flagged, not
+    discarded). ``prose`` is that printed subset, not a second destination.
+    A caller that cannot keep the derivation still retains the text from
+    ``prose``; a caller that stores the parent must not queue it again.
     """
 
     raw = values.get("derived_from")
@@ -6265,6 +6269,8 @@ def lineage_parents_from_source(
             # the store validator checks them against registered assets.
             parents.append(item)
         else:
+            # Printed text is lineage. Do not mint ``source_id::`` around it.
+            parents.append(item)
             prose.append(item)
     return tuple(parents), tuple(prose)
 
@@ -13815,6 +13821,8 @@ class Migrator:
                     source_derivation, inputs=derivation_parents
                 )
             elif source_derivation.raw_inputs is None:
+                # No input was stated. An unresolved printed input is a parent
+                # and must not be cleared here.
                 source_derivation = None
             # Invalid declarations stay attached for validate_corpus to report.
             if not derived_prose:
@@ -14539,7 +14547,12 @@ class Migrator:
                     value_derivation,
                     relation=f"{value_derivation.relation}; {phase_provenance}",
                 )
+        stored_lineage = set(derived_from or ())
+        if value_derivation is not None:
+            stored_lineage.update(value_derivation.inputs)
         for prose_item in derived_prose:
+            if prose_item in stored_lineage:
+                continue
             self.result.add_queue(
                 work.work_id,
                 locator,
