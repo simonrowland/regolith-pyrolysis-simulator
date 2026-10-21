@@ -22,6 +22,13 @@ def _assert_table_pins(document):
         "diopsidic_delta_S_cal_mol": "6.7±2",
     }
     assert rows[1]["diopsidic_delta_S_cal_mol"] == "17.0¹"
+    assert table["values"]["compositions_as_printed"]["basalt_like_wt_percent"] == {
+        "SiO2": "55.3",
+        "Al2O3": "20.2",
+        "MgO": "15.3",
+        "CaO": "9.3",
+    }
+    assert table["values"]["compositions_as_printed"]["note"] == "MgO substituted for FeO; MinerU page 1 transcription."
     figures = next(item for item in context if item["observation_id"].endswith("figures_1_2"))
     assert len(figures["values"]["figures"]) == 2
     assert all(item["digitisation"] == "deferred to a figure pass" for item in figures["values"]["figures"])
@@ -37,5 +44,14 @@ def test_colson_keedy_table_cell_mutation_fails_render_pin():
     mutated = deepcopy(document)
     table = next(item for item in mutated["species"]["Cr"]["context"] if item["observation_id"].endswith("table1_redox_reaction_thermodynamics"))
     table["values"]["rows"][0]["basalt_like_delta_H_kcal_mol"] = "34.6±13"
+    with pytest.raises(AssertionError):
+        _assert_table_pins(mutated)
+
+
+def test_colson_keedy_composition_mutation_fails_context_pin():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    mutated = deepcopy(document)
+    table = next(item for item in mutated["species"]["Cr"]["context"] if item["observation_id"].endswith("table1_redox_reaction_thermodynamics"))
+    table["values"]["compositions_as_printed"]["basalt_like_wt_percent"]["SiO2"] = "55.4"
     with pytest.raises(AssertionError):
         _assert_table_pins(mutated)
