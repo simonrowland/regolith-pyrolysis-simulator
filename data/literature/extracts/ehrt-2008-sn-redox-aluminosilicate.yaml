@@ -388,7 +388,8 @@ species:
                   locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '6'}
                 total_pressure_Pa:
                   state: {tag: value, value: '100000'}
-                  locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '6'}
+                  as_printed: 1000 mbar
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Conclusions}
                 composition:
                   state:
                     tag: value
@@ -409,9 +410,6 @@ species:
               point_conditions:
                 atmosphere:
                   state: {tag: value, value: argon}
-                  locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '6'}
-                total_pressure_Pa:
-                  state: {tag: value, value: '100000'}
                   locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '6'}
                 composition:
                   state:

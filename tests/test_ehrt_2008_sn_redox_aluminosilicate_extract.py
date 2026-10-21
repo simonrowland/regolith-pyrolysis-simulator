@@ -66,12 +66,19 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     _assert_render_pins(document)
     _assert_density_render_pins(document)
+    fig6_as_source = next(
+        observation
+        for observation in document["species"]["Sn"]["observations"]
+        if observation["observation_id"] == "ehrt2008_redox_fraction_as_1000_ppmw_fig6"
+    )
+    assert fig6_as_source["values"]["points"][0]["point_conditions"]["total_pressure_Pa"]["as_printed"] == "1000 mbar"
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     assert migrator.result.validation is not None
     assert not migrator.result.validation.hard_issues
     observations = list(migrator.result.observations.values())
+    assert len(observations) == 13
     redox_observations = [
         observation for observation in observations
         if "redox_fraction" in observation.observation_id
@@ -100,7 +107,11 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
         ("1773.15", "0.40"): abs_composition,
     }
     expected_pressure = {
-        key: (10000 if key == ("1773.15", "0.40") else 100000)
+        key: (
+            None
+            if key == ("2273.15", "1.00")
+            else 10000 if key == ("1773.15", "0.40") else 100000
+        )
         for key in expected_composition
     }
     for observation in redox_observations:
@@ -121,9 +132,14 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
             assert components == as_composition
         else:
             assert components == expected_composition[identity]
-        assert observation.identity.total_pressure_Pa is not None
-        assert observation.identity.total_pressure_Pa.is_value
-        assert observation.identity.total_pressure_Pa.value == expected_pressure[identity]
+        expected_pressure_value = expected_pressure[identity]
+        if expected_pressure_value is None:
+            assert observation.identity.total_pressure_Pa.tag.value == "unknown"
+            assert observation.identity.total_pressure_Pa.value is None
+        else:
+            assert observation.identity.total_pressure_Pa is not None
+            assert observation.identity.total_pressure_Pa.is_value
+            assert observation.identity.total_pressure_Pa.value == expected_pressure_value
         assert not observation.notices
     fig6_as = [
         observation
@@ -140,6 +156,15 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
         assert str(observation.value.point) == "1.00"
         assert observation.point_conditions["atmosphere"].state.value == "argon"
         assert dict(observation.identity.composition.value.components) == as_composition
+    conclusion_pressure = next(
+        observation
+        for observation in fig6_as
+        if str(observation.identity.temperature_K.value) == "2173.15"
+    ).point_conditions["total_pressure_Pa"]
+    assert str(conclusion_pressure.state.value) == "100000"
+    assert conclusion_pressure.locator.page == 5
+    assert conclusion_pressure.locator.published_page == 72
+    assert conclusion_pressure.locator.section == "Conclusions"
     abs_only_sn2 = [
         observation
         for observation in redox_observations
