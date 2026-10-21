@@ -111,6 +111,66 @@ def test_table_1_fun2_residues_migrate_to_the_fun2_experiment() -> None:
     assert not migrator.result.validation.hard_issues
 
 
+def test_table_1_residue_uncertainties_migrate_from_each_printed_sigma(
+    tmp_path: Path,
+) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    series = next(
+        observation["values"]["series"]
+        for observation in document["species"]["SiO2"]["observations"]
+        if observation["observation_id"]
+        == "mendybaev_2013_table1_fun1_residue_composition_series"
+    )
+    fun1_mgo = next(row for row in series if row["run_id"] == "FUN1-3")
+    fun2_series = next(
+        observation["values"]["series"]
+        for species in document["species"].values()
+        for observation in species["observations"]
+        if observation.get("observation_id")
+        == "mendybaev_2013_table1_fun2_residue_composition_series"
+    )
+    fun2_cao = next(
+        row
+        for row in fun2_series
+        if row["run_id"] == "FUN2-10" and "CaO_wt_pct" in row
+    )
+
+    def migrated(path: Path):
+        migrator = Migrator(root=ROOT, index={}, aliases={})
+        migrator._migrate_extract(path)
+        migrator.finalize()
+        assert len(migrator.result.observations) == 96
+        assert not migrator.result.validation.hard_issues
+        for observation in migrator.result.observations.values():
+            assert observation.identity.temperature_K.value == Decimal("2173.15")
+            elapsed = observation.point_conditions["time_min"]
+            assert elapsed.state.is_value
+            assert elapsed.locator is not None
+        return migrator
+
+    def residue_uncertainty(migrator: Migrator, row: str, formula: str) -> str:
+        observation = next(
+            item
+            for item in migrator.result.observations.values()
+            if item.locator.note == f"row={row}"
+            and item.identity.species.formula == formula
+        )
+        assert observation.uncertainty.kind.value == "printed"
+        return observation.uncertainty.verbatim["sigma"]
+
+    original = migrated(EXTRACT)
+    assert residue_uncertainty(original, "FUN1-3", "MgO") == "0.31"
+    assert residue_uncertainty(original, "FUN2-10", "CaO") == "0.10"
+
+    fun1_mgo["sigma"] = "0.99"
+    fun2_cao["sigma"] = "0.77"
+    mutated_extract = tmp_path / EXTRACT.name
+    mutated_extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    mutated = migrated(mutated_extract)
+    assert residue_uncertainty(mutated, "FUN1-3", "MgO") == "0.99"
+    assert residue_uncertainty(mutated, "FUN2-10", "CaO") == "0.77"
+
+
 def test_all_deferred_figure_records_have_separate_captions() -> None:
     extract = yaml.safe_load(EXTRACT.read_text())
     figures = [
