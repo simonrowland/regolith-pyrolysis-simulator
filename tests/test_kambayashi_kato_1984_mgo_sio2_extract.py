@@ -134,6 +134,34 @@ def test_tables_match_rendered_rows_and_migrate_all_typed_values_as_points() -> 
     assert point_composition.state.value.as_map() == composition
     assert point_composition.locator is not None
 
+    x_0220_rows = [
+        row
+        for body in document["species"].values()
+        for row in body["observations"]
+        if row["values"].get("composition_mole_fraction", {}).get("SiO2") == "0.220"
+    ]
+    assert len(x_0220_rows) == 4
+    for row in x_0220_rows:
+        assert row["values"]["phase_assemblage_as_printed"] == "MgO(s) + Mg2SiO4(s)"
+        migrated = migrator.result.observations[f"{EXTRACT.stem}::{row['observation_id']}"]
+        phase = migrated.point_conditions["phase_assemblage"]
+        assert phase.state.value == "MgO(s) + Mg2SiO4(s)"
+        assert phase.locator is not None
+
+    x_0220_context_rows = [
+        row
+        for body in document["species"].values()
+        for context in body["context"]
+        for row in context.get("values", {}).get("rows", [])
+        if row.get("x_SiO2_as_printed") == "0.220"
+        and "phase_assemblage_as_printed" in row
+    ]
+    assert len(x_0220_context_rows) == 2
+    assert all(
+        row["phase_assemblage_as_printed"] == "MgO(s) + Mg2SiO4(s)"
+        for row in x_0220_context_rows
+    )
+
 
 def test_figure_values_are_deferred_and_table2_blank_cell_stays_blank() -> None:
     document = _document()

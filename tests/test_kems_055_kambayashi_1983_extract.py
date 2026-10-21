@@ -68,6 +68,20 @@ def test_extract_covers_table_values_and_migrates_every_typed_row_as_a_point() -
         f"{EXTRACT.stem}::kambayashi_1983_table2_mgo_activity_03"
     ].value.point == TABLE2_MGO_ACTIVITY_03
 
+    x_0220_rows = [
+        row
+        for body in document["species"].values()
+        for row in body["observations"]
+        if row["values"].get("composition_mole_fraction", {}).get("SiO2") == "0.220"
+    ]
+    assert len(x_0220_rows) == 2
+    for row in x_0220_rows:
+        assert row["values"]["phase_assemblage_as_printed"] == "MgO(s) + Mg2SiO4(s)"
+        migrated = migrator.result.observations[f"{EXTRACT.stem}::{row['observation_id']}"]
+        phase = migrated.point_conditions["phase_assemblage"]
+        assert phase.state.value == "MgO(s) + Mg2SiO4(s)"
+        assert phase.locator is not None
+
 
 def test_table1_ratio_and_table2_activity_rows_are_complete() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
