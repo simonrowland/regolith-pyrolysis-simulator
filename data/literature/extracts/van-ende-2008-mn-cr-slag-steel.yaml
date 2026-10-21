@@ -25,6 +25,27 @@ species:
   SiO2:
     observations: []
     context:
+      - observation_id: van_ende_2008_equations_2_9_standard_reaction_free_energies
+        type: thermodynamic_equations
+        locator: {page: 2, pdf_page_index: 1, published_page: '1332'}
+        units: (J/mol)
+        values:
+          method_class: quoted_attributed
+          quantity_as_printed: standard reaction free-energy expressions for reactions (1) and (8)
+          reactions:
+            - reaction_number: '1'
+              equation_number: '2'
+              reaction_as_printed: 'Mn(l) + O_Fe = MnO(l)'
+              delta_G0_as_printed: '−229 589 + 63.74 T'
+              citations: '27–29'
+            - reaction_number: '8'
+              equation_number: '9'
+              reaction_as_printed: 'Cr(s) + 3/2 O_Fe = CrO1.5(s)'
+              delta_G0_as_printed: '−379 345 + 119.32 T'
+              citations: '34, 35'
+          note: >-
+            Expressions are retained as printed context; no value is evaluated at a
+            selected temperature and no species formation free energy is emitted.
       - observation_id: van_ende_2008_table_1_steel_interaction_coefficients
         type: composition
         locator: {page: 2, pdf_page_index: 1, published_page: '1332', table: '1'}

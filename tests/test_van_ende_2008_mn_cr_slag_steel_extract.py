@@ -16,6 +16,30 @@ EXTRACT = ROOT / "data/literature/extracts/van-ende-2008-mn-cr-slag-steel.yaml"
 def test_van_ende_tables_preserve_rendered_rows_and_figures_stay_deferred() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     contexts = document["species"]["SiO2"]["context"]
+    equations = next(
+        row
+        for row in contexts
+        if row["observation_id"] == "van_ende_2008_equations_2_9_standard_reaction_free_energies"
+    )
+    assert equations["locator"] == {"page": 2, "pdf_page_index": 1, "published_page": "1332"}
+    assert equations["units"] == "(J/mol)"
+    assert equations["values"]["reactions"] == [
+        {
+            "reaction_number": "1",
+            "equation_number": "2",
+            "reaction_as_printed": "Mn(l) + O_Fe = MnO(l)",
+            "delta_G0_as_printed": "−229 589 + 63.74 T",
+            "citations": "27–29",
+        },
+        {
+            "reaction_number": "8",
+            "equation_number": "9",
+            "reaction_as_printed": "Cr(s) + 3/2 O_Fe = CrO1.5(s)",
+            "delta_G0_as_printed": "−379 345 + 119.32 T",
+            "citations": "34, 35",
+        },
+    ]
+    assert "temperature" in equations["values"]["note"]
     tables = {row["locator"].get("table"): row for row in contexts if row["locator"].get("table")}
     table3 = list(csv.reader(StringIO(tables["3"]["values"]["printed_rows_csv"])))
     table4 = list(csv.reader(StringIO(tables["4"]["values"]["printed_rows_csv"])))
