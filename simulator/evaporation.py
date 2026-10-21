@@ -3347,7 +3347,7 @@ class EvaporationMixin:
         except (TypeError, ValueError):
             total_pressure_Pa = None
         try:
-            reported_activities = self._vapor_pressure_activity_operands(
+            reported_activities = EvaporationMixin._vapor_pressure_activity_operands(
                 equilibrium, vapor_pressure_diagnostic,
             )
             kernel_activities = vapor_pressure_diagnostic.get('activities')
@@ -3621,7 +3621,7 @@ class EvaporationMixin:
                     'vapor_pressure_numerator_provenance'
                 ) or {}
             ),
-            'vapor_pressure_activities': self._vapor_pressure_activity_operands(
+            'vapor_pressure_activities': EvaporationMixin._vapor_pressure_activity_operands(
                 equilibrium, vapor_pressure_diagnostic,
             ),
             'pO2_bar': vapor_pressure_diagnostic.get('pO2_bar'),

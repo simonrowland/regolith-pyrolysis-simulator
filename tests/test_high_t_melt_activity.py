@@ -448,6 +448,39 @@ def test_refused_openimcc_at_1800_k_keeps_existing_fallback_notice(monkeypatch) 
     ))
     assert _physics(result)[:4] == _physics(legacy)[:4]
     assert high_t["selected_parent_activities"]["FeO"] == legacy.diagnostic["activities"]["Fe"]
+    provenance = high_t["selected_parent_activity_provenance"]
+    assert set(provenance) == set(high_t["selected_parent_activities"])
+    assert all(row["provider"] == "internal-analytical" for row in provenance.values())
+    assert provenance["FeO"]["authority"] == "kress91_ferrous"
+    assert provenance["FeO"]["reason"] == "openimcc_not_importable"
+    assert provenance["FeO"]["activity"] == high_t["selected_parent_activities"]["FeO"]
+
+
+@pytest.mark.parametrize("temperature_K", [1800.0, 2000.0])
+def test_selected_parent_activities_have_matching_mixed_provenance(temperature_K):
+    composition = _moles_from_wt(_projected_weights())
+    result = _provider().dispatch(_request(composition, temperature_K))
+    high_t = result.diagnostic["high_t_melt_activity"]
+    values = high_t["selected_parent_activities"]
+    provenance = high_t["selected_parent_activity_provenance"]
+
+    assert set(provenance) == set(values) == set(composition)
+    assert high_t["selected_parent_activities_provider"] == "mixed"
+    assert high_t["selected_parent_activities_standard_state"]["component_basis"] == "parent_oxide_formula"
+    for parent, value in values.items():
+        row = provenance[parent]
+        assert row["activity"] == value
+        assert row["component_basis"] == "parent_oxide_formula"
+        assert row["provider"] and row["authority"] and row["reason"]
+    assert provenance["SiO2"]["provider"] == "openimcc"
+    assert provenance["K2O"]["provider"] == "internal-analytical"
+    assert provenance["K2O"]["reason"] == "openimcc_authority_excluded"
+    for parent in ("Cr2O3", "MnO", "P2O5"):
+        assert provenance[parent]["provider"] == "internal-analytical"
+        assert provenance[parent]["reason"] == "outside_openimcc_activity_coverage"
+        assert values[parent] == melt_oxide_activity(
+            parent, composition, temperature_K=temperature_K,
+        ).thermodynamic_parent_activity()
 
 
 @pytest.mark.parametrize("temperatures_K", [
@@ -490,6 +523,12 @@ def test_activity_below_cap_does_not_seed_vapour_continuation(monkeypatch, tempe
     assert actual.diagnostic["high_t_melt_activity"]["certified_effective_gamma_by_parent"] == (
         baseline.diagnostic["high_t_melt_activity"]["certified_effective_gamma_by_parent"]
     )
+    high_t = actual.diagnostic["high_t_melt_activity"]
+    for parent, held in high_t.get("held_effective_gamma_by_parent", {}).items():
+        row = high_t["selected_parent_activity_provenance"][parent]
+        assert row["provider"] == "openimcc"
+        assert row["authority"] == held["method"]
+        assert row["activity"] == high_t["selected_parent_activities"][parent]
 
 
 @pytest.mark.parametrize("gap_K, hour_gap", [
@@ -1777,6 +1816,11 @@ def test_simulator_default_passes_openimcc_authority_into_flux_dispatch(
         liquid_fraction=1.0,
         fO2_log=sim.melt.fO2_log,
         activity_coefficients={},
+        diagnostics={
+            "activities_provider": "internal_analytical_equilibrium",
+            "activity_provenance": {"old_carrier": {}},
+            "backend_marker": "preserved",
+        },
     )
 
     sim._refresh_vapor_pressures_from_kernel(result)
@@ -1784,6 +1828,10 @@ def test_simulator_default_passes_openimcc_authority_into_flux_dispatch(
     assert sim._high_t_melt_activity == "openimcc"
     assert sim._last_high_t_melt_activity["provider"] == "openimcc"
     assert result.activity_coefficients == sim._last_high_t_melt_activity["selected_parent_activities"]
+    assert result.diagnostics["activities_provider"] == "mixed"
+    assert set(result.diagnostics["activity_provenance"]) == set(result.activity_coefficients)
+    assert result.diagnostics["activity_provenance"] == sim._last_high_t_melt_activity["selected_parent_activity_provenance"]
+    assert result.diagnostics["backend_marker"] == "preserved"
     assert "SiO2" in result.activity_coefficients
     assert sim._last_vapor_pressures_source
 

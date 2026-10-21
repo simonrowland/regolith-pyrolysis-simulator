@@ -10180,12 +10180,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 diagnostic['vapor_pressures_source'] = dict(
                     getattr(result, 'vapor_pressures_source', {}) or {}
                 )
-        kernel_activities = (
-            (diagnostic.get('high_t_melt_activity') or {}).get('selected_parent_activities')
-            or diagnostic.get('activities') or {}
-        )
+        high_t_activity = diagnostic.get('high_t_melt_activity') or {}
+        parent_activities = high_t_activity.get('selected_parent_activities')
+        kernel_activities = parent_activities or diagnostic.get('activities') or {}
         if kernel_activities:
             result.activity_coefficients = dict(kernel_activities)
+            if parent_activities:
+                result.diagnostics = {
+                    **(getattr(result, 'diagnostics', {}) or {}),
+                    'activities_provider': high_t_activity['selected_parent_activities_provider'],
+                    'activity_provenance': high_t_activity['selected_parent_activity_provenance'],
+                    'activities_standard_state': high_t_activity['selected_parent_activities_standard_state'],
+                }
         self._last_vapor_pressures_source = dict(
             getattr(result, 'vapor_pressures_source', {}) or {}
         )

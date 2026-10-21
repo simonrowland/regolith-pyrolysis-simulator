@@ -1628,6 +1628,7 @@ def _high_t_activity_for_parent(
                     f"{fallback_reason.get('code', 'openimcc_evaluation_refused')}"
                 ),
                 evidence_tier="PREDICT_AND_FLAG",
+                authority_status="openimcc_continuation",
             )
         fallback_warning = (
             "openimcc_refused_constant_gamma_fallback:"
@@ -4166,19 +4167,54 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         }
         if high_t_activity_authority is not None:
             selected_parent_activities = {}
+            selected_parent_provenance = {}
             for parent in melt_account_mol:
                 selected = _high_t_activity_for_parent(
                     parent, melt_account_mol, temperature_K=T_K,
                     authority=high_t_activity_authority,
                 )
                 if selected is not None:
+                    analytical_fe = (
+                        parent == "FeO"
+                        and not _high_t_fe_activity_selected(high_t_activity_authority)
+                    )
                     selected_parent_activities[parent] = (
                         below_cap_fe_activity
-                        if parent == "FeO" and not _high_t_fe_activity_selected(
-                            high_t_activity_authority,
-                        ) else selected.thermodynamic_parent_activity()
+                        if analytical_fe else selected.thermodynamic_parent_activity()
                     )
+                    from_openimcc = selected.authority_status in {
+                        "openimcc", "openimcc_continuation",
+                    }
+                    reason = selected.warning or selected.authority_status
+                    if analytical_fe:
+                        reason = (
+                            (high_t_activity_authority.get("fallback_reason") or {}).get("code")
+                            or "openimcc_fe_activity_unavailable"
+                        )
+                    elif parent in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS:
+                        reason = "openimcc_authority_excluded"
+                    elif parent not in _HIGH_T_FLUX_OXIDES:
+                        reason = "outside_openimcc_activity_coverage"
+                    selected_parent_provenance[parent] = {
+                        "provider": "openimcc" if from_openimcc else "internal-analytical",
+                        "authority": (
+                            below_cap_fe_activity_basis if analytical_fe
+                            else selected.activity_model
+                        ),
+                        "reason": reason,
+                        "activity": selected_parent_activities[parent],
+                        "component_basis": "parent_oxide_formula",
+                    }
             high_t_activity_authority["selected_parent_activities"] = selected_parent_activities
+            high_t_activity_authority["selected_parent_activity_provenance"] = selected_parent_provenance
+            providers = {row["provider"] for row in selected_parent_provenance.values()}
+            high_t_activity_authority["selected_parent_activities_provider"] = (
+                "mixed" if len(providers) > 1 else next(iter(providers), None)
+            )
+            high_t_activity_authority["selected_parent_activities_standard_state"] = {
+                **diagnostic["activities_standard_state"],
+                "component_basis": "parent_oxide_formula",
+            }
             diagnostic["high_t_melt_activity"] = dict(
                 high_t_activity_authority
             )
