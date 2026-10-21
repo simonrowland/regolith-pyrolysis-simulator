@@ -6356,15 +6356,25 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
         d066_source
     )
     # d-071 reuses the version string 1.0.4-d066-v2 at ccabd0b. The alias
-    # maps only to the SF04 workbook. Shornikov 2017, Darken & Gurry 1946
-    # and Masson 1965 are not store ids, and the invalid FeO(l)
-    # independent_check is not an extra ancestor.
+    # maps only to the SF04 workbook. The v3 row DOIs are not ancestors of
+    # this pack alias.
     d066_v2_source = openimcc_pack_coefficient_sources("1.0.4-d066-v2")
     assert d066_v2_source == ("openimcc-v1.0.4-d066-v2",)
     assert expand_coefficient_sources(d066_v2_source) == (
         "sf04-magma-companion-workbook",
     )
     assert lineage_complete_for(d066_v2_source) is True
+    # d-008 default at ec31045. Same SF04 ancestor. The Shornikov 2017 store
+    # id is not in this tree, so it is not added to the expansion.
+    d066_v3_source = openimcc_pack_coefficient_sources("1.0.5-d066-v3")
+    assert d066_v3_source == ("openimcc-v1.0.5-d066-v3",)
+    assert expand_coefficient_sources(d066_v3_source) == (
+        "sf04-magma-companion-workbook",
+    )
+    assert "shornikov-2017-spinel-thermodynamics" not in expand_coefficient_sources(
+        d066_v3_source
+    )
+    assert lineage_complete_for(d066_v3_source) is True
 
 
 @pytest.mark.parametrize(

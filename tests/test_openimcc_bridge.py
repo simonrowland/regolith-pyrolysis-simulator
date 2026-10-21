@@ -1003,7 +1003,8 @@ def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
     # through openimcc 1942696. 249fde5 (Shornikov 2017 MgAl2O4 fusion)
     # is the first step; 100df4f (FeO(l) Darken-Gurry/Masson re-anchor)
     # is the second. ccabd0b rewrites the version string and does not
-    # move the activities. Both corrections stabilise competing
+    # move the activities. ec31045 keeps them: a direct call is rel 0
+    # against these anchors. Both corrections stabilise competing
     # associates, so free alkali oxide rises. The rel 1e-2 band is the
     # anchor tolerance, not the size of the move.
     expected = {
@@ -1362,3 +1363,28 @@ def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:
 
     assert result.pack_model_id == expected_pack.model_id
     assert result.pack_digest == openimcc_bridge._pack_digest(expected_pack)
+
+
+def test_d066_v3_mgal2o4_source_ref_is_shornikov_2017() -> None:
+    """The fusion row names Shornikov 2017 by DOI, not by a store id.
+
+    openimcc ec31045 records per-row source_refs. MgAl2O4 cites FC87 and
+    Shornikov 2017, DOI 10.1134/S0036024417020303. The t-1372 store id
+    shornikov-2017-spinel-thermodynamics is not in the literature store on
+    this base. The pack alias therefore stays the SF04 workbook. The loader
+    does not apply source_refs to the numerical coefficients.
+    """
+
+    _openimcc_or_skip()
+    from importlib import resources
+
+    pack_path = resources.files("openimcc").joinpath(
+        "data", "packs", "imcc-sf04-d066-v3.json"
+    )
+    content = json.loads(pack_path.read_text(encoding="utf-8"))
+    row = next(item for item in content["rows"] if item["complex"] == "MgAl2O4")
+    assert row["source_refs"] == ["FC87", "Shornikov2017"]
+    assert content["sources"]["Shornikov2017"]["doi"] == (
+        "10.1134/S0036024417020303"
+    )
+    assert content["imcc_sf04_datapack_version"] == "1.0.5-d066-v3"
