@@ -172,9 +172,9 @@ species:
           quantity_as_printed: chromium dependence of oxygen activity coefficient in liquid Ni-Cr and Co-Cr alloys
           candidate_quantity_tokens: [activity_coefficient]
           equations_as_printed:
-            - 'Ni-Cr-O: log fO(Ni) = 11.96 NCr - 15.73 NCr²'
+            - 'Ni-Cr-O: log fO(Ni) = 11.96 NCr - 15.73 N_Cr^0.8'
             - 'Co-Cr-O: log fO(Co) = 0.45 NCr - 4.12 NCr^0.6'
-          condition_as_printed: '1600 °C; fit range through approximately 30 at% Cr for Ni-Cr and 30 at% Cr for Co-Cr'
+          condition_as_printed: '1600 °C; fit range N_Cr < 0.3'
           schema_gap: 'No activity-coefficient log-form token; equations remain model-derived context.'
       - observation_id: sakao_sano_1962_interaction_parameters
         type: relation
@@ -184,7 +184,7 @@ species:
           method_class: model_derived
           quantity_as_printed: approximate first interaction parameters at chromium below 5 wt%
           candidate_quantity_tokens: [activity_coefficient]
-          values_as_printed: 'epsilon_O(Ni) = -0.20; epsilon_O(Co) = -0.17; at 1600 °C'
+          values_as_printed: 'e_O(Ni)^Cr = -0.20; e_O(Co)^Cr = -0.17; at 1600 °C'
           note: These are interaction parameters, not activity coefficients or measured equilibrium points.
       - observation_id: sakao_sano_1962_figure1_phase_equilibrium
         type: figure_only
