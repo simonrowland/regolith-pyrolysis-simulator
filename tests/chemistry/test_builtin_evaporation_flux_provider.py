@@ -1439,6 +1439,17 @@ def test_provider_extrapolates_finite_continuum_without_fabricating_zero_flux():
     assert "Kn < 0.01" in notice["model_domain"]
     assert notice["gas_temperature_K"] == 2023.15
     series = result.diagnostic["evaporation_series_resistance"]["Na"]
+    # Pre-b1002 refactor pin: existing flagged provider continuation, captured
+    # at a4608882d. This pins a move, not experimental transport validity.
+    assert {
+        key: float(series[key]).hex()
+        for key in ("flux_kg_s_m2", "r_gas", "r_interface", "alpha_effective")
+    } == {
+        "flux_kg_s_m2": "0x1.122096874b16cp-6",
+        "r_gas": "0x1.eac4e836cdd50p+10",
+        "r_interface": "0x1.f5b6ad1ecb69ep+11",
+        "alpha_effective": "0x1.57d55e2abe65ep-2",
+    }
     assert series["r_gas"] > 0.0
     assert series["continuum_extrapolation_notice"] == notice
     assert any(
