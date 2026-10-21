@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -39,6 +39,53 @@ def test_table_1_fun1_3_residue_composition_and_conditions_migrate() -> None:
     )
     assert all(o.point_conditions["time_min"].state.value == Decimal("0") for o in row)
     assert not migrator.result.validation.hard_issues
+
+
+def test_bounded_identity_conditions_stay_on_mendybaev_points(tmp_path: Path) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    row = next(
+        observation
+        for observation in document["species"]["SiO2"]["observations"]
+        if observation["observation_id"]
+        == "mendybaev_2013_table1_fun1_residue_composition_series"
+    )
+    row["point_conditions"]["sample_mass_kg"] = {
+        "state": {
+            "tag": "value",
+            "value": {
+                "kind": "bound",
+                "bound_operator": "<=",
+                "bound_value": "0.0001",
+            },
+        },
+        "locator": {"table": "1", "row": "FUN1-3"},
+    }
+    extract = tmp_path / EXTRACT.name
+    extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    observations = tuple(migrator.result.observations.values())
+    row_points = [
+        observation
+        for observation in observations
+        if observation.locator.note == "row=FUN1-3"
+    ]
+    assert len(observations) == 96
+    assert len(row_points) == 4
+    for observation in row_points:
+        pressure = observation.point_conditions["total_pressure_Pa"]
+        mass = observation.point_conditions["sample_mass_kg"]
+        assert pressure.state.is_value
+        assert pressure.state.value.kind is ValueKind.BOUND
+        assert pressure.state.value.bound_operator == "<"
+        assert observation.identity.total_pressure_Pa.is_unknown
+        assert mass.state.is_value
+        assert mass.state.value.kind is ValueKind.BOUND
+        assert mass.state.value.bound_operator == "<="
+        assert observation.identity.sample_mass_kg.is_unknown
 
 
 def test_table_1_fun2_residues_migrate_to_the_fun2_experiment() -> None:

@@ -15272,7 +15272,17 @@ class Migrator:
                 for name in ("composition", "total_pressure_Pa", "sample_mass_kg"):
                     condition = point_conditions.get(name)
                     if isinstance(condition, Located):
-                        ident_kwargs[name] = condition.state
+                        state = condition.state
+                        if state.is_value:
+                            if name == "composition":
+                                if not isinstance(state.value, Composition):
+                                    continue
+                            else:
+                                try:
+                                    state = State.of(as_decimal(state.value))
+                                except (ArithmeticError, TypeError, ValueError):
+                                    continue
+                        ident_kwargs[name] = state
                 duration = point_conditions.get("duration_h")
                 if isinstance(duration, Located):
                     duration_state = duration.state
