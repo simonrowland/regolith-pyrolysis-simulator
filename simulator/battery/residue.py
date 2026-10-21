@@ -15,6 +15,7 @@ from typing import Any
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting.formulas import parse_formula
+from simulator.alpha_kinetics import _evaluate_extracted_arrhenius_alpha
 from simulator.battery.oxygen_balance import (
     _VacuumOxygenChannel,
     _net_evaporation_pressure_Pa,
@@ -1085,11 +1086,10 @@ def _mass_loss_sourced_alphas(
                     or energy < 0.0 or high < low
                 ):
                     raise ValueError("invalid alpha fit")
-                # Premise: alpha = gamma0 exp(-E/RT). E [J/mol] divided by
-                # R [J/(mol K)] * T [K] is dimensionless, as are gamma0 and
-                # alpha. Richter Fig. 3 gives Mg ~0.128 and SiO ~0.122 at
-                # 2073 K. Positive E makes alpha increase with T; no clamping.
-                alpha = prefactor * math.exp(-energy / (gas_constant * temperature_K))
+                alpha, _sigma = _evaluate_extracted_arrhenius_alpha({
+                    "gamma_o": prefactor, "E_J_per_mol": energy,
+                    "R_J_per_mol_K": gas_constant,
+                }, temperature_K)
                 if not math.isfinite(alpha) or not 0.0 < alpha <= 1.0:
                     raise ValueError("alpha outside physical interval")
             except (KeyError, TypeError, ValueError, OverflowError) as exc:
