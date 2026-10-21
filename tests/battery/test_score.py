@@ -6077,15 +6077,18 @@ def test_crystalline_sample_vapour_is_out_of_domain_for_a_liquid_engine() -> Non
 
 
 @pytest.mark.parametrize("engine", sorted(SINGLE_LIQUID_ENGINES, key=lambda e: e.value))
-def test_spinel_vapour_refusal_names_pending_fusion_data(engine: Engine) -> None:
+@pytest.mark.parametrize("compound", ("MgAl2O4", "BaO"))
+def test_crystalline_vapour_missing_fusion_detail_comes_from_reservoir(
+    engine: Engine, compound: str
+) -> None:
     experiment, reference = _vapour_over_sample_form("condensed_solid")
-    experiment = replace(
-        experiment,
-        experiment_id=(
-            "10.1134/s0036024418080253::experiment::shornikov_2018_mo_cell_kems"
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            reservoir=State.of(Species(compound, Phase.CR)),
         ),
     )
-    reference = replace(reference, experiment_id=experiment.experiment_id)
     residual, calls = _score_sample_phase_vapour(reference, experiment, engine)
 
     assert calls == []
@@ -6098,9 +6101,7 @@ def test_spinel_vapour_refusal_names_pending_fusion_data(engine: Engine) -> None
         "quantity": "p_partial",
         "fusion_data": {
             "status": "not_available_to_simulator",
-            "compound": "MgAl2O4",
-            "pending_source": "Shornikov 2017, DOI 10.1134/S0036024417020303",
-            "pending_dependency": "OpenIMCC re-pin (d-008)",
+            "compound": compound,
         },
     }
     direct = predict_with_engine(engine, reference, experiment=experiment)
@@ -6108,16 +6109,13 @@ def test_spinel_vapour_refusal_names_pending_fusion_data(engine: Engine) -> None
     assert direct.execution.state is ExecutionState.NOT_PROBED
 
 
-@pytest.mark.parametrize("compound,missing_pair", (("BaO", True), ("MgO", False)))
-def test_crystalline_vapour_fusion_detail_uses_existing_pair_owner(
-    compound: str, missing_pair: bool
-) -> None:
+def test_crystalline_vapour_with_existing_fusion_pair_is_unaffected() -> None:
     experiment, reference = _vapour_over_sample_form("condensed_solid")
     reference = replace(
         reference,
         identity=replace(
             reference.identity,
-            reservoir=State.of(Species(compound, Phase.CR)),
+            reservoir=State.of(Species("MgO", Phase.CR)),
         ),
     )
     residual, calls = _score_sample_phase_vapour(
@@ -6127,17 +6125,11 @@ def test_crystalline_vapour_fusion_detail_uses_existing_pair_owner(
     assert calls == []
     assert residual.numeric is None
     assert residual.refusal is not None
-    expected = {
+    assert residual.refusal.detail == {
         "reason": _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID,
         "sample_phase": "cr",
         "quantity": "p_partial",
     }
-    if missing_pair:
-        expected["fusion_data"] = {
-            "status": "not_available_to_simulator",
-            "compound": compound,
-        }
-    assert residual.refusal.detail == expected
 
 
 @pytest.mark.parametrize("form", ("condensed_liquid", "oxide melt samples"))

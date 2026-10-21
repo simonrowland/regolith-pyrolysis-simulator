@@ -763,32 +763,22 @@ def vapour_crystalline_sample_liquid_engine_refusal(
         return None
 
     reservoir = stated_pure_substance_reservoir(identity)
-    compound = reservoir[0] if reservoir is not None else None
-    if (
-        experiment is not None
-        and experiment.experiment_id
-        == "10.1134/s0036024418080253::experiment::shornikov_2018_mo_cell_kems"
-    ):
-        # This source states a spinel solid solution, not a pure gas reservoir.
-        compound = "MgAl2O4"
-    if compound is None:
+    temperature_K = temperature_of(identity)
+    if reservoir is None or temperature_K is None:
         return detail
+    compound = reservoir[0]
 
-    from simulator.battery.generators.janaf import _fusion_table_pair
+    from simulator.battery.generators.janaf import janaf_fusion_energy
 
     try:
-        _fusion_table_pair(compound, None)
-    except ValueError:
-        fusion_data = {
+        janaf_fusion_energy(compound, temperature_K)
+    except ValueError as exc:
+        if str(exc) != f"no JANAF fusion table pair for {compound}":
+            return detail
+        detail["fusion_data"] = {
             "status": "not_available_to_simulator",
             "compound": compound,
         }
-        if compound == "MgAl2O4":
-            fusion_data.update(
-                pending_source="Shornikov 2017, DOI 10.1134/S0036024417020303",
-                pending_dependency="OpenIMCC re-pin (d-008)",
-            )
-        detail["fusion_data"] = fusion_data
     return detail
 
 
