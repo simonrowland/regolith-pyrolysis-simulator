@@ -16,7 +16,6 @@ from simulator.battery.enums import (
     ResidualStatus,
     ValueKind,
 )
-from simulator.battery.identity import Identity
 from simulator.battery.migrate import (
     LITERATURE,
     Migrator,
@@ -34,11 +33,7 @@ from simulator.battery.records import (
     State,
     Value,
 )
-from simulator.battery.residue import (
-    _hashimoto_geometry_areas,
-    _initial_oxide_wt_percent,
-    _located_point,
-)
+from simulator.battery.residue import _initial_oxide_wt_percent
 from simulator.battery.score import (
     QUANTITY_METRIC,
     compile_residual,
@@ -133,7 +128,7 @@ def _assert_evaporation_coefficients_not_sourced(prediction) -> None:
     detail = prediction.refusal_detail
     assert detail["reason"] == "evaporation_coefficients_not_sourced"
     assert detail["detail"] == _EVAPORATION_COEFFICIENTS_NOT_SOURCED
-    assert detail["missing_input"] == "evaporation_coefficient_alpha"
+    assert detail["missing_input"] is Quantity.EVAPORATION_COEFFICIENT_ALPHA
 
 
 def _extract_mass_loss_selection(source_id: str, observation_id: str):
@@ -329,74 +324,30 @@ def test_richter_rows_refuse_unsourced_evaporation_coefficients(
     _assert_evaporation_coefficients_not_sourced(prediction)
 
 
-def test_hashimoto_declared_unity_convention_still_predicts_mass_loss() -> None:
-    """Hashimoto's extract is the dispatch that declares the unity-alpha set."""
-    source_path = LITERATURE / "extracts" / "kems-015-hashimoto-1983.yaml"
-    migrator = Migrator()
-    migrator._migrate_extract(source_path)
-    result = migrator.result
-    runs = [
-        experiment
-        for experiment in result.experiments.values()
-        if "hashimoto-1983-run" in experiment.experiment_id
-        and _located_point(
-            None
-            if experiment.thermal_schedule is None
-            else experiment.thermal_schedule.total_duration_s
-        )
-        is not None
-    ]
-    experiment = min(
-        runs,
-        key=lambda item: _located_point(item.thermal_schedule.total_duration_s),
-    )
-    document = load_yaml(source_path)
-    preform = next(
-        item
-        for item in document["metadata"]
-        if item.get("observation_id")
-        == "hashimoto_1983_fe_fcmas_free_evap_geometry_quoted"
-    )["values"]["starting_preform_mm"]
-    mass_kg = _located_point(experiment.sample.mass_kg)
-    assert mass_kg is not None and mass_kg > 0.0
-    area_m2 = _hashimoto_geometry_areas(mass_kg, preform)["disk_4mm_constant"]
-    apparatus = experiment.apparatus or Apparatus()
-    geometry = apparatus.geometry or ApparatusGeometry()
-    experiment = replace(
-        experiment,
-        apparatus=replace(
-            apparatus,
-            geometry=replace(
-                geometry,
-                exposed_area_m2=Located(
-                    State.of(Value(ValueKind.POINT, point=Decimal(str(area_m2)))),
-                    experiment.locator,
-                ),
-            ),
-        ),
-    )
-    donor = next(
+@pytest.mark.parametrize(
+    "source_id",
+    ("kems-015-hashimoto-1983", "kems-026-markova-1984"),
+)
+def test_any_source_refuses_unsourced_evaporation_coefficients(
+    fresh_mass_loss_extracts, source_id
+) -> None:
+    """The predictor does not exempt a source, including Hashimoto 1983."""
+    richter_result, _markova_result = fresh_mass_loss_extracts
+    row = next(
         row
-        for row in result.observations.values()
-        if row.experiment_id == experiment.experiment_id and row.source_id
+        for row in richter_result.observations.values()
+        if quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and "row=r-11" in row.observation_id
     )
-    temperature = donor.identity.temperature_K
-    if temperature is None or not temperature.is_value:
-        recorded = experiment.conditions["temperature_K"].state.value
-        temperature = State.of(getattr(recorded, "point", recorded))
-    row = replace(
-        donor,
-        identity=Identity(
-            quantity=Quantity.MASS_LOSS_FRACTION,
-            species=donor.identity.species,
-            temperature_K=temperature,
-        ),
+    experiment = richter_result.experiments[row.experiment_id]
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        replace(row, source_id=source_id),
+        experiment=experiment,
     )
 
-    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
-
-    assert prediction.refusal_reason is None, prediction.refusal_detail
-    assert prediction.value is not None
+    _assert_evaporation_coefficients_not_sourced(prediction)
 
 
 def test_richter_r14_mass_loss_uses_source_declared_initial_glass_not_final_residue(

@@ -42,8 +42,6 @@ _HASHIMOTO_COMMON_UNITY_SOURCE = (
     "Hashimoto assumed alpha_i/alpha_j = 1 only; absolute alpha=1 is a "
     "declared sensitivity choice, not an author-established kinetic model"
 )
-# Source id of the only work whose scorer dispatch declares this convention.
-HASHIMOTO_COMMON_UNITY_SOURCE_ID = "kems-015-hashimoto-1983"
 
 
 class ResidueInventoryRefusal(ValueError):
@@ -1033,24 +1031,11 @@ def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
     return _hashimoto_project_oxide_wt_pct(amounts)
 
 
-def _common_unity_evaporation_coefficients_declared(source_id: str | None) -> bool:
-    """True only for the Hashimoto dispatch's work.
-
-    That work's extract declares ``assumed_unity_ratio_not_measured_alpha``
-    with ``alpha_i_over_alpha_j_assumed`` 1. The scorer already selects the
-    work by ``HASHIMOTO_COMMON_UNITY_SOURCE_ID``. No other work carries the
-    declaration, and this function does not read prose.
-    """
-
-    return source_id == HASHIMOTO_COMMON_UNITY_SOURCE_ID
-
-
 def predict_mass_loss_fraction(
     engine: str,
     experiment: object,
     *,
     temperature_K: float | None,
-    source_id: str | None = None,
 ) -> ResidueMassLossPrediction:
     """Predict one bulk mass-loss point through the existing residue integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -1135,13 +1120,10 @@ def predict_mass_loss_fraction(
         raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
     if not gas_channels:
         raise ResidueInventoryRefusal("residue_gas_channels_missing")
-    if not _common_unity_evaporation_coefficients_declared(source_id):
-        # Absolute alpha=1 is Hashimoto's declared sensitivity, not a
-        # coefficient sourced for any other work.
-        raise ResidueInventoryRefusal(
-            "evaporation_coefficients_not_sourced",
-            "per-species evaporation coefficients are not sourced for this work",
-        )
+    raise ResidueInventoryRefusal(
+        "evaporation_coefficients_not_sourced",
+        "per-species evaporation coefficients are not sourced for this work",
+    )
     channels = tuple(
         ResidueChannel(
             str(species),
@@ -1863,7 +1845,7 @@ def _predict_hashimoto_residue_cohort(
             }
             provenance = {
                 "experiment_id": experiment_id,
-                "source_id": HASHIMOTO_COMMON_UNITY_SOURCE_ID,
+                "source_id": "kems-015-hashimoto-1983",
                 "run_locator": dict(experiment.get("locator") or {}),
                 "temperature_K": temperature_K,
                 "duration_s": duration_s,

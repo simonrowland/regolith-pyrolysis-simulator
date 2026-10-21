@@ -4699,7 +4699,6 @@ def _predict_mass_loss_with_residue(
     channel: str,
     sources: tuple[str, ...],
     experiment: Experiment | None,
-    source_id: str | None,
 ) -> EnginePrediction:
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
@@ -4713,7 +4712,6 @@ def _predict_mass_loss_with_residue(
             engine.value,
             experiment,
             temperature_K=None if temperature is None else float(temperature),
-            source_id=source_id,
         )
     except ResidueInventoryRefusal as exc:
         reason = exc.reason
@@ -4739,7 +4737,7 @@ def _predict_mass_loss_with_residue(
         if reason.endswith("_not_stated"):
             detail["missing_input"] = exc.detail
         elif reason == "evaporation_coefficients_not_sourced":
-            detail["missing_input"] = "evaporation_coefficient_alpha"
+            detail["missing_input"] = Quantity.EVAPORATION_COEFFICIENT_ALPHA
         if refusal is RefusalReason.UNSUPPORTED:
             detail.update({"engine": engine.value, "capability": exc.detail})
         return EnginePrediction(
@@ -4852,7 +4850,6 @@ def predict_with_engine(
             channel,
             sources,
             experiment,
-            observation.source_id,
         )
     if quantity is Quantity.FE3_FE2_RATIO:
         return _predict_fe_redox(engine, observation, identity, channel)
@@ -6162,11 +6159,7 @@ def candidate_observation(
     )
 
 
-def _hashimoto_source_id() -> str:
-    """Source id of the work that declares the common-unity alpha convention."""
-    from simulator.battery.residue import HASHIMOTO_COMMON_UNITY_SOURCE_ID
-
-    return HASHIMOTO_COMMON_UNITY_SOURCE_ID
+_HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
 
 
 def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
@@ -6183,7 +6176,7 @@ def _hashimoto_residue_prediction(
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
-    cache_key = (_hashimoto_source_id(), engine)
+    cache_key = (_HASHIMOTO_SOURCE_ID, engine)
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
@@ -6196,8 +6189,8 @@ def _hashimoto_residue_prediction(
             observations = [
                 row
                 for row in context.observations.values()
-                if row.source_id == _hashimoto_source_id()
-                and row.observation_id.startswith(_hashimoto_source_id() + "::")
+                if row.source_id == _HASHIMOTO_SOURCE_ID
+                and row.observation_id.startswith(_HASHIMOTO_SOURCE_ID + "::")
                 and isinstance(row.identity, Identity)
                 and quantity_token(row.identity)
                 is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -6214,8 +6207,7 @@ def _hashimoto_residue_prediction(
                 )
             source_path = (
                 REPO_ROOT
-                / "data/literature/extracts"
-                / f"{_hashimoto_source_id()}.yaml"
+                / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
             )
             source = load_yaml(source_path)
             geometry = next(
@@ -7769,7 +7761,7 @@ def _score_store_with_decisions(
                             predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
-                            and point.source_id == _hashimoto_source_id()
+                            and point.source_id == _HASHIMOTO_SOURCE_ID
                             and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
                         ):
                             prediction = _hashimoto_residue_prediction(
