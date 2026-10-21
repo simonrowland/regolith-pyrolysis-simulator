@@ -4718,12 +4718,12 @@ def _predict_mass_loss_with_residue(
             experiment,
             temperature_K=None if temperature is None else float(temperature),
             source_document=source_document,
+            observation=observation,
         )
     except ResidueInventoryRefusal as exc:
         reason = exc.reason
         if reason in {
             "engine_capability_unsupported", "residue_method_unsupported",
-            "sourced_alpha_mass_loss_integration_incomplete",
         }:
             refusal = RefusalReason.UNSUPPORTED
             execution = ExecutionState.UNSUPPORTED
@@ -4736,7 +4736,10 @@ def _predict_mass_loss_with_residue(
         elif reason == "initial_composition_invalid":
             refusal = RefusalReason.METRIC_DOMAIN
             execution = ExecutionState.NOT_PROBED
-        elif reason == "evaporation_coefficients_not_sourced":
+        elif reason in {
+            "evaporation_coefficients_not_sourced", "alpha_not_sourced",
+            "area_shape_not_self_similar", "preheat_bound_not_negligible",
+        }:
             refusal = RefusalReason.UNDERDETERMINED_APPARATUS
             execution = ExecutionState.NOT_PROBED
         else:
@@ -4745,7 +4748,7 @@ def _predict_mass_loss_with_residue(
         detail: dict[str, object] = {"reason": reason, "detail": exc.detail}
         if reason.endswith("_not_stated"):
             detail["missing_input"] = exc.detail
-        elif reason == "evaporation_coefficients_not_sourced":
+        elif reason in {"evaporation_coefficients_not_sourced", "alpha_not_sourced"}:
             detail["missing_input"] = Quantity.EVAPORATION_COEFFICIENT_ALPHA
         if refusal is RefusalReason.UNSUPPORTED:
             detail.update({"engine": engine.value, "capability": exc.detail})
@@ -4775,16 +4778,21 @@ def _predict_mass_loss_with_residue(
             identity=identity,
         )
 
-    domain_notices = tuple(
+    notices = tuple(
         Notice(
-            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            kind=(NoticeKind.OUT_OF_CERTIFIED_BAND if (
+                "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
+                or flag.startswith("alpha_extrapolated:")
+            ) else NoticeKind.FALLBACK),
             affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
             reason=flag,
             origin=f"engine:{engine.value}",
         )
         for flag in result.engine_flags
         if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
+        or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
     )
+    domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -4795,13 +4803,13 @@ def _predict_mass_loss_with_residue(
         authority=(
             Authority.EXTRAPOLATED if domain_notices else Authority.BRIDGE
         ),
-        notices=domain_notices,
-        coefficient_sources=sources,
+        notices=notices,
+        coefficient_sources=(*sources, *json.loads(result.engine_metadata.get("alpha_sources", "[]"))),
         lineage_complete=False,
         identity=identity,
         version=(
             "method_class=calculated_residue_integrator; "
-            "alpha_common_unity_sensitivity; constant_printed_initial_area"
+            "sourced_alpha; bounded_unsourced_channels_and_preheat; self_similar_printed_area"
         ),
     )
 

@@ -17,6 +17,7 @@ from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting.formulas import parse_formula
 from simulator.battery.oxygen_balance import (
     _VacuumOxygenChannel,
+    _net_evaporation_pressure_Pa,
     _solve_vacuum_oxygen_balance,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
@@ -304,6 +305,7 @@ class _HashimotoGeometryIntegration:
     refusal: ResidueEngineNonconvergence | None
     atom_closure: dict[str, float]
     inventory_mol: dict[str, float]
+    evaporated_mol: Mapping[str, float]
 
     def __iter__(self):
         # Existing Hashimoto callers unpack the original five-result view.
@@ -490,6 +492,7 @@ def _finite_step_fluxes(
     temperature_K: float,
     area_m2: float,
     pressures_Pa: Mapping[str, float],
+    background_pressure_Pa: float = 0.0,
 ) -> dict[str, float]:
     """Run the authoritative HKL provider at the solved channel pressures."""
     parent_channels = [term for term in terms if term.parent_moles_per_product > 0.0]
@@ -503,10 +506,12 @@ def _finite_step_fluxes(
             species_formula_registry={},
         ),
         temperature_C=temperature_K - 273.15,
-        pressure_bar=0.0,
+        pressure_bar=background_pressure_Pa / 100_000.0,
         control_inputs={
             "vapour_batch_flux_pressures_Pa": {
-                term.source.species: float(pressures_Pa.get(term.source.species, 0.0))
+                term.source.species: _net_evaporation_pressure_Pa(
+                    float(pressures_Pa.get(term.source.species, 0.0)), background_pressure_Pa
+                )
                 for term in parent_channels
             },
             "overhead_partials_Pa": {
@@ -536,8 +541,8 @@ def _finite_step_fluxes(
                 "gas_resistance_enabled": False,
                 "melt_resistance_enabled": False,
             },
-            "overhead_pressure_pa": 0.0,
-            "commanded_pressure_pa": 0.0,
+            "overhead_pressure_pa": background_pressure_Pa,
+            "commanded_pressure_pa": background_pressure_Pa,
             "stir_factor": 0.0,
         },
     )
@@ -568,6 +573,7 @@ def integrate_residue_inventory(
     duration_s: float,
     area_evolution_m2: Sequence[float] | None = None,
     buffered_fO2_log: float | None = None,
+    background_pressure_Pa: float = 0.0,
 ) -> ResidueInventoryResult:
     """Integrate free evaporation with an engine-specific pressure callback.
 
@@ -577,7 +583,9 @@ def integrate_residue_inventory(
     ``log10(pO2 / bar)`` and the shared R1a balance selects the congruent root.
     The builtin HKL provider then evaluates
     ``J_i = alpha_i * (p_i - p_bulk,i) / sqrt(2*pi*M_i*R*T)`` in mol m^-2 s^-1;
-    here ``p_bulk=0`` and the provider receives the declared area, so its
+    the explicit background ceiling is subtracted once in the shared root and
+    HKL driver (zero for existing vacuum callers). The provider receives
+    net driving pressures and the declared area, so its
     returned kg h^-1 is converted at the boundary back to mol s^-1.
 
     For a parent with inventory ``N`` mol and requested parent draw ``r`` mol
@@ -604,6 +612,8 @@ def integrate_residue_inventory(
             "melt_surface_area_evolution_missing",
             "free evaporation requires an explicit per-step area evolution",
         )
+    if not math.isfinite(background_pressure_Pa) or background_pressure_Pa < 0.0:
+        raise ResidueInventoryRefusal("residue_background_pressure_invalid")
     temperature = float(temperature_K)
     duration = float(duration_s)
     if not math.isfinite(temperature) or temperature <= 0.0:
@@ -678,6 +688,8 @@ def integrate_residue_inventory(
                     for term in terms
                 ),
                 temperature_K=temperature,
+                **({"background_pressure_Pa": background_pressure_Pa}
+                   if background_pressure_Pa else {}),
                 )
             except ValueError as exc:
                 # No positive parent pressure is the zero-flux limit, not a
@@ -715,6 +727,7 @@ def integrate_residue_inventory(
             temperature_K=temperature,
             area_m2=area_m2,
             pressures_Pa=pressures,
+            background_pressure_Pa=background_pressure_Pa,
         )
         requested_product_mol_s = {
             species: rate_kg_s / term_by_species[species].molar_mass_kg_mol
@@ -1102,12 +1115,137 @@ def _mass_loss_sourced_alphas(
     return fits
 
 
+def _mass_loss_area_inputs(
+    experiment: object, observation: object, source: Mapping[str, Any],
+) -> tuple[float, float, float]:
+    """Read the two printed endpoints and test the approved shape premise."""
+    # Raw table row locators migrate to the observation paragraph; Experiment
+    # Locator has no row field (its raw row is retained only as a note).
+    row_name = getattr(getattr(observation, "locator", None), "paragraph", None)
+    point = getattr(getattr(observation, "value", None), "point", None)
+    if point is None or not 0.0 <= float(point) < 1.0:
+        raise ResidueInventoryRefusal("observed_mass_loss_not_stated")
+    observed_loss = float(point)
+    matches = set()
+    for block in (source.get("species") or {}).values():
+        for row in block.get("observations") or ():
+            surface = (row.get("equipment") or {}).get("sample_surface_area") or {}
+            samples = surface.get("value")
+            if not isinstance(samples, list):
+                continue
+            for sample in samples:
+                if sample.get("sample") != row_name:
+                    continue
+                try:
+                    uncertainty = surface["uncertainty"]
+                    diameter = float(sample["diameter_mm"])
+                    percent = float(uncertainty[
+                        "one_mm_percent" if diameter == 1.0 else "larger_samples_percent"
+                    ])
+                    initial = float(sample["initial_area_mm2"]) * 1.0e-6
+                    final = float(sample["final_area_mm2"]) * 1.0e-6
+                    if not all(math.isfinite(x) and x > 0 for x in (
+                        initial, final, diameter, percent
+                    )) or diameter < 1.0 or not uncertainty.get("locator"):
+                        raise ValueError("invalid area evidence")
+                    matches.add((initial, final, percent / 100.0))
+                except (KeyError, TypeError, ValueError) as exc:
+                    raise ResidueInventoryRefusal("sample_area_uncertainty_not_stated") from exc
+    if len(matches) != 1:
+        raise ResidueInventoryRefusal("sample_area_endpoints_not_stated")
+    initial, final, relative_uncertainty = matches.pop()
+    predicted_final = _self_similar_area_m2(initial, 1.0 - observed_loss, 1.0)
+    if abs(final - predicted_final) > relative_uncertainty * predicted_final:
+        raise ResidueInventoryRefusal("area_shape_not_self_similar", json.dumps({
+            "initial_area_m2": initial, "final_area_m2": final,
+            "self_similar_final_area_m2": predicted_final,
+            "relative_area_uncertainty": relative_uncertainty,
+        }, sort_keys=True))
+    return initial, final, relative_uncertainty
+
+
+def _mass_loss_thermal_segments(
+    experiment: object, temperature_K: float,
+) -> tuple[float, float, tuple[tuple[float, float], ...]]:
+    """Return preheat rectangle and documented (T midpoint K, duration s)."""
+    schedule = getattr(experiment, "thermal_schedule", None)
+    ramps = getattr(schedule, "ramps", None)
+    method = getattr(getattr(schedule, "method", None), "state", None)
+    method_text = str(getattr(method, "value", ""))
+    if not ramps or "about an hour" not in method_text:
+        raise ResidueInventoryRefusal("preheat_bound_not_stated")
+    maximum = _located_point(ramps[0].start_temperature_K)
+    if maximum is None:
+        raise ResidueInventoryRefusal("preheat_maximum_not_stated")
+    holds = {}
+    for hold in getattr(schedule, "setpoints_and_holds", None) or ():
+        at = _located_point(hold.temperature_K)
+        duration = _located_point(hold.hold_duration_s)
+        if at is None or duration is None or duration <= 0.0 or at in holds:
+            raise ResidueInventoryRefusal("thermal_schedule_invalid")
+        holds[at] = duration
+    segments = []
+    last = maximum
+    for ramp in ramps:
+        start = _located_point(ramp.start_temperature_K)
+        end = _located_point(ramp.end_temperature_K)
+        rate = _located_point(ramp.rate_K_s)
+        if start != last or end is None or rate is None or rate <= 0.0 or end <= start:
+            raise ResidueInventoryRefusal("thermal_schedule_invalid")
+        duration = (end - start) / rate
+        steps = max(1, math.ceil(duration / 60.0))
+        for index in range(steps):
+            segments.append((start + (end - start) * (index + 0.5) / steps, duration / steps))
+        if end in holds:
+            segments.append((end, holds.pop(end)))
+        last = end
+    if holds or last != temperature_K:
+        raise ResidueInventoryRefusal("thermal_schedule_invalid")
+    duration = _located_point(schedule.total_duration_s)
+    segments.append((temperature_K, duration))
+    # The source calls the preheat "about an hour". The rectangle uses that
+    # printed approximate duration, never an invented start T or ramp rate.
+    return maximum, _SECONDS_PER_HOUR, tuple(segments)
+
+
+def _mass_loss_bound_gate(
+    bound_kg: float, total_loss_kg: float, uncertainty_kg: float | None,
+    *, channels: Sequence[str], preheat_bound_kg: float,
+) -> dict[str, Any]:
+    # alpha<=1 bounds unsourced parent-channel removal, including coproduct
+    # oxygen in each parent-oxide mass. Sum it with the whole preheat rectangle
+    # as B [kg]. L [kg] is predicted total loss, so B/L is dimensionless.
+    # B=0 gives 0 for L>0; B=L gives 1 and must refuse. Physics r2 drops only
+    # the uncertainty clause when the source states none; the 1% gate stays.
+    if not all(math.isfinite(x) and x >= 0.0 for x in (bound_kg, total_loss_kg)):
+        raise ResidueInventoryRefusal("mass_loss_fraction_invalid")
+    fraction = bound_kg / total_loss_kg if total_loss_kg > 0.0 else 0.0
+    fraction_clause_passed = fraction <= 0.01
+    uncertainty_clause_passed = None if uncertainty_kg is None else bound_kg < uncertainty_kg
+    diagnostics = {
+        "fraction_clause_passed": fraction_clause_passed,
+        "uncertainty_clause_passed": uncertainty_clause_passed,
+        "bound_kg": bound_kg, "bound_fraction": fraction,
+        "preheat_bound_kg": preheat_bound_kg, "unsourced_channels": list(channels),
+        "bulk_uncertainty_kg": uncertainty_kg,
+        "uncertainty_clause": (
+            "bulk mass-loss uncertainty not stated by source"
+            if uncertainty_kg is None else "bound must be below stated bulk uncertainty"
+        ),
+    }
+    if not fraction_clause_passed or uncertainty_clause_passed is False:
+        reason = "alpha_not_sourced" if channels else "preheat_bound_not_negligible"
+        raise ResidueInventoryRefusal(reason, json.dumps(diagnostics, sort_keys=True))
+    return diagnostics
+
+
 def predict_mass_loss_fraction(
     engine: str,
     experiment: object,
     *,
     temperature_K: float | None,
     source_document: Mapping[str, Any] | None = None,
+    observation: object | None = None,
 ) -> ResidueMassLossPrediction:
     """Predict one bulk mass-loss point through the existing residue integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -1159,6 +1297,15 @@ def predict_mass_loss_fraction(
         if pressure_environment is None
         else getattr(pressure_environment, "total_pressure_Pa", None)
     )
+    pressure_value = getattr(getattr(
+        getattr(pressure_environment, "total_pressure_Pa", None), "state", None
+    ), "value", None)
+    pressure_is_bound = (
+        getattr(getattr(pressure_value, "kind", None), "value", None) == "bound"
+        and getattr(pressure_value, "bound_operator", None) in {"<", "<="}
+    )
+    if pressure_is_bound:
+        total_pressure_Pa = float(pressure_value.bound_value)
     if engine == "internal-analytical" and total_pressure_Pa is None:
         raise ResidueInventoryRefusal("total_pressure_not_stated")
 
@@ -1195,21 +1342,121 @@ def predict_mass_loss_fraction(
     fits = _mass_loss_sourced_alphas(
         experiment, source_document or {}, float(temperature_K)
     )
-    # This WIP resolves the sourced fits but cannot yet execute the required
-    # uncertainty test, complete thermal history, or bounding-area comparison.
-    # Keep that implementation limit distinct from a claim about source data.
-    # Never resurrect the old common-unity, constant-area hold as a fallback.
-    raise ResidueInventoryRefusal(
-        "sourced_alpha_mass_loss_integration_incomplete",
-        json.dumps({
-            "sourced_alphas": fits,
-            "unsourced_bound_fraction": None,
-            "remaining_requirements": [
-                "unsourced-channel bound <= 1% and below mass-loss uncertainty",
-                "bound or document the incomplete initial preheat",
-                "score against both printed area endpoints unless self-similarity is established",
-            ],
-        }, sort_keys=True),
+    if total_pressure_Pa is None or not math.isfinite(total_pressure_Pa) or total_pressure_Pa < 0:
+        raise ResidueInventoryRefusal("total_pressure_not_stated")
+    area_m2, final_area_m2, area_uncertainty = _mass_loss_area_inputs(
+        experiment, observation, source_document or {}
+    )
+    preheat_maximum_K, preheat_duration_s, segments = _mass_loss_thermal_segments(
+        experiment, float(temperature_K)
+    )
+    flags: set[str] = set()
+    metadata: dict[str, str] = {}
+    if pressure_is_bound:
+        flags.add(f"mass_loss_pressure_upper_bound: evaluated at {total_pressure_Pa:.17g} Pa; "
+                  "channel bulk partial ceiling; zero-pressure arms are bounds only")
+    flags.add(
+        f"mass_loss_preheat_rectangle: maximum_K={preheat_maximum_K}; "
+        f"duration_s={preheat_duration_s}; approximate printed duration"
+    )
+    flags.add(
+        f"mass_loss_area_self_similarity: initial_m2={area_m2}; final_m2={final_area_m2}; "
+        f"relative_area_uncertainty={area_uncertainty}"
+    )
+    unsourced = tuple(str(species) for species, (parent, *_rest) in gas_channels
+                      if parent and str(species) not in fits)
+
+    def run_segment(
+        inventory: Mapping[str, float], at_K: float, seconds: float, *,
+        rectangle: bool = False, upper_bound: bool = False,
+    ) -> tuple[Mapping[str, float], float, dict[str, float]]:
+        at_fits = _mass_loss_sourced_alphas(experiment, source_document or {}, at_K)
+        for species, fit in at_fits.items():
+            if fit["extrapolated"]:
+                flags.add(f"alpha_extrapolated:{species}:source_domain_K={fit['T_range_K']}")
+        channels = tuple(ResidueChannel(
+            str(species), str(species), parent,
+            at_fits[str(species)]["alpha"] if str(species) in at_fits else 1.0,
+            at_fits[str(species)]["source_observation_id"] if str(species) in at_fits
+            else "stoichiometric oxygen coproduct" if parent is None
+            else "alpha<=1 upper bound; not sourced coefficient",
+        ) for species, (parent, *_rest) in gas_channels)
+        pressure_model = _make_residue_pressure_model(
+            engine, gas_channels, gas_pack, temperature_K=at_K,
+            total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
+            engine_flags=flags, missing_channels_reason="residue_pressure_channels_missing",
+            caller="Mass-loss residue prediction",
+        )
+        result = _hashimoto_integrate_geometry(
+            inventory, channels, pressure_model, temperature_K=at_K,
+            duration_s=seconds, steps=min(_HASHIMOTO_N_CAP, max(1, math.ceil(seconds / 60.0))),
+            geometry_policy_id="sphere_constant" if rectangle else "sphere_shrinking",
+            initial_area_m2=area_m2, initial_sample_mass_kg=sample_mass_kg,
+            background_pressure_Pa=0.0 if upper_bound else total_pressure_Pa,
+        )
+        if result.refusal is not None:
+            raise result.refusal
+        terms = _channel_terms(channels)
+        parent_loss = {
+            term.source.species: result.evaporated_mol.get(term.source.species, 0.0)
+            * term.parent_moles_per_product * _formula_terms(term.source.parent_oxide)[1]
+            for term in terms if term.source.parent_oxide is not None
+        }
+        return result.inventory_mol, math.fsum(parent_loss.values()), {
+            species: amount for species, amount in parent_loss.items() if species in unsourced
+        }
+
+    # The unknown preheat is an upper rectangle only: do not debit it as a
+    # measured trajectory. All its removal, not just unsourced channels, joins B.
+    _unused_inventory, preheat_bound_kg, _unused_bound = run_segment(
+        initial_inventory_mol, preheat_maximum_K, preheat_duration_s,
+        rectangle=True, upper_bound=True
+    )
+    inventory = initial_inventory_mol
+    documented_loss_kg = 0.0
+    bounds_by_channel = {species: 0.0 for species in unsourced}
+    for at_K, seconds in segments:
+        incoming = inventory
+        inventory, loss, bounds = run_segment(incoming, at_K, seconds)
+        if unsourced:
+            # Do not call pressure-suppressed unsourced removal an upper bound.
+            # Compare the vacuum upper arm at the same incoming state and area.
+            _, _, vacuum_bounds = run_segment(incoming, at_K, seconds, upper_bound=True)
+            for species in unsourced:
+                bounds_by_channel[species] += max(
+                    bounds.get(species, 0.0), vacuum_bounds.get(species, 0.0)
+                )
+        documented_loss_kg += loss
+    unsourced_bound_kg = math.fsum(bounds_by_channel.values())
+    total_loss_kg = min(sample_mass_kg, documented_loss_kg + preheat_bound_kg)
+    uncertainty = getattr(observation, "uncertainty", None)
+    uncertainty_kg = None
+    if getattr(getattr(uncertainty, "kind", None), "value", "none") != "none":
+        value = getattr(uncertainty, "value", None)
+        basis = getattr(uncertainty, "basis", None)
+        if value is None or isinstance(value, tuple):
+            raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_not_numeric")
+        if basis in {"absolute", "absolute_fraction_of_initial_mass"}:
+            uncertainty_kg = float(value) * sample_mass_kg
+        elif basis in {"relative", "fraction"}:
+            uncertainty_kg = float(value) * float(observation.value.point) * sample_mass_kg
+        else:
+            raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_basis_not_stated")
+        if not math.isfinite(uncertainty_kg) or uncertainty_kg <= 0.0:
+            raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_invalid")
+    diagnostics = _mass_loss_bound_gate(
+        unsourced_bound_kg + preheat_bound_kg, total_loss_kg, uncertainty_kg,
+        channels=tuple(species for species, bound in bounds_by_channel.items() if bound > 0.0),
+        preheat_bound_kg=preheat_bound_kg,
+    )
+    diagnostics["unsourced_bound_kg_by_channel"] = bounds_by_channel
+    flags.add("mass_loss_bound:" + json.dumps(diagnostics, sort_keys=True))
+    metadata["mass_loss_bound"] = json.dumps(diagnostics, sort_keys=True)
+    metadata["sourced_alphas"] = json.dumps(fits, sort_keys=True)
+    metadata["alpha_sources"] = json.dumps([fit["source_observation_id"] for fit in fits.values()])
+    return ResidueMassLossPrediction(
+        mass_loss_fraction=total_loss_kg / sample_mass_kg,
+        engine_flags=tuple(sorted(flags)), engine_metadata=metadata,
     )
 
 
@@ -1333,6 +1580,8 @@ def _hashimoto_integrate_geometry(
     steps: int,
     geometry_policy_id: str,
     initial_area_m2: float,
+    initial_sample_mass_kg: float | None = None,
+    background_pressure_Pa: float = 0.0,
 ) -> _HashimotoGeometryIntegration:
     inventory = {str(oxide): float(amount) for oxide, amount in initial_inventory_mol.items()}
     sample_total_mol = math.fsum(inventory.values())
@@ -1340,6 +1589,9 @@ def _hashimoto_integrate_geometry(
     initial_mass_kg = math.fsum(
         amount * _formula_terms(oxide)[1] for oxide, amount in inventory.items()
     )
+    if initial_sample_mass_kg is not None:
+        # Thermal segments retain the original printed A0/m0 reference.
+        initial_mass_kg = initial_sample_mass_kg
     dt_s = duration_s / steps
     pO2_steps: list[float] = []
     evaporated_mol: defaultdict[str, float] = defaultdict(float)
@@ -1400,6 +1652,8 @@ def _hashimoto_integrate_geometry(
             temperature_K=temperature_K,
             duration_s=duration,
             area_evolution_m2=(area_for_current_inventory(),),
+            **({"background_pressure_Pa": background_pressure_Pa}
+               if background_pressure_Pa else {}),
         )
         inventory = dict(step.residue_mol)
         for species, amount in step.evaporated_mol.items():
@@ -1470,6 +1724,7 @@ def _hashimoto_integrate_geometry(
         refusal=refusal,
         atom_closure=closure,
         inventory_mol=dict(inventory),
+        evaporated_mol=dict(evaporated_mol),
     )
 
 

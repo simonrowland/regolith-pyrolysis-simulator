@@ -54,11 +54,17 @@ class _VacuumOxygenBalance:
     alpha_sources: Mapping[str, str]
 
 
+def _net_evaporation_pressure_Pa(pressure_Pa: float, background_pressure_Pa: float) -> float:
+    """HKL driving pressure; zero background preserves the vacuum expression."""
+    return max(0.0, pressure_Pa - background_pressure_Pa)
+
+
 def _solve_vacuum_oxygen_balance(
     pressure_model: Callable[[float], Mapping[str, float]],
     channels: Sequence[_VacuumOxygenChannel],
     *,
     temperature_K: float,
+    background_pressure_Pa: float = 0.0,
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
 ) -> _VacuumOxygenBalance:
     """Solve an alpha-weighted, engine-supplied vacuum pressure model.
@@ -87,6 +93,8 @@ def _solve_vacuum_oxygen_balance(
     temperature = float(temperature_K)
     if not math.isfinite(temperature) or temperature <= 0.0:
         raise ValueError("temperature_K must be finite and positive")
+    if not math.isfinite(background_pressure_Pa) or background_pressure_Pa < 0.0:
+        raise ValueError("background_pressure_Pa must be finite and nonnegative")
     low, high = bracket_log10_pO2_bar
     if not (math.isfinite(low) and math.isfinite(high) and low < high <= 0.0):
         raise ValueError("pO2 bracket must be finite, increasing, and at most 1 bar")
@@ -133,7 +141,11 @@ def _solve_vacuum_oxygen_balance(
         raise ValueError("oxygen-balance flux is not strictly monotone for active channels")
 
     def molar_flux(channel: _VacuumOxygenChannel, pressure: float) -> float:
-        return channel.alpha * pressure / math.sqrt(
+        # Only the flux uses the bulk-partial ceiling. Keep equilibrium Peq
+        # untouched for the power-law validation and thermodynamic root axis.
+        drive = (_net_evaporation_pressure_Pa(pressure, background_pressure_Pa)
+                 if background_pressure_Pa else pressure)
+        return channel.alpha * drive / math.sqrt(
             2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
         )
 
