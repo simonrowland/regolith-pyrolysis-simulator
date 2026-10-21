@@ -17493,9 +17493,38 @@ class Migrator:
             ):
                 raw_composition = located_composition.state.value
                 if isinstance(raw_composition, Composition):
-                    identity = replace(
-                        identity, composition=State.of(raw_composition)
+                    published_composition = (
+                        raw_item.get("composition_as_published")
+                        if isinstance(raw_item, Mapping)
+                        else None
                     )
+                    phase_as_printed = (
+                        raw_item.get("phase_as_printed")
+                        if isinstance(raw_item, Mapping)
+                        else None
+                    )
+                    is_printed_mol_inventory = (
+                        isinstance(published_composition, Mapping)
+                        and published_composition.get("basis") == "mol pct"
+                        and raw_composition.basis
+                        == "printed_mole_percent_as_moles_per_nominal_100_mol_inventory"
+                        and raw_composition.amount_basis is AmountBasis.MOL_INVENTORY
+                        and len(raw_composition.components) > 1
+                    )
+                    promotes_typed_composition = (
+                        q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY}
+                        or (
+                            q_token_point
+                            in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+                            and isinstance(phase_as_printed, str)
+                            and "melt" in phase_as_printed.casefold()
+                        )
+                        or is_printed_mol_inventory
+                    )
+                    if promotes_typed_composition:
+                        identity = replace(
+                            identity, composition=State.of(raw_composition)
+                        )
                 elif q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY}:
                     converted_composition = _composition_located_from_plain(
                         {

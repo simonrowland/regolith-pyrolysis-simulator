@@ -262,16 +262,19 @@ def test_composition_fallback_keeps_typed_values_broad_and_plain_maps_scoped(tmp
         if row["values"].get("quantity") == "activity"
     )
     activity_point = activity["values"]["points"][0]
-    activity_point.pop("composition_as_published")
+    activity_unmarked = deepcopy(activity)
+    activity_unmarked["observation_id"] += "_without_mol_pct_marker"
+    activity_unmarked["values"]["points"][0].pop("composition_as_published")
     activity_plain = deepcopy(activity)
     activity_plain["observation_id"] += "_plain_map_fallback"
     activity_plain_point = activity_plain["values"]["points"][0]
     activity_plain_point["point_conditions"]["composition"]["state"]["value"] = plain_components
     activity_plain_point.pop("composition_as_published", None)
 
-    # Reuse the source's typed condition for the activity case, while testing
-    # plain-map fallback for valence and density.
+    # Keep the mol-pct marker for the typed activity case. The unmarked typed
+    # condition must stay out of identity; plain-map fallback remains scoped.
     document["species"]["Cr"]["observations"].append(density)
+    document["species"]["CrO"]["observations"].append(activity_unmarked)
     document["species"]["CrO"]["observations"].append(activity_plain)
     altered_extract = tmp_path / "xiao-composition-fallback.yaml"
     altered_extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
@@ -282,23 +285,28 @@ def test_composition_fallback_keeps_typed_values_broad_and_plain_maps_scoped(tmp
     observations = migrator.result.observations
     valence_result = next(
         item
-        for key, item in observations.items()
-        if valence["observation_id"] in key
+        for item in observations.values()
+        if f"::{valence['observation_id']}::" in item.observation_id
     )
     density_result = next(
         item
-        for key, item in observations.items()
-        if density["observation_id"] in key
+        for item in observations.values()
+        if f"::{density['observation_id']}::" in item.observation_id
     )
     activity_result = next(
         item
-        for key, item in observations.items()
-        if activity["observation_id"] in key
+        for item in observations.values()
+        if f"::{activity['observation_id']}::" in item.observation_id
+    )
+    activity_unmarked_result = next(
+        item
+        for item in observations.values()
+        if f"::{activity_unmarked['observation_id']}::" in item.observation_id
     )
     activity_plain_result = next(
         item
-        for key, item in observations.items()
-        if activity_plain["observation_id"] in key
+        for item in observations.values()
+        if f"::{activity_plain['observation_id']}::" in item.observation_id
     )
 
     assert valence_result.identity.composition is not None
@@ -307,6 +315,18 @@ def test_composition_fallback_keeps_typed_values_broad_and_plain_maps_scoped(tmp
     assert density_result.identity.composition.is_value
     assert activity_result.identity.composition is not None
     assert activity_result.identity.composition.is_value
+    typed_inventory = activity_result.identity.composition.value
+    assert typed_inventory.amount_basis is AmountBasis.MOL_INVENTORY
+    assert typed_inventory.basis == (
+        "printed_mole_percent_as_moles_per_nominal_100_mol_inventory"
+    )
+    assert dict(typed_inventory.components) == {
+        formula: Decimal(amount)
+        for formula, amount in activity_point["composition_as_published"]["components"].items()
+    }
+    assert activity_unmarked_result.identity.composition is None or (
+        activity_unmarked_result.identity.composition.is_unknown
+    )
     assert (
         activity_plain_result.identity.composition is None
         or activity_plain_result.identity.composition.is_unknown
