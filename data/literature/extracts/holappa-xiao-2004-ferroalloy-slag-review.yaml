@@ -163,14 +163,14 @@ species:
     context:
       - observation_id: holappa_xiao_2004_manganese_review_values
         type: relation
-        locator: {page: 6, published_page: 434, pdf_page_index: 5, section: Manganese-oxygen system}
-        units: atm; °C; wt%; composition fraction
+        locator: {page: 5, published_page: 433, pdf_page_index: 4, section: Manganese-oxygen system}
+        units: °C; wt%; composition fraction; pressure unit not printed for cited clause
         values:
           method_class: quoted_attributed
           quantity_as_printed: manganese oxide and slag ranges quoted in the review
           candidate_quantity_tokens: [activity_coefficient, partial_pressure, composition, transition_temperature]
           quoted_values:
-            - {value_as_printed: 'x in Mn1-xO ranges from about 0.11 in air to about 0.0004 with metallic Mn; pO2 approximately 10^-14 atm at 1600 °C', attribution: 'Grundy et al., reference 26, as cited by Holappa and Xiao'}
+            - {value_as_printed: 'x in Mn1-xO ranges from about 0.11 in air to about 0.0004 with metallic Mn; pO2 approximately 10^-14 at 1600 °C', attribution: 'Grundy et al., reference 26, as cited by Holappa and Xiao'}
             - {value_as_printed: 'MnOx-SiO2 diagram study: pO2 range 10^-10 atm at 1130 °C to 10^-6 atm at 1555 °C', attribution: 'Glasser, reference 31, as cited by Holappa and Xiao'}
             - {value_as_printed: 'CaO-MnOx-SiO2 liquidus valley at 1600 °C spans about 67-43 wt% SiO2 in CaO-SiO2 and 52-19 wt% SiO2 in MnO-SiO2', attribution: 'Glasser, references 33-34, as cited by Holappa and Xiao'}
             - {value_as_printed: 'quinary slag compositions: 5-30% MnO, 20-35% CaO, 5-15% MgO, 27-58% SiO2, and 5% Al2O3; liquidus temperatures 1300-1380 °C', attribution: 'Eric et al. and Reuter et al., references 36-37, as cited by Holappa and Xiao'}

@@ -21,7 +21,8 @@ def _assert_capture(document):
     manganese = document["species"]["MnO"]["context"]
     assert [row["locator"]["figure"] for row in chromium if row["type"] == "figure_only"] == ["1", "2", "3", "4", "5", "6", "10"]
     assert [row["locator"]["figure"] for row in manganese if row["type"] == "figure_only"] == ["7", "8", "9"]
-    assert "10^-14 atm at 1600 °C" in manganese[0]["values"]["quoted_values"][0]["value_as_printed"]
+    assert "10^-14 at 1600 °C" in manganese[0]["values"]["quoted_values"][0]["value_as_printed"]
+    assert manganese[0]["locator"]["pdf_page_index"] == 4
     assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in chromium + manganese if row["type"] == "figure_only")
 
 
