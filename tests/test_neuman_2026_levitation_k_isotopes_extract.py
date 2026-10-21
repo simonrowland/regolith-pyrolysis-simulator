@@ -6,13 +6,15 @@ import re
 import subprocess
 import sys
 from collections import Counter
+from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 import yaml
 
 from simulator.battery.enums import Quantity
-from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.migrate import Migrator, REPO_ROOT, load_index, source_files_for
 from tests.literature_extract_test_helpers import (
     assert_no_unavailable_observation_values,
     iter_locators,
@@ -279,25 +281,99 @@ def test_printed_loss_summaries_and_registered_supplement_context_are_preserved(
     supplement = contexts["neuman_2026_supplementary_table_s1_mass_loss_inputs"]
     assert supplement["type"] == "printed_data_context"
     reason = supplement["values"]["reason"]
-    assert "49 rows are transcribed from the registered publisher MMC2 workbook" in reason
-    assert "no registered TABLE_CSV asset" in reason
-    assert "no mass-loss fraction is computed" in reason
+    assert "inputs to the measured_reduced mass-loss rows" in reason
+    assert "K evaporation number, J and timescales are model-derived and remain context" in reason
     assert len(supplement["values"]["rows"]) == 49
+
+    assert all(
+        "starting_weight_g" not in row and "ending_weight_g" not in row
+        for row in supplement["values"]["rows"]
+    )
+
+
+def test_derived_supplementary_mass_loss_rows_migrate_and_pin_values() -> None:
+    index_row = load_index(REPO_ROOT / "data/literature/INDEX.yaml")[SID]
+    table_asset = next(
+        asset
+        for asset in source_files_for(SID, index_row).files
+        if asset.asset_id == f"tables:{SID}"
+    )
+    assert table_asset.role.name == "TABLE_CSV"
+    assert table_asset.path == f"tables/{SID}"
+
+    rows = _migrate(_document())
+    mass_loss = [
+        row
+        for row in rows
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        and "neuman_2026_supplementary_table_s1_" in row.observation_id
+    ]
+    assert len(mass_loss) == 49
+    assert all(row.value.kind.value == "point" for row in mass_loss)
+    assert all(row.evidence.class_.value.value == "measured_reduced" for row in mass_loss)
+    assert all(row.derived_from == (f"tables:{SID}",) for row in mass_loss)
+    assert all(row.identity.temperature_K.is_value for row in mass_loss)
+    assert all(row.point_conditions for row in mass_loss)
+    assert all(
+        row.point_conditions["duration_s"].state.is_value
+        and row.point_conditions["duration_s"].locator is not None
+        for row in mass_loss
+    )
+
+    pinned = {
+        "1-2": "0.023379515092",
+        "1-4": "0.171697626419",
+        "3-5": "0.053664166186",
+    }
+
+    def pinned_values(observations):
+        return {
+            row.locator.note.split("CSV row ", 1)[1].split(";", 1)[0]: str(
+                row.value.point
+            )
+            for row in observations
+            if row.locator.note
+            and "CSV row " in row.locator.note
+            and row.locator.note.split("CSV row ", 1)[1].split(";", 1)[0]
+            in pinned
+        }
+
+    actual = pinned_values(mass_loss)
+    assert actual == pinned
+
+    target = next(
+        row
+        for row in mass_loss
+        if row.locator.note and "CSV row 1-2;" in row.locator.note
+    )
+    mutated_value = replace(target.value, point=Decimal("0.023379515093"))
+    mutated_row = replace(target, value=mutated_value)
+    mutated_rows = [mutated_row if row is target else row for row in mass_loss]
+    mutated = pinned_values(mutated_rows)
+    with pytest.raises(AssertionError):
+        assert mutated == pinned
 
 
 def test_isolated_migration_preserves_species_and_run_conditions() -> None:
     document = _document()
     source = _source_observations(document)
     rows = _migrate(document)
-    assert len(rows) == 2258
+    assert len(rows) == 2307
     assert_no_unavailable_observation_values(rows)
-    assert not any(
+    assert sum(
         row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION for row in rows
-    )
+    ) == 49
 
     actual_species_rows = Counter()
     without_sample = []
     for row in rows:
+        if (
+            row.identity.quantity.is_value
+            and row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+            and "neuman_2026_supplementary_table_s1_" in row.observation_id
+        ):
+            continue
         parts = row.observation_id.split("::", 2)
         source_id = parts[1]
         container, observation = source[source_id]
