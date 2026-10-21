@@ -1047,6 +1047,17 @@ def validate_observation(
     declares_printed_unresolved = (
         derivation is not None and derivation.declares_unresolved_printed_inputs
     )
+    if declares_printed_unresolved and derivation is not None:
+        # The printed text is not stored. The locator is what the record carries.
+        # The issue stays after reload, even when derived_from resolves.
+        locator = None if raw_inputs is None else raw_inputs.locator
+        issues.append(
+            _issue(
+                f"{path}.derivation",
+                RefusalReason.CONDITIONAL_FIELD,
+                f"printed derivation inputs do not resolve; locator {locator!r}",
+            )
+        )
     if raw_inputs is not None and not (
         (ev.is_value and ev.value is EvidenceClass.MEASURED_REDUCED)
         or (
@@ -1556,6 +1567,13 @@ def _observation_lineage(
     if obs is None:
         return None
     seen.add(observation_id)
+    if (
+        obs.derivation is not None
+        and obs.derivation.declares_unresolved_printed_inputs
+    ):
+        # Printed inputs are absent from derivation.inputs. Ancestry that
+        # reaches this row is incomplete, not an independent lineage.
+        return None
     ids: set[str] = {observation_id}
     if obs.read_from and obs.read_from in table_ids:
         ids.add(obs.read_from)

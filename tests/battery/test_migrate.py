@@ -342,7 +342,7 @@ from simulator.battery.records import (
     as_decimal,
 )
 from tests.battery import load_observation_store_summary
-from simulator.battery.validate import validate_corpus
+from simulator.battery.validate import _observation_lineage, validate_corpus
 from simulator.yaml_cache import YAML12SafeLoader, load_cached_safe_yaml
 from tests.battery import factories as F
 
@@ -2780,6 +2780,81 @@ def test_unlocated_printed_unresolved_requires_a_locator() -> None:
         ),
     )
     assert _derivation_inputs_requirement_error(located) is None
+
+
+def _assert_reloaded_printed_unresolved(
+    root: Path, marker: str, *, resolved_parent: str
+) -> None:
+    _works, experiments, loaded = load_migrated_store(root)
+    report = validate_corpus(_works, experiments, loaded, residuals=None)
+    rows = [obs for obs in loaded.values() if marker in obs.observation_id]
+    assert rows
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.declares_unresolved_printed_inputs
+        locator = obs.derivation.raw_inputs.locator
+        assert any(
+            issue.reason is RefusalReason.CONDITIONAL_FIELD
+            and issue.path == f"observation[{obs.observation_id}].derivation"
+            and issue.detail
+            == f"printed derivation inputs do not resolve; locator {locator!r}"
+            for issue in report.hard_issues
+        )
+        assert _observation_lineage(obs.observation_id, loaded, set()) is None
+    parents = [
+        obs for obs in loaded.values() if resolved_parent in obs.observation_id
+    ]
+    assert parents
+    for obs in parents:
+        assert obs.derivation is None or not obs.derivation.declares_unresolved_printed_inputs
+        assert _observation_lineage(obs.observation_id, loaded, set()) is not None
+
+
+def test_printed_unresolved_stays_flagged_after_reload(tmp_path: Path) -> None:
+    """b-979: a resolved derived_from does not clear printed inputs after load."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "parent_meas"
+    _model_derived_child(
+        extract,
+        "child_citation",
+        derived_from="parent_meas",
+        derivation={
+            "relation": "substitution of printed equilibrium relations",
+            "inputs": _PRINTED_CITATION,
+            "output_unit": "dimensionless",
+        },
+    )
+    root = _write_min_tree(tmp_path, extract)
+    migrate(root, write=True)
+    _assert_reloaded_printed_unresolved(
+        root, "child_citation", resolved_parent="parent_meas"
+    )
+
+
+def test_measured_reduced_printed_unresolved_stays_flagged_after_reload(
+    tmp_path: Path,
+) -> None:
+    """b-979: measured_reduced keeps the same loaded flag and incomplete ancestry."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "parent_meas"
+    child = _model_derived_child(
+        extract,
+        "child_reduced",
+        derived_from="parent_meas",
+        derivation={
+            "relation": "author reduction of the paired measurement",
+            "inputs": _PRINTED_NON_CITATION,
+            "output_unit": "dimensionless",
+        },
+    )
+    child["values"]["method_class"] = "measured_reduced"
+    root = _write_min_tree(tmp_path, extract)
+    migrate(root, write=True)
+    _assert_reloaded_printed_unresolved(
+        root, "child_reduced", resolved_parent="parent_meas"
+    )
 
 
 def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
