@@ -18,7 +18,7 @@ extraction:
     absorption coefficients have no quantity token.
   date: '2026-10-20'
   worker: codex
-  provenance_path: text/ehrt-2008-sn-redox-aluminosilicate/pdftotext-layout.txt
+  provenance_path: raw/ehrt-2008-sn-redox-aluminosilicate/ehrt-2008-sn-redox-aluminosilicate.pdf
 review_status: draft
 fidelity_samples:
   - path: species.Sn.observations[ehrt2008_redox_fraction_air_1600_1700C].values.points[0].value
@@ -40,7 +40,7 @@ species:
           method_class: measured_direct
           density_g_cm3: '2.85'
           value_as_published: '2.85 ± 0.01 g/cm3'
-          note: The printed ±0.01 g/cm3 uncertainty is retained as published; the density converter does not convert sigma, so sigma is omitted.
+        uncertainty: {sigma: '10', units: kg/m3}
       - observation_id: ehrt2008_density_ABS
         type: concentration_series
         locator: {page: 2, pdf_page_index: 1, published_page: 69, table: '1'}
@@ -53,7 +53,7 @@ species:
           method_class: measured_direct
           density_g_cm3: '2.56'
           value_as_published: '2.56 ± 0.01 g/cm3'
-          note: The printed ±0.01 g/cm3 uncertainty is retained as published; the density converter does not convert sigma, so sigma is omitted.
+        uncertainty: {sigma: '10', units: kg/m3}
       - observation_id: ehrt2008_redox_fraction_air_1600_1700C
         type: concentration_series
         locator: {page: 4, pdf_page_index: 3, published_page: 71, section: Results and discussion}
@@ -87,10 +87,16 @@ species:
                   locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '6'}
                 total_pressure_Pa:
                   state: {tag: value, value: '100000'}
-                  locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '6'}
+                  as_printed: 1000 mbar
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Conclusions}
                 composition:
-                  state: {tag: unknown, reason: source reports a broad range of model-glass compositions}
-                  locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '6'}
+                  state:
+                    tag: value
+                    value:
+                      basis: printed mol-percent glass composition, Table 1
+                      amount_basis: mol_inventory
+                      components: [[Al2O3, '15'], [SiO2, '65'], [BaO, '10'], [CaO, '10']]
+                  locator: {page: 2, pdf_page_index: 1, published_page: 69, table: '1'}
               locator: {page: 4, pdf_page_index: 3, published_page: 71, section: Results and discussion}
               quench_status:
                 state: {tag: value, value: asserted_preserved}
@@ -109,16 +115,22 @@ species:
                   locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '6'}
                 total_pressure_Pa:
                   state: {tag: value, value: '100000'}
-                  locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '6'}
+                  as_printed: 1000 mbar
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Conclusions}
                 composition:
-                  state: {tag: unknown, reason: source reports a broad range of model-glass compositions}
-                  locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '6'}
+                  state:
+                    tag: value
+                    value:
+                      basis: printed mol-percent glass composition, Table 1
+                      amount_basis: mol_inventory
+                      components: [[Al2O3, '15'], [SiO2, '65'], [BaO, '10'], [CaO, '10']]
+                  locator: {page: 2, pdf_page_index: 1, published_page: 69, table: '1'}
               quench_status:
                 state: {tag: value, value: asserted_preserved}
                 as_printed: Melts up to 1700°C were quenched by casting on a copper block.
                 locator: {page: 2, pdf_page_index: 1, published_page: 69, section: Experimental}
           method_as_printed: 119Sn Mössbauer spectroscopy and optical absorption calibration
-      - observation_id: ehrt2008_redox_fraction_argon_1600_1700C
+      - observation_id: ehrt2008_redox_fraction_argon_1600_1800C
         type: concentration_series
         locator: {page: 4, pdf_page_index: 3, published_page: 71, section: Results and discussion}
         phase: glass
@@ -142,22 +154,31 @@ species:
             - value: '0.40'
               approximate: true
               value_as_published: 'nearly 40% Sn2+'
-              sample: ABS
+              sample: AS
               T_C: '1600'
               melting_time_h: '2'
+              tin_ppmw: '1000'
+              note: Nearly 40% Sn2+ after 2 h in argon is the Figure 6 AS-glass result.
               point_conditions:
                 atmosphere:
                   state: {tag: value, value: argon}
                   locator: {page: 4, pdf_page_index: 3, published_page: 71, section: Results and discussion}
                 total_pressure_Pa:
                   state: {tag: value, value: '100000'}
-                  locator: {page: 4, pdf_page_index: 3, published_page: 71, section: Results and discussion}
+                  as_printed: 1000 mbar
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Conclusions}
                 composition:
-                  state: {tag: unknown, reason: source reports a broad range of model-glass compositions}
-                  locator: {page: 4, pdf_page_index: 3, published_page: 71, section: Results and discussion}
+                  state:
+                    tag: value
+                    value:
+                      basis: printed mol-percent glass composition, Table 1
+                      amount_basis: mol_inventory
+                      components: [[Al2O3, '15'], [SiO2, '65'], [BaO, '10'], [CaO, '10']]
+                  locator: {page: 2, pdf_page_index: 1, published_page: 69, table: '1'}
               locator: {page: 4, pdf_page_index: 3, published_page: 71, section: Results and discussion}
               quench_status:
-                state: {tag: value, value: not_stated}
+                state: {tag: value, value: asserted_preserved}
+                as_printed: Melts up to 1700°C were quenched by casting on a copper block.
                 locator: {page: 2, pdf_page_index: 1, published_page: 69, section: Experimental}
             - value: '0.50'
               approximate: true
@@ -165,6 +186,8 @@ species:
               sample: ABS
               T_C: '1800'
               melting_time_h: '1'
+              note: The Results prose gives approximately 55% after 1 h in argon; the Conclusions give approximately 50% for this condition. Both printed values are retained without duplicate scoring.
+              note_locator: {page: 4, pdf_page_index: 3, published_page: 71, section: Results and discussion}
               locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Results and discussion}
               point_conditions:
                 atmosphere:
@@ -172,12 +195,19 @@ species:
                   locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Results and discussion}
                 total_pressure_Pa:
                   state: {tag: value, value: '100000'}
+                  as_printed: 1000 mbar
                   locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Results and discussion}
                 composition:
-                  state: {tag: unknown, reason: source reports a broad range of model-glass compositions}
-                  locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Results and discussion}
+                  state:
+                    tag: value
+                    value:
+                      basis: printed mol-percent glass composition, Table 1
+                      amount_basis: mol_inventory
+                      components: [[Al2O3, '10'], [B2O3, '8'], [SiO2, '67'], [BaO, '2'], [CaO, '9'], [MgO, '4']]
+                  locator: {page: 2, pdf_page_index: 1, published_page: 69, table: '1'}
               quench_status:
-                state: {tag: value, value: not_stated}
+                state: {tag: value, value: asserted_preserved}
+                as_printed: High-temperature melts were quenched by centrifugal casting in a cold graphite mould.
                 locator: {page: 2, pdf_page_index: 1, published_page: 69, section: Experimental}
             - value: '0.80'
               approximate: true
@@ -192,14 +222,197 @@ species:
                   locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Results and discussion}
                 total_pressure_Pa:
                   state: {tag: value, value: '100000'}
+                  as_printed: 1000 mbar
                   locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Results and discussion}
                 composition:
-                  state: {tag: unknown, reason: source reports a broad range of model-glass compositions}
-                  locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Results and discussion}
+                  state:
+                    tag: value
+                    value:
+                      basis: printed mol-percent glass composition, Table 1
+                      amount_basis: mol_inventory
+                      components: [[Al2O3, '10'], [B2O3, '8'], [SiO2, '67'], [BaO, '2'], [CaO, '9'], [MgO, '4']]
+                  locator: {page: 2, pdf_page_index: 1, published_page: 69, table: '1'}
               quench_status:
-                state: {tag: value, value: not_stated}
+                state: {tag: value, value: asserted_preserved}
+                as_printed: High-temperature melts were quenched by centrifugal casting in a cold graphite mould.
                 locator: {page: 2, pdf_page_index: 1, published_page: 69, section: Experimental}
           method_as_printed: 119Sn Mössbauer spectroscopy and optical absorption calibration
+      - observation_id: ehrt2008_redox_fraction_as_5000_ppmw_1600C_air
+        type: concentration_series
+        locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '4'}
+        phase: glass
+        units: fraction
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states: [2]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_reduced
+          units: fraction
+          derivation:
+            relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 3, pdf_page_index: 2, published_page: 70, section: Experimental}
+            output_unit: fraction
+          points:
+            - value: '0.20'
+              approximate: true
+              value_as_published: '~20% Sn2+; ~80% Sn4+'
+              sample: AS
+              T_C: '1600'
+              tin_ppmw: '5000'
+              point_conditions:
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '4'}
+                total_pressure_Pa:
+                  state: {tag: value, value: '100000'}
+                  as_printed: 1000 mbar
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Conclusions}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed mol-percent glass composition, Table 1
+                      amount_basis: mol_inventory
+                      components: [[Al2O3, '15'], [SiO2, '65'], [BaO, '10'], [CaO, '10']]
+                  locator: {page: 2, pdf_page_index: 1, published_page: 69, table: '1'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 71, figure: '4'}
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: Melts up to 1700°C were quenched by casting on a copper block.
+                locator: {page: 2, pdf_page_index: 1, published_page: 69, section: Experimental}
+          method_as_printed: 119Sn Mössbauer spectroscopy
+      - observation_id: ehrt2008_redox_fraction_abs_1900C_argon
+        type: concentration_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Conclusions}
+        phase: glass
+        units: fraction
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states: [2]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_reduced
+          units: fraction
+          derivation:
+            relation: Sn2+ fraction evaluated from 119Sn Mössbauer measurements and optical absorption calibration.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 3, pdf_page_index: 2, published_page: 70, section: Experimental}
+            output_unit: fraction
+          points:
+            - value: '1.00'
+              approximate: true
+              value_as_published: only Sn2+ species could be detected
+              sample: ABS
+              T_C: '1900'
+              melting_time_h: '1'
+              tin_ppmw: '2000'
+              point_conditions:
+                atmosphere:
+                  state: {tag: value, value: argon}
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Conclusions}
+                total_pressure_Pa:
+                  state: {tag: value, value: '100000'}
+                  as_printed: 1000 mbar
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Conclusions}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed mol-percent glass composition, Table 1
+                      amount_basis: mol_inventory
+                      components: [[Al2O3, '10'], [B2O3, '8'], [SiO2, '67'], [BaO, '2'], [CaO, '9'], [MgO, '4']]
+                  locator: {page: 2, pdf_page_index: 1, published_page: 69, table: '1'}
+              locator: {page: 5, pdf_page_index: 4, published_page: 72, section: Conclusions}
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: High-temperature melts were quenched by centrifugal casting in a cold graphite mould.
+                locator: {page: 2, pdf_page_index: 1, published_page: 69, section: Experimental}
+          method_as_printed: 119Sn Mössbauer spectroscopy and optical absorption calibration
+      - observation_id: ehrt2008_redox_fraction_abs_pressure_reduction
+        type: concentration_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 72, figure: '8'}
+        phase: glass
+        units: fraction
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states: [2]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_reduced
+          units: fraction
+          derivation:
+            relation: Sn2+ fraction evaluated from photoluminescence and optical absorption calibration.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 5, pdf_page_index: 4, published_page: 72, figure: '8'}
+            output_unit: fraction
+          points:
+            - value: '0.20'
+              approximate: true
+              value_as_published: '~20% Sn2+'
+              sample: ABS
+              T_C: '1650'
+              tin_ppmw: '2000'
+              point_conditions:
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, figure: '8'}
+                total_pressure_Pa:
+                  state: {tag: value, value: '100000'}
+                  as_printed: 1000 mbar
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, figure: '8'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed mol-percent glass composition, Table 1
+                      amount_basis: mol_inventory
+                      components: [[Al2O3, '10'], [B2O3, '8'], [SiO2, '67'], [BaO, '2'], [CaO, '9'], [MgO, '4']]
+                  locator: {page: 2, pdf_page_index: 1, published_page: 69, table: '1'}
+              locator: {page: 5, pdf_page_index: 4, published_page: 72, figure: '8'}
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: Melts up to 1700°C were quenched by casting on a copper block.
+                locator: {page: 2, pdf_page_index: 1, published_page: 69, section: Experimental}
+            - value: '0.40'
+              approximate: true
+              value_as_published: '~40% Sn2+'
+              sample: ABS
+              T_C: '1500'
+              melting_time_h: '1'
+              tin_ppmw: '2000'
+              point_conditions:
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, figure: '8'}
+                total_pressure_Pa:
+                  state: {tag: value, value: '10000'}
+                  as_printed: 100 mbar
+                  locator: {page: 5, pdf_page_index: 4, published_page: 72, figure: '8'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed mol-percent glass composition, Table 1
+                      amount_basis: mol_inventory
+                      components: [[Al2O3, '10'], [B2O3, '8'], [SiO2, '67'], [BaO, '2'], [CaO, '9'], [MgO, '4']]
+                  locator: {page: 2, pdf_page_index: 1, published_page: 69, table: '1'}
+              locator: {page: 5, pdf_page_index: 4, published_page: 72, figure: '8'}
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: Melts up to 1700°C were quenched by casting on a copper block.
+                locator: {page: 2, pdf_page_index: 1, published_page: 69, section: Experimental}
+          method_as_printed: Photoluminescence and optical absorption calibration
     context:
       - observation_id: ehrt2008_table1_glass_composition_and_untyped_properties
         type: measured_table_context
@@ -244,6 +457,6 @@ species:
             - {figure: '4', page: 4, caption: '119Sn Mössbauer spectra at 77 K of AS glass doped with 5000 ppmw Sn and equilibrated at 1600°C in air.', panel: main, species: Sn, phase: glass, T: {state: {tag: value, value: '1600', units: °C}}, axes_as_printed: {x: isomer shift (mm/s), y: transmission}, series: [Sn4+, Sn2+], marker_counts: not_counted, attribution: this_work}
             - {figure: '5', page: 4, caption: '119Sn Mössbauer spectra at 77 K of ABS glass doped with 2000 ppmw Sn; after remelting at 1900°C in argon only Sn2+ was detected.', panel: main, species: Sn, phase: glass, T: {state: {tag: value, value: '1900', units: °C}}, axes_as_printed: {x: isomer shift (mm/s), y: transmission}, series: [Sn2+], marker_counts: not_counted, attribution: this_work}
             - {figure: '6', page: 4, caption: 'Normalised optical UV-absorption spectra of AS glass samples doped with 1000 ppmw Sn under different melting conditions.', panel: main, species: Sn, phase: glass, T: {state: {tag: value, value: '1600–2000', units: °C}}, axes_as_printed: {x: wavenumber (cm-1), y: normalised absorption}, series: [1600°C air 8h, 1700°C air 6h, 1600°C Ar 2h, 1900°C Ar 1h, 2000°C Ar 0.5h], marker_counts: not_counted, attribution: this_work}
-            - {figure: '7', page: 5, caption: 'Relative Sn2+ content of ABS glass samples depending on melting temperature and time.', panel: main, species: Sn, phase: glass, T: {state: {tag: value, value: '1650–1800', units: °C}}, axes_as_printed: {x: time (h), y: relative Sn2+ content (%)}, series: [1650°C air, 1800°C Ar, 1700°C Ar], marker_counts: not_counted, attribution: this_work}
+            - {figure: '7', page: 4, caption: 'Relative Sn2+ content of ABS glass samples depending on melting temperature and time.', panel: main, species: Sn, phase: glass, T: {state: {tag: value, value: '1650–1800', units: °C}}, axes_as_printed: {x: time (h), y: relative Sn2+ content (%)}, series: [1650°C air, 1800°C Ar, 1700°C Ar], marker_counts: not_counted, attribution: this_work}
             - {figure: '8', page: 5, caption: 'Photoluminescence excitation and emission spectra of ABS glass doped with 2000 ppmw Sn, melted at 1650°C in air and remelted at 1500°C under 100 mbar for 1 h.', panel: main, species: Sn, phase: glass, T: {state: {tag: value, value: '1500–1650', units: °C}}, axes_as_printed: {x: wavenumber (cm-1), y: intensity}, series: [excitation, emission], marker_counts: not_counted, attribution: this_work}
           digitisation: deferred to a figure pass
