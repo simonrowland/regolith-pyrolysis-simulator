@@ -61,7 +61,7 @@ def test_missing_mars_flow_refuses_and_zero_is_a_real_control():
     before = sim.atom_ledger.mol_by_account()
     with pytest.raises(CampaignPressureSetpointRefusal) as exc:
         sim.step()
-    assert exc.value.diagnostic["detail"] == "campaigns.C2A_continuous.sweep_mol_per_s"
+    assert exc.value.diagnostic["detail"] == "campaigns.C2A_continuous.sweep_mol_per_m2_s"
     assert sim.atom_ledger.mol_by_account() == before
     assert mars_sim(sweep=0.0).melt.sweep_mol_per_s == 0.0
 
@@ -76,24 +76,24 @@ def test_raw_zero_oxygen_remains_separate_from_vapor_guard():
 
 def test_campaign_and_stage_flow_recipe_identity():
     schema = RecipeSchema()
-    path = ("campaigns", "C2A_continuous", "sweep_mol_per_s")
+    path = ("campaigns", "C2A_continuous", "sweep_mol_per_m2_s")
     slow, fast = RecipePatch({path: 0.01}), RecipePatch({path: 0.1})
     assert slow.recipe_id(schema) != fast.recipe_id(schema)
     stage = RecipePatch.from_nested({"campaigns": {"C2A_staged": {"stages": [
-        {"name": "alkali_early_fe", "sweep_mol_per_s": 0.3},
+        {"name": "alkali_early_fe", "sweep_mol_per_m2_s": 0.3},
     ]}}})
     patch = schema.to_setpoints_patch(stage)
     assert isinstance(patch["campaigns"]["C2A_staged"]["stages"], list)
-    assert patch["campaigns"]["C2A_staged"]["stages"][0]["sweep_mol_per_s"] == 0.3
+    assert patch["campaigns"]["C2A_staged"]["stages"][0]["sweep_mol_per_m2_s"] == 0.3
 
 
 def test_campaign_flow_runtime_override_wins_and_zero_stage_is_preserved():
     manager = CampaignManager(load_config_bundle().setpoints)
-    assert manager._campaign_sweep_flow(CampaignPhase.C2A_STAGED, {"sweep_mol_per_s": 0.0}) == 0.0
+    assert manager._campaign_sweep_flow(CampaignPhase.C2A_STAGED, {"sweep_mol_per_m2_s": 0.0}) == 0.0
     melt = MeltState()
-    manager.overrides['C2A'] = {"sweep_mol_per_s": 0.4}
+    manager.overrides['C2A'] = {"sweep_mol_per_m2_s": 0.4}
     manager.configure_campaign(melt, CampaignPhase.C2A)
-    assert melt.sweep_mol_per_s == 0.4
+    assert melt.sweep_mol_per_s == pytest.approx(0.4 * melt.melt_surface_area_m2)
 
 
 def test_sweep_source_split_distinguishes_consumption_then_replacement():
@@ -164,7 +164,7 @@ def test_sweep_knob_changes_existing_evalspec_recipe_identity_only():
     from dataclasses import replace
     from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
     schema = RecipeSchema()
-    path = ("campaigns", "C2A_continuous", "sweep_mol_per_s")
+    path = ("campaigns", "C2A_continuous", "sweep_mol_per_m2_s")
     slow, fast = RecipePatch({path: 0.001}), RecipePatch({path: 0.01})
     before = EvalSpec(recipe_id=slow.recipe_id(schema), feedstock_recipe_digest="same",
                       feedstock_id="mars_basalt", profile_id="same", fidelity="fast",
@@ -207,12 +207,12 @@ def test_cold_train_retention_refuses_incompatible_sweep_pressure(monkeypatch, b
 @pytest.mark.parametrize("campaign", [p for p in CampaignPhase if p not in {CampaignPhase.IDLE, CampaignPhase.COMPLETE}])
 def test_common_sweep_control_is_applied_for_every_body_and_campaign(body, campaign):
     manager = CampaignManager(load_config_bundle().setpoints)
-    manager.overrides[campaign.name] = {"sweep_mol_per_s": 0.25}
+    manager.overrides[campaign.name] = {"sweep_mol_per_m2_s": 0.25}
     melt = MeltState(body=body)
     manager.configure_campaign(melt, campaign)
-    assert melt.sweep_mol_per_s == 0.25
+    assert melt.sweep_mol_per_s == pytest.approx(0.25 * melt.melt_surface_area_m2)
     key = manager._campaign_config_key(campaign)
-    assert RecipeSchema().spec_for(("campaigns", key, "sweep_mol_per_s")).units == "mol/s"
+    assert RecipeSchema().spec_for(("campaigns", key, "sweep_mol_per_m2_s")).units == "mol/m2/s"
 
 
 @pytest.mark.parametrize("body", ["moon", "asteroid"])
@@ -259,18 +259,18 @@ def test_live_continuous_campaign_flow_adjustment_is_applied(initial_flow):
     from simulator.runner import PyrolysisRun
     from simulator.session import SimSession
 
-    patch = ({'campaigns': {'C2A_continuous': {'sweep_mol_per_s': initial_flow}}}
+    patch = ({'campaigns': {'C2A_continuous': {'sweep_mol_per_m2_s': initial_flow}}}
              if initial_flow is not None else {})
     run = PyrolysisRun(feedstock_id='mars_basalt', campaign='C2A', hours=0,
                       additives_kg={'C': 30.0}, setpoints_patch=patch)
     session = SimSession().start(run._session_config())
-    session.adjust('campaign_override', 0.001, campaign='C2A', field='sweep_mol_per_s')
+    session.adjust('campaign_override', 0.001, campaign='C2A', field='sweep_mol_per_m2_s')
     sim = session.simulator
-    assert sim.melt.sweep_mol_per_s == 0.001
+    assert sim.melt.sweep_mol_per_s == pytest.approx(0.001 * sim.melt.melt_surface_area_m2)
     sim.step()
     assert sim.melt.hour == 1
-    session.adjust('campaign_override', 0.002, campaign='C2A', field='sweep_mol_per_s')
-    assert sim.melt.sweep_mol_per_s == 0.002
+    session.adjust('campaign_override', 0.002, campaign='C2A', field='sweep_mol_per_m2_s')
+    assert sim.melt.sweep_mol_per_s == pytest.approx(0.002 * sim.melt.melt_surface_area_m2)
     sim.step()
     assert sim.melt.hour == 2
 
@@ -363,3 +363,84 @@ def test_wholly_external_oxygen_cannot_become_melt_product_by_rounding(flow, ini
         volume_m3=1.0, temperature_K=300.0,
         initial_external_o2_mol=initial_o2, generated_external_o2_mol=1.0)
     assert result['external_o2_outflow_mol'] == result['outflow_species_mol']['O2']
+
+
+@pytest.mark.parametrize('mass_kg', [100.0, 1000.0])
+def test_intensive_sweep_uses_designer_area_with_explicit_headspace(mass_kg):
+    from simulator.runner import PyrolysisRun
+    from simulator.session import SimSession
+    from simulator.equipment import EquipmentDesigner
+
+    run = PyrolysisRun(feedstock_id='mars_basalt', campaign='C2A', hours=0,
+                      mass_kg=mass_kg, additives_kg={'C': 0.03 * mass_kg},
+                      setpoints_patch={
+                          'overhead_headspace': {'volume_m3': 0.1},
+                          'campaigns': {'C2A_continuous': {'sweep_mol_per_m2_s': 2.0}},
+                      })
+    sim = SimSession().start(run._session_config()).simulator
+    area = EquipmentDesigner(sim.setpoints).size_crucible(mass_kg).melt_surface_area_m2
+    assert sim.melt.melt_surface_area_m2 == pytest.approx(area)
+    assert sim.melt.sweep_mol_per_s == pytest.approx(2.0 * area)
+
+
+def test_absolute_sweep_is_no_longer_an_operator_knob():
+    with pytest.raises(ValueError):
+        RecipeSchema().to_setpoints_patch(RecipePatch({
+            ('campaigns', 'C2A_continuous', 'sweep_mol_per_s'): 1.0,
+        }))
+    manager = CampaignManager(load_config_bundle().setpoints)
+    with pytest.raises(ValueError):
+        manager._refuse_unknown_override_fields('C2A', {'sweep_mol_per_s': 1.0})
+
+
+def test_mars_default_is_generic_only_when_explicitly_declared_elsewhere():
+    setpoints = load_config_bundle().setpoints
+    intensity = setpoints['overhead_headspace']['sweep_mol_per_m2_s_default']
+    manager = CampaignManager(setpoints)
+    mars, moon = MeltState(body='mars'), MeltState(body='moon')
+    manager.configure_campaign(mars, CampaignPhase.C2A)
+    manager.configure_campaign(moon, CampaignPhase.C2A)
+    assert mars.sweep_mol_per_s == pytest.approx(intensity * mars.melt_surface_area_m2)
+    assert moon.sweep_mol_per_s is None
+    manager.overrides['C2A'] = {'sweep_mol_per_m2_s': 0.0}
+    manager.apply_sweep_flow_control(mars, CampaignPhase.C2A)
+    assert mars.sweep_mol_per_s == 0.0
+
+
+def test_first_live_intensive_flow_sizes_geometry_before_application():
+    from simulator.runner import PyrolysisRun
+    from simulator.session import SimSession
+    from simulator.equipment import EquipmentDesigner
+
+    run = PyrolysisRun(feedstock_id='lunar_mare_low_ti', campaign='C2A', hours=0,
+                      mass_kg=100.0, setpoints_patch={'overhead_headspace': {'volume_m3': 0.1}})
+    session = SimSession().start(run._session_config())
+    sim = session.simulator
+    assert sim.melt.sweep_mol_per_s is None
+    session.adjust('campaign_override', 2.0, campaign='C2A', field='sweep_mol_per_m2_s')
+    area = EquipmentDesigner(sim.setpoints).size_crucible(100.0).melt_surface_area_m2
+    assert sim.melt.melt_surface_area_m2 == pytest.approx(area)
+    assert sim.melt.sweep_mol_per_s == pytest.approx(2.0 * area)
+
+
+def test_first_staged_inert_default_activation_sizes_geometry():
+    from simulator.runner import PyrolysisRun
+    from simulator.session import SimSession
+    from simulator.equipment import EquipmentDesigner
+    from copy import deepcopy
+
+    stages = deepcopy(load_config_bundle().setpoints['campaigns']['C2A_staged']['stages'])
+    stages[0].update(gas_cover_mode='po2_hold', pO2_mbar=1.0)
+    run = PyrolysisRun(feedstock_id='mars_basalt', campaign='C2A_staged', hours=0,
+                      mass_kg=100.0, additives_kg={'C': 3.0}, setpoints_patch={
+                          'overhead_headspace': {'volume_m3': 0.1},
+                          'campaigns': {'C2A_staged': {'stages': stages}},
+                      })
+    sim = SimSession().start(run._session_config()).simulator
+    assert sim.melt.sweep_mol_per_s is None
+    sim.melt.campaign_hour = int(stages[0]['duration_h'])
+    sim.step()
+    area = EquipmentDesigner(sim.setpoints).size_crucible(100.0).melt_surface_area_m2
+    intensity = sim.setpoints['overhead_headspace']['sweep_mol_per_m2_s_default']
+    assert sim.melt.melt_surface_area_m2 == pytest.approx(area)
+    assert sim.melt.sweep_mol_per_s == pytest.approx(intensity * area)

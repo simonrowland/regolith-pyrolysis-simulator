@@ -91,12 +91,14 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
+        "9638b5dd9c6b2b0acfe9f292a69cc2f4018c3a3c26f9ae9a63edb1ea76a9d9a3"
     )
+    # d-215: regenerated with the production schema/search identity producers;
+    # sweep is now area-normalized, and the Mars fallback is resolved setpoints data.
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
     assert schema.bounds_digest == (
-        "21c0c4905a878d30051332ef69cc25cbd395a52ed5fd0f9a68484280efa7e0dc"
+        "1253c404513f50bd2f0648739525a5a1eb9d856497981fc1d24990b2cd1859a8"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -105,7 +107,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
     assert empty.recipe_id(schema) == (
-        "be70d44b9d30688788e535c9e84b42d51111956487b2b7e962deb1a70790d95e"
+        "d2d086a98b297a751679a471eb661ff7dd3922f0cb6d563ec4b137656163fbe1"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -118,7 +120,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "0cfae3821a514712c36151ca997fd5d9381191deeccca66ceb807628e179b160"
+        "c2960ae0fa39c481181e328340b2b56b098a7f8f7a272b35c9b6d53b25412860"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -1699,7 +1701,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # 2026-09-29 for C2 loader-scalar pressure coupling.
     assert (
         first.recipe_id()
-                == "cb77c9b93e43903f3820c491df51dce7a7a3d4f8784d9b55121f64906bca7b6d"
+                == "f6c61452e7fd73a11970f2c8557da0edc813905a69ded4552266834bf3c7828e"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

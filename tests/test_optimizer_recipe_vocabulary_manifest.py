@@ -43,16 +43,15 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # allowlist but disables both for search; this changes conditional subspace
     # dimensions and derived digests.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "1a1cb3658e83c6ac45b5ca8ff0feae4a653349fee76c76dbf767d679d1534751"
+        "1964ba13ac5a7d52abc5d70b686b68b3710db56c3ec84eeb08b43705de2004ca"
     )
-    assert digest == "0ab21330293ea06c2da8ed3e618c5410f69a39b8fa6abc87898daba5f3a85bcd"
+    assert digest == "c291ace8899d24f5b2a65cb278ce87fe333a730a12c4c07d94d26e267a9855b8"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
         "campaigns.vacuum_dissociation",
         "condensation_train.ballistic_condenser",
         "overhead_headspace.cover_gas",
-        "campaigns.C7",
         "campaigns.reducing_gas",
     )
     assert not any(
@@ -60,4 +59,9 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         for path in paths
         for prefix in forbidden_future_prefixes
     )
+    # The generic d-205/d-215 sweep actuator is the sole C7 control;
+    # the chemistry-specific C7 recipe surface remains unexposed.
+    assert {path for path in paths if path.startswith("campaigns.C7.")} == {
+        "campaigns.C7.sweep_mol_per_m2_s",
+    }
     assert [item["dimension"] for item in payload["conditional_subspaces"]] == [59, 65]

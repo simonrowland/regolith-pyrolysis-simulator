@@ -49,8 +49,11 @@ remain distinct: Stage 0, MRE anode, stored melt offgas, and vented melt
 offgas. With the toggle OFF, the legacy drain-each-tick behavior is preserved
 through the same kernel-committed bleed provider.
 
-`campaigns.<campaign>.sweep_mol_per_s` (also accepted in staged gas controls)
-declares a carrier flow in mol/s. Zero is a declared flow; omission is unknown.
+`campaigns.<campaign>.sweep_mol_per_m2_s` (also accepted in staged gas controls)
+declares carrier flow per melt surface in mol/(m² s). Absolute `sweep_mol_per_s`
+is derived using the crucible designer’s melt area; zero remains a real control.
+Mars inert sweeps use the reference-design default in `overhead_headspace`
+unless explicitly overridden. Other bodies retain legacy metering when omitted.
 The same campaign owner makes the applied flow available as the condenser-train
 design basis for every body; requirements-generator integration follows
 separately. Non-Mars omission retains today's metering behavior, with no

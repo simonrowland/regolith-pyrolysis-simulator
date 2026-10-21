@@ -350,7 +350,7 @@ class CampaignManager:
         'runtime_override',
     })
     _COMMON_OVERRIDE_FIELDS = frozenset({
-        'sweep_mol_per_s',
+        'sweep_mol_per_m2_s',
         'condenser_geometry',
         'duration_h',
         'freeze_gate',
@@ -1292,8 +1292,8 @@ class CampaignManager:
 
     def _campaign_sweep_flow(self, campaign: CampaignPhase, stage=None) -> float | None:
         raw = self._campaign_overrides(campaign).get(
-            'sweep_mol_per_s', (stage or {}).get(
-                'sweep_mol_per_s', self._campaign_config(campaign).get('sweep_mol_per_s'),
+            'sweep_mol_per_m2_s', (stage or {}).get(
+                'sweep_mol_per_m2_s', self._campaign_config(campaign).get('sweep_mol_per_m2_s'),
             ),
         )
         return self._validated_sweep_flow(raw)
@@ -1303,10 +1303,10 @@ class CampaignManager:
         if raw is None:
             return None
         if not is_declared_real_scalar(raw, allow_numeric_str=True):
-            raise ValueError('sweep_mol_per_s must be numeric')
+            raise ValueError('sweep_mol_per_m2_s must be numeric')
         value = float(raw)
         if not math.isfinite(value) or value < 0.0:
-            raise ValueError('sweep_mol_per_s must be finite and non-negative')
+            raise ValueError('sweep_mol_per_m2_s must be finite and non-negative')
         return value
 
     def apply_sweep_flow_control(self, melt: MeltState, campaign: CampaignPhase | None = None) -> Mapping | None:
@@ -1318,7 +1318,16 @@ class CampaignManager:
                 stage = self._c2a_staged_active_stage(melt.campaign_hour)
                 if not isinstance(stage, Mapping):
                     raise ValueError('C2A_staged.stages did not select a stage')
-        melt.sweep_mol_per_s = self._campaign_sweep_flow(active, stage)
+        flow_per_area = self._campaign_sweep_flow(active, stage)
+        atmosphere = self._c2a_staged_stage_gas_control(stage)[0] if stage is not None else melt.atmosphere
+        if flow_per_area is None and melt.body == 'mars' and atmosphere in {
+                Atmosphere.PN2_SWEEP, Atmosphere.ARGON_FLOW}:
+            flow_per_area = self._validated_sweep_flow(
+                self.setpoints.get('overhead_headspace', {}).get('sweep_mol_per_m2_s_default'))
+        # q = q_A A_melt: (mol m^-2 s^-1) m^2 = mol/s. The designer
+        # owns A_melt (~charge mass^(2/3)); zero intensity gives zero flow.
+        melt.sweep_mol_per_s = (None if flow_per_area is None else
+                                flow_per_area * melt.melt_surface_area_m2)
         return stage
 
     def apply_c2a_staged_gas_controls(

@@ -6921,6 +6921,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
+        if sweep_outflow_species_mol is not None:
+            # Capacity and outlet must use the same gas mixture. The carrier
+            # is staged in its reagent account until the one bleed transition.
+            for species, mass_kg in self.atom_ledger.project_account_kg(
+                    'reservoir.reagent.sweep_gas').items():
+                species_kg_for_M_avg[species] = species_kg_for_M_avg.get(species, 0.0) + mass_kg
         configured_downstream_pressure_bar = self._overhead_headspace_config.get(
             'downstream_pressure_bar'
         )
@@ -12932,6 +12938,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _normalized_component_key(component: str) -> str:
         return component.strip().lower().replace('-', '_').replace(' ', '_')
 
+    def _apply_sweep_flow_control(self) -> None:
+        self.campaign_mgr.apply_sweep_flow_control(self.melt)
+        if self.melt.sweep_mol_per_s is not None:
+            # Explicit headspace volume can bypass lazy geometry sizing.
+            # This also covers the first live/staged activation of a flow.
+            self._get_turbine_spec()
+            self.campaign_mgr.apply_sweep_flow_control(self.melt)
+
     def start_campaign(self, campaign: CampaignPhase):
         """Begin a campaign phase.  Sets atmosphere, temp targets, etc."""
         overhead_headspace_config = self._resolve_overhead_headspace_config(
@@ -12965,6 +12979,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             headspace_config=overhead_headspace_config,
             condenser_geometry_config=condenser_geometry_config,
         )
+        self._apply_sweep_flow_control()
         self._configure_freeze_gate(campaign, freeze_gate_config=freeze_gate_config)
         self._refresh_oxygen_reservoir_without_exchange(
             exchange_direction='none:campaign_start',
@@ -14076,6 +14091,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             sample_time_h=sample_time_h,
         )
         self.campaign_mgr.apply_c2a_staged_gas_controls(self.melt)
+        self._apply_sweep_flow_control()
         self._sync_c2a_staged_overhead_gas_control()
         self.melt.validate_melt_pressures()
         self._admit_process_pressure()
@@ -14096,7 +14112,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             from simulator.campaigns import CampaignPressureSetpointRefusal
             raise CampaignPressureSetpointRefusal({
                 'status': 'missing_input', 'reason': 'missing_input',
-                'detail': f'campaigns.{self.campaign_mgr._campaign_config_key(self.melt.campaign)}.sweep_mol_per_s',
+                'detail': f'campaigns.{self.campaign_mgr._campaign_config_key(self.melt.campaign)}.sweep_mol_per_m2_s',
                 'requested_pressure_pa': self.melt.p_total_mbar * 100.0,
                 'achieved_pressure_pa': None,
             })

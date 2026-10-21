@@ -459,7 +459,7 @@ does not resolve an instantaneous local-surface O₂ spike inside the same Mg so
 <!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:491 — conductance bleed -->
 
 **How the sweep is represented, and its current limits.** A declared
-`campaigns.<campaign>.sweep_mol_per_s` (including staged gas controls) drives
+`campaigns.<campaign>.sweep_mol_per_m2_s` (including staged gas controls) drives
 the continuous well-mixed mol balance in the overhead transport owner.
 At fixed admitted pressure, inflow plus generation plus initial inventory
 minus integrated outlet determines retained composition and physical pO₂.

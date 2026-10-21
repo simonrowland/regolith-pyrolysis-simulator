@@ -51,8 +51,12 @@ def mars_sim(*, pressure_mbar=6.0, pumping=None, sweep=0.0):
     bundle = load_config_bundle()
     setpoints = deepcopy(bundle.setpoints)
     setpoints['campaigns']['C2A_continuous']['p_total_mbar_default'] = pressure_mbar
+    if sweep is None:
+        setpoints['overhead_headspace'].pop('sweep_mol_per_m2_s_default', None)
     if sweep is not None:
-        setpoints['campaigns']['C2A_continuous']['sweep_mol_per_s'] = sweep
+        from simulator.equipment import EquipmentDesigner
+        area = EquipmentDesigner(setpoints).size_crucible(1000.0).melt_surface_area_m2
+        setpoints['campaigns']['C2A_continuous']['sweep_mol_per_m2_s'] = sweep / area
     if pumping is not None:
         setpoints.setdefault('overhead_headspace', {})['pumping'] = pumping
     sim = PyrolysisSimulator(InternalAnalyticalBackend(), setpoints,

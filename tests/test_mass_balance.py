@@ -736,20 +736,7 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal(
         assert all(math.isfinite(value) for value in drift[surface].values())
 
 
-def test_sio_disproportionation_closes(monkeypatch):
-    from dataclasses import replace
-    from simulator.runner import PyrolysisRun
-
-    session_config = PyrolysisRun._session_config
-
-    def declared_mars_flow(run):
-        if run.feedstock_id == 'mars_basalt':
-            run = replace(run, setpoints_patch={'campaigns': {
-                'C2A_continuous': {'sweep_mol_per_s': 0.001},
-            }})
-        return session_config(run)
-
-    monkeypatch.setattr(PyrolysisRun, '_session_config', declared_mars_flow)
+def test_sio_disproportionation_closes():
     for feedstock_id in ("lunar_mare_low_ti", "mars_basalt"):
         _, diagnostics = build_sio_yield_report(
             feedstock_id=feedstock_id,
