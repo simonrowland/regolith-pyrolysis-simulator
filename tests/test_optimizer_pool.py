@@ -1018,7 +1018,7 @@ def test_pool_records_thermal_admission_refusals_and_continues(
         if lab_schedule is not None:
             run_options["lab_schedule"] = lab_schedule
         return {
-            "profile_id": (
+            "id": (
                 f"pool-c2a-window-{high_C:g}"
                 if high_C is not None
                 else "pool-c2a-lab-schedule"
