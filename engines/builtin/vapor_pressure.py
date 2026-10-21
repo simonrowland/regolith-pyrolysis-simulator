@@ -592,14 +592,15 @@ _PROJECTED_COMPOSITION_WARNING_TIERS = (
 # Activity and mole fraction are both dimensionless, so their ratio Gamma is
 # dimensionless too. This reproduces the wording-file sanity values.
 # published-core is 3.5e-9 / 2.4e-8 at 1473 / 1673 K. The d-071 default
-# (openimcc ccabd0b, digest ac88aa22…) prints 2.14e-6 / 1.12e-5. On the
+# printed 2.14e-6 / 1.12e-5. openimcc ec31045 re-keys that row to digest
+# 252f8705… (pack 1.0.5-d066-v3) and keeps the same printed gammas. On the
 # Zhang N-MORB wt% basis the 1473 K single-cation gamma was
 # 1.6697561241999281e-6 under d066-v1 and is 2.137531039892675e-6 now
 # (+28.0%). The move splits at the Gale-type N-MORB proxy, 1673 K, as
 # parent a(K2O): openimcc 249fde5 (MgAl2O4 fusion from Shornikov 2017)
 # multiplies it by 1.106, and 100df4f (FeO(l) Darken-Gurry/Masson
-# re-anchor) multiplies that by 1.171. 1942696 and ccabd0b are 1.000
-# against their parents, so the total factor is 1.295. Both corrections
+# re-anchor) multiplies that by 1.171. 1942696, ccabd0b and ec31045 are
+# 1.000 against 100df4f, so the total factor is 1.295. Both corrections
 # stabilise competing associates and draw Al2O3 and SiO2 away from the
 # K associates, so free K2O rises. The content digest keys each
 # evaluation so packs sharing a model id cannot reuse one another's
@@ -618,10 +619,10 @@ _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
             1673.15: True,
         },
     },
-    "ac88aa2272c50d1cbf300634737c5d0071bddee0cd0f0483a6530c4a4992c393": {
+    "252f8705a3d04799ab9131836785992ffbedb6e01c98780c849498f4836804f2": {
         "pack_alias": "default",
         "model_id": "IMCC-SF04-D066",
-        "pack_version": "1.0.4-d066-v2",
+        "pack_version": "1.0.5-d066-v3",
         "gamma_ko0_5_by_temperature_K": {
             1473.15: "2.14e-6",
             1673.15: "1.12e-5",

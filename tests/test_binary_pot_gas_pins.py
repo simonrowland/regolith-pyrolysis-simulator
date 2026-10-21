@@ -21,18 +21,20 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 # Ref DG46-MASSON65. The Fe–Mg–Si pots move with that standard state. The largest
 # relative shifts are the high-oxygen polymers (Si3 about -22% at 1200 K with no
 # cell, W4O12 about +22% at 1700 K on W), because pO2 moves and those stoichiometries
-# amplify it. CaO–SiO2 pressures do not move. At 1200 K the Fe and FeO domain
-# flags are None. That is the current openimcc output: gas.py _source_model_flag
-# emits the supercooled notice only when the liquid Ref is Fe-019 or JANAF, and
-# the row is now DG46-MASSON65. The redox metadata flags the Darken-Gurry/Masson
-# correction as a linear extrapolation outside 1649.15–1766.15 K, and that gas
-# matcher does not read the band. This pin records the engine output. It does
-# not accept 1200 K as inside the anchor band. 1700 K is inside that band.
-# The Fe and FeO channel class becomes janaf_fitted. The oxide authority
-# primary_measurement_reanchored (rank 4) outranks the gas JANAF fit
-# (rank 3), and the channel keeps the least-authoritative row. 249fde5 still reported
-# janaf_transcribed. ccabd0b keeps the 100df4f pressures and the new class.
+# amplify it. CaO–SiO2 pressures do not move. openimcc 8de0903 reads the FeO(l)
+# fit interval from the redox row. Outside 1649.15–1766.15 K, Fe and FeO carry
+# the D&G/Masson extrapolation flag (1200 K and 1800 K). 1700 K is inside that
+# band, so those two flags stay empty. The Fe and FeO channel class becomes
+# janaf_fitted. The oxide authority primary_measurement_reanchored (rank 4)
+# outranks the gas JANAF fit (rank 3), and the channel keeps the
+# least-authoritative row. 249fde5 still reported janaf_transcribed. ccabd0b
+# keeps the 100df4f pressures and the new class. ec31045 keeps those pressures.
 # Float outputs are stored as float.hex strings so these are exact pins.
+# openimcc 8de0903. The band is the FeO(l) redox fit interval.
+_FEO_DG_MASSON_EXTRAPOLATION = (
+    "FeO(l) uses the D&G/Masson correction extrapolated "
+    "outside its 1649.15-1766.15 K fit range (Ref=DG46-MASSON65)"
+)
 _GOLDEN = {
     ("cao_sio2_40_60", 1200.0, None): {
         "pressures": {
@@ -113,7 +115,7 @@ _GOLDEN = {
         "residual": "0x1.4ef3db7464879p-49", "iterations": 14,
         "O": (("O2", "0x1.201d633ce9e4ap-46"), ("O", "0x1.8047802a1b698p-50"), ("FeO", "0x1.d0113db9f4368p-53"), ("SiO", "0x1.1412ca2755b56p-53"), ("SiO2", "0x1.d98aa147c3c9ep-60")),
         "metal": (("Fe", "0x1.34b912c0475cfp-46"), ("SiO", "0x1.1412ca2755b56p-52"), ("FeO", "0x1.d0113db9f4368p-53"), ("Mg", "0x1.40a2eaf591fe9p-54"), ("SiO2", "0x1.d98aa147c3c9ep-60")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Fe", _FEO_DG_MASSON_EXTRAPOLATION), ("FeO", _FEO_DG_MASSON_EXTRAPOLATION), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
         "flux": None, "buffer": None,
     },
     ("feo_mgo_sio2_30_20_50", 1200.0, "W"): {
@@ -132,7 +134,7 @@ _GOLDEN = {
         "residual": "0x1.cc4a5858196f6p-47", "iterations": 22,
         "O": (("W2O6", "0x1.6f8369e6f2731p-42"), ("W3O9", "0x1.4acd05883a59fp-42"), ("W3O8", "0x1.9b9acff0f37a6p-45"), ("SiO", "0x1.4c1bfc6fe4d54p-48"), ("W4O12", "0x1.c4201126c5c3ap-51")),
         "metal": (("Fe", "0x1.7362ca3f477c1p-41"), ("SiO", "0x1.4c1bfc6fe4d54p-47"), ("Mg", "0x1.81b7ad0c6f85ap-49"), ("FeO", "0x1.d0113db9f4368p-53"), ("SiO2", "0x1.d98aa147c3c9ep-60")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Fe", _FEO_DG_MASSON_EXTRAPOLATION), ("FeO", _FEO_DG_MASSON_EXTRAPOLATION), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
         "flux": "0x1.fc4c57904c896p-1", "buffer": "0x1.0e9617dca9e3ap-54",
     },
     ("feo_mgo_sio2_30_20_50", 1700.0, None): {
@@ -199,7 +201,8 @@ _DOMAIN_FLAGS = {
         "AlO2": _COMMON_LOW_FLAGS,
         "Ca": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
         "CaO": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
-        "Fe": None, "FeO": None,
+        "Fe": _FEO_DG_MASSON_EXTRAPOLATION,
+        "FeO": _FEO_DG_MASSON_EXTRAPOLATION,
         "K": _POTASSIUM_OXIDE_LOW_FLAGS, "K2": _POTASSIUM_OXIDE_LOW_FLAGS,
         "K2O": _POTASSIUM_OXIDE_LOW_FLAGS, "KO": _POTASSIUM_OXIDE_LOW_FLAGS,
         "Mg": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
@@ -280,10 +283,10 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
             "condensate_table_digest": package_identity.condensate_table_digest,
             "gas_table_digest": package_identity.gas_table_digest,
         },
-        # d-071 ccabd0b reuses pack version 1.0.4-d066-v2. The d066-v1 digest
-        # was 02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75.
-        "pack": "1.0.4-d066-v2",
-        "pack_digest": "ac88aa2272c50d1cbf300634737c5d0071bddee0cd0f0483a6530c4a4992c393",
+        # d-008 ec31045 default is 1.0.5-d066-v3. The d066-v2 digest was
+        # ac88aa2272c50d1cbf300634737c5d0071bddee0cd0f0483a6530c4a4992c393.
+        "pack": "1.0.5-d066-v3",
+        "pack_digest": "252f8705a3d04799ab9131836785992ffbedb6e01c98780c849498f4836804f2",
         "package_version": "0.1.0.dev0",
     }
 
@@ -367,6 +370,13 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
         else:
             assert "cell_oxide_janaf_sources" not in solved
         assert result.vapor_pressures_source == expected_sources
+
+    # 1800 K is outside the 1649.15–1766.15 K fit. 1700 K is inside it and
+    # stays on the golden above.
+    hot = _gas_result(backend, pots["feo_mgo_sio2_30_20_50"], 1800.0, None)
+    hot_flags = hot.diagnostics["openimcc_gas"]["domain_flags"]
+    assert hot_flags["Fe"] == _FEO_DG_MASSON_EXTRAPOLATION
+    assert hot_flags["FeO"] == _FEO_DG_MASSON_EXTRAPOLATION
 
 
 def test_binary_pot_gas_pin_inputs_cover_both_paths_without_low_t_interval_flags() -> None:

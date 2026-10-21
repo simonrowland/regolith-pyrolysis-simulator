@@ -379,7 +379,7 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
     # 100df4f re-anchors FeO(l), and the vacuum oxygen balance follows that
     # standard state: alpha=1 becomes 0.9216674327271643 Pa (+11.2% versus
     # the d066-v1 pin) and alpha=0.25 becomes 0.33536809943014373 Pa
-    # (+11.7%). ccabd0b does not move either root. 8cd96dd's oxide-parent
+    # (+11.7%). ccabd0b and ec31045 do not move either root. 8cd96dd's oxide-parent
     # count was already inside the d066-v1 pin.
     # The two engines still use their own melt channel pressures for both arms.
     assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.3542a12f3caa5p-17"

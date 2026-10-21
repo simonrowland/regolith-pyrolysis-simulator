@@ -354,19 +354,17 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     # sha256 of json.dumps(_physics(result), sort_keys=True). _physics is
     # the pressures, activities, sources, numerator provenance, and
     # warnings. The provenance copies the K2O exclusion reason, and that
-    # reason embeds Gamma(KO0.5) from _K2O_PACK_EVALUATIONS_BY_DIGEST.
-    # The completed d-071 default row prints 2.14e-6 and 1.12e-5, so those
-    # strings are inside the hashed text. Direct call against openimcc
-    # ccabd0b gives
-    # 0f90f3fd63c8cff60ebdb8256de0b830ef866d86dbf5aa9cc49b02b922d1dbe2.
-    # e12fc971… is that same dispatch before the table strings replaced
-    # the exclusion text. Pressures are unchanged by the table: the hash
-    # was 0dbdc367… through 1942696, moved at 249fde5 and 100df4f, and
-    # ccabd0b changed it again through the pack version, digest, and
-    # binding. JSON round-trips preserve float bits.
+    # reason embeds Gamma(KO0.5) from _K2O_PACK_EVALUATIONS_BY_DIGEST plus
+    # the loaded pack version and digest. The printed gammas stay 2.14e-6
+    # and 1.12e-5. Direct call against openimcc ec31045, with this table
+    # keyed to digest 252f8705 and version 1.0.5-d066-v3, gives
+    # 2690da4be47509125e25b8ad9051677f62f64b9db095aa43b39a5a57374d14a8.
+    # 0f90f3fd… is the ccabd0b hash. Pressures and the printed gammas are
+    # unchanged. The hash moves because the exclusion reason embeds the
+    # ec31045 pack version and digest. JSON round-trips preserve float bits.
     assert hashlib.sha256(
         json.dumps(_physics(result), sort_keys=True).encode()
-    ).hexdigest() == "0f90f3fd63c8cff60ebdb8256de0b830ef866d86dbf5aa9cc49b02b922d1dbe2"
+    ).hexdigest() == "2690da4be47509125e25b8ad9051677f62f64b9db095aa43b39a5a57374d14a8"
 
 
 @pytest.mark.parametrize("gap_K, hour_gap", [
@@ -817,7 +815,8 @@ def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> N
     # The ratio was 1.7673900327583708e-15 through openimcc 1942696, inside
     # the old ±0.01 band around 0. Live probe gammas move at 249fde5 to
     # 0.011330388717366009, which lies outside that band (0.01133 > 0.01).
-    # 100df4f changes it to 0.011330355283529284; ccabd0b holds that value.
+    # 100df4f changes it to 0.011330355283529284; ccabd0b and ec31045 hold
+    # that value. The melt coefficients are unchanged at ec31045.
     # This abs=0.0005 band excludes 0.
     assert (activity_65.effective_gamma - reference) / reference == pytest.approx(
         0.011330355283529284, abs=0.0005,
@@ -985,9 +984,10 @@ def test_above_cap_openimcc_route_feeds_flux_with_provenance() -> None:
 
     assert high_t["provider"] == "openimcc"
     assert high_t["temperature_domain_status"] == "in_domain"
-    # d-071 default. ccabd0b reuses the version string that 249fde5
-    # introduced; 100df4f briefly called the same physics 1.0.5-d066-v3.
-    assert high_t["openimcc_pack_version"] == "1.0.4-d066-v2"
+    # d-008 default. openimcc ec31045 promotes 1.0.5-d066-v3. 100df4f used
+    # that version string briefly for different bytes; this digest is
+    # 252f8705….
+    assert high_t["openimcc_pack_version"] == "1.0.5-d066-v3"
     assert high_t["openimcc_pack_digest"]
     assert set(high_t["activities_by_oxide"]) == {
         "Na2O",
