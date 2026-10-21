@@ -20,6 +20,11 @@ EXPECTED = {
 
 def test_table1_printed_mg_pressures_are_retained() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    table_context = next(
+        row for row in document["species"]["Mg"]["context"]
+        if row["observation_id"] == "gribchenkova_2017_table1_calculated_pressures"
+    )
+    assert "table_csv" not in table_context["values"]
     observations = document["species"]["Mg"]["observations"]
     assert {
         observation["observation_id"]: (
@@ -31,7 +36,6 @@ def test_table1_printed_mg_pressures_are_retained() -> None:
     assert all(observation["point_conditions"]["temperature_K"]["state"]["value"] == "1900" for observation in observations)
 
     context = document["species"]["Mg"]["context"]
-    table_context = next(row for row in context if row["observation_id"] == "gribchenkova_2017_table1_calculated_pressures")
     assert table_context["values"]["Mg_pmin"] == [
         {"composition": "MgO", "value": "0.21491"},
         {"composition": "MgO + MgAl2O4", "value": "0.21491"},
