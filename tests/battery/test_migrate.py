@@ -891,6 +891,56 @@ def test_production_migration_rejects_unlocated_unprinted_raw_input_declaration(
     )
 
 
+def test_plante_1992_table2_activities_migrate_with_table1_ancestry(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-021-plante-1992-feo.yaml", write=False
+    )
+    activities = {
+        str(observation.identity.composition.value.components[0][1]): observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-021-plante-1992-feo"
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+    }
+
+    # Table 2, p. 1278: these three printed a(FeO) values provide independent
+    # pins against the source page; each was obtained by integrating Eq. (4)
+    # from the measured Table 1 ion-intensity ratios.
+    expected = {"0.1": "0.404", "0.2": "0.604", "0.3": "0.699"}
+    for x_feo, activity in expected.items():
+        observation = activities[x_feo]
+        assert observation.value.point == Decimal(activity)
+        assert observation.identity.temperature_K.value == Decimal("1973")
+        assert observation.identity.species.phase.value is Phase.L
+        assert len(observation.derived_from or ()) == 14
+        assert observation.derivation is not None
+        assert "analytical integration" in observation.derivation.relation
+        assert all(parent in result.observations for parent in observation.derived_from)
+
+    scored = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-021-plante-1992-feo"
+        and observation.value.kind is ValueKind.POINT
+    ]
+    assert len(scored) == 23
+    for observation in scored:
+        temperature = observation.point_conditions["temperature_K"]
+        assert temperature.state.value == Decimal("1973")
+        assert temperature.locator.page == 1278
+    ratios = [
+        observation
+        for observation in scored
+        if observation.identity.quantity.value is Quantity.ION_INTENSITY_RATIO
+    ]
+    assert len(ratios) == 14
+    assert all(observation.identity.species.phase.value is Phase.L for observation in ratios)
+
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+
 @pytest.mark.parametrize(
     ("inputs", "raw_inputs", "expected_path", "expected_detail"),
     [

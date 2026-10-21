@@ -443,6 +443,41 @@ species:
         state".
       regime: kems_effusion
       units: dimensionless activity
+      derived_from:
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15::rows:h=3a2b47c99153
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15::rows:h=530b489d64f6
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30::rows:h=8ab48e8a15ab
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30::rows:h=c0fd2c2a2315
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40::rows:h=c923adf0ad27
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40::rows:h=27620d32b777
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54::rows:h=cad40b2f02a7
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54::rows:h=fa110e67ab1d
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70::rows:h=3471283ba8b1
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70::rows:h=31cbd0349b51
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80::rows:h=74b0251157b4
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80::rows:h=ac160c987d81
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90::rows:h=facdb3555ee2
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90::rows:h=85cdfbdee3ac
+      derivation:
+        relation: >-
+          The Table 2 activity coefficients were calculated by analytical integration
+          of Eq. (4), using least-squares fits to the measured ratios in Table 1
+          and Figures 2–3.
+        inputs:
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15::rows:h=3a2b47c99153
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15::rows:h=530b489d64f6
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30::rows:h=8ab48e8a15ab
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30::rows:h=c0fd2c2a2315
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40::rows:h=c923adf0ad27
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40::rows:h=27620d32b777
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54::rows:h=cad40b2f02a7
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54::rows:h=fa110e67ab1d
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70::rows:h=3471283ba8b1
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70::rows:h=31cbd0349b51
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80::rows:h=74b0251157b4
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80::rows:h=ac160c987d81
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90::rows:h=facdb3555ee2
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90::rows:h=85cdfbdee3ac
       admission_status: admitted
       values:
         quantity: activity
@@ -718,7 +753,7 @@ species:
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -774,7 +809,7 @@ species:
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -830,7 +865,7 @@ species:
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -886,7 +921,7 @@ species:
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -942,7 +977,7 @@ species:
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -998,7 +1033,7 @@ species:
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -1054,7 +1089,7 @@ species:
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
