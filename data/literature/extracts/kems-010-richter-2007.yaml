@@ -63193,8 +63193,10 @@ species:
         - {run_id: R3-5, sample: R3-5, T_C: '1600', t_min: '4285', MgO_wt_pct: '0.12', SiO2_wt_pct: '17.74', Al2O3_wt_pct: '38.36', CaO_wt_pct: '43.78'}
 fidelity_samples:
 - locator:
-    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-    line_range: '448'
+    source_path: corpus/raw/kems-010-richter-2007/kems-010-richter-2007.pdf
+    page: 10
+    published_page: 5553
+    figure: '3'
     note: γo=143, E=121±53 kJ/mol for γ_Mg
   path: species.Mg.context[1].values.alpha_form
   value:
@@ -63206,8 +63208,10 @@ fidelity_samples:
     E_uncertainty_J_per_mol: 53000.0
     R_J_per_mol_K: 8.314
 - locator:
-    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-    line_range: '448'
+    source_path: corpus/raw/kems-010-richter-2007/kems-010-richter-2007.pdf
+    page: 10
+    published_page: 5553
+    figure: '3'
     note: γo=25.3, E=92±37 kJ/mol for γ_Si
   path: species.SiO.context[0].values.alpha_form.c0
   value: 25.3

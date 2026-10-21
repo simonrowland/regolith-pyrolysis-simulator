@@ -10136,10 +10136,10 @@ species:
     - observation_id: sossi_2019_ti_table2_open_furnace_residue_ppm
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        source_path: corpus/raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+        page: 54
         table: '2'
         section: '4.0 Results / Table 2'
-        line_range: '1104-1108'
         note: >-
           LA-ICP-MS Ti residue ppm in quenched glass vs T, t, fO2. Open 1-bar furnace; NOT a
           vacuum Langmuir alpha and NOT a mol m^-2 s^-1 flux. Run 2M-15-07-16f omitted (empty OCR
@@ -18251,9 +18251,9 @@ fidelity_samples:
     table: '1'
     line_range: '1100'
 - locator:
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    source_path: corpus/raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+    page: 56
     table: '3'
-    line_range: 1108-1112
   path: species.Na.context[0].values[2].values_by_temperature_K[0].log10_K_star
   value: -5.36
 - locator:
