@@ -8,6 +8,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.identity import atm_to_pa
+
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/park-morita-2025-vanadium-activity.yaml"
 SID = "park-morita-2025-vanadium-activity"
@@ -41,7 +43,9 @@ def test_table4_independent_grid_and_migration(tmp_path: Path) -> None:
         for sample, values in grid.items():
             for state, printed in zip((2, 3, 4, 5), values):
                 record = rows[f"park_2025_table4_{sample.lower()}_v{state}_fraction"]
-                assert record["values"]["points"][0]["value_as_published"] == printed
+                point = record["values"]["points"][0]
+                assert point["value"] == printed
+                assert point["value_as_published"] == printed
 
     assert_grid_matches(source, expected)
     bad_grid = deepcopy(expected)
@@ -52,17 +56,26 @@ def test_table4_independent_grid_and_migration(tmp_path: Path) -> None:
     bad_extract["species"]["V"]["observations"][0]["values"]["points"][0]["value_as_published"] = "0.395"
     with pytest.raises(AssertionError):
         assert_grid_matches(bad_extract, expected)
+    bad_value = deepcopy(source)
+    bad_value["species"]["V"]["observations"][0]["values"]["points"][0]["value"] = "0.395"
+    with pytest.raises(AssertionError):
+        assert_grid_matches(bad_value, expected)
 
     for sample, values in expected.items():
         for state, printed in zip((2, 3, 4, 5), values):
             row = by_id[f"park_2025_table4_{sample.lower()}_v{state}_fraction"]
             assert row["sample_id"] == sample
             assert row["values"]["valence_basis"]["numerator_oxidation_states"] == [state]
-            assert row["values"]["points"][0]["value_as_published"] == printed
-            assert row["values"]["points"][0]["point_conditions"]["oxygen_partial_pressure"]["as_printed"] in {
+            point = row["values"]["points"][0]
+            assert point["value"] == printed
+            assert point["value_as_published"] == printed
+            assert point["T_K"] == "1873"
+            oxygen = point["point_conditions"]["oxygen_partial_pressure"]
+            assert oxygen["value"] == oxygen["state"]["value"]["point"]
+            assert oxygen["as_printed"] in {
                 "1.94 × 10^-11 atm", "1.90 × 10^-7 atm"
             }
-            assert row["values"]["points"][0]["point_conditions"]["temperature_K"]["state"]["value"] == "1873"
+            assert point["point_conditions"]["temperature_K"]["state"]["value"] == "1873"
 
     from tests.battery.test_migrate import _migrate_real_extract
 
@@ -72,8 +85,21 @@ def test_table4_independent_grid_and_migration(tmp_path: Path) -> None:
     assert all(o.value.kind.value == "point" for o in observations)
     assert all(o.identity.species.formula == "V" for o in observations)
     assert all(o.point_conditions and "oxygen_partial_pressure" in o.point_conditions for o in observations)
-    assert all(
-        o.point_conditions["oxygen_partial_pressure"].state.value.point
-        == (Decimal("1.94e-11") if "cvas01" in o.observation_id.lower() or any(f"cvas{i:02d}" in o.observation_id.lower() for i in range(2, 8)) else Decimal("1.90e-7"))
-        for o in observations
-    )
+    by_observation_id = {o.observation_id: o for o in observations}
+    for sample, values in expected.items():
+        expected_pressure = Decimal("1.94e-11") if int(sample[-2:]) <= 7 else Decimal("1.90e-7")
+        for state, printed in zip((2, 3, 4, 5), values):
+            source_id = f"park_2025_table4_{sample.lower()}_v{state}_fraction"
+            source_row = by_id[source_id]
+            matches = [
+                row for key, row in by_observation_id.items()
+                if key.startswith(f"{SID}::{source_id}::")
+            ]
+            assert len(matches) == 1
+            observation = matches[0]
+            assert observation.value.point == Decimal(printed)
+            assert observation.identity.temperature_K.is_value
+            assert observation.identity.temperature_K.value == Decimal("1873")
+            assert observation.identity.fO2_Pa.is_value
+            expected_from_extract = atm_to_pa(Decimal(source_row["values"]["points"][0]["point_conditions"]["oxygen_partial_pressure"]["value"]))
+            assert observation.identity.fO2_Pa.value == expected_from_extract == atm_to_pa(expected_pressure)
