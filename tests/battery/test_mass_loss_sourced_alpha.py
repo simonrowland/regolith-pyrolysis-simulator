@@ -245,7 +245,7 @@ def prescribed_pressure_engine(monkeypatch, fig3_source):
     import simulator.battery.residue as residue
     from simulator.diagnostic_helpers import binary_pot_battery
 
-    state = {"unsourced_ca": False, "pressures": []}
+    state = {"unsourced_ca": False, "ca_coefficient": 0.000001, "pressures": []}
     package = ModuleType("openimcc")
     package.load_gas_datapack = lambda: object()
     monkeypatch.setitem(sys.modules, "openimcc", package)
@@ -264,7 +264,7 @@ def prescribed_pressure_engine(monkeypatch, fig3_source):
             p = 10.0**logp
             factor = (at / 2073.15)**20
             return {"Mg": 0.00001 * factor / p**0.5, "O2": 100000.0 * p,
-                    "Ca": 0.000001 * factor / p**0.5}
+                    "Ca": state["ca_coefficient"] * factor / p**0.5}
         return pressure
 
     original = score_module.load_yaml
@@ -285,14 +285,17 @@ def test_sourced_r11_integrates_schedule_and_exposes_bounds(
     # Independent continuous-law integration of the prescribed pressure fixture,
     # the printed alpha, the two source ramps/holds and shrinking area. Its
     # 0.1% tolerance covers the documented 60 s finite inventory intervals.
-    assert float(prediction.value) == pytest.approx(0.013952813675583747, rel=1e-3)
+    assert float(prediction.value) == pytest.approx(0.013952648580481508, rel=1e-3)
     notices = [notice.reason for notice in prediction.notices]
     bound = json.loads(next(note.removeprefix("mass_loss_bound:") for note in notices
                             if note.startswith("mass_loss_bound:")))
     assert 0 < bound["bound_fraction"] <= 0.01
     assert bound["preheat_bound_kg"] > 0
+    assert bound["point_loss_kg"] == pytest.approx(float(prediction.value) * 0.0001904)
+    assert bound["bound_kg"] == bound["preheat_bound_kg"]
     assert bound["uncertainty_clause"] == "bulk mass-loss uncertainty not stated by source"
-    assert any("approximate printed duration" in note for note in notices)
+    assert any("approximate printed duration" in note and "excluded from point loss" in note
+               for note in notices)
     assert any(note.startswith("alpha_extrapolated:") for note in notices)
     assert all(p == pytest.approx(0.00013332236842105263)
                for p in prescribed_pressure_engine["pressures"])
@@ -392,3 +395,65 @@ def test_reproduction_arrhenius_numeric_pin_before_owner_move(form, alpha_hex, s
         assert point["sigma"] == (None if sigma_hex is None else float.fromhex(sigma_hex[i]))
         assert point["T_provenance"] == "alpha_form_synthetic"
         assert point["series_name"] == "alpha_form"
+
+
+def test_small_unsourced_bound_passes_without_entering_point_loss(
+    r11_inputs, prescribed_pressure_engine,
+):
+    row, experiment = r11_inputs
+    sourced_only = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+    prescribed_pressure_engine.update(unsourced_ca=True, ca_coefficient=1e-10)
+    small_bound = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+    assert sourced_only.value is not None, sourced_only.refusal_detail
+    assert small_bound.value is not None, small_bound.refusal_detail
+    assert small_bound.value == sourced_only.value
+    bound = json.loads(next(n.reason.removeprefix("mass_loss_bound:") for n in small_bound.notices
+                            if n.reason.startswith("mass_loss_bound:")))
+    assert bound["point_loss_kg"] == pytest.approx(float(small_bound.value) * 0.0001904)
+    assert bound["unsourced_channels"] == ["Ca"]
+    ca_bound = bound["unsourced_bound_kg_by_channel"]["Ca"]
+    # Independent analytic shrinking-area integration of isolated Ca in each
+    # prescribed thermal segment, starting at the sourced point inventory.
+    assert ca_bound == pytest.approx(6.020586440780917e-9, rel=1e-4)
+    assert bound["bound_kg"] == pytest.approx(ca_bound + bound["preheat_bound_kg"])
+    assert bound["bound_fraction"] == pytest.approx(bound["bound_kg"] / bound["point_loss_kg"])
+    assert 0 < bound["bound_fraction"] <= 0.01
+
+
+def test_preheat_rectangle_changes_only_bound_not_point_loss(
+    r11_inputs, prescribed_pressure_engine, monkeypatch,
+):
+    import simulator.battery.residue as residue
+
+    row, experiment = r11_inputs
+    original = residue._mass_loss_thermal_segments
+    first = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+
+    def shorter_bound(*args):
+        maximum, _duration, segments = original(*args)
+        return maximum, 60.0, segments
+
+    # Perturb only the bound duration; the documented point schedule is identical.
+    monkeypatch.setattr(residue, "_mass_loss_thermal_segments", shorter_bound)
+    shorter = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+    assert first.value is not None, first.refusal_detail
+    assert shorter.value is not None, shorter.refusal_detail
+    assert first.value == shorter.value
+    bounds = [json.loads(next(n.reason.removeprefix("mass_loss_bound:") for n in p.notices
+                             if n.reason.startswith("mass_loss_bound:"))) for p in (first, shorter)]
+    assert bounds[0]["point_loss_kg"] == bounds[1]["point_loss_kg"]
+    assert bounds[0]["preheat_bound_kg"] == pytest.approx(60 * bounds[1]["preheat_bound_kg"])
+    assert bounds[0]["bound_kg"] > bounds[1]["bound_kg"]
+
+
+def test_positive_bound_with_zero_point_loss_refuses():
+    from simulator.battery.residue import _mass_loss_bound_gate
+
+    with pytest.raises(ResidueInventoryRefusal) as failure:
+        _mass_loss_bound_gate(1e-9, 0.0, None, channels=("Ca",), preheat_bound_kg=0)
+    detail = json.loads(failure.value.detail)
+    assert failure.value.reason == "alpha_not_sourced"
+    assert detail["point_loss_kg"] == 0.0
+    assert detail["bound_fraction"] is None
+    assert detail["fraction_clause_passed"] is False
+    assert _mass_loss_bound_gate(0, 0, None, channels=(), preheat_bound_kg=0)["bound_fraction"] == 0

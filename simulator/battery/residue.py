@@ -1209,23 +1209,27 @@ def _mass_loss_thermal_segments(
 
 
 def _mass_loss_bound_gate(
-    bound_kg: float, total_loss_kg: float, uncertainty_kg: float | None,
+    bound_kg: float, point_loss_kg: float, uncertainty_kg: float | None,
     *, channels: Sequence[str], preheat_bound_kg: float,
 ) -> dict[str, Any]:
-    # alpha<=1 bounds unsourced parent-channel removal, including coproduct
-    # oxygen in each parent-oxide mass. Sum it with the whole preheat rectangle
-    # as B [kg]. L [kg] is predicted total loss, so B/L is dimensionless.
-    # B=0 gives 0 for L>0; B=L gives 1 and must refuse. Physics r2 drops only
-    # the uncertainty clause when the source states none; the 1% gate stays.
-    if not all(math.isfinite(x) and x >= 0.0 for x in (bound_kg, total_loss_kg)):
+    # L is the sourced-channel point loss on the documented schedule [kg].
+    # Each unsourced channel is bounded separately at alpha=1 with its O2
+    # coproduct; other parent channels are off to avoid suppressing its flux.
+    # Their summed parent-oxide removal plus the WHOLE preheat rectangle is
+    # extra loss B [kg], an envelope, not a jointly realizable trajectory.
+    # The gate B/L has units kg/kg. Neither unsourced removal nor preheat
+    # enters L. No unsourced channels and no preheat give B=0; B=L fails.
+    # Physics r2 drops only the uncertainty clause when the source states none.
+    if not all(math.isfinite(x) and x >= 0.0 for x in (bound_kg, point_loss_kg)):
         raise ResidueInventoryRefusal("mass_loss_fraction_invalid")
-    fraction = bound_kg / total_loss_kg if total_loss_kg > 0.0 else 0.0
-    fraction_clause_passed = fraction <= 0.01
+    fraction = (bound_kg / point_loss_kg if point_loss_kg > 0.0
+                else 0.0 if bound_kg == 0.0 else None)
+    fraction_clause_passed = fraction is not None and fraction <= 0.01
     uncertainty_clause_passed = None if uncertainty_kg is None else bound_kg < uncertainty_kg
     diagnostics = {
         "fraction_clause_passed": fraction_clause_passed,
         "uncertainty_clause_passed": uncertainty_clause_passed,
-        "bound_kg": bound_kg, "bound_fraction": fraction,
+        "point_loss_kg": point_loss_kg, "bound_kg": bound_kg, "bound_fraction": fraction,
         "preheat_bound_kg": preheat_bound_kg, "unsourced_channels": list(channels),
         "bulk_uncertainty_kg": uncertainty_kg,
         "uncertainty_clause": (
@@ -1357,7 +1361,8 @@ def predict_mass_loss_fraction(
                   "channel bulk partial ceiling; zero-pressure arms are bounds only")
     flags.add(
         f"mass_loss_preheat_rectangle: maximum_K={preheat_maximum_K}; "
-        f"duration_s={preheat_duration_s}; approximate printed duration"
+        f"duration_s={preheat_duration_s}; approximate printed duration; "
+        "excluded from point loss; rectangle enters B only"
     )
     flags.add(
         f"mass_loss_area_self_similarity: initial_m2={area_m2}; final_m2={final_area_m2}; "
@@ -1369,18 +1374,28 @@ def predict_mass_loss_fraction(
     def run_segment(
         inventory: Mapping[str, float], at_K: float, seconds: float, *,
         rectangle: bool = False, upper_bound: bool = False,
+        bound_channel: str | None = None,
     ) -> tuple[Mapping[str, float], float, dict[str, float]]:
         at_fits = _mass_loss_sourced_alphas(experiment, source_document or {}, at_K)
         for species, fit in at_fits.items():
             if fit["extrapolated"]:
                 flags.add(f"alpha_extrapolated:{species}:source_domain_K={fit['T_range_K']}")
-        channels = tuple(ResidueChannel(
-            str(species), str(species), parent,
-            at_fits[str(species)]["alpha"] if str(species) in at_fits else 1.0,
-            at_fits[str(species)]["source_observation_id"] if str(species) in at_fits
-            else "stoichiometric oxygen coproduct" if parent is None
-            else "alpha<=1 upper bound; not sourced coefficient",
-        ) for species, (parent, *_rest) in gas_channels)
+        channels = []
+        for species, (parent, *_rest) in gas_channels:
+            species = str(species)
+            if parent is None:
+                alpha, provenance = 1.0, "stoichiometric oxygen coproduct"
+            elif bound_channel is not None:
+                alpha = 1.0 if species == bound_channel else 0.0
+                provenance = "isolated alpha<=1 channel bound; other parent channels off"
+            elif species in at_fits:
+                alpha = at_fits[species]["alpha"]
+                provenance = at_fits[species]["source_observation_id"]
+            else:
+                alpha = 1.0 if upper_bound else 0.0
+                provenance = ("alpha<=1 preheat bound; not sourced coefficient" if upper_bound
+                              else "unsourced channel excluded from point loss")
+            channels.append(ResidueChannel(species, species, parent, alpha, provenance))
         pressure_model = _make_residue_pressure_model(
             engine, gas_channels, gas_pack, temperature_K=at_K,
             total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
@@ -1417,18 +1432,17 @@ def predict_mass_loss_fraction(
     bounds_by_channel = {species: 0.0 for species in unsourced}
     for at_K, seconds in segments:
         incoming = inventory
-        inventory, loss, bounds = run_segment(incoming, at_K, seconds)
-        if unsourced:
-            # Do not call pressure-suppressed unsourced removal an upper bound.
-            # Compare the vacuum upper arm at the same incoming state and area.
-            _, _, vacuum_bounds = run_segment(incoming, at_K, seconds, upper_bound=True)
-            for species in unsourced:
-                bounds_by_channel[species] += max(
-                    bounds.get(species, 0.0), vacuum_bounds.get(species, 0.0)
-                )
+        inventory, loss, _unused_bounds = run_segment(incoming, at_K, seconds)
+        for species in unsourced:
+            # Each independent vacuum ceiling uses the point arm's incoming
+            # state and area, with only this unsourced parent and its O2 active.
+            _, _, channel_bounds = run_segment(
+                incoming, at_K, seconds, upper_bound=True, bound_channel=species,
+            )
+            bounds_by_channel[species] += channel_bounds.get(species, 0.0)
         documented_loss_kg += loss
     unsourced_bound_kg = math.fsum(bounds_by_channel.values())
-    total_loss_kg = min(sample_mass_kg, documented_loss_kg + preheat_bound_kg)
+    point_loss_kg = documented_loss_kg
     uncertainty = getattr(observation, "uncertainty", None)
     uncertainty_kg = None
     if getattr(getattr(uncertainty, "kind", None), "value", "none") != "none":
@@ -1445,7 +1459,7 @@ def predict_mass_loss_fraction(
         if not math.isfinite(uncertainty_kg) or uncertainty_kg <= 0.0:
             raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_invalid")
     diagnostics = _mass_loss_bound_gate(
-        unsourced_bound_kg + preheat_bound_kg, total_loss_kg, uncertainty_kg,
+        unsourced_bound_kg + preheat_bound_kg, point_loss_kg, uncertainty_kg,
         channels=tuple(species for species, bound in bounds_by_channel.items() if bound > 0.0),
         preheat_bound_kg=preheat_bound_kg,
     )
@@ -1455,7 +1469,7 @@ def predict_mass_loss_fraction(
     metadata["sourced_alphas"] = json.dumps(fits, sort_keys=True)
     metadata["alpha_sources"] = json.dumps([fit["source_observation_id"] for fit in fits.values()])
     return ResidueMassLossPrediction(
-        mass_loss_fraction=total_loss_kg / sample_mass_kg,
+        mass_loss_fraction=point_loss_kg / sample_mass_kg,
         engine_flags=tuple(sorted(flags)), engine_metadata=metadata,
     )
 
