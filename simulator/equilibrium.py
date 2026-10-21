@@ -6,7 +6,7 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import _antoine_log10_pressure, _antoine_skip_notice
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
@@ -384,7 +384,7 @@ class EquilibriumMixin:
         # method (missing activity, activity-threshold skip, P <= 1e-15 Pa).
         # Those omissions keep status='ok' with a note. Other continues in
         # this method (inactive row, missing parent, A<=0, oxide-vapor
-        # outside valid_range_K) still omit without a note.
+        # outside valid_range_K) omit without a typed silent-zero note.
         from simulator.silent_zero import (
             CATEGORY_PROVEN_ZERO,
             CATEGORY_REFUSE,
@@ -648,6 +648,15 @@ class EquilibriumMixin:
                 B = antoine.get('B', 0)
                 C = antoine.get('C', 0)
                 if P_reference_Pa is None and not (A > 0 and T_K > 300):
+                    if not A > 0:
+                        warnings.append(
+                            _antoine_skip_notice(
+                                antoine,
+                                species=species,
+                                site="equilibrium.internal_analytical.metal_antoine",
+                                temperature_K=T_K,
+                            )
+                        )
                     continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
@@ -804,6 +813,18 @@ class EquilibriumMixin:
                 B_l = float(antoine_liq.get("B", 0.0) or 0.0)
                 C_l = float(antoine_liq.get("C", 0.0) or 0.0)
                 if not (A_l > 0.0 and T_K > 300.0):
+                    if not A_l > 0.0:
+                        warnings.append(
+                            _antoine_skip_notice(
+                                antoine_liq,
+                                species=species,
+                                site=(
+                                    "equilibrium.internal_analytical."
+                                    "liquid_oxide_antoine"
+                                ),
+                                temperature_K=T_K,
+                            )
+                        )
                     continue
                 valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
                 if valid_liq is not None:
@@ -891,6 +912,15 @@ class EquilibriumMixin:
                 B_g = float(antoine_gas.get("B", 0.0) or 0.0)
                 C_g = float(antoine_gas.get("C", 0.0) or 0.0)
                 if not (A_g > 0.0 and T_K > 300.0):
+                    if not A_g > 0.0:
+                        warnings.append(
+                            _antoine_skip_notice(
+                                antoine_gas,
+                                species=species,
+                                site="equilibrium.internal_analytical.gas_rail_antoine",
+                                temperature_K=T_K,
+                            )
+                        )
                     continue
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
@@ -1249,6 +1279,18 @@ class EquilibriumMixin:
             else:
                 # Out-of-range or A <= 0: omit without a silent-zero note
                 # on this path (the `_sz_omit` helpers are not called).
+                if not A > 0:
+                    warnings.append(
+                        _antoine_skip_notice(
+                            antoine,
+                            species=name,
+                            site=(
+                                "equilibrium.internal_analytical."
+                                "oxide_vapor_antoine"
+                            ),
+                            temperature_K=T_K,
+                        )
+                    )
                 continue
 
             parent_oxide = data.get('parent_oxide', '')
