@@ -1725,6 +1725,14 @@ class CampaignManager:
             )
         return min(requested, self.furnace_max_T_C)
 
+    def _c2a_ramp_band(self, temperature_C: float) -> tuple[float, float]:
+        """Upper temperature and configured rate of the active C2A band."""
+        if temperature_C < 1320:
+            return (1320.0, self._campaign_rate_band_midpoint(
+                CampaignPhase.C2A, 'early_ramp_1050_1320C'))
+        return (self.furnace_max_T_C, self._campaign_rate_band_midpoint(
+            CampaignPhase.C2A, 'peak_SiO_window_1400_1600C'))
+
     def _get_base_temp_target(self, campaign: CampaignPhase,
                                campaign_hour: int,
                                melt: MeltState) -> Tuple[Optional[float], float]:
@@ -1757,12 +1765,7 @@ class CampaignManager:
         elif campaign == CampaignPhase.C2A:
             # Continuous ramp 1050 C -> furnace_max_T_C
             # Ramp rate varies by YAML band midpoint.
-            if melt.temperature_C < 1320:
-                ramp = self._campaign_rate_band_midpoint(
-                    campaign, 'early_ramp_1050_1320C')
-            else:
-                ramp = self._campaign_rate_band_midpoint(
-                    campaign, 'peak_SiO_window_1400_1600C')
+            _, ramp = self._c2a_ramp_band(melt.temperature_C)
             return (self.furnace_max_T_C, ramp)
 
         elif campaign == CampaignPhase.C2A_STAGED:
