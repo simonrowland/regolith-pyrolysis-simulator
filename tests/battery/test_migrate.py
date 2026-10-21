@@ -850,6 +850,7 @@ def test_production_migration_keeps_located_unprinted_raw_input_declaration(
     assert observation.derivation.raw_inputs.state.value.value == "not_printed"
     assert observation.derivation.raw_inputs.locator is not None
     assert result.validation.hard_issues == ()
+    assert result.queue == []
 
     reloaded = observation_from_plain(
         yaml.safe_load(yaml.safe_dump(to_plain(observation)))

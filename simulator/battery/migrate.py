@@ -17610,7 +17610,10 @@ class Migrator:
             EvidenceClass.MEASURED_REDUCED,
         }:
             return
-        if not derived_from:
+        has_grounded_unprinted_inputs = (
+            derivation is not None and derivation.has_located_unprinted_raw_inputs
+        )
+        if not derived_from and not has_grounded_unprinted_inputs:
             self.result.add_queue(
                 work_id,
                 locator,
