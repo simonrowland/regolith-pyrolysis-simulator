@@ -127,6 +127,28 @@ class EvaporationFluxConfigurationError(ValueError):
     """Invalid or unsupported transport inputs for authoritative flux."""
 
 
+def _continuum_film_extrapolation_notice(
+    domain_diagnostic: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Keep the continuum prediction, explicitly outside its validated domain."""
+    if (
+        domain_diagnostic is None
+        or domain_diagnostic.get("reason") != "viscous_p_bulk_transport_out_of_domain"
+    ):
+        return None
+    return {
+        **{key: value for key, value in domain_diagnostic.items()
+           if key not in ("silent_zero_notes", "evaporation_flux_kg_hr")},
+        "status": "extrapolated",
+        "authority_level": "extrapolated",
+        "authority_class": "extrapolated",
+        "doctrine_category": 2,
+        "ledger_yields_authorized": True,
+        "evaporation_flux_status": "extrapolated",
+        "detail": domain_diagnostic["detail"] + "; finite continuation of the same continuum fit; not certified transitional transport",
+    }
+
+
 @dataclass(frozen=True)
 class SeriesEvaporationFlux:
     flux_kg_s_m2: float
@@ -1178,18 +1200,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 active_gas_transport_species
                 and continuum_validity_refuses(domain_refusal)
             ):
-                if domain_refusal.get("reason") == "viscous_p_bulk_transport_out_of_domain":
-                    continuum_extrapolation = {
-                        **{key: value for key, value in domain_refusal.items()
-                           if key not in ("silent_zero_notes", "evaporation_flux_kg_hr")},
-                        "status": "extrapolated",
-                        "authority_level": "extrapolated",
-                        "authority_class": "extrapolated",
-                        "doctrine_category": 2,
-                        "ledger_yields_authorized": True,
-                        "evaporation_flux_status": "extrapolated",
-                        "detail": domain_refusal["detail"] + "; finite continuation of the same continuum fit; not certified transitional transport",
-                    }
+                continuum_extrapolation = _continuum_film_extrapolation_notice(
+                    domain_refusal
+                )
             if (
                 active_gas_transport_species
                 and continuum_validity_refuses(domain_refusal)
