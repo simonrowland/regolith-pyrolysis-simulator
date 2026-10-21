@@ -63,6 +63,25 @@ from simulator.state import (
     clamp_stir_state,
 )
 
+DEFAULT_C4_HOLD_TEMP_C = 1670.0
+
+
+def c4_default_hold_temp_C(setpoints: Mapping[str, Any]) -> float:
+    """Resolve the absent C4 hold from its declared temperature window."""
+    campaigns = setpoints.get("campaigns") if isinstance(setpoints, Mapping) else None
+    c4 = campaigns.get("C4") if isinstance(campaigns, Mapping) else None
+    temp_range = c4.get("temp_range_C") if isinstance(c4, Mapping) else None
+    if isinstance(temp_range, (list, tuple)) and len(temp_range) >= 2:
+        try:
+            value = float(temp_range[-1])
+        except (TypeError, ValueError):
+            value = DEFAULT_C4_HOLD_TEMP_C
+        if math.isfinite(value):
+            return value
+    return DEFAULT_C4_HOLD_TEMP_C
+
+
+
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
 C2A_STAGED_DEPLETION_YIELD_FLOOR_MOL = 1.0e-12
 C2A_STAGED_GAS_COVER_PN2_SWEEP = 'pn2_sweep'

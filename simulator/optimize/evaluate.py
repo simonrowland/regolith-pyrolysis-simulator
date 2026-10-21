@@ -36,7 +36,11 @@ from simulator.backends import (
     requires_stage0_subprocess,
     resolve_backend,
 )
-from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignPressureSetpointRefusal,
+    DEFAULT_C4_HOLD_TEMP_C,
+    c4_default_hold_temp_C as _c4_default_hold_temp_C,
+)
 from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
 from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
@@ -179,7 +183,6 @@ LAB_OVERLAY_SCOPE_FIELDS = (
     "oxide_vapor_ceiling_digest",
     "sink_channel_evidence_digests",
 )
-DEFAULT_C4_HOLD_TEMP_C = 1670.0
 _VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES = {
     DEFAULT_VAPOR_PRESSURE_PROVIDER_ID: (
         "engines.builtin._common",
@@ -3209,26 +3212,6 @@ def _evalspec_recipe_id(
         else:
             values[C4_HOLD_TEMP_C_PATH] = hold_temp
     return RecipePatch(values).optimizer_recipe_id(schema)
-
-
-def _c4_default_hold_temp_C(setpoints: Mapping[str, Any]) -> float:
-    # The C4 hold_temp_C absence-normalization anchors on temp_range_C[-1].
-    # This is golden-neutral ONLY because the C4 runtime, with no hold_temp_C
-    # override, falls back to c4_max_temp_C (campaigns.py:_get_base_temp_target),
-    # whose default equals temp_range_C[-1]. That coupling is by value, not by
-    # shared code; it is pinned in CI by
-    # tests/test_optimizer_evalspec.py::test_c4_default_hold_temp_anchor_matches_runtime_fallback.
-    campaigns = setpoints.get("campaigns") if isinstance(setpoints, MappingABC) else None
-    c4 = campaigns.get("C4") if isinstance(campaigns, MappingABC) else None
-    temp_range = c4.get("temp_range_C") if isinstance(c4, MappingABC) else None
-    if isinstance(temp_range, (list, tuple)) and len(temp_range) >= 2:
-        try:
-            value = float(temp_range[-1])
-        except (TypeError, ValueError):
-            value = DEFAULT_C4_HOLD_TEMP_C
-        if math.isfinite(value):
-            return value
-    return DEFAULT_C4_HOLD_TEMP_C
 
 
 def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]:
