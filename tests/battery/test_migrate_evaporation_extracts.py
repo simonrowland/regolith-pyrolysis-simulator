@@ -345,25 +345,54 @@ def test_richter02_type_b_melt_phase_is_canonical(tmp_path: Path) -> None:
 def test_richter02_table1_flux_and_alpha_values_keep_conditions(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-037-richter-2002.yaml")
     assert result.validation.hard_issues == ()
-    _assert_migrated_rows_keep_temperature_and_conditions(result, "kems-037-richter-2002")
+    assert result.observations == {}
+    gamma_context = _context_data_row(
+        result,
+        "kems-037-richter-2002",
+        "richter_2002_table1_per_run_gamma_context",
+    )
+    assert gamma_context["schema_gap"] == "t-1382"
+    gamma_rows = [row for row in gamma_context["values"]["rows"] if row.get("run_id")]
+    assert len(gamma_rows) == 32
+    for row in gamma_rows:
+        assert row["T_C"]
+        assert row["table_csv_row"] in range(1, 22)
+        assert row["locator"]["published_page"] == 525
+        assert row["point_conditions"]
+        for condition in row["point_conditions"].values():
+            assert condition["state"]
+            assert condition["locator"]
+        temperature = row["point_conditions"]["temperature_K"]
+        assert temperature["state"]["value"]["point"] == str(
+            Decimal(row["T_C"]) + Decimal("273.15")
+        )
+        assert row["derivation"]["relation"] == "Hertz-Knudsen equation (1)"
+        assert row["derivation"]["quote"] == (
+            "J_i = Σ_{j=1}^{n} γ_ij P_{ij,sat} / √(2π m_ij R T)"
+        )
+        assert row["derivation"]["locator"]["published_page"] == 523
+        assert "Grossman" in row["model_dependence"]
+        assert "Hertz-Knudsen" in row["model_dependence"]
+        assert row["values"]["method_class"] == "measured_reduced"
     expected_alpha = {
         "richter_2002_table1_mg_gamma_bcai-ss1": Decimal("0.051"),
         "richter_2002_table1_mg_gamma_bcai-ss2": Decimal("0.047"),
         "richter_2002_table1_sio_gamma_bcai-ss1": Decimal("0.058"),
     }
     for observation_id, value in expected_alpha.items():
-        row = next(
-            item
-            for item in result.observations.values()
-            if observation_id in item.observation_id
-        )
-        assert row.value.point == value
-        assert row.identity.quantity.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
-        assert row.identity.temperature_K.value == Decimal("1773.15")
-        assert row.point_conditions["temperature_K"].state.value == Decimal("1773.15")
-        assert row.point_conditions["total_pressure_Pa"].state.value.point == Decimal("18.7")
-        assert row.point_conditions["composition"].state.value.components
-        assert row.derivation is None
+        row = next(item for item in gamma_rows if item["source_observation_id"] == observation_id)
+        assert Decimal(row["values"]["alpha"]) == value
+    assert {
+        row["source_observation_id"]
+        for row in gamma_context["values"]["rows"]
+        if row.get("source_observation_id") in {
+            "richter_2002_mg_cai_langmuir_gamma",
+            "richter_2002_sio_cai_langmuir_gamma",
+        }
+    } == {
+        "richter_2002_mg_cai_langmuir_gamma",
+        "richter_2002_sio_cai_langmuir_gamma",
+    }
 
     flux_id = "richter_2002_table1_mg_flux_bcai-ss1"
     assert not any(flux_id in item.observation_id for item in result.observations.values())
@@ -372,15 +401,8 @@ def test_richter02_table1_flux_and_alpha_values_keep_conditions(tmp_path: Path) 
     assert flux["units"] == "mol cm^-2 s^-1"
     assert flux["values"]["value_as_printed"] == "4.12e-08"
     assert "kg_per_s" in flux["reason_not_typed_as_evaporation_rate"]
-    assert "area" in flux["reason_not_typed_as_evaporation_rate"]
-    assert len(result.observations) == 32
-    assert all(
-        row.identity.temperature_K.is_value
-        and "temperature_K" in row.point_conditions
-        and "total_pressure_Pa" in row.point_conditions
-        and "composition" in row.point_conditions
-        for row in result.observations.values()
-    )
+    assert "average area separately" in flux["reason_not_typed_as_evaporation_rate"]
+    assert "no total kg_per_s rate is derived" in flux["reason_not_typed_as_evaporation_rate"]
 
 
 def test_markova_table2_residue_values_keep_row_temperature(tmp_path: Path) -> None:
