@@ -103,17 +103,28 @@ species:
     observations: []
     context:
     - observation_id: fedkin_2006_table3_hashimoto_fit_outputs
-      kind: model_fit_output
+      type: evaporation_coefficient_table_context
       table: '3'
       locator:
-        page: 8
+        page: 7
+        published_page: 212
         table: '3'
+      units: dimensionless alpha
+      equipment:
+        chamber_pressure_bar:
+          value: 1.3e-8
+          locator:
+            page: 7
+            published_page: 212
+            table: '3'
+            note: Hashimoto vacuum chamber pressure for the Table 3 runs.
       note: Evaporation coefficients obtained by Fedkin et al. modeling Hashimoto
         (1983) vacuum experiments; context, not scored points.
       schema_gap: fitted evaporation coefficient output is context under the evidence
         rule
-      rows:
+      values:
       - element: Fe
+        source_observation_id: fedkin_2006_fe_hashimoto_langmuir_table3
         gas_species: Fe(g)
         printed_phase_descriptor: silicate_melt
         temperature_values:
@@ -129,8 +140,23 @@ species:
         - T_K: 2273.0
           alpha: 0.23
           sigma: 0.02
+        alexander_2004_temperature_values:
+        - T_K: 1973.0
+          alpha: 0.25
+          sigma: 0.03
+        - T_K: 2073.0
+          alpha: 0.26
+          sigma: 0.04
+        - T_K: 2173.0
+          alpha: 0.27
+          sigma: 0.02
+        - T_K: 2273.0
+          alpha: 0.28
+          sigma: 0.01
+        quoted_author: Alexander (2004)
         note: null
       - element: Mg
+        source_observation_id: fedkin_2006_mg_hashimoto_langmuir_table3
         gas_species: Mg(g)
         printed_phase_descriptor: silicate_melt
         temperature_values:
@@ -146,9 +172,24 @@ species:
         - T_K: 2273.0
           alpha: 0.27
           sigma: 0.01
+        alexander_2004_temperature_values:
+        - T_K: 1973.0
+          alpha: 0.27
+          sigma: 0.05
+        - T_K: 2073.0
+          alpha: 0.28
+          sigma: 0.05
+        - T_K: 2173.0
+          alpha: 0.28
+          sigma: 0.05
+        - T_K: 2273.0
+          alpha: 0.29
+          sigma: 0.03
+        quoted_author: Alexander (2004)
         note: Table 3 Mg this-work values transcribed from the repaired MinerU HTML
           table; weak T dependence
       - element: SiO
+        source_observation_id: fedkin_2006_sio_hashimoto_langmuir_table3
         gas_species: SiO(g)
         printed_phase_descriptor: silicate_melt_FCMAS_chondrule_analog
         temperature_values:
@@ -164,6 +205,20 @@ species:
         - T_K: 2273.0
           alpha: 0.21
           sigma: 0.01
+        alexander_2004_temperature_values:
+        - T_K: 1973.0
+          alpha: 0.16
+          sigma: 0.02
+        - T_K: 2073.0
+          alpha: 0.17
+          sigma: 0.02
+        - T_K: 2173.0
+          alpha: 0.19
+          sigma: 0.02
+        - T_K: 2273.0
+          alpha: 0.21
+          sigma: 0.02
+        quoted_author: Alexander (2004)
         note: 'Table 3 this-work SiO row: 0.12/0.17/0.20/0.21 ±0.01 at 1973–2273 K.
           Authors note progressive increase with T. Mid-range pin alpha=0.17 at 2073
           K.'
@@ -171,15 +226,16 @@ species:
     observations: []
     context:
     - observation_id: fedkin_2006_table4_inverse_fit_outputs
-      kind: model_fit_output
+      type: inverse_fit_outputs_context
       table: '4'
       locator:
         page: 14
         table: '4'
+      units: dimensionless alpha
       note: Printed inverse-fit coefficients from the FeO-free Wang et al. (2001)
         experiment and quoted Alexander (2001) estimates; context, not scored points.
       schema_gap: inverse-fitted evaporation coefficient has no scored token
-      rows:
+      values:
       - element: Mg
         source_observation_id: fedkin_2006_t4_mg_this_work_inverse
         quoted_author: Fedkin et al. (2006)
@@ -307,9 +363,10 @@ species:
   SiO:
     observations: []
   Na:
-    observations:
+    observations: []
+    context:
     - observation_id: fedkin_2006_na_yu_langmuir
-      type: alpha
+      type: best_fit_model_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         figure: '4'
@@ -366,10 +423,13 @@ species:
           locator:
             page: 9
             figure: '4'
+      context_note: Author-reported best-fit model coefficient for Yu et al. data;
+        model output, not a measured evaporation coefficient.
   K:
-    observations:
+    observations: []
+    context:
     - observation_id: fedkin_2006_k_yu_langmuir
-      type: alpha
+      type: best_fit_model_context
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         figure: '4'
@@ -424,9 +484,11 @@ species:
           locator:
             page: 9
             figure: '4'
+      context_note: Author-reported best-fit model coefficient for Yu et al. data;
+        model output, not a measured evaporation coefficient.
 fidelity_samples:
 - species: K
-  observable: alpha
+  observable: best_fit_model_context
   observation_id: fedkin_2006_k_yu_langmuir
   field: alpha
   value: 0.13
