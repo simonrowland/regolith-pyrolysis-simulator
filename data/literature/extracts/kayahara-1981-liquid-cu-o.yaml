@@ -14,7 +14,7 @@ species:
     context:
       - observation_id: kayahara_1981_printed_measurement_ranges
         type: relation
-        locator: {page: 1, published_page: 494, pdf_page_index: 0, section: Introduction}
+        locator: {page: 3, published_page: 495, pdf_page_index: 2, section: Introduction}
         units: K; atomic percent O; dimensionless
         values:
           method_class: measured_direct
@@ -28,11 +28,12 @@ species:
             - 'emf relationship at 1573 K'
             - 'Cu2O standard formation-energy equations apply over the experimental temperature range 1370 to 1600 K'
             - 'intersection of solid and liquid Cu2O formation-energy lines: 1499 K'
+            - 'comparison temperatures: 1503 K (Osterwald) and 1500 K (Sadat-Darbandi)'
             - 'oxygen partial pressure over the concentration range 3 to 34 at% and 1423 to 1600 K: 10^-3.0 to 10^-4.5 pO2/p°O2'
           note: Values are prose summaries or fit results without row-level conditions; Cu-O oxygen activity, copper activity, oxygen solubility, and partial entropy series have no fitting token in this extract context. The Cu2O formation energies are printed linear fits, not point observations.
       - observation_id: kayahara_1981_delta_g_fits
         type: relation
-        locator: {page: 6, published_page: 499, pdf_page_index: 5, section: Results}
+        locator: {page: 7, published_page: 499, pdf_page_index: 6, section: Results}
         units: kJ/mol
         values:
           method_class: model_derived
@@ -45,7 +46,7 @@ species:
           note: Printed linear fit coefficients are retained as model-derived context and are not expanded into values at unprinted temperatures.
       - observation_id: kayahara_1981_fig1_phase_diagram
         type: figure_only
-        locator: {figure: '1', page: 1, published_page: 494, pdf_page_index: 0}
+        locator: {figure: '1', page: 2, published_page: 494, pdf_page_index: 1}
         units: at% O; K
         values:
           method_class: figure_only
@@ -63,7 +64,7 @@ species:
           digitisation: deferred to a figure pass
       - observation_id: kayahara_1981_fig2_cell_arrangement
         type: figure_only
-        locator: {figure: '2', page: 2, published_page: 495, pdf_page_index: 1}
+        locator: {figure: '2', page: 3, published_page: 495, pdf_page_index: 2}
         units: not applicable
         values:
           method_class: figure_only
@@ -80,7 +81,7 @@ species:
           digitisation: deferred to a figure pass
       - observation_id: kayahara_1981_fig3_emf_copper
         type: figure_only
-        locator: {figure: '3', page: 3, published_page: 496, pdf_page_index: 2}
+        locator: {figure: '3', page: 4, published_page: 496, pdf_page_index: 3}
         units: mV
         values:
           method_class: figure_only
@@ -98,7 +99,7 @@ species:
           digitisation: deferred to a figure pass
       - observation_id: kayahara_1981_fig4_emf_oxide
         type: figure_only
-        locator: {figure: '4', page: 3, published_page: 496, pdf_page_index: 2}
+        locator: {figure: '4', page: 4, published_page: 496, pdf_page_index: 3}
         units: mV
         values:
           method_class: figure_only
@@ -116,7 +117,7 @@ species:
           digitisation: deferred to a figure pass
       - observation_id: kayahara_1981_fig5_emf_mole_fraction
         type: figure_only
-        locator: {figure: '5', page: 4, published_page: 497, pdf_page_index: 3}
+        locator: {figure: '5', page: 5, published_page: 497, pdf_page_index: 4}
         units: mV
         values:
           method_class: figure_only
@@ -134,7 +135,7 @@ species:
           digitisation: deferred to a figure pass
       - observation_id: kayahara_1981_fig6_activities
         type: figure_only
-        locator: {figure: '6', page: 5, published_page: 498, pdf_page_index: 4}
+        locator: {figure: '6', page: 6, published_page: 498, pdf_page_index: 5}
         units: dimensionless
         values:
           method_class: figure_only
@@ -152,7 +153,7 @@ species:
           digitisation: deferred to a figure pass
       - observation_id: kayahara_1981_fig7_cu2o_formation_energy
         type: figure_only
-        locator: {figure: '7', page: 5, published_page: 498, pdf_page_index: 4}
+        locator: {figure: '7', page: 6, published_page: 498, pdf_page_index: 5}
         units: kJ/mol
         values:
           method_class: figure_only
@@ -170,7 +171,7 @@ species:
           digitisation: deferred to a figure pass
       - observation_id: kayahara_1981_fig8_partial_entropy
         type: figure_only
-        locator: {figure: '8', page: 6, published_page: 499, pdf_page_index: 5}
+        locator: {figure: '8', page: 7, published_page: 499, pdf_page_index: 6}
         units: J/(mol K)
         values:
           method_class: figure_only
@@ -188,7 +189,7 @@ species:
           digitisation: deferred to a figure pass
       - observation_id: kayahara_1981_fig9_oxygen_potential
         type: figure_only
-        locator: {figure: '9', page: 6, published_page: 499, pdf_page_index: 5}
+        locator: {figure: '9', page: 7, published_page: 499, pdf_page_index: 6}
         units: log10(pO2/p°O2)
         values:
           method_class: figure_only
