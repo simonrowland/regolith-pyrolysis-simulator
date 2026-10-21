@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from copy import deepcopy
 from pathlib import Path
 
@@ -854,8 +855,9 @@ RECIPE_PRESSURE_CAMPAIGNS = (
 def _set_campaign_pressure(setpoints, campaign, pressure):
     key = CampaignManager(setpoints)._campaign_config_key(campaign)
     config = setpoints['campaigns'][key]
-    config.update(pO2_mbar=0.0, pO2_mbar_default=0.0,
-                  p_total_mbar=pressure, p_total_mbar_default=pressure)
+    config.update(p_total_mbar=pressure, p_total_mbar_default=pressure)
+    if campaign != CampaignPhase.C6:
+        config.update(pO2_mbar=0.0, pO2_mbar_default=0.0)
     if campaign == CampaignPhase.C2A_STAGED:
         _stage(setpoints, 'alkali_early_fe').update(
             gas_cover_mode='pn2_sweep', pO2_mbar=0.0, p_total_mbar=pressure,

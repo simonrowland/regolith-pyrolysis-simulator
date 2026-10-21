@@ -49,7 +49,7 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         )
         for index in range(8)
     )
-    assert [len(item.patch.values) for item in batch] == [59, 65] * 4
+    assert [len(item.patch.values) for item in batch] == [53, 59] * 4
     assert [item.patch.canonical_json() for item in batch] == [
         item.patch.canonical_json() for item in indexed
     ]
@@ -96,7 +96,7 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
     # schema envelope and positive-carrier coupling (no 5 mbar carrier floor).
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "a5bf226e897bde9b00a04f6fe54ab8310b6661d5a5888bffdb8afaf19f68f92b"
+    ).hexdigest() == "b7ab498ddc6dba7c9370736cfa8779ec7d53750e11adcc8153411e1b903bc676"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -128,7 +128,7 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
     # two disabled search paths also change this sampled stream.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "9bae78a0e22492102f2cd2fcc7c30acd6901e1c43d23611f2f6348f520400b7b"
+    ).hexdigest() == "472333850a57d1e3dd7036c8e08c57f1e6b0d764a50ee49fbf0d0b1386500619"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():
@@ -217,7 +217,7 @@ def _small_schema() -> RecipeSchema:
     return RecipeSchema(
         allowlist=(
             KnobSpec(
-                path=("campaigns", "C0", "temp_range_C"),
+                path=("campaigns", "C0", "temperature_C"),
                 kind="float",
                 low=20,
                 high=950,
@@ -514,7 +514,7 @@ def test_dependency_free_lhc_canonical_json_vector_is_pinned() -> None:
     schema = RecipeSchema(
         allowlist=(
             KnobSpec(
-                path=("campaigns", "C0", "temp_range_C"),
+                path=("campaigns", "C0", "temperature_C"),
                 kind="float",
                 low=20,
                 high=950,
@@ -538,9 +538,9 @@ def test_dependency_free_lhc_canonical_json_vector_is_pinned() -> None:
             sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
         )
     ) == (
-        '[{"path":["campaigns","C0","temp_range_C"],"value":798.1766251556933},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":55}]',
-        '[{"path":["campaigns","C0","temp_range_C"],"value":225.76036480263147},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":20}]',
-        '[{"path":["campaigns","C0","temp_range_C"],"value":596.8221746252607},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":45}]',
+        '[{"path":["campaigns","C0","temperature_C"],"value":798.1766251556933},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":55}]',
+        '[{"path":["campaigns","C0","temperature_C"],"value":225.76036480263147},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":20}]',
+        '[{"path":["campaigns","C0","temperature_C"],"value":596.8221746252607},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":45}]',
     )
 
 
@@ -755,7 +755,7 @@ def test_phase_order_grid_covers_stage0_order_count_and_dwell_skeletons() -> Non
 
 # --- anchored (neighborhood) sampling -------------------------------------
 
-_TEMP = ("campaigns", "C0", "temp_range_C")
+_TEMP = ("campaigns", "C0", "temperature_C")
 _HOLD = ("campaigns", "C3", "endpoint", "hold_time_ticks")
 _MODE = ("campaigns", "C0", "mode")
 _C3_PO2_DEFAULT = ("campaigns", "C3", "pO2_mbar_default")
@@ -827,7 +827,7 @@ def test_doe_spec_round_trips_anchor_and_delta_fraction() -> None:
     assert payload["delta_fraction"] == 0.2
     assert payload["anchor"] == [
         {"path": ["campaigns", "C0", "mode"], "value": "nominal"},
-        {"path": ["campaigns", "C0", "temp_range_C"], "value": 500.0},
+        {"path": ["campaigns", "C0", "temperature_C"], "value": 500.0},
         {"path": ["campaigns", "C3", "endpoint", "hold_time_ticks"], "value": 30},
     ]
 
@@ -981,14 +981,14 @@ def test_anchored_interior_dependency_free_lhc_canonical_json_matches_legacy() -
             delta_fraction=0.15,
         )
     ) == (
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":453.40763271253763},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":36}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":517.3343123700043},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":29}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":543.0543134472375},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":34}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":419.2745649641729},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":24}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":577.4789490504673},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":27}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":466.4803891941184},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":32}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":364.7420667677326},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":26}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":613.0671952710939},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":31}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":453.40763271253763},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":36}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":517.3343123700043},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":29}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":543.0543134472375},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":34}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":419.2745649641729},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":24}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":577.4789490504673},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":27}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":466.4803891941184},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":32}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":364.7420667677326},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":26}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":613.0671952710939},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":31}]',
     )
 
 
@@ -1011,14 +1011,14 @@ def test_anchored_interior_scipy_sobol_canonical_json_matches_legacy() -> None:
             delta_fraction=0.15,
         )
     ) == (
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":589.6556176226586},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":26}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":477.6095311231911},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":31}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":415.90245443955064},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":27}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":512.9525380562991},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":35}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":554.9749413356185},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":30}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":372.78716417588294},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":35}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":450.8525401148945},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":24}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":617.4994091466069},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":33}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":589.6556176226586},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":26}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":477.6095311231911},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":31}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":415.90245443955064},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":27}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":512.9525380562991},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":35}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":554.9749413356185},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":30}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":372.78716417588294},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":35}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":450.8525401148945},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":24}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temperature_C"],"value":617.4994091466069},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":33}]',
     )
 
 

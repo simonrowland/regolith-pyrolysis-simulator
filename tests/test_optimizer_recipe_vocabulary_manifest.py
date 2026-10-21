@@ -45,9 +45,9 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # d-209: producer regenerated C2A search bounds/provenance and admission
     # metadata; runtime design defaults and conditional dimensions are unchanged.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "17988fd7fb68d38b1807d0c3ead58e4b846e04fb2cfb19a6bf908f82e642e244"
+        "dc2e058957a28921fe1b46df50384029b295ff6dcab42365617a6bdbc17eeab3"
     )
-    assert digest == "8b9be0c15bad08aad73340963971e249e07051abcd014254444014c5285e6bc6"
+    assert digest == "a25a04c233e0ae998d706ebdd6cdb4dd1369b67beb5cb0b999bcccd3ebfaef28"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
@@ -66,4 +66,4 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     assert {path for path in paths if path.startswith("campaigns.C7.")} == {
         "campaigns.C7.sweep_mol_per_m2_s",
     }
-    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [59, 65]
+    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [53, 59]
