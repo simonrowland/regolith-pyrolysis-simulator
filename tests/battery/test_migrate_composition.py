@@ -1107,9 +1107,10 @@ def test_markova_point_refusal_mutation_proof(monkeypatch: pytest.MonkeyPatch) -
         and observation.identity.temperature_K.value == target_t
     )
     assert row.identity.composition.is_value
-    assert row.identity.composition.value.components == wt_pct_to_mole_fraction(
-        raw["values"]["composition_wt_pct"]
-    ).components
+    assert row.identity.composition.value == replace(
+        wt_pct_to_mole_fraction(raw["values"]["composition_wt_pct"]),
+        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    )
     assert normalized_composition(
         migrator.result.experiments[row.experiment_id], _bench(), row
     ).selected is not None
