@@ -327,7 +327,31 @@ def test_review_author_provenance_matrix(tmp_path, method, shape, case):
         assert _child(result).derivation.inputs == ("fixture-source::parent",)
     else:
         assert evidence.is_unknown
-    assert not result.validation.hard_issues
+    if case == "partial_prose":
+        # "not an observation" used to leave the record, so this case had no
+        # hard issue. That pinned the drop. The printed derived_from stays,
+        # and the existing referential_integrity issue flags it.
+        printed = "not an observation"
+        children = [
+            obs for obs in result.observations.values()
+            if obs.observation_id == "fixture-source::child"
+            or obs.observation_id.startswith("fixture-source::child::")
+        ]
+        assert children
+        assert all(printed in obs.derived_from for obs in children)
+        assert {
+            (issue.path, issue.reason, issue.detail)
+            for issue in result.validation.hard_issues
+        } == {
+            (
+                f"observation[{obs.observation_id}].derived_from",
+                RefusalReason.REFERENTIAL_INTEGRITY,
+                f"derived_from {printed!r} does not resolve",
+            )
+            for obs in children
+        }
+    else:
+        assert not result.validation.hard_issues
 
 
 @pytest.mark.parametrize("method", [
@@ -888,15 +912,87 @@ def test_geometry_context_keeps_original_source_record():
                    for row in result.context_by_work[experiment.work_id])
 
 
+_ITOH_KNACKE = (
+    "Knacke et al. thermochemical data and prior Mg, Ca and Al "
+    "deoxidation-equilibrium data cited by the authors"
+)
+_ITOH_PRESENT = (
+    "present 1873 K equilibrium observations plus prior Mg, Ca and Al "
+    "deoxidation-equilibrium parameters"
+)
+_BOULLIUNG_APPARATUS = "boulliung_2025_ssas_apparatus_and_run_conditions"
+_BOULLIUNG_STARTING = "boulliung_2025_starting_material_hg_and_trace_doping"
+# Unresolved printed parents kept on both derived_from and derivation.inputs.
+_BOULLIUNG_UNRESOLVED = {
+    "boulliung_2025_hg_equilibrium_partial_pressure": (_BOULLIUNG_APPARATUS,),
+    "boulliung_2025_hg_equilibrium_partial_pressure_1400c": (
+        _BOULLIUNG_STARTING, _BOULLIUNG_APPARATUS,
+    ),
+    "boulliung_2025_cd_tl_author_partial_pressures": (_BOULLIUNG_APPARATUS,),
+    "boulliung_2025_hsc_gas_speciation": (
+        _BOULLIUNG_STARTING, _BOULLIUNG_APPARATUS,
+    ),
+}
+_WIMPENNY_TABLE = "wimpenny_2019_table1_experimental_zn_rows"
+
+
+def _printed_lineage_issue(source: str, local_id: str, field: str, text: str):
+    noun = "derived_from" if field == "derived_from" else "derivation input"
+    return (
+        f"observation[{source}::{local_id}].{field}",
+        RefusalReason.REFERENTIAL_INTEGRITY,
+        f"{noun} {text!r} does not resolve",
+    )
+
+
 @pytest.mark.parametrize("source", [
     "boulliung-2025-mercury-volatile-metals-magmatic", "itoh-hino-banya-1998-spinel",
     "wimpenny-2019-zn-isotope-evaporation-extreme-t",
 ])
 def test_ancestry_lookup_preserves_nonconditional_derivation_emission(source):
+    """Kept printed lineage is referential_integrity, not a silent drop.
+
+    This assertion used to forbid every referential_integrity issue. That
+    pinned the drop: Itoh's two printed derivation inputs were removed, so
+    the fixture raised none. They stay on derivation.inputs and are flagged.
+    Boulliung and Wimpenny share this parameter and keep their printed
+    parents the same way. No other referential_integrity issue is allowed.
+    """
+
     migrator = F.migrate_one_extract(
         M.REPO_ROOT,
         M.REPO_ROOT / "data/literature/extracts" / f"{source}.yaml",
     )
     migrator.finalize()
-    assert not any(issue.reason.value == "referential_integrity"
-                   for issue in migrator.result.validation.hard_issues)
+    referential = {
+        (issue.path, issue.reason, issue.detail)
+        for issue in migrator.result.validation.hard_issues
+        if issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    }
+    if source == "itoh-hino-banya-1998-spinel":
+        expected = {
+            _printed_lineage_issue(
+                source, "itoh_1998_spinel_equilibrium_constants",
+                "derivation.inputs", _ITOH_KNACKE,
+            ),
+            _printed_lineage_issue(
+                source, "itoh_1998_spinel_interaction_parameters",
+                "derivation.inputs", _ITOH_PRESENT,
+            ),
+        }
+    elif source == "boulliung-2025-mercury-volatile-metals-magmatic":
+        expected = {
+            _printed_lineage_issue(source, local_id, field, text)
+            for local_id, texts in _BOULLIUNG_UNRESOLVED.items()
+            for text in texts
+            for field in ("derived_from", "derivation.inputs")
+        }
+    else:
+        expected = {
+            _printed_lineage_issue(
+                source, "wimpenny_2019_zn_fractionation_summary", field,
+                _WIMPENNY_TABLE,
+            )
+            for field in ("derived_from", "derivation.inputs")
+        }
+    assert referential == expected
