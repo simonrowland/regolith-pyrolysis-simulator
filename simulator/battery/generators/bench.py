@@ -14,6 +14,7 @@ from simulator.battery.waypoints import (
     WaypointResult, _prediction_pressure_waypoint, pure_substance_engine_point_gap,
     is_invalid_row_composition_gap,
 )
+from simulator.melt_backend.base import multivalent_components
 
 
 _FLAGGED_AUTHORITIES = {"assumed", "bound", "extrapolated"}
@@ -112,31 +113,6 @@ class UnsupportedValue(ValueError):
 
 
 # Each element has more than one oxidation state in silicate melts over the
-# fO2 range these engines are asked to run. Omitting fO2 lets the engine
-# invent that redox state. Composition names and the measured species are
-# mapped onto this table; the element symbols are not repeated elsewhere.
-# Fe: Fe2+ and Fe3+, and Fe0 at very low fO2. Every MELTS iron alias, including
-#     the total-iron prints, maps here.
-# Ti: Ti4+ and Ti3+.
-# Cr: Cr3+ and Cr2+.
-# Mn: Mn2+ and Mn3+.
-# V: V3+, V4+, and V5+.
-# Eu: Eu3+ and Eu2+.
-# Ce: Ce4+ and Ce3+.
-# S: sulfide S2- and sulfate S6+.
-# Ga: Ga3+ and Ga+. Bischof measures Ga dissolved in CMAS, so Ga is not in the bulk map.
-MULTIVALENT_MELT_ELEMENTS: dict[str, str] = {
-    "Fe": "Fe2+/Fe3+",
-    "Ti": "Ti4+/Ti3+",
-    "Cr": "Cr3+/Cr2+",
-    "Mn": "Mn2+/Mn3+",
-    "V": "V3+/V4+/V5+",
-    "Eu": "Eu3+/Eu2+",
-    "Ce": "Ce4+/Ce3+",
-    "S": "S2-/S6+",
-    "Ga": "Ga3+/Ga+",
-}
-
 # Parent-oxide basis tokens already printed on rows. single_cation is a
 # different activity and is not converted into this set.
 _PARENT_OXIDE_COMPONENT_BASES = frozenset({"oxide", "parent", "parent_oxide"})
@@ -182,63 +158,6 @@ _ENGINE_REPORTED_ACTIVITY["internal-analytical"] = EngineReportedActivity(
     Phase.L,
     _PARENT_OXIDE_COMPONENT_BASES,
 )
-
-
-def _oxide_lookup_key(name: str) -> str:
-    key = str(name).strip()
-    if key.endswith("_Liq"):
-        key = key[:-4]
-    # FeO* is total iron written as FeO. The MELTS alias map keys FeO, not the star.
-    if key.endswith("*"):
-        key = key[:-1]
-    return key
-
-
-def _elements_of_component(name: str) -> frozenset[str]:
-    """Elements in one composition name or species formula.
-
-    Iron aliases come from the MELTS basis map (FeO_tot, FeOT, FeO_total,
-    and the same keys in any case). A name the map does not know is parsed
-    as a formula, which is how TiO2, V2O3, and Ga reach the element table.
-    """
-
-    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
-    from simulator.reference_data.janaf import formula_composition
-
-    key = _oxide_lookup_key(name)
-    canonical = MELTS_OXIDE_ALIASES.get(key.lower())
-    # FeO_total does not parse: the underscore is not a formula token.
-    # Every MELTS total-iron alias is total Fe expressed as FeO.
-    formula = "FeO" if canonical == "FeO_total" else (canonical or key)
-    parsed = formula_composition(formula)
-    if not parsed:
-        return frozenset()
-    return frozenset(element for element, _count in parsed)
-
-
-def _is_multivalent(name: str) -> bool:
-    return any(element in MULTIVALENT_MELT_ELEMENTS for element in _elements_of_component(name))
-
-
-def _redox_components(composition: Mapping, species: str | None = None) -> tuple[str, ...]:
-    """Names that hold a multivalent element at a positive amount, plus the species.
-
-    A printed zero does not count, so FeO = 0 cannot hide TiO2.
-    """
-
-    present: list[str] = []
-    for name, amount in composition.items():
-        try:
-            number = Decimal(str(amount))
-        except (ArithmeticError, ValueError):
-            continue
-        if number <= 0:
-            continue
-        if _is_multivalent(str(name)):
-            present.append(str(name))
-    if species and _is_multivalent(species) and species not in present:
-        present.append(species)
-    return tuple(sorted(present))
 
 
 def _melts_reports_oxide_endmember(formula: str) -> tuple[bool, str]:
@@ -511,11 +430,13 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
         point_gap = _point_gap("temperature_K", temperature.selected)
         if point_gap is not None:
             gaps.append(point_gap)
-    redox: tuple[str, ...] = ()
-    if composition.selected is not None:
-        redox = _redox_components(composition.selected.value, inputs.measured_species)
-    elif inputs.measured_species and _is_multivalent(inputs.measured_species):
-        redox = (inputs.measured_species,)
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+
+    redox = multivalent_components(
+        composition.selected.value if composition.selected is not None else None,
+        inputs.measured_species,
+        oxide_aliases=MELTS_OXIDE_ALIASES,
+    )
     if redox:
         oxygen = inputs.waypoints["oxygen_condition"]
         if oxygen.selected is None:

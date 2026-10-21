@@ -69,12 +69,9 @@ from simulator.chemistry.kernel.dto import (
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.fe_redox import normalize_redox_state
 from simulator.melt_backend.base import (
-    EquilibriumResult,
-    MeltCompositionError,
     RealBackendAuthority,
     RealBackendFamily,
 )
-from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
@@ -575,29 +572,24 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
 
         Returns the adapter's :class:`EquilibriumResult`. The adapter itself
         converts failure into an ``EquilibriumResult`` with
-        ``status='not_converged'`` rather than raising, so the broad except
-        here is a final safety net for unexpected exceptions only.
+        ``status='not_converged'`` rather than raising. Exceptions escaping
+        the adapter are unexpected programming or control-flow errors and
+        must propagate to the caller.
         """
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
-        try:
-            return backend.equilibrate(
-                temperature_C=float(request.temperature_C),
-                pressure_bar=float(request.pressure_bar),
-                fO2_log=(
-                    float(request.fO2_log)
-                    if request.fO2_log is not None
-                    else -9.0
-                ),
-                composition_mol_by_account=composition_mol_by_account,
-                species_formula_registry=species_registry,
-            )
-        except Exception as exc:  # noqa: BLE001 - optional shadow boundary
-            return EquilibriumResult(
-                status='not_converged',
-                warnings=(f'MAGEMin equilibrate raised: {exc}',),
-            )
+        return backend.equilibrate(
+            temperature_C=float(request.temperature_C),
+            pressure_bar=float(request.pressure_bar),
+            fO2_log=(
+                float(request.fO2_log)
+                if request.fO2_log is not None
+                else -9.0
+            ),
+            composition_mol_by_account=composition_mol_by_account,
+            species_formula_registry=species_registry,
+        )
 
     def _run_liquidus_finder(
         self,
@@ -620,21 +612,13 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
-        try:
-            return finder(
-                pressure_bar=float(request.pressure_bar),
-                fO2_log=(float(fO2_log) if fO2_log is not None else -9.0),
-                redox_state=redox_state,
-                composition_mol_by_account=composition_mol_by_account,
-                species_formula_registry=species_registry,
-            )
-        except MeltCompositionError:
-            raise
-        except Exception as exc:  # noqa: BLE001 - optional engine boundary
-            return LiquidusSolidusResult(
-                status='not_converged',
-                warnings=(f'MAGEMin liquidus finder failed: {exc}',),
-            )
+        return finder(
+            pressure_bar=float(request.pressure_bar),
+            fO2_log=(float(fO2_log) if fO2_log is not None else -9.0),
+            redox_state=redox_state,
+            composition_mol_by_account=composition_mol_by_account,
+            species_formula_registry=species_registry,
+        )
 
     @staticmethod
     def _mode_label(backend: Any) -> str:
