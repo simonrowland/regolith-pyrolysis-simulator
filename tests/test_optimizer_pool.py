@@ -830,7 +830,7 @@ def _spec(
         recipe_id=patch.recipe_id(recipe_schema_version="pool-test-schema"),
         feedstock_recipe_digest="feedstock-recipe-digest",
         feedstock_id=feedstock_id,
-        profile_id=str(profile["id"]),
+        profile_id=str(profile.get("profile_id") or profile["id"]),
         fidelity=fidelity,
         code_version="pool-test-code",
         data_digests=_DATA_DIGESTS,
@@ -1018,7 +1018,7 @@ def test_pool_records_thermal_admission_refusals_and_continues(
         if lab_schedule is not None:
             run_options["lab_schedule"] = lab_schedule
         return {
-            "id": (
+            "profile_id": (
                 f"pool-c2a-window-{high_C:g}"
                 if high_C is not None
                 else "pool-c2a-lab-schedule"
