@@ -1044,8 +1044,16 @@ def validate_observation(
     ev = observation.evidence.class_
     derivation = observation.derivation
     raw_inputs = derivation.raw_inputs if derivation is not None else None
+    declares_printed_unresolved = (
+        derivation is not None and derivation.declares_unresolved_printed_inputs
+    )
     if raw_inputs is not None and not (
-        ev.is_value and ev.value is EvidenceClass.MEASURED_REDUCED
+        (ev.is_value and ev.value is EvidenceClass.MEASURED_REDUCED)
+        or (
+            declares_printed_unresolved
+            and ev.is_value
+            and ev.value is EvidenceClass.MODEL_DERIVED
+        )
     ):
         detail = (
             "raw_inputs not_printed declaration is invalid for model_derived evidence"
@@ -1109,7 +1117,10 @@ def validate_observation(
             derivation is not None and derivation.declares_unprinted_raw_inputs
         )
         if raw_inputs is not None:
-            if not declares_unprinted_raw_inputs:
+            if (
+                not declares_unprinted_raw_inputs
+                and not declares_printed_unresolved
+            ):
                 issues.append(
                     _issue(
                         f"{path}.derivation.raw_inputs",
@@ -1122,7 +1133,11 @@ def validate_observation(
                     _issue(
                         f"{path}.derivation.raw_inputs",
                         RefusalReason.CONDITIONAL_FIELD,
-                        "raw_inputs not_printed declaration requires a locator",
+                        (
+                            "raw_inputs printed_unresolved declaration requires a locator"
+                            if declares_printed_unresolved
+                            else "raw_inputs not_printed declaration requires a locator"
+                        ),
                     )
                 )
         if (
@@ -1142,6 +1157,8 @@ def validate_observation(
             for parent in observation.derived_from or ()
         )
         if not figure_only_without_value:
+            # printed_unresolved is not complete lineage. Only a located
+            # not_printed declaration excuses a missing derived_from.
             if not has_resolved_lineage and not (
                 ev.value is EvidenceClass.MEASURED_REDUCED
                 and derivation is not None

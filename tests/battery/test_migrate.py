@@ -38,6 +38,7 @@ from simulator.battery.enums import (
     PolymorphRejectionKind,
     Quantity,
     Rail,
+    RawInputStatus,
     ResidualStatus,
     ReferenceStateConvention,
     RefusalReason,
@@ -71,6 +72,7 @@ from simulator.battery.migrate import (
     iter_observation_store_paths,
     lineage_parents_from_source,
     source_derivation_from_source,
+    _derivation_inputs_requirement_error,
     load_migrated_context,
     map_phase,
     map_quantity,
@@ -329,6 +331,9 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
 from simulator.battery.records import (
     Bench,
     BenchIdentity,
+    Derivation,
+    Located,
+    Locator,
     Notice,
     Reaction,
     Species,
@@ -2674,6 +2679,107 @@ def test_restoring_the_printed_lineage_drop_fails(tmp_path: Path) -> None:
             parent.startswith("fixture-source::parent_meas::") for parent in obs.derived_from
         )
     _assert_printed_lineage_flagged(result, cited, "derivation.inputs")
+
+
+def test_all_prose_derivation_inputs_are_located_printed_unresolved(
+    tmp_path: Path,
+) -> None:
+    """b-979: every printed input becomes a located printed_unresolved.
+    The text stays a conditional_field and a queue entry, and the store
+    loader accepts the empty inputs.
+    """
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    _model_derived_child(
+        extract,
+        "child_prose_inputs",
+        derivation={
+            "relation": "fit from the present observations",
+            "inputs": _PRINTED_NON_CITATION,
+            "output_unit": "dimensionless",
+        },
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=True)
+    rows = _rows_for(result, "child_prose_inputs")
+    assert rows
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == ()
+        assert obs.derivation.has_located_unresolved_printed_inputs
+        assert (
+            obs.derivation.raw_inputs.state.value
+            is RawInputStatus.PRINTED_UNRESOLVED
+        )
+        assert obs.derivation.raw_inputs.locator == obs.locator
+    _assert_printed_lineage_flagged(
+        result, _PRINTED_NON_CITATION, "derivation.inputs"
+    )
+    _loaded_works, _loaded_experiments, loaded = load_migrated_store(root)
+    reloaded = [
+        obs
+        for obs in loaded.values()
+        if "child_prose_inputs" in obs.observation_id
+    ]
+    assert reloaded
+    for obs in reloaded:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == ()
+        assert (
+            obs.derivation.raw_inputs.state.value
+            is RawInputStatus.PRINTED_UNRESOLVED
+        )
+        assert obs.derivation.raw_inputs.locator is not None
+
+
+def test_mixed_resolved_inputs_leave_raw_inputs_absent(tmp_path: Path) -> None:
+    """b-979: a resolved input stays on the derivation. raw_inputs stays absent."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "parent_meas"
+    _model_derived_child(
+        extract,
+        "child_mixed_raw",
+        derived_from=["parent_meas"],
+        derivation={
+            "relation": "Gibbs-energy minimization using thermodynamic data [19]",
+            "inputs": ["parent_meas", "thermodynamic data cited as [19]"],
+            "output_unit": "Pa",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    rows = _rows_for(result, "child_mixed_raw")
+    assert rows
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == obs.derived_from
+        assert obs.derivation.raw_inputs is None
+    _assert_printed_lineage_flagged(
+        result, "thermodynamic data cited as [19]", "derivation.inputs"
+    )
+
+
+def test_unlocated_printed_unresolved_requires_a_locator() -> None:
+    """b-979: an unlocated printed_unresolved does not satisfy empty inputs."""
+
+    bare = Derivation(
+        relation="author calculation",
+        inputs=(),
+        parameters=(),
+        output_unit="Pa",
+        raw_inputs=Located(State.of(RawInputStatus.PRINTED_UNRESOLVED)),
+    )
+    assert _derivation_inputs_requirement_error(bare) == (
+        "raw_inputs printed_unresolved declaration requires a locator"
+    )
+    located = replace(
+        bare,
+        raw_inputs=Located(
+            State.of(RawInputStatus.PRINTED_UNRESOLVED),
+            locator=Locator(page=2),
+        ),
+    )
+    assert _derivation_inputs_requirement_error(located) is None
 
 
 def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:

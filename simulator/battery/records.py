@@ -422,6 +422,25 @@ class Derivation:
             and self.raw_inputs.locator is not None
         )
 
+    @property
+    def declares_unresolved_printed_inputs(self) -> bool:
+        raw_inputs = self.raw_inputs
+        return (
+            raw_inputs is not None
+            and raw_inputs.state.is_value
+            and raw_inputs.state.value is RawInputStatus.PRINTED_UNRESOLVED
+        )
+
+    @property
+    def has_located_unresolved_printed_inputs(self) -> bool:
+        """Located printed prose. Not complete lineage for scoring."""
+
+        return (
+            self.declares_unresolved_printed_inputs
+            and self.raw_inputs is not None
+            and self.raw_inputs.locator is not None
+        )
+
     def __post_init__(self) -> None:
         if not self.relation:
             raise ValueError("Derivation.relation is required")

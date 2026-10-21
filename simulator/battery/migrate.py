@@ -954,6 +954,12 @@ def _derivation_inputs_requirement_error(
         return "raw_inputs not_printed declaration requires a locator"
     if (
         not derivation.inputs
+        and derivation.declares_unresolved_printed_inputs
+        and not derivation.has_located_unresolved_printed_inputs
+    ):
+        return "raw_inputs printed_unresolved declaration requires a locator"
+    if (
+        not derivation.inputs
         and derivation.raw_inputs is None
         and not has_resolved_lineage
     ):
@@ -6273,6 +6279,18 @@ def lineage_parents_from_source(
 
 
 _CONDITIONAL_REDUCED_METHODS = frozenset({"calculated", "author_derived"})
+
+
+def _derivation_source_locator(
+    obs: Mapping[str, Any], values: Mapping[str, Any]
+) -> Locator | None:
+    """Locator the source wrote on the derivation, if any."""
+
+    for payload in (obs, values):
+        raw = payload.get("derivation")
+        if isinstance(raw, Mapping) and raw.get("locator") is not None:
+            return _locator_from_plain(raw.get("locator"))
+    return None
 
 
 def source_derivation_from_source(
@@ -13822,8 +13840,20 @@ class Migrator:
                 )
             elif derivation_prose:
                 # Printed inputs do not resolve. Keep the derivation and
-                # leave the text off the pointer fields.
-                source_derivation = replace(source_derivation, inputs=())
+                # leave the text off the pointer fields. A located
+                # printed_unresolved satisfies the empty-inputs contract.
+                prose_locator = _derivation_source_locator(obs, values) or locator
+                if prose_locator is None:
+                    source_derivation = replace(source_derivation, inputs=())
+                else:
+                    source_derivation = replace(
+                        source_derivation,
+                        inputs=(),
+                        raw_inputs=Located(
+                            State.of(RawInputStatus.PRINTED_UNRESOLVED),
+                            locator=prose_locator,
+                        ),
+                    )
             elif source_derivation.raw_inputs is None:
                 # No input was stated.
                 source_derivation = None
