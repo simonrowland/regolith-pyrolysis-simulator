@@ -2722,8 +2722,21 @@ species:
         candidate_tokens:
         - valence_ratio
         - fe3_fe2_ratio
-        disposition_reason: Phase-area percentages have no matching quantity token. Class summaries and Fe3+/FeT
-          are author-reduced from target data; derived store rows are pending the missing corpus table asset (controller).
+        disposition_reason: >-
+          Phase-area percentages have no matching quantity token. The printed Fe3+/FeT class summaries are whole-sample
+          Mössbauer ratios, not melt redox observations, and remain context under the controller ruling. Their printed
+          reductions are linked to tables:morris-2006-gusev-mossbauer (table-5.csv target rows and component-area cells).
+        derived_from:
+        - tables:morris-2006-gusev-mossbauer
+        derivation:
+          relation: >-
+            The reported area means are arithmetic means of member target values; the paper reports area uncertainty
+            as 1s standard deviation or 2%, whichever is larger (Table 6 footnote a). Target-level Fe3+/FeT is
+            preserved as printed because the cited footnote gives no algebraic formula. These whole-sample ratios
+            remain context under the controller ruling.
+          inputs:
+          - tables:morris-2006-gusev-mossbauer
+          locator: table-5.csv target rows; printed component-area cells; physical PDF pp. 8–9, Table 5
         attribution_as_printed: Morris et al. MER Spirit MIMOS II measurements and author-reduced Mössbauer fits.
         page_locators:
         - page: 21
@@ -2864,8 +2877,22 @@ species:
         candidate_tokens:
         - valence_ratio
         - fe3_fe2_ratio
-        disposition_reason: Phase-area percentages have no matching quantity token. Class summaries and Fe3+/FeT
-          are author-reduced from target data; derived store rows are pending the missing corpus table asset (controller).
+        disposition_reason: >-
+          Phase-area percentages have no matching quantity token. The printed Fe3+/FeT class and subclass summaries
+          are whole-sample Mössbauer ratios, not melt redox observations, and remain context under the controller
+          ruling. Their printed reductions are linked to tables:morris-2006-gusev-mossbauer (table-5.csv target rows
+          and component-area cells).
+        derived_from:
+        - tables:morris-2006-gusev-mossbauer
+        derivation:
+          relation: >-
+            The reported area means are arithmetic means of member target values; the paper reports area uncertainty
+            as 1s standard deviation or 2%, whichever is larger (Table 7 footnote a). Target-level Fe3+/FeT is
+            preserved as printed because the cited footnote gives no algebraic formula. These whole-sample ratios
+            remain context under the controller ruling.
+          inputs:
+          - tables:morris-2006-gusev-mossbauer
+          locator: table-5.csv target rows; printed component-area cells; physical PDF pp. 8–9, Table 5
         attribution_as_printed: Morris et al. MER Spirit MIMOS II measurements and author-reduced Mössbauer fits.
         page_locators:
         - page: 24

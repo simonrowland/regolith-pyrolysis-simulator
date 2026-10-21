@@ -15,6 +15,7 @@ EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
 CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
 PDF = CORPUS / "raw" / SID / f"{SID}.pdf"
 TEXT = CORPUS / "text" / SID / "pdftotext-layout.txt"
+TABLES = CORPUS / "tables" / SID
 
 # Independent Table 5 transcription from 600 dpi renders of physical PDF pages 8–9.
 RENDER_GRID = {
@@ -104,6 +105,22 @@ def test_all_tables_have_dispositions_and_all_figures_are_deferred_without_point
     assert "210–270 K" in figure2["values"]["temperature_as_printed"]
 
 
+@pytest.mark.skipif(not TABLES.is_dir(), reason=f"corpus table asset is unavailable: {TABLES}")
+def test_derived_class_means_remain_context_linked_to_table5():
+    source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    context = source["species"]["Fe"]["context"]
+    for table_number in (6, 7):
+        row = next(
+            item for item in context
+            if item["observation_id"] == f"morris_2006_gusev_table{table_number}_context"
+        )
+        assert row["type"] == "measured_table_context"
+        assert row["values"]["derived_from"] == [f"tables:{SID}"]
+        assert row["values"]["derivation"]["inputs"] == [f"tables:{SID}"]
+        assert "table-5.csv" in row["values"]["derivation"]["locator"]
+        assert "remain context" in row["values"]["derivation"]["relation"]
+
+
 @pytest.mark.skipif(not PDF.is_file() or not TEXT.is_file(), reason=f"corpus source is unavailable: {SID}")
 def test_context_only_extract_migrates_no_unavailable_scored_observations():
     index = {
@@ -111,6 +128,7 @@ def test_context_only_extract_migrates_no_unavailable_scored_observations():
             "corpus": {
                 "raw": {"path": str(PDF), "present": PDF.is_file()},
                 "text": {"path": str(TEXT), "exists": TEXT.is_file()},
+                "tables": {"path": str(TABLES), "exists": TABLES.is_dir()},
             }
         }
     }
@@ -120,3 +138,7 @@ def test_context_only_extract_migrates_no_unavailable_scored_observations():
     observations = [row for row in migrator.result.observations.values() if row.source_id == SID]
     assert observations == []
     assert not [row for row in observations if row.value.kind is ValueKind.UNAVAILABLE]
+    assert not migrator.result.validation.hard_issues
+    work = next(work for work in migrator.result.works.values() if SID in work.source_ids)
+    table_asset = next(asset for asset in work.source_files.files if asset.asset_id == f"tables:{SID}")
+    assert table_asset.path == str(TABLES)
