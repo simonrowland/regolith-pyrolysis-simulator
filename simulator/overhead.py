@@ -721,7 +721,7 @@ class OverheadGasModel:
         allowed_pressure_mbar = _required_finite_nonnegative_float(
             melt.p_total_mbar,
             'melt.p_total_mbar',
-        )  # mbar — caller-supplied total-pressure ceiling
+        )  # mbar — operating ceiling, or zero for hard-vacuum operation
         pipe_temperature_C = self.resolve_pipe_temperature_C(melt)  # °C — active pipe/liner wall temperature
         # Pa = mbar*100. A numerical pressure floor would evaluate rarefied
         # capacity at the wrong physical input (and invent flow at P1=P2=0).
@@ -762,18 +762,31 @@ class OverheadGasModel:
             pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
         if not controlled_flow and (
             conductance > 0.0
-            or (allowed_pressure_Pa == 0.0 and downstream_pressure_Pa == 0.0)
+            or allowed_pressure_Pa == 0.0
         ):
-            # A zero pressure CEILING has zero capacity, but a positive gas
-            # source still develops the pressure required to leave an open
-            # pipe into vacuum. Invert that source without inventing a 1 Pa
-            # floor; its load/capacity remains infinite and throttles heating.
+            # Zero is the hard-vacuum campaign setting, not a zero upstream
+            # ceiling. The evolved gas develops the pressure solving F(P1,P2)
+            # = source. F is kg/s and the inverse returns mbar. In the
+            # molecular limit P1=P2+source/K, with K independent of pressure;
+            # as source -> 0, P1 -> P2. No arbitrary pressure floor is needed.
             vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, inverted pipe balance
                 total_evap_kg_hr / 3600.0,  # kg/s — evaporation mass flow
                 conductance_temperature_C,
                 p_downstream_bar=downstream_pressure_Pa / 1.0e5,
                 species_kg_for_M_avg=evap_flux.species_kg_hr,
             )
+            if allowed_pressure_Pa == 0.0:
+                allowed_pressure_Pa = vapor_pressure_mbar * 100.0
+                if total_evap_kg_hr > 0.0 and allowed_pressure_Pa <= downstream_pressure_Pa:
+                    raise OverheadConfigurationError(
+                        'hard-vacuum source requires a valid pipe with positive forward capacity'
+                    )
+                conductance = self._pipe_conductance(
+                    allowed_pressure_Pa, conductance_temperature_C,
+                    p_downstream_Pa=downstream_pressure_Pa,
+                    species_kg_for_M_avg=evap_flux.species_kg_hr,
+                )
+                pipe_conductance_kg_hr = conductance * 3600.0
         elif not controlled_flow:
             # Premise: zero forward conductance is a closed-line condition,
             # not zero vapor pressure; evolved gas fills the upstream volume
@@ -789,6 +802,13 @@ class OverheadGasModel:
             pipe_capacity_used_pct = (
                 effective_transport_capacity.saturation * 100.0
             )
+        elif allowed_pressure_mbar == 0.0:
+            # No positive upstream pressure ceiling is prescribed in hard
+            # vacuum. The solved source pressure supplies HK backpressure;
+            # load/F at that pressure is identically one, not a spare-capacity
+            # constraint on heating. Report no ceiling saturation (also the
+            # zero-source 0/0 limit), rather than fabricate a ramp throttle.
+            pipe_capacity_used_pct = 0.0
         elif total_evap_kg_hr <= 0.0:
             pipe_capacity_used_pct = 0.0
         elif pipe_conductance_kg_hr > 0.0:
@@ -797,21 +817,21 @@ class OverheadGasModel:
             )  # percent — load / capacity at allowed upstream pressure
         else:
             pipe_capacity_used_pct = math.inf
-        # Capacity is evaluated at the allowed UPSTREAM pressure and resolved
-        # downstream pressure. The historical p_mean_Pa key below is an alias
+        # Capacity uses the declared ceiling or resolved hard-vacuum source
+        # pressure and the downstream pressure. The historical p_mean_Pa key is an alias
         # for the upstream pressure, not their arithmetic mean. Units: kg/s;
         # conductance_kg_s_per_bar remains the same historical kg/s alias.
         return {
             'pipe_temperature_C': pipe_temperature_C,  # °C — active pipe/liner wall temperature
             'conductance_temperature_C': conductance_temperature_C,  # °C — gas temperature used for conductance
-            'p_mean_Pa': allowed_pressure_Pa,  # Pa — compatibility field; allowed upstream pressure
+            'p_mean_Pa': allowed_pressure_Pa,  # Pa — compatibility field; resolved upstream pressure
             'initial_throat_area_m2': self.initial_throat_area_m2,  # m² — user-configured throat cross-section
             'throat_diameter_m': self.pipe_diameter_m,  # m — circular-equivalent throat diameter
             'stage_area_m2_by_stage': self.stage_area_m2_by_stage(),  # m² by stage — throat area × ratio
             'stage_area_geometry_provenance_notice': (
                 self.stage_area_geometry_provenance_notice()
             ),
-            'conductance_kg_s': conductance,  # kg/s — PIPE-1 capacity at allowed upstream and downstream pressures, not at the arithmetic mean
+            'conductance_kg_s': conductance,  # kg/s — PIPE-1 flow at resolved upstream/downstream pressures, not their arithmetic mean
             'conductance_kg_s_per_bar': conductance,  # kg/s — deprecated compatibility alias; not per-bar
             'pipe_conductance_kg_hr': pipe_conductance_kg_hr,  # kg/hr — pipe mass-flow capacity
             'pipe_capacity_used_pct': pipe_capacity_used_pct,  # percent — capacity used
@@ -875,6 +895,13 @@ class OverheadGasModel:
             dt_hr=dt_hr,
             equipment_capacity_required=equipment_capacity_required,
             upstream_pressure_bar=allowed_pressure_Pa / 1.0e5,
+            pipe_diameter_m=self.pipe_diameter_m,
+            pipe_length_m=self.pipe_length_m,
+            gas_temperature_K=float(melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+            gas_molar_mass_kg_mol=_mean_molar_mass_kg_mol(
+                evap_flux.species_kg_hr,
+                species_formula_registry=self.species_formula_registry,
+            ),
         )
 
     def _resolve_liner_temperature_value(
@@ -1077,7 +1104,7 @@ class OverheadGasModel:
         )
         gas.bleed_conductance_kg_s = finite_conductance  # kg/s — finite-headspace bleed mass-flow capacity
         gas.bleed_conductance_kg_s_per_bar = finite_conductance  # kg/s — deprecated compatibility alias
-        if effective_transport_capacity is None:
+        if effective_transport_capacity is None and float(melt.p_total_mbar) > 0.0:
             inlet_load_kg_hr = (
                 max(0.0, float(transport_inlet_kg_hr))
                 if transport_inlet_kg_hr is not None
@@ -1117,13 +1144,10 @@ class OverheadGasModel:
             return gas
 
         # ── Overhead pressure ───────────────────────────────────────
-        # Premise: the shared pipe law is F=C₀(P_up²-P_down²), where
-        # C₀ has units kg/(s·Pa²). Algebra gives
-        # P_vapor=sqrt(F/C₀+P_down²). Against vacuum, if F_allowed is the
-        # capacity evaluated at P_allowed, then
-        # P_vapor/P_allowed=sqrt(F/F_allowed), not F/F_allowed. Unit check:
-        # (kg/s)/(kg/(s·Pa²))=Pa². Sanity: 25% of vacuum capacity requires
-        # 50% of the allowed pressure; full capacity requires 100%.
+        # The shared inverse resolves pressure from the same full pipe law.
+        # Against vacuum, quarter flow needs quarter pressure in the molecular
+        # limit and half pressure in the viscous limit. These pressure/flow
+        # ratios are dimensionless; the inverse returns mbar in both regimes.
         # Total pressure may include a non-condensable background gas
         # such as Mars CO2; product partial pressures should not inherit
         # that background pressure.
@@ -1565,9 +1589,14 @@ class OverheadGasModel:
             not all(math.isfinite(value) for value in (
                 F_kg_s, T_K, d, L, p_downstream_bar,
             ))
-            or F_kg_s <= 0.0
+            or F_kg_s < 0.0
         ):
             return 0.0
+        if F_kg_s == 0.0:
+            # Open-pipe zero-source limit: F(P1,P2)=0 equilibrates P1=P2.
+            # bar*1000=mbar. Vacuum still returns zero; a finite sink must
+            # not be replaced by a fictitious zero upstream pressure.
+            return max(0.0, p_downstream_bar) * 1000.0
         F_kg_s = max(0.0, F_kg_s)  # kg/s — nonnegative vapor mass throughput
         M_avg = _mean_molar_mass_kg_mol(  # kg/mol — mole-weighted gas molar mass
             species_kg_for_M_avg,

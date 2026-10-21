@@ -1196,3 +1196,46 @@ def pipe_pressure_pa_for_mass_flow(d, L, M_avg, eta, T_K, F_kg_s, p_downstream_P
         else:
             high = middle
     return low + (high - low) / 2.0
+
+
+def pipe_downstream_pressure_pa_for_flow_fraction(d, L, M_avg, eta, T_K, p_upstream_Pa, fraction):
+    """Invert the same pipe owner for a fraction of its vacuum capacity."""
+    # Premise: at fixed P1 the owner F(P1,P2) decreases continuously from
+    # F(P1,0) to zero. Solve F(P1,P2)=fraction*F(P1,0) on [0,P1]. Using
+    # a dimensionless fraction also preserves explicitly scaled hardware
+    # capacities. Both bounds are Pa; the target and forward values are kg/s.
+    # With x=k(P1+P2)/2, a=2.507, b=3.095, the molecular derivative in P2
+    # is -a/b-(1-a/b)*(1+b*k*P1)/(1+b*x)^2 < 0; the viscous derivative
+    # is nonpositive too. Hence this inverse has a unique physical root.
+    # Molecular limit: P2=P1*(1-fraction); viscous limit:
+    # P2=P1*sqrt(1-fraction). No pressure-square proxy survives in callers.
+    if fraction <= 0.0:
+        return p_upstream_Pa
+    if fraction >= 1.0:
+        return 0.0
+    target = fraction * pipe_mass_flow_kg_s(
+        d, L, M_avg, eta, T_K, p_upstream_Pa, 0.0,
+    )
+    low, high = 0.0, p_upstream_Pa
+    for _ in range(64):
+        middle = low + (high - low) / 2.0
+        if middle == low or middle == high:
+            break
+        if pipe_mass_flow_kg_s(d, L, M_avg, eta, T_K, p_upstream_Pa, middle) > target:
+            low = middle
+        else:
+            high = middle
+    return low + (high - low) / 2.0
+
+
+def pipe_pressure_capacity_fraction(d, L, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa):
+    """Finite-pressure / vacuum capacity, with the same gas and geometry."""
+    vacuum = pipe_mass_flow_kg_s(d, L, M_avg, eta, T_K, p_upstream_Pa, 0.0)
+    # F(P1,P2)/F(P1,0) is dimensionless. Empty vacuum has zero throughput,
+    # not an undefined capacity ratio. Limits: molecular 1-P2/P1; viscous
+    # 1-(P2/P1)^2. A constant square-law fraction cannot span both regimes.
+    if vacuum <= 0.0:
+        return 0.0
+    return pipe_mass_flow_kg_s(
+        d, L, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa,
+    ) / vacuum

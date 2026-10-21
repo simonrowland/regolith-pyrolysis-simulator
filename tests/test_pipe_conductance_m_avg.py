@@ -79,6 +79,7 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
             campaign_hour=0.0,
         ),
         _resolve_condensation_carrier_gas=lambda: "N2",
+        _pipe_transport_inlet_flux=lambda flux: flux,
     )
 
     PyrolysisSimulator._configure_condensation_operating_conditions(
@@ -902,13 +903,13 @@ def test_vapor_pressure_scaling_lies_between_molecular_and_viscous_limits():
     assert math.sqrt(2.0) < ratio < 2.0
 
 
-def test_loop3_vacuum_overcapacity_exceeds_100_and_throttles_ramp():
+def test_loop3_positive_pressure_ceiling_overcapacity_throttles_ramp():
     model = _make_model()
     # Explicit test choice: 0.085 m³ was the former fail-open product default.
     model.configure_headspace({"enabled": True, "volume_m3": 0.085})
     melt = MeltState()
     melt.temperature_C = 1500.0
-    melt.p_total_mbar = 0.0
+    melt.p_total_mbar = 0.001
 
     flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
     transport = model.estimate_transport_state(flux, melt)

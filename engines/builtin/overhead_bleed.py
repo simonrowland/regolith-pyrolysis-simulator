@@ -24,6 +24,10 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.account_ids import OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
 from simulator.thermal_train import OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL
+from simulator.transport_regime import (
+    gas_dynamic_viscosity_Pa_s,
+    pipe_downstream_pressure_pa_for_flow_fraction,
+)
 
 
 PROCESS_OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
@@ -64,6 +68,10 @@ def controlled_flow_capacity(
     dt_hr: float = 1.0,
     equipment_capacity_required: bool = True,
     upstream_pressure_bar: float,
+    pipe_diameter_m: float,
+    pipe_length_m: float,
+    gas_temperature_K: float,
+    gas_molar_mass_kg_mol: float,
 ) -> EffectiveTransportCapacity:
     """Resolve a controlled-pO2 flow boundary without prescribing suction."""
 
@@ -73,6 +81,10 @@ def controlled_flow_capacity(
         "retained_holdup_kg": retained_holdup_kg,
         "dt_hr": dt_hr,
         "upstream_pressure_bar": upstream_pressure_bar,
+        "pipe_diameter_m": pipe_diameter_m,
+        "pipe_length_m": pipe_length_m,
+        "gas_temperature_K": gas_temperature_K,
+        "gas_molar_mass_kg_mol": gas_molar_mass_kg_mol,
     }
     if equipment_capacity_kg_hr is not None:
         declared["equipment_capacity_kg_hr"] = equipment_capacity_kg_hr
@@ -81,6 +93,15 @@ def controlled_flow_capacity(
         for value in declared.values()
     ):
         raise TypeError("controlled-flow capacity input is missing")
+
+    pipe_diameter_m = float(pipe_diameter_m)
+    pipe_length_m = float(pipe_length_m)
+    gas_temperature_K = float(gas_temperature_K)
+    gas_molar_mass_kg_mol = float(gas_molar_mass_kg_mol)
+    if not all(math.isfinite(value) and value > 0.0 for value in (
+        pipe_diameter_m, pipe_length_m, gas_temperature_K, gas_molar_mass_kg_mol,
+    )):
+        raise ValueError("controlled-flow pipe geometry and gas properties must be finite and positive")
 
     pipe_capacity = max(0.0, float(pipe_capacity_kg_hr))
     equipment_capacity = (
@@ -124,16 +145,11 @@ def controlled_flow_capacity(
     if upstream_pressure <= 0.0 or pipe_capacity <= 0.0:
         downstream_pressure = upstream_pressure
     else:
-        # Premise: integrated compressible Poiseuille flow is
-        # C(P1,P2)=k(P1^2-P2^2), while C0=k*P1^2 is the vacuum carrying
-        # limit. Algebra gives P2=sqrt(max(P1^2-C/k,0)) =
-        # P1*sqrt(max(1-C/C0,0)). Here C is the flow the equipment can
-        # actually swallow this tick. Units: C/k is bar^2, so P2 is bar.
-        # Limits: C->0 gives P2->P1; C->C0 gives P2->0; requested C>C0
-        # has no real forward-flow solution and is reported by saturation.
-        downstream_pressure = upstream_pressure * math.sqrt(
-            max(1.0 - swallowed_flux / pipe_capacity, 0.0)
-        )
+        downstream_pressure = pipe_downstream_pressure_pa_for_flow_fraction(
+            pipe_diameter_m, pipe_length_m, gas_molar_mass_kg_mol,
+            gas_dynamic_viscosity_Pa_s(gas_temperature_K), gas_temperature_K,
+            upstream_pressure * 1.0e5, swallowed_flux / pipe_capacity,
+        ) / 1.0e5
 
     return EffectiveTransportCapacity(
         pipe_capacity_kg_hr=pipe_capacity,
@@ -152,35 +168,6 @@ def controlled_flow_capacity(
         downstream_pressure_bar=downstream_pressure,
         binding_cause=binding_cause,
     )
-
-
-def compressible_pressure_capacity_fraction(
-    p_upstream_bar: float,
-    p_downstream_bar: float,
-) -> float:
-    """Fraction of upstream-to-vacuum capacity available at finite P2."""
-
-    try:
-        p_upstream_bar = float(p_upstream_bar)
-        p_downstream_bar = float(p_downstream_bar)
-    except (TypeError, ValueError):
-        return 0.0
-    if (
-        not math.isfinite(p_upstream_bar)
-        or not math.isfinite(p_downstream_bar)
-        or p_upstream_bar <= 0.0
-        or p_downstream_bar >= p_upstream_bar
-    ):
-        return 0.0
-    p_downstream_bar = max(0.0, p_downstream_bar)
-    # DERIVATION: premise — a supplied conductance is the kg/s capacity at
-    # upstream pressure P1 against vacuum. Compressible Poiseuille flow at
-    # fixed geometry is proportional to P1^2-P2^2, so finite downstream
-    # pressure multiplies capacity by (P1^2-P2^2)/P1^2. The factored form
-    # below avoids cancellation as P2 approaches P1. Sanity: P2=0.5*P1
-    # returns 0.75; P2 approaching P1 tends continuously to zero.
-    pressure_ratio = p_downstream_bar / p_upstream_bar
-    return (1.0 - pressure_ratio) * (1.0 + pressure_ratio)
 
 
 class BuiltinOverheadBleedProvider(ChemistryProvider):
@@ -510,12 +497,15 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             # never be fed back into committed disposition.
             bleed_kg = flow_capacity.swallowed_flux_kg_hr * dt_hr
         else:
-            pressure_square_fraction = compressible_pressure_capacity_fraction(
-                controls.get("p_total_bar") or 0.0,
-                controls.get("p_downstream_bar") or 0.0,
-            )
+            # The caller supplies the owner's capacity at the actual TWO
+            # pressures. A vacuum-capacity multiplier would count the drop
+            # twice and, in molecular flow, over-credit a half-pressure sink.
+            upstream = float(controls.get("p_total_bar") or 0.0)
+            downstream = float(controls.get("p_downstream_bar") or 0.0)
             bleed_kg = (
-                conductance * pressure_square_fraction * dt_hr * 3600.0
+                conductance * dt_hr * 3600.0
+                if math.isfinite(upstream) and math.isfinite(downstream)
+                and upstream > downstream >= 0.0 else 0.0
             )
         if bleed_kg <= 0.0:
             return {}

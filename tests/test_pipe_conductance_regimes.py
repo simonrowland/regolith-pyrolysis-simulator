@@ -8,8 +8,8 @@ import pytest
 from simulator import transport_regime as tr
 from simulator.core import PyrolysisSimulator
 from simulator.equipment import EquipmentDesigner
-from simulator.overhead import OverheadGasModel
-from simulator.state import Atmosphere, EvaporationFlux, MeltState
+from simulator.overhead import OverheadConfigurationError, OverheadGasModel
+from simulator.state import Atmosphere, CampaignPhase, CondensationTrain, EvaporationFlux, MeltState
 from simulator.thermal_train import NoColdTrain
 
 
@@ -123,7 +123,7 @@ def test_interpolation_notice_does_not_label_limits_transitional():
     assert tr.pipe_conductance_authority_notice(*args, 1e-6, 0.0) is None
 
 
-@pytest.mark.parametrize("pressure_mbar", [0.0, 1e-4, 1e-3, 0.1])
+@pytest.mark.parametrize("pressure_mbar", [1e-4, 1e-3, 0.1])
 def test_runtime_capacity_paths_preserve_actual_low_pressure(pressure_mbar):
     model = OverheadGasModel({})
     melt = MeltState()
@@ -144,6 +144,7 @@ def test_runtime_capacity_paths_preserve_actual_low_pressure(pressure_mbar):
     sim._overhead_headspace_config = {}
     assert sim._headspace_bleed_conductance_kg_s(
         species_kg_for_M_avg=flux.species_kg_hr,
+        p_upstream_bar=pressure_mbar / 1000, p_downstream_bar=0.0,
     ) == expected
 
     melt.atmosphere = Atmosphere.CONTROLLED_O2
@@ -180,3 +181,66 @@ def test_transitional_inferred_pressure_is_flagged_under_viscous_ceiling():
     )
     assert state["vapor_pressure_mbar"] == pytest.approx(0.2)
     assert model.last_pipe_conductance_authority_notice
+
+
+@pytest.mark.parametrize("source_kg_hr", [0.0, 1e-6, 0.1])
+@pytest.mark.parametrize("sink_bar", [0.0, 1e-6])
+def test_c0_vacuum_resolves_source_pressure_without_artificial_ramp_stall(source_kg_hr, sink_bar):
+    model = OverheadGasModel({"headspace": {}})
+    model.configure_headspace({"enabled": True, "volume_m3": 0.085})
+    melt = MeltState()
+    melt.temperature_C = 475.0
+    melt.p_total_mbar = 0.0
+    melt.atmosphere = Atmosphere.HARD_VACUUM
+    melt.campaign = CampaignPhase.C0
+    melt.campaign_hour = 9.0
+    flux = EvaporationFlux(species_kg_hr={"Na": source_kg_hr}, total_kg_hr=source_kg_hr)
+    state = model.estimate_transport_state(flux, melt, p_downstream_bar=sink_bar)
+    assert state["p_mean_Pa"] >= sink_bar * 1e5
+    # Actual pressure solves the source balance; the campaign setting stays 0.
+    assert model._pipe_conductance(
+        state["p_mean_Pa"], melt.temperature_C,
+        p_downstream_Pa=sink_bar * 1e5,
+        species_kg_for_M_avg=flux.species_kg_hr,
+    ) * 3600.0 == pytest.approx(source_kg_hr, rel=1e-12)
+    assert melt.p_total_mbar == 0.0
+    gas = model.update(flux, melt, CondensationTrain.create_default(), p_downstream_bar=sink_bar)
+    assert gas.transport_saturation_pct == 0.0
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt, sim.overhead = melt, gas
+    sim.campaign_mgr = SimpleNamespace(get_temp_target=lambda *_: (1000.0, 50.0))
+    sim._update_temperature()
+    assert melt.temperature_C == 525.0
+
+
+@pytest.mark.parametrize("upstream_pa", [1e-4, 10.0, 1000.0])
+def test_controlled_downstream_diagnostic_inverts_same_forward_owner(upstream_pa):
+    model = OverheadGasModel({})
+    melt = MeltState()
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = upstream_pa / 100.0
+    melt.atmosphere = Atmosphere.CONTROLLED_O2
+    vacuum = model._pipe_conductance(upstream_pa, 1500.0, species_kg_for_M_avg={"Ar": 1.0})
+    flux = EvaporationFlux(species_kg_hr={"Ar": vacuum * 900.0}, total_kg_hr=vacuum * 900.0)
+    flow = model.controlled_o2_transport_capacity(
+        flux, melt, cold_train_capacity=NoColdTrain("runtime_enforcement_disabled"),
+    )
+    actual = model._pipe_conductance(
+        upstream_pa, 1500.0, p_downstream_Pa=flow.downstream_pressure_bar * 1e5,
+        species_kg_for_M_avg=flux.species_kg_hr,
+    )
+    assert actual == pytest.approx(vacuum * 0.25, rel=1e-12)
+    if upstream_pa == 1e-4:
+        # Independently: molecular F=K(P1-P2); quarter flow means P2=.75 P1.
+        assert flow.downstream_pressure_bar * 1e5 / upstream_pa == pytest.approx(0.75, rel=1e-4)
+
+
+def test_c0_positive_source_refuses_invalid_pipe_instead_of_zero_pressure():
+    model = OverheadGasModel({})
+    model.pipe_diameter_m = 0.0
+    melt = MeltState()
+    melt.p_total_mbar = 0.0
+    with pytest.raises(OverheadConfigurationError, match="valid pipe"):
+        model.estimate_transport_state(
+            EvaporationFlux(species_kg_hr={"Na": 1e-6}, total_kg_hr=1e-6), melt,
+        )
