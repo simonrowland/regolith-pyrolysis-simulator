@@ -29,6 +29,11 @@ from simulator.chemistry.kernel import (
     BACKEND_STATUS_PRECEDENCE,
     select_backend_status,
 )
+from simulator.chemistry.graphite_c_co import (
+    _CCO_EQUATION,
+    cco_log10_fO2_bar,
+)
+
 _OXIDE_SET = frozenset(OXIDE_SPECIES)
 
 
@@ -424,7 +429,7 @@ WARN_TIER_ANALYTICAL_MODELS: dict[str, dict[str, Any]] = {
                 "citation": "Brooker et al. 2014; Sephton et al. 2004 DOI 10.1016/j.gca.2003.08.019",
             },
             "cco_buffer": {
-                "equation": "log10(fO2/bar) = -21803/T_K + 4.325 + 0.171*(P_bar - 1)/T_K",
+                "equation": _CCO_EQUATION,
                 "valid_range_K": (1273.15, 1873.15),
                 "error": "CCO reference only; EMOG/EMOD graphite-saturation bounds stay interval-only",
                 "citation": "Jakobsson & Oskarsson 1994 DOI 10.1016/0016-7037(94)90442-1; Stagno & Frost 2010 EPSL 300:72-84",
@@ -838,9 +843,8 @@ def _evaluate_analytical_forms(
     cco = forms.get("cco_buffer")
     if isinstance(cco, Mapping):
         # Keep this as an explicit diagnostic evaluation of the stored formula;
-        # callers that need the canonical redox helper still use
-        # engines.builtin.cco_redox_buffer.
-        log10_fO2 = -21803.0 / temperature + 4.325
+        # the stored point is evaluated at its documented 1 bar reference.
+        log10_fO2 = cco_log10_fO2_bar(temperature, 1.0)
         evaluations["cco_buffer"] = {
             "T_K": temperature,
             "pressure_bar": 1.0,

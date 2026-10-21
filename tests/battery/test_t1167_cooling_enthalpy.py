@@ -3,12 +3,13 @@
 from decimal import Decimal
 
 from simulator.battery.enums import Quantity, ValueKind
-from simulator.battery.migrate import REPO_ROOT, Migrator
+from simulator.battery.migrate import REPO_ROOT
+from tests.battery.factories import migrate_one_extract
 
 
 def test_zigo_measured_cooling_column_maps_to_H_minus_H298_with_provenance() -> None:
-    migrator = Migrator(REPO_ROOT)
-    migrator._migrate_extract(
+    migrator = migrate_one_extract(
+        REPO_ROOT,
         REPO_ROOT / "data/literature/extracts/zigo-1987-gehlenite-fusion.yaml"
     )
 

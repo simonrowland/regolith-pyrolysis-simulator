@@ -56,10 +56,13 @@ from engines.builtin.metallothermic_step import (
 )
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
 )
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
+    ellingham_delta_g_kj_per_mol_o2,
+    ellingham_fit_segments,
 )
 from simulator.chemistry.kernel import (
     AtomBalanceError,
@@ -72,6 +75,7 @@ from simulator.chemistry.kernel import (
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.magemin import MAGEMinBackend
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.state import (
     MOLAR_MASS,
     CampaignPhase,
@@ -242,6 +246,125 @@ def test_ellingham_authority_flag_is_consumed_by_metallothermic_diagnostic():
         "limited_species"
     ]
     assert set(limited) == {"Na", "Ti"}
+
+
+def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
+    # NIST-JANAF Na-013, liquid Na2O formation Gibbs energies, doubled from
+    # kJ/mol Na2O to the 4 Na + O2 -> 2 Na2O basis (kJ/mol O2).
+    for temperature_K, expected_standard_delta_g in (
+        (1200.0, -483.844),
+        (1300.0, -433.616),
+        (1400.0, -384.082),
+    ):
+        _priority, diagnostic = (
+            BuiltinMetallothermicStepProvider._na_thermo_priority(
+                ("FeO",),
+                temperature_K - CELSIUS_TO_KELVIN_OFFSET,
+                {"Na2O": 1.0, "FeO": 1.0},
+            )
+        )
+        assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
+            expected_standard_delta_g
+        )
+
+    # The closest representable sub-Tm value exercises the liquid branch's
+    # one-sided limit without a finite-offset probe.
+    alpha_na2o_segment = next(
+        segment
+        for segment in ellingham_fit_segments("Na")
+        if "Na2O(alpha)" in segment.phase_basis
+    )
+    melting_temperature_K = 1405.2
+    below_melting_temperature_K = math.nextafter(
+        melting_temperature_K,
+        -math.inf,
+    )
+    below_tm_liquid_delta_g = (
+        _na_activity_reference_standard_delta_g_kj_per_mol_o2(
+            below_melting_temperature_K
+        )
+    )
+    alpha_delta_g_at_tm = alpha_na2o_segment.delta_g_kJ_per_mol_O2(
+        melting_temperature_K
+    )
+    assert below_tm_liquid_delta_g == pytest.approx(
+        alpha_delta_g_at_tm,
+        abs=1e-3,
+    )
+
+    # Keep the existing green-path discontinuity explicit until physics ticket
+    # b-959 reconciles the liquid fit at/above Tm with the JANAF alpha limit.
+    liquid_delta_g_at_tm = ellingham_delta_g_kj_per_mol_o2(
+        "Na",
+        melting_temperature_K,
+    )
+    assert liquid_delta_g_at_tm - alpha_delta_g_at_tm == pytest.approx(
+        1.3262736,
+        abs=1e-6,
+    )
+
+
+def test_na_standard_state_at_and_above_melting_keeps_ellingham_path():
+    melting_temperature_C = 1405.2 - CELSIUS_TO_KELVIN_OFFSET
+    for temperature_C in (
+        melting_temperature_C,
+        1150.0,
+        1181.5,
+        1500.0,
+    ):
+        _priority, diagnostic = (
+            BuiltinMetallothermicStepProvider._na_thermo_priority(
+                ("FeO",),
+                temperature_C,
+                {"Na2O": 1.0, "FeO": 1.0},
+            )
+        )
+        temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
+        assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
+            ellingham_delta_g_kj_per_mol_o2("Na", temperature_K)
+        )
+        if temperature_C == 1150.0:
+            assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
+                -371.612616
+            )
+
+
+def test_na_feo_crossover_margin_at_1181_5_c_keeps_green_value():
+    _priority, diagnostic = (
+        BuiltinMetallothermicStepProvider._na_thermo_priority(
+            ("FeO",),
+            1181.5,
+            {"Na2O": 1.0, "FeO": 1.0},
+        )
+    )
+    assert diagnostic["margin"]["FeO"] == pytest.approx(
+        -0.001828,
+        abs=1e-6,
+    )
+
+
+def test_na_standard_state_keeps_out_of_band_ellingham_prediction():
+    provider = BuiltinMetallothermicStepProvider()
+    temperature_K = 3001.0
+    temperature_C = temperature_K - CELSIUS_TO_KELVIN_OFFSET
+    _priority, diagnostic = provider._na_thermo_priority(
+        ("FeO",),
+        temperature_C,
+        {"Na2O": 1.0, "FeO": 1.0},
+    )
+    assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
+        ellingham_delta_g_kj_per_mol_o2("Na", temperature_K)
+    )
+    extrapolations = provider._ellingham_pair_fit_extrapolations(
+        "Na",
+        ("FeO",),
+        temperature_C,
+    )
+    authority = provider._ellingham_fit_diagnostic(extrapolations)[
+        "ellingham_authority"
+    ]
+    assert authority["status"] == "extrapolation_limited"
+    assert authority[ELLINGHAM_AUTHORITY_LIMIT_FLAG] is True
 
 
 def test_reconstructed_mn_authority_is_not_mislabeled_as_fit_extrapolation():
@@ -1373,6 +1496,122 @@ def _c3_k_feo_request(sim, *, liquid_fraction, k_kg=30.0):
             "liquid_fraction": liquid_fraction,
             "dt_hr": 1.0,
         },
+    )
+
+
+def test_c3_k_solubility_cap_accounts_for_consumed_feo_mass(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    monkeypatch.setattr(
+        provider,
+        "_reduction_margin_kj_per_mol_o2",
+        lambda *_args: 1.0,
+    )
+    monkeypatch.setattr(
+        provider,
+        "_ellingham_pair_fit_extrapolations",
+        lambda *_args: {},
+    )
+
+    result = provider.dispatch(
+        _c3_k_feo_request(sim, liquid_fraction=1.0)
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    feo_removed_mol = result.transition.debits[
+        "process.cleaned_melt"
+    ]["FeO"]
+    k2o_added_mol = result.transition.credits[
+        "process.cleaned_melt"
+    ]["K2O"]
+    feo_removed_kg = feo_removed_mol * MOLAR_MASS["FeO"] / 1000.0
+    k2o_added_kg = k2o_added_mol * MOLAR_MASS["K2O"] / 1000.0
+    final_melt_kg = 10.0 - feo_removed_kg + k2o_added_kg
+
+    assert k2o_added_kg / final_melt_kg == pytest.approx(
+        BuiltinMetallothermicStepProvider.K2O_SOLUBILITY_WT_PCT / 100.0,
+        abs=1e-12,
+    )
+
+
+def test_c3_k_injection_floor_uses_mass_balanced_capacity(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    monkeypatch.setattr(
+        provider,
+        "_reduction_margin_kj_per_mol_o2",
+        lambda *_args: 1.0,
+    )
+    monkeypatch.setattr(
+        provider,
+        "_ellingham_pair_fit_extrapolations",
+        lambda *_args: {},
+    )
+
+    def request_at_k2o_mass(k2o_kg):
+        feo_kg = 10.0 - k2o_kg
+        return IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=ProviderAccountView(
+                accounts={
+                    "process.cleaned_melt": {
+                        "FeO": feo_kg / (MOLAR_MASS["FeO"] / 1000.0),
+                        "K2O": k2o_kg / (MOLAR_MASS["K2O"] / 1000.0),
+                    },
+                    "process.metal_phase": {},
+                    "process.reagent_inventory": {},
+                },
+                species_formula_registry=sim.species_formula_registry,
+            ),
+            temperature_C=1150.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C3_K,
+                # Above the caller's 0.01 kg inventory gate; the hourly
+                # allotment also exceeds the cap in both cases below.
+                "reagent_available_kg": 0.02,
+                "liquid_fraction": 1.0,
+                "dt_hr": 1.0,
+            },
+        )
+
+    # At M=10 kg and L=0.10, this input leaves 0.000999 kg K capacity
+    # under the old fixed-melt-mass calculation, just below the 0.001 kg
+    # injection floor. Using r=M_FeO/M_K2O=71.844/94.1956, the closed form
+    # x=(L*M-K2O)/(1-L*(1-r)) gives 0.001232644411287 kg K2O, or
+    # 0.001023281363160 kg K after stoichiometric conversion. The accepted
+    # amount comes from the mass-balanced endpoint, not a copied cap formula.
+    boundary = provider.dispatch(request_at_k2o_mass(0.998796604911211))
+    assert boundary.status == "ok"
+    assert boundary.transition is not None
+    assert boundary.diagnostic["reagent_consumed_kg"] == pytest.approx(
+        0.001023281363160,
+        abs=1e-15,
+    )
+
+    # This second input has only 0.000500 kg K headroom by the old
+    # calculation and 0.000512152834414 kg by the closed form, clearly
+    # below the same floor, so the provider must skip it.
+    below_floor = provider.dispatch(request_at_k2o_mass(0.999397700155761))
+    assert below_floor.status == "ok"
+    assert below_floor.transition is None
+    assert below_floor.diagnostic["reason_skipped"] == (
+        "c3_k_shuttle skipped: injection floor (<0.001 kg K)"
     )
 
 

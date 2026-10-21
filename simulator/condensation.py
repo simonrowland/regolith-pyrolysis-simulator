@@ -111,7 +111,12 @@ from simulator.transport_constants import (
     N2_COLLISION_DIAMETER_M,
     VISCOUS_KNUDSEN_MAX,
 )
-from simulator.transport_regime import KnudsenRegime, classify_knudsen_regime
+from simulator.transport_regime import (
+    KnudsenRegime,
+    _minimum_pressure_pa_for_knudsen,
+    _single_species_mean_free_path_m_unchecked,
+    classify_knudsen_regime,
+)
 from simulator.physical_constants import (
     AVOGADRO,
     BOLTZMANN,
@@ -7124,15 +7129,16 @@ def _mean_free_path_m(
         return math.inf
     if T_K <= 0.0 or molecular_diameter_m <= 0.0:
         return 0.0
-    denominator = (
-        math.sqrt(2.0)
-        * math.pi
-        * molecular_diameter_m ** 2
-        * pressure_pa
-    )
-    if denominator <= 0.0:
+    try:
+        return _single_species_mean_free_path_m_unchecked(
+            pressure_pa,
+            T_K,
+            molecular_diameter_m,
+        )
+    except ZeroDivisionError:
+        # Preserve the prior limit when positive finite inputs underflow to a
+        # zero denominator.
         return math.inf
-    return BOLTZMANN_CONSTANT_J_K * T_K / denominator
 
 
 def _knudsen_number(
@@ -7220,16 +7226,11 @@ def minimum_pressure_mbar_for_knudsen(
     # P_min=k_B*T/(sqrt(2)*pi*d^2*L*Kn_ceiling). Unit check: (J/K*K)/m^3
     # = N/m^2 = Pa; /100 gives mbar. Sanity: hotter gas or a smaller pipe
     # raises P_min, while a larger pipe lowers it.
-    minimum_pressure_pa = (
-        BOLTZMANN_CONSTANT_J_K
-        * temperature_K
-        / (
-            math.sqrt(2.0)
-            * math.pi
-            * collision_diameter_m ** 2
-            * controlling_length_m
-            * ceiling
-        )
+    minimum_pressure_pa = _minimum_pressure_pa_for_knudsen(
+        temperature_K,
+        collision_diameter_m,
+        controlling_length_m,
+        ceiling,
     )
     return {
         'minimum_pressure_pa': minimum_pressure_pa,
