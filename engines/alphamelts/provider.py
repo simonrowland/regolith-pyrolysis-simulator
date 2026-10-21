@@ -567,8 +567,9 @@ class AlphaMELTSProvider(ChemistryProvider):
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
+        equilibrate = getattr(self._backend, 'equilibrate', None)
         try:
-            parameters = inspect.signature(self._backend.equilibrate).parameters
+            parameters = inspect.signature(equilibrate).parameters
         except (TypeError, ValueError):
             parameters = {}
         transport_kwargs = {
