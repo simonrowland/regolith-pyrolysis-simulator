@@ -1266,72 +1266,129 @@ species:
         reliability_note: Only intermediate-range data included by authors; initial (other species still
           depleting) and final (exhaustion) ranges excluded due to poor T-reproducibility of ion intensity.
         points:
-        - T_K: 2060.0
+        - <<: &smales_12022_catalogue_composition
+            composition_basis: same_sample_catalog_first_complete_whole_sample_bulk_analysis
+            composition_from_sample_catalog: true
+            composition_source_kind: published_same_sample_bulk_analysis
+            composition_source: >-
+              Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation
+              smales_1971_apollo_12022_bulk_composition_tables1_2_3. Selection rule: use the first
+              reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis;
+              do not average methods. This is the starting bulk composition, not a per-step residue
+              composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue,
+              and no step-specific residue composition is printed.
+            composition_source_observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
+            sample_oxide_composition_wt_pct:
+              SiO2: 42.3
+              Al2O3: 8.2
+              FeO: 21.6
+              MgO: 11.9
+              CaO: 9.0
+              Na2O: 0.23
+              K2O: 0.061
+              TiO2: 4.9
+              MnO: 0.31
+          T_K: 2060.0
           p_atm: 5.07e-09
           p_Pa: 0.0005137178
           instrument: NAA
           sample: '12022'
-        - T_K: 2104.0
+        - <<: *smales_12022_catalogue_composition
+          T_K: 2104.0
           p_atm: 1.13e-08
           p_Pa: 0.0011449725000000001
           instrument: NAA
           sample: '12022'
-        - T_K: 2125.0
+        - <<: *smales_12022_catalogue_composition
+          T_K: 2125.0
           p_atm: 1.57e-08
           p_Pa: 0.0015908025000000003
           instrument: NAA
           sample: '12022'
-        - T_K: 2146.0
+        - <<: *smales_12022_catalogue_composition
+          T_K: 2146.0
           p_atm: 2.24e-08
           p_Pa: 0.00226968
           instrument: NAA
           sample: '12022'
-        - T_K: 2180.0
+        - <<: *smales_12022_catalogue_composition
+          T_K: 2180.0
           p_atm: 3.65e-08
           p_Pa: 0.0036983625000000003
           instrument: NAA
           sample: '12022'
-        - T_K: 2183.0
+        - <<: *smales_12022_catalogue_composition
+          T_K: 2183.0
           p_atm: 3.82e-08
           p_Pa: 0.003870615
           instrument: NAA
           sample: '12022'
-        - T_K: 2194.0
+        - <<: *smales_12022_catalogue_composition
+          T_K: 2194.0
           p_atm: 4.01e-08
           p_Pa: 0.0040631325
           instrument: NAA
           sample: '12022'
-        - T_K: 2290.0
+        - <<: *smales_12022_catalogue_composition
+          T_K: 2290.0
           p_atm: 1.55e-07
           p_Pa: 0.015705375
           instrument: NAA
           sample: '12022'
-        - T_K: 2270.0
+        - <<: *smales_12022_catalogue_composition
+          T_K: 2270.0
           p_atm: 1.04e-07
           p_Pa: 0.0105378
           instrument: NAA
           sample: '12022'
-        - T_K: 2360.0
+        - <<: &smales_12065_catalogue_composition
+            composition_basis: same_sample_catalog_first_complete_whole_sample_bulk_analysis
+            composition_from_sample_catalog: true
+            composition_source_kind: published_same_sample_bulk_analysis
+            composition_source: >-
+              Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation
+              smales_1971_apollo_12065_bulk_composition_tables1_2_3. Selection rule: use the first
+              reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis;
+              do not average methods. This is the starting bulk composition, not a per-step residue
+              composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue,
+              and no step-specific residue composition is printed.
+            composition_source_observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
+            sample_oxide_composition_wt_pct:
+              SiO2: 47.1
+              Al2O3: 9.8
+              FeO: 20.0
+              MgO: 9.2
+              CaO: 10.1
+              Na2O: 0.24
+              K2O: 0.063
+              TiO2: 3.1
+              MnO: 0.26
+              Cr2O3: 0.50
+          T_K: 2360.0
           p_atm: 6.9e-07
           p_Pa: 0.06991425
           instrument: BC
           sample: '12065'
-        - T_K: 2395.0
+        - <<: *smales_12065_catalogue_composition
+          T_K: 2395.0
           p_atm: 9.88e-07
           p_Pa: 0.10010909999999999
           instrument: BC
           sample: '12065'
-        - T_K: 2425.0
+        - <<: *smales_12065_catalogue_composition
+          T_K: 2425.0
           p_atm: 1.9e-06
           p_Pa: 0.1925175
           instrument: BC
           sample: '12065'
-        - T_K: 2465.0
+        - <<: *smales_12065_catalogue_composition
+          T_K: 2465.0
           p_atm: 3.39e-06
           p_Pa: 0.34349175000000004
           instrument: BC
           sample: '12065'
-        - T_K: 2500.0
+        - <<: *smales_12065_catalogue_composition
+          T_K: 2500.0
           p_atm: 4.73e-06
           p_Pa: 0.47926725
           instrument: BC
@@ -1438,32 +1495,38 @@ species:
         condensed_phase: lunar_basalt_melt
         reliability_note: AlO NAA points mostly final-range — excluded by authors from tables
         points:
-        - T_K: 2320.0
+        - <<: *smales_12065_catalogue_composition
+          T_K: 2320.0
           p_atm: 1.05e-06
           p_Pa: 0.10639124999999999
           instrument: BC
           sample: '12065'
-        - T_K: 2360.0
+        - <<: *smales_12065_catalogue_composition
+          T_K: 2360.0
           p_atm: 1.3e-06
           p_Pa: 0.1317225
           instrument: BC
           sample: '12065'
-        - T_K: 2395.0
+        - <<: *smales_12065_catalogue_composition
+          T_K: 2395.0
           p_atm: 2.22e-06
           p_Pa: 0.2249415
           instrument: BC
           sample: '12065'
-        - T_K: 2425.0
+        - <<: *smales_12065_catalogue_composition
+          T_K: 2425.0
           p_atm: 3.79e-06
           p_Pa: 0.38402175
           instrument: BC
           sample: '12065'
-        - T_K: 2465.0
+        - <<: *smales_12065_catalogue_composition
+          T_K: 2465.0
           p_atm: 6.84e-06
           p_Pa: 0.693063
           instrument: BC
           sample: '12065'
-        - T_K: 2500.0
+        - <<: *smales_12065_catalogue_composition
+          T_K: 2500.0
           p_atm: 8.96e-06
           p_Pa: 0.907872
           instrument: BC
@@ -1711,28 +1774,7 @@ species:
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         points:
-        - <<: &smales_12022_catalogue_composition
-            composition_basis: same_sample_catalog_first_complete_whole_sample_bulk_analysis
-            composition_from_sample_catalog: true
-            composition_source_kind: published_same_sample_bulk_analysis
-            composition_source: >-
-              Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation
-              smales_1971_apollo_12022_bulk_composition_tables1_2_3. Selection rule: use the first
-              reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis;
-              do not average methods. This is the starting bulk composition, not a per-step residue
-              composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue,
-              and no step-specific residue composition is printed.
-            composition_source_observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
-            sample_oxide_composition_wt_pct:
-              SiO2: 42.3
-              Al2O3: 8.2
-              FeO: 21.6
-              MgO: 11.9
-              CaO: 9.0
-              Na2O: 0.23
-              K2O: 0.061
-              TiO2: 4.9
-              MnO: 0.31
+        - <<: *smales_12022_catalogue_composition
           T_K: 2015.0
           p_atm: 9.2e-08
           p_Pa: 0.009321900000000001
@@ -1774,29 +1816,7 @@ species:
           p_Pa: 0.20265
           instrument: NAA
           sample: '12022'
-        - <<: &smales_12065_catalogue_composition
-            composition_basis: same_sample_catalog_first_complete_whole_sample_bulk_analysis
-            composition_from_sample_catalog: true
-            composition_source_kind: published_same_sample_bulk_analysis
-            composition_source: >-
-              Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation
-              smales_1971_apollo_12065_bulk_composition_tables1_2_3. Selection rule: use the first
-              reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis;
-              do not average methods. This is the starting bulk composition, not a per-step residue
-              composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue,
-              and no step-specific residue composition is printed.
-            composition_source_observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
-            sample_oxide_composition_wt_pct:
-              SiO2: 47.1
-              Al2O3: 9.8
-              FeO: 20.0
-              MgO: 9.2
-              CaO: 10.1
-              Na2O: 0.24
-              K2O: 0.063
-              TiO2: 3.1
-              MnO: 0.26
-              Cr2O3: 0.50
+        - <<: *smales_12065_catalogue_composition
           T_K: 2320.0
           p_atm: 1.63e-06
           p_Pa: 0.16515975

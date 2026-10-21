@@ -279,11 +279,46 @@ def test_demaria_atomic_oxygen_points_use_smales_catalogue_composition(
         assert observation.identity.quantity.value is Quantity.P_PARTIAL
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
         assert observation.admission.status is AdmissionStatus.ADMITTED
+    _assert_smales_catalogue_composition(oxygen, expected_sources)
+
+
+def test_demaria_table4_points_use_sample_smales_catalogue_composition(
+    migrated_targets,
+) -> None:
+    table4 = [
+        observation
+        for observation in _source_observations(
+            migrated_targets, "kems-022-demaria-1971"
+        )
+        if (
+            "demaria_1971_al2o_psat_table4" in observation.observation_id
+            or "demaria_1971_alo_psat_table4" in observation.observation_id
+        )
+        and observation.value.kind is ValueKind.POINT
+    ]
+    assert len(table4) == 20
+    expected_sources = {
+        "12022": "smales_1971_apollo_12022_bulk_composition_tables1_2_3",
+        "12065": "smales_1971_apollo_12065_bulk_composition_tables1_2_3",
+    }
+    for observation in table4:
+        assert observation.identity.quantity.value is Quantity.P_PARTIAL
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        assert observation.admission.status is AdmissionStatus.ADMITTED
+    _assert_smales_catalogue_composition(table4, expected_sources)
+
+
+def _assert_smales_catalogue_composition(observations, expected_sources) -> None:
+    for observation in observations:
         composition = observation.identity.composition
         assert composition is not None and composition.is_value
         assert composition.value.proxy_flag == "composition_from_sample_catalog"
         assert "depleted residue" in composition.value.analysis_selection_rule
-        sample = "12022" if ":row=12022" in observation.observation_id else "12065"
+        sample = next(
+            sample
+            for sample in expected_sources
+            if f":row={sample}" in observation.observation_id
+        )
         assert expected_sources[sample] in composition.value.proxy_source
         assert any(
             notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
