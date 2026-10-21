@@ -7968,3 +7968,225 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             stage_report['activity'] = activity
         report[stage_key] = stage_report
     return report
+
+
+class CrownStationRefusal(ValueError):
+    """A station input/surface law is unavailable, rather than zero recovery."""
+
+
+@dataclass(frozen=True)
+class CrownCarrierAllocation:
+    """Tick-average mol/s; inventory is mol. No ledger mutation."""
+
+    forward_mol_s: float
+    gross_mol_s: float
+    incidence_mol_s: float
+    reemission_mol_s: float
+    return_mol_s: float
+    net_source_mol_s: float
+    dish_gain_mol_s: float
+    sky_mol_s: float
+    oxidized_mol_s: float
+    inventory_mol: float
+
+
+def crown_carrier_allocation(
+    forward_mol_s: float,
+    reemission_capacity_mol_s: float,
+    inventory_mol: float,
+    duration_s: float,
+    *,
+    view_factor_from_melt: float,
+    return_view_factor: float,
+    sticking: float,
+    return_accommodation: float,
+    oxidation_mol_s: float = 0.0,
+) -> CrownCarrierAllocation:
+    """Two diffuse surfaces and sky, with finite shared evaporation/reaction stock.
+
+    A prescribed oxidation sink here requires separate oxygen attribution by its
+    chemistry caller; it is not an oxidation-rate prediction. The station below
+    exposes only the explicitly flagged no-chemistry screen.
+    """
+    values = (forward_mol_s, reemission_capacity_mol_s, inventory_mol, oxidation_mol_s)
+    if any(not math.isfinite(x) or x < 0 for x in values):
+        raise CrownStationRefusal("crown rates and inventory must be finite and nonnegative")
+    if not math.isfinite(duration_s) or duration_s <= 0:
+        raise CrownStationRefusal("duration_s must be finite and positive")
+    F, r, s, u = view_factor_from_melt, return_view_factor, sticking, return_accommodation
+    if any(not math.isfinite(x) or not 0 <= x <= 1 for x in (F, r, s, u)):
+        raise CrownStationRefusal("crown view factors and accommodations must be in [0,1]")
+    denominator = 1 - (1-u)*r*(1-s)*F
+    if denominator <= 0:
+        raise CrownStationRefusal("singular crown: no capture or escape sink")
+    # B=(1-s)FE+R and E=E0+(1-u)rB imply E=a+bR. All quantities
+    # here are mol/s except dimensionless a/E0 and b. D=E-rB=C+Q+L.
+    a = forward_mol_s / denominator
+    b = (1-u)*r / denominator
+    # R+Q <= N/dt+sFE, hence (1-sFb)R+Q <= N/dt+sFa.
+    # Constant competing sinks operate until stock exhausts, then share new
+    # arrivals in the same ratio. This integrates both portions of the tick;
+    # neither sink can spend stock allocated to the other. For a hot empty
+    # dish Q=0 implies R=sI, never negative stock or inferred phase activity.
+    demand = (1-s*F*b)*reemission_capacity_mol_s + oxidation_mol_s
+    supply = inventory_mol/duration_s + s*F*a
+    fraction = min(1.0, supply/demand) if demand > 0 else (1.0 if supply > 0 else 0.0)
+    R = fraction*reemission_capacity_mol_s
+    Q = fraction*oxidation_mol_s
+    E = a+b*R
+    I = F*E
+    B = (1-s)*I+R
+    returned = r*B
+    C = s*I-R-Q
+    # F->0 with empty stock gives C=0. Stored material can give C<0.
+    # As Psat grows, an empty dish re-emits its sticking incidence (Q=0).
+    return CrownCarrierAllocation(
+        forward_mol_s, E, I, R, returned, E-returned, C,
+        (1-F)*E+(1-r)*B, Q, max(0.0, inventory_mol+C*duration_s),
+    )
+
+
+@dataclass(frozen=True)
+class CrownSurfaceLaw:
+    """Declared pure-crust/scattering approximation, never measured by default."""
+
+    sticking: float
+    evaporation_accommodation: float
+    return_accommodation: float
+    status: str
+
+
+@dataclass(frozen=True)
+class CrownStationResult:
+    allocations: Mapping[str, CrownCarrierAllocation]
+    source_temperature_K: float
+    collector_temperature_K: float
+    return_view_factor: float
+    pressure_notices: Mapping[str, Any]
+    knudsen_upper_bounds: Mapping[str, float | None]
+    statuses: tuple[str, ...]
+
+
+def crown_station(
+    pressures_pa: Mapping[str, float],
+    source_alpha: Mapping[str, float],
+    surface_laws: Mapping[str, CrownSurfaceLaw],
+    inventory_mol: Mapping[str, float],
+    *,
+    source_temperature_K: float,
+    collector_temperature_K: float,
+    melt_area_m2: float,
+    collector_area_m2: float,
+    view_factor_from_melt: float,
+    melt_to_collector_m: float,
+    duration_s: float,
+) -> CrownStationResult:
+    """Shared Mg/Ca station law; supplied pressures are oxide-release P_eq.
+
+    The caller selects the active station and passes its exposed temperature,
+    not a coolant setpoint. Only a pure Mg/Ca major crust and nonretaining O/O2
+    scattering have a law here. Missing trace/oxide/substrate laws refuse with
+    their species name. No claim of metallic purity is possible without O2
+    gettering kinetics; the allocation is explicitly a no-reaction screen.
+    """
+    # Local import: LK already imports condensation for alpha/physical constants.
+    from simulator.accounting.formulas import parse_formula
+    from simulator.chemistry.langmuir_knudsen import langmuir_molar_flux
+    from simulator.transport_regime import (
+        TransportRegimeRefusal, carrier_mixture_mean_free_path,
+    )
+
+    for label, value in (
+        ("source_temperature_K", source_temperature_K),
+        ("collector_temperature_K", collector_temperature_K),
+        ("melt_area_m2", melt_area_m2), ("collector_area_m2", collector_area_m2),
+        ("melt_to_collector_m", melt_to_collector_m), ("duration_s", duration_s),
+    ):
+        if not math.isfinite(value) or value <= 0:
+            raise CrownStationRefusal(f"{label} must be finite and positive")
+    F = view_factor_from_melt
+    if not math.isfinite(F) or not 0 <= F <= 1:
+        raise CrownStationRefusal("view_factor_from_melt must be in [0,1]")
+    # Reciprocity Am*F=Ad*r [m2]; r must be a possible view factor.
+    r = melt_area_m2*F/collector_area_m2
+    if r > 1:
+        raise CrownStationRefusal("crown geometry violates view-factor reciprocity")
+    if set(inventory_mol) - set(pressures_pa):
+        raise CrownStationRefusal("dish inventory has carriers absent from the source boundary")
+    allocations = {}
+    notices: dict[str, Any] = {}
+    statuses = {"no_oxidation_screen_missing_surface_chemistry",
+                "pure_crust_stock_limited_bare_surface_approximation",
+                "collisionless_transport_approximation"}
+    for species, pressure in pressures_pa.items():
+        if species not in {"Mg", "Ca", "O", "O2"}:
+            raise CrownStationRefusal(f"{species}: surface/trace retention law unavailable")
+        if species not in surface_laws or species not in source_alpha:
+            raise CrownStationRefusal(f"{species}: missing surface law or source alpha")
+        law = surface_laws[species]
+        coefficients = (source_alpha[species], law.sticking,
+                        law.evaporation_accommodation, law.return_accommodation)
+        if not law.status or any(not math.isfinite(x) or not 0 <= x <= 1 for x in coefficients):
+            raise CrownStationRefusal(f"{species}: invalid/undeclared surface coefficients")
+        if not math.isfinite(pressure) or pressure < 0:
+            raise CrownStationRefusal(f"{species}: invalid equilibrium pressure")
+        stock = inventory_mol.get(species, 0.0)
+        if species in {"O", "O2"}:
+            if law.sticking != 0 or law.evaporation_accommodation != 0 or stock != 0:
+                raise CrownStationRefusal(f"{species}: oxygen does not condense on the crown")
+            psat = 0.0
+        else:
+            psat = _antoine_psat_pa(
+                species, collector_temperature_K,
+                enforce_hot_train_applicability=False, antoine_extrapolations=notices,
+            )
+        mass = parse_formula(species).molar_mass_kg_per_mol()
+        forward = melt_area_m2*langmuir_molar_flux(
+            source_temperature_K, pressure, 0, source_alpha[species], molar_mass_kg_mol=mass,
+        )
+        reemission = collector_area_m2*langmuir_molar_flux(
+            collector_temperature_K, psat, 0, law.evaporation_accommodation,
+            molar_mass_kg_mol=mass,
+        )
+        allocations[species] = crown_carrier_allocation(
+            forward, reemission, stock, duration_s, view_factor_from_melt=F,
+            return_view_factor=r, sticking=law.sticking,
+            return_accommodation=law.return_accommodation,
+        )
+        statuses.add(law.status)
+    # The source partial pressures give a near-source plume diagnostic, not an
+    # invented pipe pressure. Missing collision data stays unavailable; a dense
+    # plume flags the ballistic approximation without imposing a regime gate.
+    total_pressure = sum(pressures_pa.values())
+    fractions = {s: p/total_pressure for s, p in pressures_pa.items() if p > 0}
+    knudsen = {}
+    for species in pressures_pa:
+        try:
+            diagnostic = carrier_mixture_mean_free_path(
+                species, fractions or {species: 1.0}, total_pressure,
+                source_temperature_K, melt_to_collector_m,
+            )
+            knudsen[species] = diagnostic.knudsen_number
+            if diagnostic.knudsen_number < FREE_MOLECULAR_KNUDSEN_MIN:
+                statuses.add("loaded_plume_outside_collisionless_band")
+        except TransportRegimeRefusal:
+            if species in _LENNARD_JONES_PARAMS:
+                # Self collisions alone bound lambda from above: every omitted
+                # cross-species collision adds a positive collision frequency.
+                # Use this species' own partial pressure and existing sigma.
+                # Mg sigma is an estimate; this is a diagnostic, not authority.
+                knudsen[species] = _knudsen_number(
+                    pressures_pa[species], source_temperature_K, melt_to_collector_m,
+                    molecular_diameter_m=_LENNARD_JONES_PARAMS[species][0]*1e-10,
+                )
+                statuses.add(f"{species}:self_collision_only_Kn_upper_bound")
+                statuses.add(f"{species}:collision_status_{_LENNARD_JONES_PROVENANCE[species]['status']}")
+                if knudsen[species] < FREE_MOLECULAR_KNUDSEN_MIN:
+                    statuses.add("loaded_plume_outside_collisionless_band")
+            else:
+                knudsen[species] = None
+                statuses.add(f"{species}:collision_data_unavailable")
+    return CrownStationResult(
+        allocations, source_temperature_K, collector_temperature_K, r,
+        notices, knudsen, tuple(sorted(statuses)),
+    )

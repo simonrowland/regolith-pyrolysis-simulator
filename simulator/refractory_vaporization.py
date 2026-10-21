@@ -4,7 +4,7 @@ import math
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Mapping
+from typing import Callable, Mapping
 
 from scipy.optimize import brentq
 
@@ -581,3 +581,141 @@ def _positive_temperature(temperature_K: float) -> float:
     if not math.isfinite(temperature) or temperature <= 0.0:
         raise ValueError("temperature_K must be finite and positive")
     return temperature
+
+
+@dataclass(frozen=True)
+class MeltVaporizationResult:
+    """Supplied MgO/CaO activities, explicit congruent-release assumption."""
+
+    temperature_K: float
+    surface_pO2_pa: float
+    pressures_pa: Mapping[str, float]
+    forward_flux_mol_m2_s: Mapping[str, float]
+    net_flux_mol_m2_s: Mapping[str, float]
+    oxide_debit_mol_m2_s: Mapping[str, float]
+    oxygen_residual: float
+    thermo_range_uses: tuple[ThermoRangeUse, ...]
+    statuses: tuple[str, ...]
+
+
+def solve_melt_vaporization(
+    temperature_K: float,
+    oxide_activities: Mapping[str, float],
+    emission_alpha: Mapping[str, float],
+    *,
+    net_flux_boundary: Callable[
+        [Mapping[str, float], Mapping[str, float]], Mapping[str, float]
+    ] | None = None,
+) -> MeltVaporizationResult:
+    """Close net oxygen atoms over supplied Mg/Ca component activities.
+
+    ``net_flux_boundary(pressures_pa, forward_flux_mol_m2_s)`` returns actual
+    net source fluxes after the two-surface return solve. Without it this is
+    the one-pass screen. The boundary must use the same source alphas/area.
+    Returned metals here restore their parent MO: a metal/redox-reservoir
+    return needs that reservoir owner and is deliberately not inferred here.
+    This function does not change a retained melt oxygen-potential owner.
+
+    Species are selected explicitly by emission_alpha; omitted registry
+    carriers are flagged. The pure-material solver above remains independent
+    because its condensed reference and congruence contract are different.
+    """
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_delta_g_kj_per_mol_o2, ellingham_metal_phase_kind,
+        ellingham_segment_for_temperature,
+    )
+    from simulator.chemistry.langmuir_knudsen import langmuir_molar_flux
+    from simulator.physical_constants import GAS_CONSTANT
+
+    temperature = _positive_temperature(temperature_K)
+    if not oxide_activities or set(oxide_activities) - {"MgO", "CaO"}:
+        raise CongruentVaporizationError("mixed boundary requires supplied MgO/CaO activities")
+    if any(not math.isfinite(a) or a < 0 for a in oxide_activities.values()):
+        raise CongruentVaporizationError("oxide activities must be finite and nonnegative")
+    if not any(oxide_activities.values()):
+        raise CongruentVaporizationError("no active MgO/CaO release component")
+    metals = tuple(oxide[:-1] for oxide in oxide_activities)
+    registry = set().union(*(refractory_vapor_species(m+"O") for m in metals))
+    gas_names = tuple(emission_alpha)
+    if set(gas_names) - registry or not {"O", "O2", *metals} <= set(gas_names):
+        raise CongruentVaporizationError("carrier alphas must include active metals, O and O2 only from their registry")
+    if any(not math.isfinite(a) or not 0 < a <= 1 for a in emission_alpha.values()):
+        raise CongruentVaporizationError("source emission alphas must be in (0,1]")
+    formulas = {s: parse_formula(_gas_entry(s)["formula"]) for s in gas_names}
+    masses = {s: f.molar_mass_kg_per_mol() for s, f in formulas.items()}
+    range_uses = []
+    log_kf = {}
+    for species in gas_names:
+        log_kf[species], use = refractory_log10_kf(species, temperature)
+        range_uses.append(use)
+    release_log_k = {}
+    statuses = {"supplied_activity_congruent_MO_release_screen",
+                "returned_cations_restore_parent_oxide",
+                "finite_melt_transfer_and_redox_inventory_not_solved",
+                "non_authoritative_source_activity_and_alpha_inputs"}
+    statuses.add("net_return_boundary_applied" if net_flux_boundary else "one_pass_no_return_screen")
+    for metal in metals:
+        if ellingham_metal_phase_kind(metal, temperature) != "gas":
+            raise CongruentVaporizationError(f"{metal}: source requires gas-basis Ellingham rail")
+        segment = ellingham_segment_for_temperature(metal, temperature)
+        if not segment.range_K[0] <= temperature <= segment.range_K[1]:
+            statuses.add(f"{metal}:source_thermodynamics_extrapolated")
+        # Oxidation ΔG is for 2M(g)+O2->2MO. Reverse reaction has
+        # log10 K2=+ΔGoxid/(RT ln10); activities and p/p0 are dimensionless.
+        # Therefore log(pM/p0)=log(aMO)+0.5(logK2-log(pO2/p0)).
+        release_log_k[metal] = (
+            ellingham_delta_g_kj_per_mol_o2(metal, temperature)*1000
+            / (GAS_CONSTANT*temperature*math.log(10))
+        )
+    statuses.update(f"{s}:carrier_omitted" for s in registry-set(gas_names))
+    statuses.update(f"{s}:thermodynamic_carrier_unmodeled" for m in metals
+                    for s in refractory_vapor_species_gaps(m+"O"))
+    statuses.update(f"{s}:thermodynamics_{u.status}" for s, u in zip(gas_names, range_uses)
+                    if u.status != "in_range")
+
+    def state(oxygen_log):
+        element_logs = {}
+        for metal in metals:
+            activity = oxide_activities[metal+"O"]
+            element_logs[metal] = (
+                math.log10(activity)+0.5*(release_log_k[metal]-oxygen_log)-log_kf[metal]
+                if activity else -math.inf
+            )
+        pressures = _carrier_pressures_pa(
+            formulas, log_kf, element_logs, oxygen_log,
+        )
+        gross = {s: langmuir_molar_flux(temperature, p, 0, emission_alpha[s],
+                                      molar_mass_kg_mol=masses[s])
+                 for s, p in pressures.items()}
+        net = dict(net_flux_boundary(pressures, gross)) if net_flux_boundary else gross
+        if set(net) != set(gross) or any(not math.isfinite(v) for v in net.values()):
+            raise CongruentVaporizationError("return boundary must supply every carrier net flux")
+        if any(net[s] > gross[s] and not math.isclose(net[s], gross[s], rel_tol=1e-10)
+               for s in gross):
+            raise CongruentVaporizationError("net source loss exceeds forward emission: inconsistent return boundary")
+        debit = {m+"O": sum(f.elements.get(m, 0)*net[s] for s, f in formulas.items())
+                 for m in metals}
+        # One oxygen atom per net parent-MO debit. Oxygen already in MO(g)
+        # remains in that carrier; dimers count twice on the cation side.
+        # This closes D_O+2D_O2=D_Mg+D_Ca in the monatomic screen. Every D
+        # is mol/(m2 s), not gross emission: absorbed returns reduce BOTH
+        # oxide debit and oxygen release. No ambient-fO2 inversion is used.
+        oxygen = sum(f.elements.get("O", 0)*net[s] for s, f in formulas.items())
+        cations = sum(debit.values())
+        scale = sum(abs(v) for v in debit.values()) + sum(
+            f.elements.get("O", 0)*abs(net[s]) for s, f in formulas.items())
+        residual = (cations-oxygen)/max(scale, 1e-300)
+        return pressures, gross, net, debit, residual
+
+    try:
+        root = brentq(lambda x: state(x)[-1], _LOG10_ACTIVITY_MIN,
+                      _LOG10_ACTIVITY_MAX, xtol=1e-12, rtol=1e-12)
+    except (ValueError, RuntimeError) as exc:
+        raise CongruentVaporizationError(f"mixed net oxygen closure failed: {exc}") from exc
+    pressures, gross, net, debit, residual = state(root)
+    if abs(residual) > _SOLVER_RESIDUAL_TOLERANCE:
+        raise CongruentVaporizationError("mixed net oxygen closure residual exceeds tolerance")
+    return MeltVaporizationResult(
+        temperature, pressures["O2"], pressures, gross, net, debit, residual,
+        tuple(range_uses), tuple(sorted(statuses)),
+    )

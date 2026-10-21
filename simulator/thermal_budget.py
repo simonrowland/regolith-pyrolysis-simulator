@@ -1181,3 +1181,83 @@ def _finite(value: float, name: str) -> float:
     if not math.isfinite(number):
         raise ValueError(f"{name} must be finite")
     return number
+
+
+def crown_thermal_demand(
+    *,
+    source_temperature_K: float,
+    collector_temperature_K: float,
+    melt_area_m2: float,
+    collector_area_m2: float,
+    view_factor_from_melt: float,
+    absorptivity: float,
+    radiator_area_m2: float,
+    radiator_emissivity: float,
+    sky_temperature_K: float,
+    heat_pipe_capacity_W: float,
+    deposition_heat_W: float | None,
+    reaction_heat_W: float | None,
+    crust_thickness_m: float | None,
+    crust_conductivity_W_m_K: float | None,
+) -> dict[str, Any]:
+    """Conditional exposed-crust heat balance; optical inputs are assumptions.
+
+    Deposition heat includes latent AND sensible duty at the actual two
+    temperatures, supplied by its enthalpy owner/caller. Missing chemistry or
+    conduction prevents a feasibility claim, rather than becoming zero heat.
+    Heat-pipe capacity is additional extraction; a pipe feeding the declared
+    radiator cannot also be credited as an independent rejection capacity.
+    """
+    source = _positive(source_temperature_K, "source_temperature_K")
+    surface = _positive(collector_temperature_K, "collector_temperature_K")
+    melt_area = _positive(melt_area_m2, "melt_area_m2")
+    dish_area = _positive(collector_area_m2, "collector_area_m2")
+    F = _unit_interval(view_factor_from_melt, "view_factor_from_melt")
+    if melt_area*F > dish_area:
+        raise ValueError("crown geometry violates view-factor reciprocity")
+    absorption = _unit_interval(absorptivity, "absorptivity")
+    radiator = _non_negative(radiator_area_m2, "radiator_area_m2")
+    epsilon = _unit_interval(radiator_emissivity, "radiator_emissivity")
+    sky = _kelvin(sky_temperature_K, "sky_temperature_K")
+    heat_pipe = _non_negative(heat_pipe_capacity_W, "heat_pipe_capacity_W")
+    # Reuse the radiative exchange owner: kW/m2 * m2 * 1000 W/kW.
+    # Am F = Ad r, so received power has the same area in both directions.
+    # At F->0 the melt load vanishes; Tsource=Ts gives zero net exchange.
+    absorbed = melt_area*1000*_radiative_flux_kW_per_m2(
+        source, surface, emissivity=absorption, view_factor=F,
+    )
+    rejected = radiator*1000*_radiative_flux_kW_per_m2(
+        surface, sky, emissivity=epsilon, view_factor=1.0,
+    )
+    deposition = None if deposition_heat_W is None else _finite(deposition_heat_W, "deposition_heat_W")
+    reaction = None if reaction_heat_W is None else _finite(reaction_heat_W, "reaction_heat_W")
+    statuses = ["assumed_optical_coefficients"]
+    if deposition is None:
+        statuses.append("latent_and_sensible_deposition_heat_unavailable")
+    if reaction is None:
+        statuses.append("oxidation_heat_unavailable")
+    load = None if deposition is None or reaction is None else absorbed+deposition+reaction
+    required_backside = None
+    if crust_thickness_m is None or crust_conductivity_W_m_K is None:
+        statuses.append("crust_conduction_unavailable")
+    else:
+        thickness = _non_negative(crust_thickness_m, "crust_thickness_m")
+        conductivity = _positive(crust_conductivity_W_m_K, "crust_conductivity_W_m_K")
+        if load is not None:
+            # Fourier Q=k A (Ts-Tback)/L -> Tback=Ts-Q L/(k A).
+            # W*m/[(W/(m K))*m2]=K. L->0 removes the crust temperature drop.
+            required_backside = surface-load*thickness/(conductivity*dish_area)
+    return {
+        "absorbed_melt_radiation_W": absorbed,
+        "sky_radiation_W": rejected,
+        "heat_pipe_capacity_W": heat_pipe,
+        "total_heat_load_W": load,
+        "heat_removal_margin_W": None if load is None else rejected+heat_pipe-load,
+        "required_backside_temperature_K": required_backside,
+        "setpoint_status": (
+            "unavailable" if load is None or required_backside is None else
+            "infeasible" if rejected+heat_pipe < load or required_backside < 0 else
+            "conditional_on_declared_cooling_and_surface_inputs"
+        ),
+        "statuses": tuple(statuses),
+    }
