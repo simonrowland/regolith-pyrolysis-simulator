@@ -2414,6 +2414,21 @@ def test_throughput_excludes_offgas_and_overhead_metals() -> None:
     assert summary["per_product_kg_per_furnace_h"]["Na_plus_K"] == 0.15
 
 
+def test_throughput_excludes_vented_oxygen_when_partition_has_no_captured_bins() -> None:
+    execution, classes = _throughput_fixture()
+    classes["metals_plus_O2"]["O2_partition_kg"] = {
+        "vented": 1.5,
+        "total": 1.5,
+    }
+
+    summary = objective_module.throughput_per_furnace_hour_summary(
+        execution, product_classes=classes
+    )
+
+    assert summary["separated_product_kg"] == 4.5
+    assert summary["per_product_kg_per_furnace_h"]["O2"] == 0.0
+
+
 def test_throughput_sio_rate_requires_pure_silica_product() -> None:
     execution, classes = _throughput_fixture()
     classes["pure_silica_glass"]["class_total_kg"] = 0.0

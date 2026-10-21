@@ -3756,8 +3756,7 @@ def throughput_per_furnace_hour_summary(
             _finite_float(oxygen_partition.get(key, 0.0), f"O2_partition_kg.{key}")
             for key in ("stored", "captured")
         )
-        if isinstance(oxygen_partition, Mapping)
-        and ("stored" in oxygen_partition or "captured" in oxygen_partition)
+        if isinstance(metals, Mapping) and "O2_partition_kg" in metals
         else _finite_float(metals.get("O2_kg", 0.0), "metals_plus_O2.O2_kg")
     )
     metals_total_kg = _finite_float(
