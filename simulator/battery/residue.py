@@ -1309,6 +1309,20 @@ def _hashimoto_project_oxide_wt_pct(inventory_mol: Mapping[str, float]) -> dict[
     }
 
 
+def _self_similar_area_m2(
+    initial_area_m2: float, remaining_mass_kg: float, initial_mass_kg: float
+) -> float:
+    # Constant density and self-similar shape: A=k V^(2/3), V=m/rho,
+    # hence A=A0*(m/m0)^(2/3). m/m0 is dimensionless and A is m2.
+    # Equal masses give equal areas; a sphere with V=4*pi*r^3/3 has
+    # k=(36*pi)^(1/3) and therefore A=4*pi*r^2. For R-11, Af/A0=0.876
+    # implies mf/m0=0.876^1.5=0.820; test the printed endpoints against
+    # the source area uncertainty before applying this shape premise.
+    return initial_area_m2 * (
+        max(0.0, remaining_mass_kg / initial_mass_kg) ** (2.0 / 3.0)
+    )
+
+
 def _hashimoto_integrate_geometry(
     initial_inventory_mol: Mapping[str, float],
     channels: Sequence[ResidueChannel],
@@ -1362,8 +1376,8 @@ def _hashimoto_integrate_geometry(
             amount * _formula_terms(oxide)[1]
             for oxide, amount in inventory.items()
         )
-        return initial_area_m2 * (
-            max(0.0, remaining_mass_kg / initial_mass_kg) ** (2.0 / 3.0)
+        return _self_similar_area_m2(
+            initial_area_m2, remaining_mass_kg, initial_mass_kg
         )
 
     def advance(duration: float, *, step_number: int, substep: int) -> None:
@@ -2463,9 +2477,9 @@ def _predict_sossi_residue_cohort(
                         for oxide, amount in current_inventory.items()
                     ) + min(0.0, buffer_exchange) * _formula_terms("O")[1]
                     if geometry == "pt_loop_bead_sphere_shrinking":
-                        area = areas[geometry] * max(
-                            0.0, current_mass / initial_total_mass
-                        ) ** (2.0 / 3.0)
+                        area = _self_similar_area_m2(
+                            areas[geometry], current_mass, initial_total_mass
+                        )
                     else:
                         area = areas[geometry]
                     try:
