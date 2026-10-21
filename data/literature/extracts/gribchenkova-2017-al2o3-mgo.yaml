@@ -1,0 +1,464 @@
+schema_version: literature_extract.v1
+source_id: gribchenkova-2017-al2o3-mgo
+source:
+  citation: Gribchenkova N. A., Smorchkov K. G., Kolmakov A. G. and Alikhanyan A. S. (2017). Vaporization
+    in the Al2O3–MgO System. Inorganic Materials 53(5):514–518.
+  doi: 10.1134/S0020168517050077
+  year: 2017
+extraction:
+  method: Manual transcription from pdftotext-layout; Table 1 rendered at 600 dpi because no MinerU table
+    source is present. Mg p_eff values are measured-direct; calculated pressures and fit outputs are context;
+    Figures 1–4 are deferred.
+  date: '2026-10-20'
+  worker: codex
+  provenance_path: text/gribchenkova-2017-al2o3-mgo/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+- path: species.Mg.observations[gribchenkova_2017_table1_MgO_pMg_peff].values.P_Pa
+  value: '0.20863'
+  note: Table 1, MgO row, p_eff; rendered PDF p. 3 / printed p. 516.
+  locator:
+    pdf_page_index: 2
+    page: 3
+    published_page: 516
+    table: '1'
+- path: species.Mg.observations[gribchenkova_2017_table1_MgAl2O4+Al2O3_pMg_peff].values.P_Pa
+  value: '0.03237'
+  note: Table 1, MgAl2O4 + Al2O3 row, p_eff; rendered PDF p. 3 / printed p. 516.
+  locator:
+    pdf_page_index: 2
+    page: 3
+    published_page: 516
+    table: '1'
+species:
+  Mg:
+    observations:
+    - observation_id: gribchenkova_2017_table1_MgO_pMg_peff
+      type: partial_pressure
+      locator: &id001
+        pdf_page_index: 2
+        page: 3
+        published_page: 516
+        table: '1'
+        row_label: MgO
+      phase: g
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        P_Pa: '0.20863'
+        T_K: '1900'
+        sample_id: MgO
+        sample_composition_as_printed: MgO
+        source_error_as_printed: ~30% for absolute partial pressures
+        raw_inputs:
+          state: not_printed
+          locator: &id002
+            pdf_page_index: 1
+            page: 2
+            published_page: 515
+            section: Experimental procedure
+        method: Knudsen effusion mass spectrometry; Mg ion current converted to absolute partial pressure
+          using the instrument sensitivity constant.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1900'
+          locator:
+            pdf_page_index: 2
+            page: 3
+            published_page: 516
+            table: '1'
+            column_header: T = 1900 K
+        composition:
+          state:
+            tag: value
+            value: MgO
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The effusion-cell background pressure for this row is not stated; table total is vapor-species
+              pressure.
+          locator: *id002
+    - observation_id: gribchenkova_2017_table1_MgO+MgAl2O4_pMg_peff
+      type: partial_pressure
+      locator: &id003
+        pdf_page_index: 2
+        page: 3
+        published_page: 516
+        table: '1'
+        row_label: MgO + MgAl2O4
+      phase: g
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        P_Pa: '0.20863'
+        T_K: '1900'
+        sample_id: MgO+MgAl2O4
+        sample_composition_as_printed: MgO + MgAl2O4
+        source_error_as_printed: ~30% for absolute partial pressures
+        raw_inputs:
+          state: not_printed
+          locator: &id004
+            pdf_page_index: 1
+            page: 2
+            published_page: 515
+            section: Experimental procedure
+        method: Knudsen effusion mass spectrometry; Mg ion current converted to absolute partial pressure
+          using the instrument sensitivity constant.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1900'
+          locator:
+            pdf_page_index: 2
+            page: 3
+            published_page: 516
+            table: '1'
+            column_header: T = 1900 K
+        composition:
+          state:
+            tag: value
+            value: MgO + MgAl2O4
+          locator: *id003
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The effusion-cell background pressure for this row is not stated; table total is vapor-species
+              pressure.
+          locator: *id004
+    - observation_id: gribchenkova_2017_table1_MgAl2O4+Al2O3_pMg_peff
+      type: partial_pressure
+      locator: &id005
+        pdf_page_index: 2
+        page: 3
+        published_page: 516
+        table: '1'
+        row_label: MgAl2O4 + Al2O3
+      phase: g
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        P_Pa: '0.03237'
+        T_K: '1900'
+        sample_id: MgAl2O4+Al2O3
+        sample_composition_as_printed: MgAl2O4 + Al2O3
+        source_error_as_printed: ~30% for absolute partial pressures
+        raw_inputs:
+          state: not_printed
+          locator: &id006
+            pdf_page_index: 1
+            page: 2
+            published_page: 515
+            section: Experimental procedure
+        method: Knudsen effusion mass spectrometry; Mg ion current converted to absolute partial pressure
+          using the instrument sensitivity constant.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1900'
+          locator:
+            pdf_page_index: 2
+            page: 3
+            published_page: 516
+            table: '1'
+            column_header: T = 1900 K
+        composition:
+          state:
+            tag: value
+            value: MgAl2O4 + Al2O3
+          locator: *id005
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The effusion-cell background pressure for this row is not stated; table total is vapor-species
+              pressure.
+          locator: *id006
+    context:
+    - observation_id: gribchenkova_2017_figure_1_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 1
+        page: 2
+        published_page: 515
+        figure: '1'
+      panel: whole_figure
+      attribution: Zienert and Fabrichnaya [13]; experimental data are attributed to Ref. [13] in the
+        caption.
+      units: axes as printed
+      values:
+        quantity: pseudobinary Al2O3–MgO phase diagram
+        typed_quantity_candidate: phase diagram
+        species: MgO–Al2O3 solid phases
+        phase: vapor over the printed condensed assemblage
+        temperature_as_printed: phase boundaries; figure does not provide a numeric table
+        axes_as_printed:
+          x: mol % Al2O3
+          y: T (K)
+        method_class: quoted_attributed
+        digitisation_note: Figure 1 caption attributes the diagram to Zienert and Fabrichnaya [13]; digitisation
+          deferred.
+        quantity_as_printed: solid/liquid phase boundaries
+      series:
+      - name: thermodynamic phase boundaries
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      - name: experimental data from Ref. [13]
+        marker: symbols as printed in legend (1)
+        marker_count: 12
+        method_class: quoted_attributed
+      - name: other data cited in Ref. [13]
+        marker: symbols as printed in legend (2)
+        marker_count: 8
+        method_class: quoted_attributed
+      digitisation: deferred to a figure pass
+    - observation_id: gribchenkova_2017_figure_2_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 517
+        figure: '2'
+      panel: whole_figure
+      attribution: Present study; homogeneity-range boundaries attributed to Fujii et al. [20].
+      units: axes as printed
+      values:
+        quantity: p–x section of the pseudobinary Al2O3–MgO system at 1900 K
+        typed_quantity_candidate: partial_pressure
+        species: Mg, O2, O over Al2O3–MgO condensed assemblages
+        phase: vapor over the printed condensed assemblage
+        temperature_as_printed: 1900 K
+        axes_as_printed:
+          x: mol % Al2O3
+          y: partial pressure (Pa)
+        method_class: model_derived
+        digitisation_note: Boundary compositions are attributed to Fujii et al. [20]; no figure values
+          digitised.
+        quantity_as_printed: p–x total vapor-pressure section
+      series:
+      - name: calculated p–x section, including phase-region boundaries
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+    - observation_id: gribchenkova_2017_figure_3_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 517
+        figure: '3'
+      panel: whole_figure
+      attribution: Gribchenkova et al. (2017); series numbers identify separate experiments.
+      units: axes as printed
+      values:
+        quantity: temperature dependence of log p(Mg)
+        typed_quantity_candidate: partial_pressure
+        species: Mg vapor over MgO
+        phase: vapor over the printed condensed assemblage
+        temperature_as_printed: MgO region I, 1750–1930 K
+        axes_as_printed:
+          x: 10^3/T (K−1)
+          y: log p(Mg)
+        method_class: measured_reduced
+        digitisation_note: Numbered mass-spectrometric experimental series; figure-read pass deferred.
+        quantity_as_printed: log p(Mg) against 10^3/T
+      series:
+      - name: experiment 1
+        marker: filled circle
+        marker_count: 17
+        method_class: measured_direct
+      - name: experiment 2
+        marker: open circle
+        marker_count: 16
+        method_class: measured_direct
+      - name: experiment 3
+        marker: filled triangle
+        marker_count: 17
+        method_class: measured_direct
+      - name: experiment 4
+        marker: open triangle
+        marker_count: 18
+        method_class: measured_direct
+      - name: experiment 5
+        marker: star
+        marker_count: 15
+        method_class: measured_direct
+      digitisation: deferred to a figure pass
+    - observation_id: gribchenkova_2017_figure_4_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 517
+        figure: '4'
+      panel: whole_figure
+      attribution: Gribchenkova et al. (2017); series numbers identify separate experiments.
+      units: axes as printed
+      values:
+        quantity: temperature dependence of log p(Mg)
+        typed_quantity_candidate: partial_pressure
+        species: Mg vapor over MgAl2O4 + Al2O3
+        phase: vapor over the printed condensed assemblage
+        temperature_as_printed: two-phase region II, 1900–2100 K
+        axes_as_printed:
+          x: 10^3/T (K−1)
+          y: log p(Mg)
+        method_class: measured_reduced
+        digitisation_note: Numbered mass-spectrometric experimental series; figure-read pass deferred.
+        quantity_as_printed: log p(Mg) against 10^3/T
+      series:
+      - name: experiment 1
+        marker: filled circle
+        marker_count: 17
+        method_class: measured_direct
+      - name: experiment 2
+        marker: open circle
+        marker_count: 18
+        method_class: measured_direct
+      - name: experiment 3
+        marker: circled cross
+        marker_count: 20
+        method_class: measured_direct
+      digitisation: deferred to a figure pass
+    - observation_id: gribchenkova_2017_table1_calculated_pressures
+      type: model_derived_table_values
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 516
+        table: '1'
+      units: Pa
+      values:
+        table_csv: .agent-scratch/f36-tables/gribchenkova-2017-al2o3-mgo/table1.csv
+        Mg_pmin:
+        - composition: MgO
+          value: '0.21491'
+        - composition: MgO + MgAl2O4
+          value: '0.21491'
+        - composition: MgAl2O4 + Al2O3
+          value: '0.03259'
+        O2_peff:
+        - composition: MgO
+          value: '0.09861'
+        - composition: MgO + MgAl2O4
+          value: '0.09861'
+        - composition: MgAl2O4 + Al2O3
+          value: '0.01140'
+        O2_pmin:
+        - composition: MgO
+          value: '0.09296'
+        - composition: MgO + MgAl2O4
+          value: '0.09296'
+        - composition: MgAl2O4 + Al2O3
+          value: '0.01125'
+        O_peff:
+        - composition: MgO
+          value: '0.02984'
+        - composition: MgO + MgAl2O4
+          value: '0.02984'
+        - composition: MgAl2O4 + Al2O3
+          value: '0.01014'
+        O_pmin:
+        - composition: MgO
+          value: '0.02897'
+        - composition: MgO + MgAl2O4
+          value: '0.02897'
+        - composition: MgAl2O4 + Al2O3
+          value: '0.01008'
+        total_vapor_pressure_peff:
+        - composition: MgO
+          value: '0.33708'
+        - composition: MgO + MgAl2O4
+          value: '0.33708'
+        - composition: MgAl2O4 + Al2O3
+          value: '0.05392'
+        total_vapor_pressure_pmin:
+        - composition: MgO
+          value: '0.33683'
+        - composition: MgO + MgAl2O4
+          value: '0.33683'
+        - composition: MgAl2O4 + Al2O3
+          value: '0.05391'
+      note: O2 and O were not experimentally measurable and were calculated using Eqs. (4)–(5); pmin columns
+        were recalculated for minimum total pressure using Eqs. (4)–(7). Total vapor pressure is not a
+        species partial-pressure observation. Derivation pending a corpus table asset (controller, t-1382);
+        full Table 1 inputs are in the listed CSV. The table reports ~30% error for absolute partial pressures.
+    - observation_id: gribchenkova_2017_mgo_activity_context
+      type: model_derived_activity
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 516
+        section: Results and discussion; equation (8)
+      units: dimensionless
+      values:
+        activity_as_printed: '0.0528'
+        uncertainty_as_printed: ±0.0119
+        species: MgO
+        phase: spinel solid solution in MgAl2O4 + Al2O3 two-phase region
+        temperature_as_printed: 1900 K
+        candidate_token: activity
+        reference_as_printed: ratio of MgO vapor pressure over the two-phase region to that over pure
+          MgO
+        derivation: Equation (8), using vapor pressures and the equilibrium constant; input values include
+          the paper Table 1 rows and reference data [11].
+      note: Solid-solution activity, not a melt activity. Derivation pending a corpus table asset (controller,
+        t-1382); Table 1 numbers are in the seat CSV.
+    - observation_id: gribchenkova_2017_thermochemical_calculations_context
+      type: model_derived_thermochemical_values
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 517
+        section: Results and discussion; equations (6)–(9)
+        additional_locator:
+          pdf_page_index: 4
+          page: 5
+          published_page: 518
+          section: Third-law calculation; abstract
+      units: kJ/mol; K
+      values:
+        reaction6_second_law_enthalpy: 723.54 ± 39.26 kJ/mol
+        reaction7_second_law_enthalpy: 752.78 ± 633.63 kJ/mol
+        spinel_formation_from_oxides_second_law: −29.24 ± 74.76 kJ/mol
+        reaction9_enthalpy_1900K: −14.52 ± 10.92 kJ/mol
+        reaction9_enthalpy_289K: −24.68 ± 10.92 kJ/mol
+        spinel_delta_fH_body: −2301.61 ± 11.00 kJ/mol at 289 K
+        spinel_delta_fH_abstract: −2301.61 ± 11.00 kJ/mol at 298 K
+        previous_value_as_printed: −2299.11 ± 1.3 kJ/mol [11]
+        equilibrium_constants_fit_coefficients:
+          region_I_1750_to_1930K:
+            logpMg: −(25242 ± 1315)/T + (7.43 ± 0.71)
+            logpO2: −(25098 ± 1797)/T + (7.01 ± 0.80)
+            logpO: −(25869 ± 735)/T + (6.99 ± 0.40)
+          region_II_1900_to_2100K:
+            logpMg: −(26226 ± 2784)/T + (6.72 ± 1.40)
+            logpO2: −(26185 ± 4023)/T + (6.05 ± 2.02)
+            logpO: −(26413 ± 2011)/T + (6.51 ± 1.01)
+        spinel_formation_from_oxides_reaction: MgO(s) + Al2O3(s) = MgAl2O4(s)
+        standard_state_note: The body says 289 K; the abstract says 298 K for the same ΔfH value. Preserve
+          both printed temperatures; do not score twice.
+      note: Reaction enthalpies of spinel formation FROM OXIDES are not standard formation enthalpy from
+        elements. All third-law/second-law derived values remain context because their derivation inputs
+        are not all stored as observations.
+    - observation_id: gribchenkova_2017_solubility_context
+      type: quoted_phase_equilibrium_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 516
+        section: Results and discussion
+      units: mol %; K
+      values:
+        spinel_solubility_in_MgO_as_printed: about 1 mol %
+        temperature_as_printed: 1900 K
+        attribution: reference [16]
+      note: Quoted prior-work solubility result; no point typed.
