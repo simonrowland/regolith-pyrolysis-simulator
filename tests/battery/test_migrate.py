@@ -1002,6 +1002,35 @@ def test_shornikov_2021_model_results_are_context_not_observations(
     assert result.validation.hard_issues == ()
 
 
+def test_stolyarova_1992_untyped_bulk_thermodynamics_stays_in_context(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-016-stolyarova-1992.yaml", write=False
+    )
+    assert result.observations == {}
+    contexts = {
+        context["observation_id"]: context
+        for rows in result.context_by_work.values()
+        for context in rows
+        if context.get("source_id") == "kems-016-stolyarova-1992"
+    }
+    table1 = contexts["stolyarova_1992_gibbs_cas_and_fcm_table1"]["values"]["points"]
+    table3 = contexts["stolyarova_1992_na2o_k2o_sio2_gibbs_table3"]["values"]["points"]
+    table4 = contexts["stolyarova_1992_na2o_chemical_potential_nbs_table4"]["values"]["points"]
+
+    # Physical PDF p. 2 (Table 1) and p. 3 (Tables 3-4). These are printed
+    # bulk Gibbs energies and a component chemical potential, for which this
+    # schema has no matching quantity token; keep the numbers in context.
+    assert table1[0]["minus_delta_G_exp_kcal_mol"] == 8.3
+    assert table1[0]["minus_delta_G_kohler"] == 8.4
+    assert table1[0]["minus_delta_G_wilson"] == 7.4
+    assert table3[0]["minus_delta_G_exp_kcal_mol"] == 8.4
+    assert table4[0]["mu_Na2O_exp_kcal_mol"] == 56.0
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+
 @pytest.mark.parametrize(
     ("inputs", "raw_inputs", "expected_path", "expected_detail"),
     [
