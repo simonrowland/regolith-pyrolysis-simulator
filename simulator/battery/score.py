@@ -4699,6 +4699,7 @@ def _predict_mass_loss_with_residue(
     channel: str,
     sources: tuple[str, ...],
     experiment: Experiment | None,
+    source_id: str | None,
 ) -> EnginePrediction:
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
@@ -4712,6 +4713,7 @@ def _predict_mass_loss_with_residue(
             engine.value,
             experiment,
             temperature_K=None if temperature is None else float(temperature),
+            source_id=source_id,
         )
     except ResidueInventoryRefusal as exc:
         reason = exc.reason
@@ -4727,12 +4729,17 @@ def _predict_mass_loss_with_residue(
         elif reason == "initial_composition_invalid":
             refusal = RefusalReason.METRIC_DOMAIN
             execution = ExecutionState.NOT_PROBED
+        elif reason == "evaporation_coefficients_not_sourced":
+            refusal = RefusalReason.UNDERDETERMINED_APPARATUS
+            execution = ExecutionState.NOT_PROBED
         else:
             refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
             execution = ExecutionState.ATTEMPTED_UNAVAILABLE
         detail: dict[str, object] = {"reason": reason, "detail": exc.detail}
         if reason.endswith("_not_stated"):
             detail["missing_input"] = exc.detail
+        elif reason == "evaporation_coefficients_not_sourced":
+            detail["missing_input"] = "evaporation_coefficient_alpha"
         if refusal is RefusalReason.UNSUPPORTED:
             detail.update({"engine": engine.value, "capability": exc.detail})
         return EnginePrediction(
@@ -4845,6 +4852,7 @@ def predict_with_engine(
             channel,
             sources,
             experiment,
+            observation.source_id,
         )
     if quantity is Quantity.FE3_FE2_RATIO:
         return _predict_fe_redox(engine, observation, identity, channel)

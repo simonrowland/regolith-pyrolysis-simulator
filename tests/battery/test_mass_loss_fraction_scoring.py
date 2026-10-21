@@ -11,11 +11,12 @@ from simulator.battery.enums import (
     Engine,
     MethodToken,
     MetricOperation,
-    NoticeKind,
     Quantity,
     RefusalReason,
+    ResidualStatus,
     ValueKind,
 )
+from simulator.battery.identity import Identity
 from simulator.battery.migrate import (
     LITERATURE,
     Migrator,
@@ -33,11 +34,14 @@ from simulator.battery.records import (
     State,
     Value,
 )
-from simulator.battery.residue import _initial_oxide_wt_percent
+from simulator.battery.residue import (
+    _hashimoto_geometry_areas,
+    _initial_oxide_wt_percent,
+    _located_point,
+)
 from simulator.battery.score import (
     QUANTITY_METRIC,
     compile_residual,
-    compute_metric,
     load_score_context,
     predict_with_engine,
     quantity_token,
@@ -114,6 +118,22 @@ def _richter_rep5_run(experiment):
         sample=sample,
         apparatus=apparatus,
     )
+
+
+_EVAPORATION_COEFFICIENTS_NOT_SOURCED = (
+    "per-species evaporation coefficients are not sourced for this work"
+)
+
+
+def _assert_evaporation_coefficients_not_sourced(prediction) -> None:
+    assert prediction.value is None, prediction.value
+    assert prediction.refusal_reason is RefusalReason.UNDERDETERMINED_APPARATUS, (
+        prediction.refusal_reason
+    )
+    detail = prediction.refusal_detail
+    assert detail["reason"] == "evaporation_coefficients_not_sourced"
+    assert detail["detail"] == _EVAPORATION_COEFFICIENTS_NOT_SOURCED
+    assert detail["missing_input"] == "evaporation_coefficient_alpha"
 
 
 def _extract_mass_loss_selection(source_id: str, observation_id: str):
@@ -291,9 +311,9 @@ def test_finalize_never_promotes_untyped_observation_map_to_initial(
     assert prediction.refusal_detail["reason"] == "initial_composition_not_stated"
 
 
-@pytest.mark.parametrize(("sample_id", "expected"), (("R-11", 0.5503), ("R-14", 0.5469)))
-def test_richter_predictions_keep_the_declared_starting_glass(
-    fresh_mass_loss_extracts, sample_id, expected
+@pytest.mark.parametrize("sample_id", ("R-11", "R-14"))
+def test_richter_rows_refuse_unsourced_evaporation_coefficients(
+    fresh_mass_loss_extracts, sample_id
 ) -> None:
     richter_result, _markova_result = fresh_mass_loss_extracts
     row = next(
@@ -306,9 +326,77 @@ def test_richter_predictions_keep_the_declared_starting_glass(
 
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
 
+    _assert_evaporation_coefficients_not_sourced(prediction)
+
+
+def test_hashimoto_declared_unity_convention_still_predicts_mass_loss() -> None:
+    """Hashimoto's extract is the dispatch that declares the unity-alpha set."""
+    source_path = LITERATURE / "extracts" / "kems-015-hashimoto-1983.yaml"
+    migrator = Migrator()
+    migrator._migrate_extract(source_path)
+    result = migrator.result
+    runs = [
+        experiment
+        for experiment in result.experiments.values()
+        if "hashimoto-1983-run" in experiment.experiment_id
+        and _located_point(
+            None
+            if experiment.thermal_schedule is None
+            else experiment.thermal_schedule.total_duration_s
+        )
+        is not None
+    ]
+    experiment = min(
+        runs,
+        key=lambda item: _located_point(item.thermal_schedule.total_duration_s),
+    )
+    document = load_yaml(source_path)
+    preform = next(
+        item
+        for item in document["metadata"]
+        if item.get("observation_id")
+        == "hashimoto_1983_fe_fcmas_free_evap_geometry_quoted"
+    )["values"]["starting_preform_mm"]
+    mass_kg = _located_point(experiment.sample.mass_kg)
+    assert mass_kg is not None and mass_kg > 0.0
+    area_m2 = _hashimoto_geometry_areas(mass_kg, preform)["disk_4mm_constant"]
+    apparatus = experiment.apparatus or Apparatus()
+    geometry = apparatus.geometry or ApparatusGeometry()
+    experiment = replace(
+        experiment,
+        apparatus=replace(
+            apparatus,
+            geometry=replace(
+                geometry,
+                exposed_area_m2=Located(
+                    State.of(Value(ValueKind.POINT, point=Decimal(str(area_m2)))),
+                    experiment.locator,
+                ),
+            ),
+        ),
+    )
+    donor = next(
+        row
+        for row in result.observations.values()
+        if row.experiment_id == experiment.experiment_id and row.source_id
+    )
+    temperature = donor.identity.temperature_K
+    if temperature is None or not temperature.is_value:
+        recorded = experiment.conditions["temperature_K"].state.value
+        temperature = State.of(getattr(recorded, "point", recorded))
+    row = replace(
+        donor,
+        identity=Identity(
+            quantity=Quantity.MASS_LOSS_FRACTION,
+            species=donor.identity.species,
+            temperature_K=temperature,
+        ),
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+
     assert prediction.refusal_reason is None, prediction.refusal_detail
     assert prediction.value is not None
-    assert abs(prediction.value - Decimal(str(expected))) <= Decimal("0.0001")
 
 
 def test_richter_r14_mass_loss_uses_source_declared_initial_glass_not_final_residue(
@@ -402,9 +490,7 @@ def test_richter_catalogue_sibling_keeps_initial_through_finalization(
     )
 
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=migrated)
-    assert prediction.refusal_reason is None, prediction.refusal_detail
-    assert prediction.value is not None
-    assert abs(prediction.value - Decimal("0.5469")) <= Decimal("0.002")
+    _assert_evaporation_coefficients_not_sourced(prediction)
 
 
 def test_mendybaev_func5_keeps_serialization_equivalent_table1_start() -> None:
@@ -439,7 +525,9 @@ def test_mendybaev_func5_keeps_serialization_equivalent_table1_start() -> None:
     )
 
 
-def test_richter_rep5_row_has_numeric_residual_and_domain_notice(mass_loss_rows) -> None:
+def test_richter_rep5_row_refuses_unsourced_evaporation_coefficients(
+    mass_loss_rows,
+) -> None:
     richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
         mass_loss_rows
     )
@@ -450,14 +538,8 @@ def test_richter_rep5_row_has_numeric_residual_and_domain_notice(mass_loss_rows)
         experiment=_richter_rep5_run(experiment),
     )
 
-    assert prediction.refusal_reason is None, prediction.refusal_detail
-    assert prediction.value is not None
-    assert prediction.unit == "dimensionless"
-    assert richter.value.point is not None
-    residual = compute_metric(
-        MetricOperation.ABSOLUTE, prediction.value, richter.value.point
-    )
-    assert residual is not None and residual.is_finite()
+    _assert_evaporation_coefficients_not_sourced(prediction)
+    assert prediction.notices == ()
     context = load_score_context(sources=("kems-010-richter-2007",))
     context = replace(
         context,
@@ -473,14 +555,11 @@ def test_richter_rep5_row_has_numeric_residual_and_domain_notice(mass_loss_rows)
         prediction=prediction,
         comparison_ids={richter.observation_id},
     )
-    assert scored.numeric is not None
-    assert scored.numeric.operation is MetricOperation.ABSOLUTE
-    assert scored.numeric.value == residual
-    assert any(
-        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-        and "paper-demonstrated-window" in notice.reason
-        for notice in prediction.notices
-    )
+    assert scored.status is ResidualStatus.REFUSED
+    assert scored.numeric is None
+    assert scored.refusal is not None
+    assert scored.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert scored.refusal.detail["reason"] == "evaporation_coefficients_not_sourced"
 
 
 def test_richter_rep5_table1_inputs_migrate_to_sample_mass_and_area() -> None:
