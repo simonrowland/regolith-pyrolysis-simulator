@@ -73,6 +73,64 @@ def _domain_composition() -> dict[str, float]:
     }
 
 
+@pytest.mark.parametrize(
+    ("a_value", "reason"),
+    ((None, "missing_antoine_A"), (-1.0, "nonpositive_antoine_A")),
+    ids=("missing-A", "nonpositive-A"),
+)
+@pytest.mark.parametrize(
+    ("section", "species", "parent_oxide", "site"),
+    (
+        (
+            "metals",
+            "Na",
+            "Na2O",
+            "alphamelts_volatility.metal_antoine",
+        ),
+        (
+            "oxide_vapors",
+            "SiO",
+            "SiO2",
+            "alphamelts_volatility.oxide_vapor_antoine",
+        ),
+    ),
+    ids=("metal-site", "oxide-vapor-site"),
+)
+def test_antoine_A_skip_is_reported_in_volatility_diagnostic(
+    a_value, reason, section, species, parent_oxide, site
+) -> None:
+    coefficients = {"B": 0.0, "C": 0.0}
+    if a_value is not None:
+        coefficients["A"] = a_value
+    row = {"parent_oxide": parent_oxide, "antoine": coefficients}
+    if section == "metals":
+        row["fit_target"] = "pure_component_psat"
+    else:
+        row["valid_range_K"] = [1000.0, 2500.0]
+    vapor_data = {
+        "metals": {species: row} if section == "metals" else {},
+        "oxide_vapors": {species: row} if section == "oxide_vapors" else {},
+    }
+    activities = {"Na2O": 0.25, "SiO2": 0.25}
+    source = StubActivitySource({1.0: activities, 10.0: activities})
+
+    diagnostic = alphamelts_activity_volatility_diagnostic(
+        composition_wt_pct=_domain_composition(),
+        pO2_grid_bar=[1e-9],
+        temperature_C=1500.0,
+        activity_source=source,
+        vapor_pressure_data=vapor_data,
+    )
+
+    expected = (
+        "antoine_species_skipped: "
+        f"species={species} site={site} reason={reason} "
+        "temperature_K=1773.150"
+    )
+    assert expected in diagnostic["warnings"]
+    assert species not in diagnostic["grid"][0]["species"]
+
+
 def test_default_activity_source_uses_explicit_reference_pressure(monkeypatch):
     seen: dict[str, object] = {}
 
