@@ -367,6 +367,13 @@ def test_1800_k_pre_switch_physics_pin() -> None:
     ).hexdigest() == "ccdfb94254defeb15f302b251c93dc46ab420c1a83b43b3a78bd4ceb718c8368"
 
 
+def test_1800_k_quantity_split_refactor_pin() -> None:
+    result = _provider().dispatch(_request(BASE_MELT_MOL, 1800.0))
+    assert hashlib.sha256(
+        json.dumps(_physics(result), sort_keys=True).encode()
+    ).hexdigest() == "0ad5ccbc84666fb5faa28899d639656a1cd6afe27f990a3dcae59763396ad252"
+
+
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])
 def test_certified_edge_selects_openimcc(temperature_K, expected) -> None:
     result = _provider().dispatch(
