@@ -11,6 +11,8 @@ SID = "kems-012-sossi-2019"
 EXTRACT = f"{SID}.yaml"
 FEDKIN_SID = "kems-005-fedkin-2006"
 FEDKIN_EXTRACT = f"{FEDKIN_SID}.yaml"
+HASHIMOTO_SID = "kems-015-hashimoto-1983"
+HASHIMOTO_EXTRACT = f"{HASHIMOTO_SID}.yaml"
 TABLE2_RUNS = {
     "sossi-2019-run-2m-16-07-16e": Decimal("848.9"),
     "sossi-2019-run-2m-16-07-16a": Decimal("742.5"),
@@ -125,4 +127,31 @@ def _assert_fedkin_pins(result) -> None:
 def test_fedkin_table3_fit_outputs_are_context_and_yu_runs_keep_conditions(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, FEDKIN_EXTRACT)
     _assert_fedkin_pins(result)
+
+
+def _assert_hashimoto_table3_pins(result) -> None:
+    assert result.validation.hard_issues == ()
+    values = {}
+    for row in result.observations.values():
+        if (
+            row.value.kind is ValueKind.POINT
+            and "::hashimoto_1983_table3_residue_composition_series::" in row.observation_id
+            and ":row=c3-(2):" in row.observation_id
+            and row.identity.temperature_K.is_value
+            and row.identity.temperature_K.value == Decimal("1973.15")
+        ):
+            values[row.identity.species.formula] = row
+    expected = {"SiO2": Decimal("39.09"), "Al2O3": Decimal("3.57"), "FeO": Decimal("27.92")}
+    assert set(values) >= set(expected)
+    for formula, value in expected.items():
+        row = values[formula]
+        assert row.value.point == value
+        assert row.identity.temperature_K.value == Decimal("1973.15")
+        assert row.identity.total_pressure_Pa is not None
+        assert row.identity.fO2_Pa is not None
+
+
+def test_hashimoto_table3_residue_values_keep_row_temperature_and_conditions(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, HASHIMOTO_EXTRACT)
+    _assert_hashimoto_table3_pins(result)
 
