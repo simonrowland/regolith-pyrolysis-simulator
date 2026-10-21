@@ -9,7 +9,11 @@ import pytest
 from simulator.battery.enums import Engine, EvidenceClass, Phase, Quantity
 from simulator.battery.records import Species, State
 from simulator.battery.score import _bench_for_score, compile_residual, load_score_context
-from simulator.battery.source_oxygen import resolve_source_oxygen
+from simulator.battery.source_oxygen import (
+    SourceOxygenFallback,
+    SourceOxygenFallbackReason as FallbackReason,
+    resolve_source_oxygen,
+)
 from simulator.diagnostic_helpers import binary_pot_battery as battery
 
 
@@ -62,6 +66,20 @@ def _capture_engine(monkeypatch, row):
     return requests, {"openimcc": handle}
 
 
+def _fallback_notice(context, monkeypatch, row, rows):
+    requests, handles = _capture_engine(monkeypatch, row)
+    residual, _ = compile_residual(
+        row, Engine.OPENIMCC, context=context, handles=handles,
+        point_observations=tuple(rows),
+    )
+    assert len(requests) == 1
+    assert requests[0].mode == battery.PO2_OXYGEN_BALANCE_EFFUSION
+    return next(
+        notice for notice in residual.notices
+        if notice.reason.startswith("model assumption: vapour-only zero-storage closure;")
+    )
+
+
 @pytest.mark.parametrize(
     "source,expected_bar",
     (("kems-053-stolyarova-1991", 3.0730622426279393e-12),
@@ -99,9 +117,27 @@ def test_conditioning_cell_gases_remain_visible_but_are_not_scored(source_contex
     assert residual.refusal.detail["derivation"]["inputs"]
 
 
-def test_untyped_1996_alternative_oxygen_columns_keep_closure(source_context):
+def test_untyped_1996_alternative_oxygen_columns_keep_closure(source_context, monkeypatch):
     row = _row(source_context, "stolyarova-1996-cao-alumina-silica-kems", "AlO")
-    assert _resolve(source_context, row) is None
+    # The primary lineage is untyped; other columns depend on sample gases.
+    # Multiple raw columns are not multiple independently eligible conditions.
+    assert _resolve(source_context, row).reason is FallbackReason.UNTYPED_LINEAGE
+    notice = _fallback_notice(source_context, monkeypatch, row, source_context.observations.values())
+    assert "source_oxygen_fallback=lineage_untyped" in notice.reason
+
+
+def test_no_oxygen_in_supplied_point_records_is_reported(source_context, monkeypatch):
+    row = _row(source_context, "kems-053-stolyarova-1991")
+    assert _resolve(source_context, row, (row,)).reason is FallbackReason.NO_PRINTED_CONDITION
+    notice = _fallback_notice(source_context, monkeypatch, row, (row,))
+    assert "source_oxygen_fallback=no_oxygen_condition_printed" in notice.reason
+
+
+@pytest.mark.parametrize("axis", ("temperature_K", "composition"))
+def test_missing_point_axes_report_untyped_linkage(source_context, axis):
+    row = _row(source_context, "kems-053-stolyarova-1991")
+    row = replace(row, identity=replace(row.identity, **{axis: State.unknown("not printed")}))
+    assert _resolve(source_context, row).reason is FallbackReason.UNTYPED_LINEAGE
 
 
 @pytest.mark.parametrize("axis", ("source", "temperature", "composition"))
@@ -114,10 +150,10 @@ def test_source_oxygen_never_matches_another_point(source_context, axis):
     else:
         composition = replace(row.identity.composition.value, components=(("CaO", Decimal("0.9")), ("SiO2", Decimal("0.1"))))
         row = replace(row, identity=replace(row.identity, composition=State.of(composition)))
-    assert _resolve(source_context, row) is None
+    assert isinstance(_resolve(source_context, row), SourceOxygenFallback)
 
 
-def test_multiple_measured_oxygen_conditions_are_not_averaged(source_context):
+def test_multiple_measured_oxygen_conditions_are_not_averaged(source_context, monkeypatch):
     row = _row(source_context, "kems-053-stolyarova-1991")
     condition = _resolve(source_context, row)
     original = source_context.observations[next(iter(condition.used_observations))]
@@ -127,16 +163,40 @@ def test_multiple_measured_oxygen_conditions_are_not_averaged(source_context):
         identity=replace(original.identity, reaction=State.unknown("direct pressure")),
     )
     other = replace(measured, observation_id="other-printed-oxygen", identity=replace(measured.identity, species=Species("O2", Phase.G)))
-    assert _resolve(source_context, row, (row, measured, other)) is None
+    rows = (row, measured, other)
+    assert _resolve(source_context, row, rows).reason is FallbackReason.AMBIGUOUS
+    notice = _fallback_notice(source_context, monkeypatch, row, rows)
+    assert "source_oxygen_fallback=several_candidates_survive" in notice.reason
 
 
-def test_oxygen_from_any_sample_target_is_excluded(source_context):
+def test_oxygen_from_any_sample_target_is_excluded(source_context, monkeypatch):
     row = _row(source_context, "kems-053-stolyarova-1991")
     condition = _resolve(source_context, row)
     original = source_context.observations[next(iter(condition.used_observations))]
     magnesium = replace(row, observation_id="sample-Mg", identity=replace(row.identity, species=Species("Mg", Phase.G)))
     oxygen = replace(original, derived_from=(magnesium.observation_id,))
-    assert _resolve(source_context, row, (row, magnesium, oxygen)) is None
+    rows = (row, magnesium, oxygen)
+    assert _resolve(source_context, row, rows).reason is FallbackReason.SAMPLE_DERIVED
+    notice = _fallback_notice(source_context, monkeypatch, row, rows)
+    assert "source_oxygen_fallback=derived_from_scored_sample_species" in notice.reason
+
+
+def test_typed_source_inconsistency_prevents_conditioning(source_context, monkeypatch):
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.records import Notice, SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX
+
+    row = _row(source_context, "kems-053-stolyarova-1991")
+    original = source_context.observations[next(iter(_resolve(source_context, row).used_observations))]
+    oxygen = replace(original, notices=(*original.notices, Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX + " conflicting printed O/O2",
+        origin="source table consistency audit",
+    )))
+    rows = (row, oxygen)
+    assert _resolve(source_context, row, rows).reason is FallbackReason.SOURCE_INCONSISTENT
+    notice = _fallback_notice(source_context, monkeypatch, row, rows)
+    assert "source_oxygen_fallback=source_inconsistent" in notice.reason
 
 
 def test_printed_command_is_preserved(source_context, monkeypatch):

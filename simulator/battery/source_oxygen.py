@@ -5,11 +5,12 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, replace
 from decimal import Decimal
+from enum import StrEnum
 from typing import Iterable, Mapping
 
-from simulator.battery.enums import AdmissionStatus, EvidenceClass, Phase, Quantity, UncertaintyKind, ValueKind
+from simulator.battery.enums import AdmissionStatus, EvidenceClass, NoticeKind, Phase, Quantity, UncertaintyKind, ValueKind
 from simulator.battery.identity import Identity, quantity_token
-from simulator.battery.records import Bench, Derivation, Located, Locator, Observation, Species, State, Uncertainty, Value
+from simulator.battery.records import Bench, Derivation, Located, Locator, Notice, Observation, Species, State, Uncertainty, Value, _is_source_internally_inconsistent
 from simulator.battery.waypoints import identity_composition_waypoint
 from simulator.physical_constants import GAS_CONSTANT
 
@@ -72,6 +73,38 @@ class SourceOxygenCondition:
     used_observations: frozenset[str]
 
 
+class SourceOxygenFallbackReason(StrEnum):
+    NO_PRINTED_CONDITION = "no_oxygen_condition_printed"
+    UNTYPED_LINEAGE = "lineage_untyped"
+    AMBIGUOUS = "several_candidates_survive"
+    SAMPLE_DERIVED = "derived_from_scored_sample_species"
+    SOURCE_INCONSISTENT = "source_inconsistent"
+
+
+@dataclass(frozen=True)
+class SourceOxygenFallback:
+    reason: SourceOxygenFallbackReason
+
+
+def source_oxygen_closure_notice(quantity: Quantity, row: Observation) -> Notice:
+    # Direct predictor calls have no sibling-source search. They can report
+    # untyped linkage, but cannot assert that a source printed no oxygen.
+    reason = SourceOxygenFallbackReason(
+        (row.provenance or {}).get(
+            "source_oxygen_fallback", SourceOxygenFallbackReason.UNTYPED_LINEAGE
+        )
+    )
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=(
+            "model assumption: vapour-only zero-storage closure; "
+            f"source_oxygen_fallback={reason.value}"
+        ),
+        origin="source oxygen selection",
+    )
+
+
 def _point_key(row: Observation) -> tuple | None:
     identity = row.identity
     if (
@@ -118,13 +151,32 @@ def resolve_source_oxygen(
     reference: Observation,
     observations: Iterable[Observation],
     bench: Bench | None,
-) -> SourceOxygenCondition | None:
+) -> SourceOxygenCondition | SourceOxygenFallback:
     """Select a unique printed condition using typed axes and gas ancestry."""
+    rows = tuple(observations)
+    oxygen_rows = [
+        row for row in rows
+        if row.source_id == reference.source_id
+        and row.experiment_id == reference.experiment_id
+        and quantity_token(row.identity) is Quantity.P_PARTIAL
+        and row.identity.species.formula in {"O", "O2"}
+    ]
     key = _point_key(reference)
+    inconsistent = [reference, *(
+        row for row in oxygen_rows if key is not None and _point_key(row) == key
+    )]
+    if any(
+        _is_source_internally_inconsistent(notice.kind, notice.reason)
+        for row in inconsistent for notice in row.notices
+    ):
+        return SourceOxygenFallback(SourceOxygenFallbackReason.SOURCE_INCONSISTENT)
     if key is None:
-        return None
+        return SourceOxygenFallback(
+            SourceOxygenFallbackReason.UNTYPED_LINEAGE if oxygen_rows
+            else SourceOxygenFallbackReason.NO_PRINTED_CONDITION
+        )
     point = {
-        row.observation_id: row for row in observations
+        row.observation_id: row for row in rows
         if quantity_token(row.identity) is Quantity.P_PARTIAL
         and row.source_id == reference.source_id and _point_key(row) == key
     }
@@ -139,6 +191,8 @@ def resolve_source_oxygen(
     } - cell_pair - {"O", "O2"}
     measured = []
     cell_oxygen = []
+    printed = 0
+    sample_derived = 0
     for row in point.values():
         formula = row.identity.species.formula
         if (
@@ -148,8 +202,12 @@ def resolve_source_oxygen(
             or not row.value.point.is_finite() or row.value.point <= 0
         ):
             continue
+        printed += 1
         ancestry = _lineage(row, point)
-        if ancestry is None or ancestry[0] & sample_species:
+        if ancestry is None:
+            continue
+        if ancestry[0] & sample_species:
+            sample_derived += 1
             continue
         gases, used = ancestry
         if formula == "O" and cell_pair and gases == cell_pair:
@@ -164,7 +222,18 @@ def resolve_source_oxygen(
             measured.append((row, used))
     candidates = measured or cell_oxygen
     if len(candidates) != 1:
-        return None
+        # Report the gate that prevented selection. Mixed untyped/sample
+        # failures are untyped, not "all sample-derived"; ambiguity means
+        # multiple independently eligible candidates, not raw column count.
+        if len(candidates) > 1:
+            reason = SourceOxygenFallbackReason.AMBIGUOUS
+        elif printed and sample_derived == printed:
+            reason = SourceOxygenFallbackReason.SAMPLE_DERIVED
+        elif printed or any(_point_key(row) in (None, key) for row in oxygen_rows):
+            reason = SourceOxygenFallbackReason.UNTYPED_LINEAGE
+        else:
+            reason = SourceOxygenFallbackReason.NO_PRINTED_CONDITION
+        return SourceOxygenFallback(reason)
     source, used = candidates[0]
     assumption = "" if measured else "; cell-metal activity as assumed by the source"
     # A printed O2 reduction downstream of the selected atomic-O observation
@@ -182,7 +251,7 @@ def resolve_source_oxygen(
             and ancestry[0] == cell_pair
         ]
         if len(molecular) > 1:
-            return None
+            return SourceOxygenFallback(SourceOxygenFallbackReason.AMBIGUOUS)
         if molecular:
             used = used | {molecular[0].observation_id}
             source = molecular[0]

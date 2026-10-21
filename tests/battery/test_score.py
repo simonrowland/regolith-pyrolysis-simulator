@@ -11049,7 +11049,10 @@ def test_unlinked_knudsen_row_keeps_closure_with_assumption_notice(monkeypatch) 
     assert not any(request.mode == battery.PO2_COMMANDED for request in requests)
     assert any(
         notice.kind is NoticeKind.INPUT_OMITTED
-        and notice.reason == "model assumption: vapour-only zero-storage closure"
+        and notice.reason == (
+            "model assumption: vapour-only zero-storage closure; "
+            "source_oxygen_fallback=lineage_untyped"
+        )
         for notice in prediction.notices
     )
 

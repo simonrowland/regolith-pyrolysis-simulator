@@ -76,11 +76,13 @@ from simulator.battery.identity import (
     quantity_token,
 )
 from simulator.battery.source_oxygen import (
+    SourceOxygenCondition,
     linked_source_pressure,
     oxygen_pressure_point,
     pressure_has_only_unit_conversion,
     printed_source_pressure,
     resolve_source_oxygen,
+    source_oxygen_closure_notice,
 )
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.battery.migrate import (
@@ -5340,9 +5342,7 @@ def predict_with_engine(
                 cell_material=modelled,
             )
             input_notices.append(
-                _omission_notice(
-                    quantity, "model assumption: vapour-only zero-storage closure"
-                )
+                source_oxygen_closure_notice(quantity, observation)
             )
     else:
         decision = _oxygen_input_request(
@@ -6878,7 +6878,7 @@ def compile_residual(
                 point_observations if point_observations is not None else context.observations.values(),
                 recorded,
             )
-            if oxygen is not None:
+            if isinstance(oxygen, SourceOxygenCondition):
                 if reference.observation_id in oxygen.used_observations:
                     return _refused(
                         RefusalReason.UNSUPPORTED,
@@ -6902,6 +6902,14 @@ def compile_residual(
                     provenance={
                         **(reference.provenance or {}),
                         "source_oxygen_condition": to_plain(oxygen.observation),
+                    },
+                )
+            else:
+                reference = replace(
+                    reference,
+                    provenance={
+                        **(reference.provenance or {}),
+                        "source_oxygen_fallback": oxygen.reason.value,
                     },
                 )
         predictor_kwargs: dict[str, object] = {
