@@ -51,6 +51,42 @@ STARTING = {
     "FUN2": {"MgO": "33.03", "Al2O3": "15.18", "SiO2": "38.39", "CaO": "13.40"},
 }
 
+EXPECTED_ISOTOPE_ROWS = {
+    ("mendybaev_2013_table1_isotope_delta_context", "FUN1-9"): (
+        "FUN1-9 | d26Mg(a)=33.18±0.14 | d25Mg(a)=16.93±0.07 | "
+        "d30Si(a)=18.70±0.70 | d29Si(a)=9.50±0.30"
+    ),
+    ("mendybaev_2013_table1_isotope_delta_context", "FUN2-1"): (
+        "FUN2-1 | d30Si(a)=9.20±0.13 | d29Si(a)=4.70±0.10"
+    ),
+    ("mendybaev_2013_table1_isotope_delta_context", "FUN2-8"): (
+        "FUN2-8 | d26Mg(b)=57.08±0.14 | d25Mg(b)=28.86±0.11 | "
+        "d30Si(a)=23.20±0.60 | d29Si(a)=11.90±0.20 | "
+        "d30Si(b)=22.17±0.46 | d29Si(b)=11.24±0.27 | d17O=21.27±0.11 "
+        "| d18O=41.91±0.18 | D17O=-0.55"
+    ),
+    ("mendybaev_2013_table1_isotope_delta_context", "FUN2-6"): (
+        "FUN2-6 | d26Mg(a)=81.37±0.05 | d25Mg(a)=40.92±0.03 | "
+        "d30Si(a)=29.20±2.00 | d29Si(a)=15.20±0.30"
+    ),
+    ("mendybaev_2013_table2_isotope_context", "FUN2-9"): (
+        "FUN2-9 | t=50 | f24Mg=0.082 | d26Mg*=80.88±0.31 | d25Mg=40.70±0.21 | "
+        "f28Si=0.266 | d30Si=27.76±0.09 | d29Si=14.19±0.09 | f16O=0.196"
+    ),
+}
+
+
+def _assert_isotope_context_rows(document) -> None:
+    context_ids = {context_id for context_id, _sample in EXPECTED_ISOTOPE_ROWS}
+    contexts = {
+        observation["observation_id"]: observation["values"]["rows_as_printed"]
+        for observation in document["species"]["FUN_CAIs"]["context"]
+        if observation["observation_id"] in context_ids
+    }
+    for (context_id, sample), expected_row in EXPECTED_ISOTOPE_ROWS.items():
+        row = next(row for row in contexts[context_id] if row.startswith(f"{sample} |"))
+        assert row == expected_row
+
 
 def _migrate(path: Path = EXTRACT):
     migrator = migrate_one_extract(ROOT, path, index={}, aliases={})
@@ -130,6 +166,7 @@ def test_mendybaev_table_1_residue_points_conditions_and_initial_charge_migrate(
     _assert_migrated_residue_points(result)
 
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_isotope_context_rows(document)
     marker_count = 0
     for oxide in OXIDES:
         observations = document["species"][oxide]["observations"]
@@ -142,6 +179,21 @@ def test_mendybaev_table_1_residue_points_conditions_and_initial_charge_migrate(
             assert "mass_loss_pct" not in initial
             marker_count += 1
     assert marker_count == 8
+
+
+def test_mendybaev_isotope_context_row_pins_fail_for_each_extract_mutation() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    for (context_id, sample), expected_row in EXPECTED_ISOTOPE_ROWS.items():
+        mutated_document = deepcopy(document)
+        rows = next(
+            observation["values"]["rows_as_printed"]
+            for observation in mutated_document["species"]["FUN_CAIs"]["context"]
+            if observation["observation_id"] == context_id
+        )
+        row_index = next(i for i, row in enumerate(rows) if row.startswith(f"{sample} |"))
+        rows[row_index] = expected_row.replace("±", "±1", 1)
+        with pytest.raises(AssertionError):
+            _assert_isotope_context_rows(mutated_document)
 
 
 def test_mendybaev_migrated_point_pins_fail_for_expected_or_extract_mutations(tmp_path: Path) -> None:
