@@ -161,6 +161,7 @@ class RefusalReason(StrEnum):
     )
     ENGINE_DOES_NOT_MODEL_SULFUR = "engine_does_not_model_sulfur"
     ENGINE_DOES_NOT_MODEL_CHLORIDE = "engine_does_not_model_chloride"
+    CAPACITY_DEFINITION_NOT_IMPLEMENTED = "capacity_definition_not_implemented"
 
 
 class CellMaterial(StrEnum):

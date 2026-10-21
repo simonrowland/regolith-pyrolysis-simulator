@@ -66,6 +66,11 @@ SULFIDE_EQUATION = (
     "log10 C_S = log10(wt% S) + 0.5 log10(pO2/pS2), Fincham and Richardson"
 )
 CHLORIDE_EQUATION = (
+    "C_Cl = (wt% Cl) * fO2**(1/4) / fCl2**(1/2), "
+    "charge-balanced; fugacity over 1 bar"
+)
+# The sulfide square-root ratio written on chloride. Not a chloride definition.
+SULFIDE_EXPONENT_ON_CHLORIDE = (
     "log10 C_Cl = log10(wt% Cl) + 0.5 log10(pO2/pCl2), printed definition"
 )
 T_C = 1400
@@ -522,12 +527,27 @@ def _with_bulk(observation):
 def _defining_log10_capacity(
     weight_percent: float, p_o2_pa: Decimal, p_anion_pa: Decimal
 ) -> Decimal:
-    """Sign-off capacity, evaluated with math rather than the scorer.
+    """Fincham-Richardson sulfide capacity, with math.sqrt not Decimal.sqrt.
 
-    C = (wt% solute) * (pO2 / pAnion) ** (1/2). The compared number is log10 C.
+    C_S = (wt% S) * (pO2 / pS2) ** (1/2). The compared number is log10 C_S.
     """
 
     capacity = weight_percent * math.sqrt(float(p_o2_pa) / float(p_anion_pa))
+    return Decimal(str(math.log10(capacity)))
+
+
+def _charge_balanced_log10_chloride(
+    weight_percent: float, p_o2_pa: Decimal, p_cl2_pa: Decimal
+) -> Decimal:
+    """Charge-balanced chloride capacity, with float powers not Decimal.sqrt.
+
+    C_Cl = (wt% Cl) * fO2**(1/4) / fCl2**(1/2). Fugacity is over 1 bar.
+    """
+
+    bar = 1e5
+    f_o2 = float(p_o2_pa) / bar
+    f_cl2 = float(p_cl2_pa) / bar
+    capacity = weight_percent * (f_o2 ** 0.25) / math.sqrt(f_cl2)
     return Decimal(str(math.log10(capacity)))
 
 
@@ -1041,9 +1061,11 @@ def test_capacity_scores_only_when_the_adapter_declares_the_solute(
         reference=Decimal("-1.2"),
     )
     sulfur_expected = _defining_log10_capacity(1.0, sulfur_oxygen, sulfur_anion)
-    chloride_expected = _defining_log10_capacity(1.0, chloride_oxygen, chloride_anion)
+    chloride_expected = _charge_balanced_log10_chloride(
+        1.0, chloride_oxygen, chloride_anion
+    )
     assert sulfur_expected == Decimal("1.0")
-    assert chloride_expected == Decimal("0.0")
+    assert chloride_expected == Decimal("1.0")
 
     scored = predict_with_engine(Engine.ALPHAMELTS, sulfur)
     assert scored.execution.state is ExecutionState.PRODUCED
@@ -1126,3 +1148,123 @@ def test_capacity_scores_only_when_the_adapter_declares_the_solute(
     assert any(
         RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE.value in key for key in census
     )
+
+
+def test_chloride_capacity_sanity_point_is_log10_one() -> None:
+    """1 wt% Cl at fO2 = fCl2 = 10 Pa is log10 C_Cl = 1. Same law, any spelling."""
+
+    from simulator.battery.score import (
+        _log10_printed_capacity,
+        _recognised_capacity_law,
+    )
+
+    spellings = (
+        CHLORIDE_EQUATION,
+        "log10 C_Cl = log10(wt% Cl) + (1/4) log10(fO2) - (1/2) log10(fCl2)",
+        "C_Cl = (wt% Cl) / sqrt(f(Cl2)) * f(O2)^(1/4), Thomas and Wood 2021 eq 2",
+        "C_Cl = (wt% Cl)·fO2^(1/4)/fCl2^(1/2)",
+        "C_Cl = (wt% Cl) * fO2**(0.25) / fCl2**(0.5)",
+    )
+    independent = _charge_balanced_log10_chloride(
+        1.0, Decimal("10"), Decimal("10")
+    )
+    assert independent == Decimal("1.0")
+    laws = []
+    for relation in spellings:
+        law = _recognised_capacity_law(Quantity.CHLORIDE_CAPACITY, relation)
+        assert law is not None
+        assert law.identity == "chloride_charge_balance"
+        scored = _log10_printed_capacity(
+            Decimal("1"), Decimal("10"), Decimal("10"), law
+        )
+        assert scored == independent
+        laws.append(law)
+    assert all(law is laws[0] for law in laws)
+    assert (
+        _recognised_capacity_law(
+            Quantity.CHLORIDE_CAPACITY, SULFIDE_EXPONENT_ON_CHLORIDE
+        )
+        is None
+    )
+    assert _recognised_capacity_law(Quantity.SULFIDE_CAPACITY, CHLORIDE_EQUATION) is None
+    sulfide = _recognised_capacity_law(Quantity.SULFIDE_CAPACITY, SULFIDE_EQUATION)
+    assert sulfide is not None
+    assert sulfide.identity == "fincham_richardson"
+    assert sulfide is not laws[0]
+
+
+def test_unknown_capacity_equation_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    monkeypatch.setattr(AlphaMELTSBackend, "models_dissolved_sulfur", True)
+    monkeypatch.setattr(ThermoEngineBackend, "models_dissolved_chloride", True)
+    calls: list[Engine] = []
+
+    def hook(
+        engine,
+        *,
+        temperature_C,
+        composition_kg,
+        fO2_log,
+        pressure_bar,
+        solute_fugacity_bar=None,
+        solute_fugacity_parameter=None,
+    ):
+        calls.append(engine)
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"S": 1.0, "Cl": 1.0}},
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    chloride_rows = (
+        SULFIDE_EXPONENT_ON_CHLORIDE,
+        "C_Cl = (wt% Cl) * fO2 / fCl2",
+        "log CCl = 1.601 + (4470 XCa) / T",
+    )
+    for relation in chloride_rows:
+        observation = _capacity_observation(
+            "unknown-ccl",
+            Quantity.CHLORIDE_CAPACITY,
+            "Cl",
+            fO2_Pa=Decimal("10"),
+            anion_key="pCl2_Pa",
+            anion_pa=Decimal("10"),
+            relation=relation,
+            reference=Decimal("-1.2"),
+        )
+        refused = predict_with_engine(Engine.THERMOENGINE, observation)
+        assert refused.value is None
+        assert refused.authority is Authority.REFUSED
+        assert refused.execution.state is ExecutionState.UNSUPPORTED
+        assert (
+            refused.refusal_reason
+            is RefusalReason.CAPACITY_DEFINITION_NOT_IMPLEMENTED
+        )
+        assert refused.refusal_detail["input"] == "defining_equation"
+        assert (
+            refused.refusal_detail["reason"]
+            == RefusalReason.CAPACITY_DEFINITION_NOT_IMPLEMENTED.value
+        )
+    sulfide = _capacity_observation(
+        "unknown-cs",
+        Quantity.SULFIDE_CAPACITY,
+        "S",
+        fO2_Pa=Decimal("10000"),
+        anion_key="pS2_Pa",
+        anion_pa=Decimal("100"),
+        relation="C_S = (wt% S) * fO2 / fS2",
+        reference=Decimal("-2.4"),
+    )
+    sulfide_refused = predict_with_engine(Engine.ALPHAMELTS, sulfide)
+    assert sulfide_refused.value is None
+    assert (
+        sulfide_refused.refusal_reason
+        is RefusalReason.CAPACITY_DEFINITION_NOT_IMPLEMENTED
+    )
+    assert calls == []

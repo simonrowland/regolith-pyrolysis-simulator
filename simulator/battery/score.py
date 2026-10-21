@@ -23,6 +23,7 @@ import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
+from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Iterable, Literal, Mapping, Sequence
@@ -4761,30 +4762,432 @@ def _printed_point_pa(observation: Observation, key: str) -> Decimal | None:
     return pa
 
 
+@dataclass(frozen=True)
+class _CapacityLaw:
+    """Recognised capacity rearrangement. Dispatch is on this identity.
+
+    C = (wt% solute) * fO2**oxygen_exponent / fAnion**anion_exponent.
+    bar_standard_state: those fugacities are over the 1 bar standard state.
+    When false, the ratio is dimensionless in any shared pressure unit.
+    """
+
+    identity: str
+    oxygen_exponent: Fraction
+    anion_exponent: Fraction
+    bar_standard_state: bool
+
+
+# Fincham–Richardson: 1/2 S2 + O2-(melt) = 1/2 O2 + S2-(melt).
+_FINCHAM_RICHARDSON = _CapacityLaw(
+    "fincham_richardson", Fraction(1, 2), Fraction(1, 2), False
+)
+# Charge balance: 1/2 Cl2 + 1/2 O^2- = Cl- + 1/4 O2. See _log10_printed_capacity.
+_CHLORIDE_CHARGE_BALANCE = _CapacityLaw(
+    "chloride_charge_balance", Fraction(1, 4), Fraction(1, 2), True
+)
+_CAPACITY_LAWS: dict[Quantity, _CapacityLaw] = {
+    Quantity.SULFIDE_CAPACITY: _FINCHAM_RICHARDSON,
+    Quantity.CHLORIDE_CAPACITY: _CHLORIDE_CHARGE_BALANCE,
+}
+
+_FUGACITY_SPECIES = re.compile(r"^(?:[pf])_?\(?((?:cl|o|s)2)\)?$")
+_WEIGHT_PERCENT_SOLUTE = re.compile(r"^wt%_?(s|cl)$")
+_CAPACITY_SYMBOL = re.compile(r"^c_?(s|cl)$")
+
+
+def _matching_paren(text: str, open_at: int) -> int | None:
+    if open_at < 0 or open_at >= len(text) or text[open_at] != "(":
+        return None
+    depth = 0
+    for index in range(open_at, len(text)):
+        char = text[index]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0:
+                return index
+    return None
+
+
+def _strip_wrapping_parens(token: str) -> str:
+    body = token
+    while (
+        body.startswith("(")
+        and body.endswith(")")
+        and _matching_paren(body, 0) == len(body) - 1
+    ):
+        body = body[1:-1]
+    return body
+
+
+def _fraction_token(token: str) -> Fraction | None:
+    body = _strip_wrapping_parens(token)
+    if not body or body[0] in "+-":
+        return None
+    try:
+        if "/" in body:
+            numerator, denominator = body.split("/", 1)
+            if not numerator.isdecimal() or not denominator.isdecimal():
+                return None
+            return Fraction(int(numerator), int(denominator))
+        if re.fullmatch(r"\d+(?:\.\d+)?", body) is None:
+            return None
+        return Fraction(body)
+    except (ValueError, ZeroDivisionError, ArithmeticError):
+        return None
+
+
+def _capacity_equation_text(relation: str) -> str | None:
+    """Equation body. A top-level comma or semicolon starts a citation note."""
+
+    depth = 0
+    cut = len(relation)
+    for index, char in enumerate(relation):
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth < 0:
+                return None
+        elif char in ",;" and depth == 0:
+            cut = index
+            break
+    if depth != 0 and cut == len(relation):
+        return None
+    text = relation[:cut]
+    text = (
+        text.replace("·", "*")
+        .replace("×", "*")
+        .replace("−", "-")
+        .replace("–", "-")
+        .replace("—", "-")
+    )
+    text = re.sub(r"\s+", "", text).casefold().replace("^", "**")
+    needle = "sqrt("
+    while True:
+        start = text.find(needle)
+        if start < 0:
+            return text or None
+        open_at = start + len(needle) - 1
+        close_at = _matching_paren(text, open_at)
+        if close_at is None:
+            return None
+        inner = text[open_at + 1 : close_at]
+        text = f"{text[:start]}({inner})**(1/2){text[close_at + 1 :]}"
+
+
+def _solute_of_capacity_symbol(lhs: str) -> str | None:
+    body = lhs[len("log10") :] if lhs.startswith("log10") else lhs
+    match = _CAPACITY_SYMBOL.fullmatch(_strip_wrapping_parens(body))
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _weight_percent_solute(token: str) -> str | None:
+    match = _WEIGHT_PERCENT_SOLUTE.fullmatch(_strip_wrapping_parens(token))
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _fugacity_species(token: str) -> str | None:
+    match = _FUGACITY_SPECIES.fullmatch(_strip_wrapping_parens(token))
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _ratio_parts(token: str) -> tuple[str, str] | None:
+    depth = 0
+    slash: int | None = None
+    for index, char in enumerate(token):
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth < 0:
+                return None
+        elif char == "/" and depth == 0:
+            if slash is not None:
+                return None
+            slash = index
+    if depth != 0 or slash is None or slash == 0 or slash == len(token) - 1:
+        return None
+    return token[:slash], token[slash + 1 :]
+
+
+def _apply_fugacity(
+    token: str,
+    exponent: Fraction,
+    solute: str,
+    oxygen: Fraction,
+    anion: Fraction,
+) -> tuple[Fraction, Fraction] | None:
+    species = _fugacity_species(token)
+    if species == "o2":
+        return oxygen + exponent, anion
+    if (species == "s2" and solute == "s") or (species == "cl2" and solute == "cl"):
+        return oxygen, anion + exponent
+    return None
+
+
+def _apply_gas_term(
+    argument: str,
+    exponent: Fraction,
+    solute: str,
+    oxygen: Fraction,
+    anion: Fraction,
+) -> tuple[Fraction, Fraction] | None:
+    stripped = _strip_wrapping_parens(argument)
+    if "/" not in stripped:
+        return _apply_fugacity(stripped, exponent, solute, oxygen, anion)
+    parts = _ratio_parts(stripped)
+    if parts is None:
+        return None
+    left, right = parts
+    step = _apply_fugacity(left, exponent, solute, oxygen, anion)
+    if step is None:
+        return None
+    oxygen, anion = step
+    return _apply_fugacity(right, -exponent, solute, oxygen, anion)
+
+
+def _capacity_exponents(
+    solute: str,
+    weight_solute: str | None,
+    weight_exponent: Fraction,
+    oxygen: Fraction,
+    anion: Fraction,
+) -> tuple[str, Fraction, Fraction] | None:
+    # anion is the signed power. A capacity has it in the denominator.
+    if weight_solute != solute or weight_exponent != 1 or oxygen <= 0 or anion >= 0:
+        return None
+    return solute, oxygen, -anion
+
+
+def _split_power(factor: str) -> tuple[str, Fraction] | None:
+    if "**" not in factor:
+        return factor, Fraction(1)
+    base, exponent, *rest = factor.split("**")
+    if rest or not base or not exponent:
+        return None
+    parsed = _fraction_token(exponent)
+    if parsed is None:
+        return None
+    return base, parsed
+
+
+def _split_product(expr: str) -> list[tuple[int, str]] | None:
+    if not expr:
+        return None
+    parts: list[tuple[int, str]] = []
+    buf: list[str] = []
+    depth = 0
+    sign = 1
+    index = 0
+    while index < len(expr):
+        char = expr[index]
+        if char == "(":
+            depth += 1
+            buf.append(char)
+        elif char == ")":
+            depth -= 1
+            if depth < 0:
+                return None
+            buf.append(char)
+        elif (
+            char == "*"
+            and depth == 0
+            and index + 1 < len(expr)
+            and expr[index + 1] == "*"
+        ):
+            buf.append("**")
+            index += 1
+        elif char in {"*", "/"} and depth == 0:
+            parts.append((sign, "".join(buf)))
+            buf = []
+            sign = 1 if char == "*" else -1
+        else:
+            buf.append(char)
+        index += 1
+    if depth != 0:
+        return None
+    parts.append((sign, "".join(buf)))
+    if any(not factor for _sign, factor in parts):
+        return None
+    return parts
+
+
+def _parse_product_capacity(
+    solute: str, rhs: str
+) -> tuple[str, Fraction, Fraction] | None:
+    factors = _split_product(rhs)
+    if factors is None:
+        return None
+    oxygen = Fraction(0)
+    anion = Fraction(0)
+    weight_solute: str | None = None
+    weight_exponent = Fraction(0)
+    for sign, factor in factors:
+        powered = _split_power(factor)
+        if powered is None:
+            return None
+        base, power = powered
+        exponent = Fraction(sign) * power
+        stripped = _strip_wrapping_parens(base)
+        weight = _weight_percent_solute(stripped)
+        if weight is not None:
+            if weight_solute is not None:
+                return None
+            weight_solute = weight
+            weight_exponent = exponent
+            continue
+        step = _apply_gas_term(stripped, exponent, solute, oxygen, anion)
+        if step is None:
+            return None
+        oxygen, anion = step
+    return _capacity_exponents(
+        solute, weight_solute, weight_exponent, oxygen, anion
+    )
+
+
+def _read_log_term(
+    text: str, index: int
+) -> tuple[Fraction, str, int] | None:
+    if index >= len(text) or text[index] not in "+-":
+        return None
+    sign = Fraction(1 if text[index] == "+" else -1)
+    index += 1
+    if index < len(text) and text[index] == "(":
+        close_at = _matching_paren(text, index)
+        if close_at is None:
+            return None
+        coeff = _fraction_token(text[index : close_at + 1])
+        index = close_at + 1
+    else:
+        fraction = re.match(r"(\d+)/(\d+)", text[index:])
+        decimal = re.match(r"\d+(?:\.\d+)?", text[index:])
+        if fraction is not None:
+            coeff = _fraction_token(fraction.group(0))
+            index += fraction.end()
+        elif decimal is not None:
+            coeff = _fraction_token(decimal.group(0))
+            index += decimal.end()
+        else:
+            return None
+    if coeff is None:
+        return None
+    if index < len(text) and text[index] == "*":
+        if index + 1 < len(text) and text[index + 1] == "*":
+            return None
+        index += 1
+    prefix = "log10("
+    if not text.startswith(prefix, index):
+        return None
+    open_at = index + len(prefix) - 1
+    close_at = _matching_paren(text, open_at)
+    if close_at is None:
+        return None
+    return sign * coeff, text[open_at + 1 : close_at], close_at + 1
+
+
+def _parse_log_capacity(
+    solute: str, rhs: str
+) -> tuple[str, Fraction, Fraction] | None:
+    prefix = "log10("
+    if not rhs.startswith(prefix):
+        return None
+    close_at = _matching_paren(rhs, len(prefix) - 1)
+    if close_at is None:
+        return None
+    weight = _weight_percent_solute(rhs[len(prefix) : close_at])
+    rest = rhs[close_at + 1 :]
+    if weight is None or not rest:
+        return None
+    oxygen = Fraction(0)
+    anion = Fraction(0)
+    index = 0
+    while index < len(rest):
+        term = _read_log_term(rest, index)
+        if term is None:
+            return None
+        coeff, argument, index = term
+        step = _apply_gas_term(argument, coeff, solute, oxygen, anion)
+        if step is None:
+            return None
+        oxygen, anion = step
+    return _capacity_exponents(solute, weight, Fraction(1), oxygen, anion)
+
+
+def _parse_printed_capacity(
+    relation: str,
+) -> tuple[str, Fraction, Fraction] | None:
+    """Exponents of one printed capacity equation, or None.
+
+    The result is (solute, oxygen_exponent, anion_exponent) for
+    C = (wt% solute) * fO2**oxygen / fAnion**anion. Citations are not read.
+    """
+
+    text = _capacity_equation_text(relation)
+    if text is None or text.count("=") != 1:
+        return None
+    lhs, rhs = text.split("=", 1)
+    solute = _solute_of_capacity_symbol(lhs)
+    if solute is None or not rhs:
+        return None
+    if lhs.startswith("log10"):
+        return _parse_log_capacity(solute, rhs)
+    return _parse_product_capacity(solute, rhs)
+
+
+def _recognised_capacity_law(
+    quantity: Quantity | None, relation: str
+) -> _CapacityLaw | None:
+    """Law whose exponent identity is the printed equation. Not a text search."""
+
+    parsed = _parse_printed_capacity(relation)
+    if parsed is None or quantity is None:
+        return None
+    solute, oxygen, anion = parsed
+    law = _CAPACITY_LAWS.get(quantity)
+    if law is None:
+        return None
+    expected = "s" if quantity is Quantity.SULFIDE_CAPACITY else "cl"
+    if solute != expected or oxygen != law.oxygen_exponent or anion != law.anion_exponent:
+        return None
+    return law
+
+
 def _log10_printed_capacity(
     weight_percent: Decimal,
     p_o2_pa: Decimal,
     p_anion_pa: Decimal,
+    law: _CapacityLaw,
 ) -> Decimal | None:
-    """log10 of C_S, or of the chloride analogue C_Cl.
+    """log10 of the printed capacity the row's defining equation names.
 
-    Premise: Fincham and Richardson define sulfide capacity from the
-    heterogeneous equilibrium 1/2 S2 + O2-(melt) = 1/2 O2 + S2-(melt).
-    The engine's predicted dissolved sulfur at the printed T, pO2, and
-    pS2 is the only sulfur number. The scorer does not add a capacity
-    model of its own. Chloride capacity is the same exponent with Cl
-    and pCl2 (physics sign-off 2026-10-21). The row stores the printed
-    log, so the compared number is log10 C.
+    The engine's dissolved amount is the only solute number. This is that
+    amount rearranged by the printed definition, not a second capacity model.
+    A non-positive weight percent has no logarithm and is refused. It is
+    not stored as zero.
 
-    Algebra: C = (wt% solute) * (pO2 / pAnion) ** (1/2)
-             log10 C = log10(wt% solute) + (1/2) log10(pO2 / pAnion)
-    Units: wt% is the engine phase-map weight percent. pO2 and pAnion
-    are both pascal, so the ratio is dimensionless and C carries wt%.
-    log10 C is dimensionless.
+    Sulfide, Fincham and Richardson. Equilibrium
+    1/2 S2 + O2-(melt) = 1/2 O2 + S2-(melt), so
+    C_S = (wt% S) * (fO2 / fS2) ** (1/2). The ratio is dimensionless in
+    any shared unit, so the printed pascal values are used as printed.
+    One weight percent at pO2 = 10000 Pa and pS2 = 100 Pa is log10 C_S = 1.
 
-    Limiting case: pO2 = pAnion gives C = wt% solute. One weight percent
-    at equal fugacities is log10 C = 0. A non-positive weight percent
-    has no logarithm and is refused. It is not stored as zero.
+    Chloride, charge balance. Equilibrium
+    1/2 Cl2(g) + 1/2 O^2-(melt) = Cl^-(melt) + 1/4 O2(g), so
+    K is proportional to x_Cl * fO2**(1/4) / (fCl2**(1/2) * a_O^2-**(1/2)).
+    Folding a_O^2- into the capacity gives
+    C_Cl = (wt% Cl) * fO2**(1/4) / fCl2**(1/2).
+    Fugacities are in bar, dimensionless over the 1 bar standard state.
+    Sanity: fO2 = fCl2 = 10 Pa = 1e-4 bar and 1 wt% Cl give
+    C_Cl = 1 * (1e-4)**(1/4) / (1e-4)**(1/2) = 0.1 / 0.01 = 10,
+    so log10 C_Cl = 1.
     """
 
     if (
@@ -4796,7 +5199,14 @@ def _log10_printed_capacity(
         or p_anion_pa <= 0
     ):
         return None
-    capacity = weight_percent * (p_o2_pa / p_anion_pa).sqrt()
+    if law is _FINCHAM_RICHARDSON:
+        capacity = weight_percent * (p_o2_pa / p_anion_pa).sqrt()
+    elif law is _CHLORIDE_CHARGE_BALANCE:
+        f_o2 = p_o2_pa / PA_PER_BAR_DEC
+        f_cl2 = p_anion_pa / PA_PER_BAR_DEC
+        capacity = weight_percent * f_o2.sqrt().sqrt() / f_cl2.sqrt()
+    else:
+        return None
     if not capacity.is_finite() or capacity <= 0:
         return None
     return Decimal(str(math.log10(float(capacity))))
@@ -5056,6 +5466,7 @@ def _predict_phase_row(
             execution=ExecutionState.NOT_PROBED,
         )
     anion_pa: Decimal | None = None
+    law: _CapacityLaw | None = None
     if solute is not None:
         relation = ""
         if observation.derivation is not None and observation.derivation.relation:
@@ -5065,6 +5476,16 @@ def _predict_phase_row(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {"reason": "missing_input", "input": "defining_equation"},
                 execution=ExecutionState.NOT_PROBED,
+            )
+        law = _recognised_capacity_law(quantity, relation)
+        if law is None:
+            return refused(
+                RefusalReason.CAPACITY_DEFINITION_NOT_IMPLEMENTED,
+                {
+                    "reason": RefusalReason.CAPACITY_DEFINITION_NOT_IMPLEMENTED.value,
+                    "input": "defining_equation",
+                    "quantity": quantity.value if quantity is not None else "",
+                },
             )
         anion_pa = _printed_point_pa(observation, solute.pressure_key)
         if anion_pa is None:
@@ -5155,10 +5576,10 @@ def _predict_phase_row(
             )
         predicted = Decimal(str(amount)) / Decimal(str(counter_amount))
     elif solute is not None:
-        assert anion_pa is not None
+        assert anion_pa is not None and law is not None
         p_o2_pa = as_decimal(identity.fO2_Pa.value)
         predicted = _log10_printed_capacity(
-            Decimal(str(amount)), p_o2_pa, anion_pa
+            Decimal(str(amount)), p_o2_pa, anion_pa, law
         )
         if predicted is None:
             return refused(
