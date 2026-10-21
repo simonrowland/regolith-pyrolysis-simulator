@@ -1455,7 +1455,7 @@ def _work_for_alias(src: str, works: Mapping[str, Work] | None) -> Work | None:
 # An unbound call recomputes. It does not remember a previous map, so
 # replacing an observation in the same dict cannot return the old ids.
 _BOUND_WORK_INPUTS: dict[
-    tuple[int, int], tuple[frozenset[str], dict[str, set[str]]]
+    tuple[int, int], tuple[frozenset[str], dict[str, set[str] | None]]
 ] = {}
 
 
@@ -1465,7 +1465,7 @@ def _inputs_for_work(
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
     obs_by_work: Mapping[str, tuple[Observation, ...]] | None = None,
-) -> set[str]:
+) -> set[str] | None:
     ids: set[str] = set()
     for asset in work.source_files.files:
         if asset.role is AssetRole.TABLE_CSV:
@@ -1484,8 +1484,11 @@ def _inputs_for_work(
     )
     for obs in grouped:
         nested = _observation_lineage(obs.observation_id, observations, table_ids)
-        if nested:
-            ids |= nested
+        if nested is None:
+            # One incomplete row makes the work alias incomplete. A table
+            # asset or a complete sibling must not hide that None.
+            return None
+        ids |= nested
     return ids
 
 
@@ -1494,7 +1497,7 @@ def _index_work_inputs(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
-) -> dict[str, set[str]]:
+) -> dict[str, set[str] | None]:
     obs_by_work: dict[str, list[Observation]] = {}
     if experiments:
         for obs in observations.values():
@@ -1540,12 +1543,13 @@ def _inputs_registered_under_work(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
-) -> set[str]:
+) -> set[str] | None:
     bound = _BOUND_WORK_INPUTS.get((id(observations), id(experiments)))
     if bound is not None and bound[0] == frozenset(table_ids):
-        found = bound[1].get(work.work_id)
-        if found is not None:
-            return found
+        found_map = bound[1]
+        if work.work_id in found_map:
+            # None is a stored incomplete expansion, not a missing entry.
+            return found_map[work.work_id]
     return _inputs_for_work(work, observations, experiments, table_ids)
 
 
@@ -1624,7 +1628,7 @@ def _resolve_coefficient_sources(
             expanded = _inputs_registered_under_work(
                 work, observations, experiments, table_ids
             )
-            if not expanded:
+            if expanded is None or not expanded:
                 return None
             resolved |= expanded
     return resolved

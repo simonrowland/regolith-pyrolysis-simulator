@@ -6328,6 +6328,296 @@ def test_mapped_coefficient_sources_decide_circularity() -> None:
     assert independent is SourceRelation.INDEPENDENT
 
 
+def _printed_unresolved_observation(
+    observation_id: str,
+    experiment_id: str,
+    *,
+    derived_from: tuple[str, ...],
+):
+    from simulator.battery.enums import RawInputStatus
+
+    return F.observation(
+        observation_id,
+        experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="lineage-source",
+        derived_from=derived_from,
+        derivation=Derivation(
+            relation="printed reduction",
+            inputs=(),
+            parameters=(),
+            output_unit="dimensionless",
+            raw_inputs=Located(
+                State.of(RawInputStatus.PRINTED_UNRESOLVED),
+                locator=F.loc(),
+            ),
+        ),
+    )
+
+
+def test_printed_unresolved_work_alias_stays_incomplete() -> None:
+    """b-979: a complete sibling or a table asset does not hide printed inputs."""
+
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        _inputs_for_work,
+        _inputs_registered_under_work,
+        _observation_lineage,
+        _resolve_coefficient_sources,
+        _table_ids,
+        bound_work_inputs,
+    )
+
+    work = replace(
+        F.work("lineage-work"),
+        source_ids=("lineage-work", "lineage-source"),
+    )
+    pdf, table = work.source_files.files
+    work = replace(
+        work,
+        source_files=replace(
+            work.source_files,
+            files=(
+                replace(pdf, asset_id="lineage-pdf"),
+                replace(table, asset_id="lineage-table"),
+            ),
+        ),
+    )
+    experiment = F.tabulation_experiment(
+        experiment_id="lineage-exp", work_id=work.work_id
+    )
+    sibling = F.observation(
+        "sibling-a",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="lineage-source",
+    )
+    printed = _printed_unresolved_observation(
+        "row-b",
+        experiment.experiment_id,
+        derived_from=(sibling.observation_id,),
+    )
+    printed_alone = _printed_unresolved_observation(
+        "row-b-alone",
+        experiment.experiment_id,
+        derived_from=(),
+    )
+    ref_work = replace(F.work("ref-work"), source_ids=("ref-work",))
+    ref_experiment = F.tabulation_experiment(
+        experiment_id="ref-exp", work_id=ref_work.work_id
+    )
+    reference = F.observation(
+        "ref-r",
+        ref_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="ref-work",
+    )
+    aliases = (
+        printed.observation_id,
+        work.work_id,
+        "lineage-source",
+        "lineage-pdf",
+    )
+    shapes = {
+        "sibling-and-table": (sibling, printed),
+        "table-only": (printed_alone,),
+    }
+    for _name, rows in shapes.items():
+        observations = {row.observation_id: row for row in rows}
+        observations[reference.observation_id] = reference
+        experiments = {
+            experiment.experiment_id: experiment,
+            ref_experiment.experiment_id: ref_experiment,
+        }
+        works = {work.work_id: work, ref_work.work_id: ref_work}
+        table_ids = _table_ids(works)
+
+        def assert_incomplete(alias: str) -> None:
+            assert (
+                _resolve_coefficient_sources(
+                    (alias,), observations, works, experiments
+                )
+                is None
+            )
+            assert (
+                lineage_complete_for(
+                    (alias,),
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is False
+            )
+            assert (
+                resolve_source_relation(
+                    reference,
+                    (alias,),
+                    True,
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is SourceRelation.UNKNOWN
+            )
+
+        shape_aliases = (
+            aliases
+            if _name == "sibling-and-table"
+            else (
+                printed_alone.observation_id,
+                work.work_id,
+                "lineage-source",
+                "lineage-pdf",
+            )
+        )
+        assert _inputs_for_work(work, observations, experiments, table_ids) is None
+        assert (
+            _inputs_registered_under_work(
+                work, observations, experiments, table_ids
+            )
+            is None
+        )
+        for alias in shape_aliases:
+            assert_incomplete(alias)
+        with bound_work_inputs(works, observations, experiments):
+            assert (
+                _inputs_registered_under_work(
+                    work, observations, experiments, table_ids
+                )
+                is None
+            )
+            for alias in shape_aliases:
+                assert_incomplete(alias)
+        if _name == "sibling-and-table":
+            assert (
+                _observation_lineage(sibling.observation_id, observations, table_ids)
+                is not None
+            )
+            assert (
+                _observation_lineage(printed.observation_id, observations, table_ids)
+                is None
+            )
+
+    complete_observations = {
+        sibling.observation_id: sibling,
+        reference.observation_id: reference,
+    }
+    complete_experiments = {
+        experiment.experiment_id: experiment,
+        ref_experiment.experiment_id: ref_experiment,
+    }
+    complete_works = {work.work_id: work, ref_work.work_id: ref_work}
+    assert lineage_complete_for(
+        (work.work_id,),
+        works=complete_works,
+        observations=complete_observations,
+        experiments=complete_experiments,
+    ) is True
+    assert (
+        resolve_source_relation(
+            reference,
+            (work.work_id,),
+            True,
+            works=complete_works,
+            observations=complete_observations,
+            experiments=complete_experiments,
+        )
+        is SourceRelation.INDEPENDENT
+    )
+
+
+def _fe_ratio_identity() -> Identity:
+    na = "fe redox ratio"
+    return replace(
+        F.activity_identity(
+            formula="FeO",
+            T_K=Decimal("1673"),
+            fO2_Pa=Decimal("1e-5"),
+            total_P=Decimal("100000"),
+        ),
+        quantity=Quantity.FE3_FE2_RATIO,
+        per=State.not_applicable(na),
+        reference_state=State.not_applicable(na),
+    )
+
+
+def _compile_redox(reference):
+    experiment = F.tabulation_experiment()
+    prediction = EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel="internal-analytical",
+        execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:redox"),
+        value=Decimal("0.4"),
+        unit=QUANTITY_UNITS[Quantity.FE3_FE2_RATIO],
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("nasa-cea-thermo",),
+        lineage_complete=True,
+        identity=reference.identity,
+    )
+    return compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference),
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+        derived_band=DecisionBand(Decimal("1"), "dimensionless", "test-dex"),
+    )
+
+
+def test_printed_unresolved_redox_reference_stays_unknown() -> None:
+    """b-979: the Fe redox attribution split does not promote an incomplete walk."""
+
+    from simulator.battery.enums import RawInputStatus
+
+    identity = _fe_ratio_identity()
+    printed = F.observation(
+        "redox-printed",
+        "exp-1",
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derived_from=(),
+        derivation=Derivation(
+            relation="printed redox reduction",
+            inputs=(),
+            parameters=(),
+            output_unit="dimensionless",
+            raw_inputs=Located(
+                State.of(RawInputStatus.PRINTED_UNRESOLVED),
+                locator=F.loc(),
+            ),
+        ),
+    )
+    residual, _candidate = _compile_redox(printed)
+    assert residual.source_relation is SourceRelation.UNKNOWN
+    assert residual.score_eligible is False
+    assert "source_relation_independent_complete_ancestry" in residual.exclusions
+
+    complete = F.observation(
+        "redox-complete",
+        "exp-1",
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    complete_residual, _candidate = _compile_redox(complete)
+    assert complete_residual.source_relation is SourceRelation.INDEPENDENT
+
+    calibration = replace(
+        complete,
+        observation_id="redox-calibration",
+        evidence=replace(complete.evidence, attribution="K&C88+; K&C91"),
+    )
+    calibration_residual, _candidate = _compile_redox(calibration)
+    assert calibration_residual.source_relation is SourceRelation.TRAINING
+
+
 def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     from simulator.battery.score import (
         ENGINE_COEFFICIENT_SOURCES,

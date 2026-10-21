@@ -6886,16 +6886,27 @@ def compile_residual(
         and engine is Engine.INTERNAL_ANALYTICAL
         and quantity is Quantity.FE3_FE2_RATIO
     ):
-        attribution = (
-            None
-            if reference.evidence is None
-            else reference.evidence.attribution
+        # The Kress citation does not resolve in the store, so a complete
+        # reference still arrives here as UNKNOWN. The attribution split
+        # applies only when that reference's own ancestry walk succeeds.
+        # A None walk (printed-unresolved, or any unresolvable parent)
+        # stays UNKNOWN.
+        reference_lineage = _observation_lineage(
+            relation_reference.observation_id,
+            context.observations,
+            _table_ids(context.works),
         )
-        source_relation = (
-            SourceRelation.TRAINING
-            if _kc91_calibration_source_overlap(attribution)
-            else SourceRelation.INDEPENDENT
-        )
+        if reference_lineage is not None:
+            attribution = (
+                None
+                if reference.evidence is None
+                else reference.evidence.attribution
+            )
+            source_relation = (
+                SourceRelation.TRAINING
+                if _kc91_calibration_source_overlap(attribution)
+                else SourceRelation.INDEPENDENT
+            )
     if (
         quantity in FUSION_QUANTITIES
         and prediction.engine is Engine.INTERNAL_ANALYTICAL
