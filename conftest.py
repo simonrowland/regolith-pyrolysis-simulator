@@ -297,9 +297,20 @@ def _fail_on_missing_docs_private_opens(session: pytest.Session) -> str | None:
         return None
     missing: set[tuple[str, str]] = set()
     for record_file in sorted(Path(audit_dir).glob("*.jsonl")):
-        for line in record_file.read_text(encoding="utf-8").splitlines():
-            record = json.loads(line)
-            missing.add((record["path"], record["nodeid"]))
+        with record_file.open(encoding="utf-8") as stream:
+            for line in stream:
+                try:
+                    record = json.loads(line)
+                    path = record["path"]
+                    nodeid = record["nodeid"]
+                    if not isinstance(path, str) or not isinstance(nodeid, str):
+                        raise TypeError("audit record fields must be strings")
+                except (json.JSONDecodeError, KeyError, TypeError):
+                    missing.add(
+                        (f"truncated audit record in {record_file.name}", "<audit log>")
+                    )
+                    continue
+                missing.add((path, nodeid))
     if not missing:
         return None
 
@@ -334,11 +345,8 @@ def pytest_sessionstart(session: pytest.Session) -> None:
         DOCS_PRIVATE_MANIFEST_STRICT_ENV in os.environ
         and not os.environ.get("PYTEST_XDIST_WORKER")
     ):
-        base_temp = getattr(session.config.option, "basetemp", None)
-        audit_parent = Path(base_temp) if base_temp else Path(tempfile.gettempdir())
-        audit_parent.mkdir(parents=True, exist_ok=True)
         _DOCS_PRIVATE_AUDIT_SESSION_DIR = Path(
-            tempfile.mkdtemp(prefix="docs-private-audit-", dir=audit_parent)
+            tempfile.mkdtemp(prefix="regolith-docs-private-audit-")
         )
         os.environ[DOCS_PRIVATE_AUDIT_DIR_ENV] = str(
             _DOCS_PRIVATE_AUDIT_SESSION_DIR
@@ -414,11 +422,13 @@ def pytest_sessionfinish(
     global _DOCS_PRIVATE_AUDIT_SESSION_DIR
     del exitstatus
     if not os.environ.get("PYTEST_XDIST_WORKER"):
-        _fail_on_missing_docs_private_opens(session)
-        if _DOCS_PRIVATE_AUDIT_SESSION_DIR is not None:
-            shutil.rmtree(_DOCS_PRIVATE_AUDIT_SESSION_DIR, ignore_errors=True)
-            _DOCS_PRIVATE_AUDIT_SESSION_DIR = None
-            os.environ.pop(DOCS_PRIVATE_AUDIT_DIR_ENV, None)
+        try:
+            _fail_on_missing_docs_private_opens(session)
+        finally:
+            if _DOCS_PRIVATE_AUDIT_SESSION_DIR is not None:
+                shutil.rmtree(_DOCS_PRIVATE_AUDIT_SESSION_DIR, ignore_errors=True)
+                _DOCS_PRIVATE_AUDIT_SESSION_DIR = None
+                os.environ.pop(DOCS_PRIVATE_AUDIT_DIR_ENV, None)
     # t-420: close warm engine pools before the b-093 watchdog disarms, so the
     # bounded-cleanup path still runs under session-safety supervision.
     # Drop the process-scoped VapoRock warm-boot cache first so its pools are

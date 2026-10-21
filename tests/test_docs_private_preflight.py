@@ -350,6 +350,8 @@ def test_strict_audit_fails_session_for_missing_docs_private_open(
             text=True,
         )
         assert worker.returncode == 0, worker.stderr
+        audit_dir = Path(os.environ[conftest.DOCS_PRIVATE_AUDIT_DIR_ENV])
+        (audit_dir / "truncated.jsonl").write_text('{"path":', encoding="utf-8")
 
         session = SimpleNamespace(
             exitstatus=pytest.ExitCode.OK,
@@ -362,6 +364,9 @@ def test_strict_audit_fails_session_for_missing_docs_private_open(
         """
     )
     audit_env = os.environ.copy()
+    for name in tuple(audit_env):
+        if name.startswith("PYTEST_XDIST_"):
+            audit_env.pop(name)
     audit_env[_STRICT_ENV] = "1"
     audit_env[project_conftest.DOCS_PRIVATE_AUDIT_DIR_ENV] = str(audit_dir)
     audit_env["TMPDIR"] = str(tmp_path)
@@ -380,6 +385,7 @@ def test_strict_audit_fails_session_for_missing_docs_private_open(
     assert "tests/example.py::test_controller_missing_private_open" in result.stderr
     assert "docs-private/worker-missing.yaml" in result.stderr
     assert "tests/example.py::test_worker_missing_private_open" in result.stderr
+    assert "truncated audit record in truncated.jsonl" in result.stderr
     assert "rerun scripts/derive_docs_private_inputs.py" in result.stderr.lower()
 
 
