@@ -975,3 +975,18 @@ def test_sc333_equipment_overhead_pipe_transport_numeric_pins():
     assert equipment_conductance.hex() == expected_conductance_hex
     assert overhead_conductance.hex() == expected_conductance_hex
     assert equipment_conductance == overhead_conductance
+
+
+@pytest.mark.parametrize("pressure_pa, capacity_hex, inverse_hex", [
+    (0.01, "0x1.851855052c012p-37", "0x1.ecaf5ffd033e9p-6"),
+    (0.1, "0x1.2ffb026c0a60fp-30", "0x1.ecf465ff9af32p-6"),
+    (10.0, "0x1.7311e874e2ab4p-17", "0x1.abb7f27b646a1p-4"),
+    (1000.0, "0x1.c4f75c42aeb21p-4", "0x1.40005ed1888aep+3"),
+])
+def test_t1396_pre_move_pipe_numeric_pin(pressure_pa, capacity_hex, inverse_hex):
+    """Bitwise relocation evidence captured on a4608882d, before changing physics."""
+    model = _make_model()
+    assert model._pipe_conductance(pressure_pa, 1500.0).hex() == capacity_hex
+    assert model._vapor_pressure_mbar_from_flux(
+        1e-6, 1500.0, p_downstream_bar=pressure_pa / 1e5,
+    ).hex() == inverse_hex
