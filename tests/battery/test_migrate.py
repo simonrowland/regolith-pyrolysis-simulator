@@ -941,6 +941,44 @@ def test_plante_1992_table2_activities_migrate_with_table1_ancestry(
     assert result.validation.hard_issues == ()
 
 
+def test_guo_2021_unregistered_reduction_inputs_stay_in_context(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "guo-2021-mgo-activity-cmas-slag.yaml", write=False
+    )
+    assert result.observations == {}
+    contexts = [
+        context
+        for rows in result.context_by_work.values()
+        for context in rows
+        if context.get("source_id") == "guo-2021-mgo-activity-cmas-slag"
+    ]
+    table5 = next(
+        context for context in contexts
+        if context["observation_id"] == "guo_2021_table5_mgo_activities_1873k"
+    )
+    values = table5["values"]
+    assert values["schema_gap"] == "t-1382 (table assets)"
+    assert values["temperature_K"] == "1873"
+    assert values["standard_state_as_printed"] == "relative to pure solid MgO"
+    assert values["uncertainty_as_printed"].startswith("No numeric uncertainty")
+    assert [point["activity"] for point in values["points"][:4]] == [
+        "0.4478", "0.5121", "0.5379", "0.6376"
+    ]
+    assert [point["composition_wt_pct"]["MgO"] for point in values["points"][:4]] == [
+        "9.26", "9.46", "9.51", "9.77"
+    ]
+    table6 = next(
+        context for context in contexts
+        if context["observation_id"] == "guo_2021_table6_mg_activity_coefficients_1873k"
+    )
+    assert table6["type"] == "model_output"
+    assert table6["values"]["points"][0]["gamma"] == "3.1713"
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+
 @pytest.mark.parametrize(
     ("inputs", "raw_inputs", "expected_path", "expected_detail"),
     [
