@@ -642,11 +642,11 @@ def _values_equal(
 
 
 def _path_is_observation_evidence(path: str) -> bool:
-    """True when a path-based sample pins observation values or equipment.
+    """True when a path-based sample pins observation or context evidence.
 
     Required shape::
 
-        species.<id>.observations[<obs_id|index>].(values|equipment)[....]
+        species.<id>.(observations|context)[<id|index>].(values|equipment)[....]
     """
     if not path or not isinstance(path, str):
         return False
@@ -656,7 +656,11 @@ def _path_is_observation_evidence(path: str) -> bool:
     if parts[0] != "species":
         return False
     obs_seg = _PATH_SEGMENT_RE.match(parts[2])
-    if not obs_seg or obs_seg.group(1) != "observations" or obs_seg.group(2) is None:
+    if (
+        not obs_seg
+        or obs_seg.group(1) not in ("observations", "context")
+        or obs_seg.group(2) is None
+    ):
         return False
     leaf_seg = _PATH_SEGMENT_RE.match(parts[3])
     if not leaf_seg:
@@ -1394,8 +1398,9 @@ def _check_fidelity_sample_shape(
     """Validate one fidelity sample's structure (path-based or structured).
 
     When ``enforce_observation_paths`` is True (non-allowlisted / new extracts),
-    path-based samples must pin under ``species.*.observations[...].(values|equipment)``
-    so metadata-only paths cannot satisfy the gate.
+        path-based samples must pin under
+        ``species.*.(observations|context)[...].(values|equipment)`` so
+        metadata-only paths cannot satisfy the gate.
     """
     path_keys, structured_keys = _sample_addressing_keys(sample)
     path = sample.get(path_keys[0]) if len(path_keys) == 1 else None
@@ -1418,8 +1423,8 @@ def _check_fidelity_sample_shape(
         if not _path_is_observation_evidence(str(path)):
             errors.append(
                 f"{sp}: path-based fidelity sample on new extracts must pin "
-                f"observation evidence "
-                f"(species.*.observations[id].(values|equipment)...); "
+                f"observation or context evidence "
+                f"(species.*.(observations|context)[id].(values|equipment)...); "
                 f"got path={path!r} (metadata-only paths refused)"
             )
     if "value" not in sample and "draft_value" not in sample:

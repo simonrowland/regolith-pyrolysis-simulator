@@ -2286,21 +2286,27 @@ def _repo_point_rows(filename: str) -> list[tuple[dict, dict]]:
 
 def test_sossi_na_inference_and_ceiling_never_recreate_alpha_range():
     """Na's disagreeing inference and adopted ceiling are not measured ranges."""
-    gamma = _repo_observation(
-        "kems-012-sossi-2019.yaml",
-        "sossi_2019_na_alpha_e_gamma_derived_range",
+    doc = load_cached_safe_yaml(
+        (EXTRACTS / "kems-012-sossi-2019.yaml").read_text(encoding="utf-8")
     )
-    adopted = _repo_observation(
-        "kems-012-sossi-2019.yaml",
-        "sossi_2019_na_alpha_e_authors_adopted_unity",
+    context = next(
+        row
+        for row in doc["species"]["Na"]["context"]
+        if row["observation_id"] == "sossi_2019_narrative_evaporation_model_inferences"
     )
+    rows = {
+        row["source_observation_id"]: row
+        for row in context["values"]
+    }
+    gamma = rows["sossi_2019_na_alpha_e_gamma_derived_range"]["values"]
+    adopted = rows["sossi_2019_na_alpha_e_authors_adopted_unity"]["values"]
 
-    assert "alpha_range" not in gamma["values"]
-    assert gamma["values"]["gamma_derived_alpha_e_inference_at_1400C"] == [0.3, 1.7]
-    assert gamma["values"]["consumer_policy"] == "report_only_not_executable_alpha_range"
-    assert adopted["values"]["alpha_authority_status"] == "analytical_upper_bound"
-    assert adopted["values"]["physical_alpha_upper_bound"] == 1.0
-    assert adopted["values"]["alpha"] == 1.0
+    assert "alpha_range" not in gamma
+    assert gamma["gamma_derived_alpha_e_inference_at_1400C"] == [0.3, 1.7]
+    assert gamma["consumer_policy"] == "report_only_not_executable_alpha_range"
+    assert adopted["alpha_authority_status"] == "analytical_upper_bound"
+    assert adopted["physical_alpha_upper_bound"] == 1.0
+    assert adopted["alpha"] == 1.0
 
 
 def test_wetzel_duplicate_is_typed_as_solid_film_growth():
@@ -3923,6 +3929,26 @@ def test_new_extract_metadata_only_path_sample_refused():
         check_fidelity_match=True,
     )
     assert any("observation evidence" in e or "metadata" in e for e in errs), errs
+
+
+def test_new_extract_context_value_path_sample_admitted():
+    doc = _minimal_extract()
+    doc["source_id"] = "context-source"
+    doc["species"]["Fe"]["context"] = [_context_row()]
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.context[0].values.furnace",
+            "value": "muffle",
+            "locator": {"page": 3, "section": "experimental"},
+        }
+    ]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="context-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert errs == [], errs
 
 
 def test_new_extract_mixed_metadata_path_and_structured_sample_refused():
