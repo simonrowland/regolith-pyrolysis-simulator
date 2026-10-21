@@ -399,7 +399,7 @@ class EquipmentDesigner:
         # Calculate actual conductance
         p_Pa = pressure_mbar * 100.0
         T_K = 1773.15  # 1500°C pipe temperature
-        from simulator.overhead import (
+        from simulator.transport_regime import (
             compressible_poiseuille_mass_flow,
             gas_dynamic_viscosity_Pa_s,
         )

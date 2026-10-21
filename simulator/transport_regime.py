@@ -37,6 +37,11 @@ from simulator.transport_constants import (
 GAS_CONSTANT_J_MOL_K = GAS_CONSTANT
 BOLTZMANN_CONSTANT_J_K = BOLTZMANN
 
+# Keep the runtime pipe law's historical six-significant-figure R, derived
+# from the physical-constants owner: rounding 8.31446261815324 to 5 decimal
+# places gives 8.31446 J/(mol K). The relocation must preserve float.hex pins.
+PIPE_GAS_CONSTANT_J_MOL_K = round(GAS_CONSTANT_J_MOL_K, 5)
+
 LONG_TUBE_L_OVER_D_MIN = 10.0
 
 FORMULA_FREE_MOLECULAR_APERTURE = "free_molecular_aperture_conductance"
@@ -61,6 +66,49 @@ MOLAR_MASSES_KG_PER_MOL: Mapping[str, float] = MappingProxyType(
         "H2O": 0.01801528,
     }
 )
+
+
+# DERIVATION: premise — steady isothermal ideal-gas flow keeps molar flow
+# constant while local volumetric flow varies as 1/P. Integrating circular
+# Poiseuille along the pipe gives pV throughput
+# π*d^4*(P1^2-P2^2)/(256*eta*L): the incompressible 128 denominator gains
+# the factor 2 from P1^2-P2^2 = 2*p_mean*(P1-P2). Dividing by R*T and
+# multiplying by molar mass M gives kg/s; units are
+# [m^4*Pa^2*kg/mol]/[(Pa*s)*m*(Pa*m^3/(mol*K))*K] = kg/s. Worked check:
+# d=0.08 m, L=2 m, T=1473.15 K, M(SiO)=0.0440845 kg/mol and m_dot=0.003
+# kg/s require P1=426.45 Pa against vacuum; the forward law returns
+# 0.003000 kg/s. Both capacity and pressure inversion use this one factor.
+COMPRESSIBLE_POISEUILLE_DENOMINATOR = 256.0  # dimensionless — integrated mean-pressure factor
+
+
+def gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
+    """Return the provisional N₂-like dynamic viscosity at temperature T_K."""
+    return 1.8e-5 * (T_K / 300.0) ** 0.7
+
+
+def compressible_poiseuille_mass_flow(
+    d: float,
+    L: float,
+    M_avg: float,
+    eta: float,
+    T_K: float,
+    p_upstream_Pa: float,
+    p_downstream_Pa: float,
+) -> float:
+    """Return compressible Poiseuille mass flow in kg/s."""
+    pressure_square_delta_Pa2 = max(
+        0.0,
+        p_upstream_Pa**2 - p_downstream_Pa**2,
+    )
+    numerator = math.pi * d**4 * M_avg * pressure_square_delta_Pa2
+    denominator = (
+        COMPRESSIBLE_POISEUILLE_DENOMINATOR
+        * eta
+        * L
+        * PIPE_GAS_CONSTANT_J_MOL_K
+        * T_K
+    )
+    return numerator / denominator
 
 
 class KnudsenRegime(str, Enum):
@@ -1010,3 +1058,28 @@ def carrier_mixture_mean_free_path(
         carriers=carriers,
         collision_diameter_source=COLLISION_DIAMETER_SOURCE,
     )
+
+
+def pipe_pressure_pa_for_mass_flow(d, L, M_avg, eta, T_K, F_kg_s, p_downstream_Pa):
+    """Invert the pipe mass-flow law; inputs are validated by the caller."""
+    numerator = (
+        COMPRESSIBLE_POISEUILLE_DENOMINATOR
+        * eta
+        * L
+        * PIPE_GAS_CONSTANT_J_MOL_K
+        * T_K
+        * F_kg_s
+    )
+    denominator = math.pi * M_avg * d**4
+    if denominator <= 0.0:
+        return 0.0
+    # F-112 inverse derivation:
+    # premise: F = C * (P_up^2 - P_down^2).
+    # algebra: P_up = sqrt(F / C + P_down^2).
+    # unit check: numerator/denominator is Pa^2, and P_down^2 is Pa^2.
+    # sanity: zero downstream reproduces the legacy sqrt(F/C); non-zero
+    # downstream raises the required upstream pressure for the same flow.
+    pressure_Pa = math.sqrt(  # Pa — upstream pressure from pressure-square balance
+        max(0.0, numerator / denominator + p_downstream_Pa**2)
+    )
+    return pressure_Pa
