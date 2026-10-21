@@ -30,6 +30,7 @@ else:
 
 from collections.abc import Iterator
 
+import json
 import os
 import re
 import shutil
@@ -152,11 +153,73 @@ if os.environ.get("REGOLITH_VAPOROCK_SESSION_WARM") is None:
 
 
 _SESSION_WATCHDOG: SessionWatchdog | None = None
+DOCS_PRIVATE_MANIFEST_STRICT_ENV = "REGOLITH_DOCS_PRIVATE_MANIFEST_STRICT"
+
+
+def _preflight_docs_private_inputs(repo_root: Path, manifest_path: Path) -> None:
+    if DOCS_PRIVATE_MANIFEST_STRICT_ENV not in os.environ:
+        return
+
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise pytest.UsageError(
+            f"{DOCS_PRIVATE_MANIFEST_STRICT_ENV} is set, but cannot read "
+            f"docs-private input manifest {manifest_path}: {exc}"
+        ) from exc
+
+    missing: list[str] = []
+    for entry in manifest["entries"]:
+        kind = entry["kind"]
+        path = entry["path"]
+        reader = entry["reader"]
+        input_path = repo_root / path
+        if kind == "file":
+            if not input_path.is_file():
+                missing.append(f"{path} (read by {reader})")
+        elif kind == "directory":
+            if not input_path.is_dir():
+                missing.append(f"{path} (read by {reader})")
+        elif kind == "glob":
+            required = entry["required"]
+            if not required:
+                missing.append(f"{path} (no required named files; read by {reader})")
+                continue
+            matched = {
+                match.relative_to(repo_root).as_posix()
+                for match in repo_root.glob(path)
+            }
+            for required_entry in required:
+                required_path = required_entry["path"]
+                required_reader = required_entry["reader"]
+                if required_path not in matched or not (
+                    repo_root / required_path
+                ).is_file():
+                    missing.append(
+                        f"{required_path} (required by glob {path}; "
+                        f"read by {required_reader})"
+                    )
+        else:
+            raise pytest.UsageError(
+                f"invalid docs-private input kind {kind!r} for {path!r} "
+                f"in {manifest_path}"
+            )
+
+    if missing:
+        details = "\n".join(f"  - {item}" for item in missing)
+        raise pytest.UsageError(
+            f"{DOCS_PRIVATE_MANIFEST_STRICT_ENV} is set, but required docs-private "
+            f"inputs are missing or unmatched:\n{details}"
+        )
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionstart(session: pytest.Session) -> None:
-    del session
+    repo_root = Path(session.config.rootpath)
+    _preflight_docs_private_inputs(
+        repo_root,
+        repo_root / "tests" / "docs_private_inputs.json",
+    )
     if os.environ.get("PYTEST_XDIST_WORKER"):
         return
     global _SESSION_WATCHDOG
