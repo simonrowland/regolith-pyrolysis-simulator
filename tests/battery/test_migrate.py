@@ -9832,9 +9832,16 @@ def test_registered_unknown_placeholder_resolves_as_lineage(tmp_path: Path) -> N
     )
 
 
-def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
+def test_measured_reduced_derivation_printed_input_is_kept_and_flagged(
     tmp_path: Path,
 ) -> None:
+    """b-979: printed derivation inputs stay on the record.
+
+    This used to be test_measured_reduced_derivation_prose_input_is_queued_not_pointed.
+    That test required a prose queue entry and forbade referential_integrity.
+    It pinned the silent drop: the input left the derivation and was only queued.
+    """
+
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     raw = extract["species"]["Na"]["observations"][0]
     raw["values"]["method_class"] = "measured_reduced"
@@ -9854,22 +9861,29 @@ def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
         if obs.observation_id.startswith("fixture-source::na_psat::T=1200.0")
     )
     assert observation.derived_from is None
-    queued = [
-        entry
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == (
+        "Table 2 DSC Cp points",
+        "Table 3 drop-calorimetric heat contents",
+    )
+    assert observation.locator
+    assert not any(
+        "Table 2 DSC Cp points" in (entry.why or "")
+        and "never minted" in (entry.why or "")
         for entry in result.queue
-        if entry.observation_id == observation.observation_id
-        and "Table 2 DSC Cp points" in (entry.why or "")
-    ]
-    assert len(queued) == 1
-    assert queued[0].axes == ["derived_from"]
-    assert queued[0].locator
+    )
     report = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )
-    assert not any(
-        issue.path.startswith(f"observation[{observation.observation_id}].")
-        and issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    flagged = {
+        issue.detail
         for issue in report.hard_issues
+        if issue.path.startswith(f"observation[{observation.observation_id}].")
+        and issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    }
+    assert any("Table 2 DSC Cp points" in detail for detail in flagged)
+    assert any(
+        "Table 3 drop-calorimetric heat contents" in detail for detail in flagged
     )
 
 
