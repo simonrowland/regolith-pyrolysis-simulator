@@ -1228,7 +1228,7 @@ def test_stolyarova_1991_w_cell_pressure_and_residual_report() -> None:
         assert len(point_rows) == 1, x_sio2
 
 
-def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_regime_flagged(tmp_path: Path, monkeypatch) -> None:
+def test_stolyarova_typed_w_cell_scores_at_source_oxygen_and_flags_uncalibrated_regime(tmp_path: Path, monkeypatch) -> None:
     # d-216 commands linked source oxygen; other typed W rows retain the
     # labelled closure. Neither route may restore the reactive-cell refusal.
 
@@ -1356,6 +1356,11 @@ def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_
                 assert fallback[0].reason.startswith(prefix)
                 assert SourceOxygenFallbackReason(fallback[0].reason.removeprefix(prefix))
     assert linked_seen > 0 and closure_seen > 0 and anchor_seen > 0
+    assert all(
+        residual.refusal is None
+        or residual.refusal.detail.get("reason") != "reactive_cell_oxygen_reservoir"
+        for residual in residuals
+    )
     report = []
     for engine in engines:
         bucket = [
