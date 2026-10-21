@@ -19,6 +19,25 @@ extraction:
   date: '2026-10-20'
   worker: fam24-1020
 review_status: draft
+fidelity_samples:
+  - path: species.MgTi2O5.observations[he2017_table5_standard_entropy_x014].values.entropy
+    value: 132.4
+    note: Table 5 row 1 experimental S_total; asset table-5.csv column S_total_J_mol-1_K-1_as_printed
+    locator:
+      page: 15
+      published_page: 15
+      pdf_page_index: 14
+      table: '5'
+      row: '1'
+  - path: species.MgTi2O5.observations[he2017_table5_standard_entropy_x037].values.entropy
+    value: 142.8
+    note: Table 5 row 2 experimental S_total; asset table-5.csv column S_total_J_mol-1_K-1_as_printed
+    locator:
+      page: 15
+      published_page: 15
+      pdf_page_index: 14
+      table: '5'
+      row: '2'
 scope_assessment:
   tables:
     - table: '1'
@@ -45,20 +64,99 @@ scope_assessment:
         Elastic stiffness coefficients and the DFT bulk modulus have no matching
         quantity token; the paper labels the table as theory.
     - table: '5'
-      disposition: context-measured-lineage-pending
+      disposition: measured-reduced-table-rows
       reason: >-
-        Table 5 totals remain in context because the component values have no
-        distinct Quantity token. derivation pending a corpus table asset
-        (controller, t-1382); 126.1 is the X=0 extrapolation of the experimental
-        S° totals, each of which is Svib plus Sconfig from equation (1), and is
-        not a calorimetric standard entropy of ordered MgTi2O5.
+        The two experimental S° totals are measured-reduced values, each the
+        printed sum of Svib and Sconfig under equation (1). The 126.1 X=0
+        extrapolation remains context; it is not a calorimetric standard
+        entropy of ordered MgTi2O5.
   figure_only_candidate: >-
     Figure 10 contains measured Cp points, but figure digitization is deferred
     by the family rule. Figures 11–12 are calculated or reduced curves and
     remain unscored context.
 species:
   MgTi2O5:
-    observations: []
+    observations:
+      - observation_id: he2017_table5_standard_entropy_x014
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 15
+          published_page: 15
+          pdf_page_index: 14
+          table: '5'
+          row: '1'
+          column: S_total_J_mol-1_K-1_as_printed
+          note: Experimental X = 0.14(1) total entropy
+        phase: cr
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '298'}
+            locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '5', row: '1'}
+        units: J/mol K
+        uncertainty: {reported_status: printed, value: '0.4'}
+        derived_from:
+          - tables:he-2017-karrooite-ordering-heat-capacity
+        derivation:
+          relation: >-
+            The printed total is S° = S°vib + S°config; Eq. (1), p. 16, gives
+            S_config. Table 5 row 1 reports the experimental vibrational and
+            configurational entropy inputs and total in columns
+            S_vib_J_mol-1_K-1_as_printed, S_config_J_mol-1_K-1_as_printed, and
+            S_total_J_mol-1_K-1_as_printed of table-5.csv.
+          inputs:
+            - tables:he-2017-karrooite-ordering-heat-capacity
+          page: 16
+        values:
+          quantity: S
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          species: MgTi2O5
+          T_K: 298
+          sample_state_as_printed: 'X = 0.14(1), Exp.'
+          entropy: 132.4
+          S_as_printed: '132.4(4)'
+          components_as_printed: {S_vib: '124.8(1)', S_config: '7.6(4)'}
+      - observation_id: he2017_table5_standard_entropy_x037
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 15
+          published_page: 15
+          pdf_page_index: 14
+          table: '5'
+          row: '2'
+          column: S_total_J_mol-1_K-1_as_printed
+          note: Experimental X = 0.37(1) total entropy
+        phase: cr
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '298'}
+            locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '5', row: '2'}
+        units: J/mol K
+        uncertainty: {reported_status: printed, value: '0.2'}
+        derived_from:
+          - tables:he-2017-karrooite-ordering-heat-capacity
+        derivation:
+          relation: >-
+            The printed total is S° = S°vib + S°config; Eq. (1), p. 16, gives
+            S_config. Table 5 row 2 reports the experimental vibrational and
+            configurational entropy inputs and total in columns
+            S_vib_J_mol-1_K-1_as_printed, S_config_J_mol-1_K-1_as_printed, and
+            S_total_J_mol-1_K-1_as_printed of table-5.csv.
+          inputs:
+            - tables:he-2017-karrooite-ordering-heat-capacity
+          page: 16
+        values:
+          quantity: S
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          species: MgTi2O5
+          T_K: 298
+          sample_state_as_printed: 'X = 0.37(1), Exp.'
+          entropy: 142.8
+          S_as_printed: '142.8(2)'
+          components_as_printed: {S_vib: '129.4(1)', S_config: '13.4(2)'}
     context:
       - observation_id: he2017_table1_synthesis_and_refinement
         type: table_record
@@ -238,34 +336,6 @@ species:
             - >-
               X=0 values are DFT or model results, not measurements; kept here
               as context and not admitted as observations.
-            - >-
-              The two experimental S_total rows are pending TABLE_CSV lineage
-              registration; the controller directs context parking under
-              ruling t-1382.
-
-      - observation_id: he2017_table5_standard_entropy_pending_asset
-        type: table_record
-        locator:
-          page: 15
-          published_page: 15
-          pdf_page_index: 14
-          table: '5'
-        units: J mol−1 K−1 per mole of formula unit
-        values:
-          quantity: S
-          candidate_token: standard entropy
-          method_class: measured_reduced
-          species: MgTi2O5
-          phase: crystalline MgTi2O5
-          T_K: 298
-          rows_as_printed:
-            - {sample_state: 'X = 0.14(1), Exp.', S_vib_as_printed: '124.8(1)', S_config_as_printed: '7.6(4)', S_total_as_printed: '132.4(4)'}
-            - {sample_state: 'X = 0.37(1), Exp.', S_vib_as_printed: '129.4(1)', S_config_as_printed: '13.4(2)', S_total_as_printed: '142.8(2)'}
-          capture_note: >-
-            derivation pending a corpus table asset (controller, t-1382); 126.1
-            is the X=0 extrapolation of the experimental S° totals, each of
-            which is Svib plus Sconfig from equation (1), and is not a
-            calorimetric standard entropy of ordered MgTi2O5.
 
       - observation_id: he2017_prose_vibrational_entropy_difference
         type: table_record
