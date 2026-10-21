@@ -15,6 +15,7 @@ import yaml
 
 from tests.literature_extract_test_helpers import iter_locators
 from simulator.battery.migrate import Migrator, load_index
+from data.literature.build_index import corpus_pointers, sha256_file
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -201,13 +202,19 @@ def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
     index = load_index()
     index[SOURCE_ID] = {
         "source_id": SOURCE_ID,
-        "corpus": {
-            "commit": "c607a766",
-            "tables": {
-                "path": f"tables/{SOURCE_ID}",
-                "exists": True,
-            },
-        },
+        "corpus": corpus_pointers(
+            CORPUS_ROOT,
+            SOURCE_ID,
+            sha256_file(PDF) if PDF.is_file() else None,
+            EXTRACT,
+            "c607a766",
+            extract_doc=_document(),
+        ),
+    }
+    assert index[SOURCE_ID]["corpus"]["tables"] == {
+        "path": f"tables/{SOURCE_ID}",
+        "exists": True,
+        "file_count": 2,
     }
     migrator = Migrator(root=ROOT, index=index, aliases={})
     migrator._migrate_extract(EXTRACT)
@@ -225,11 +232,24 @@ def test_isolated_migration_types_both_experimental_entropy_rows() -> None:
     table_totals = _table5_total_entropies()
     assert by_id["he2017_table5_standard_entropy_x014"].value.point == table_totals[0]
     assert by_id["he2017_table5_standard_entropy_x037"].value.point == table_totals[1]
-    assert all(observation.identity.temperature_K.value == 298 for observation in observations.values())
+    expected_parent = (f"tables:{SOURCE_ID}",)
     assert all(
-        observation.read_from == f"tables:{SOURCE_ID}"
+        observation.derived_from == expected_parent
         for observation in observations.values()
     )
+    assert all(
+        observation.derivation.inputs == expected_parent
+        for observation in observations.values()
+    )
+    assert all(
+        observation.identity.temperature_K.value == 298
+        for observation in observations.values()
+    )
+    if index[SOURCE_ID]["corpus"]["raw"]["present"]:
+        assert all(
+            observation.read_from == f"pdf:{SOURCE_ID}"
+            for observation in observations.values()
+        )
 
 
 def test_all_locators_match_physical_pdf_pages() -> None:
