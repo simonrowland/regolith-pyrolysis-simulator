@@ -19,6 +19,9 @@ def test_context_tables_and_deferred_capacity_figures(tmp_path: Path) -> None:
     species = source["species"]["MnO"]
     assert species["observations"] == []
     table1, table2 = species["context"][:2]
+    assert table1["values"]["oxygen_partial_pressure_as_printed"] == "around 1.22 × 10^-16 atm under CO"
+    assert table1["values"]["oxygen_partial_pressure_determined_as_printed"] == "1.21 × 10^-16 atm at 1773 K"
+    assert table1["values"]["carbon_monoxide_partial_pressure_as_printed"] == "pCO = 0.83 atm"
     rows1 = [line for line in table1["values"]["table_values_as_printed"].splitlines() if line.strip().split()[:1] and line.strip().split()[0].isdigit()]
     rows2 = [line for line in table2["values"]["table_values_as_printed"].splitlines() if line.strip().split()[:1] and line.strip().split()[0].isdigit()]
     assert len(rows1) == len(rows2) == 16
