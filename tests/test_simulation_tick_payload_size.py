@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import replace
 from pathlib import Path
+import subprocess
 from types import SimpleNamespace
 
 import pytest
@@ -31,6 +33,33 @@ _ROOT = Path(__file__).resolve().parents[1]
 
 def _nbytes(obj) -> int:
     return len(json.dumps(obj, default=str))
+
+
+def _client_tick_result(
+    ticks: list[dict[str, object]],
+    history_response: dict[str, object] | None = None,
+    tick_during_history_fetch: dict[str, object] | None = None,
+) -> dict:
+    harness = _ROOT / "tests/fixtures/web_render/render_simulator_socket_dom.mjs"
+    completed = subprocess.run(
+        ["node", str(harness)],
+        input=json.dumps({
+            "socket_script_path": str(_ROOT / "web/static/js/simulator-socket.js"),
+            "decisions_script_path": str(_ROOT / "web/static/js/simulator-decisions.js"),
+            "simulation_ticks": ticks,
+            "simulation_history_response": history_response,
+            "simulation_tick_during_history_fetch": tick_during_history_fetch,
+            "defer_simulation_history_response": (
+                tick_during_history_fetch is not None
+            ),
+        }),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return json.loads(completed.stdout)
 
 
 def _force_internal_analytical(monkeypatch) -> list:
@@ -107,9 +136,9 @@ def _assert_hourly_payload_slope_is_bounded(
     # check still rejects a monotonic climb far too gentle to reach this bound
     # (1 byte/hour), and this bound catches a steep trend the interval check
     # excuses. See SAWTOOTH_SLOPE_BYTES_PER_HOUR for the calibration.
-    assert slope < SAWTOOTH_SLOPE_BYTES_PER_HOUR, (
+    assert abs(slope) < SAWTOOTH_SLOPE_BYTES_PER_HOUR, (
         f"{event} payload grew {slope:.1f} bytes/hour "
-        f"(sawtooth bound {SAWTOOTH_SLOPE_BYTES_PER_HOUR}); samples={ordered}"
+        f"(absolute bound {SAWTOOTH_SLOPE_BYTES_PER_HOUR}); samples={ordered}"
     )
     assert not all(interval_slope > 0.0 for interval_slope in interval_slopes), (
         f"{event} payload grew {slope:.1f} bytes/hour; samples={ordered}"
@@ -130,6 +159,12 @@ def test_hourly_payload_gate_rejects_smallest_sustained_growth_and_allows_jitter
         _assert_hourly_payload_slope_is_bounded(
             "counterfactual",
             [(hour, 10_000 + hour) for hour in range(1, 7)],
+        )
+
+    with pytest.raises(AssertionError, match="grew -1000.0 bytes/hour"):
+        _assert_hourly_payload_slope_is_bounded(
+            "counterfactual",
+            [(hour, 10_000 - 1_000 * hour) for hour in range(1, 7)],
         )
 
     _assert_hourly_payload_slope_is_bounded(
@@ -153,9 +188,32 @@ def test_advisory_js_fetches_on_demand_full_records() -> None:
     assert "appendOnDemandAdvisoryDetail(" in source
     assert "renderVapourRailInstrumentationPanel(" in source
     assert "renderCondensationRefusalsPanel(" in source
+    assert "renderWallRiskPanel(data.wall_risk_panel)" in source
+    assert "'wall_risk_panel'" in source
+    socket_source = (_ROOT / "web/static/js/simulator-socket.js").read_text(
+        encoding="utf-8"
+    )
+    assert "SIMULATION_TICK_PAYLOAD_VERSION = 4" in socket_source
+    assert "per_hour_summary_delta" in socket_source
+    assert "fetchSimulationHistory" in socket_source
+    assert "/api/simulation-history" in socket_source
     html = (_ROOT / "web/templates/simulator.html").read_text(encoding="utf-8")
     assert 'id="vapour-rail-instrumentation-panel"' in html
     assert 'id="condensation-refusals-panel"' in html
+
+
+def test_rendered_simulator_references_versioned_javascript_assets() -> None:
+    app = app_module.create_app()
+    rendered = app.test_client().get("/").get_data(as_text=True)
+    script_urls = re.findall(
+        r'<script src="([^"]*simulator-[^"]+\.js[^"]*)"></script>',
+        rendered,
+    )
+    assert script_urls
+    assert all(
+        f"?v={web_events.SIMULATION_TICK_PAYLOAD_VERSION}" in url
+        for url in script_urls
+    ), script_urls
 
 
 def test_advisory_panel_detail_http_requires_browser_session() -> None:
@@ -170,6 +228,13 @@ def test_advisory_panel_detail_http_requires_browser_session() -> None:
         "/api/advisory-panel-detail?panel=condensation_refusals_panel"
     )
     assert no_run.status_code == 404
+    assert client.get("/api/simulation-history").status_code == 404
+
+
+def test_simulation_history_requires_browser_session() -> None:
+    app = app_module.create_app()
+    client = app.test_client()
+    assert client.get("/api/simulation-history").status_code == 400
 
 
 def test_condensation_refusals_tick_panel_keeps_counts_without_nested_blobs():
@@ -275,16 +340,14 @@ def test_vapour_rail_tick_panel_keeps_channel_index_without_full_answers():
     assert _nbytes(panel["channels_by_species"]) < 400
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="b-793: per-hour payload still grows with the species set",
-)
 def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
     captured_tasks = _force_internal_analytical(monkeypatch)
     original_drive_session = web_events.drive_session
     original_emit = app_module.socketio.emit
     tick_samples: list[tuple[int, int]] = []
+    tick_payloads: list[dict[str, object]] = []
     wire_samples: list[tuple[str, int | None, int, str]] = []
+    per_hour_deltas: list[dict[str, object]] = []
     mismatches: list[str] = []
 
     def drive_with_large_hourly_diagnostics(*args, **kwargs):
@@ -325,12 +388,23 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             wire_samples.append((event, hour, len(serialized), serialized))
         if event == "simulation_tick" and isinstance(payload, dict):
             emitted = dict(payload)
+            assert emitted.get("payload_version") == 4
+            assert emitted["wall_risk_panel"].get("tick_view") == "compact"
+            assert "zones" not in emitted["wall_risk_panel"]
+            assert "stage_purity_report" not in emitted
+            assert emitted["per_hour_summary_delta"]["hour"] == emitted["hour"]
             tick_samples.append((int(emitted["hour"]), _nbytes(emitted)))
+            tick_payloads.append(emitted)
             sid = kwargs.get("room")
             state = _simulations.get(sid)
             sim = state["session"].simulator if state else None
             if sim is not None:
                 _assert_tick_preserves_vr_totals(emitted, sim, mismatches)
+        if event == "per_hour_summary" and isinstance(payload, dict):
+            per_hour_deltas.append({
+                key: value for key, value in payload.items()
+                if key != "run_id"
+            })
         if event == "per_hour_summary" and isinstance(payload, dict):
             sid = kwargs.get("room")
             state = _simulations.get(sid)
@@ -356,6 +430,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             "start_simulation",
             {
                 "backend": "internal-analytical",
+                "payload_version": 4,
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -379,15 +454,23 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         assert len(tick_samples) >= 12, tick_samples
         for event, hour, size, _serialized in wire_samples:
             assert size < 120_000, (event, hour, size)
+        tick_hourly = [
+            (hour, size)
+            for name, hour, size, _serialized in wire_samples
+            if name == "simulation_tick" and hour is not None
+        ][:12]
+        tick_tail = tick_hourly[4:12]
+        summary_hourly = [
+            (hour, size)
+            for name, hour, size, _serialized in wire_samples
+            if name == "per_hour_summary" and hour is not None
+        ][:12]
+        _assert_hourly_payload_slope_is_bounded(
+            "per_hour_summary", summary_hourly[4:12]
+        )
+        _assert_hourly_payload_slope_is_bounded("simulation_tick", tick_tail)
         stable_tail = [size for _hour, size in tick_samples[4:12]]
         assert max(stable_tail) - min(stable_tail) <= 1024, tick_samples
-        for event in ("simulation_tick", "per_hour_summary"):
-            hourly = [
-                (hour, size)
-                for name, hour, size, _serialized in wire_samples
-                if name == event and hour is not None
-            ][:12]
-            _assert_hourly_payload_slope_is_bounded(event, hourly[4:12])
         assert all(
             '"padding"' not in serialized
             for event, _hour, _size, serialized in wire_samples
@@ -398,6 +481,91 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         state = _simulations[active_sids.pop()]
         captured_summary = state["last_recipe_capture"]["per_hour_summary"]
         assert '"padding"' in json.dumps(captured_summary, default=str)
+        history_response = http.get("/api/simulation-history")
+        assert history_response.status_code == 200
+        history = history_response.get_json()
+        assert history["payload_version"] == 4
+        assert history["run_id"] == state["run_id"]
+        assert len(per_hour_deltas) == len(history["per_hour_summary"])
+        carrier_fields = {
+            "condensation_train_kg",
+            "vapor_species_kg_hr",
+            "metal_yields_kg",
+            "product_ledger_kg_at_hour",
+            "condensation_train_kg_cumulative",
+            "recycled_to_reagent_kg_cumulative",
+        }
+        assert all(
+            "hour" in event_summary
+            and carrier_fields.isdisjoint(event_summary)
+            and (
+                "redox_source_breakdown" not in event_summary
+                or {
+                    "applied_terms_mol_o2_equiv_by_label",
+                    "skipped_terms_mol_o2_equiv_by_label",
+                    "net_mol_o2_equiv",
+                    "delta_log10_fO2",
+                    "ferric_divergence",
+                    "source_campaign",
+                    "source_hour",
+                    "source_campaign_hour",
+                }.issuperset(event_summary["redox_source_breakdown"])
+            )
+            for event_summary in per_hour_deltas
+        )
+        assert per_hour_deltas == history["per_hour_summary"]
+        assert all(
+            carrier_fields.isdisjoint(history_entry)
+            for history_entry in history["per_hour_summary"]
+        )
+        deltas = [tick["per_hour_summary_delta"] for tick in tick_payloads]
+        assert deltas == history["per_hour_summary"]
+        client_result = _client_tick_result(tick_payloads, history)
+        assert client_result["simulationPerHourSummaryHistoryBeforeFetch"] == (
+            deltas
+        )
+        assert client_result["latestPerHourSummaryBeforeFetch"] == deltas[-1]
+        assert client_result["simulationPerHourSummaryHistory"] == history[
+            "per_hour_summary"
+        ]
+        race_snapshot = dict(history)
+        race_snapshot["per_hour_summary"] = [
+            history["per_hour_summary"][0],
+            {**tick_payloads[1]["per_hour_summary_delta"], "race_marker": "snapshot"},
+        ]
+        race_client_result = _client_tick_result(
+            [tick_payloads[0]],
+            race_snapshot,
+            tick_payloads[1],
+        )
+        assert race_client_result["simulationPerHourSummaryHistory"] == (
+            history["per_hour_summary"][:2]
+        )
+        mismatched_snapshot = dict(history)
+        mismatched_snapshot["run_id"] = "another-run"
+        mismatch_client_result = _client_tick_result(
+            [tick_payloads[0]],
+            mismatched_snapshot,
+            tick_payloads[1],
+        )
+        assert mismatch_client_result["simulationPerHourSummaryHistory"] == (
+            history["per_hour_summary"][:2]
+        )
+        assert [
+            call["url"] for call in client_result["simulationHistoryFetches"]
+        ] == ["/api/simulation-history"]
+        stale_tick = dict(tick_payloads[0])
+        stale_tick["payload_version"] = 1
+        stale_client_result = _client_tick_result([stale_tick])
+        assert stale_client_result["simulationPerHourSummaryHistory"] == []
+        assert "Unsupported simulation_tick payload version: 1" in (
+            stale_client_result["statusAfterSimulationTicks"]
+        )
+        wall_detail = http.get(
+            "/api/advisory-panel-detail?panel=wall_risk_panel"
+        )
+        assert wall_detail.status_code == 200
+        assert "zones" in wall_detail.get_json()
         assert mismatches == []
     finally:
         if client.is_connected():
@@ -424,16 +592,19 @@ def _assert_tick_preserves_vr_totals(tick: dict, sim, mismatches: list[str]) -> 
     check("n_requested", panel.get("n_requested"), batch.get("n_requested", 0))
     check("n_flux_active", panel.get("n_flux_active"), batch.get("n_flux_active", 0))
     check("n_refused", panel.get("n_refused"), batch.get("n_refused", 0))
+    check("tick_view", panel.get("tick_view"), "compact")
     check(
-        "channel_species",
-        set((panel.get("channels_by_species") or {})),
-        set((batch.get("channels_by_species") or {})),
+        "channel_species_count",
+        panel.get("n_channel_species"),
+        len(batch.get("channels_by_species") or {}),
     )
     check(
-        "refused_species",
-        set((panel.get("refusals_by_species") or {})),
-        set((batch.get("refusals_by_species") or {})),
+        "refused_species_count",
+        panel.get("n_refused_species"),
+        len(batch.get("refusals_by_species") or {}),
     )
+    if "channels_by_species" in panel or "refusals_by_species" in panel:
+        mismatches.append(f"hour={hour} vapor species maps remain on the tick")
     check(
         "condensation_n_species",
         refusals_panel.get("n_species"),
@@ -444,11 +615,11 @@ def _assert_tick_preserves_vr_totals(tick: dict, sim, mismatches: list[str]) -> 
         bool(refusals_panel.get("has_refusals")),
         bool(condensation.get("has_refusals")),
     )
-    check(
-        "condensation_species",
-        set((refusals_panel.get("by_species") or {})),
-        set((condensation.get("by_species") or {})),
-    )
+    check("condensation_tick_view", refusals_panel.get("tick_view"), "compact")
+    if "by_species" in refusals_panel:
+        mismatches.append(
+            f"hour={hour} condensation species map remains on the tick"
+        )
     wire_authority = panel.get("condensation_authority") or {}
     check(
         "authority_n_species",

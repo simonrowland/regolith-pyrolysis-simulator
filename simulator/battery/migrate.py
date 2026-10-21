@@ -34,6 +34,7 @@ on ``Species.phase`` and queued; they are never stored as gas.
 
 from __future__ import annotations
 
+import ast
 import collections.abc
 import fnmatch
 import hashlib
@@ -4875,15 +4876,50 @@ def _pressure_evaluator(values: Mapping[str, Any], units: str | None) -> bool:
     if not form or not values.get("coefficients"):
         return False
     output = form.split("=", 1)[0].strip()
-    function = re.fullmatch(r"([A-Za-z_]\w*)\s*\((.*)\)", output)
-    if function and function.group(1).lower() not in {"ln", "log", "log10"}:
-        output = function.group(1)
-    if "=" in form and not re.search(r"\bP(?:_|\b)|pressure", output, re.I):
+    try:
+        expression = ast.parse(output, mode="eval").body
+    except SyntaxError:
         return False
-    return bool(re.search(r"\bP_(?:bar|mmHg|Pa|atm|Torr)\b", output, re.I)) or (
-        bool(re.search(r"\bP\b|pressure", output, re.I))
-        and str(units or "").lower() in {"bar", "mmhg", "pa", "atm", "torr"}
-    )
+
+    pressure_units = {"bar", "mmhg", "pa", "atm", "torr"}
+
+    def is_pressure_name(name: str) -> bool:
+        name = name.casefold()
+        return name in {"p_bar", "p_mmhg", "p_pa", "p_atm", "p_torr"} or (
+            (name == "p" or "pressure" in name)
+            and str(units or "").lower() in pressure_units
+        )
+
+    pending = [expression]
+    while pending:
+        node = pending.pop()
+        if isinstance(node, ast.Subscript):
+            continue
+        if isinstance(node, ast.Call):
+            function = (
+                node.func.id
+                if isinstance(node.func, ast.Name)
+                else node.func.attr
+                if isinstance(node.func, ast.Attribute)
+                else ""
+            )
+            normalized_function = function.casefold()
+            if normalized_function in {"psat", "p_sat"} or is_pressure_name(function):
+                return True
+            if normalized_function in {"ln", "log", "log10"}:
+                pending.extend(node.args)
+            continue
+        if isinstance(node, ast.Name):
+            if is_pressure_name(node.id):
+                return True
+            continue
+        if isinstance(node, ast.Attribute):
+            if is_pressure_name(node.attr):
+                return True
+            pending.append(node.value)
+            continue
+        pending.extend(ast.iter_child_nodes(node))
+    return False
 
 
 def _quantity_contradiction(

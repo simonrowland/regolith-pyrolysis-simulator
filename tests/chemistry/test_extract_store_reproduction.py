@@ -312,6 +312,20 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
     assert any(record.status in SCORING_STATUSES for record in evaluation.records)
 
 
+def test_untyped_system_class_is_not_alpha_pin_bearing() -> None:
+    obs = _alpha_fixture(
+        species_id="Fe",
+        observation_id="fixture_untyped_fe_alpha",
+        phase=None,
+        values={"alpha": 0.02, "material": "unclassified_sample"},
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+    pin_ok, pin_skip, axes = rail_alpha_comparability(obs)
+    assert pin_ok is False
+    assert pin_skip == "missing_system_classification"
+    assert axes["rail_system_class_verdict"] == "undeterminable"
+
+
 @pytest.mark.parametrize("markers", [
     {"evidence_kind": "model"},
     {"measurement_status": "model_output_not_measurement"},
@@ -1997,6 +2011,32 @@ def test_alkali_first_observed_stays_unparsed_ordering() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "quantity",
+    (
+        "vapour_partial_pressure_ordering_no_numeric_P",
+        "vapour_partial_pressure_ratio_ordering_no_numeric_P",
+    ),
+)
+def test_explicit_ordering_quantity_stays_unparsed_ordering(quantity: str) -> None:
+    obs = _ordering_fixture(quantity=quantity)
+    _assert_qualitative_skip(
+        obs, "typed-refusal:unsupported_observable:ordering_claim_unparsed"
+    )
+
+
+def test_unclassified_qualitative_payload_is_not_reported_as_ordering_gap() -> None:
+    obs = _ordering_fixture(
+        observation_id="unclassified_qualitative_payload",
+        quantity="unclassified_qualitative_trend",
+        note="Qualitative trend only; no ordering relation is stated.",
+    )
+    _assert_qualitative_skip(
+        obs,
+        "typed-refusal:unsupported_observable:qualitative_payload_unclassified",
+    )
+
+
 # Live-battery qualitative rows that used to share ordering_claim_unparsed.
 # Tokens are the payload class; none of these become comparable.
 _LIVE_QUALITATIVE_SKIP_BY_ID = {
@@ -2030,6 +2070,9 @@ _LIVE_QUALITATIVE_SKIP_BY_ID = {
     "drowart_2005_kems_reporting_requirements": (
         "unsupported_observable:methodology_guidance_not_observable"
     ),
+    "ichise_1986_few_activity_runs_no_arrest": (
+        "unsupported_observable:qualitative_activity_not_tabulated"
+    ),
     "hastie_1981_table3_solgasmix_model_not_measurement": (
         "model_output_not_measurement"
     ),
@@ -2038,6 +2081,9 @@ _LIVE_QUALITATIVE_SKIP_BY_ID = {
     ),
     "sauerborn_2005_qms_traces_figure_only_blocked": (
         "unsupported_observable:figure_only_not_digitized"
+    ),
+    "sossi_fegley_2018_table5_Ag_speciation": (
+        "unsupported_observable:species_speciation_without_numeric_pressures"
     ),
     "sesko_2024_crucible_deposit_edx": (
         "unsupported_observable:deposit_composition_not_species_rate"
