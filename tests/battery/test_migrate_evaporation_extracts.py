@@ -248,3 +248,39 @@ def test_richter02_table1_flux_and_alpha_values_keep_conditions(tmp_path: Path) 
         for row in result.observations.values()
     )
 
+
+def test_markova_table2_residue_values_keep_row_temperature(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-026-markova-1984.yaml")
+    assert result.validation.hard_issues == ()
+    expected = {"SiO2": Decimal("44.4"), "FeO": Decimal("7.01"), "MgO": Decimal("36.92")}
+    for formula, value in expected.items():
+        row = next(
+            item
+            for item in result.observations.values()
+            if "markova_1984_table2_residual_melt_VI_lherzolite" in item.observation_id
+            and item.identity.species.formula == formula
+            and item.identity.temperature_K.is_value
+            and item.identity.temperature_K.value == Decimal("1748.15")
+        )
+        assert row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        assert row.value.kind is ValueKind.POINT
+        assert row.value.point == value
+        assert row.point_conditions["temperature_K"].state.value == Decimal("1748.15")
+        assert row.point_conditions["composition"].state.value.components
+
+    table2_rows = [
+        row
+        for row in result.observations.values()
+        if "markova_1984_table2_residual_melt_" in row.observation_id
+        and row.identity.temperature_K is not None
+        and row.identity.temperature_K.is_value
+    ]
+    assert table2_rows
+    assert all(
+        row.point_conditions
+        and "temperature_K" in row.point_conditions
+        and row.point_conditions["temperature_K"].locator is not None
+        and "composition" in row.point_conditions
+        for row in table2_rows
+    )
+
