@@ -105,6 +105,22 @@ def _configure_worker_cache_isolation() -> None:
 _configure_worker_cache_isolation()
 
 
+@pytest.fixture(scope="session", autouse=True)
+def magemin_openmpi_tmpdir(
+    tmp_path_factory: pytest.TempPathFactory,
+) -> Iterator[Path]:
+    """Keep OpenMPI session files inside pytest's retained per-run temp tree."""
+    tmpdir = tmp_path_factory.getbasetemp() / "magemin-openmpi"
+    tmpdir.mkdir(parents=True, exist_ok=True)
+
+    environment = pytest.MonkeyPatch()
+    environment.setenv("OMPI_MCA_orte_tmpdir_base", str(tmpdir))
+    try:
+        yield tmpdir
+    finally:
+        environment.undo()
+
+
 @pytest.fixture(autouse=True)
 def _isolate_vapor_payload_cache_between_tests():
     module = sys.modules.get("engines.builtin.foulant_disposition")
