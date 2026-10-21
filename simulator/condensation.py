@@ -79,6 +79,8 @@ The Fe → SiO separation (Stage 1 → Stage 3):
 
 from __future__ import annotations
 
+from simulator.condensation_routing import CrownCarrierAllocation, CrownStationRefusal
+
 import copy
 import math
 import warnings
@@ -7969,25 +7971,6 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
         report[stage_key] = stage_report
     return report
 
-
-class CrownStationRefusal(ValueError):
-    """A station input/surface law is unavailable, rather than zero recovery."""
-
-
-@dataclass(frozen=True)
-class CrownCarrierAllocation:
-    """Tick-average mol/s; inventory is mol. No ledger mutation."""
-
-    forward_mol_s: float
-    gross_mol_s: float
-    incidence_mol_s: float
-    reemission_mol_s: float
-    return_mol_s: float
-    net_source_mol_s: float
-    dish_gain_mol_s: float
-    sky_mol_s: float
-    oxidized_mol_s: float
-    inventory_mol: float
 
 
 def crown_carrier_allocation(

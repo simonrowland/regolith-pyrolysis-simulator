@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 
 STAGE_KEY_BY_NUMBER: dict[int, str] = {
     1: 'stage_1_fe_condenser',
@@ -156,3 +158,24 @@ def is_designated_for_stage(species: str, stage_number: int) -> bool:
     """True when species belongs to the stage's accepted-species set."""
 
     return species in accepted_species_for_stage_number(stage_number)
+
+
+class CrownStationRefusal(ValueError):
+    """A station input/surface law is unavailable, rather than zero recovery."""
+
+
+@dataclass(frozen=True)
+class CrownCarrierAllocation:
+    """Tick-average mol/s; inventory is mol. No ledger mutation."""
+
+    forward_mol_s: float
+    gross_mol_s: float
+    incidence_mol_s: float
+    reemission_mol_s: float
+    return_mol_s: float
+    net_source_mol_s: float
+    dish_gain_mol_s: float
+    sky_mol_s: float
+    oxidized_mol_s: float
+    inventory_mol: float
+
