@@ -2016,6 +2016,13 @@ def _selected_temperature_segment(
         return candidates[-1]
     ranged.sort(key=lambda item: item[0])
     if temperature_K < ranged[0][0]:
+        if (
+            ranged[0][2].get("extrapolation_policy") == "refuse"
+            and block.get("A") is not None
+        ):
+            # A bounded new segment must not replace an existing default's
+            # out-of-band predictions/refusals (e.g. Mg underflow at 115 K).
+            return block
         return ranged[0][2]
     return ranged[-1][2]
 
@@ -2030,6 +2037,12 @@ def _coefficient_mapping(
     if not _is_mapping(block):
         return {}
     if coefficient_block == COEFF_BLOCK_PURE_COMPONENT:
+        # Mg/Ca solid segments are surface evidence. Preserve the original
+        # source fit and its early domain skip: substituting Mg's 496 K
+        # surface band would bypass the 701 K source skip during heat-up.
+        # Surface consumers pass their selected pure block in a local view.
+        if (row or {}).get("parent_oxide") in {"MgO", "CaO"}:
+            return block
         return _selected_temperature_segment(block, temperature_K)
     return block
 
@@ -2096,7 +2109,9 @@ def vapor_pressure_antoine_coefficients(
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
-            selected = _selected_temperature_segment(pure, temperature_K)
+            selected = _coefficient_mapping(
+                row, COEFF_BLOCK_PURE_COMPONENT, temperature_K=temperature_K,
+            )
             if not _pure_segment_usable(selected, temperature_K):
                 antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
                 if _is_mapping(antoine):
@@ -2153,22 +2168,37 @@ def wall_condensation_antoine_coefficients(
     sidecar usable at this temperature, wall re-evaporation uses that sidecar;
     otherwise it fails closed (empty block -> caller types a refusal; never
     invents a fiat pressure) rather than serve the melt activity/pO2 term as
-    a local P_sat. Non-standard-reaction rows keep the runtime selector's
-    behavior byte-for-byte.
+    a local P_sat. A declared lower-branch refusal also blocks the legacy
+    fallback, so pole-adjacent fits cannot replace missing surface evidence.
     """
 
+    pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
+    if _is_mapping(pure) and not bool((row or {}).get("interval_required")):
+        selected = _selected_temperature_segment(pure, temperature_K)
+        bounds = _range_tuple(selected.get("valid_range_K"))
+        if (
+            temperature_K is not None
+            and selected.get("extrapolation_policy") == "refuse"
+            and bounds is not None
+            and temperature_K < bounds[0]
+        ):
+            # The Ca Hartmann-Schneider lower branch approaches a pole.
+            # Neither evaluate it nor substitute the melt-source fallback.
+            return {}, COEFF_BLOCK_PURE_COMPONENT
+        if (
+            temperature_K is not None
+            and bounds is not None
+            and bounds[0] <= temperature_K <= bounds[1]
+        ):
+            # Let the wall evaluator type missing/nonfinite coefficients;
+            # a malformed in-band surface fit is not a source-fit fallback.
+            return selected, COEFF_BLOCK_PURE_COMPONENT
+        if _pure_segment_usable(selected, temperature_K):
+            return selected, COEFF_BLOCK_PURE_COMPONENT
+        if _fit_target(row) == FIT_TARGET_STANDARD_REACTION:
+            return {}, COEFF_BLOCK_PURE_COMPONENT
     if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
         return vapor_pressure_antoine_coefficients(row, temperature_K)
-    if not bool((row or {}).get("interval_required")):
-        pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
-        if _is_mapping(pure):
-            selected = _selected_temperature_segment(pure, temperature_K)
-            if _pure_segment_usable(selected, temperature_K):
-                return selected, COEFF_BLOCK_PURE_COMPONENT
-            # A grounded pure-species wall answer exists but not at this
-            # temperature: fail closed so the caller types a refusal rather
-            # than extrapolate through a pole or substitute the melt term.
-            return {}, COEFF_BLOCK_PURE_COMPONENT
     return {}, COEFF_BLOCK_PURE_COMPONENT
 
 
@@ -2492,9 +2522,26 @@ def require_antoine_source_certified_temperature(
 ) -> dict[str, Any] | None:
     """Refuse Antoine evaluation outside an explicit source-certified range."""
 
+    block = _coefficient_mapping(
+        row,
+        coefficient_block,
+        temperature_K=temperature_K,
+    )
     total_bounds = _range_tuple(
         (row or {}).get("total_source_certified_range_K")
     )
+    if (
+        consumer == "wall_condensation"
+        and coefficient_block == COEFF_BLOCK_PURE_COMPONENT
+    ):
+        surface_bounds = _range_tuple(block.get("source_certified_range_K"))
+        if (
+            surface_bounds is not None
+            and surface_bounds[0] <= temperature_K <= surface_bounds[1]
+        ):
+            # A source's melt-release band does not veto independently
+            # reviewed pure-solid surface evidence (Mg at 496-658 K).
+            total_bounds = None
     if total_bounds is not None:
         total_low, total_high = total_bounds
         if not total_low <= float(temperature_K) <= total_high:
@@ -2515,11 +2562,6 @@ def require_antoine_source_certified_temperature(
     if reconstructed_limit is not None:
         return reconstructed_limit
 
-    block = _coefficient_mapping(
-        row,
-        coefficient_block,
-        temperature_K=temperature_K,
-    )
     certified_range = None
     if _is_mapping(block):
         certified_range = block.get("source_certified_range_K")

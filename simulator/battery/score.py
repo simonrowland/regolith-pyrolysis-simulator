@@ -4841,7 +4841,8 @@ def predict_with_engine(
                     identity=identity,
                 )
             source_range = vapor_pressure_valid_range_K(
-                row, coefficient_block, temperature_K=float(T)
+                dict(row, pure_component_antoine=coefficients),
+                coefficient_block, temperature_K=float(T)
             )
             certified_band = None
             notices: tuple[Notice, ...] = ()

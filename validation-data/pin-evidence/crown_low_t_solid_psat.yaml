@@ -1,0 +1,50 @@
+schema_version: 1
+kind: vapour_pressure_fit_evidence
+source_id: crown-low-t-solid-psat
+date: '2026-10-20'
+validation_use: pure_surface_reference_input
+# Assessed JANAF functions are reference input, not independent battery
+# measurements. No store regeneration or new scoring rows in this change.
+extraction:
+  method: Primary NASA PDF text and official NIST HTML checked against existing JANAF compilation rows.
+  review_status: primary_source_checked
+magnesium:
+  reference: REF-060
+  citation: Gilbreath, W. P. (1965), NASA TN D-2723
+  url: https://ntrs.nasa.gov/api/citations/19650008905/downloads/19650008905.pdf
+  locator: Summary p. 1 (PDF p. 3), Results pp. 2-3, Summary of Results p. 4
+  equation_as_printed: log P_torr = 8.6047 - 7560.3/T
+  logarithm_base: 10
+  pressure_unit_as_printed: torr
+  valid_range_K: [496, 658]
+  condensed_reference: Mg(s), clean pure smooth surface
+  method: Langmuir weight loss
+  limitation: Pressure inferred assuming sublimation coefficient one; oxide contamination inhibited loss. Not a collector sticking measurement.
+  conversion: 1 torr = 101325/760 Pa
+  independent_check:
+    table_url: https://janaf.nist.gov/tables/Mg-005.html
+    temperature_K: 500
+    log10_Kf: -9.338
+    note: JANAF gives about 4.592e-5 Pa, roughly 13 percent above Gilbreath; do not tune either source.
+calcium:
+  reference: REF-020
+  url: https://janaf.nist.gov/tables/Ca-006.html
+  compilation: data/literature/compilations/janaf/tables/Ca-006.yaml
+  compilation_source_sha256: 974d576e6c2f0774695ac1904d97f3b9292ec402a1f7b4f733fa10a3bbb3855a
+  table_revision: September 1983 (1 bar)
+  standard_pressure_Pa: 100000
+  condensed_reference: stable alpha Ca(s), activity one
+  phase_reference_url: https://janaf.nist.gov/tables/Ca-001.html
+  alpha_beta_transition_K: 716
+  valid_range_K: [400, 700]
+  phase_scope: Stop before alpha-beta transition; beta solid is not certified by these segments.
+  columns: [temperature_K, log10_Kf]
+  rows:
+    - [400, -17.311]
+    - [450, -14.742]
+    - [500, -12.690]
+    - [600, -9.623]
+    - [700, -7.444]
+  relation: P_sat = p0 Kf for Ca(s) -> Ca(g)
+  interpolation: ln(P) linear in 1/T between adjacent published rows; exactly represented by C=0 Antoine segments
+  extrapolation: Below 400 K predict and flag; above 700 K no alpha-solid certification. Refuse the unvalidated lower Hartmann-Schneider branch.

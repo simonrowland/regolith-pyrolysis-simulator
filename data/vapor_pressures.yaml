@@ -1219,6 +1219,34 @@ families:
             valid_range_K:
             - 701
             - 1361
+            default_segment: crc_stull
+            segments:
+            # Mg(s) -> Mg(g), Gilbreath 1965 pp. 1-4, clean smooth pure
+            # surface with sublimation coefficient assumed one. Oxide films
+            # inhibited measured loss; this is not an oxidized-dish law.
+            # log10(P/Pa) = log10(P/torr) + log10(101325/760).
+            # Thus A = 8.6047 + log10(101325/760), B = 7560.3 K,
+            # C = 0 K. Logs are dimensionless; B/T is dimensionless.
+            # At either band endpoint this reproduces the printed equation.
+            - name: solid_gilbreath
+              phase: solid
+              source: REF-060 Gilbreath 1965 NASA TN D-2723, NTRS 19650008905, pp. 1-4
+              provenance_class: source_equation_fit
+              source_basis: clean_pure_solid_Mg_sublimation
+              extrapolation_policy: refuse
+              source_certified_range_K: [496, 658]
+              valid_range_K: [496, 658]
+              A: 10.729603020132938
+              B: 7560.3
+              C: 0
+            - name: crc_stull
+              source: REF-033 CRC.b/Stull magnesium pressure-level table fit; REF-034 cross-check
+              provenance_class: source_tabulated_fit
+              source_certified_range_K: [701, 1361]
+              valid_range_K: [701, 1361]
+              A: 9.4964271591
+              B: 5613.103906
+              C: -110.759803
           reconstructed_vapor_pressure_segment:
             range_K:
             - 1361
@@ -1618,6 +1646,63 @@ families:
             valid_range_K:
             - 1254
             - 1712
+            default_segment: hartmann_schneider
+            # Ca(s,alpha) -> Ca(g): JANAF Ca-006 log Kf is relative to
+            # stable elemental Ca at p0=1 bar. Unit solid activity gives
+            # Kf=P/p0, so log10(P/Pa)=5+log Kf. This band stops at 700 K:
+            # Ca-001 puts alpha <-> beta at 716 K; no interpolation across it.
+            # Each adjacent table pair (T1,L1),(T2,L2), L=log10(P/Pa),
+            # is represented exactly by existing Antoine segments with C=0:
+            # B=(L2-L1)/(1/T1-1/T2), A=L1+B/T1. Then ln P is linear
+            # in 1/T (ln(10) is constant). B has units K; endpoints are exact,
+            # and increasing T raises P because every B is positive.
+            # Rows/provenance: validation-data/pin-evidence/crown_low_t_solid_psat.yaml.
+            segments:
+            - name: solid_janaf_400_450
+              phase: alpha_solid
+              source: REF-020 NIST-JANAF Ca-006 gas relative to Ca-001 stable alpha solid
+              provenance_class: derived_from_evaluation
+              source_certified_range_K: [400, 450]
+              valid_range_K: [400, 450]
+              A: 10.809999999999985
+              B: 9248.399999999994
+              C: 0
+            - name: solid_janaf_450_500
+              phase: alpha_solid
+              source: REF-020 NIST-JANAF Ca-006 gas relative to Ca-001 stable alpha solid
+              provenance_class: derived_from_evaluation
+              source_certified_range_K: [450, 500]
+              valid_range_K: [450, 500]
+              A: 10.778000000000016
+              B: 9234.000000000007
+              C: 0
+            - name: solid_janaf_500_600
+              phase: alpha_solid
+              source: REF-020 NIST-JANAF Ca-006 gas relative to Ca-001 stable alpha solid
+              provenance_class: derived_from_evaluation
+              source_certified_range_K: [500, 600]
+              valid_range_K: [500, 600]
+              A: 10.712000000000005
+              B: 9201.000000000002
+              C: 0
+            - name: solid_janaf_600_700
+              phase: alpha_solid
+              source: REF-020 NIST-JANAF Ca-006 gas relative to Ca-001 stable alpha solid
+              provenance_class: derived_from_evaluation
+              source_certified_range_K: [600, 700]
+              valid_range_K: [600, 700]
+              A: 10.62999999999999
+              B: 9151.799999999994
+              C: 0
+            - name: hartmann_schneider
+              source: REF-043 NIST Hartmann and Schneider 1929 calcium
+              source_certification: source_equation_fit
+              # Refuse the low branch: do not approach/cross the 594.591 K pole.
+              extrapolation_policy: refuse
+              A: 7.78473
+              B: 3121.368
+              C: -594.591
+              valid_range_K: [1254, 1712]
           boiling_point_C: 1484
           notes: dH_vap ~ 182.3 kJ/mol. Significant above ~1500 degC.
           gas_rail_standard_reaction:

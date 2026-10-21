@@ -188,7 +188,6 @@ def test_predict_flag_wall_certified_value_retains_bits():
 
 
 @pytest.mark.parametrize(("temperature", "pressure_hex", "band"), [
-    (500.0, "0x1.8f7e06aa69f40p-17", [701.0, 1361.0]),
     (1500.0, "0x1.17121f336b398p+18", [701.0, 1361.0]),
 ])
 def test_predict_flag_wall_values_keep_source_fit_and_authority(temperature, pressure_hex, band):
@@ -229,10 +228,12 @@ def test_predict_flag_invalid_wall_input_is_typed_and_terminal(monkeypatch, inva
         import copy
         data = copy.deepcopy(original(species, **kwargs))
         if species == "Mg":
-            if invalid_value is None:
-                del data["pure_component_antoine"]["B"]
-            else:
-                data["pure_component_antoine"]["B"] = invalid_value
+            pure = data["pure_component_antoine"]
+            for segment in [pure, *pure.get("segments", [])]:
+                if invalid_value is None:
+                    del segment["B"]
+                else:
+                    segment["B"] = invalid_value
         return data
 
     monkeypatch.setattr(condensation, "_species_vapor_data", missing_coefficient)
@@ -527,7 +528,7 @@ def test_predict_flag_wall_history_keeps_both_source_band_misses():
         overhead_pressure_mbar=10.0, species_partial_pressures_mbar={"Mg": 1.0},
         gas_temperature_C=1700.0, campaign_name="C0",
     )
-    for temperature in (500.0, 1500.0, 1000.0):
+    for temperature in (495.0, 500.0, 1500.0, 1000.0):
         wall_deposit_candidate_for_surface_kg(
             model, species="Mg", rate_kg_hr=1.0, T_cond_C=1200.0,
             melt_temperature_C=1700.0, wall_temperature_C=temperature - 273.15,
@@ -535,7 +536,7 @@ def test_predict_flag_wall_history_keeps_both_source_band_misses():
         )
     records = model.last_sticking_alpha_provenance_notice[
         "wall_saturation_pressure_extrapolations_by_species"]["Mg"]
-    assert {record["temperature_K"] for record in records.values()} == {500.0, 1500.0}
+    assert {record["temperature_K"] for record in records.values()} == {495.0, 1500.0}
     assert all(record["authority_level"] == "extrapolated" for record in records.values())
 
 

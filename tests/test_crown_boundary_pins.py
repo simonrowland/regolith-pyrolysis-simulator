@@ -1,4 +1,4 @@
-"""Chunk-0 outputs captured from green a4608882d; parity, not physics evidence."""
+"""Chunk-0 captures; four cold-surface pins updated for reviewed chunk-1 evidence."""
 from pathlib import Path
 
 import pytest
@@ -11,7 +11,6 @@ from simulator.campaigns import CampaignManager
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import (
-    WallSaturationPressureRefusal,
     _antoine_psat_pa,
     _hkl_surface_deposition_flux_mol_m2_s,
 )
@@ -61,24 +60,24 @@ def test_positive_only_wall_deposition_pin(pressure, expected):
 
 
 @pytest.mark.parametrize(("species", "temperature", "expected"), [
-    ("Mg", 500.0, "0x1.8f7e06aa69f40p-17"),
-    ("Mg", 600.0, "0x1.59c21edf6fa22p-7"),
-    ("Ca", 500.0, "0x1.0f0813d0ddc16p-26")])
+    ("Mg", 500.0, "0x1.54f3a5b579a20p-15"),
+    ("Mg", 600.0, "0x1.b91dbbcab24f0p-7"),
+    ("Ca", 500.0, "0x1.5ec4959df407cp-26")])
 def test_cold_surface_pressure_pin(species, temperature, expected):
     notices = {}
     assert _antoine_psat_pa(
         species, temperature, antoine_extrapolations=notices,
         enforce_hot_train_applicability=False).hex() == expected
-    assert notices[species]["status"] == "extrapolated"
+    assert notices == {}
 
 
-def test_ca_600k_refusal_pin():
-    with pytest.raises(WallSaturationPressureRefusal) as caught:
-        _antoine_psat_pa("Ca", 600.0, enforce_hot_train_applicability=False)
-    assert str(caught.value) == (
-        "wall_saturation_pressure_refused: species=Ca temperature_K=600.000 "
-        "reason=no extrapolation available: Antoine pressure is not representable "
-        "as finite positive; valid_range_K=[1254, 1712]")
+def test_ca_600k_pressure_pin():
+    notices = {}
+    pressure = _antoine_psat_pa(
+        "Ca", 600.0, antoine_extrapolations=notices,
+        enforce_hot_train_applicability=False)
+    assert pressure.hex() == "0x1.8fafd7938d038p-16"
+    assert notices == {}
 
 
 def test_campaign_successor_pins():
