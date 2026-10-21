@@ -2264,7 +2264,11 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12
 
 
-def test_engine_report_gate_skips_without_private_docs() -> None:
+def test_engine_report_gate_skips_without_private_docs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Mutation proof: ungated ENGINE_REPORT_PATH.read_text ERROR'd on fresh CI."""
+    missing_report = tmp_path / ENGINE_REPORT_PATH.name
+    monkeypatch.setitem(globals(), "ENGINE_REPORT_PATH", missing_report)
     assert _engine_report_unavailable() is True
     assert ENGINE_REPORT_PATH.is_file() is False
