@@ -24,6 +24,7 @@ def test_table_3_points_migrate_with_species_composition_and_temperature():
     assert by_id["tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c05"].value.point == Decimal("0.0047")
     assert by_id["tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c08"].value.point == Decimal("0.000003")
     assert by_id["tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r04_c10"].value.point == Decimal("0.30")
+    assert by_id["tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r05_c08"].value.point == Decimal("8.6e-6")
 
     expected_species = {"Sr": "Sr", "SiO": "SiO", "O": "O", "SrO": "SrO", "Al2O3": "Al2O3", "SiO2": "SiO2"}
     for species, container in document["species"].items():
