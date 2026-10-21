@@ -296,7 +296,8 @@ def test_pre_rg_subthreshold_effective_source_zero_requires_answered_batch():
     ] == 'pre_rg_backend_below_effective_pressure_threshold'
 
 
-def test_authoritative_vapor_pressure_liquid_present_dispatch_unchanged():
+@pytest.mark.parametrize('simulation_hour', [None, 37])
+def test_authoritative_vapor_pressure_liquid_present_dispatch_unchanged(simulation_hour):
     sim, calls = _sim_with_vapor_dispatch({'Na': 12.5})
     result = EquilibriumResult(
         temperature_C=1600.0,
@@ -308,9 +309,12 @@ def test_authoritative_vapor_pressure_liquid_present_dispatch_unchanged():
         vapor_pressures_source={'Na': 'backend_pre_kernel'},
     )
 
-    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, result)
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(
+        sim, result, simulation_hour=simulation_hour,
+    )
 
     assert [call[0] for call in calls] == [ChemistryIntent.VAPOR_PRESSURE]
+    assert calls[0][1]['control_inputs']['simulation_hour'] == simulation_hour
     assert result.vapor_pressures_Pa == {'Na': pytest.approx(12.5)}
     assert result.vapor_pressures_source == {'Na': 'builtin_authoritative'}
 

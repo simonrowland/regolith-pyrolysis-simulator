@@ -595,8 +595,10 @@ class InternalAnalyticalEngine:
             if raw_status in POINT_STATUSES
             else "refused"
         )
-        diagnostics = dict(result.diagnostics or {})
-        provenance = dict(diagnostics.get("activity_provenance", {}) or {})
+        diagnostics = dict(sim._last_vapor_pressure_diagnostic or {})
+        provenance = dict(
+            diagnostics.get("vapor_pressure_numerator_provenance", {}) or {}
+        )
         activities: dict[str, float] = {}
         gammas: dict[str, float] = {}
         parent_mole_fractions = _oxide_mole_fractions(composition_wt_pct)

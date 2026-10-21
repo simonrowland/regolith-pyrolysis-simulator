@@ -9768,7 +9768,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # removed at flip time per the goal spec ("comparing against the
         # same source is moot"). Subsequent intent flips
         # (EVAPORATION_FLUX, ...) sit on top of this same kernel.
-        self._refresh_vapor_pressures_from_kernel(result)
+        self._refresh_vapor_pressures_from_kernel(
+            result, simulation_hour=int(self.melt.hour) + 1,
+        )
         # SULFUR_SATURATION_GATE — post-equilibrium hook. Runs only when
         # Stage 0 left sulfide / sulfate inventory behind; otherwise
         # short-circuits without touching PySulfSat. Never mutates the
@@ -9848,6 +9850,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         result,
         *,
         include_diagnostic_shadows: bool = True,
+        simulation_hour: int | None = None,
     ) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
 
@@ -9855,6 +9858,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         \\goal BUILTIN-ENGINE-EXTRACTION (#7). Called from
         :meth:`_record_equilibrium_status` after the backend (or the
         legacy internal analytical path) produces an EquilibriumResult.
+
+        ``simulation_hour`` enables trajectory continuation for runtime calls;
+        standalone equilibrium probes omit it.
 
         Behaviour:
           - Below 400 K this method returns before kernel dispatch and preserves
@@ -9994,7 +10000,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'high_t_melt_activity_previous': getattr(
                     self, '_last_high_t_melt_activity', {}
                 ),
-                'simulation_hour': int(self.melt.hour) + 1,
+                'simulation_hour': simulation_hour,
             }
         dispatch_kwargs = {
             'control_inputs': {

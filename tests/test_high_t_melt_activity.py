@@ -222,7 +222,9 @@ def _run_fe2o3_lookup_only_case(mode: str) -> dict[str, object]:
         activity_coefficients={},
     )
 
-    sim._refresh_vapor_pressures_from_kernel(result)
+    sim._refresh_vapor_pressures_from_kernel(
+        result, simulation_hour=int(sim.melt.hour) + 1,
+    )
 
     after = sim.atom_ledger.mol_by_account()
     melt = after["process.cleaned_melt"]
@@ -1674,7 +1676,8 @@ def test_nonconvergence_keeps_prediction_and_emits_run_notice(monkeypatch) -> No
             liquid_fraction=1.0,
             fO2_log=sim.melt.fO2_log,
             activity_coefficients={},
-        )
+        ),
+        simulation_hour=int(sim.melt.hour) + 1,
     )
     sim.melt.hour = completed_hour
 
@@ -1811,7 +1814,9 @@ def test_simulator_default_passes_openimcc_authority_into_flux_dispatch(
         },
     )
 
-    sim._refresh_vapor_pressures_from_kernel(result)
+    sim._refresh_vapor_pressures_from_kernel(
+        result, simulation_hour=int(sim.melt.hour) + 1,
+    )
 
     assert sim._high_t_melt_activity == "openimcc"
     assert sim._last_high_t_melt_activity["provider"] == "openimcc"
@@ -1827,13 +1832,17 @@ def test_simulator_default_passes_openimcc_authority_into_flux_dispatch(
         sim.melt.temperature_C = 100.0
     else:
         result.liquid_fraction = 0.0
-    sim._refresh_vapor_pressures_from_kernel(result)
+    sim._refresh_vapor_pressures_from_kernel(
+        result, simulation_hour=int(sim.melt.hour) + 1,
+    )
     assert sim._last_high_t_melt_activity == {}
     assert sim._last_high_t_melt_activity_temperature_K is None
 
     sim.melt.temperature_C = 1850.0
     result.liquid_fraction = 1.0
-    sim._refresh_vapor_pressures_from_kernel(result)
+    sim._refresh_vapor_pressures_from_kernel(
+        result, simulation_hour=int(sim.melt.hour) + 1,
+    )
     certificates = sim._last_high_t_melt_activity["certified_effective_gamma_by_parent"]
     assert certificates
     assert all(c["window_K"] == 0.0 for c in certificates.values())
