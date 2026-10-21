@@ -2435,6 +2435,45 @@ def test_lineage_parents_from_source_never_invents_pointer() -> None:
     assert lineage_parents_from_source({}, {}, "src", {"local_a"}) == ((), ())
 
 
+def test_whitespace_qualified_token_is_prose_and_keeps_derivation(
+    tmp_path: Path,
+) -> None:
+    """b-979: a colon token with whitespace is printed prose. The derivation
+    stays, and the verbatim text is a conditional_field plus a queue entry.
+    """
+
+    text = "not a citation::not a record"
+    parents, prose = lineage_parents_from_source(
+        {"derived_from": text}, {}, "src", set()
+    )
+    assert parents == ()
+    assert prose == (text,)
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    _model_derived_child(
+        extract,
+        "child_spaced_ref",
+        derived_from=text,
+        derivation={
+            "relation": "substitution of printed equilibrium relations",
+            "inputs": text,
+            "output_unit": "dimensionless",
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    rows = _rows_for(result, "child_spaced_ref")
+    assert rows
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == ()
+        assert text not in (obs.derived_from or ())
+    _assert_printed_lineage_flagged(result, text, "derived_from")
+    _assert_printed_lineage_flagged(result, text, "derivation.inputs")
+    assert sum(
+        1 for entry in result.queue if entry.why == _printed_lineage_detail(text)
+    ) == 1
+
+
 _PRINTED_CITATION = (
     "Knacke et al. thermochemical data and prior Mg, Ca and Al "
     "deoxidation-equilibrium data cited by the authors"
@@ -3436,6 +3475,41 @@ def test_langmuir_migrated_rows_keep_qualified_derived_from() -> None:
         "kems-005-fedkin-2006::fedkin_2006_k_class_b1",
     )
     assert observations["iron_olivine_kems"].derived_from is None
+
+
+def test_langmuir_printed_derived_from_is_flagged_verbatim(tmp_path: Path) -> None:
+    """b-979: Langmuir printed derived_from is not stripped into a pointer.
+    The source states no derivation, so none is invented.
+    """
+
+    printed = "  author estimate  "
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "measurements": {
+                    "potassium_silicate_vacuum": {
+                        "species": "K",
+                        "temperature_range_k": [1723.15, 1723.15],
+                        "measured_langmuir_to_effusion_flux_ratio": {"value": 0.13},
+                        "derived_from": printed,
+                        "source": {
+                            "citation_id": "REF-014",
+                            "citation": "Fedkin et al. (2006)",
+                        },
+                    }
+                }
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    observation = result.observations["potassium_silicate_vacuum"]
+    assert observation.derived_from is None
+    assert observation.derivation is None
+    assert observation.value.kind is ValueKind.POINT
+    _assert_printed_lineage_flagged(result, printed, "derived_from")
 
 
 def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:

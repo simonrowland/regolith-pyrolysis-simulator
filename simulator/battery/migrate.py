@@ -6232,8 +6232,9 @@ def lineage_parents_from_source(
     """Source-stated lineage as (parents, prose), without inventing pointers.
 
     A local observation id is qualified with ``source_id::``. A ``pdf:`` or
-    other asset id, and a colon token with no whitespace, stay parents for
-    store validation. Printed text is not a parent: storing it would dangle.
+    other asset id stays a parent. A whitespace-free colon token stays a
+    parent too: a broken reference is a data error for store validation.
+    Any string that contains whitespace is printed text, even with a colon.
     ``prose`` keeps that text verbatim. The caller flags it as a hard
     ``conditional_field`` and queues the same string for page-grounding.
     """
@@ -6262,9 +6263,8 @@ def lineage_parents_from_source(
             parents.append(f"{prefix}{local}")
         elif item in asset_ids:
             parents.append(item)
-        elif "::" in item or (":" in item and not any(char.isspace() for char in item)):
-            # Keep source-stated qualified references for store validation;
-            # the store validator checks them against registered assets.
+        elif ":" in item and not any(char.isspace() for char in item):
+            # A broken whitespace-free reference is a data error, not prose.
             parents.append(item)
         else:
             # Printed text is not a pointer. Do not mint ``source_id::``.
@@ -14559,40 +14559,22 @@ class Migrator:
         if value_derivation is not None:
             stored_lineage.update(value_derivation.inputs)
         queued_prose: set[str] = set()
-
-        def queue_printed(prose_item: str) -> str:
-            detail = (
-                f"derived_from {prose_item!r} is prose, not a resolvable "
-                "observation id; retained here, never minted as a pointer"
-            )
-            if prose_item in stored_lineage or prose_item in queued_prose:
-                return detail
-            self.result.add_queue(
-                work.work_id,
-                locator,
-                ["derived_from"],
-                detail,
-                source=source_key,
-                observation_id=obs_id,
-            )
-            queued_prose.add(prose_item)
-            return detail
-
-        for field, prose_item in (
-            *[("derived_from", item) for item in derived_from_prose],
-            *[("derivation.inputs", item) for item in derivation_prose],
-        ):
-            if prose_item in stored_lineage:
-                continue
-            self.result.registry_issues.append(
-                ValidationIssue(
-                    path=f"observation[{obs_id}].{field}",
-                    reason=RefusalReason.CONDITIONAL_FIELD,
-                    detail=queue_printed(prose_item),
-                )
-            )
+        flag_kwargs = dict(
+            work_id=work.work_id,
+            locator=locator,
+            source_key=source_key,
+            observation_id=obs_id,
+            stored_lineage=stored_lineage,
+            queued=queued_prose,
+        )
+        self._flag_printed_lineage(
+            derived_from_prose, field="derived_from", **flag_kwargs
+        )
+        self._flag_printed_lineage(
+            derivation_prose, field="derivation.inputs", **flag_kwargs
+        )
         for prose_item in lineage_errors:
-            queue_printed(prose_item)
+            self._queue_printed_lineage(prose_item, **flag_kwargs)
         yield_key, yield_items = _yield_table_items(values)
         if (
             yield_items is None
@@ -16780,6 +16762,69 @@ class Migrator:
                     value_reason=value_sel.reason,
                 )
 
+    def _queue_printed_lineage(
+        self,
+        prose_item: str,
+        *,
+        work_id: str,
+        locator: Locator,
+        source_key: str,
+        observation_id: str,
+        stored_lineage: set[str],
+        queued: set[str],
+    ) -> str:
+        """Queue one printed lineage string, verbatim, for page-grounding."""
+
+        detail = (
+            f"derived_from {prose_item!r} is prose, not a resolvable "
+            "observation id; retained here, never minted as a pointer"
+        )
+        if prose_item in stored_lineage or prose_item in queued:
+            return detail
+        self.result.add_queue(
+            work_id,
+            locator,
+            ["derived_from"],
+            detail,
+            source=source_key,
+            observation_id=observation_id,
+        )
+        queued.add(prose_item)
+        return detail
+
+    def _flag_printed_lineage(
+        self,
+        prose: tuple[str, ...],
+        *,
+        field: str,
+        work_id: str,
+        locator: Locator,
+        source_key: str,
+        observation_id: str,
+        stored_lineage: set[str],
+        queued: set[str],
+    ) -> None:
+        """Flag printed lineage as conditional_field without storing it."""
+
+        for prose_item in prose:
+            if prose_item in stored_lineage:
+                continue
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observation[{observation_id}].{field}",
+                    reason=RefusalReason.CONDITIONAL_FIELD,
+                    detail=self._queue_printed_lineage(
+                        prose_item,
+                        work_id=work_id,
+                        locator=locator,
+                        source_key=source_key,
+                        observation_id=observation_id,
+                        stored_lineage=stored_lineage,
+                        queued=queued,
+                    ),
+                )
+            )
+
     def _migrate_langmuir(self, path: Path) -> None:
         if not path.is_file():
             return
@@ -16855,23 +16900,36 @@ class Migrator:
                     source=rel,
                     observation_id=str(meas_id),
                 )
+            source_id = str((src or {}).get("citation_id") or meas_id)
             raw_derived_from = meas.get("derived_from")
-            if isinstance(raw_derived_from, str) and raw_derived_from.strip():
-                derived_from = (raw_derived_from.strip(),)
-            elif isinstance(raw_derived_from, (list, tuple)) and all(
-                isinstance(parent, str) and parent.strip()
-                for parent in raw_derived_from
+            if raw_derived_from is not None and not isinstance(
+                raw_derived_from, (str, list, tuple)
             ):
-                derived_from = tuple(parent.strip() for parent in raw_derived_from)
-            elif raw_derived_from is None:
-                derived_from = None
-            else:
                 raise ValueError(
                     f"malformed derived_from for Langmuir ledger row {meas_id!r}"
                 )
+            try:
+                derived_parents, derived_prose = lineage_parents_from_source(
+                    meas, {}, source_id, set()
+                )
+            except ValueError as exc:
+                raise ValueError(
+                    f"malformed derived_from for Langmuir ledger row {meas_id!r}"
+                ) from exc
+            derived_from = derived_parents or None
+            self._flag_printed_lineage(
+                derived_prose,
+                field="derived_from",
+                work_id=work.work_id,
+                locator=loc,
+                source_key=rel,
+                observation_id=str(meas_id),
+                stored_lineage=set(derived_from or ()),
+                queued=set(),
+            )
             self._generic_obs(
                 work=work,
-                source_id=str((src or {}).get("citation_id") or meas_id),
+                source_id=source_id,
                 source_key=rel,
                 observation_id=str(meas_id),
                 locator=loc,
