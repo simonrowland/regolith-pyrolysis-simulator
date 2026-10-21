@@ -114,7 +114,7 @@ def magemin_openmpi_tmpdir(
     tmpdir.mkdir(parents=True, exist_ok=True)
 
     environment = pytest.MonkeyPatch()
-    environment.setenv("OMPI_MCA_orte_tmpdir_base", str(tmpdir))
+    environment.setenv("TMPDIR", str(tmpdir))
     try:
         yield tmpdir
     finally:
