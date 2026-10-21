@@ -3418,6 +3418,26 @@ def test_g02_langmuir_ledger_keeps_qualified_derived_from(tmp_path: Path) -> Non
     assert observation.derived_from == (parent,)
 
 
+def test_langmuir_migrated_rows_keep_qualified_derived_from() -> None:
+    """b-979: the real Langmuir ledger's qualified parents, pinned before
+    that parser joins ``lineage_parents_from_source``.
+    """
+
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_langmuir(
+        REPO_ROOT / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml"
+    )
+    observations = migrator.result.observations
+    assert observations["chromium_solid_langmuir_knudsen"].derived_from == (
+        "kems-003-pound-1972::pound_1972_cr_solid_alpha_mccabe",
+    )
+    assert observations["potassium_silicate_vacuum"].derived_from == (
+        "kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir",
+        "kems-005-fedkin-2006::fedkin_2006_k_class_b1",
+    )
+    assert observations["iron_olivine_kems"].derived_from is None
+
+
 def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "kems_measurements.yaml").write_text(
