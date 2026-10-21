@@ -358,6 +358,16 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     ).hexdigest() == "0dbdc3673e0d640898dad7b848278f93322c0b48898050618b21811bd63c7e78"
 
 
+@pytest.mark.parametrize("mode", ["constant_gamma", "openimcc"])
+def test_1800_k_pre_switch_physics_pin(mode) -> None:
+    result = _provider().dispatch(
+        _request(BASE_MELT_MOL, 1800.0, high_t_melt_activity=mode)
+    )
+    assert hashlib.sha256(
+        json.dumps(_physics(result), sort_keys=True).encode()
+    ).hexdigest() == "ccdfb94254defeb15f302b251c93dc46ab420c1a83b43b3a78bd4ceb718c8368"
+
+
 @pytest.mark.parametrize("gap_K, hour_gap", [
     (7.5, 1), (15.0, 2), (15.01, 1), (0.0, 3),
 ])
