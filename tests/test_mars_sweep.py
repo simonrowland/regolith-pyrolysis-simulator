@@ -79,6 +79,16 @@ def test_campaign_and_stage_flow_recipe_identity():
     path = ("campaigns", "C2A_continuous", "sweep_mol_per_m2_s")
     slow, fast = RecipePatch({path: 0.01}), RecipePatch({path: 0.1})
     assert slow.recipe_id(schema) != fast.recipe_id(schema)
+    sweep_specs = [spec for spec in schema.allowlist if spec.path[-1] == "sweep_mol_per_m2_s"]
+    assert len(sweep_specs) == 15  # 11 campaign controls and four named stages.
+    for spec in sweep_specs:
+        assert spec.runtime_enabled and not spec.search_enabled
+        assert spec.high is None
+        assert spec not in schema.search_allowlist
+        assert spec.bounds_source == (
+            "search disabled: carrier circulation cost unpriced (t-1407); "
+            "upper bound to derive from duct capacity"
+        )
     stage = RecipePatch.from_nested({"campaigns": {"C2A_staged": {"stages": [
         {"name": "alkali_early_fe", "sweep_mol_per_m2_s": 0.3},
     ]}}})

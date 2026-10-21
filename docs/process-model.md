@@ -54,6 +54,10 @@ declares carrier flow per melt surface in mol/(m² s). Absolute `sweep_mol_per_s
 is derived using the crucible designer’s melt area; zero remains a real control.
 Mars inert sweeps use the reference-design default in `overhead_headspace`
 unless explicitly overridden. Other bodies retain legacy metering when omitted.
+The control remains operator-settable and part of recipe/EvalSpec identity,
+with automatic search disabled until carrier circulation and sensible-heat
+makeup are priced (t-1407). Its search envelope will then derive from duct
+capacity at the campaign process pressure; no upper bound is assumed today.
 The same campaign owner makes the applied flow available as the condenser-train
 design basis for every body; requirements-generator integration follows
 separately. Non-Mars omission retains today's metering behavior, with no

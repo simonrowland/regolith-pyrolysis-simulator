@@ -43,9 +43,9 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # allowlist but disables both for search; this changes conditional subspace
     # dimensions and derived digests.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "1964ba13ac5a7d52abc5d70b686b68b3710db56c3ec84eeb08b43705de2004ca"
+        "a161c71238aa6b2cff698b3b70f1a46487144d4836e22e2ffefad0a83b1e190f"
     )
-    assert digest == "c291ace8899d24f5b2a65cb278ce87fe333a730a12c4c07d94d26e267a9855b8"
+    assert digest == "a98eb12f5bf66dd4f0486a2e63df22f94cd1680ba5014832764ee9e0f9ba0da5"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (

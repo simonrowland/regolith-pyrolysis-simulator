@@ -469,7 +469,7 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
     return (
         _knob(
             f"{prefix}.sweep_mol_per_m2_s", low=0.0, units="mol/m2/s",
-            bounds_source="operator_declared: installed carrier-flow envelope required for search",
+            bounds_source="search disabled: carrier circulation cost unpriced (t-1407); upper bound to derive from duct capacity",
             search_enabled=False,
         ),
         _knob(
@@ -598,7 +598,7 @@ class RecipeSchema:
     ALLOWLIST: tuple[KnobSpec, ...] = (
         *tuple(_knob(
             f"campaigns.{campaign}.sweep_mol_per_m2_s", low=0.0, units="mol/m2/s",
-            bounds_source="operator_declared: installed carrier-flow envelope required for search",
+            bounds_source="search disabled: carrier circulation cost unpriced (t-1407); upper bound to derive from duct capacity",
             search_enabled=False,
         ) for campaign in (
             "C0", "C0b_p_cleanup", "C2A_continuous", "C2A_staged", "C2B",
