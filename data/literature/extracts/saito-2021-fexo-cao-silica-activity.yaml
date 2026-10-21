@@ -1,0 +1,418 @@
+schema_version: literature_extract.v1
+source_id: saito-2021-fexo-cao-silica-activity
+source:
+  citation: Saito, K., Oshima, Y. and Hasegawa, M. (2021), “Reevaluation and Measurements of FexO Activities in
+    FexO–CaO–SiO2 Pseudo-ternary System at 1 573 K,” ISIJ International 61(3), 697–704.
+  doi: 10.2355/isijinternational.ISIJINT-2020-349
+  year: 2021
+extraction:
+  method: Born-digital pdftotext-layout; tables retained as numeric context because the nonstoichiometric FexO component
+    and its reference-phase basis do not map to a scored species/activity encoding; Figures 1–9 recorded with digitisation
+    deferred.
+  date: '2026-10-21'
+  worker: fam38-1021
+review_status: draft
+scope_assessment:
+  document_type: electrochemical FexO activity measurement in ternary slag
+  scored_observations: 0
+  note: 'No typed points: the measured component is nonstoichiometric FexO and both activity references are nonstoichiometric
+    Fe-equilibrated oxide states. The complete numeric tables and all figures are retained in context.'
+species:
+  FeO:
+    observations: []
+    context:
+    - observation_id: saito_2021_table1_initial_compositions
+      type: schema_gap_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 699
+        table: '1'
+      units: mass% and mass-ratio as printed
+      values:
+        method_class: measured_direct
+        quantity_as_printed: initial bulk compositions of slag samples
+        candidate_tokens:
+        - residue_component_composition
+        - activity
+        disposition_reason: Table 1 gives initial whole-sample composition; the store has no token for a multicomponent
+          bulk slag composition vector.
+        table_values_as_printed: "            Table 1.   Initial bulk compositions of slag samples.            \
+          \                      E\x1F      ln 1/ 4\n Et ................... (7)\n                             \
+          \                                                                            F    pO2\n pe1/ 4\n     \
+          \                                                       (mass%CaO)/\nNo.   (mass%FexO)         (mass%CaO)\
+          \       (mass%SiO2)                            , where R is the gas constant, F is the Faraday constant,\
+          \ T is\n                                                            (mass%SiO2)\n  1          22.0   \
+          \           39.0            39.0             50/50             temperature, pO2 (ref ) is the oxygen partial\
+          \ pressure at the ref-\n  2          45.0              11.0            44.0             20/80\n      \
+          \                                                                            erence electrode, pe is the\
+          \ oxygen partial pressure at which\n                                                                 \
+          \                 the ionic and the n-type conductivities are equal, and Et is\n  3          60.0    \
+          \           0.0            40.0             0/100\n                                                  \
+          \                                thermo-emf between Mo(positive) and Fe(negative). Values\n  4       \
+          \   30.0              21.0            49.0             30/70             for these parameters in this\
+          \ study have been reported as\n  5          60.0               0.0            40.0             0/100\n\
+          \                                                                                          log[ pO2 (ref\
+          \ ) / atm ] \x1F 8.84\n 30 100 / (T / K )34 ) ....... (8)\n  6          26.0              29.6       \
+          \     44.4             40/60\n  7          65.0              33.6              1.4             96/4  \
+          \                     log[ pe / atm ] \x1F 20.40\n 64 500 / (T / K )35) ......... (9)\n  8          30.0\
+          \              28.0            42.0             40/60\n  9          55.0               2.3           \
+          \ 42.8              5/95                          Et / mV\n14.69\n 0.0227(T / K )36 ) ........... (10)\n\
+          \                                                                                     When the standard\
+          \ state for FexO is taken as pure non-\n                                                             \
+          \                     stoichiometric solid FexO in equilibrium with pure solid Fe,\n                 \
+          \                                                                 the activity of FexO in slag coexisted\
+          \ with pure solid Fe can\n                                                                           \
+          \       be calculated as follows.\n                                                                  \
+          \                                                                     1/ 2\n pO \e                  .......................\
+          \ (11)\n                                                                                             \
+          \            aFe x O(s)\n  2 \x19\n p O2 ( s ) \x1A\n                                               \
+          \                                   , where pO2 (s ) represents the equilibrium oxygen partial\n    \
+          \                                                                              pressure between pure solid\
+          \ Fe and pure solid FexO, which\n                                                                    \
+          \              is given by\n                                                                         \
+          \                 log\n pO2 (s ) / atm\n \e 6.71 \x1A 27 400 / (T / K )36 ) .... (12)\n             \
+          \                                                                       Similarly, when the standard state\
+          \ for FexO is taken as\n                                                                             \
+          \     pure non-stoichiometric liquid FexO in equilibrium with pure\n                                 \
+          \                                                 solid Fe, the activity of FexO can be obtained as follows.\n\
+          \                                                                                                    \
+          \                               1/ 2\n pO \e\n                                                       \
+          \                                                  aFe x O(l)\n  2 \x19                 ........................\
+          \ (13)\n p O2 ( l ) \x1A\n                                                                           \
+          \       , where pO2 ( l ) is the equilibrium oxygen partial pressure\n                              \
+          \                                                    between pure solid Fe and pure liquid FexO, which\
+          \ is\n                                                                                  reported by\n\
+          \                                                                                          log\n pO2\
+          \ ( l ) / atm\n \e 4.39 \x1A 23 500 / (T / K )37) .... (14)\n                                        \
+          \                                             After the stable value for emf was measured, the slag"
+    - observation_id: saito_2021_table2_measured_activities_context
+      type: schema_gap_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 700
+        table: '2'
+      units: as printed
+      values:
+        method_class: measured_reduced
+        quantity_as_printed: '42 electrochemical results: FeO and FeO1.5 mass%, CaO and SiO2 mass%, emf, log(pO2/atm),
+          and two FexO activity references per row'
+        candidate_tokens:
+        - activity
+        - valence_ratio
+        - residue_component_composition
+        disposition_reason: The activity component is printed as nonstoichiometric FexO, which has no supported
+          species formula; the two references are pure nonstoichiometric FexO equilibrated with Fe, whose phase
+          basis remains unknown under the family standard-state ruling. Table rows are preserved intact without
+          scoring.
+        table_values_as_printed: "                                                   Table 2.     Experimental results\
+          \ at 1 573 K.\n                        (mass%CaO)                  mass%\n                 No.       \
+          \                                                      E/mV       log( pO2 / atm )   aFe x O (s) *   aFe\
+          \ x O (l) **\n                        (mass%SiO2 )      FeO     FeO1.5 CaO SiO2\n                  1-1\
+          \       50/50         29.0      3.3    33.9     33.9    73.75 ± 1.25        −10.97           0.727   \
+          \        0.616\n                  1-2                     37.5      5.2    28.6     28.6    68.40 ± 0.05\
+          \        −10.90           0.787           0.666\n                  1-3                     46.4      6.4\
+          \    23.6     23.6    58.55 ± 0.25        −10.77           0.911           0.772\n                 1-4\
+          \                      48.8      7.4    21.9     21.9    57.40 ± 0.20        −10.76           0.926  \
+          \         0.785\n                 2-1        20/80         57.0      4.2       7.8   31.0    66.02 ± 0.10\
+          \        −10.87           0.816           0.692\n                 2-2                      58.5      3.9\
+          \       7.5   30.1    64.20 ± 0.20        −10.85           0.838           0.709\n                 2-3\
+          \                      59.8      6.2       6.8   27.3    54.41 ± 0.05        −10.72           0.968  \
+          \         0.821\n                 2-4                      63.6      7.1       5.9   23.5    54.27 ± 0.03\
+          \        −10.72           0.970           0.823\n                 3-1        0/100         59.3      0.8\
+          \       0.0   39.9    103.40 ± 0.05       −11.35           0.469           0.397\n                 3-2\
+          \                      61.9      1.3       0.0   36.8    88.15 ± 0.05        −11.16           0.588  \
+          \         0.498\n                 3-3                      64.1      3.4       0.0   32.5    74.52 ± 0.04\
+          \        −10.98           0.719           0.609\n                 3-4                      64.4      6.9\
+          \       0.0   28.7    63.50 ± 0.05        −10.84           0.847           0.717\n                 4-1\
+          \        30/70         54.7      6.7    11.6     27.0    64.03 ± 0.05        −10.85           0.840  \
+          \         0.711\n                 4-2                      56.7      6.0    11.2     26.1    62.25 ± 0.05\
+          \        −10.82           0.862           0.730\n                 4-3                      57.5      7.6\
+          \    10.5     24.4    57.96 ± 0.06        −10.77           0.919           0.778\n                 4-4\
+          \                      60.5      8.3       9.4   21.9    56.38 ± 0.05        −10.75           0.941  \
+          \         0.797\n                 4-5                      60.2      8.6       9.3   21.8    56.00 ± 0.05\
+          \        −10.74           0.946           0.801\n                 4-6                      63.4      9.6\
+          \       8.1   18.9    53.30 ± 0.06        −10.71           0.984           0.834\n                 5-1\
+          \        0/100         56.7      3.0       0.0   40.2    102.87 ± 0.03       −11.34           0.473  \
+          \         0.400\n                 5-2                      58.8      5.2       0.0   36.0    86.84 ± 0.10\
+          \        −11.14           0.599           0.507\n                 5-3                      62.6      6.3\
+          \       0.0   31.1    72.12 ± 0.05        −10.95           0.745           0.631\n                 5-4\
+          \                      64.8      7.3       0.0   27.8    65.91 ± 0.05        −10.87           0.817  \
+          \         0.692\n                 5-5                      66.4      7.5       0.0   26.2    60.72 ± 0.05\
+          \        −10.80           0.882           0.747\n                 5-6                      65.3     11.8\
+          \       0.0   22.9    54.56 ± 0.15        −10.72           0.966           0.818\n                  5-7\
+          \                     71.3     11.2       0.0   17.5    52.72 ± 0.03        −10.70           0.993   \
+          \        0.841\n                 6-1        40/60         29.7      2.5    27.1     40.7    110.67 ± 0.05\
+          \       −11.45           0.421           0.357\n                 6-2                      39.5      4.4\
+          \    22.4     33.6    72.05 ± 0.05        −10.95           0.746           0.632\n                 6-3\
+          \                      46.0      5.9     19.3    28.9    65.26 ± 0.10        −10.86           0.825  \
+          \         0.698\n                 6-4                      48.4      9.0     17.0    25.6    56.15 ± 0.10\
+          \        −10.74           0.944           0.799\n                 6-5                      56.4     12.0\
+          \     12.6    18.9    54.23 ± 0.05        −10.72           0.971           0.822\n                  7-1\
+          \       96/4          46.5     21.9     30.4    1.3     85.72 ± 0.05        −11.12           0.609   \
+          \        0.516\n                  7-2                     51.9     21.2     25.8    1.1     66.99 ± 0.10\
+          \        −10.88           0.804           0.681\n                  7-3                     61.1     21.3\
+          \     16.9    0.7     57.26 ± 0.05        −10.76           0.928           0.786\n                  8-1\
+          \       40/60         33.4      6.4     24.1    36.1    90.45 ± 0.05        −11.19           0.566   \
+          \        0.479\n                 8-2                      41.8      6.0     20.9    31.4    74.57 ± 0.05\
+          \        −10.98           0.716           0.606\n                 9-1        5/95          51.3      6.2\
+          \       2.1   40.4    107.28 ± 0.05       −11.41           0.441           0.373\n                 9-2\
+          \                      57.5      4.9       1.9   35.8    90.76 ± 0.05        −11.19           0.563  \
+          \         0.477\n                 9-3                      59.8      6.7       1.7   31.8    76.60 ± 0.05\
+          \        −11.01           0.695           0.589\n                 9-4                      60.4      9.6\
+          \       1.5   28.6    68.44 ± 0.05        −10.91           0.784           0.664\n                 9-5\
+          \                      61.6      8.4       1.5   28.5    64.09 ± 0.05        −10.85           0.836  \
+          \         0.708\n                 9-6                      63.6     12.1       1.2   23.1    58.29 ± 0.05\
+          \        −10.77           0.911           0.772\n                 9-7                      64.7     13.1\
+          \       1.1   21.1    54.20 ± 0.05        −10.72           0.968           0.820"
+        printed_log_pO2_reference: atm
+        standard_states_as_printed:
+          a_FexO_s: pure non-stoichiometric solid FexO in equilibrium with pure solid Fe
+          a_FexO_l: pure non-stoichiometric liquid FexO in equilibrium with pure solid Fe
+    - observation_id: saito_2021_figure1_deferred
+      type: figure_record
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      panel: whole_figure
+      phase: FexO–CaO–SiO2 ternary system at 1573 K
+      units: phase_diagram; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: phase_diagram
+        species: FexO, CaO, and SiO2
+        temperature_as_printed: 1573 K
+        axes_as_printed:
+          x: CaO–SiO2–FexO ternary composition
+          y: as printed; ternary diagram
+        series:
+        - name: liquidus and phase boundaries
+          marker: curves
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        caption: Iso-thermal section of the FexO–CaO–SiO2 ternary system at 1 573 K.
+        digitisation: deferred to a figure pass
+    - observation_id: saito_2021_figure2_deferred
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+      panel: whole_figure
+      phase: FexO–CaO–SiO2 ternary system
+      units: activity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: activity
+        species: FexO, CaO, and SiO2
+        temperature_as_printed: 1573 K
+        axes_as_printed:
+          x: ternary composition
+          y: FexO activity
+        series:
+        - name: Bodsworth [27]
+          marker: symbols/curves
+          marker_count: 0
+          attribution: as identified in figure legend
+        - name: Kudo et al. [31]
+          marker: symbols/curves
+          marker_count: 0
+          attribution: as identified in figure legend
+        - name: Enaka et al. [32]
+          marker: symbols/curves
+          marker_count: 0
+          attribution: as identified in figure legend
+        caption: FexO activities in the FexO–CaO–SiO2 ternary system at 1 573 K by Bodsworth, Kudo et al. and Enaka
+          et al.
+        digitisation: deferred to a figure pass
+    - observation_id: saito_2021_figure3_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        figure: '3'
+      panel: whole_figure
+      phase: electrochemical activity-measurement apparatus
+      units: apparatus; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: apparatus
+        species: FexO
+        temperature_as_printed: apparatus figure
+        axes_as_printed:
+          x: not applicable
+          y: not applicable
+        series:
+        - name: apparatus schematic
+          marker: diagram
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        caption: Experimental apparatus.
+        digitisation: deferred to a figure pass
+    - observation_id: saito_2021_figure4_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        figure: '4'
+      panel: whole_figure
+      phase: FexO–CaO–SiO2 liquid slag at 1573 K
+      units: activity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: activity
+        species: FexO
+        temperature_as_printed: 1573 K
+        axes_as_printed:
+          x: mole fraction of FexO
+          y: FexO activity
+        series:
+        - name: present measurements, CaO/SiO2 composition series
+          marker: curves
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        caption: FexO activities plotted against mole fractions of FexO at 1 573 K in the present study.
+        digitisation: deferred to a figure pass
+    - observation_id: saito_2021_figure5_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        figure: '5'
+      panel: whole_figure
+      phase: FexO–CaO–SiO2 liquid slag at 1573 K; CaO/SiO2 mass ratio about 50/50
+      units: activity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: activity
+        species: FexO
+        temperature_as_printed: 1573 K
+        axes_as_printed:
+          x: as printed
+          y: FexO activity
+        series:
+        - name: present study
+          marker: symbols
+          marker_count: 0
+          attribution: as identified in figure legend
+        - name: literature measurements [27,31,32]
+          marker: symbols
+          marker_count: 0
+          attribution: as identified in figure legend
+        caption: Comparison of the present results with literature data for initial mass CaO/SiO2 ratio approximately
+          50/50.
+        digitisation: deferred to a figure pass
+    - observation_id: saito_2021_figure6_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        figure: '6'
+      panel: whole_figure
+      phase: FexO–CaO–SiO2 ternary system at 1573 K
+      units: activity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: activity
+        species: FexO, CaO, and SiO2
+        temperature_as_printed: 1573 K
+        axes_as_printed:
+          x: ternary composition
+          y: FexO activity
+        series:
+        - name: FexO iso-activity curves
+          marker: curves
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        caption: Iso-activity curve of FexO; standard state pure solid FexO.
+        digitisation: deferred to a figure pass
+    - observation_id: saito_2021_figure7_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        figure: '7'
+      panel: panels (a)–(b)
+      phase: FexO–CaO–SiO2 ternary system at 1573 K
+      units: phase_diagram; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: phase_diagram
+        species: FexO, CaO, and SiO2
+        temperature_as_printed: 1573 K
+        axes_as_printed:
+          x: CaO/(CaO+SiO2) mole fraction
+          y: phase boundaries and logarithmic activities
+        series:
+        - name: phase boundaries
+          marker: curves
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        - name: FexO activity
+          marker: curve
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        - name: CaO activity
+          marker: curve
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        - name: SiO2 activity
+          marker: curve
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        caption: (a) phase diagram; (b) FexO, CaO, and SiO2 activities along liquidus lines.
+        digitisation: deferred to a figure pass
+    - observation_id: saito_2021_figure8_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: '8'
+      panel: whole_figure
+      phase: FexO–CaO–SiO2 liquidus line d–e
+      units: activity; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: activity
+        species: FexO
+        temperature_as_printed: 1573 K
+        axes_as_printed:
+          x: X_FexO/(2X_SiO2−X_CaO)
+          y: log a_FexO(s)
+        series:
+        - name: liquidus line d–e
+          marker: curve
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        caption: Relation between X_FexO/(2X_SiO2−X_CaO) and log a_FexO(s).
+        digitisation: deferred to a figure pass
+    - observation_id: saito_2021_figure9_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: '9'
+      panel: whole_figure
+      phase: phosphorus content in molten iron coexisting with slag
+      units: phosphorus_content; no numeric points transcribed
+      values:
+        method_class: figure_only
+        quantity_as_printed: phosphorus_content
+        species: FexO
+        temperature_as_printed: 1573 K
+        axes_as_printed:
+          x: CaO/(CaO+SiO2)
+          y: log mass% P in Fe
+        series:
+        - name: present calculation from Eq. 31
+          marker: calculated curve
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        - name: comparison data
+          marker: symbols
+          marker_count: 0
+          attribution: Saito, Oshima and Hasegawa (2021)
+        caption: log mass% P in molten iron plotted against CaO/(CaO+SiO2).
+        digitisation: deferred to a figure pass
