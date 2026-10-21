@@ -96,7 +96,7 @@ fidelity_samples:
     pdf_page_index: 2
     note: Table 2 right panel T=0 SiO2 = 52.32 (composition V)
 - species: Na
-  observable: rate_series
+  observable: model_output_context
   observation_id: markova_1984_dissipation_1500C_reduced_lunar_mass_model
   field: Na_pct
   value: 14.0
@@ -104,7 +104,7 @@ fidelity_samples:
     published_page: 510
     pdf_page_index: 2
     paragraph: dissipation for SiO-2%, K-3%, Na-14%
-- path: species.SiO2.observations[markova_1984_kems_method_stepwise_heating].values.temperature_step_C
+- path: species.SiO2.context[markova_1984_kems_method_stepwise_heating].values.temperature_step_C
   value: 70.0
   locator:
     published_page: 509
@@ -728,7 +728,7 @@ species:
         note: Figure-only; tracks not digitised.
     context:
       - observation_id: markova_1984_kems_method_stepwise_heating
-        type: rate_series
+        type: method_context
         locator:
           published_page: 509
           pdf_page_index: 1
@@ -777,10 +777,10 @@ species:
           note: No numeric uncertainty printed for the temperature step or duration.
 
   Na:
-    observations:
+    observations: []
     context:
       - observation_id: markova_1984_dissipation_1500C_recent_moon_model
-        type: rate_series
+        type: model_output_context
         class_tag: model
         locator:
           published_page: 509
@@ -814,7 +814,7 @@ species:
         uncertainty:
           note: Authors print ~2% and ~1%; no numeric uncertainty.
       - observation_id: markova_1984_dissipation_1500C_reduced_lunar_mass_model
-        type: rate_series
+        type: model_output_context
         class_tag: model
         locator:
           published_page: 510
@@ -848,7 +848,7 @@ species:
           note: Model percentages as printed; no numeric uncertainty. Fig. 2 is the curve form of the same
             calculation and was not digitised.
       - observation_id: markova_1984_fig2_dissipation_curves_figure_only
-        type: rate_series
+        type: figure_model_context
         locator:
           figure: '2'
           published_page: 510
