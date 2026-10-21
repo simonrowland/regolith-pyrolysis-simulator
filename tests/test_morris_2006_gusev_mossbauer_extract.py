@@ -107,7 +107,7 @@ def test_all_tables_have_dispositions_and_all_figures_are_deferred_without_point
 
 
 @pytest.mark.skipif(not TABLES.is_dir(), reason=f"corpus table asset is unavailable: {TABLES}")
-def test_derived_class_means_remain_context_linked_to_table5():
+def test_derived_class_means_remain_context_with_printed_footnote():
     source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     context = source["species"]["Fe"]["context"]
     for table_number in (6, 7):
@@ -118,7 +118,8 @@ def test_derived_class_means_remain_context_linked_to_table5():
         assert row["type"] == "measured_table_context"
         assert row["values"]["derived_from"] == [f"tables:{SID}"]
         assert row["values"]["derivation"]["inputs"] == [f"tables:{SID}"]
-        assert "table-5.csv" in row["values"]["derivation"]["locator"]
+        assert "table-5.csv" not in row["values"]["derivation"]["locator"]
+        assert "table-5.csv" not in row["values"]["disposition_reason"]
         relation = row["values"]["derivation"]["relation"]
         assert "Standard deviation of class members or 2%, whichever is larger, for subspectral areas." in relation
         assert "printed averages are retained as printed" in relation

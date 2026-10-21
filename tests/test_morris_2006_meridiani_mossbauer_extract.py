@@ -126,7 +126,11 @@ def test_derived_class_means_remain_context_linked_to_registered_tables():
     assert table10["values"]["derivation"]["inputs"] == [f"tables:{SID}"]
     assert "table-9.csv" in table10["values"]["derivation"]["locator"]
     relation = table10["values"]["derivation"]["relation"]
+    disposition = table10["values"]["disposition_reason"]
     assert 'Calculated from elemental data in Table 9.' in relation
+    assert 'Calculated from elemental data in Table 9.' in disposition
+    assert "copy" not in disposition.lower()
+    assert "copied" not in disposition.lower()
     assert "arithmetic means of member target values" not in relation
     assert "copies" not in relation
     assert "remain context" in relation
