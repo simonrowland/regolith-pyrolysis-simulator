@@ -1,0 +1,36 @@
+source_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+source:
+  citation: 'Balabanova, E. A., Lopatin, S. I., Tyurnina, N. G. & Tyurnina, Z. G. (2025). Vaporization and Thermodynamic Properties of the SrO–BaO–Al2O3–SiO2 System Based on High-Temperature Mass Spectrometry Data. Glass Physics and Chemistry, 51(6), 670–677. DOI: 10.1134/S1087659625600966.'
+  doi: 10.1134/S1087659625600966
+  year: 2025
+extraction:
+  method: MinerU table 2 cell mapping; activity values subsequently retained with printed spelling and converted to scalar values for migration.
+  date: '2026-10-20'
+  worker: codex-fam33-1020
+tables:
+  - page: 5
+    table_index: 2
+    type: partial_pressure
+    quantity: partial_pressure
+    unit: Pa
+    evidence_class: measured_direct
+    phase: gas
+    temperature: {as_printed: '2000', unit: K}
+    values:
+      - {column: 2, species: Ba}
+      - {column: 3, species: BaO}
+      - {column: 4, species: Sr}
+      - {column: 5, species: SiO}
+      - {column: 6, species: O2}
+  - page: 5
+    table_index: 2
+    type: gibbs_table
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: unknown
+    temperature: {as_printed: '2000', unit: K}
+    values:
+      - {column: 7, species: BaO}
+      - {column: 8, species: SrO}
+      - {column: 9, species: SiO2}
