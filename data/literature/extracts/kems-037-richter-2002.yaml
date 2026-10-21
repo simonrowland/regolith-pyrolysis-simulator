@@ -177,502 +177,2689 @@ experiments:
 species:
   Mg:
     observations:
-    - observation_id: richter_2002_mg_cai_langmuir_gamma
-      experiment: bcai-evaporation
-      type: alpha
+    - observation_id: richter_2002_table1_mg_flux_b-133-11
+      type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        page: 5
+        published_page: 525
         table: '1'
-        figure: '12'
-        line_range: 174-178
-        note: γ_Mg evaporation coefficients from vacuum and H2 experiments
+        row: B-133-11
+        note: J_Mg printed molar flux
       T_range_K:
-      - 1673.0
-      - 1773.0
-      phase: l
-      condensed_form:
-        state: partially_molten
-        metastable: false
-        basis: temperature_inferred
-        note: Richter-2002 CAI liquidus ~1823 K; scored/range includes subliquidus or mixed H2/vacuum grounding
-        transition_context:
-          liquidus_K: 1823.0
-          source_locator: Type-B CAI liquidus ~1823 K (audit 2026-08-09; Richter-2007 fully-molten claim)
-      standard_state: free evaporation / low-P H2; γ from HKL with thermodynamic P_sat
-      regime: langmuir_free_evaporation
-      units: dimensionless
-      values:
-        alpha: 0.04
-        system_note: Type-B CAI-like starting melt; authors' fitted gamma_Mg value
-        alpha_note: γ_Mg = 0.04 chosen so calculated curve passes through average Mg evaporation rate
-          of BCAI series at 1500°C (Fig. 12; limit a→0 no recondensation)
-        gas_species: Mg(g)
-        material: Type_B_CAI_like_liquid
-        surface_area_range_cm2:
-        - 0.063
-        - 0.416
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        missing_note: Free-evap / furnace experiments — not Knudsen-cell Motzfeldt geometry.
-      uncertainty:
-        note: single γ_Mg=0.04 fit to average BCAI rate at 1500°C; Table 1 has per-run γ
-      equipment:
-        sample_surface_area:
-          value:
-            range_cm2:
-            - 0.063
-            - 0.416
-            table: 1
-            note: Avg.area (cm2) column in Table 1; range used to assess recondensation
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-            paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
-            line_range: '450'
-            note: Authors prose range (Table 1 Avg.area spans ~0.062–0.425; prose rounds to 0.063–0.416)
-        chamber_pressure:
-          value:
-            vacuum_bar: 1.0e-09
-            hydrogen_bar_example: 0.000187
-            one_bar_gas_mix: true
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-            paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
-            line_range: 194-196
-          note: Scoped to vacuum-run subset (~10^-6 Torr) that owns the pinned γ_Mg=0.04; H2 (1.87e-4
-            bar) and 1-bar gas-mix runs are separate atmospheres in the paper — not collapsed into this
-            pressure field.
-          scope: vacuum_runs_only
-    - observation_id: richter_2002_mg_table1_per_run_areas_b1
-      type: alpha
-      locator:
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-        table: '1'
-        paragraph: Avg.area (cm2) and γ_Mg per run
-      T_range_K:
-      - 1773.15
+      - 2073.15
       - 2073.15
       phase: l
-      condensed_form:
-        state: partially_molten
-        metastable: false
-        basis: temperature_inferred
-        note: Richter-2002 CAI liquidus ~1823 K; range straddles it — B-113/B-133 vacuum runs at 1973/2073 K are liquid-side but carry no adopted per-run α (adopted α=0.04 is the H2 1773 K subliquidus series pin), so no per-point split is possible
-        transition_context:
-          liquidus_K: 1823.0
-          source_locator: Type-B CAI liquidus ~1823 K (audit 2026-08-09; Richter-2007 fully-molten claim)
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id001
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-11
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-11
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-11
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '9.14e-08'
+        gas_species: Mg(g)
+        sample: B-133-11
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_b-133-11
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-11
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
       regime: langmuir_free_evaporation
       units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_b-133-11
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_b-133-11
+      point_conditions: *id001
       values:
-        alpha: 0.04
-        system_note: Type-B CAI-like starting melt; per-run gamma_Mg table
-        alpha_note: Existing pin ~0.04 for H2 series mid; full per-run γ_Mg matrix below
+        alpha: '0.21'
         gas_species: Mg(g)
-        material: Type_B_CAI-like_CMAS
-        method_class: measured_direct
-        system_class: silicate_melt
-        transformation_class: redox_reduction_required
-        interfacial_reaction: MgO(melt) -> Mg(g) + 1/2 O2
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         semantics: competing_observation_do_not_average
-        per_run_table1:
-        - sample: B-133-11
-          pressure_note: <1e-9
-          T_C: 1800
-          T_K: 2073.15
-          avg_area_cm2: 0.12
-          avg_area_m2: 1.2e-05
-          gamma_Mg: 0.21
-          gamma_Si: 0.2
-        - sample: B-133-12
-          pressure_note: <1e-9
-          T_C: 1800
-          T_K: 2073.15
-          avg_area_cm2: 0.14
-          avg_area_m2: 1.4000000000000001e-05
-          gamma_Mg: 0.17
-          gamma_Si: 0.17
-        - sample: B-133-13
-          pressure_note: <1e-9
-          T_C: 1800
-          T_K: 2073.15
-          avg_area_cm2: 0.15
-          avg_area_m2: 1.5e-05
-          gamma_Mg: 0.18
-          gamma_Si: 0.18
-        - sample: B-133-15
-          pressure_note: <1e-9
-          T_C: 1800
-          T_K: 2073.15
-          avg_area_cm2: 0.19
-          avg_area_m2: 1.9e-05
-          gamma_Mg: 0.21
-          gamma_Si: 0.2
-        - sample: B-133-16
-          pressure_note: <1e-9
-          T_C: 1800
-          T_K: 2073.15
-          avg_area_cm2: 0.13
-          avg_area_m2: 1.3000000000000001e-05
-          gamma_Mg: 0.22
-          gamma_Si: 0.2
-        - sample: B-133-17
-          pressure_note: <1e-9
-          T_C: 1800
-          T_K: 2073.15
-          avg_area_cm2: 0.19
-          avg_area_m2: 1.9e-05
-          gamma_Mg: 0.12
-          gamma_Si: 0.13
-        - sample: B-133-19
-          pressure_note: <1e-9
-          T_C: 1800
-          T_K: 2073.15
-          avg_area_cm2: 0.26
-          avg_area_m2: 2.6000000000000002e-05
-          gamma_Mg: 0.1
-          gamma_Si: 0.11
-        - sample: B-113-8
-          pressure_note: <1e-9
-          T_C: 1800
-          T_K: 2073.15
-          avg_area_cm2: 0.161
-          avg_area_m2: 1.6100000000000002e-05
-          gamma_Mg: 0.15
-          gamma_Si: 0.14
-        - sample: B-113-9
-          pressure_note: <1e-9
-          T_C: 1800
-          T_K: 2073.15
-          avg_area_cm2: 0.135
-          avg_area_m2: 1.3500000000000001e-05
-          gamma_Mg: 0.24
-          gamma_Si: 0.15
-        - sample: B-113-10
-          pressure_note: <1e-9
-          T_C: 1700
-          T_K: 1973.15
-          avg_area_cm2: 0.131
-          avg_area_m2: 1.3100000000000002e-05
-          gamma_Mg: 0.18
-          gamma_Si: 0.14
-        - sample: BCAI-ss1
-          pressure_note: 1.87e-4_H2
-          T_C: 1500
-          T_K: 1773.15
-          avg_area_cm2: 0.0672
-          avg_area_m2: 6.72e-06
-          gamma_Mg: 0.051
-          gamma_Si: 0.058
-        - sample: BCAI-ss2
-          pressure_note: 1.87e-4_H2
-          T_C: 1500
-          T_K: 1773.15
-          avg_area_cm2: 0.0621
-          avg_area_m2: 6.210000000000001e-06
-          gamma_Mg: 0.047
-          gamma_Si: 0.068
-        - sample: BCAI-s1
-          pressure_note: 1.87e-4_H2
-          T_C: 1500
-          T_K: 1773.15
-          avg_area_cm2: 0.168
-          avg_area_m2: 1.6800000000000002e-05
-          gamma_Mg: 0.039
-          gamma_Si: 0.048
-        - sample: BCAI-s3
-          pressure_note: 1.87e-4_H2
-          T_C: 1500
-          T_K: 1773.15
-          avg_area_cm2: 0.134
-          avg_area_m2: 1.3400000000000002e-05
-          gamma_Mg: 0.048
-          gamma_Si: 0.069
-        - sample: BCAI-m1
-          pressure_note: 1.87e-4_H2
-          T_C: 1500
-          T_K: 1773.15
-          avg_area_cm2: 0.407
-          avg_area_m2: 4.07e-05
-          gamma_Mg: 0.026
-          gamma_Si: 0.049
-        - sample: BCAI-m2
-          pressure_note: 1.87e-4_H2
-          T_C: 1500
-          T_K: 1773.15
-          avg_area_cm2: 0.425
-          avg_area_m2: 4.25e-05
-          gamma_Mg: 0.029
-          gamma_Si: 0.05
-        note: Per-run Avg.area broken out of prior range 0.063–0.416 cm2. Areas are melt free surfaces
-          (Langmuir), not Knudsen orifices.
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        - P_eq
-      equipment:
-        sample_surface_area:
-          value: 1.68e-05
-          units: m2
-          inferred: true
-          inference: A = 0.168 cm2 (BCAI-s1) * 1e-4 m2/cm2 = 1.68e-5 m2; full per-run series in values.per_run_table1
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_b-133-12
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-12
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id002
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            page: 5
             table: '1'
-            paragraph: BCAI-s1 Avg.area 0.168 cm2
-        chamber_pressure:
-          value: 0.000187
-          units: bar
-          note: H2 series example; vacuum rows are <1e-9 bar
+            row: B-133-12
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+            page: 5
             table: '1'
+            row: B-133-12
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-12
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '6.78e-08'
+        gas_species: Mg(g)
+        sample: B-133-12
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_b-133-12
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-12
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_b-133-12
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_b-133-12
+      point_conditions: *id002
+      values:
+        alpha: '0.17'
+        gas_species: Mg(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_b-133-13
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-13
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id003
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-13
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-13
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-13
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '7.73e-08'
+        gas_species: Mg(g)
+        sample: B-133-13
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_b-133-13
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-13
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_b-133-13
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_b-133-13
+      point_conditions: *id003
+      values:
+        alpha: '0.18'
+        gas_species: Mg(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_b-133-15
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-15
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id004
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-15
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-15
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-15
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '8.28e-08'
+        gas_species: Mg(g)
+        sample: B-133-15
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_b-133-15
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-15
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_b-133-15
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_b-133-15
+      point_conditions: *id004
+      values:
+        alpha: '0.21'
+        gas_species: Mg(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_b-133-16
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-16
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id005
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-16
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-16
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-16
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '8.65e-08'
+        gas_species: Mg(g)
+        sample: B-133-16
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_b-133-16
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-16
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_b-133-16
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_b-133-16
+      point_conditions: *id005
+      values:
+        alpha: '0.22'
+        gas_species: Mg(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_b-133-17
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-17
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id006
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-17
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-17
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-17
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '3.71e-08'
+        gas_species: Mg(g)
+        sample: B-133-17
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_b-133-17
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-17
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_b-133-17
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_b-133-17
+      point_conditions: *id006
+      values:
+        alpha: '0.12'
+        gas_species: Mg(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_b-133-19
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-19
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id007
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-19
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-19
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-19
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '11.94'
+              - - SiO2
+                - '46.04'
+              - - CaO
+                - '22.64'
+              - - Al2O3
+                - '19.3'
+          locator:
+            page: 5
+            table: '1'
+            row: B-133-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.84e-08'
+        gas_species: Mg(g)
+        sample: B-133-19
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_b-133-19
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-19
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_b-133-19
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_b-133-19
+      point_conditions: *id007
+      values:
+        alpha: '0.1'
+        gas_species: Mg(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_b-113-8
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-8
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id008
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-8
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-8
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-8
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '12.67'
+              - - SiO2
+                - '47.89'
+              - - CaO
+                - '19.66'
+              - - Al2O3
+                - '19.78'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '5.74e-08'
+        gas_species: Mg(g)
+        sample: B-113-8
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_b-113-8
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-8
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_b-113-8
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_b-113-8
+      point_conditions: *id008
+      values:
+        alpha: '0.15'
+        gas_species: Mg(g)
+        material: Type B CAI-like B-113 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_b-113-9
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-9
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id009
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2073.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-9
+            note: 1800 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-9
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-9
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '12.67'
+              - - SiO2
+                - '47.89'
+              - - CaO
+                - '19.66'
+              - - Al2O3
+                - '19.78'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '9.24e-08'
+        gas_species: Mg(g)
+        sample: B-113-9
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_b-113-9
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-9
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_b-113-9
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_b-113-9
+      point_conditions: *id009
+      values:
+        alpha: '0.24'
+        gas_species: Mg(g)
+        material: Type B CAI-like B-113 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_b-113-10
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-10
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 1973.15
+      - 1973.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id010
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1973.15'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-10
+            note: 1700 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: reported only as <1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-10
+            note: vacuum, P < 1e-9 bar
+        atmosphere:
+          state:
+            tag: value
+            value: vacuum, P < 1e-9 bar
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-10
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '12.67'
+              - - SiO2
+                - '47.89'
+              - - CaO
+                - '19.66'
+              - - Al2O3
+                - '19.78'
+          locator:
+            page: 5
+            table: '1'
+            row: B-113-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '1.66e-08'
+        gas_species: Mg(g)
+        sample: B-113-10
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_b-113-10
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-10
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 1973.15
+      - 1973.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_b-113-10
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_b-113-10
+      point_conditions: *id010
+      values:
+        alpha: '0.18'
+        gas_species: Mg(g)
+        material: Type B CAI-like B-113 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_bcai-ss1
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss1
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id011
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss1
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss1
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '4.12e-08'
+        gas_species: Mg(g)
+        sample: BCAI-ss1
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_bcai-ss1
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss1
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_bcai-ss1
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_bcai-ss1
+      point_conditions: *id011
+      values:
+        alpha: '0.051'
+        gas_species: Mg(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_bcai-ss2
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss2
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id012
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss2
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss2
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-ss2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '3.68e-08'
+        gas_species: Mg(g)
+        sample: BCAI-ss2
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_bcai-ss2
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss2
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_bcai-ss2
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_bcai-ss2
+      point_conditions: *id012
+      values:
+        alpha: '0.047'
+        gas_species: Mg(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_bcai-s1
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s1
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id013
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s1
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s1
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '3.12e-08'
+        gas_species: Mg(g)
+        sample: BCAI-s1
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_bcai-s1
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s1
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_bcai-s1
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_bcai-s1
+      point_conditions: *id013
+      values:
+        alpha: '0.039'
+        gas_species: Mg(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_bcai-s3
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s3
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id014
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s3
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s3
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-s3
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '3.51e-08'
+        gas_species: Mg(g)
+        sample: BCAI-s3
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_bcai-s3
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s3
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_bcai-s3
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_bcai-s3
+      point_conditions: *id014
+      values:
+        alpha: '0.048'
+        gas_species: Mg(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_bcai-m1
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m1
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id015
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m1
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m1
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m1
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.1e-08'
+        gas_species: Mg(g)
+        sample: BCAI-m1
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_bcai-m1
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m1
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_bcai-m1
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_bcai-m1
+      point_conditions: *id015
+      values:
+        alpha: '0.026'
+        gas_species: Mg(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_flux_bcai-m2
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m2
+        note: J_Mg printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: &id016
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773.15'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m2
+            note: 1500 °C as printed
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '18.7'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m2
+            note: 1.87e-4 bar H2
+        atmosphere:
+          state:
+            tag: value
+            value: hydrogen, 1.87e-4 bar
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-m2
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - MgO
+                - '17.84'
+              - - SiO2
+                - '37.04'
+              - - CaO
+                - '24.61'
+              - - Al2O3
+                - '20.51'
+          locator:
+            page: 5
+            table: '1'
+            row: BCAI-0
+            note: starting composition as printed in Table 1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.34e-08'
+        gas_species: Mg(g)
+        sample: BCAI-m2
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_mg_gamma_bcai-m2
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m2
+        note: gamma_Mg printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_mg_flux_bcai-m2
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_mg_flux_bcai-m2
+      point_conditions: *id016
+      values:
+        alpha: '0.029'
+        gas_species: Mg(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    context:
+    - observation_id: richter_2002_mg_cai_langmuir_gamma_fit
+      type: figure_fit_record
+      locator:
+        page: 5
+        published_page: 525
+        figure: '12'
+        note: paragraph states gamma_Mg=0.04 chosen so the calculated curve passes
+          through average BCAI Mg evaporation rate
+      units: dimensionless
+      values:
+        quantity_as_printed: fitted apparent evaporation coefficient gamma_Mg
+        value_as_printed: '0.04'
+        schema_gap: Model/fit output; gamma is chosen to make the calculated curve
+          pass through the BCAI average. Retained as context, not a scored point.
+        model_dependence: Grossman et al. thermodynamic model and Eq. 1
   SiO:
     observations:
-    - observation_id: richter_2002_sio_cai_langmuir_gamma
-      experiment: bcai-evaporation
-      type: alpha
+    - observation_id: richter_2002_table1_sio_flux_b-133-11
+      type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        page: 5
+        published_page: 525
         table: '1'
-        line_range: 174-178
+        row: B-133-11
+        note: J_Si printed molar flux
       T_range_K:
-      - 1673.0
-      - 1773.0
-      phase: l
-      condensed_form:
-        state: partially_molten
-        metastable: false
-        basis: temperature_inferred
-        note: Richter-2002 CAI liquidus ~1823 K; scored/range includes subliquidus or mixed H2/vacuum grounding
-        transition_context:
-          liquidus_K: 1823.0
-          source_locator: Type-B CAI liquidus ~1823 K (audit 2026-08-09; Richter-2007 fully-molten claim)
-      regime: langmuir_free_evaporation
-      units: dimensionless
-      values:
-        alpha: null
-        system_note: Type-B CAI-like starting melt; Table 1 per-run gamma_Si data
-        gas_species: SiO(g)
-        material: Type_B_CAI_like_liquid
-        note: Table 1 includes γ_Si per run; OCR table truncated — retain package with surface areas
-        missing_for_motzfeldt:
-        - orifice_area
-        - clausing_factor
-        - complete_gamma_table_numeric
-      equipment:
-        sample_surface_area:
-          value:
-            range_cm2:
-            - 0.063
-            - 0.416
-            table: 1
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-            paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
-            line_range: '450'
-            note: Authors prose range (Table 1 Avg.area spans ~0.062–0.425; prose rounds to 0.063–0.416)
-    - observation_id: richter_2002_sio_table1_per_run_areas_b1
-      type: alpha
-      locator:
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-        table: '1'
-      T_range_K:
-      - 1773.15
+      - 2073.15
       - 2073.15
       phase: l
-      condensed_form:
-        state: partially_molten
-        metastable: false
-        basis: temperature_inferred
-        note: Richter-2002 CAI liquidus ~1823 K; range straddles it — B-113/B-133 vacuum runs at 1973/2073 K are liquid-side but carry no adopted per-run α (adopted α=0.04 is the H2 1773 K subliquidus series pin), so no per-point split is possible
-        transition_context:
-          liquidus_K: 1823.0
-          source_locator: Type-B CAI liquidus ~1823 K (audit 2026-08-09; Richter-2007 fully-molten claim)
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id001
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '1.88e-07'
+        gas_species: SiO(g)
+        sample: B-133-11
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_b-133-11
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-11
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
       regime: langmuir_free_evaporation
       units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_b-133-11
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_b-133-11
+      point_conditions: *id001
       values:
-        alpha: null
-        system_note: Type-B CAI-like starting melt; per-run gamma_Si table
+        alpha: '0.2'
         gas_species: SiO(g)
-        method_class: measured_direct
-        system_class: silicate_melt
-        transformation_class: network_former_dissociation
-        interfacial_reaction: SiO2(melt) -> SiO(g) + 1/2 O2
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         semantics: competing_observation_do_not_average
-        per_run_gamma_Si:
-        - sample: B-133-11
-          gamma_Si: 0.2
-          avg_area_cm2: 0.12
-          T_C: 1800
-        - sample: B-133-12
-          gamma_Si: 0.17
-          avg_area_cm2: 0.14
-          T_C: 1800
-        - sample: B-133-13
-          gamma_Si: 0.18
-          avg_area_cm2: 0.15
-          T_C: 1800
-        - sample: B-133-15
-          gamma_Si: 0.2
-          avg_area_cm2: 0.19
-          T_C: 1800
-        - sample: B-133-16
-          gamma_Si: 0.2
-          avg_area_cm2: 0.13
-          T_C: 1800
-        - sample: B-133-17
-          gamma_Si: 0.13
-          avg_area_cm2: 0.19
-          T_C: 1800
-        - sample: B-133-19
-          gamma_Si: 0.11
-          avg_area_cm2: 0.26
-          T_C: 1800
-        - sample: B-113-8
-          gamma_Si: 0.14
-          avg_area_cm2: 0.161
-          T_C: 1800
-        - sample: B-113-9
-          gamma_Si: 0.15
-          avg_area_cm2: 0.135
-          T_C: 1800
-        - sample: B-113-10
-          gamma_Si: 0.14
-          avg_area_cm2: 0.131
-          T_C: 1700
-        - sample: BCAI-ss1
-          gamma_Si: 0.058
-          avg_area_cm2: 0.0672
-          T_C: 1500
-        - sample: BCAI-ss2
-          gamma_Si: 0.068
-          avg_area_cm2: 0.0621
-          T_C: 1500
-        - sample: BCAI-s1
-          gamma_Si: 0.048
-          avg_area_cm2: 0.168
-          T_C: 1500
-        - sample: BCAI-s3
-          gamma_Si: 0.069
-          avg_area_cm2: 0.134
-          T_C: 1500
-        - sample: BCAI-m1
-          gamma_Si: 0.049
-          avg_area_cm2: 0.407
-          T_C: 1500
-        - sample: BCAI-m2
-          gamma_Si: 0.05
-          avg_area_cm2: 0.425
-          T_C: 1500
-        note: γ_Si per-run matrix from Table 1; no single pin.
-      equipment:
-        sample_surface_area:
-          value: 1.68e-05
-          units: m2
-          inferred: true
-          inference: same BCAI-s1 area as Mg package
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-            table: '1'
-fidelity_samples:
-- species: Mg
-  observable: alpha
-  observation_id: richter_2002_mg_cai_langmuir_gamma
-  field: alpha
-  value: 0.04
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-    figure: '12'
-    paragraph: evaporation coefficient γ_Mg = 0.04
-    line_range: 530-548
-- path: species.Mg.observations[richter_2002_mg_cai_langmuir_gamma].equipment.sample_surface_area.value.range_cm2
-  value:
-  - 0.063
-  - 0.416
-  note: BCAI surface-area range for recondensation test
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-    paragraph: samples with a range of surface areas from 0.063 to 0.416 cm2
-    line_range: '450'
-- species: Mg
-  observable: alpha
-  observation_id: richter_2002_mg_table1_per_run_areas_b1
-  field: alpha
-  value: 0.04
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-    table: '1'
-    note: representative pin; matrix in per_run
-- species: SiO
-  observable: alpha
-  observation_id: richter_2002_sio_table1_per_run_areas_b1
-  field: per_run_gamma_Si
-  value:
-  - sample: B-133-11
-    gamma_Si: 0.2
-    avg_area_cm2: 0.12
-    T_C: 1800
-  - sample: B-133-12
-    gamma_Si: 0.17
-    avg_area_cm2: 0.14
-    T_C: 1800
-  - sample: B-133-13
-    gamma_Si: 0.18
-    avg_area_cm2: 0.15
-    T_C: 1800
-  - sample: B-133-15
-    gamma_Si: 0.2
-    avg_area_cm2: 0.19
-    T_C: 1800
-  - sample: B-133-16
-    gamma_Si: 0.2
-    avg_area_cm2: 0.13
-    T_C: 1800
-  - sample: B-133-17
-    gamma_Si: 0.13
-    avg_area_cm2: 0.19
-    T_C: 1800
-  - sample: B-133-19
-    gamma_Si: 0.11
-    avg_area_cm2: 0.26
-    T_C: 1800
-  - sample: B-113-8
-    gamma_Si: 0.14
-    avg_area_cm2: 0.161
-    T_C: 1800
-  - sample: B-113-9
-    gamma_Si: 0.15
-    avg_area_cm2: 0.135
-    T_C: 1800
-  - sample: B-113-10
-    gamma_Si: 0.14
-    avg_area_cm2: 0.131
-    T_C: 1700
-  - sample: BCAI-ss1
-    gamma_Si: 0.058
-    avg_area_cm2: 0.0672
-    T_C: 1500
-  - sample: BCAI-ss2
-    gamma_Si: 0.068
-    avg_area_cm2: 0.0621
-    T_C: 1500
-  - sample: BCAI-s1
-    gamma_Si: 0.048
-    avg_area_cm2: 0.168
-    T_C: 1500
-  - sample: BCAI-s3
-    gamma_Si: 0.069
-    avg_area_cm2: 0.134
-    T_C: 1500
-  - sample: BCAI-m1
-    gamma_Si: 0.049
-    avg_area_cm2: 0.407
-    T_C: 1500
-  - sample: BCAI-m2
-    gamma_Si: 0.05
-    avg_area_cm2: 0.425
-    T_C: 1500
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
-    table: '1'
-    note: fidelity pin on one per-run γ_Si point
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_b-133-12
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-12
+        note: J_Si printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id002
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.03e-07'
+        gas_species: SiO(g)
+        sample: B-133-12
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_b-133-12
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-12
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_b-133-12
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_b-133-12
+      point_conditions: *id002
+      values:
+        alpha: '0.17'
+        gas_species: SiO(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_b-133-13
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-13
+        note: J_Si printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id003
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '1.56e-07'
+        gas_species: SiO(g)
+        sample: B-133-13
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_b-133-13
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-13
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_b-133-13
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_b-133-13
+      point_conditions: *id003
+      values:
+        alpha: '0.18'
+        gas_species: SiO(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_b-133-15
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-15
+        note: J_Si printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id004
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '1.64e-07'
+        gas_species: SiO(g)
+        sample: B-133-15
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_b-133-15
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-15
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_b-133-15
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_b-133-15
+      point_conditions: *id004
+      values:
+        alpha: '0.2'
+        gas_species: SiO(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_b-133-16
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-16
+        note: J_Si printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id005
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '1.66e-07'
+        gas_species: SiO(g)
+        sample: B-133-16
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_b-133-16
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-16
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_b-133-16
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_b-133-16
+      point_conditions: *id005
+      values:
+        alpha: '0.2'
+        gas_species: SiO(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_b-133-17
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-17
+        note: J_Si printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id006
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '1.82e-07'
+        gas_species: SiO(g)
+        sample: B-133-17
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_b-133-17
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-17
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_b-133-17
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_b-133-17
+      point_conditions: *id006
+      values:
+        alpha: '0.13'
+        gas_species: SiO(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_b-133-19
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-19
+        note: J_Si printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id007
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '1.97e-07'
+        gas_species: SiO(g)
+        sample: B-133-19
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_b-133-19
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-133-19
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_b-133-19
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_b-133-19
+      point_conditions: *id007
+      values:
+        alpha: '0.11'
+        gas_species: SiO(g)
+        material: Type B CAI-like B-133 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_b-113-8
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-8
+        note: J_Si printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id008
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.06e-07'
+        gas_species: SiO(g)
+        sample: B-113-8
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_b-113-8
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-8
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_b-113-8
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_b-113-8
+      point_conditions: *id008
+      values:
+        alpha: '0.14'
+        gas_species: SiO(g)
+        material: Type B CAI-like B-113 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_b-113-9
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-9
+        note: J_Si printed molar flux
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id009
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.14e-07'
+        gas_species: SiO(g)
+        sample: B-113-9
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_b-113-9
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-9
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_b-113-9
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_b-113-9
+      point_conditions: *id009
+      values:
+        alpha: '0.15'
+        gas_species: SiO(g)
+        material: Type B CAI-like B-113 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_b-113-10
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-10
+        note: J_Si printed molar flux
+      T_range_K:
+      - 1973.15
+      - 1973.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id010
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '4.24e-08'
+        gas_species: SiO(g)
+        sample: B-113-10
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_b-113-10
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: B-113-10
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 1973.15
+      - 1973.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_b-113-10
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_b-113-10
+      point_conditions: *id010
+      values:
+        alpha: '0.14'
+        gas_species: SiO(g)
+        material: Type B CAI-like B-113 starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_bcai-ss1
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss1
+        note: J_Si printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id011
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.7e-08'
+        gas_species: SiO(g)
+        sample: BCAI-ss1
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_bcai-ss1
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss1
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_bcai-ss1
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_bcai-ss1
+      point_conditions: *id011
+      values:
+        alpha: '0.058'
+        gas_species: SiO(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_bcai-ss2
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss2
+        note: J_Si printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id012
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.73e-08'
+        gas_species: SiO(g)
+        sample: BCAI-ss2
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_bcai-ss2
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-ss2
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_bcai-ss2
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_bcai-ss2
+      point_conditions: *id012
+      values:
+        alpha: '0.068'
+        gas_species: SiO(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_bcai-s1
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s1
+        note: J_Si printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id013
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.1e-08'
+        gas_species: SiO(g)
+        sample: BCAI-s1
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_bcai-s1
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s1
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_bcai-s1
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_bcai-s1
+      point_conditions: *id013
+      values:
+        alpha: '0.048'
+        gas_species: SiO(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_bcai-s3
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s3
+        note: J_Si printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id014
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.67e-08'
+        gas_species: SiO(g)
+        sample: BCAI-s3
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_bcai-s3
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-s3
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_bcai-s3
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_bcai-s3
+      point_conditions: *id014
+      values:
+        alpha: '0.069'
+        gas_species: SiO(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_bcai-m1
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m1
+        note: J_Si printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id015
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.3e-08'
+        gas_species: SiO(g)
+        sample: BCAI-m1
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_bcai-m1
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m1
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_bcai-m1
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_bcai-m1
+      point_conditions: *id015
+      values:
+        alpha: '0.049'
+        gas_species: SiO(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_flux_bcai-m2
+      type: rate_series
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m2
+        note: J_Si printed molar flux
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir evaporation flux as printed in Table 1
+      regime: langmuir_free_evaporation
+      units: mol cm^-2 s^-1
+      point_conditions: *id016
+      values:
+        quantity: evaporation_rate
+        method_class: measured_direct
+        evidence_class: measured_direct
+        evaporation_rate: '2.13e-08'
+        gas_species: SiO(g)
+        sample: BCAI-m2
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1
+    - observation_id: richter_2002_table1_sio_gamma_bcai-m2
+      type: alpha
+      locator:
+        page: 5
+        published_page: 525
+        table: '1'
+        row: BCAI-m2
+        note: gamma_SiO printed coefficient
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: l
+      standard_state: Langmuir coefficient relative to equilibrium vapor pressure
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      derived_from:
+      - richter_2002_table1_sio_flux_bcai-m2
+      derivation:
+        relation: Table 1 evaporation coefficient derived from measured molar flux
+          and Eq. 1 Hertz-Knudsen flux; equilibrium saturation vapor pressure is calculated
+          with the Grossman et al. thermodynamic model, so the reduced coefficient
+          inherits that model dependence.
+        inputs:
+        - richter_2002_table1_sio_flux_bcai-m2
+      point_conditions: *id016
+      values:
+        alpha: '0.05'
+        gas_species: SiO(g)
+        material: Type B CAI-like BCAI starting melt
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        semantics: competing_observation_do_not_average
+        system_note: Type-B CAI-like starting melt; sample family and composition
+          are printed in Table 1

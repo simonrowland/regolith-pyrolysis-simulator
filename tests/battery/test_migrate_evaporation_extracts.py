@@ -208,3 +208,43 @@ def test_richter02_type_b_melt_phase_is_canonical(tmp_path: Path) -> None:
         for item in result.queue
     )
 
+
+def test_richter02_table1_flux_and_alpha_values_keep_conditions(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-037-richter-2002.yaml")
+    assert result.validation.hard_issues == ()
+    expected_alpha = {
+        "richter_2002_table1_mg_gamma_bcai-ss1": Decimal("0.051"),
+        "richter_2002_table1_mg_gamma_bcai-ss2": Decimal("0.047"),
+        "richter_2002_table1_sio_gamma_bcai-ss1": Decimal("0.058"),
+    }
+    for observation_id, value in expected_alpha.items():
+        row = next(
+            item
+            for item in result.observations.values()
+            if observation_id in item.observation_id
+        )
+        assert row.value.point == value
+        assert row.identity.quantity.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        assert row.identity.temperature_K.value == Decimal("1773.15")
+        assert row.point_conditions["temperature_K"].state.value == Decimal("1773.15")
+        assert row.point_conditions["total_pressure_Pa"].state.value.point == Decimal("18.7")
+        assert row.point_conditions["composition"].state.value.components
+        assert row.derived_from
+
+    flux = next(
+        item
+        for item in result.observations.values()
+        if "richter_2002_table1_mg_flux_bcai-ss1" in item.observation_id
+    )
+    assert flux.value.point == Decimal("4.12E-8")
+    assert flux.identity.quantity.value is Quantity.EVAPORATION_RATE
+    assert flux.point_conditions["temperature_K"].state.value == Decimal("1773.15")
+    assert len(result.observations) == 64
+    assert all(
+        row.identity.temperature_K.is_value
+        and "temperature_K" in row.point_conditions
+        and "total_pressure_Pa" in row.point_conditions
+        and "composition" in row.point_conditions
+        for row in result.observations.values()
+    )
+
