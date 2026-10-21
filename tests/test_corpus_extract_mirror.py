@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 # The corpus checkout to compare against. REGOLITH_CORPUS_ROOT lets a gate point at a
 # specific clone (the controller's, or a CI-provisioned one) instead of the default path.
-CORPUS_ROOT = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS_ROOT = regolith_corpus_root()
 
 
 @pytest.mark.skipif(not CORPUS_ROOT.is_dir(), reason="regolith-corpus checkout is absent")

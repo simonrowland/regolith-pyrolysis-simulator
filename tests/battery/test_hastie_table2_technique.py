@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import MethodToken, NoticeKind
+from simulator.battery.enums import AdmissionStatus, MethodToken, NoticeKind
 from simulator.battery.records import SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX
 from simulator.yaml_cache import load_cached_safe_yaml
 from tests.battery.test_migrate import _migrate_real_extract
@@ -85,6 +85,57 @@ def test_quoted_fits_experiment_carries_transpiration_from_printed_p22(hastie) -
     assert experiment.locator.page == 22
     assert experiment.locator.pdf_page_index == 27
     assert "TMS technique" in (experiment.locator.paragraph or "")
+
+
+def test_hastie_figure_observations_have_paper_supported_admissions(hastie) -> None:
+    """NBSIR 81-2279 reports these 31 figure observations as measured results.
+
+    Section 10.5.3 calls the Figure 11 K2O coefficients apparent and describes
+    where equilibrium is and is not supported; that caveat stays attached to
+    the source data and does not make the reported observations default-pending.
+    """
+    groups = {
+        "Figure 11 K2O activity coefficients": (
+            "::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::",
+            "::hastie_1981_fig11_k1_slag_k2o_gamma_tms_open_square::",
+        ),
+        "Figure 5 Na partial pressures": (
+            "::hastie_1981_fig5_glass_Na_this_work_digitized::",
+        ),
+        "Figure 4 SiO partial pressures": (
+            "::hastie_1981_fig4_illite_K_SiO_digitized::",
+        ),
+    }
+    expected_counts = {
+        "Figure 11 K2O activity coefficients": 19,
+        "Figure 5 Na partial pressures": 6,
+        "Figure 4 SiO partial pressures": 6,
+    }
+
+    for label, markers in groups.items():
+        rows = [
+            observation
+            for observation in hastie.observations.values()
+            if any(marker in observation.observation_id for marker in markers)
+        ]
+        assert len(rows) == expected_counts[label], label
+        assert all(
+            observation.admission.status is AdmissionStatus.ADMITTED
+            for observation in rows
+        ), label
+
+    k2o_rows = [
+        observation
+        for observation in hastie.observations.values()
+        if any(
+            marker in observation.observation_id
+            for marker in groups["Figure 11 K2O activity coefficients"]
+        )
+    ]
+    assert all(
+        observation.admission.reason == "source admission_status=admitted"
+        for observation in k2o_rows
+    )
 
 
 def test_live_table2_row_flags_technique_assignment_ambiguous() -> None:

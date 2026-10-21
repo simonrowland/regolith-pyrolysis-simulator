@@ -151,10 +151,12 @@
                 <select id="furnace-material"
                         class="recipe-defining-control"
                         aria-label="Furnace material"
+                        aria-describedby="furnace-material-error"
                         data-catalog-url="{{ url_for('web.furnace_material_catalog') }}">
-                    <option value="" selected>Default (1800 C ceiling)</option>
+                    <option value="" selected>Default</option>
                 </select>
             </label>
+            <div id="furnace-material-error" class="config-warning" hidden role="status" aria-live="polite"></div>
             <div class="chip-row" aria-label="Wall temperature offset display">
                 <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">-50</button>
                 <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">nominal</button>
@@ -738,10 +740,10 @@ Start a simulation to populate process inventory JSON.
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('web.static', filename='js/simulator-socket.js') }}"></script>
-<script src="{{ url_for('web.static', filename='js/simulator-charts.js') }}"></script>
-<script src="{{ url_for('web.static', filename='js/simulator-ticks.js') }}"></script>
-<script src="{{ url_for('web.static', filename='js/simulator-advisory.js') }}"></script>
-<script src="{{ url_for('web.static', filename='js/simulator-decisions.js') }}"></script>
-<script src="{{ url_for('web.static', filename='js/simulator-controls.js') }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-socket.js', v=simulation_tick_payload_version) }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-charts.js', v=simulation_tick_payload_version) }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-ticks.js', v=simulation_tick_payload_version) }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-advisory.js', v=simulation_tick_payload_version) }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-decisions.js', v=simulation_tick_payload_version) }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-controls.js', v=simulation_tick_payload_version) }}"></script>
 {% endblock %}

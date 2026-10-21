@@ -12,10 +12,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from decimal import Decimal
 from enum import Enum
 import math
 from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence
 
+from engines.domain_reason import OutOfDomainReason
 from simulator.melt_regime import liquid_fraction_invalidity
 
 
@@ -31,6 +33,85 @@ DEFAULT_BACKEND_CAPABILITIES = {
     key: (key == 'silicate_melt')
     for key in BACKEND_CAPABILITY_KEYS
 }
+
+REDOX_MODE_NOT_AN_INPUT = 'not_an_input'
+
+# More than one oxidation state in silicate melts over the fO2 range these
+# engines are asked to run. The melt-backend contract owns this eligibility
+# rule so scorers and backend calls use the same component test.
+MULTIVALENT_MELT_ELEMENTS: dict[str, str] = {
+    'Fe': 'Fe2+/Fe3+',
+    'Ti': 'Ti4+/Ti3+',
+    'Cr': 'Cr3+/Cr2+',
+    'Mn': 'Mn2+/Mn3+',
+    'V': 'V3+/V4+/V5+',
+    'Eu': 'Eu3+/Eu2+',
+    'Ce': 'Ce4+/Ce3+',
+    'S': 'S2-/S6+',
+    'Ga': 'Ga3+/Ga+',
+}
+
+
+def _elements_of_component(
+    name: str,
+    oxide_aliases: Mapping[str, str],
+) -> frozenset[str]:
+    key = str(name).strip()
+    if key.endswith('_Liq'):
+        key = key[:-4]
+    if key.endswith('*'):
+        key = key[:-1]
+    canonical = oxide_aliases.get(key.lower())
+    formula = 'FeO' if canonical == 'FeO_total' else (canonical or key)
+    from simulator.reference_data.janaf import formula_composition
+
+    parsed = formula_composition(formula)
+    if not parsed:
+        return frozenset()
+    return frozenset(element for element, _count in parsed)
+
+
+def _is_multivalent_component(
+    name: str,
+    oxide_aliases: Mapping[str, str],
+) -> bool:
+    return any(
+        element in MULTIVALENT_MELT_ELEMENTS
+        for element in _elements_of_component(name, oxide_aliases)
+    )
+
+
+def multivalent_components(
+    composition: Any,
+    species: str | None = None,
+    *,
+    oxide_aliases: Mapping[str, str],
+) -> tuple[str, ...]:
+    """Return positive multivalent composition components and measured species."""
+    if composition is None:
+        items = ()
+    elif isinstance(composition, Mapping):
+        items = composition.items()
+    else:
+        items = getattr(composition, 'components', ())
+
+    present: list[str] = []
+    for name, amount in items:
+        try:
+            number = Decimal(str(amount))
+        except (ArithmeticError, ValueError):
+            continue
+        if number <= 0:
+            continue
+        if _is_multivalent_component(str(name), oxide_aliases):
+            present.append(str(name))
+    if (
+        species
+        and _is_multivalent_component(species, oxide_aliases)
+        and species not in present
+    ):
+        present.append(species)
+    return tuple(sorted(set(present)))
 
 
 class RealBackendFamily(str, Enum):
@@ -571,6 +652,58 @@ class MeltBackend(ABC):
     backend_name = 'unknown'
     supports_intrinsic_fO2 = False
 
+    def _not_an_input_redox_refusal(
+        self,
+        *,
+        redox_mode: Optional[str],
+        composition_kg: Optional[Mapping[str, float]],
+        composition_mol: Optional[Mapping[str, float]],
+        composition_mol_by_account: Optional[
+            Mapping[str, Mapping[str, float]]
+        ],
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: Optional[float],
+        oxide_aliases: Mapping[str, str],
+    ) -> EquilibriumResult | None:
+        if redox_mode != REDOX_MODE_NOT_AN_INPUT:
+            return None
+        if composition_mol_by_account is not None:
+            composition = composition_mol_by_account.get(
+                CLEANED_MELT_ACCOUNT, {}
+            )
+        elif composition_mol is not None:
+            composition = composition_mol
+        else:
+            composition = composition_kg
+        components = multivalent_components(
+            composition,
+            oxide_aliases=oxide_aliases,
+        )
+        if not components:
+            return None
+
+        reason = OutOfDomainReason.INVALID_INPUT.value
+        message = (
+            "redox_mode='not_an_input' requires a composition without "
+            "multivalent elements; found " + ", ".join(components)
+        )
+        return EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            status='out_of_domain',
+            warnings=[message],
+            diagnostics={
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': reason,
+                'backend_failure_reason_code': reason,
+                'redox_mode': redox_mode,
+                'multivalent_components': list(components),
+                'authoritative_for_requested_conditions': False,
+            },
+        )
+
     @abstractmethod
     def initialize(self, config: dict) -> bool:
         """
@@ -594,6 +727,7 @@ class MeltBackend(ABC):
                         Mapping[str, Mapping[str, float]]
                     ] = None,
                     species_formula_registry: Optional[Mapping[str, Any]] = None,
+                    redox_mode: Optional[str] = None,
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium at given conditions.
@@ -611,6 +745,9 @@ class MeltBackend(ABC):
                               finite default preserves legacy callers; an
                               intrinsic-capable implementation may default to
                               ``None`` explicitly.
+            redox_mode:     ``'not_an_input'`` distinguishes a scorer omission
+                              from an intrinsic closed-system fO2 request. The
+                              default preserves the legacy ``fO2_log`` meaning.
             pressure_bar:    Total pressure (bar)
 
         Returns:

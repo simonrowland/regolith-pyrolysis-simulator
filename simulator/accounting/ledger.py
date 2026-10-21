@@ -25,6 +25,7 @@ from simulator.accounting.lots import (
     ATTRIBUTION_METHODS,
     MATERIAL_ORIGINS,
     MaterialLot,
+    _species_moles_from_kg,
     allocate_pool_withdrawal,
 )
 from simulator.account_ids import (
@@ -357,11 +358,11 @@ class AtomLedger:
 
         self._load_account_policies(account_policies)
         for account, species_kg in dict(initial_balances or {}).items():
-            cleaned_kg = _clean_species_kg(species_kg, self.balance_tolerance_kg)
+            cleaned_kg = _clean_species_kg(species_kg)
             self._balances[str(account)] = _species_kg_to_mol(
                 cleaned_kg,
                 self.registry,
-                tolerance_kg=self.balance_tolerance_kg,
+                tolerance_kg=0.0,
             )
             self._record_movement_scale(
                 self._movement_scale_kg,
@@ -1849,18 +1850,6 @@ def _sum_lot_atom_moles(
     return dict(sorted(atoms.items()))
 
 
-def _signed_atom_moles(
-    species_kg: Mapping[str, float], registry: Mapping[str, Any] | None
-) -> dict[str, float]:
-    atoms: defaultdict[str, float] = defaultdict(float)
-    for species, kg in species_kg.items():
-        formula = resolve_species_formula(species, registry)
-        species_moles = kg / formula.molar_mass_kg_per_mol()
-        for element, count in formula.elements.items():
-            atoms[element] += species_moles * count
-    return dict(sorted((element, value) for element, value in atoms.items() if value != 0.0))
-
-
 def _signed_atom_moles_from_species_mol(
     species_mol: Mapping[str, float], registry: Mapping[str, Any] | None
 ) -> dict[str, float]:
@@ -2248,15 +2237,9 @@ def _apply_lot(
     }
 
 
-def _clean_species_kg(species_kg: Mapping[str, float], tolerance_kg: float) -> dict[str, float]:
-    cleaned: dict[str, float] = {}
-    for species, kg in species_kg.items():
-        value = float(kg)
-        if not math.isfinite(value):
-            raise AccountingError(f"balance for species {species!r} must be finite")
-        if abs(value) > tolerance_kg:
-            cleaned[str(species)] = value
-    return dict(sorted(cleaned.items()))
+def _clean_species_kg(species_kg: Mapping[str, float]) -> dict[str, float]:
+    lot = MaterialLot("initial_balances", species_kg)
+    return dict(lot.without_empty().species_kg)
 
 
 def _clean_species_mol(
@@ -2290,8 +2273,7 @@ def _species_kg_to_mol(
             raise AccountingError(f"balance for species {name!r} must be finite")
         if abs(value) <= tolerance_kg:
             continue
-        formula = resolve_species_formula(name, registry)
-        converted[name] = value / formula.molar_mass_kg_per_mol()
+        converted[name] = _species_moles_from_kg(name, value, registry)
     return dict(sorted(converted.items()))
 
 

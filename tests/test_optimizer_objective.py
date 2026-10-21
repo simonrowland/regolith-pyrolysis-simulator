@@ -1301,6 +1301,48 @@ def test_furnace_amortization_none_reaches_summary_as_infinite_lifetime() -> Non
     )
 
 
+def test_ungrounded_resinter_lifetime_returns_typed_amortization_status(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
+    campaigns_to_resinter = objective_module._campaigns_to_resinter(
+        {("hot_duct", "Rb"): 1.66e-4}
+    )
+    assert campaigns_to_resinter == "resinter_threshold_kg / 0.000166"
+    params = CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=1.0,
+        depreciation_expense_per_run=1.0,
+        generic_reagent_cost_per_kg=1.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+        furnace_lifetime_cost_multiplier=500.0,
+        min_fouling_penalty=1.0,
+    )
+    sim = SimpleNamespace(
+        record=SimpleNamespace(
+            cost_rollup={
+                "run_input_cost": {"owner_ratify_money_projection": 20.0}
+            }
+        )
+    )
+
+    summary = objective_module._furnace_amortization_summary(
+        sim,
+        campaigns_to_resinter,
+        has_positive_fouling=True,
+        cost_parameters=params,
+    )
+
+    assert summary["furnace_amortization_status"] == "resinter_threshold_ungrounded"
+    assert summary["furnace_amortization_batch_cost_equivalents"] == 0.0
+    assert summary["campaigns_to_resinter"] == campaigns_to_resinter
+
+
 def test_instant_death_furnace_cost_stays_finite_through_pareto_scoring() -> None:
     params = CostParameters(
         electricity_cost_per_kWh=1.0,

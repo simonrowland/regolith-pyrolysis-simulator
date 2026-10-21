@@ -7565,7 +7565,7 @@
         "species": "Na",
         "terminal_mol": 0.019459161903568743,
         "terminal_kg": 0.00044736164254521106,
-        "origin_scope": "typed_material_origin",
+        "origin_scope": "mixed_typed_and_unattributed_origin",
         "attribution_method": "tracked"
       },
       {
@@ -7576,7 +7576,7 @@
         "species": "Na2",
         "terminal_mol": 2.620366511624545e-09,
         "terminal_kg": 1.2048324306257347e-10,
-        "origin_scope": "typed_material_origin",
+        "origin_scope": "mixed_typed_and_unattributed_origin",
         "attribution_method": "tracked"
       },
       {
@@ -7587,7 +7587,7 @@
         "species": "Na2O_gas",
         "terminal_mol": 2.3578019289314935e-11,
         "terminal_kg": 1.4613311776912296e-12,
-        "origin_scope": "typed_material_origin",
+        "origin_scope": "mixed_typed_and_unattributed_origin",
         "attribution_method": "tracked"
       },
       {
@@ -7655,16 +7655,23 @@
       "basis": "element_mol_atoms",
       "limit_mol_atoms": 4.404668082946444e-05,
       "input_mol_atoms_by_element": {},
-      "terminal_mol_atoms_by_element": {},
+      "terminal_mol_atoms_by_element": {
+        "Na": 1.6940658945086014e-21
+      },
       "cumulative_mol_atoms_by_element": {
         "O": 3.61389282358341e-18,
+        "Na": 1.6940658945086014e-21,
         "K": 2.303929616531697e-19,
         "Mn": 2.649562899583917e-23,
         "P": 5.169878828456423e-26,
         "Si": 2.117582368135751e-22,
         "Cr": 2.0679515313825692e-25
       },
-      "terminal_mol_atoms_by_account": {}
+      "terminal_mol_atoms_by_account": {
+        "terminal.offgas": {
+          "Na": 1.6940658945086014e-21
+        }
+      }
     },
     "closure": {
       "limit_fraction": 5e-14,
@@ -27879,7 +27886,7 @@
     },
     "pipe_m_avg_fallback": {
       "engaged": true,
-      "total_count": 56,
+      "total_count": 55,
       "by_hour": [
         {
           "campaign": "C0",
@@ -27957,12 +27964,6 @@
           "campaign": "C0",
           "hour": 12,
           "campaign_hour": 12,
-          "count": 1
-        },
-        {
-          "campaign": "C0",
-          "hour": 13,
-          "campaign_hour": 13,
           "count": 1
         },
         {
@@ -105770,7 +105771,7 @@
       "hour": 14,
       "campaign": "C0",
       "T_C": 725.0,
-      "P_total_bar": 0.0,
+      "P_total_bar": 1.646586842192279e-21,
       "pO2_bar": 0.0,
       "mass_balance_pct": 0.0,
       "O2_yield_kg_cumulative": 2.999618780431898e-07,

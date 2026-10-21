@@ -56,13 +56,106 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 _RECIPE_DIR = _REPO_ROOT / "data" / "recipes"
 
 
+def test_product_story_bucket_omits_species_rounded_to_zero() -> None:
+    bucket = web_events._product_story_bucket({"Fe": 3e-13})
+
+    assert bucket["species_kg"] == {}
+    assert bucket["class_total_kg"] == 0.0
+
+
 def _identified_socket_client(app):
     http_client = app.test_client()
     assert http_client.get("/").status_code == 200
-    return app_module.socketio.test_client(
+    client = app_module.socketio.test_client(
         app,
         flask_test_client=http_client,
     )
+    original_emit = client.emit
+
+    def emit_current_protocol(event, *args, **kwargs):
+        if event in {"start_simulation", "resume_simulation"}:
+            payload = args[0] if args else {}
+            if isinstance(payload, dict):
+                payload = {**payload, "payload_version": 4}
+                args = (payload, *args[1:]) if args else (payload,)
+            elif event == "resume_simulation" and not args:
+                args = ({"payload_version": 4},)
+        return original_emit(event, *args, **kwargs)
+
+    client.emit = emit_current_protocol
+    return client
+
+
+def test_socket_start_rejects_missing_protocol_version_with_reload_message():
+    app = app_module.create_app()
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    client = app_module.socketio.test_client(app, flask_test_client=http_client)
+    before = set(_simulations)
+    try:
+        client.emit("start_simulation", {
+            "backend": "internal-analytical",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+            "speed": 0,
+        })
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["error_type"] == "client_protocol_version_mismatch"
+        assert statuses[-1]["reload_required"] is True
+        assert "Reload this page" in statuses[-1]["message"]
+        assert set(_simulations) == before
+    finally:
+        client.disconnect()
+
+
+def test_socket_start_accepts_current_protocol_version(monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+    try:
+        client.emit("start_simulation", {
+            "payload_version": 4,
+            "backend": "internal-analytical",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+            "speed": 0,
+        })
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["status"] == "started"
+        assert statuses[-1].get("error_type") is None
+        assert len(set(_simulations) - before) == 1
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_socket_resume_rejects_missing_protocol_version_with_reload_message():
+    app = app_module.create_app()
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    client = app_module.socketio.test_client(app, flask_test_client=http_client)
+    try:
+        client.emit("resume_simulation")
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["error_type"] == "client_protocol_version_mismatch"
+        assert statuses[-1]["reload_required"] is True
+        assert "Reload this page" in statuses[-1]["message"]
+    finally:
+        client.disconnect()
 
 
 def _tag_with_id(source: str, element_id: str) -> str:
@@ -2047,6 +2140,7 @@ def test_cached_real_misconfig_over_socket_is_input_not_backend_unavailable(
     with app.app_context():
         result = web_events._registered_start_handler(
             {
+                "payload_version": 4,
                 "backend": "cached-real",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
@@ -2095,6 +2189,7 @@ def test_missing_stage0_reductant_is_input_error_not_backend_unavailable(
     with app.app_context():
         result = web_events._registered_start_handler(
             {
+                "payload_version": 4,
                 "backend": "internal-analytical",
                 "feedstock": "mars_basalt",
                 "mass_kg": 1000,
@@ -2146,6 +2241,7 @@ def test_unknown_feedstock_is_typed_unknown_feedstock_not_backend_unavailable(
     with app.app_context():
         result = web_events._registered_start_handler(
             {
+                "payload_version": 4,
                 "backend": "internal-analytical",
                 "feedstock": "__no_such_feedstock_for_typing_test__",
                 "mass_kg": 1000,
@@ -2193,6 +2289,7 @@ def test_socket_start_rejection_echoes_status_strip_lifecycle_generation(
     with app.app_context():
         result = web_events._registered_start_handler(
             {
+                "payload_version": 4,
                 "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
@@ -3558,8 +3655,13 @@ def test_tick_snapshot_is_built_before_concurrent_mutation(monkeypatch):
 
         assert mutation_done.is_set()
         assert sim.live_pressure == 2.0
-        assert captured_ticks == [{"live_pressure": 1.0}]
-        assert state["last_recipe_capture"]["tick"] == {"live_pressure": 1.0}
+        assert captured_ticks[0]["live_pressure"] == 1.0
+        assert captured_ticks[0]["per_hour_summary_delta"] == {"hour": 1}
+        captured_tick = state["last_recipe_capture"]["tick"]
+        assert captured_tick["live_pressure"] == 1.0
+        assert captured_tick["per_hour_summary_delta"] == (
+            captured_ticks[0]["per_hour_summary_delta"]
+        )
     finally:
         mutator.join(2)
         _clear_simulation_state(sid)
@@ -5495,10 +5597,7 @@ class RaisingCleanedMeltLedger:
         raise RuntimeError("cleaned melt unavailable")
 
 
-@pytest.mark.parametrize("ledger", [None, RaisingCleanedMeltLedger()])
-def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
-    ledger,
-):
+def _cleaned_melt_test_sim():
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -5517,7 +5616,14 @@ def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
         {"metals": {}, "oxide_vapors": {}},
     )
     sim.load_batch("s_type")
-    snapshot = sim._make_snapshot()
+    return sim, sim._make_snapshot()
+
+
+@pytest.mark.parametrize("ledger", [None, RaisingCleanedMeltLedger()])
+def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
+    ledger,
+):
+    sim, snapshot = _cleaned_melt_test_sim()
     assert snapshot.inventory.melt_oxide_kg["SiO2"] > 0
     sim.atom_ledger = ledger
 
@@ -5531,6 +5637,30 @@ def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
 
     assert payload["pot_composition"] == {}
     assert payload["pot_composition_wt_pct"] == {}
+
+
+def test_tick_keeps_trace_species_keys_in_pot_composition(monkeypatch):
+    sim, snapshot = _cleaned_melt_test_sim()
+    ledger = sim.atom_ledger
+    project_account_kg = ledger.project_account_kg
+
+    def project_with_trace_species(account):
+        species = project_account_kg(account)
+        if account == "process.cleaned_melt":
+            return {**species, "PbO": 1e-13}
+        return species
+
+    monkeypatch.setattr(ledger, "project_account_kg", project_with_trace_species)
+    payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="",
+        backend_status="internal-analytical",
+        backend_authoritative=False,
+    )
+
+    assert payload["pot_composition"].get("PbO") == 0.0
+    assert payload["pot_composition_wt_pct"].get("PbO") == 0.0
 
 
 def test_web_pause_resume_is_result_neutral(monkeypatch, tmp_path):

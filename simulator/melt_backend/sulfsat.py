@@ -556,30 +556,38 @@ class SulfSatGate:
             ))
 
         numerical_warnings: List[str] = []
-        scss_ppm, note = self._finite_capacity_ppm(
+        repair_warnings: List[str] = []
+        scss_ppm, note, repair_note = self._finite_capacity_ppm(
             scss_ppm,
             field='SCSS_ppm',
             model='Smythe 2017 SCSS',
         )
         if note is not None:
             numerical_warnings.append(note)
-        scas_ppm, note = self._finite_capacity_ppm(
+        if repair_note is not None:
+            repair_warnings.append(repair_note)
+        scas_ppm, note, repair_note = self._finite_capacity_ppm(
             scas_ppm,
             field='SCAS_ppm',
             model='Chowdhury-Dasgupta 2019 SCAS',
         )
         if note is not None:
             numerical_warnings.append(note)
-        s6_fraction, note = self._finite_fraction(
+        if repair_note is not None:
+            repair_warnings.append(repair_note)
+        s6_fraction, note, repair_note = self._finite_fraction(
             s6_fraction,
             field='S6_fraction',
             model='Jugo 2010 S6+/S_total',
         )
         if note is not None:
             numerical_warnings.append(note)
+        if repair_note is not None:
+            repair_warnings.append(repair_note)
         if numerical_warnings:
             redox_warnings = list(redox_warnings) + numerical_warnings
             redox_in_range = False
+        redox_warnings = list(redox_warnings) + repair_warnings
 
         return scss_ppm, scas_ppm, s6_fraction, redox_warnings, redox_in_range
 
@@ -695,12 +703,28 @@ class SulfSatGate:
         return cleaned
 
     @staticmethod
+    def _finite_output_repair_notice(
+        *,
+        field: str,
+        raw: float,
+        replacement: float,
+        reason: str,
+        unit: str = '',
+    ) -> str:
+        unit_suffix = f' {unit}' if unit else ''
+        return (
+            'SR24:sulfsat_output_repaired '
+            f'field={field} raw={format(raw, ".17g")} reason={reason} '
+            f'replacement={replacement:.1f}{unit_suffix}'
+        )
+
+    @staticmethod
     def _finite_capacity_ppm(
         value: float,
         *,
         field: str,
         model: str,
-    ) -> tuple[float, str | None]:
+    ) -> tuple[float, str | None, str | None]:
         try:
             number = float(value)
         except (TypeError, ValueError) as exc:
@@ -708,6 +732,7 @@ class SulfSatGate:
                 0.0,
                 f'{model} returned invalid {field}={value!r}; '
                 f'treating capacity as 0.0 ppm ({exc!r})',
+                None,
             )
         if not math.isfinite(number):
             return (
@@ -715,8 +740,21 @@ class SulfSatGate:
                 f'{model} returned non-finite {field}={number!r}; '
                 'treating capacity as 0.0 ppm for degenerate no modeled '
                 'sulfide/sulfate saturation',
+                None,
             )
-        return max(0.0, number), None
+        if number < 0.0:
+            return (
+                0.0,
+                None,
+                SulfSatGate._finite_output_repair_notice(
+                    field=field,
+                    raw=number,
+                    replacement=0.0,
+                    reason='negative_capacity',
+                    unit='ppm',
+                ),
+            )
+        return max(0.0, number), None, None
 
     @staticmethod
     def _finite_fraction(
@@ -724,7 +762,7 @@ class SulfSatGate:
         *,
         field: str,
         model: str,
-    ) -> tuple[float, str | None]:
+    ) -> tuple[float, str | None, str | None]:
         try:
             number = float(value)
         except (TypeError, ValueError) as exc:
@@ -732,14 +770,28 @@ class SulfSatGate:
                 0.0,
                 f'{model} returned invalid {field}={value!r}; '
                 f'treating fraction as 0.0 ({exc!r})',
+                None,
             )
         if not math.isfinite(number):
             return (
                 0.0,
                 f'{model} returned non-finite {field}={number!r}; '
                 'treating fraction as 0.0 for degenerate sulfur speciation',
+                None,
             )
-        return min(1.0, max(0.0, number)), None
+        if number < 0.0 or number > 1.0:
+            replacement = min(1.0, max(0.0, number))
+            return (
+                replacement,
+                None,
+                SulfSatGate._finite_output_repair_notice(
+                    field=field,
+                    raw=number,
+                    replacement=replacement,
+                    reason='fraction_outside_[0,1]',
+                ),
+            )
+        return min(1.0, max(0.0, number)), None, None
 
     @staticmethod
     def _partition_input_S(

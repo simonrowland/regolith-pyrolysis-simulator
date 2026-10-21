@@ -973,6 +973,66 @@ def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeyp
     assert output["run_mode"] == "isothermal"
 
 
+def test_run_point_real_alphamelts_adapter_omits_default_redox_mode(
+    monkeypatch,
+):
+    import simulator.melt_backend.alphamelts as alphamelts_module
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.base import EquilibriumResult
+
+    backend = AlphaMELTSBackend(model_name="MELTSv1.0.2")
+    backend._mode = "subprocess"
+    backend._binary_path = Path("fake-alphamelts")
+    backend._vaporock_available = False
+    result = EquilibriumResult(
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        phases_present=["liquid"],
+        phase_masses_kg={"liquid": 100.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={"SiO2": 60.0, "FeO": 30.0, "CaO": 10.0},
+        activity_coefficients={"SiO2": 0.5},
+    )
+    launches = []
+
+    def fake_run(args, **kwargs):
+        launches.append((args, kwargs))
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(
+        alphamelts_module, "_run_alphamelts_subprocess", fake_run
+    )
+    monkeypatch.setattr(
+        AlphaMELTSBackend,
+        "_parse_single_point_stdout",
+        lambda _self, _output, **_kwargs: result,
+    )
+    monkeypatch.setattr(
+        AlphaMELTSBackend,
+        "_builtin_vapor_projection_for_subprocess",
+        lambda _self, _eq: ({}, {}, {}),
+    )
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", backend)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_MODULE", alphamelts_module)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND_NAME", "subprocess")
+    monkeypatch.setattr(
+        grid_pregrind, "_WORKER_ENGINE_VERSION", "fixture-engine"
+    )
+
+    grid_key_id, output = grid_pregrind._run_point(
+        grid_pregrind.WorkerJob(
+            grid_key_id=7,
+            shuffle_rank=0,
+            inputs={**_inputs(1200.0), "intended_fO2_log": -9.0},
+        )
+    )
+
+    assert grid_key_id == 7
+    assert output["status"] == "ok", output["failure_message"]
+    assert len(launches) == 1
+    assert json.loads(output["raw_payload"])["engine_invoked"] is True
+
+
 def test_thermoengine_failure_reinitializes_before_next_point(monkeypatch):
     result = SimpleNamespace(**dict(_output()["generic"]))
 
@@ -4091,14 +4151,14 @@ def test_observe_hook_binds_to_real_adapter_signature():
         if p.strip() and not p.strip().startswith("*")
     ) | {"total_input_kg", "diagnostics", "run_mode"}
     adapter_params = set(adapter_sig.parameters) - {"self"}
+    if adapter_sig.parameters["redox_mode"].default is None:
+        adapter_params.remove("redox_mode")
     missing = adapter_params - hook_params - {"comp_wt"} | (
         {"composition_wt_pct"} - hook_params if "comp_wt" in adapter_params else set()
     )
-    assert not (adapter_params - {"self", "comp_wt", "temperature_C", "fO2_log",
-                                  "pressure_bar", "warnings", "total_input_kg",
-                                  "diagnostics", "run_mode"}), (
-        "adapter grew parameters the grinder hook does not know: "
-        f"{adapter_params}"
+    assert not missing, (
+        "adapter call shape is not accepted by the grinder hook: "
+        f"{missing}"
     )
 
 

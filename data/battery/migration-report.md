@@ -17,7 +17,7 @@ hard issues: 3334
 | citations | 147 | 347 (mismatch) |
 | doi_works | 56 | 170 (mismatch) |
 | no_doi_works | 91 | 179 (mismatch) |
-| admission_statuses | 374 | 2888 (mismatch) |
+| admission_statuses | 374 | 2890 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 683 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
@@ -25,7 +25,7 @@ hard issues: 3334
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2103 (mismatch) |
 | equipment_payloads | 670 | 955 (mismatch) |
-| absent_admissions | 3511 | 5994 (mismatch) |
+| absent_admissions | 3511 | 5992 (mismatch) |
 | absent_classes | 2174 | 2118 (mismatch) |
 | range_only_T | 3125 | 2612 (mismatch) |
 | system_like_phases | 1065 | 2806 (mismatch) |

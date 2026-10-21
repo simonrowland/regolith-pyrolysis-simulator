@@ -107,16 +107,23 @@ function optionForFurnaceMaterial(material) {
 function hydrateFurnaceMaterialCatalog() {
     const select = document.getElementById('furnace-material');
     if (!select || !select.dataset.catalogUrl) return;
-    const defaultOption = select.querySelector('option[value=""]') || new Option('Default (1800 C ceiling)', '');
+    const defaultOption = select.querySelector('option[value=""]');
     fetch(select.dataset.catalogUrl)
         .then(r => r.ok ? r.json() : Promise.reject(new Error('catalog unavailable')))
         .then(data => {
             if (!Array.isArray(data.materials)) return;
-            select.replaceChildren(defaultOption, ...data.materials.map(optionForFurnaceMaterial));
+            const options = data.materials.map(optionForFurnaceMaterial);
+            if (defaultOption) options.unshift(defaultOption);
+            select.replaceChildren(...options);
             select.value = '';
         })
         .catch(() => {
             select.value = '';
+            const error = document.getElementById('furnace-material-error');
+            if (error) {
+                error.textContent = 'Could not load furnace material options. The default remains selected.';
+                error.hidden = false;
+            }
         });
 }
 
@@ -246,6 +253,8 @@ function handleRecipeDefiningControlEdit(e) {
 }
 
 socket.on('simulation_tick', (data) => {
+    if (typeof window.requireSimulationTickPayloadVersion === 'function'
+        && !window.requireSimulationTickPayloadVersion(data)) return;
     lastRecipeTick = data || null;
 });
 
@@ -789,6 +798,7 @@ document.getElementById('btn-start').addEventListener('click', () => {
     const furnaceMaterialId = selectedFurnaceMaterialId();
 
     const payload = {
+        payload_version: window.simulationTickPayloadVersion,
         feedstock: feedstock,
         mass_kg: mass_kg,
         backend: document.getElementById('engine-select').value,
@@ -872,7 +882,9 @@ document.getElementById('btn-pause').addEventListener('click', () => {
 });
 
 document.getElementById('btn-resume').addEventListener('click', () => {
-    socket.emit('resume_simulation');
+    socket.emit('resume_simulation', {
+        payload_version: window.simulationTickPayloadVersion,
+    });
     document.getElementById('btn-resume').disabled = true;
     document.getElementById('btn-pause').disabled = false;
     transitionSimulatorLifecycle({
