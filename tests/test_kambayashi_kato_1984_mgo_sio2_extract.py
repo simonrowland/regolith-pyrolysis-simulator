@@ -68,6 +68,17 @@ def test_tables_match_rendered_rows_and_migrate_all_typed_values_as_points() -> 
             assert migrated.value.kind is ValueKind.POINT, row["observation_id"]
             assert migrated.value.point == Decimal(str(source_value))
             assert migrated.identity.species.formula == formula
+            assert migrated.identity.temperature_K.is_value
+            assert migrated.point_conditions is not None
+            source_conditions = row["point_conditions"]
+            assert set(source_conditions) <= set(migrated.point_conditions)
+            for key, source_condition in source_conditions.items():
+                condition = migrated.point_conditions[key]
+                assert condition.state.tag.value == source_condition["state"]["tag"]
+                assert condition.locator is not None
+            temperature = migrated.point_conditions["temperature_K"]
+            assert temperature.state.is_value
+            assert temperature.state.value == migrated.identity.temperature_K.value
     assert by_quantity == {
         Quantity.ION_INTENSITY: 30,
         Quantity.ION_INTENSITY_RATIO: 15,
@@ -105,6 +116,23 @@ def test_tables_match_rendered_rows_and_migrate_all_typed_values_as_points() -> 
         for formula in ("SiO", "Mg", "SiO2", "MgO")
         for row in document["species"][formula]["observations"]
     )
+
+    x_0795 = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == EXTRACT.stem
+        and observation.identity.species.formula == "MgO"
+        and observation.identity.composition.is_value
+        and observation.identity.composition.value.as_map()["SiO2"]
+        == Decimal("0.795")
+    )
+    composition = x_0795.identity.composition.value.as_map()
+    assert composition["SiO2"] == Decimal("0.795")
+    assert composition["MgO"] == Decimal("0.205")
+    point_composition = x_0795.point_conditions["composition"]
+    assert point_composition.state.is_value
+    assert point_composition.state.value.as_map() == composition
+    assert point_composition.locator is not None
 
 
 def test_figure_values_are_deferred_and_table2_blank_cell_stays_blank() -> None:

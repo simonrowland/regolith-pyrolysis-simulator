@@ -45,6 +45,17 @@ def test_extract_covers_table_values_and_migrates_every_typed_row_as_a_point() -
             assert migrated.value.kind is ValueKind.POINT, row["observation_id"]
             assert migrated.value.point == Decimal(str(row["values"][field]))
             assert migrated.identity.species.formula == formula
+            assert migrated.identity.temperature_K.is_value
+            assert migrated.point_conditions is not None
+            source_conditions = row["point_conditions"]
+            assert set(source_conditions) <= set(migrated.point_conditions)
+            for key, source_condition in source_conditions.items():
+                condition = migrated.point_conditions[key]
+                assert condition.state.tag.value == source_condition["state"]["tag"]
+                assert condition.locator is not None
+            temperature = migrated.point_conditions["temperature_K"]
+            assert temperature.state.is_value
+            assert temperature.state.value == migrated.identity.temperature_K.value
 
     # Endpoints and the low-silica activity are fidelity pins from the page-6 render.
     assert migrator.result.observations[
