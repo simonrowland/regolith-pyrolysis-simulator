@@ -26,11 +26,16 @@ def test_table_3_render_values_and_row_count():
 
 def test_figures_are_queued_without_digitised_values():
     extract = yaml.safe_load(EXTRACT.read_text())
-    queued = extract["species"]["SiO2"]["context"][1]["values"]["figures"]
+    figure_record = next(
+        row
+        for row in extract["species"]["SiO2"]["context"]
+        if row["observation_id"] == "alexander_2001_figure_read_candidates"
+    )
+    queued = figure_record["values"]["figures"]
 
     assert len(queued) == 18
     assert [row["figure"] for row in queued] == [str(n) for n in range(1, 19)]
     assert all("caption" in row and "page" in row for row in queued)
-    assert extract["species"]["SiO2"]["context"][1]["values"]["digitisation"] == (
+    assert figure_record["values"]["digitisation"] == (
         "deferred to a figure pass"
     )
