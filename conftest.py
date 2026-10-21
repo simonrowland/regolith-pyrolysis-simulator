@@ -154,6 +154,10 @@ if os.environ.get("REGOLITH_VAPOROCK_SESSION_WARM") is None:
 
 _SESSION_WATCHDOG: SessionWatchdog | None = None
 DOCS_PRIVATE_MANIFEST_STRICT_ENV = "REGOLITH_DOCS_PRIVATE_MANIFEST_STRICT"
+_DOCS_PRIVATE_AUDIT_ROOT: Path | None = None
+_DOCS_PRIVATE_MISSING_OPENS: set[tuple[str, str]] = set()
+_DOCS_PRIVATE_ACTIVE_TEST_NODEID: str | None = None
+_DOCS_PRIVATE_AUDIT_INSTALLED = False
 
 
 def _preflight_docs_private_inputs(repo_root: Path, manifest_path: Path) -> None:
@@ -213,6 +217,71 @@ def _preflight_docs_private_inputs(repo_root: Path, manifest_path: Path) -> None
         )
 
 
+def _record_missing_docs_private_open(event: str, args: tuple[object, ...]) -> None:
+    if event != "open" or not args or _DOCS_PRIVATE_AUDIT_ROOT is None:
+        return
+
+    mode = args[1] if len(args) > 1 else None
+    flags = args[2] if len(args) > 2 else None
+    if isinstance(mode, str) and any(flag in mode for flag in "wax+"):
+        return
+    if mode is None and isinstance(flags, int):
+        if flags & os.O_ACCMODE != os.O_RDONLY:
+            return
+
+    try:
+        opened = Path(os.fsdecode(os.fspath(args[0])))
+        if not opened.is_absolute():
+            opened = Path.cwd() / opened
+        opened = opened.resolve()
+        private_root = (_DOCS_PRIVATE_AUDIT_ROOT / "docs-private").resolve()
+        if not opened.is_relative_to(private_root) or opened.exists():
+            return
+        relative_path = opened.relative_to(_DOCS_PRIVATE_AUDIT_ROOT).as_posix()
+    except (OSError, RuntimeError, TypeError, ValueError):
+        return
+
+    nodeid = _DOCS_PRIVATE_ACTIVE_TEST_NODEID or "<session setup or collection>"
+    _DOCS_PRIVATE_MISSING_OPENS.add((relative_path, nodeid))
+
+
+def _install_docs_private_open_audit(repo_root: Path) -> bool:
+    global _DOCS_PRIVATE_AUDIT_ROOT, _DOCS_PRIVATE_AUDIT_INSTALLED
+    if (
+        DOCS_PRIVATE_MANIFEST_STRICT_ENV not in os.environ
+        or _DOCS_PRIVATE_AUDIT_INSTALLED
+    ):
+        return False
+
+    _DOCS_PRIVATE_AUDIT_ROOT = repo_root.resolve()
+    sys.addaudithook(_record_missing_docs_private_open)
+    _DOCS_PRIVATE_AUDIT_INSTALLED = True
+    return True
+
+
+def _fail_on_missing_docs_private_opens(session: pytest.Session) -> str | None:
+    if not _DOCS_PRIVATE_MISSING_OPENS:
+        return None
+
+    details = "\n".join(
+        f"  - {path} (opened by {nodeid})"
+        for path, nodeid in sorted(_DOCS_PRIVATE_MISSING_OPENS)
+    )
+    message = (
+        "strict docs-private audit found missing docs-private inputs:\n"
+        f"{details}\n"
+        "Rerun scripts/derive_docs_private_inputs.py and add the inputs to "
+        "tests/docs_private_inputs.json."
+    )
+    session.exitstatus = pytest.ExitCode.TESTS_FAILED
+    terminalreporter = session.config.pluginmanager.getplugin("terminalreporter")
+    if terminalreporter is None:
+        print(message, file=sys.stderr)
+    else:
+        terminalreporter.write_sep("!", message)
+    return message
+
+
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionstart(session: pytest.Session) -> None:
     repo_root = Path(session.config.rootpath)
@@ -220,11 +289,29 @@ def pytest_sessionstart(session: pytest.Session) -> None:
         repo_root,
         repo_root / "tests" / "docs_private_inputs.json",
     )
+    _install_docs_private_open_audit(repo_root)
     if os.environ.get("PYTEST_XDIST_WORKER"):
         return
     global _SESSION_WATCHDOG
     _SESSION_WATCHDOG = SessionWatchdog()
     _SESSION_WATCHDOG.start()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_protocol(
+    item: pytest.Item, nextitem: pytest.Item | None
+) -> Iterator[object]:
+    del nextitem
+    if not _DOCS_PRIVATE_AUDIT_INSTALLED:
+        yield
+        return
+    global _DOCS_PRIVATE_ACTIVE_TEST_NODEID
+    previous_nodeid = _DOCS_PRIVATE_ACTIVE_TEST_NODEID
+    _DOCS_PRIVATE_ACTIVE_TEST_NODEID = item.nodeid
+    try:
+        yield
+    finally:
+        _DOCS_PRIVATE_ACTIVE_TEST_NODEID = previous_nodeid
 
 
 @pytest.hookimpl(optionalhook=True, tryfirst=True)
@@ -270,7 +357,8 @@ def pytest_sessionfinish(
     session: pytest.Session,
     exitstatus: int | pytest.ExitCode,
 ) -> None:
-    del session, exitstatus
+    del exitstatus
+    _fail_on_missing_docs_private_opens(session)
     # t-420: close warm engine pools before the b-093 watchdog disarms, so the
     # bounded-cleanup path still runs under session-safety supervision.
     # Drop the process-scoped VapoRock warm-boot cache first so its pools are

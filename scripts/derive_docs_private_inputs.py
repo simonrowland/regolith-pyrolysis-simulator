@@ -1,4 +1,9 @@
-"""Derive the docs-private test-input manifest from repository path readers."""
+"""Derive private test inputs from static readers, manifests, and file globs.
+
+The static scan recognizes path assignments, direct pathlib reads, and literal
+glob patterns. It cannot resolve every helper return, f-string, or function-local
+path join; strict CI also audits attempted opens so those misses fail loudly.
+"""
 
 from __future__ import annotations
 
@@ -282,18 +287,6 @@ def _glob_specs(
     return sorted(set(specs), key=lambda item: (item[0], str(item[1]), item[2]))
 
 
-def _old_expansions(manifest: dict[str, Any]) -> tuple[set[str], set[str], set[str]]:
-    c6, profiles, literature = set(), set(), set()
-    for entry in manifest["entries"]:
-        if entry["kind"] == "glob" and entry["path"] == "docs-private/grind/manifest-c6-*.json":
-            c6.update(item["path"] for item in entry["required"])
-        elif entry["kind"] == "glob" and entry["path"] == "docs-private/deep-research/literature/*/benchmark-fixture.yaml":
-            literature.update(item["path"] for item in entry["required"])
-        elif entry["kind"] == "file" and entry["path"].startswith("docs-private/grind/profiles/"):
-            profiles.add(entry["path"])
-    return c6, profiles, literature
-
-
 def _files(root: Path, pattern: str) -> set[str]:
     return {
         path.relative_to(root).as_posix()
@@ -312,21 +305,18 @@ def _tracked_papers(root: Path) -> set[str]:
 
 
 def _profile_paths(
-    root: Path, manifest_paths: set[str], fallback: set[str], grind_dir: str
+    root: Path, manifest_paths: set[str], grind_dir: str
 ) -> set[str]:
-    if not manifest_paths or not all((root / path).is_file() for path in manifest_paths):
-        return fallback
+    if not manifest_paths:
+        raise RuntimeError("no directly read C6 manifests found in tests")
     profiles = set()
-    try:
-        for path in manifest_paths:
-            payload = json.loads((root / path).read_text(encoding="utf-8"))
-            profiles.update(
-                (PurePosixPath(grind_dir) / job["profile"]).as_posix()
-                for job in payload.get("jobs", [])
-            )
-    except (OSError, KeyError, TypeError, json.JSONDecodeError):
-        return fallback
-    return profiles or fallback
+    for path in manifest_paths:
+        payload = json.loads((root / path).read_text(encoding="utf-8"))
+        profiles.update(
+            (PurePosixPath(grind_dir) / job["profile"]).as_posix()
+            for job in payload.get("jobs", [])
+        )
+    return profiles
 
 
 def _reader_lines(tree: ast.AST, method: str) -> set[int]:
@@ -340,9 +330,6 @@ def _reader_lines(tree: ast.AST, method: str) -> set[int]:
 
 
 def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
-    manifest_path = root / "tests" / "docs_private_inputs.json"
-    previous = json.loads(manifest_path.read_text(encoding="utf-8"))
-    old_c6, old_profiles, old_literature = _old_expansions(previous)
     path_readers, trees, aliases = _readers(root)
     globs = _glob_specs(root, trees, aliases)
     c6_pattern = next(
@@ -368,16 +355,14 @@ def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
     c6_paths = {
         (PurePosixPath("docs-private/grind") / name).as_posix()
         for name in c6_names
-    } | _files(root, c6_pattern) | old_c6
+    } | _files(root, c6_pattern)
 
     c6_manifest_paths = {
         path
         for path in path_readers
         if path.startswith("docs-private/grind/manifest-c6-") and path.endswith(".json")
     }
-    profiles = old_profiles | _profile_paths(
-        root, c6_manifest_paths, old_profiles, "docs-private/grind"
-    )
+    profiles = _profile_paths(root, c6_manifest_paths, "docs-private/grind")
     profile_test_lines = {
         node.lineno
         for node in ast.walk(c6_tree)
@@ -421,7 +406,7 @@ def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
         for path in _files(root, literature_pattern)
         if PurePosixPath(path).parent.name not in tracked
     }
-    literature = corpus_files | old_literature
+    literature = corpus_files
     corpus_read_lines = _reader_lines(literature_tree, "read_text")
     corpus_call_line = next(
         line for path, source, line in globs if path == literature_pattern and source == literature_source
@@ -489,20 +474,11 @@ def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
         }
     )
     known_patterns = {c6_pattern, literature_pattern}
-    previous_globs = {
-        entry["path"]: entry
-        for entry in previous["entries"]
-        if entry["kind"] == "glob"
-    }
     extra_patterns = sorted(
         {pattern for pattern, _source, _line in globs} - known_patterns
     )
     for pattern in extra_patterns:
-        prior = previous_globs.get(pattern, {})
-        required_readers = {
-            item["path"]: item["reader"] for item in prior.get("required", [])
-        }
-        required_paths = set(required_readers) | _files(root, pattern)
+        required_paths = _files(root, pattern)
         readers = {
             f"{source.relative_to(root).as_posix()}:{line}"
             for candidate, source, line in globs
@@ -516,9 +492,7 @@ def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
                 "required": [
                     {
                         "path": path,
-                        "reader": required_readers.get(
-                            path, _format_readers(readers)
-                        ),
+                        "reader": _format_readers(readers),
                     }
                     for path in sorted(required_paths)
                 ],
