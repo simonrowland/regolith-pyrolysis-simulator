@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}Pareto tradeoffs {{ pareto.run_id }} - Regolith Pyrolysis{% endblock %}
+
+{% block content %}
+<section class="main-area tradeoff-page">
+    <div class="section-card">
+        <h2>Pareto tradeoffs</h2>
+        <p class="config-hint">Run {{ pareto.run_id }}</p>
+        {% if pareto.front_note %}
+        <p class="empty-hint" role="status">{{ pareto.front_note }}</p>
+        {% endif %}
+        {% if pareto.axis_error %}
+        <p id="pareto-axis-error" class="empty-hint" role="alert">{{ pareto.axis_error }}</p>
+        {% endif %}
+        <form id="pareto-controls" method="get"
+              action="{{ url_for('web.optimizer_pareto_page', run_id=pareto.run_id) }}">
+            <div class="tradeoff-controls">
+                <div class="ctrl-row">
+                    <label for="pareto-x">X axis</label>
+                    <select id="pareto-x" name="x">
+                        {% for metric in pareto.metrics %}
+                        <option value="{{ metric.metric }}" {% if metric.metric == pareto.x %}selected{% endif %}>{{ metric.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="ctrl-row">
+                    <label for="pareto-y">Y axis</label>
+                    <select id="pareto-y" name="y">
+                        {% for metric in pareto.metrics %}
+                        <option value="{{ metric.metric }}" {% if metric.metric == pareto.y %}selected{% endif %}>{{ metric.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="tradeoff-actions">
+                    <button class="btn" type="submit">Update axes</button>
+                </div>
+            </div>
+            <ul class="tradeoff-legend">
+                <li><span class="plot-status plot-status-feasible">feasible</span></li>
+                <li><span class="plot-status plot-status-infeasible">infeasible</span></li>
+                <li><span class="plot-status plot-status-unavailable">unavailable</span></li>
+                <li><span class="plot-status plot-status-feasible plot-status-front">front</span></li>
+            </ul>
+            {% if pareto.plotted_count %}
+            <div id="pareto-scatter" class="tradeoff-chart" role="img"
+                 aria-label="Pareto scatter of {{ pareto.x_label }} and {{ pareto.y_label }}"></div>
+            {% else %}
+            <p class="empty-hint" role="status">No evaluated point has both axis values.</p>
+            {% endif %}
+            <div class="table-scroll">
+                <table class="param-table tradeoff-table">
+                    <thead>
+                        <tr>
+                            <th>Compare</th>
+                            <th>Point</th>
+                            <th>Status</th>
+                            <th>{{ pareto.x_label }}</th>
+                            <th>{{ pareto.y_label }}</th>
+                            <th>Trajectory</th>
+                            <th>Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for point in pareto.points %}
+                        <tr data-candidate="{{ point.candidate_id }}">
+                            <td>
+                                <input type="checkbox"
+                                       name="cache_key"
+                                       id="compare-{{ loop.index }}"
+                                       value="{{ point.cache_key }}"
+                                       {% if point.cache_key in compare_keys %}checked{% endif %}>
+                                <label for="compare-{{ loop.index }}">Select {{ point.candidate_id or point.cache_key }}</label>
+                            </td>
+                            <td class="tradeoff-key">{{ point.candidate_id or point.cache_key }}</td>
+                            <td>
+                                <span class="plot-status plot-status-{{ point.plot_status }}{% if point.on_pareto_front %} plot-status-front{% endif %}">
+                                    {{ point.plot_status }}{% if point.on_pareto_front %} front{% endif %}
+                                </span>
+                            </td>
+                            <td>{% if point.x is none %}unavailable{% else %}{{ point.x }}{% endif %}</td>
+                            <td>{% if point.y is none %}unavailable{% else %}{{ point.y }}{% endif %}</td>
+                            <td>{% if point.trajectory_message %}{{ point.trajectory_message }}{% else %}available{% endif %}</td>
+                            <td><a href="{{ point.detail_url }}">Detail</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tradeoff-actions">
+                <button class="btn" type="submit">Compare trajectories</button>
+            </div>
+        </form>
+        <div class="control-buttons">
+            <a class="btn" href="{{ url_for('web.optimizer_page') }}">Back to optimizer</a>
+        </div>
+    </div>
+
+    {% if compare_error %}
+    <p id="compare-error" class="empty-hint" role="alert">{{ compare_error }}</p>
+    {% endif %}
+
+    {% if compare %}
+    <div class="section-card" id="trajectory-overlay">
+        <h3>Trajectory overlay</h3>
+        {% if compare.series %}
+        <form class="tradeoff-controls" method="get"
+              action="{{ url_for('web.optimizer_pareto_page', run_id=pareto.run_id) }}">
+            <input type="hidden" name="x" value="{{ pareto.x or '' }}">
+            <input type="hidden" name="y" value="{{ pareto.y or '' }}">
+            {% for key in compare_keys %}
+            <input type="hidden" name="cache_key" value="{{ key }}">
+            {% endfor %}
+            <div class="ctrl-row">
+                <label for="compare-series">Series</label>
+                <select id="compare-series" name="series">
+                    {% for group in compare.series_groups %}
+                    <optgroup label="{{ group.label }}">
+                        {% for series in group.series %}
+                        <option value="{{ series.id }}" {% if series.id == compare.series_id %}selected{% endif %}>{{ series.label }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="tradeoff-actions">
+                <button class="btn" type="submit">Show series</button>
+            </div>
+        </form>
+        {% endif %}
+        {% for point in compare.points %}
+        {% if point.message %}
+        <p class="empty-hint" role="status">{{ point.label }}: {{ point.message }}</p>
+        {% endif %}
+        {% endfor %}
+        {% if compare.chart %}
+        {% for point in compare.points if point.series_points %}
+        <h4 class="ctrl-heading">{{ point.label }}</h4>
+        <div class="table-scroll">
+            <table class="param-table tradeoff-table">
+                <thead>
+                    <tr>
+                        <th>Hour</th>
+                        <th>{{ compare.series_label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in point.series_points %}
+                    <tr>
+                        <td>{{ row.hour }}</td>
+                        <td>{% if row.value is none %}unavailable{% else %}{{ row.value }}{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+        <div id="compare-chart" class="tradeoff-chart" role="img"
+             aria-label="{{ compare.series_label }} overlay"></div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <script type="application/json" id="pareto-payload">{{ pareto|tojson }}</script>
+    {% if compare %}
+    <script type="application/json" id="compare-payload">{{ compare|tojson }}</script>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% if pareto.plotted_count or (compare and compare.chart) %}
+<script src="{{ url_for('web.static', filename='js/simulator-charts.js') }}"></script>
+<script src="{{ url_for('web.static', filename='js/optimizer-tradeoff.js') }}"></script>
+{% endif %}
+{% endblock %}
