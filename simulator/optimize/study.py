@@ -4284,6 +4284,7 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "neighbor_disagreement",
             "reduced_real_cache",
             "per_hour_summary",
+            "trajectory",
         ):
             if key in trace:
                 payload[key] = _jsonable_value(trace[key])
@@ -6446,6 +6447,7 @@ def _record_payload(
     payload = {
         "cache_hit": record.cache_hit,
         "cache_key": record.cache_key,
+        "trajectory_cache_key": record.cache_key,
         "candidate_id": record.candidate_id,
         "failure_category": record.failure_category,
         "failing_gates": list(record.failing_gates),
