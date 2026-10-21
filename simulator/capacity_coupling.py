@@ -89,6 +89,14 @@ class CapacityCouplingRefusalError(RuntimeError):
         super().__init__(refusal.reason)
 
 
+def external_oxygen_outlet_mol(*, bled_o2_mol: float, overhead_o2_mol: float,
+                             external_o2_holdup_mol: float) -> float:
+    """External share of the legacy uniform batch outlet."""
+    external_holdup = min(max(0.0, external_o2_holdup_mol), max(0.0, overhead_o2_mol))
+    return (min(bled_o2_mol, bled_o2_mol * external_holdup / overhead_o2_mol)
+            if bled_o2_mol > 0.0 and overhead_o2_mol > 0.0 else 0.0)
+
+
 def partition_melt_oxygen(
     *,
     bled_o2_mol: float,
@@ -114,10 +122,9 @@ def partition_melt_oxygen(
     external_holdup = min(
         max(0.0, external_o2_holdup_mol), max(0.0, overhead_o2_mol)
     )
-    external = (
-        min(bled_o2_mol, bled_o2_mol * external_holdup / overhead_o2_mol)
-        if bled_o2_mol > 0.0 and overhead_o2_mol > 0.0
-        else 0.0
+    external = external_oxygen_outlet_mol(
+        bled_o2_mol=bled_o2_mol, overhead_o2_mol=overhead_o2_mol,
+        external_o2_holdup_mol=external_holdup,
     )
     melt_inventory = max(0.0, overhead_o2_mol - external_holdup)
     melt_bled = min(melt_inventory, max(0.0, bled_o2_mol - external))

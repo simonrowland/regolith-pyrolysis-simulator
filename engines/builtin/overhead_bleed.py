@@ -312,13 +312,11 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             controls,
             overhead_o2_mol,
         )
-        external_o2_bled_mol = (
-            min(
-                bled_o2_mol,
-                bled_o2_mol * external_o2_holdup_mol / overhead_o2_mol,
-            )
-            if bled_o2_mol > 0.0 and overhead_o2_mol > 0.0
-            else 0.0
+        from simulator.capacity_coupling import external_oxygen_outlet_mol
+
+        external_o2_bled_mol = external_oxygen_outlet_mol(
+            bled_o2_mol=bled_o2_mol, overhead_o2_mol=overhead_o2_mol,
+            external_o2_holdup_mol=external_o2_holdup_mol,
         )
         melt_o2_bled_mol = max(0.0, bled_o2_mol - external_o2_bled_mol)
         capacity = controls.get("cold_train_capacity")
