@@ -99,6 +99,10 @@ STARTING_COMPOSITION_DETAILS = {
         "Lu": "88.5",
     },
 }
+TABLE3_TI_JC_RENDER = {
+    ("1800", "120–220"): "7.-9×10^-7",
+    ("2000", "20–25"): "4.41×10^-6",
+}
 TABLE4_RENDER = """
 17O/16O 0.0|0.5|1.2|3.1|4.0|4.8|8.4|8.3|10.2|12.6|13.8|19.4|22.1|22.8|28.0
 18O/16O 0.0|0.4|1.6|5.2|7.2|8.9|16.0|15.6|19.3|24.1|26.3|37.4|43.0|44.5|53.1
@@ -213,6 +217,25 @@ def test_starting_composition_is_separate_and_pinned_to_table1() -> None:
         for row in values["series"]
         if row.get("sample") in TABLE1_SAMPLES
     )
+
+
+def test_table3_ti_volatilities_match_printed_cells() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    table3 = next(
+        row
+        for row in extract["species"]["SiO2"]["context"]
+        if row["observation_id"] == "wang_2001_table3_calculated_evaporation_parameters"
+    )
+    rows = table3["values"]["rows_as_printed"]
+    cells = {
+        (row["temperature_C"], row["time_min"]): row["J_over_C_cm_s"]["Ti"]
+        for row in rows
+        if "Ti" in row.get("J_over_C_cm_s", {})
+    }
+    assert {key: cells[key] for key in TABLE3_TI_JC_RENDER} == TABLE3_TI_JC_RENDER
+    note = table3["values"]["note"]
+    assert "7.-9 × 10^-7" in note
+    assert "1800 °C / 120–220 min Ti J/C cell" in note
 
 
 def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:

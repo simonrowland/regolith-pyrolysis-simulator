@@ -3612,7 +3612,7 @@ species:
           J_over_C_cm_s:
             Si: 5.37×10^-6
             Mg: 6.98×10^-6
-            Ti: 7×10^-7
+            Ti: 7.-9×10^-7
         - temperature_C: '2000'
           time_min: 0–5
           J_mol_cm2_s:
@@ -3652,9 +3652,9 @@ species:
           J_over_C_cm_s:
             Si: 1.14×10^-4
             Mg: 1.39×10^-4
-            Ti: 7.-9×10^-7
-        note: Table 3 is model-derived. Its final 1800 °C Ti volatility cell appears as ‘7.-9 × 10^-7’ in the 600-dpi
-          render and is retained verbatim as an ambiguous printed value.
+            Ti: 4.41×10^-6
+        note: Table 3 is model-derived. The ambiguous printed token ‘7.-9 × 10^-7’ is in the 1800 °C / 120–220 min Ti
+          J/C cell and is retained verbatim from the 600-dpi render.
     - observation_id: wang_2001_table5_isotope_fractionation_factors_no_quantity_token
       type: context
       locator:
