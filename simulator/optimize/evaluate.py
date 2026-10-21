@@ -3770,7 +3770,7 @@ def _furnace_ceiling_C(
 
     if material_caps is not None:
         applied_ceiling_C = material_caps["effective_applied_ceiling_T_C"]
-        if applied_ceiling_C <= ceiling_C:
+        if applied_ceiling_C < ceiling_C:
             if (
                 material_caps["requested_ceiling_T_C"]
                 >= material_caps["service_rating_T_C"]
@@ -3779,6 +3779,8 @@ def _furnace_ceiling_C(
                     f"furnace_material[{material}]."
                     "effective_applied_ceiling_T_C"
                 )
+            else:
+                ceiling_bound = "profile_default_furnace_max_T_C"
             return applied_ceiling_C, ceiling_bound
     return ceiling_C, ceiling_bound
 
