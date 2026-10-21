@@ -8249,6 +8249,10 @@ _ANCILLARY_SERIES_KEYS = (
 
 _PARTIAL_PRESSURE_FIELDS = ("partial_pressure_pa", "p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa")
 
+# Keep the legacy six-slot no-temperature residue id layout stable when new
+# component fields are appended (five oxide columns plus residue_ppm).
+_RESIDUE_SERIES_LEGACY_ID_STRIDE = 6
+
 QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.ACTIVITY: ("activity",),
     Quantity.ACTIVITY_COEFFICIENT: ("gamma", "activity_coefficient"),
@@ -8376,6 +8380,14 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "FeO_wt_pct",
         "MgO_wt_pct",
         "CaO_wt_pct",
+        "TiO2_wt_pct",
+        "Cr2O3_wt_pct",
+        "MnO_wt_pct",
+        "Na2O_wt_pct",
+        "K2O_wt_pct",
+        "P2O5_wt_pct",
+        "Fe2O3_wt_pct",
+        "WO3_wt_pct",
     ),
     Quantity.EQUILIBRIUM_PHASE_COMPOSITION: (
         "r_as_printed",
@@ -15400,6 +15412,15 @@ class Migrator:
                 )
                 point_index = int(point.get("index", 0))
                 for component_index, field in enumerate(component_fields):
+                    legacy_id_field = (
+                        component_index < _RESIDUE_SERIES_LEGACY_ID_STRIDE - 1
+                    )
+                    source_index = (
+                        point_index * _RESIDUE_SERIES_LEGACY_ID_STRIDE
+                        + component_index
+                        if legacy_id_field
+                        else point_index * len(residue_fields) + component_index
+                    )
                     cell_units = str(obs.get("units") or "")
                     if (
                         field.endswith("_wt_pct")
@@ -15413,7 +15434,12 @@ class Migrator:
                     if not cell_selection.available:
                         continue
                     cell_item = dict(raw_item)
-                    for other in residue_fields:
+                    id_fields = (
+                        residue_fields[:_RESIDUE_SERIES_LEGACY_ID_STRIDE]
+                        if legacy_id_field
+                        else residue_fields
+                    )
+                    for other in id_fields:
                         if other != field:
                             cell_item.pop(other, None)
                     point_species = species
@@ -15427,7 +15453,7 @@ class Migrator:
                     self._emit_exploded_point(
                         parent_id=obs_id,
                         item={
-                            "index": point_index * len(residue_fields) + component_index,
+                            "index": source_index,
                             "item": cell_item,
                             "units": cell_units,
                         },
@@ -15454,6 +15480,7 @@ class Migrator:
                         parent_values=values,
                         provenance=observation_provenance,
                         parent_point_conditions=point_conditions,
+                        content_stable_id=not legacy_id_field,
                         source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
                             raw_item
                         ),
