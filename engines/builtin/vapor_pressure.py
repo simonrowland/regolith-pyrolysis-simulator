@@ -682,7 +682,10 @@ def openimcc_binding_selected_by_inputs(
     *,
     temperature_K: float,
     controls: Mapping[str, Any],
+    quantity_class: str = "activity",
 ) -> bool:
+    if quantity_class not in {"activity", "vapour"}:
+        raise ValueError(f"Unknown OpenIMCC quantity class: {quantity_class!r}")
     mode = normalize_high_t_melt_activity(
         controls.get("high_t_melt_activity", "openimcc")
     )
@@ -1001,6 +1004,7 @@ def _build_high_t_melt_activity_authority(
     if not openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K,
         controls=controls,
+        quantity_class="activity",
     ):
         return None
     mode = "openimcc"
@@ -1019,6 +1023,14 @@ def _build_high_t_melt_activity_authority(
         "authority_exclusions": {},
     }
     previous = controls.get("high_t_melt_activity_previous") or {}
+    vapour_selected = openimcc_binding_selected_by_inputs(
+        temperature_K=temperature_K, controls=controls, quantity_class="vapour",
+    )
+    if not vapour_selected or (previous and not openimcc_binding_selected_by_inputs(
+        temperature_K=previous["temperature_K"],
+        controls=controls, quantity_class="vapour",
+    )):
+        previous = {}
     certificates = dict(previous.get("certified_effective_gamma_by_parent") or {})
     base["certified_effective_gamma_by_parent"] = certificates
     hour = controls.get("simulation_hour")
@@ -1491,7 +1503,7 @@ def _build_high_t_melt_activity_authority(
             }
         )
     base["seam_max_abs_ratio_dex"] = max_abs_dex
-    if hour is not None and not bridge.extrapolated and projection_notice is None:
+    if vapour_selected and hour is not None and not bridge.extrapolated and projection_notice is None:
         composition = _high_t_composition_vector(composition_mol)
         previous_temperature = controls.get("high_t_melt_activity_previous_temperature_K")
         # The recorded window is still two observed local steps: thermal
@@ -2747,13 +2759,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             below_cap_fe_activity=below_cap_fe_activity,
             below_cap_fe_activity_basis=below_cap_fe_activity_basis,
         )
+        vapour_activity_authority = high_t_activity_authority
         # An openimcc activity can move a valid carrier below the numerical
         # output floor; preserve the carrier so predict-and-flag never drops it.
         retain_high_t_openimcc_carriers = bool(
-            high_t_activity_authority
+            vapour_activity_authority
             and (
-                high_t_activity_authority.get("provider") == "openimcc"
-                or high_t_activity_authority.get("held_effective_gamma_by_parent")
+                vapour_activity_authority.get("provider") == "openimcc"
+                or vapour_activity_authority.get("held_effective_gamma_by_parent")
             )
         )
         if high_t_activity_authority:
@@ -2981,7 +2994,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 0.0 or (
                     not retain_analytical_channel
@@ -3127,7 +3140,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -3259,7 +3272,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -3364,13 +3377,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if (
-                    high_t_activity_authority
+                    vapour_activity_authority
                     and (
-                        high_t_activity_authority.get("provider") == "openimcc"
-                        or "FeO" in high_t_activity_authority.get("held_effective_gamma_by_parent", {})
+                        vapour_activity_authority.get("provider") == "openimcc"
+                        or "FeO" in vapour_activity_authority.get("held_effective_gamma_by_parent", {})
                     )
                     and candidate_activity is not None
                 ):
@@ -3410,7 +3423,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if oxide_activity is None:
                     continue
@@ -3705,7 +3718,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     parent_oxide,
                     melt_account_mol,
                     temperature_K=T_K,
-                    authority=high_t_activity_authority,
+                    authority=vapour_activity_authority,
                 )
                 if oxide_activity is None:
                     continue
@@ -4049,7 +4062,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             }
 
         _attach_high_t_activity_provenance(
-            authority=high_t_activity_authority,
+            authority=vapour_activity_authority,
             metals_data=metals_data,
             oxide_vapors_data=oxide_vapors_data,
             vapor_pressure_sources=vapor_pressure_sources,

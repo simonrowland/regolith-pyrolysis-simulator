@@ -2525,6 +2525,7 @@ def record_binding_producer_ids(
         if openimcc_binding_selected_by_inputs(
             temperature_K=temperature_C + 273.15,
             controls=getattr(sim, "setpoints", {}) or {},
+            quantity_class="activity",
         ):
             selected.append("openimcc")
 

@@ -9976,6 +9976,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         if openimcc_binding_selected_by_inputs(
             temperature_K=T_C + 273.15, controls={},
+            quantity_class="activity",
         ):
             high_t_control_inputs = {
                 'high_t_melt_activity': getattr(
