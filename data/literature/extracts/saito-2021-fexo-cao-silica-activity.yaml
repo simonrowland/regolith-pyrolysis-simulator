@@ -11,6 +11,23 @@ extraction:
     composition cells remain in row locator notes; Figures 1–9 are recorded with digitisation deferred.
   date: '2026-10-21'
   worker: fam38-1021
+fidelity_samples:
+- path: species.Fe(1-x)O.observations[saito_2021_table2_row_1_1_solid_activity].values.activity
+  value: '0.727'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 700
+    table: '2'
+    record: Table 2 row 1-1
+- path: species.Fe(1-x)O.observations[saito_2021_table2_row_9_7_liquid_activity].values.activity
+  value: '0.820'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 700
+    table: '2'
+    record: Table 2 row 9-7
 review_status: draft
 scope_assessment:
   document_type: electrochemical FexO activity measurement in ternary slag
@@ -33,7 +50,7 @@ species:
     observations:
     - observation_id: saito_2021_table2_row_1_1_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id001
         page: 4
         pdf_page_index: 3
@@ -75,7 +92,7 @@ species:
         activity: '0.727'
     - observation_id: saito_2021_table2_row_1_1_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id001
       phase: l
       units: dimensionless activity as printed
@@ -111,7 +128,7 @@ species:
         activity: '0.616'
     - observation_id: saito_2021_table2_row_1_2_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id002
         page: 4
         pdf_page_index: 3
@@ -153,7 +170,7 @@ species:
         activity: '0.787'
     - observation_id: saito_2021_table2_row_1_2_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id002
       phase: l
       units: dimensionless activity as printed
@@ -189,7 +206,7 @@ species:
         activity: '0.666'
     - observation_id: saito_2021_table2_row_1_3_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id003
         page: 4
         pdf_page_index: 3
@@ -231,7 +248,7 @@ species:
         activity: '0.911'
     - observation_id: saito_2021_table2_row_1_3_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id003
       phase: l
       units: dimensionless activity as printed
@@ -267,7 +284,7 @@ species:
         activity: '0.772'
     - observation_id: saito_2021_table2_row_1_4_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id004
         page: 4
         pdf_page_index: 3
@@ -309,7 +326,7 @@ species:
         activity: '0.926'
     - observation_id: saito_2021_table2_row_1_4_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id004
       phase: l
       units: dimensionless activity as printed
@@ -345,7 +362,7 @@ species:
         activity: '0.785'
     - observation_id: saito_2021_table2_row_2_1_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id005
         page: 4
         pdf_page_index: 3
@@ -387,7 +404,7 @@ species:
         activity: '0.816'
     - observation_id: saito_2021_table2_row_2_1_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id005
       phase: l
       units: dimensionless activity as printed
@@ -423,7 +440,7 @@ species:
         activity: '0.692'
     - observation_id: saito_2021_table2_row_2_2_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id006
         page: 4
         pdf_page_index: 3
@@ -465,7 +482,7 @@ species:
         activity: '0.838'
     - observation_id: saito_2021_table2_row_2_2_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id006
       phase: l
       units: dimensionless activity as printed
@@ -501,7 +518,7 @@ species:
         activity: '0.709'
     - observation_id: saito_2021_table2_row_2_3_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id007
         page: 4
         pdf_page_index: 3
@@ -543,7 +560,7 @@ species:
         activity: '0.968'
     - observation_id: saito_2021_table2_row_2_3_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id007
       phase: l
       units: dimensionless activity as printed
@@ -579,7 +596,7 @@ species:
         activity: '0.821'
     - observation_id: saito_2021_table2_row_2_4_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id008
         page: 4
         pdf_page_index: 3
@@ -621,7 +638,7 @@ species:
         activity: '0.970'
     - observation_id: saito_2021_table2_row_2_4_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id008
       phase: l
       units: dimensionless activity as printed
@@ -657,7 +674,7 @@ species:
         activity: '0.823'
     - observation_id: saito_2021_table2_row_3_1_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id009
         page: 4
         pdf_page_index: 3
@@ -699,7 +716,7 @@ species:
         activity: '0.469'
     - observation_id: saito_2021_table2_row_3_1_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id009
       phase: l
       units: dimensionless activity as printed
@@ -735,7 +752,7 @@ species:
         activity: '0.397'
     - observation_id: saito_2021_table2_row_3_2_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id010
         page: 4
         pdf_page_index: 3
@@ -777,7 +794,7 @@ species:
         activity: '0.588'
     - observation_id: saito_2021_table2_row_3_2_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id010
       phase: l
       units: dimensionless activity as printed
@@ -813,7 +830,7 @@ species:
         activity: '0.498'
     - observation_id: saito_2021_table2_row_3_3_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id011
         page: 4
         pdf_page_index: 3
@@ -855,7 +872,7 @@ species:
         activity: '0.719'
     - observation_id: saito_2021_table2_row_3_3_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id011
       phase: l
       units: dimensionless activity as printed
@@ -891,7 +908,7 @@ species:
         activity: '0.609'
     - observation_id: saito_2021_table2_row_3_4_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id012
         page: 4
         pdf_page_index: 3
@@ -933,7 +950,7 @@ species:
         activity: '0.847'
     - observation_id: saito_2021_table2_row_3_4_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id012
       phase: l
       units: dimensionless activity as printed
@@ -969,7 +986,7 @@ species:
         activity: '0.717'
     - observation_id: saito_2021_table2_row_4_1_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id013
         page: 4
         pdf_page_index: 3
@@ -1011,7 +1028,7 @@ species:
         activity: '0.840'
     - observation_id: saito_2021_table2_row_4_1_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id013
       phase: l
       units: dimensionless activity as printed
@@ -1047,7 +1064,7 @@ species:
         activity: '0.711'
     - observation_id: saito_2021_table2_row_4_2_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id014
         page: 4
         pdf_page_index: 3
@@ -1089,7 +1106,7 @@ species:
         activity: '0.862'
     - observation_id: saito_2021_table2_row_4_2_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id014
       phase: l
       units: dimensionless activity as printed
@@ -1125,7 +1142,7 @@ species:
         activity: '0.730'
     - observation_id: saito_2021_table2_row_4_3_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id015
         page: 4
         pdf_page_index: 3
@@ -1167,7 +1184,7 @@ species:
         activity: '0.919'
     - observation_id: saito_2021_table2_row_4_3_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id015
       phase: l
       units: dimensionless activity as printed
@@ -1203,7 +1220,7 @@ species:
         activity: '0.778'
     - observation_id: saito_2021_table2_row_4_4_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id016
         page: 4
         pdf_page_index: 3
@@ -1245,7 +1262,7 @@ species:
         activity: '0.941'
     - observation_id: saito_2021_table2_row_4_4_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id016
       phase: l
       units: dimensionless activity as printed
@@ -1281,7 +1298,7 @@ species:
         activity: '0.797'
     - observation_id: saito_2021_table2_row_4_5_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id017
         page: 4
         pdf_page_index: 3
@@ -1323,7 +1340,7 @@ species:
         activity: '0.946'
     - observation_id: saito_2021_table2_row_4_5_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id017
       phase: l
       units: dimensionless activity as printed
@@ -1359,7 +1376,7 @@ species:
         activity: '0.801'
     - observation_id: saito_2021_table2_row_4_6_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id018
         page: 4
         pdf_page_index: 3
@@ -1401,7 +1418,7 @@ species:
         activity: '0.984'
     - observation_id: saito_2021_table2_row_4_6_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id018
       phase: l
       units: dimensionless activity as printed
@@ -1437,7 +1454,7 @@ species:
         activity: '0.834'
     - observation_id: saito_2021_table2_row_5_1_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id019
         page: 4
         pdf_page_index: 3
@@ -1479,7 +1496,7 @@ species:
         activity: '0.473'
     - observation_id: saito_2021_table2_row_5_1_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id019
       phase: l
       units: dimensionless activity as printed
@@ -1515,7 +1532,7 @@ species:
         activity: '0.400'
     - observation_id: saito_2021_table2_row_5_2_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id020
         page: 4
         pdf_page_index: 3
@@ -1557,7 +1574,7 @@ species:
         activity: '0.599'
     - observation_id: saito_2021_table2_row_5_2_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id020
       phase: l
       units: dimensionless activity as printed
@@ -1593,7 +1610,7 @@ species:
         activity: '0.507'
     - observation_id: saito_2021_table2_row_5_3_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id021
         page: 4
         pdf_page_index: 3
@@ -1635,7 +1652,7 @@ species:
         activity: '0.745'
     - observation_id: saito_2021_table2_row_5_3_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id021
       phase: l
       units: dimensionless activity as printed
@@ -1671,7 +1688,7 @@ species:
         activity: '0.631'
     - observation_id: saito_2021_table2_row_5_4_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id022
         page: 4
         pdf_page_index: 3
@@ -1713,7 +1730,7 @@ species:
         activity: '0.817'
     - observation_id: saito_2021_table2_row_5_4_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id022
       phase: l
       units: dimensionless activity as printed
@@ -1749,7 +1766,7 @@ species:
         activity: '0.692'
     - observation_id: saito_2021_table2_row_5_5_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id023
         page: 4
         pdf_page_index: 3
@@ -1791,7 +1808,7 @@ species:
         activity: '0.882'
     - observation_id: saito_2021_table2_row_5_5_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id023
       phase: l
       units: dimensionless activity as printed
@@ -1827,7 +1844,7 @@ species:
         activity: '0.747'
     - observation_id: saito_2021_table2_row_5_6_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id024
         page: 4
         pdf_page_index: 3
@@ -1869,7 +1886,7 @@ species:
         activity: '0.966'
     - observation_id: saito_2021_table2_row_5_6_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id024
       phase: l
       units: dimensionless activity as printed
@@ -1905,7 +1922,7 @@ species:
         activity: '0.818'
     - observation_id: saito_2021_table2_row_5_7_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id025
         page: 4
         pdf_page_index: 3
@@ -1947,7 +1964,7 @@ species:
         activity: '0.993'
     - observation_id: saito_2021_table2_row_5_7_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id025
       phase: l
       units: dimensionless activity as printed
@@ -1983,7 +2000,7 @@ species:
         activity: '0.841'
     - observation_id: saito_2021_table2_row_6_1_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id026
         page: 4
         pdf_page_index: 3
@@ -2025,7 +2042,7 @@ species:
         activity: '0.421'
     - observation_id: saito_2021_table2_row_6_1_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id026
       phase: l
       units: dimensionless activity as printed
@@ -2061,7 +2078,7 @@ species:
         activity: '0.357'
     - observation_id: saito_2021_table2_row_6_2_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id027
         page: 4
         pdf_page_index: 3
@@ -2103,7 +2120,7 @@ species:
         activity: '0.746'
     - observation_id: saito_2021_table2_row_6_2_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id027
       phase: l
       units: dimensionless activity as printed
@@ -2139,7 +2156,7 @@ species:
         activity: '0.632'
     - observation_id: saito_2021_table2_row_6_3_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id028
         page: 4
         pdf_page_index: 3
@@ -2181,7 +2198,7 @@ species:
         activity: '0.825'
     - observation_id: saito_2021_table2_row_6_3_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id028
       phase: l
       units: dimensionless activity as printed
@@ -2217,7 +2234,7 @@ species:
         activity: '0.698'
     - observation_id: saito_2021_table2_row_6_4_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id029
         page: 4
         pdf_page_index: 3
@@ -2259,7 +2276,7 @@ species:
         activity: '0.944'
     - observation_id: saito_2021_table2_row_6_4_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id029
       phase: l
       units: dimensionless activity as printed
@@ -2295,7 +2312,7 @@ species:
         activity: '0.799'
     - observation_id: saito_2021_table2_row_6_5_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id030
         page: 4
         pdf_page_index: 3
@@ -2337,7 +2354,7 @@ species:
         activity: '0.971'
     - observation_id: saito_2021_table2_row_6_5_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id030
       phase: l
       units: dimensionless activity as printed
@@ -2373,7 +2390,7 @@ species:
         activity: '0.822'
     - observation_id: saito_2021_table2_row_7_1_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id031
         page: 4
         pdf_page_index: 3
@@ -2415,7 +2432,7 @@ species:
         activity: '0.609'
     - observation_id: saito_2021_table2_row_7_1_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id031
       phase: l
       units: dimensionless activity as printed
@@ -2451,7 +2468,7 @@ species:
         activity: '0.516'
     - observation_id: saito_2021_table2_row_7_2_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id032
         page: 4
         pdf_page_index: 3
@@ -2493,7 +2510,7 @@ species:
         activity: '0.804'
     - observation_id: saito_2021_table2_row_7_2_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id032
       phase: l
       units: dimensionless activity as printed
@@ -2529,7 +2546,7 @@ species:
         activity: '0.681'
     - observation_id: saito_2021_table2_row_7_3_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id033
         page: 4
         pdf_page_index: 3
@@ -2571,7 +2588,7 @@ species:
         activity: '0.928'
     - observation_id: saito_2021_table2_row_7_3_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id033
       phase: l
       units: dimensionless activity as printed
@@ -2607,7 +2624,7 @@ species:
         activity: '0.786'
     - observation_id: saito_2021_table2_row_8_1_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id034
         page: 4
         pdf_page_index: 3
@@ -2649,7 +2666,7 @@ species:
         activity: '0.566'
     - observation_id: saito_2021_table2_row_8_1_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id034
       phase: l
       units: dimensionless activity as printed
@@ -2685,7 +2702,7 @@ species:
         activity: '0.479'
     - observation_id: saito_2021_table2_row_8_2_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id035
         page: 4
         pdf_page_index: 3
@@ -2727,7 +2744,7 @@ species:
         activity: '0.716'
     - observation_id: saito_2021_table2_row_8_2_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id035
       phase: l
       units: dimensionless activity as printed
@@ -2763,7 +2780,7 @@ species:
         activity: '0.606'
     - observation_id: saito_2021_table2_row_9_1_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id036
         page: 4
         pdf_page_index: 3
@@ -2805,7 +2822,7 @@ species:
         activity: '0.441'
     - observation_id: saito_2021_table2_row_9_1_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id036
       phase: l
       units: dimensionless activity as printed
@@ -2841,7 +2858,7 @@ species:
         activity: '0.373'
     - observation_id: saito_2021_table2_row_9_2_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id037
         page: 4
         pdf_page_index: 3
@@ -2883,7 +2900,7 @@ species:
         activity: '0.563'
     - observation_id: saito_2021_table2_row_9_2_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id037
       phase: l
       units: dimensionless activity as printed
@@ -2919,7 +2936,7 @@ species:
         activity: '0.477'
     - observation_id: saito_2021_table2_row_9_3_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id038
         page: 4
         pdf_page_index: 3
@@ -2961,7 +2978,7 @@ species:
         activity: '0.695'
     - observation_id: saito_2021_table2_row_9_3_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id038
       phase: l
       units: dimensionless activity as printed
@@ -2997,7 +3014,7 @@ species:
         activity: '0.589'
     - observation_id: saito_2021_table2_row_9_4_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id039
         page: 4
         pdf_page_index: 3
@@ -3039,7 +3056,7 @@ species:
         activity: '0.784'
     - observation_id: saito_2021_table2_row_9_4_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id039
       phase: l
       units: dimensionless activity as printed
@@ -3075,7 +3092,7 @@ species:
         activity: '0.664'
     - observation_id: saito_2021_table2_row_9_5_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id040
         page: 4
         pdf_page_index: 3
@@ -3117,7 +3134,7 @@ species:
         activity: '0.836'
     - observation_id: saito_2021_table2_row_9_5_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id040
       phase: l
       units: dimensionless activity as printed
@@ -3153,7 +3170,7 @@ species:
         activity: '0.708'
     - observation_id: saito_2021_table2_row_9_6_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id041
         page: 4
         pdf_page_index: 3
@@ -3195,7 +3212,7 @@ species:
         activity: '0.911'
     - observation_id: saito_2021_table2_row_9_6_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id041
       phase: l
       units: dimensionless activity as printed
@@ -3231,7 +3248,7 @@ species:
         activity: '0.772'
     - observation_id: saito_2021_table2_row_9_7_solid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: &id042
         page: 4
         pdf_page_index: 3
@@ -3273,7 +3290,7 @@ species:
         activity: '0.968'
     - observation_id: saito_2021_table2_row_9_7_liquid_activity
       experiment: saito_2021_emf_activity_measurement
-      type: activity
+      type: activity_coefficient
       locator: *id042
       phase: l
       units: dimensionless activity as printed
