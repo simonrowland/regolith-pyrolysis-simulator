@@ -743,7 +743,16 @@ def profile_for(identity: Identity) -> QuantityProfile:
         # assumed geometry remains prediction provenance rather than identity.
         na("fO2_Pa")
     elif q is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
-        req("temperature_K", "subtype", "phase_role", "composition", "fO2_Pa")
+        # Printed total pressure is an input. Marking it not-applicable
+        # drops the experiment registry point before the scorer can read it.
+        req(
+            "temperature_K",
+            "subtype",
+            "phase_role",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+        )
         na(
             "counter_phase_role",
             "per",
@@ -752,7 +761,6 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "formation_elements",
             "reference_state",
             "reservoir",
-            "total_pressure_Pa",
             "sweep_gas",
             "exposure",
             "sample_mass_kg",
@@ -766,6 +774,7 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "counter_phase_role",
             "composition",
             "fO2_Pa",
+            "total_pressure_Pa",
         )
         na(
             "per",
@@ -774,14 +783,19 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "formation_elements",
             "reference_state",
             "reservoir",
-            "total_pressure_Pa",
             "sweep_gas",
             "exposure",
             "sample_mass_kg",
             "wall",
         )
     elif q in {Quantity.SULFIDE_CAPACITY, Quantity.CHLORIDE_CAPACITY}:
-        req("temperature_K", "phase_role", "composition", "fO2_Pa")
+        req(
+            "temperature_K",
+            "phase_role",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+        )
         na(
             "subtype",
             "counter_phase_role",
@@ -791,7 +805,6 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "formation_elements",
             "reference_state",
             "reservoir",
-            "total_pressure_Pa",
             "sweep_gas",
             "exposure",
             "sample_mass_kg",

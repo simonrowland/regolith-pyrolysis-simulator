@@ -1,16 +1,20 @@
 """Phase-composition rows, distribution ratios, and printed S/Cl capacities.
 
 d-223: one scalar row per printed component. The balance is not filled, and pO2
-is not taken from a model closure. Scoring is component-wise dex. An engine
-that does not report a phase assemblage refuses, and the refusal is counted.
+is not taken from a model closure. Scoring is component-wise dex. A printed
+experiment total pressure is an input. Distribution ratios sit on redox or
+melt activity. A capacity is scored only when the engine adapter declares
+dissolved S or Cl, and that refusal is counted.
 """
 
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 from decimal import Decimal
 
 import pytest
+import yaml
 
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -28,10 +32,11 @@ from simulator.battery.enums import (
     ResidualStatus,
     SourceRelation,
 )
-from simulator.battery.identity import Identity, celsius_to_kelvin
-from simulator.battery.migrate import migrate
+from simulator.battery.identity import Identity, celsius_to_kelvin, profile_for
+from simulator.battery.migrate import REPO_ROOT, migrate
 from simulator.battery.records import (
     Composition,
+    Derivation,
     Execution,
     Residual,
     ResidualRefusal,
@@ -39,8 +44,10 @@ from simulator.battery.records import (
     State,
 )
 from simulator.battery.score import (
+    DECISION_BAND_RATCHET_RELATIVE_PATH,
     ScoreContext,
     _ScorePayloadAccumulator,
+    _alignment_axes,
     _residual_engine_observable,
     compute_metric,
     metric_operation_for_identity,
@@ -321,6 +328,35 @@ def _extract() -> dict:
     }
 
 
+def _extract_with_printed_pressure(point: str) -> dict:
+    """Same rows, plus the experiment-registry total pressure the migrator reads."""
+
+    doc = _extract()
+    doc["experiments"] = [
+        {
+            "experiment_id": "sample-1",
+            "locator": {"page": 3, "section": "Apparatus"},
+            "pressure_environment": {
+                "total_pressure_Pa": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"kind": "point", "point": point},
+                    },
+                    "locator": {"page": 3, "section": "Apparatus"},
+                },
+                "sweep_gas": {
+                    "state": {"tag": "unknown", "reason": "not_published"},
+                    "locator": {"page": 3, "section": "Apparatus"},
+                },
+                "regime": {
+                    "regime_class": {"tag": "unknown", "reason": "not_published"},
+                },
+            },
+        }
+    ]
+    return doc
+
+
 def _row(result, raw_id: str):
     matches = [
         observation
@@ -472,6 +508,27 @@ def _bulk() -> Composition:
         components=(("SiO2", Decimal("1")), ("MgO", Decimal("1"))),
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
+
+
+def _with_bulk(observation):
+    """Fill composition after migrate so scoring can reach the pressure check."""
+
+    return replace(
+        observation,
+        identity=replace(observation.identity, composition=State.of(_bulk())),
+    )
+
+
+def _defining_log10_capacity(
+    weight_percent: float, p_o2_pa: Decimal, p_anion_pa: Decimal
+) -> Decimal:
+    """Sign-off capacity, evaluated with math rather than the scorer.
+
+    C = (wt% solute) * (pO2 / pAnion) ** (1/2). The compared number is log10 C.
+    """
+
+    capacity = weight_percent * math.sqrt(float(p_o2_pa) / float(p_anion_pa))
+    return Decimal(str(math.log10(capacity)))
 
 
 def _phase_identity(
@@ -626,13 +683,18 @@ def test_distribution_ratio_dex_uses_both_phase_amounts(
     assert numeric is not None
     assert numeric.value == _dex(Decimal("2"), Decimal("1"))
     assert rail_for_quantity(Quantity.DISTRIBUTION_RATIO, species_formula="FeO") is Rail.REDOX
+    for formula in ("Cr2O3", "MnO", "TiO2", "P2O5"):
+        assert (
+            rail_for_quantity(Quantity.DISTRIBUTION_RATIO, species_formula=formula)
+            is Rail.REDOX
+        )
     assert (
-        rail_for_quantity(Quantity.DISTRIBUTION_RATIO, species_formula="SiO2") is None
+        rail_for_quantity(Quantity.DISTRIBUTION_RATIO, species_formula="SiO2")
+        is Rail.MELT_ACTIVITY
     )
-    assert (
-        no_headline_rail_reason(Quantity.DISTRIBUTION_RATIO, species_formula="SiO2")
-        == "distribution_ratio_not_multivalent"
-    )
+    assert no_headline_rail_reason(
+        Quantity.DISTRIBUTION_RATIO, species_formula="SiO2"
+    ) != "distribution_ratio_not_multivalent"
     assert rail_for_quantity(Quantity.EQUILIBRIUM_PHASE_COMPOSITION) is Rail.MELT_ACTIVITY
     assert rail_for_quantity(Quantity.SULFIDE_CAPACITY) is Rail.MELT_ACTIVITY
     assert rail_for_quantity(Quantity.CHLORIDE_CAPACITY) is Rail.MELT_ACTIVITY
@@ -715,7 +777,7 @@ def test_non_phase_engines_refuse_and_the_refusal_is_counted(
     assert capacity_prediction.execution.state is ExecutionState.UNSUPPORTED
     assert (
         capacity_prediction.refusal_reason
-        is RefusalReason.ENGINE_DOES_NOT_REPORT_CAPACITY
+        is RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR
     )
 
     pressure_prediction = predict_with_engine(Engine.ALPHAMELTS, missing_pressure_observation)
@@ -761,7 +823,7 @@ def test_non_phase_engines_refuse_and_the_refusal_is_counted(
         for key in census
     )
     assert any(
-        RefusalReason.ENGINE_DOES_NOT_REPORT_CAPACITY.value in key for key in census
+        RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR.value in key for key in census
     )
 
     context = ScoreContext(
@@ -782,3 +844,285 @@ def test_non_phase_engines_refuse_and_the_refusal_is_counted(
     accumulator.add(phase_payload)
     accumulator.add(capacity_payload)
     assert sum(accumulator.refusal_counts.values()) == 2
+
+
+def test_printed_experiment_pressure_reaches_the_scorer(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls: list[dict] = []
+
+    def hook(engine, *, temperature_C, composition_kg, fO2_log, pressure_bar):
+        calls.append(
+            {
+                "engine": engine,
+                "pressure_bar": pressure_bar,
+                "fO2_log": fO2_log,
+                "temperature_C": temperature_C,
+            }
+        )
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 10.0}},
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    printed = Decimal("100000")
+    root = _write_min_tree(
+        tmp_path / "with-pressure", _extract_with_printed_pressure("100000")
+    )
+    migrated = _with_bulk(_row(migrate(root, write=False), "sample1-sio2-melt"))
+    assert migrated.identity.total_pressure_Pa.is_value
+    assert migrated.identity.total_pressure_Pa.value == printed
+    assert migrated.identity.total_pressure_Pa.is_not_applicable is False
+    prediction = predict_with_engine(Engine.ALPHAMELTS, migrated)
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal("10")
+    assert len(calls) == 1
+    assert calls[0]["pressure_bar"] == float(printed / Decimal("1e5"))
+    assert calls[0]["pressure_bar"] != 1e-6
+    assert calls[0]["fO2_log"] == -4.0
+    assert calls[0]["fO2_log"] != -9.0
+
+    calls.clear()
+    bare = _write_min_tree(tmp_path / "no-pressure", _extract())
+    missing = _with_bulk(_row(migrate(bare, write=False), "sample1-sio2-melt"))
+    assert missing.identity.total_pressure_Pa.is_unknown
+    assert missing.identity.total_pressure_Pa.is_not_applicable is False
+    refused = predict_with_engine(Engine.ALPHAMELTS, missing)
+    assert refused.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert refused.refusal_detail["input"] == "total_pressure_Pa"
+    assert refused.execution.state is ExecutionState.NOT_PROBED
+    assert refused.value is None
+    assert calls == []
+
+
+def test_legacy_alignment_axes_match_the_stored_ratchet() -> None:
+    payload = yaml.safe_load(
+        (REPO_ROOT / DECISION_BAND_RATCHET_RELATIVE_PATH).read_text(encoding="utf-8")
+    )
+    groups = payload["groups"]
+    assert groups
+    stored = tuple(groups[0]["group_key"]["axes"])
+    assert "phase_role" not in stored
+    assert "counter_phase_role" not in stored
+    for group in groups:
+        assert tuple(group["group_key"]["axes"]) == stored
+    assert _alignment_axes(profile_for(F.o2_identity())) == stored
+    phase_axes = _alignment_axes(
+        profile_for(
+            _phase_identity(
+                "SiO2",
+                Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+                role=PhaseRole.MELT,
+            )
+        )
+    )
+    assert phase_axes == stored + ("phase_role", "counter_phase_role")
+    ratio_axes = _alignment_axes(
+        profile_for(
+            _phase_identity(
+                "FeO",
+                Quantity.DISTRIBUTION_RATIO,
+                role=PhaseRole.SLAG,
+                counter=PhaseRole.METAL,
+            )
+        )
+    )
+    assert "phase_role" in ratio_axes
+    assert "counter_phase_role" in ratio_axes
+    assert ratio_axes != stored
+
+
+def _capacity_observation(
+    observation_id: str,
+    quantity: Quantity,
+    formula: str,
+    *,
+    fO2_Pa: Decimal,
+    anion_key: str,
+    anion_pa: Decimal,
+    relation: str,
+    reference: Decimal,
+):
+    identity = _phase_identity(
+        formula,
+        quantity,
+        role=PhaseRole.MELT,
+        subtype=None,
+        fO2_Pa=fO2_Pa,
+    )
+    observation = F.observation(
+        observation_id,
+        "sample-1",
+        identity,
+        reference,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+        derivation=Derivation(
+            relation=relation,
+            inputs=(),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
+    )
+    conditions = dict(observation.point_conditions or {})
+    conditions[anion_key] = F.located(anion_pa)
+    return replace(observation, point_conditions=conditions)
+
+
+def test_capacity_scores_only_when_the_adapter_declares_the_solute(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.magemin import MAGEMinBackend
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    assert AlphaMELTSBackend.models_dissolved_sulfur is False
+    assert AlphaMELTSBackend.models_dissolved_chloride is False
+    assert MAGEMinBackend.models_dissolved_sulfur is False
+    assert ThermoEngineBackend.models_dissolved_chloride is False
+    monkeypatch.setattr(AlphaMELTSBackend, "models_dissolved_sulfur", True)
+    monkeypatch.setattr(ThermoEngineBackend, "models_dissolved_chloride", True)
+
+    calls: list[dict] = []
+
+    def hook(
+        engine,
+        *,
+        temperature_C,
+        composition_kg,
+        fO2_log,
+        pressure_bar,
+        solute_fugacity_bar=None,
+        solute_fugacity_parameter=None,
+    ):
+        calls.append(
+            {
+                "engine": engine,
+                "pressure_bar": pressure_bar,
+                "fO2_log": fO2_log,
+                "solute_fugacity_bar": solute_fugacity_bar,
+                "solute_fugacity_parameter": solute_fugacity_parameter,
+            }
+        )
+        element = "S" if solute_fugacity_parameter == "sulfur_fugacity_bar" else "Cl"
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {element: 1.0}},
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    sulfur_oxygen = Decimal("10000")
+    sulfur_anion = Decimal("100")
+    sulfur = _capacity_observation(
+        "log-cs",
+        Quantity.SULFIDE_CAPACITY,
+        "S",
+        fO2_Pa=sulfur_oxygen,
+        anion_key="pS2_Pa",
+        anion_pa=sulfur_anion,
+        relation=SULFIDE_EQUATION,
+        reference=Decimal("-2.4"),
+    )
+    chloride_oxygen = Decimal(str(P_O2_PA))
+    chloride_anion = Decimal(str(P_O2_PA))
+    chloride = _capacity_observation(
+        "log-ccl",
+        Quantity.CHLORIDE_CAPACITY,
+        "Cl",
+        fO2_Pa=chloride_oxygen,
+        anion_key="pCl2_Pa",
+        anion_pa=chloride_anion,
+        relation=CHLORIDE_EQUATION,
+        reference=Decimal("-1.2"),
+    )
+    sulfur_expected = _defining_log10_capacity(1.0, sulfur_oxygen, sulfur_anion)
+    chloride_expected = _defining_log10_capacity(1.0, chloride_oxygen, chloride_anion)
+    assert sulfur_expected == Decimal("1.0")
+    assert chloride_expected == Decimal("0.0")
+
+    scored = predict_with_engine(Engine.ALPHAMELTS, sulfur)
+    assert scored.execution.state is ExecutionState.PRODUCED
+    assert scored.execution.call_evidence == "phase_assemblage"
+    assert scored.value == sulfur_expected
+    sulfur_numeric, sulfur_reason, _detail = populate_numeric(
+        quantity=Quantity.SULFIDE_CAPACITY,
+        candidate=scored.value,
+        reference=Decimal("-2.4"),
+        source_relation=SourceRelation.INDEPENDENT,
+        operation_override=metric_operation_for_identity(sulfur.identity),
+    )
+    assert sulfur_reason is None
+    assert sulfur_numeric is not None
+    assert sulfur_numeric.operation is MetricOperation.ABSOLUTE
+    assert sulfur_numeric.value == sulfur_expected - Decimal("-2.4")
+
+    refused = predict_with_engine(Engine.MAGEMIN, sulfur)
+    assert refused.execution.state is ExecutionState.UNSUPPORTED
+    assert refused.refusal_reason is RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR
+    assert refused.value is None
+
+    chloride_scored = predict_with_engine(Engine.THERMOENGINE, chloride)
+    assert chloride_scored.execution.state is ExecutionState.PRODUCED
+    assert chloride_scored.value == chloride_expected
+    chloride_refused = predict_with_engine(Engine.ALPHAMELTS, chloride)
+    assert (
+        chloride_refused.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE
+    )
+    assert chloride_refused.value is None
+    assert [call["engine"] for call in calls] == [
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+    ]
+    assert calls[0]["solute_fugacity_parameter"] == "sulfur_fugacity_bar"
+    assert calls[0]["solute_fugacity_bar"] == float(sulfur_anion / Decimal("1e5"))
+    assert calls[0]["fO2_log"] == -1.0
+    assert calls[0]["pressure_bar"] == 1.0
+    assert calls[1]["solute_fugacity_parameter"] == "chloride_fugacity_bar"
+    assert calls[1]["solute_fugacity_bar"] == float(chloride_anion / Decimal("1e5"))
+    assert calls[1]["fO2_log"] == -4.0
+
+    sulfur_residual = Residual(
+        key=f"{sulfur.observation_id}::{Engine.MAGEMIN.value}",
+        reference=sulfur.observation_id,
+        execution=Execution(state=refused.execution.state),
+        rail=Rail.MELT_ACTIVITY,
+        status=ResidualStatus.REFUSED,
+        source_relation=SourceRelation.INDEPENDENT,
+        score_eligible=False,
+        exclusions=(),
+        notices=(),
+        refusal=ResidualRefusal(
+            reason=refused.refusal_reason,
+            detail=dict(refused.refusal_detail),
+        ),
+    )
+    chloride_residual = Residual(
+        key=f"{chloride.observation_id}::{Engine.ALPHAMELTS.value}",
+        reference=chloride.observation_id,
+        execution=Execution(state=chloride_refused.execution.state),
+        rail=Rail.MELT_ACTIVITY,
+        status=ResidualStatus.REFUSED,
+        source_relation=SourceRelation.INDEPENDENT,
+        score_eligible=False,
+        exclusions=(),
+        notices=(),
+        refusal=ResidualRefusal(
+            reason=chloride_refused.refusal_reason,
+            detail=dict(chloride_refused.refusal_detail),
+        ),
+    )
+    assert _residual_engine_observable(residual_to_plain(sulfur_residual)) is True
+    assert _residual_engine_observable(residual_to_plain(chloride_residual)) is True
+    census = refusal_census((sulfur_residual, chloride_residual))
+    assert any(
+        RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR.value in key for key in census
+    )
+    assert any(
+        RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE.value in key for key in census
+    )

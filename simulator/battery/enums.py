@@ -159,7 +159,8 @@ class RefusalReason(StrEnum):
     ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION = (
         "engine_does_not_report_phase_composition"
     )
-    ENGINE_DOES_NOT_REPORT_CAPACITY = "engine_does_not_report_capacity"
+    ENGINE_DOES_NOT_MODEL_SULFUR = "engine_does_not_model_sulfur"
+    ENGINE_DOES_NOT_MODEL_CHLORIDE = "engine_does_not_model_chloride"
 
 
 class CellMaterial(StrEnum):

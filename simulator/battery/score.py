@@ -300,8 +300,12 @@ DECISION_BAND_POLICY_VERSION = "q6-v1"
 DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.yaml")
 # Minimum n for a descriptive residual bias/scatter ratio; it does not gate bands.
 MIN_RESIDUAL_SUMMARY_N = 10
-# Same axis list as identity equality. One tuple, owned by identity.
+# Candidate axes, the same names identity equality walks, owned by identity.
+# The group key drops phase_role and counter_phase_role unless the quantity
+# profile names them. The stored ratchet tokens were built from the sixteen
+# axes that predate those two; adding them misses every stored key.
 _ALIGNMENT_AXES = _AXIS_NAMES
+_ROLE_ALIGNMENT_AXES = frozenset({"phase_role", "counter_phase_role"})
 _UNIT_DIMENSION: dict[str, str] = {
     "kJ_per_declared_mol_basis": "energy_per_mol",
     "J_per_declared_mol_basis_per_K": "energy_per_mol_per_K",
@@ -614,9 +618,11 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
     if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION or quantity in PRINTED_CAPACITY_QUANTITIES:
         return Rail.MELT_ACTIVITY
     if quantity is Quantity.DISTRIBUTION_RATIO:
+        # Fe, Cr, Mn, Ti, and P stay on redox. Every other distribution
+        # ratio is a melt-activity row. It is not left without a rail.
         if _distribution_ratio_on_redox_rail(species_formula):
             return Rail.REDOX
-        return None
+        return Rail.MELT_ACTIVITY
     if quantity in _VAPOUR_EQUILIBRIUM:
         if species_formula in _SIO_FORMULAS:
             return Rail.SIO_EVOLUTION
@@ -661,9 +667,6 @@ def no_headline_rail_reason(
 
     if quantity is None:
         return "quantity_unknown"
-    if quantity is Quantity.DISTRIBUTION_RATIO:
-        if not _distribution_ratio_on_redox_rail(species_formula):
-            return "distribution_ratio_not_multivalent"
     if quantity in _NOT_VAPOUR_QUANTITIES:
         return "not_a_vapour_quantity"
     if quantity in KINETIC_YIELD_QUANTITIES:
@@ -3035,6 +3038,17 @@ def _printed_uncertainty_band(
     return _PrintedBandResolution(DecisionBand(ticket, unit, rule), notice=notice)
 
 
+def _alignment_axes(profile: object) -> tuple[str, ...]:
+    """Group-key axes. Role axes stay out unless this profile names them."""
+
+    named = profile.required | profile.permitted_not_applicable
+    return tuple(
+        name
+        for name in _ALIGNMENT_AXES
+        if name not in _ROLE_ALIGNMENT_AXES or name in named
+    )
+
+
 def _axis_alignment_value(identity: Identity, name: str, profile: object) -> object | None:
     state = getattr(identity, name)
     required = name in profile.required
@@ -3076,7 +3090,7 @@ def _source_alignment_group_key(
         return None
     profile = profile_for(identity)
     axes: dict[str, object] = {}
-    for name in _ALIGNMENT_AXES:
+    for name in _alignment_axes(profile):
         value = _axis_alignment_value(identity, name, profile)
         if value is None:
             return None
@@ -4679,6 +4693,115 @@ def _battery_hero_oxygen_condition(
     return mode, log10_fO2_bar, fO2_Pa, "observations-v2", mode, ""
 
 
+@dataclass(frozen=True)
+class _CapacitySolute:
+    element: str
+    pressure_key: str
+    fugacity_parameter: str
+    flag: str
+    refusal: RefusalReason
+
+
+# The scorer does not own a sulfide-capacity model. C_S and C_Cl are the
+# defining rearrangement of the dissolved amount the engine already returned.
+_CAPACITY_SOLUTES: dict[Quantity, _CapacitySolute] = {
+    Quantity.SULFIDE_CAPACITY: _CapacitySolute(
+        element="S",
+        pressure_key="pS2_Pa",
+        fugacity_parameter="sulfur_fugacity_bar",
+        flag="models_dissolved_sulfur",
+        refusal=RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR,
+    ),
+    Quantity.CHLORIDE_CAPACITY: _CapacitySolute(
+        element="Cl",
+        pressure_key="pCl2_Pa",
+        fugacity_parameter="chloride_fugacity_bar",
+        flag="models_dissolved_chloride",
+        refusal=RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE,
+    ),
+}
+
+
+def _capacity_solute(quantity: Quantity | None) -> _CapacitySolute | None:
+    if quantity is None:
+        return None
+    return _CAPACITY_SOLUTES.get(quantity)
+
+
+def _adapter_models_dissolved_solute(engine: Engine, solute: _CapacitySolute) -> bool:
+    """Read the adapter's declaration. No engine list lives here."""
+
+    from simulator.melt_backend.base import battery_adapter_class
+
+    adapter = battery_adapter_class(engine.value)
+    if adapter is None:
+        return False
+    return bool(getattr(adapter, solute.flag, False))
+
+
+def _printed_point_pa(observation: Observation, key: str) -> Decimal | None:
+    """A printed positive point pressure, in pascal. Never a default."""
+
+    located = (observation.point_conditions or {}).get(key)
+    if located is None or located.inference is not None or not located.state.is_value:
+        return None
+    raw = located.state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None or raw.approximate:
+            return None
+        raw = raw.point
+    if raw is None:
+        return None
+    try:
+        pa = as_decimal(raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not pa.is_finite() or pa <= 0:
+        return None
+    return pa
+
+
+def _log10_printed_capacity(
+    weight_percent: Decimal,
+    p_o2_pa: Decimal,
+    p_anion_pa: Decimal,
+) -> Decimal | None:
+    """log10 of C_S, or of the chloride analogue C_Cl.
+
+    Premise: Fincham and Richardson define sulfide capacity from the
+    heterogeneous equilibrium 1/2 S2 + O2-(melt) = 1/2 O2 + S2-(melt).
+    The engine's predicted dissolved sulfur at the printed T, pO2, and
+    pS2 is the only sulfur number. The scorer does not add a capacity
+    model of its own. Chloride capacity is the same exponent with Cl
+    and pCl2 (physics sign-off 2026-10-21). The row stores the printed
+    log, so the compared number is log10 C.
+
+    Algebra: C = (wt% solute) * (pO2 / pAnion) ** (1/2)
+             log10 C = log10(wt% solute) + (1/2) log10(pO2 / pAnion)
+    Units: wt% is the engine phase-map weight percent. pO2 and pAnion
+    are both pascal, so the ratio is dimensionless and C carries wt%.
+    log10 C is dimensionless.
+
+    Limiting case: pO2 = pAnion gives C = wt% solute. One weight percent
+    at equal fugacities is log10 C = 0. A non-positive weight percent
+    has no logarithm and is refused. It is not stored as zero.
+    """
+
+    if (
+        not weight_percent.is_finite()
+        or not p_o2_pa.is_finite()
+        or not p_anion_pa.is_finite()
+        or weight_percent <= 0
+        or p_o2_pa <= 0
+        or p_anion_pa <= 0
+    ):
+        return None
+    capacity = weight_percent * (p_o2_pa / p_anion_pa).sqrt()
+    if not capacity.is_finite() or capacity <= 0:
+        return None
+    return Decimal(str(math.log10(float(capacity))))
+
+
 def _equilibrate_phase_assemblage(
     engine: Engine,
     *,
@@ -4686,8 +4809,16 @@ def _equilibrate_phase_assemblage(
     composition_kg: Mapping[str, float],
     fO2_log: float,
     pressure_bar: float,
+    solute_fugacity_bar: float | None = None,
+    solute_fugacity_parameter: str | None = None,
 ) -> EquilibriumResult:
-    """One melt-backend equilibrate. Tests replace this; it does not default pO2 or P."""
+    """One melt-backend equilibrate. Tests replace this; it does not default pO2 or P.
+
+    A capacity call passes the printed solute fugacity. An adapter that
+    declares the solute and cannot be told that fugacity fails closed.
+    """
+
+    import inspect
 
     from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
 
@@ -4696,12 +4827,25 @@ def _equilibrate_phase_assemblage(
     if backend is None:
         reason = getattr(handle, "unavailable_reason", None) or "backend unavailable"
         raise RuntimeError(str(reason))
-    return backend.equilibrate(
-        temperature_C,
-        composition_kg=dict(composition_kg),
-        fO2_log=fO2_log,
-        pressure_bar=pressure_bar,
-    )
+    kwargs: dict[str, object] = {
+        "temperature_C": temperature_C,
+        "composition_kg": dict(composition_kg),
+        "fO2_log": fO2_log,
+        "pressure_bar": pressure_bar,
+    }
+    if solute_fugacity_bar is not None:
+        if not solute_fugacity_parameter:
+            raise RuntimeError("printed solute fugacity has no parameter name")
+        parameters = inspect.signature(backend.equilibrate).parameters
+        accepts = solute_fugacity_parameter in parameters or any(
+            item.kind is inspect.Parameter.VAR_KEYWORD for item in parameters.values()
+        )
+        if not accepts:
+            raise RuntimeError(
+                f"{type(backend).__name__} does not accept {solute_fugacity_parameter}"
+            )
+        kwargs[solute_fugacity_parameter] = solute_fugacity_bar
+    return backend.equilibrate(**kwargs)
 
 
 def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
@@ -4815,17 +4959,21 @@ def _predict_phase_row(
             identity=identity,
         )
 
-    if quantity in PRINTED_CAPACITY_QUANTITIES:
+    solute = _capacity_solute(quantity)
+    if solute is not None and not _adapter_models_dissolved_solute(engine, solute):
         return refused(
-            RefusalReason.ENGINE_DOES_NOT_REPORT_CAPACITY,
+            solute.refusal,
             {
-                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_CAPACITY.value,
+                "reason": solute.refusal.value,
                 "engine": engine.value,
-                "quantity": quantity.value,
-                "detail": "engine does not print log10 C_S or log10 C_Cl; the scorer does not compute it",
+                "quantity": quantity.value if quantity is not None else "",
+                "detail": (
+                    "adapter does not model dissolved "
+                    f"{solute.element}; the scorer does not compute a capacity"
+                ),
             },
         )
-    if engine not in MELTS_ENGINES:
+    if solute is None and engine not in MELTS_ENGINES:
         return refused(
             RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
             {
@@ -4851,22 +4999,23 @@ def _predict_phase_row(
             execution=ExecutionState.NOT_PROBED,
         )
     subtype = identity.subtype.value if identity.subtype is not None and identity.subtype.is_value else None
-    if subtype == "mole_fraction":
-        return refused(
-            RefusalReason.COEFFICIENT_BASIS_MISMATCH,
-            {
-                "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
-                "basis": "mole_fraction",
-                "engine_basis": "wt_percent",
-                "detail": "engine phase maps are wt%; mole_fraction rows are not converted",
-            },
-        )
-    if subtype != "wt_percent":
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "basis"},
-            execution=ExecutionState.NOT_PROBED,
-        )
+    if solute is None:
+        if subtype == "mole_fraction":
+            return refused(
+                RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+                {
+                    "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                    "basis": "mole_fraction",
+                    "engine_basis": "wt_percent",
+                    "detail": "engine phase maps are wt%; mole_fraction rows are not converted",
+                },
+            )
+        if subtype != "wt_percent":
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "basis"},
+                execution=ExecutionState.NOT_PROBED,
+            )
     temperature = temperature_of(identity)
     if temperature is None or not temperature.is_finite() or temperature <= 0:
         return refused(
@@ -4906,13 +5055,36 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "total_pressure_Pa"},
             execution=ExecutionState.NOT_PROBED,
         )
+    anion_pa: Decimal | None = None
+    if solute is not None:
+        relation = ""
+        if observation.derivation is not None and observation.derivation.relation:
+            relation = observation.derivation.relation.strip()
+        if not relation:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "defining_equation"},
+                execution=ExecutionState.NOT_PROBED,
+            )
+        anion_pa = _printed_point_pa(observation, solute.pressure_key)
+        if anion_pa is None:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": solute.pressure_key},
+                execution=ExecutionState.NOT_PROBED,
+            )
     try:
+        call_kwargs: dict[str, object] = {}
+        if solute is not None and anion_pa is not None:
+            call_kwargs["solute_fugacity_bar"] = float(anion_pa / Decimal("1e5"))
+            call_kwargs["solute_fugacity_parameter"] = solute.fugacity_parameter
         result = _equilibrate_phase_assemblage(
             engine,
             temperature_C=float(temperature - Decimal("273.15")),
             composition_kg={name: amount / 1000.0 for name, amount in wt.items()},
             fO2_log=fo2_log,
             pressure_bar=float(pressure_bar),
+            **call_kwargs,
         )
     except Exception as exc:  # a backend failure is a counted refusal
         return refused(
@@ -4936,7 +5108,9 @@ def _predict_phase_row(
                 "engine": engine.value,
             },
         )
-    oxide = role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
+    # Capacity uses the solute weight percent, including an elemental label.
+    # Oxide matching would drop raw S and Cl.
+    oxide = solute is None and role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
     amount = _component_wt(formula, phase_map, oxide=oxide)
     if amount is None or not math.isfinite(amount):
         return refused(
@@ -4980,6 +5154,17 @@ def _predict_phase_row(
                 },
             )
         predicted = Decimal(str(amount)) / Decimal(str(counter_amount))
+    elif solute is not None:
+        assert anion_pa is not None
+        p_o2_pa = as_decimal(identity.fO2_Pa.value)
+        predicted = _log10_printed_capacity(
+            Decimal(str(amount)), p_o2_pa, anion_pa
+        )
+        if predicted is None:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "nonpositive_phase_amount", "amount": str(amount)},
+            )
     else:
         if amount <= 0:
             return refused(
@@ -11192,10 +11377,12 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
     # counted, including when this engine is outside the melt-activity list.
     if reason in {
         RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
-        RefusalReason.ENGINE_DOES_NOT_REPORT_CAPACITY.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE.value,
     } or detail_reason in {
         RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
-        RefusalReason.ENGINE_DOES_NOT_REPORT_CAPACITY.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE.value,
     }:
         return True
     if rail == Rail.VAPOUR.value and engine == Engine.MAGEMIN.value:
