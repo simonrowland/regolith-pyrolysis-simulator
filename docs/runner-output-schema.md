@@ -6,7 +6,7 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.9.0`
+**Schema version:** `1.10.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
 
 Schema 1.9.0 adds the unconditional top-level
@@ -18,6 +18,11 @@ legacy-shadow comparison. Eligible channels consume the pre-RG seam whenever a
 value is present, regardless of domain status. Only a genuinely missing seam
 value uses the catalog fallback; the overlay reports that source per species
 while retaining out-of-domain status for degraded-path accounting.
+
+Schema 1.10.0 adds `final.throughput_per_furnace_hour`, reporting captured
+product mass per furnace-hour, charge-normalized throughput, per-product rates,
+refractory rump rate, feasibility statuses, and the cycle-time/geometry caveats.
+The coating gate is explicitly `unavailable` until d-045 (b-585) lands.
 
 Schema 1.8.0 adds the unconditional top-level
 `terminal_product_taxonomy` field. Successful and handled-failure runs with a
@@ -103,7 +108,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
@@ -267,7 +272,7 @@ it does not introduce a new schema version.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -421,7 +426,22 @@ it does not introduce a new schema version.
   "deposit_by_surface_species_kg": {
     "stage_0_to_stage_1": {"SiO": 0.004}
   },
-  "pump_outlet_by_species_kg": "not_applicable_until_p0"
+  "pump_outlet_by_species_kg": "not_applicable_until_p0",
+  "throughput_per_furnace_hour": {
+    "status": "available",
+    "separated_product_kg": 12.0,
+    "furnace_time_h": 4.0,
+    "separated_product_kg_per_furnace_h": 3.0,
+    "separated_product_kg_per_kg_charge_per_h": 0.003,
+    "rump_kg": 20.0,
+    "rump_kg_per_furnace_h": 5.0,
+    "per_product_kg_per_furnace_h": {"Fe": 0.5, "O2": 0.75},
+    "feasibility": {"status": "unavailable", "gates": {
+      "coating": {"status": "unavailable", "reason": "d-045 coating gate not on this base (b-585 pending)"},
+      "delivered_stream_purity": {"status": "feasible"}
+    }},
+    "caveats": ["Cycle excludes unmodelled cool-down and turnaround.", "Charge-normalized rate applies only at the simulated melt geometry; evaporation scales with melt area."]
+  }
 }
 ```
 
@@ -433,6 +453,10 @@ it does not introduce a new schema version.
 * `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.4.0`
   reports the explicit sentinel `not_applicable_until_p0`; P6b will
   replace it with pump/outlet totals after molecular transport lands.
+* `throughput_per_furnace_hour` is computed by the optimizer objective owner.
+  It reuses the three-product classifier and the furnace-hour cost rollup; the
+  report layer only attaches the returned block. When inputs are unavailable,
+  the block says so and retains the feasibility-gate statuses.
 
 With `--include-wall-deposit-rate-diagnostics`, `final` also carries
 `wall_deposition_rate_committed` (mol/s and kg/h by segment/species, divided

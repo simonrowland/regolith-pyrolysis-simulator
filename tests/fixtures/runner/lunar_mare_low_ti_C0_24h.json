@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.9.0",
+  "schema_version": "1.10.0",
   "run_metadata": {
-    "schema_version": "1.9.0",
+    "schema_version": "1.10.0",
     "feedstock_id": "lunar_mare_low_ti",
     "campaign": "C0",
     "hours_requested": 24,
@@ -1245,7 +1245,44 @@
       "SiO": 0.0
     },
     "deposit_by_surface_species_kg": {},
-    "pump_outlet_by_species_kg": "not_applicable_until_p0"
+    "pump_outlet_by_species_kg": "not_applicable_until_p0",
+    "throughput_per_furnace_hour": {
+      "status": "available",
+      "separated_product_kg": 0.0013575535537053653,
+      "furnace_time_h": 24.0,
+      "separated_product_kg_per_furnace_h": 5.656473140439022e-05,
+      "separated_product_kg_per_kg_charge_per_h": 5.656473140439022e-08,
+      "rump_kg": 999.022402507621,
+      "rump_kg_per_furnace_h": 41.625933437817544,
+      "per_product_kg_per_furnace_h": {
+        "Fe": 6.744966909167071e-08,
+        "O2": 5.174019614963334e-07,
+        "Na_plus_K": 5.597869591579483e-05,
+        "SiO_glass": 0.0,
+        "Mg": 1.8792068192845534e-10,
+        "Ca": 0.0
+      },
+      "feasibility": {
+        "status": "infeasible",
+        "gates": {
+          "coating": {
+            "status": "unavailable",
+            "reason": "d-045 coating gate not on this base (b-585 pending)"
+          },
+          "delivered_stream_purity": {
+            "status": "infeasible",
+            "reason": "stage 3 purity 0.237724; contaminants={'SiO2_gas': 1.912444183281564e-09, 'Fe': 6.516856025626231e-08, 'CrO': 8.439189702600315e-11, 'TiO2_gas': 7.834347331439409e-12}",
+            "margin": -0.7122755303523016,
+            "observed": 0.2377244696476984,
+            "threshold": 0.95
+          }
+        }
+      },
+      "caveats": [
+        "Cycle excludes unmodelled cool-down and turnaround.",
+        "Charge-normalized rate applies only at the simulated melt geometry; evaporation scales with melt area."
+      ]
+    }
   },
   "yield_disposition": {
     "schema_version": "5.0",

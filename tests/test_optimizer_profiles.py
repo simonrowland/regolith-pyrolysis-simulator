@@ -293,6 +293,20 @@ def test_unknown_objective_metric_raises_named_error() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
+def test_furnace_hour_rate_metrics_are_available_without_profile_defaults() -> None:
+    assert {
+        "separated_product_kg_per_furnace_h",
+        "separated_product_kg_per_kg_charge_per_h",
+        "rump_kg_per_furnace_h",
+        "Fe_kg_per_furnace_h",
+        "O2_kg_per_furnace_h",
+        "Na_plus_K_kg_per_furnace_h",
+        "SiO_glass_kg_per_furnace_h",
+        "Mg_kg_per_furnace_h",
+        "Ca_kg_per_furnace_h",
+    }.issubset(KNOWN_OBJECTIVE_METRICS)
+
+
 def test_profile_objective_importance_requires_evidence_rationale() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["objectives"][0].pop("rationale")

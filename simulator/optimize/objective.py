@@ -74,6 +74,17 @@ ENERGY_ELECTRICAL_PLUS_EVAPORATION_ALIASES = frozenset(
 )
 SOLAR_THERMAL_FLUX_METRICS = frozenset({"solar_thermal_flux_h", "thermal_flux_h"})
 FURNACE_TIME_METRICS = frozenset({"furnace_time_h", "furnace_h"})
+THROUGHPUT_RATE_METRICS = frozenset({
+    "separated_product_kg_per_furnace_h",
+    "separated_product_kg_per_kg_charge_per_h",
+    "rump_kg_per_furnace_h",
+    "Fe_kg_per_furnace_h",
+    "O2_kg_per_furnace_h",
+    "Na_plus_K_kg_per_furnace_h",
+    "SiO_glass_kg_per_furnace_h",
+    "Mg_kg_per_furnace_h",
+    "Ca_kg_per_furnace_h",
+})
 THROUGHPUT_OWNER_COST_METRICS = frozenset({"throughput_cost_owner_ratify_usd"})
 FURNACE_LIFESPAN_COST_METRICS = frozenset({
     "furnace_lifespan_consumed_fraction",
@@ -1348,6 +1359,12 @@ def _expected_objective_units(metric: str) -> str | None:
         return "kWh"
     if _energy_per_product_metric(metric) is not None:
         return "kWh/kg"
+    if metric in THROUGHPUT_RATE_METRICS:
+        return (
+            "kg/kg/h"
+            if metric == "separated_product_kg_per_kg_charge_per_h"
+            else "kg/h"
+        )
     if metric in _MASS_OBJECTIVE_METRICS:
         return "kg"
     if metric == ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC:
@@ -3602,6 +3619,11 @@ def product_summary(
             _extraction_constraints_from_profile(profile),
         ),
         "target_species_yield_report": target_species_yield_report(sim),
+        "throughput_per_furnace_hour": throughput_report_block(
+            run_execution,
+            profile,
+            product_classes=product_classes,
+        ),
     }
     notice = _engine_commissioning_notice(sim)
     if notice:
@@ -3636,6 +3658,207 @@ def product_summary(
             )
         )
     return MappingProxyType(summary)
+
+
+def throughput_per_furnace_hour_summary(
+    run_execution: Any,
+    profile: Mapping[str, Any] | None = None,
+    *,
+    product_classes: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    """Report captured-product throughput using the classifier's class masses.
+
+    The unit-economics premise is captured saleable product per furnace-hour;
+    the refractory rump is separate.  FoM = (metals + O2 + pure silica glass +
+    industrial mixed glass) / furnace_time_h, in kg / h. For a fixed-mass
+    check, class totals 3 + 1 + 2 kg over 2 h yield 6 / 2 = 3 kg / h;
+    charge-normalized throughput divides that same numerator by batch mass too.
+    The 225 h hero's class breakdown was not committed at a4608882d, so its
+    numerator cannot be stated from the available artifact.
+    This excludes unmodelled cool-down/turnaround, and its charge-normalized
+    value applies only at the simulated melt geometry because evaporation scales
+    with melt area.
+    """
+
+    sim = getattr(run_execution, "simulator", run_execution)
+    active_profile = profile or {}
+    classes = (
+        product_classes
+        if product_classes is not None
+        else classify_products(
+            sim,
+            early_tap_mode=bool(active_profile.get("early_tap_mode", False)),
+        )
+    )
+    product_ledger = _product_ledger(sim)
+    metric_args = {
+        "run_execution": run_execution,
+    }
+    mass_metrics = (
+        "metals_plus_o2_kg",
+        "pure_silica_glass_kg",
+        "industrial_mixed_glass_kg",
+    )
+    masses = {
+        metric: _metric_value(metric, sim, product_ledger, classes, **metric_args)
+        for metric in mass_metrics
+    }
+    for metric, value in masses.items():
+        if value is None:
+            bucket_name = {
+                "metals_plus_o2_kg": "metals_plus_O2",
+                "pure_silica_glass_kg": "pure_silica_glass",
+                "industrial_mixed_glass_kg": "industrial_mixed_glass",
+            }[metric]
+            bucket = classes.get(bucket_name)
+            flag = bucket.get("flag") if isinstance(bucket, Mapping) else None
+            raise ObjectiveComputationError(
+                f"{metric} is unavailable; classifier flag={flag!r}"
+            )
+    numerator_kg = sum(float(value) for value in masses.values())
+    furnace_time_h = _metric_value(
+        "furnace_time_h", sim, product_ledger, classes, **metric_args
+    )
+    if furnace_time_h is None or furnace_time_h <= 0.0:
+        raise ObjectiveComputationError(
+            f"furnace_time_h must be positive, got {furnace_time_h!r}"
+        )
+    charge_kg = _run_mass_kg(run_execution, active_profile)
+    if charge_kg <= 0.0:
+        raise ObjectiveComputationError(
+            f"charge mass must be positive, got {charge_kg!r}"
+        )
+    rate = numerator_kg / furnace_time_h
+    metals = classes.get("metals_plus_O2")
+    metals_by_species = (
+        metals.get("metals_kg", {}) if isinstance(metals, Mapping) else {}
+    )
+    silica = classes.get("pure_silica_glass")
+    silica_by_species = (
+        silica.get("stage_3_kg_by_species", {}) if isinstance(silica, Mapping) else {}
+    )
+    rump = classes.get("refractory_ceramic_rump")
+    if not isinstance(metals_by_species, Mapping) or not isinstance(
+        silica_by_species, Mapping
+    ):
+        raise ObjectiveComputationError("product classifier species masses are missing")
+    species_masses = {
+        "Fe_kg_per_furnace_h": _finite_float(
+            metals_by_species.get("Fe", 0.0), "Fe_kg"
+        ),
+        "O2_kg_per_furnace_h": _nested_float(classes, ("metals_plus_O2", "O2_kg")),
+        "Na_plus_K_kg_per_furnace_h": sum(
+            _finite_float(metals_by_species.get(species, 0.0), f"{species}_kg")
+            for species in ("Na", "K")
+        ),
+        "SiO_glass_kg_per_furnace_h": _finite_float(
+            silica_by_species.get("SiO", 0.0),
+            "pure_silica_glass.stage_3_kg_by_species.SiO",
+        ),
+        "Mg_kg_per_furnace_h": _finite_float(
+            metals_by_species.get("Mg", 0.0), "Mg_kg"
+        ),
+        "Ca_kg_per_furnace_h": _finite_float(
+            metals_by_species.get("Ca", 0.0), "Ca_kg"
+        ),
+    }
+    if not isinstance(rump, Mapping) or rump.get("rump_total_kg") is None:
+        raise ObjectiveComputationError("refractory rump mass is unavailable")
+    rump_kg = _finite_float(
+        rump["rump_total_kg"], "refractory_ceramic_rump.rump_total_kg"
+    )
+    feasibility = _throughput_feasibility_summary(run_execution, active_profile)
+    return MappingProxyType(
+        {
+            "status": "available",
+            "separated_product_kg": numerator_kg,
+            "furnace_time_h": furnace_time_h,
+            "separated_product_kg_per_furnace_h": rate,
+            "separated_product_kg_per_kg_charge_per_h": rate / charge_kg,
+            "rump_kg": rump_kg,
+            "rump_kg_per_furnace_h": rump_kg / furnace_time_h,
+            "per_product_kg_per_furnace_h": MappingProxyType(
+                {
+                    key.removesuffix("_kg_per_furnace_h"): (
+                        value / furnace_time_h
+                    )
+                    for key, value in species_masses.items()
+                }
+            ),
+            "feasibility": feasibility,
+            "caveats": (
+                "Cycle excludes unmodelled cool-down and turnaround.",
+                "Charge-normalized rate applies only at the simulated melt geometry; evaporation scales with melt area.",
+            ),
+        }
+    )
+
+
+def throughput_report_block(
+    run_execution: Any,
+    profile: Mapping[str, Any] | None = None,
+    *,
+    product_classes: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    """Keep the run-report field present when source quantities are refused."""
+
+    try:
+        return throughput_per_furnace_hour_summary(
+            run_execution,
+            profile,
+            product_classes=product_classes,
+        )
+    except ObjectiveComputationError as exc:
+        return MappingProxyType({
+            "status": "unavailable",
+            "reason": str(exc),
+            "feasibility": _throughput_feasibility_summary(
+                run_execution, profile or {}
+            ),
+        })
+
+
+def _throughput_feasibility_summary(
+    run_execution: Any,
+    profile: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    trace = getattr(run_execution, "trace", None)
+    purity = _extraction_constraints_from_profile(profile or {}).delivered_stream_purity(
+        trace
+    )
+    purity_available = (
+        purity.status != "unavailable"
+        and purity.authoritative
+        and math.isfinite(purity.margin)
+        and (purity.observed is None or math.isfinite(purity.observed))
+    )
+    purity_status = (
+        "unavailable"
+        if not purity_available
+        else "feasible" if purity.feasible else "infeasible"
+    )
+    # Single future wire-in point: replace this typed unavailable result with
+    # the d-045 coating verdict when b-585 lands.
+    coating_gate = {
+        "status": "unavailable",
+        "reason": "d-045 coating gate not on this base (b-585 pending)",
+    }
+    gates = {
+        "coating": coating_gate,
+        "delivered_stream_purity": {
+            "status": purity_status,
+            "reason": purity.detail,
+            "margin": purity.margin if math.isfinite(purity.margin) else None,
+            "observed": (
+                purity.observed
+                if purity.observed is None or math.isfinite(purity.observed)
+                else None
+            ),
+            "threshold": purity.threshold.value,
+        },
+    }
+    overall = "infeasible" if purity_status == "infeasible" else "unavailable"
+    return MappingProxyType({"status": overall, "gates": MappingProxyType(gates)})
 
 
 def _engine_commissioning_notice(sim: Any) -> Mapping[str, Any] | None:
@@ -4477,6 +4700,18 @@ def _metric_value(
     run_execution: Any | None = None,
     cost_parameters: CostParameters | None = None,
 ) -> float | None:
+    if metric in THROUGHPUT_RATE_METRICS:
+        summary = throughput_per_furnace_hour_summary(
+            run_execution if run_execution is not None else sim,
+            product_classes=product_classes,
+        )
+        if metric == "separated_product_kg_per_furnace_h":
+            return float(summary[metric])
+        if metric == "separated_product_kg_per_kg_charge_per_h":
+            return float(summary[metric])
+        if metric == "rump_kg_per_furnace_h":
+            return float(summary[metric])
+        return float(summary["per_product_kg_per_furnace_h"][metric.removesuffix("_kg_per_furnace_h")])
     if metric == "pure_silica_glass_kg":
         return _silica_product_objective_value(product_classes)
     if metric in PRODUCT_CLASS_MASS_METRIC_PATHS:
