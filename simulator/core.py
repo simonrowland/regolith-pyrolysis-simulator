@@ -9844,6 +9844,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         result,
         *,
         include_diagnostic_shadows: bool = True,
+        observation_pO2_bar: float | None = None,
     ) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
 
@@ -9939,7 +9940,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
-        pO2_bar = self._vapor_pressure_dispatch_pO2_bar()
+        # A reproduction cell binds measured transport oxygen. Simulated
+        # headspace controls still use their environment and quantization owner.
+        pO2_bar = (
+            self._vapor_pressure_dispatch_pO2_bar()
+            if observation_pO2_bar is None else observation_pO2_bar
+        )
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         intrinsic_fO2_log = getattr(
             reservoir,
@@ -10004,6 +10010,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         dispatch_kwargs = {
             'control_inputs': {
                 'pO2_bar': pO2_bar,
+                **({'pO2_admission': 'observation'}
+                   if observation_pO2_bar is not None else {}),
                 'intrinsic_fO2_log': intrinsic_fO2_log,
                 'vacuum_floor_bar': vacuum_floor,
                 'body': getattr(self.melt, 'body', ''),
