@@ -1,0 +1,578 @@
+schema_version: literature_extract.v1
+source_id: henao-2001-ni-cr-mn-co-cu-slag-distribution
+source:
+  citation: Henao, H. M., Hino, M. and Itagaki, K. (2001), “Distribution of Ni, Cr, Mn, Co and Cu between
+    Fe–Ni Alloy and FeOx–MgO–SiO2 Base Slags,” Materials Transactions 42(9), 1959–1966. DOI 10.2320/matertrans.42.1959.
+  doi: 10.2320/matertrans.42.1959
+  url: https://doi.org/10.2320/matertrans.42.1959
+  year: 2001
+  corpus_source_id: henao-2001-ni-cr-mn-co-cu-slag-distribution
+extraction:
+  method: MinerU text and table blocks were used for this scanned paper. Table rows were rendered at 600
+    dpi for cell and row alignment checks. The table tool produced loss-preserving CSV drafts. Its invented
+    chart tables inside <details> blocks were ignored. Distribution ratios and composition/activity-coefficient
+    plots were not digitised.
+  date: '2026-10-21'
+  worker: fam37-1021
+review_status: draft
+species:
+  FeO:
+    observations: []
+    context:
+    - observation_id: henao_2001_table_1_slag_alloy_composition_and_calculated_activity
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+      units: mass% as headed; activity coefficients and FeO activity dimensionless
+      values:
+        quantity_as_printed: Table 1 slag and Fe-Ni alloy analyses; calculated oxide activity coefficients
+          and FeO activity
+        method_class: measured_reduced
+        temperature_K: 1773
+        oxygen_condition_as_printed: log pO2, dimensionless pO2 = (P_O2/Pa)/(101325 Pa); row values retained
+          verbatim in printed_rows_csv
+        full_phase_system: FeOx-MgO-SiO2
+        activity_coefficient_basis: Raoultian, on the mono-cation basis, as stated in the discussion.
+        FeO_activity_reference: Fe(l) + 1/2 O2(g) = FeO(l), as printed in the discussion.
+        candidate_tokens:
+        - activity_coefficient
+        - activity
+        - residue_component_composition
+        - equilibrium_phase_composition
+        schema_gap: The table composition vectors have no store token; equilibrium_phase_composition is
+          scalar only. The printed gamma_MeOx and a_FeO values are calculated from table compositions,
+          oxygen condition, and cited thermodynamic data, so their input lineage cannot be registered
+          in this run.
+        derivation_status: derivation pending a corpus table asset (controller, t-1382); printed inputs
+          are retained in the seat CSV because this run may not register TABLE_CSV assets.
+        input_csv: .agent-scratch/F37-tables/henao-2001-ni-cr-mn-co-cu-slag-distribution/p002-t01.csv
+        printed_rows_csv: 'pdf_table_row,column_1,column_2,column_3,column_4,column_5,column_6,column_7,column_8,column_9,column_10,column_11,column_12,column_13,column_14,column_15,column_16
+
+          4,A-1,-6.8,42.5,4.50,,,21.8,11.3,2.2,,,0.78,11.2,91.7,,
+
+          5,A-2,-6.9,49.7,3.01,,,17.0,11.7,2.5,,,0.64,10.6,93.6,,
+
+          6,A-3,-7.2,48.8,1.21,,,18.0,13.9,4.5,,,0.76,15.6,86.3,,
+
+          7,A-4,-7.7,49.7,0.63,,,17.8,18.3,1.7,,,0.79,24.2,76.1,,
+
+          8,A-5,-7.0,41.4,3.02,2.30,,23.0,13.9,2.5,1.8,,0.79,13.4,87.9,0.0007,
+
+          9,A-6,-7.1,38.9,2.15,2.85,,22.9,17.5,3.0,1.1,,0.78,14.8,88.4,0.0007,
+
+          10,A-7,-7.5,37.4,0.97,2.19,,24.8,18.9,3.5,1.4,,0.72,19.5,84.3,0.0053,
+
+          11,A-8,-7.5,35.6,1.20,2.75,,28.4,20.0,4.1,0.6,,0.61,16.8,82.8,0.0010,
+
+          12,A-9,-7.6,31.9,0.81,1.24,,29.9,25.6,4.0,1.7,,0.88,24.6,77.7,0.0010,
+
+          13,A-10,-8.0,38.5,0.63,2.29,,21.8,23.9,2.9,0.5,,0.74,30.0,72.0,0.0013,
+
+          14,A-11,-8.4,28.7,0.16,0.66,,30.8,31.9,6.4,1.5,,0.68,39.9,63.4,0.0019,
+
+          15,A-12,-8.5,25.8,0.36,2.33,,29.0,32.0,2.2,2.2,,0.68,43.6,60.8,0.0015,
+
+          16,A-13,-9.0,27.9,0.12,1.59,,27.2,32.2,2.6,0.3,,0.49,49.2,48.3,0.0029,
+
+          17,A-14,-9.5,21.7,0.03,2.58,,29.2,38.1,6.0,1.1,,0.28,50.8,48.0,0.0350,
+
+          18,A-15,-8.3,36.9,0.21,,3.15,21.9,27.5,5.3,,0.15,0.64,35.3,69.2,,0.0026
+
+          19,A-16,-8.8,33.2,0.12,,3.62,24.2,28.9,4.8,,0.12,0.43,40.6,65.2,,0.0036
+
+          20,A-17,-9.3,30.4,0.06,,3.97,25.0,33.8,4.8,,0.10,0.28,44.3,61.2,,0.0049'
+        printed_row_count: 17
+        blank_cells: Blank cells remain blank; em dash is retained as printed and is not zero; <0.03 remains
+          a printed bound.
+    - observation_id: henao_2001_table_2_slag_alloy_composition_and_calculated_activity
+      type: composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+      units: mass% as headed; activity coefficients and FeO activity dimensionless
+      values:
+        quantity_as_printed: Table 2 slag and Fe-Ni alloy analyses; calculated oxide activity coefficients
+          and FeO activity
+        method_class: measured_reduced
+        temperature_K: 1773
+        oxygen_condition_as_printed: log pO2, dimensionless pO2 = (P_O2/Pa)/(101325 Pa); row values retained
+          verbatim in printed_rows_csv
+        full_phase_system: FeOx-MgO-SiO2-CaO
+        activity_coefficient_basis: Raoultian, on the mono-cation basis, as stated in the discussion.
+        FeO_activity_reference: Fe(l) + 1/2 O2(g) = FeO(l), as printed in the discussion.
+        candidate_tokens:
+        - activity_coefficient
+        - activity
+        - residue_component_composition
+        - equilibrium_phase_composition
+        schema_gap: The table composition vectors have no store token; equilibrium_phase_composition is
+          scalar only. The printed gamma_MeOx and a_FeO values are calculated from table compositions,
+          oxygen condition, and cited thermodynamic data, so their input lineage cannot be registered
+          in this run.
+        derivation_status: derivation pending a corpus table asset (controller, t-1382); printed inputs
+          are retained in the seat CSV because this run may not register TABLE_CSV assets.
+        input_csv: .agent-scratch/F37-tables/henao-2001-ni-cr-mn-co-cu-slag-distribution/p003-t02.csv
+        printed_rows_csv: 'pdf_table_row,column_1,column_2,column_3,column_4,column_5,column_6,column_7,column_8,column_9,column_10,column_11,column_12,column_13,column_14,column_15,column_16,column_17
+
+          4,B-1,-7.0,24.9,0.94,3.95,,20.3,19.4,18.3,8.3,1.8,,0.64,11.3,92.1,0.0013,
+
+          5,B-2,-7.9,30.6,0.40,3.37,,17.6,17.7,16.1,4.9,0.6,,0.84,30.8,73.8,0.0017,
+
+          6,B-3,-8.3,25.5,0.21,0.98,,15.8,25.2,22.3,4.9,2.7,,0.80,40.9,63.6,0.0045,
+
+          7,B-4,-8.8,23.9,0.06,1.16,,17.0,24.0,23.4,5.4,1.3,,0.68,55.9,48.3,0.0065,
+
+          8,B-5,-9.4,23.6,< 0.03,0.64,,15.4,27.0,25.1,—,1.6,,0.42,67.1,36.5,0.0110,
+
+          9,B-6,-6.8,24.5,4.02,,1.59,15.1,22.3,20.3,2.5,,0.74,0.63,9.3,95.0,,0.0032
+
+          10,B-7,-7.3,22.7,0.35,,1.80,15.9,26.7,23.9,13.6,,0.74,0.85,18.9,86.1,,0.0044
+
+          11,B-8,-8.1,18.3,0.15,,2.03,16.1,28.6,26.6,10.5,,0.93,0.66,30.9,74.5,,0.0100
+
+          12,B-9,-8.6,14.6,0.13,,2.52,18.5,30.5,27.2,6.7,,0.82,0.43,34.3,71.5,,0.0160
+
+          13,B-10,-9.0,12.3,0.09,,2.28,19.3,30.1,28.1,5.5,,0.79,0.29,35.8,69.1,,0.0220'
+        printed_row_count: 10
+        blank_cells: Blank cells remain blank; em dash is retained as printed and is not zero; <0.03 remains
+          a printed bound.
+    - observation_id: henao_2001_table_3_slag_alloy_composition_and_calculated_activity
+      type: composition
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '3'
+      units: mass% as headed; activity coefficients and FeO activity dimensionless
+      values:
+        quantity_as_printed: Table 3 slag and Fe-Ni alloy analyses; calculated oxide activity coefficients
+          and FeO activity
+        method_class: measured_reduced
+        temperature_K: 1773
+        oxygen_condition_as_printed: log pO2, dimensionless pO2 = (P_O2/Pa)/(101325 Pa); row values retained
+          verbatim in printed_rows_csv
+        full_phase_system: FeOx-MgO-SiO2-AlO1.5
+        activity_coefficient_basis: Raoultian, on the mono-cation basis, as stated in the discussion.
+        FeO_activity_reference: Fe(l) + 1/2 O2(g) = FeO(l), as printed in the discussion.
+        candidate_tokens:
+        - activity_coefficient
+        - activity
+        - residue_component_composition
+        - equilibrium_phase_composition
+        schema_gap: The table composition vectors have no store token; equilibrium_phase_composition is
+          scalar only. The printed gamma_MeOx and a_FeO values are calculated from table compositions,
+          oxygen condition, and cited thermodynamic data, so their input lineage cannot be registered
+          in this run.
+        derivation_status: derivation pending a corpus table asset (controller, t-1382); printed inputs
+          are retained in the seat CSV because this run may not register TABLE_CSV assets.
+        input_csv: .agent-scratch/F37-tables/henao-2001-ni-cr-mn-co-cu-slag-distribution/p003-t03.csv
+        printed_rows_csv: 'pdf_table_row,column_1,column_2,column_3,column_4,column_5,column_6,column_7,column_8,column_9,column_10,column_11,column_12,column_13,column_14,column_15,column_16,column_17,column_18,column_19,column_20,column_21,column_22,column_23,column_24
+
+          4,C-1,-6.8,25.8,0.88,,,,31.6,23.0,11.5,6.6,,,,0.61,,,,8.8,91.2,,,,
+
+          5,C-2,-7.6,27.8,0.32,,,,24.3,21.2,15.4,9.5,,,,0.38,,,,12.7,87.2,,,,
+
+          6,C-3,-8.0,25.1,0.17,,,,23.4,25.1,14.9,12.8,,,,0.44,,,,20.4,81.4,,,,
+
+          7,C-4,-8.5,21.7,0.09,,,,18.7,25.4,16.6,14.8,,,,0.21,,,,17.0,79.1,,,,
+
+          8,C-5,-8.7,30.4,0.07,,,,24.3,19.7,15.8,10.6,,,,0.14,,,,15.9,86.9,,,,
+
+          9,C-6,-9.3,21.1,< 0.03,,,,20.1,25.6,15.7,—,,,,0.10,,,,19.6,77.5,,,,
+
+          10,C-7,-9.7,30.4,< 0.03,,,,23.6,22.1,12.7,—,,,,0.09,,,,25.2,78.8,,,,
+
+          11,C-8,-6.8,26.9,0.89,7.30,,,16.0,20.1,15.3,10.4,0.37,,,0.68,,,,9.1,86.5,0.0003,,,
+
+          12,C-9,-7.2,27.6,0.95,1.85,,,23.7,20.0,14.1,6.8,0.26,,,0.58,,,,12.4,89.3,0.0001,,,
+
+          13,C-10,-7.3,31.1,0.12,0.73,,,19.2,19.5,12.4,34.6,0.86,,,0.50,,,,10.9,80.4,0.0002,,,
+
+          14,C-11,-7.4,26.4,0.43,6.66,,,16.8,24.3,15.1,10.83,0.17,,,0.44,,,,11.5,86.5,0.0004,,,
+
+          15,C-12,-7.9,27.6,0.14,5.16,,,17.4,24.7,13.7,6.3,0.21,,,0.39,,,,16.2,79.5,0.0008,,,
+
+          16,C-13,-7.9,30.9,0.38,1.07,,,19.8,25.5,15.4,19.3,0.17,,,0.50,,,,18.9,75.0,0.0001,,,
+
+          17,C-14,-8.3,27.0,0.32,1.14,,,24.2,24.7,12.9,5.68,0.35,,,0.19,,,,13.9,88.7,0.0006,,,
+
+          18,C-15,-8.4,27.3,0.33,0.95,,,22.3,23.9,13.7,3.99,0.44,,,0.27,,,,18.2,74.9,0.0009,,,
+
+          19,C-16,-8.9,23.0,0.23,1.52,,,28.0,24.2,14.8,4.2,0.29,,,0.07,,,,11.3,89.9,0.0019,,,
+
+          20,C-17,-9.4,17.5,< 0.03,0.74,,,28.1,32.3,15.4,—,0.23,,,0.15,,,,29.4,69.1,0.0018,,,
+
+          21,C-18,-6.9,32.2,0.77,,0.066,,21.5,21.0,12.6,10.73,,10.1,,0.80,,,,12.4,90.3,,3.68,,
+
+          22,C-19,-7.5,30.4,0.19,,0.045,,19.9,24.8,13.2,21.5,,10.7,,0.61,,,,16.9,84.8,,3.50,,
+
+          23,C-20,-8.1,27.4,0.07,,0.033,,20.9,28.5,14.0,28.41,,11.4,,0.42,,,,20.0,75.4,,3.30,,
+
+          24,C-21,-8.6,23.2,0.10,,0.030,,25.8,31.8,14.6,11.54,,9.2,,0.21,,,,19.0,80.2,,3.23,,
+
+          25,C-22,-9.1,22.5,0.05,,0.017,,24.6,30.6,14.6,12.8,,14.7,,0.19,,,,26.9,73.0,,2.98,,
+
+          26,C-23,-9.1,21.3,0.05,,0.013,,27.7,29.5,11.5,10.77,,10.3,,0.14,,,,21.0,75.9,,2.65,,
+
+          27,C-24,-7.0,16.1,0.46,,,0.0800,31.9,22.2,15.4,8.75,,,13.9,0.59,,,,9.9,85.8,,,1.63,
+
+          28,C-25,-7.7,17.0,0.18,,,0.0400,33.1,27.5,13.4,15,,,15.0,0.60,,,,18.8,77.4,,,1.74,
+
+          29,C-26,-8.3,27.6,0.09,,,0.0210,22.9,26.7,11.8,7.81,,,13.5,0.30,,,,18.4,75.6,,,1.79,
+
+          30,C-27,-8.8,17.8,0.04,,,0.0048,31.3,29.0,12.6,17.48,,,12.4,0.24,,,,23.7,71.1,,,1.58,
+
+          31,C-28,-9.1,18.3,0.03,,,0.0035,32.7,29.5,10.7,22.66,,,10.4,0.15,,,,22.3,72.6,,,1.63,'
+        printed_row_count: 28
+        blank_cells: Blank cells remain blank; em dash is retained as printed and is not zero; <0.03 remains
+          a printed bound.
+    - observation_id: henao_2001_table_4_quoted_thermodynamic_data
+      type: thermodynamic_example
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '4'
+      units: Delta G expressions in J; K dimensionless at 1773 K
+      values:
+        quantity_as_printed: reaction standard free-energy expressions and equilibrium constants at 1773
+          K
+        method_class: quoted_attributed
+        attribution: Refs. 10–14, respectively, as identified in Table 4; full source titles and pages
+          appear in the paper references.
+        rows:
+        - reaction: Ni(l) + 1/2 O2(g) = NiO(s)
+          Delta_G0_J: -247750 + 92.57 (T/K)
+          K_at_1773_K: 2.9 x 10^2
+          reference: '10'
+        - reaction: Cr(s) + 3/4 O2(g) = CrO1.5(s)
+          Delta_G0_J: -566180 + 127.5 (T/K)
+          K_at_1773_K: 1.05 x 10^10
+          reference: '11'
+        - reaction: Mn(l) + 1/2 O2(g) = MnO(s)
+          Delta_G0_J: -400550 + 86.51 (T/K)
+          K_at_1773_K: 1.91 x 10^7
+          reference: '12'
+        - reaction: Cu(l) + 1/4 O2(g) = CuO0.5(l)
+          Delta_G0_J: -60850 + 21.84 (T/K)
+          K_at_1773_K: '4.5'
+          reference: '13'
+        - reaction: Co(s) + 1/2 O2(g) = CoO(s)
+          Delta_G0_J: -234100 + 70.49 (T/K)
+          K_at_1773_K: 1.64 x 10^3
+          reference: '14'
+        schema_gap: Reaction free-energy equations and equilibrium constants are not delta_fG observations
+          for a species; retained as quoted thermodynamic context.
+    - observation_id: henao_2001_fig1_apparatus
+      type: figure
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: as plotted; dimensionless where applicable
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: experimental apparatus schematic
+        species: FeO
+        phase: apparatus
+        temperature_as_printed: apparatus
+        x_axis_as_printed: not applicable
+        y_axis_as_printed: none
+        caption_as_printed: 'Fig. 1: experimental apparatus schematic; series and conditions are as named
+          in the caption and legend.'
+        standard_state: null
+        series:
+        - name: schematic labels
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        digitisation: deferred to a figure pass
+        schema_gap: The printed slag/alloy distribution ratio has no quantity token in the current store.
+    - observation_id: henao_2001_fig2_slag_compositions
+      type: figure
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '2'
+      units: as plotted; dimensionless where applicable
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: equilibrated slag composition diagram
+        species: FeO
+        phase: liquid slag at 1773 K, analyzed after quench
+        temperature_as_printed: 1773 K, analyzed after quench
+        x_axis_as_printed: 'mole fractions in ternary A-B-C system: MgO, SiO2 or SiO2 plus CaO/AlO1.5,
+          FeOx plus XOn'
+        y_axis_as_printed: composition diagram
+        caption_as_printed: 'Fig. 2: equilibrated slag composition diagram; series and conditions are
+          as named in the caption and legend.'
+        standard_state: null
+        series:
+        - name: three slag-system series
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        digitisation: deferred to a figure pass
+        schema_gap: The figure represents composition vectors; equilibrium_phase_composition is scalar-only
+          in the current schema.
+  Ni:
+    observations: []
+    context:
+    - observation_id: henao_2001_fig3_ni_distribution
+      type: figure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        figure: '3'
+      units: as plotted; dimensionless where applicable
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: Ni distribution ratio L_Ni^(s/Ni)
+        species: Ni
+        phase: liquid slag and Fe-Ni alloy at 1773 K; equilibrium samples quenched
+        temperature_as_printed: 1773 K
+        x_axis_as_printed: log pO2, where pO2 is dimensionless relative to 101325 Pa
+        y_axis_as_printed: log L_Ni^(s/Ni)
+        caption_as_printed: 'Fig. 3: Ni distribution ratio L_Ni^(s/Ni); series and conditions are as named
+          in the caption and legend.'
+        standard_state: null
+        series:
+        - name: plain slag
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: CaO-added
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: Al2O3-added
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        digitisation: deferred to a figure pass
+        schema_gap: The printed slag/alloy distribution ratio has no quantity token in the current store.
+  Cr:
+    observations: []
+    context:
+    - observation_id: henao_2001_fig4_cr_distribution
+      type: figure
+      locator:
+        page: 4
+        pdf_page_index: 3
+        figure: '4'
+      units: as plotted; dimensionless where applicable
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: Cr distribution ratio L_Cr^(s/Ni)
+        species: Cr
+        phase: liquid slag and Fe-Ni alloy at 1773 and 1873 K; equilibrium samples quenched
+        temperature_as_printed: 1773 and 1873 K
+        x_axis_as_printed: log pO2, where pO2 is dimensionless relative to 101325 Pa
+        y_axis_as_printed: log L_Cr^(s/Ni)
+        caption_as_printed: 'Fig. 4: Cr distribution ratio L_Cr^(s/Ni); series and conditions are as named
+          in the caption and legend.'
+        standard_state: null
+        series:
+        - name: 1773 K
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: 1873 K
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        digitisation: deferred to a figure pass
+        schema_gap: The printed slag/alloy distribution ratio has no quantity token in the current store.
+    - observation_id: henao_2001_fig5_cr_distribution_modified_slags
+      type: figure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        figure: '5'
+      units: as plotted; dimensionless where applicable
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: Cr distribution ratio L_Cr^(s/Ni)
+        species: Cr
+        phase: liquid slag and Fe-Ni alloy at 1773 K; equilibrium samples quenched
+        temperature_as_printed: 1773 K
+        x_axis_as_printed: log pO2, where pO2 is dimensionless relative to 101325 Pa
+        y_axis_as_printed: log L_Cr^(s/Ni)
+        caption_as_printed: 'Fig. 5: Cr distribution ratio L_Cr^(s/Ni); series and conditions are as named
+          in the caption and legend.'
+        standard_state: null
+        series:
+        - name: Al2O3-added
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: CaO-added
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        digitisation: deferred to a figure pass
+        schema_gap: The printed slag/alloy distribution ratio has no quantity token in the current store.
+  Mn:
+    observations: []
+    context:
+    - observation_id: henao_2001_fig6_mn_distribution
+      type: figure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        figure: '6'
+      units: as plotted; dimensionless where applicable
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: Mn distribution ratio L_Mn^(s/Ni)
+        species: Mn
+        phase: liquid slag and Fe-Ni alloy at 1773 K; equilibrium samples quenched
+        temperature_as_printed: 1773 K
+        x_axis_as_printed: log pO2, where pO2 is dimensionless relative to 101325 Pa
+        y_axis_as_printed: log L_Mn^(s/Ni)
+        caption_as_printed: 'Fig. 6: Mn distribution ratio L_Mn^(s/Ni); series and conditions are as named
+          in the caption and legend.'
+        standard_state: null
+        series:
+        - name: plain slag
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: CaO-added
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        digitisation: deferred to a figure pass
+        schema_gap: The printed slag/alloy distribution ratio has no quantity token in the current store.
+  Co:
+    observations: []
+    context:
+    - observation_id: henao_2001_fig7_co_distribution
+      type: figure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        figure: '7'
+      units: as plotted; dimensionless where applicable
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: Co distribution ratio L_Co^(s/Ni)
+        species: Co
+        phase: liquid slag and Fe-Ni alloy at 1773 K; present alumina-added plus quoted comparison
+        temperature_as_printed: 1773 K
+        x_axis_as_printed: log pO2, where pO2 is dimensionless relative to 101325 Pa
+        y_axis_as_printed: log L_Co^(s/Ni)
+        caption_as_printed: 'Fig. 7: Co distribution ratio L_Co^(s/Ni); series and conditions are as named
+          in the caption and legend.'
+        standard_state: null
+        series:
+        - name: Al2O3-added present work
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: plain slag cited comparison
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: CaO-added cited comparison
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        digitisation: deferred to a figure pass
+        schema_gap: The printed slag/alloy distribution ratio has no quantity token in the current store.
+  Cu:
+    observations: []
+    context:
+    - observation_id: henao_2001_fig8_cu_distribution
+      type: figure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        figure: '8'
+      units: as plotted; dimensionless where applicable
+      values:
+        method_class: figure_only
+        typed_quantity: null
+        quantity_as_printed: Cu distribution ratio L_Cu^(s/Ni)
+        species: Cu
+        phase: liquid slag and Fe-Ni alloy at 1773 K; present alumina-added plus quoted comparison
+        temperature_as_printed: 1773 K
+        x_axis_as_printed: log pO2, where pO2 is dimensionless relative to 101325 Pa
+        y_axis_as_printed: log L_Cu^(s/Ni)
+        caption_as_printed: 'Fig. 8: Cu distribution ratio L_Cu^(s/Ni); series and conditions are as named
+          in the caption and legend.'
+        standard_state: null
+        series:
+        - name: Al2O3-added present work
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: plain slag cited comparison
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: CaO-added cited comparison
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        digitisation: deferred to a figure pass
+        schema_gap: The printed slag/alloy distribution ratio has no quantity token in the current store.
+  NiO:
+    observations: []
+    context:
+    - observation_id: henao_2001_fig9_nio_activity_coefficient
+      type: figure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        figure: '9'
+      units: as plotted; dimensionless where applicable
+      values:
+        method_class: figure_only
+        typed_quantity: activity_coefficient
+        quantity_as_printed: activity coefficient gamma_NiO
+        species: NiO
+        phase: liquid slag at 1773 K, equilibrated with Fe-Ni alloy and quenched
+        temperature_as_printed: 1773 K, equilibrated with Fe-Ni alloy and quenched
+        x_axis_as_printed: mole fraction N_FeOx in slag
+        y_axis_as_printed: gamma_NiO
+        caption_as_printed: 'Fig. 9: activity coefficient gamma_NiO; series and conditions are as named
+          in the caption and legend.'
+        standard_state: Raoultian activity coefficient on the mono-cation basis, as stated in the discussion.
+        series:
+        - name: plain slag
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: CaO-added
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: Al2O3-added
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        digitisation: deferred to a figure pass
+        schema_gap: The printed slag/alloy distribution ratio has no quantity token in the current store.
+  CrO1.5:
+    observations: []
+    context:
+    - observation_id: henao_2001_fig10_cro15_activity_coefficient
+      type: figure
+      locator:
+        page: 6
+        pdf_page_index: 5
+        figure: '10'
+      units: as plotted; dimensionless where applicable
+      values:
+        method_class: figure_only
+        typed_quantity: activity_coefficient
+        quantity_as_printed: activity coefficient gamma_CrO1.5
+        species: CrO1.5
+        phase: liquid slag at 1773 K, equilibrated with Fe-Ni alloy and quenched
+        temperature_as_printed: 1773 K, equilibrated with Fe-Ni alloy and quenched
+        x_axis_as_printed: mole fraction N_FeOx in slag
+        y_axis_as_printed: gamma_CrO1.5
+        caption_as_printed: 'Fig. 10: activity coefficient gamma_CrO1.5; series and conditions are as
+          named in the caption and legend.'
+        standard_state: Raoultian activity coefficient on the mono-cation basis, as stated in the discussion.
+        series:
+        - name: plain slag
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: CaO-added
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        - name: Al2O3-added
+          marker: as shown in figure legend
+          marker_count: unknown; no figure values digitised
+        digitisation: deferred to a figure pass
+        schema_gap: The printed slag/alloy distribution ratio has no quantity token in the current store.
