@@ -689,10 +689,11 @@ def openimcc_binding_selected_by_inputs(
     mode = normalize_high_t_melt_activity(
         controls.get("high_t_melt_activity", "openimcc")
     )
-    return (
-        mode == "openimcc"
-        and temperature_K >= openimcc_bridge._temperature_domain_K()[0]
-    )
+    if mode != "openimcc":
+        return False
+    if quantity_class == "vapour":
+        return temperature_K > VAPOROCK_T_MAX_K
+    return temperature_K >= openimcc_bridge._temperature_domain_K()[0]
 
 
 def _high_t_composition_vector(composition_mol: Mapping[str, float]) -> dict[str, float]:
@@ -994,12 +995,7 @@ def _build_high_t_melt_activity_authority(
     below_cap_fe_activity: float,
     below_cap_fe_activity_basis: str,
 ) -> dict[str, Any] | None:
-    """Resolve C3's high-temperature activity source once per pressure call.
-
-    The returned payload is diagnostic state only.  Pressure and pO2 algebra
-    remain in the existing dispatch branches; callers replace only the melt
-    activity object for the eight flux oxides when this payload is successful.
-    """
+    """Resolve melt activity once; the quantity gate controls its pressure use."""
 
     if not openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K,
@@ -1022,6 +1018,8 @@ def _build_high_t_melt_activity_authority(
         "seam": {},
         "authority_exclusions": {},
     }
+    # Trajectory certificates continue vapour operands. Fresh activity solves
+    # below that domain must not seed a later pressure secant.
     previous = controls.get("high_t_melt_activity_previous") or {}
     vapour_selected = openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K, controls=controls, quantity_class="vapour",
@@ -1669,6 +1667,13 @@ def _high_t_activity_for_parent(
         evidence_tier="PREDICT_AND_FLAG",
         authority_status="openimcc",
     )
+
+
+def _high_t_fe_activity_selected(authority: Mapping[str, Any] | None) -> bool:
+    return bool(authority and (
+        authority.get("provider") == "openimcc"
+        or "FeO" in authority.get("held_effective_gamma_by_parent", {})
+    ))
 
 
 def _attach_high_t_activity_provenance(
@@ -2759,7 +2764,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             below_cap_fe_activity=below_cap_fe_activity,
             below_cap_fe_activity_basis=below_cap_fe_activity_basis,
         )
-        vapour_activity_authority = high_t_activity_authority
+        vapour_activity_authority = (
+            high_t_activity_authority
+            if openimcc_binding_selected_by_inputs(
+                temperature_K=T_K, controls=controls, quantity_class="vapour",
+            ) else None
+        )
         # An openimcc activity can move a valid carrier below the numerical
         # output floor; preserve the carrier so predict-and-flag never drops it.
         retain_high_t_openimcc_carriers = bool(
@@ -3380,11 +3390,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     authority=vapour_activity_authority,
                 )
                 if (
-                    vapour_activity_authority
-                    and (
-                        vapour_activity_authority.get("provider") == "openimcc"
-                        or "FeO" in vapour_activity_authority.get("held_effective_gamma_by_parent", {})
-                    )
+                    _high_t_fe_activity_selected(vapour_activity_authority)
                     and candidate_activity is not None
                 ):
                     oxide_activity = candidate_activity
@@ -4159,6 +4165,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "species_authority": species_authority,
         }
         if high_t_activity_authority is not None:
+            selected_parent_activities = {}
+            for parent in melt_account_mol:
+                selected = _high_t_activity_for_parent(
+                    parent, melt_account_mol, temperature_K=T_K,
+                    authority=high_t_activity_authority,
+                )
+                if selected is not None:
+                    selected_parent_activities[parent] = (
+                        below_cap_fe_activity
+                        if parent == "FeO" and not _high_t_fe_activity_selected(
+                            high_t_activity_authority,
+                        ) else selected.thermodynamic_parent_activity()
+                    )
+            high_t_activity_authority["selected_parent_activities"] = selected_parent_activities
             diagnostic["high_t_melt_activity"] = dict(
                 high_t_activity_authority
             )

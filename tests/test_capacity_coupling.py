@@ -738,11 +738,11 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         )
 
     temperature_K = equilibrium.temperature_C + 273.15
-    original_activities = dict(equilibrium.activity_coefficients)
-    original_diagnostic_activities = dict(
-        sim._last_vapor_pressure_diagnostic["activities"]
-    )
-    assert original_activities == original_diagnostic_activities
+    original_equilibrium_activities = dict(equilibrium.activity_coefficients)
+    original_activities = dict(sim._last_vapor_pressure_diagnostic["activities"])
+    original_diagnostic_activities = dict(original_activities)
+    assert original_equilibrium_activities == sim._last_high_t_melt_activity["selected_parent_activities"]
+    assert original_equilibrium_activities != original_activities
     baseline_catalog_pa: dict[str, float] = {}
     activity_exponents: dict[str, float] = {}
     for species_id, probe_pa in verifier_probe_pa.items():
@@ -836,7 +836,7 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
                 float(seam_pa),
             )
     finally:
-        equilibrium.activity_coefficients = original_activities
+        equilibrium.activity_coefficients = original_equilibrium_activities
         sim._last_vapor_pressure_diagnostic["activities"] = (
             original_diagnostic_activities
         )

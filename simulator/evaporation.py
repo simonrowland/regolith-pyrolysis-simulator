@@ -3289,8 +3289,13 @@ class EvaporationMixin:
         return max(partial_sum_Pa, control_floor_Pa)
 
     @staticmethod
-    def _vapor_pressure_activity_operands(equilibrium: Any) -> dict[str, float]:
-        return dict(getattr(equilibrium, 'activity_coefficients', {}) or {})
+    def _vapor_pressure_activity_operands(
+        equilibrium: Any, diagnostic: Mapping[str, Any],
+    ) -> dict[str, float]:
+        operands = diagnostic.get('activities')
+        if not isinstance(operands, Mapping):
+            operands = getattr(equilibrium, 'activity_coefficients', {}) or {}
+        return dict(operands)
 
     def _resolve_evaporation_vapour_batch(
         self,
@@ -3342,11 +3347,12 @@ class EvaporationMixin:
         except (TypeError, ValueError):
             total_pressure_Pa = None
         try:
-            reported_activities = self._vapor_pressure_activity_operands(equilibrium)
+            reported_activities = self._vapor_pressure_activity_operands(
+                equilibrium, vapor_pressure_diagnostic,
+            )
             kernel_activities = vapor_pressure_diagnostic.get('activities')
             kernel_activity_source = (
                 isinstance(kernel_activities, Mapping)
-                and dict(kernel_activities) == reported_activities
                 and bool(reported_activities)
             )
             if kernel_activity_source:
@@ -3616,7 +3622,7 @@ class EvaporationMixin:
                 ) or {}
             ),
             'vapor_pressure_activities': self._vapor_pressure_activity_operands(
-                equilibrium,
+                equilibrium, vapor_pressure_diagnostic,
             ),
             'pO2_bar': vapor_pressure_diagnostic.get('pO2_bar'),
             'overhead_partials_Pa': dict(overhead_partials_Pa),

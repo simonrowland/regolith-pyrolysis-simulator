@@ -367,7 +367,12 @@ def test_1800_k_pre_switch_physics_pin() -> None:
     ).hexdigest() == "ccdfb94254defeb15f302b251c93dc46ab420c1a83b43b3a78bd4ceb718c8368"
 
 
-def test_1800_k_quantity_split_refactor_pin() -> None:
+def test_1800_k_combined_authority_refactor_pin(monkeypatch) -> None:
+    selected = vapor_pressure_module.openimcc_binding_selected_by_inputs
+    monkeypatch.setattr(
+        vapor_pressure_module, "openimcc_binding_selected_by_inputs",
+        lambda **kwargs: selected(**{**kwargs, "quantity_class": "activity"}),
+    )
     result = _provider().dispatch(_request(BASE_MELT_MOL, 1800.0))
     assert hashlib.sha256(
         json.dumps(_physics(result), sort_keys=True).encode()
@@ -382,10 +387,22 @@ def test_certified_edge_selects_openimcc(temperature_K, expected) -> None:
     high_t = result.diagnostic.get("high_t_melt_activity", {})
     assert (high_t.get("provider") == "openimcc") is expected
     assert high_t.get("above_vaporock_cap", False) is False
-    if not expected:
-        assert _physics(result) == _physics(_provider().dispatch(
-            _request(BASE_MELT_MOL, temperature_K, high_t_melt_activity="constant_gamma")
-        ))
+    legacy = _provider().dispatch(
+        _request(BASE_MELT_MOL, temperature_K, high_t_melt_activity="constant_gamma")
+    )
+    assert _physics(result)[:4] == _physics(legacy)[:4]
+    if expected:
+        selected = high_t["selected_parent_activities"]
+        oracle = evaluate_cleaned_melt(
+            composition_mol=BASE_MELT_MOL, temperature_K=temperature_K,
+        )
+        for parent in ("Na2O", "Al2O3", "SiO2", "FeO"):
+            assert selected[parent] == pytest.approx(
+                oracle.bridge.parent_oxide_activities[parent], rel=1.0e-12,
+            )
+        assert high_t["certified_effective_gamma_by_parent"] == {}
+    else:
+        assert _physics(result) == _physics(legacy)
 
 
 def test_binding_reads_lower_edge_from_default_pack(monkeypatch) -> None:
@@ -397,8 +414,18 @@ def test_binding_reads_lower_edge_from_default_pack(monkeypatch) -> None:
     selected = vapor_pressure_module.openimcc_binding_selected_by_inputs
     assert not selected(temperature_K=1800.0, controls={})
     assert selected(temperature_K=1850.0, controls={})
+    assert not selected(temperature_K=1800.0, controls={}, quantity_class="vapour")
+    assert not selected(temperature_K=1950.0, controls={}, quantity_class="vapour")
+    assert selected(temperature_K=CAP_PLUS_T_K, controls={}, quantity_class="vapour")
+    shifted = _provider().dispatch(_request(BASE_MELT_MOL, 1800.0))
+    assert "high_t_melt_activity" not in shifted.diagnostic
+    assert _physics(shifted) == _physics(_provider().dispatch(_request(
+        BASE_MELT_MOL, 1800.0, high_t_melt_activity="constant_gamma",
+    )))
     monkeypatch.setattr(openimcc_bridge_module, "_load_pack", lambda _: pack)
     assert selected(temperature_K=1800.0, controls={})
+    assert not selected(temperature_K=1800.0, controls={}, quantity_class="vapour")
+    assert selected(temperature_K=CAP_PLUS_T_K, controls={}, quantity_class="vapour")
     assert selected(
         temperature_K=openimcc_bridge_module._temperature_domain_K()[0], controls={},
     )
@@ -419,9 +446,50 @@ def test_refused_openimcc_at_1800_k_keeps_existing_fallback_notice(monkeypatch) 
     legacy = provider.dispatch(_request(
         BASE_MELT_MOL, 1800.0, high_t_melt_activity="constant_gamma",
     ))
-    assert result.diagnostic["vapor_pressures_Pa"] == legacy.diagnostic[
-        "vapor_pressures_Pa"
-    ]
+    assert _physics(result)[:4] == _physics(legacy)[:4]
+    assert high_t["selected_parent_activities"]["FeO"] == legacy.diagnostic["activities"]["Fe"]
+
+
+@pytest.mark.parametrize("temperatures_K", [
+    (1800.0, 1950.1),
+    (1800.0, 2000.0, 2007.0),
+    (2000.0, 1800.0, 2007.0),
+])
+def test_activity_below_cap_does_not_seed_vapour_continuation(monkeypatch, temperatures_K):
+    provider = _provider()
+
+    def run(*, legacy_below_cap):
+        previous = {}
+        previous_temperature = None
+        for hour, temperature in enumerate(temperatures_K, 1):
+            mode = "constant_gamma" if legacy_below_cap and temperature == 1800.0 else "openimcc"
+            request = _request(
+                BASE_MELT_MOL, temperature, high_t_melt_activity=mode,
+                previous_temperature_K=previous_temperature,
+            )
+            request = replace(request, control_inputs={
+                **request.control_inputs,
+                "simulation_hour": hour,
+                "high_t_melt_activity_previous": previous,
+            })
+            with monkeypatch.context() as patch:
+                if hour == len(temperatures_K):
+                    def refuse(**_kwargs):
+                        raise openimcc_bridge_module.OpenImccUnavailableError()
+                    patch.setattr(openimcc_bridge_module, "evaluate_cleaned_melt", refuse)
+                result = provider.dispatch(request)
+            previous = result.diagnostic.get("high_t_melt_activity") or {}
+            if temperature == 1800.0:
+                assert not previous.get("certified_effective_gamma_by_parent")
+            previous_temperature = temperature
+        return result
+
+    baseline = run(legacy_below_cap=True)
+    actual = run(legacy_below_cap=False)
+    assert _physics(actual) == _physics(baseline)
+    assert actual.diagnostic["high_t_melt_activity"]["certified_effective_gamma_by_parent"] == (
+        baseline.diagnostic["high_t_melt_activity"]["certified_effective_gamma_by_parent"]
+    )
 
 
 @pytest.mark.parametrize("gap_K, hour_gap", [
@@ -1715,6 +1783,8 @@ def test_simulator_default_passes_openimcc_authority_into_flux_dispatch(
 
     assert sim._high_t_melt_activity == "openimcc"
     assert sim._last_high_t_melt_activity["provider"] == "openimcc"
+    assert result.activity_coefficients == sim._last_high_t_melt_activity["selected_parent_activities"]
+    assert "SiO2" in result.activity_coefficients
     assert sim._last_vapor_pressures_source
 
     if reset_kind == "cold":
