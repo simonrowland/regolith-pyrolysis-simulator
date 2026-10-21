@@ -199,3 +199,12 @@ def test_richter07_table1_mass_loss_and_context_keep_conditions(tmp_path: Path) 
     result = _migrate_real_extract(tmp_path, RICHTER07_EXTRACT)
     _assert_richter07_pins(result)
 
+
+def test_richter02_type_b_melt_phase_is_canonical(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-037-richter-2002.yaml")
+    assert result.validation.hard_issues == ()
+    assert not any(
+        "phase string 'silicate_melt_Type_B_CAI_like'" in item.why
+        for item in result.queue
+    )
+

@@ -189,7 +189,7 @@ species:
       T_range_K:
       - 1673.0
       - 1773.0
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       condensed_form:
         state: partially_molten
         metastable: false
@@ -203,6 +203,7 @@ species:
       units: dimensionless
       values:
         alpha: 0.04
+        system_note: Type-B CAI-like starting melt; authors' fitted gamma_Mg value
         alpha_note: γ_Mg = 0.04 chosen so calculated curve passes through average Mg evaporation rate
           of BCAI series at 1500°C (Fig. 12; limit a→0 no recondensation)
         gas_species: Mg(g)
@@ -251,7 +252,7 @@ species:
       T_range_K:
       - 1773.15
       - 2073.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       condensed_form:
         state: partially_molten
         metastable: false
@@ -264,6 +265,7 @@ species:
       units: dimensionless
       values:
         alpha: 0.04
+        system_note: Type-B CAI-like starting melt; per-run gamma_Mg table
         alpha_note: Existing pin ~0.04 for H2 series mid; full per-run γ_Mg matrix below
         gas_species: Mg(g)
         material: Type_B_CAI-like_CMAS
@@ -436,7 +438,7 @@ species:
       T_range_K:
       - 1673.0
       - 1773.0
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       condensed_form:
         state: partially_molten
         metastable: false
@@ -449,6 +451,7 @@ species:
       units: dimensionless
       values:
         alpha: null
+        system_note: Type-B CAI-like starting melt; Table 1 per-run gamma_Si data
         gas_species: SiO(g)
         material: Type_B_CAI_like_liquid
         note: Table 1 includes γ_Si per run; OCR table truncated — retain package with surface areas
@@ -476,7 +479,7 @@ species:
       T_range_K:
       - 1773.15
       - 2073.15
-      phase: silicate_melt_Type_B_CAI_like
+      phase: l
       condensed_form:
         state: partially_molten
         metastable: false
@@ -489,6 +492,7 @@ species:
       units: dimensionless
       values:
         alpha: null
+        system_note: Type-B CAI-like starting melt; per-run gamma_Si table
         gas_species: SiO(g)
         method_class: measured_direct
         system_class: silicate_melt
