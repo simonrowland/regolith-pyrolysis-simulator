@@ -979,6 +979,29 @@ def test_guo_2021_unregistered_reduction_inputs_stay_in_context(
     assert result.validation.hard_issues == ()
 
 
+def test_shornikov_2021_model_results_are_context_not_observations(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "shornikov-2021-mgo-feo-silicate.yaml", write=False
+    )
+    assert result.observations == {}
+    contexts = [
+        context
+        for rows in result.context_by_work.values()
+        for context in rows
+        if context.get("source_id") == "shornikov-2021-mgo-feo-silicate"
+    ]
+    study = next(
+        context for context in contexts
+        if context["observation_id"] == "shornikov_2021_study_aim_and_temperature"
+    )
+    assert study["values"]["study_kind_as_reported"] == "theoretical calculations"
+    assert study["values"]["model_as_reported"] == "semi-empirical model (Shornikov, 2019)"
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+
 @pytest.mark.parametrize(
     ("inputs", "raw_inputs", "expected_path", "expected_detail"),
     [
