@@ -17,9 +17,10 @@ from simulator.condensation import (
     DEFAULT_BINARY_DIFFUSION_M2_S,
     GAS_CONSTANT_J_MOL_K,
     _chapman_enskog_d_ab_m2_s,
+    _knudsen_number,
     _series_resistance_deposition_flux_mol_m2_s,
 )
-from simulator.state import MAX_STIR_FACTOR
+from simulator.state import MAX_STIR_FACTOR, MOLAR_MASS
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
 
@@ -204,14 +205,62 @@ def test_universal_melt_renewal_conductance_is_uncertified_and_refused():
         )
 
 
-def test_transition_and_free_molecular_regimes_do_not_apply_continuum_gas_film():
+def test_transitional_film_is_flagged_and_free_molecular_limit_has_no_film():
     transitional = _evap(knudsen_number=1.0)
     free_molecular = _evap(knudsen_number=FREE_MOLECULAR_KNUDSEN_MIN)
 
-    assert transitional.r_gas == 0.0
+    assert transitional.r_gas > 0.0
     assert free_molecular.r_gas == 0.0
-    assert transitional.gas_resistance_weight == 0.0
+    assert transitional.gas_resistance_weight == 1.0
     assert free_molecular.gas_resistance_weight == 0.0
+    diag = transitional.as_diagnostic()
+    assert diag["authority_class"] == "extrapolated"
+    notice = diag["continuum_extrapolation_notice"]
+    assert notice["ledger_yields_authorized"] is True
+    assert notice["doctrine_category"] == 2
+    assert "not certified transitional transport" in notice["detail"]
+    assert "continuum_extrapolation_notice" not in free_molecular.as_diagnostic()
+    assert "continuum_extrapolation_notice" not in _evap(
+        gas_resistance_enabled=False
+    ).as_diagnostic()
+
+
+@pytest.mark.parametrize("species", ["Na", "Fe", "SiO", "Mg"])
+def test_source_film_is_continuous_at_viscous_boundary_and_small_at_kn10(species):
+    # Independent invariant: a vanishing pressure change must not remove a
+    # finite resistor. Resolve physical Kn from pressure, never force Kn while
+    # holding pressure fixed. Alpha=1 bounds the residual relative to HKL.
+    def at_pressure(pressure):
+        return _evap(
+            species=species,
+            P_eq_pa=1.0,
+            P_bulk_pa=0.0,
+            molar_mass_kg_mol=MOLAR_MASS[species] / 1000.0,
+            alpha_i=1.0,
+            knudsen_number=None,
+            overhead_pressure_pa=pressure,
+        )
+
+    high, low = at_pressure(32.4), at_pressure(32.3)
+    assert high.knudsen_number < 0.01 < low.knudsen_number
+    assert high.flux_kg_s_m2 < low.flux_kg_s_m2 < high.flux_kg_s_m2 * 1.004
+    boundary_pa = _knudsen_number(1.0, 1800.0, 0.12, carrier_gas="N2") / 0.01
+    high, low = at_pressure(boundary_pa * (1 + 1e-8)), at_pressure(
+        boundary_pa * (1 - 1e-8)
+    )
+    assert low.flux_kg_s_m2 == pytest.approx(high.flux_kg_s_m2, rel=3e-8)
+    assert low.as_diagnostic()["authority_class"] == "extrapolated"
+    assert high.as_diagnostic()["authority_class"] == "upper-bound"
+
+    # Kn=10 is 1000 times the mean free path ratio at the old boundary.
+    molecular_pa = boundary_pa * 0.01 / FREE_MOLECULAR_KNUDSEN_MIN
+    high, low = at_pressure(molecular_pa * (1 + 1e-8)), at_pressure(
+        molecular_pa * (1 - 1e-8)
+    )
+    assert high.knudsen_number < FREE_MOLECULAR_KNUDSEN_MIN < low.knudsen_number
+    assert 0.0 < high.r_gas / high.r_interface < 0.01
+    assert low.r_gas == 0.0
+    assert 1.0 < low.flux_kg_s_m2 / high.flux_kg_s_m2 < 1.01
 
 
 def test_missing_chapman_enskog_parameters_do_not_fall_back_to_constant():

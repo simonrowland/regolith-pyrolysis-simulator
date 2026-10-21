@@ -3469,6 +3469,7 @@ class ExtractionMixin:
         )
         from engines.builtin.evaporation_flux import (
             EvaporationFluxConfigurationError,
+            _continuum_film_extrapolation_notice,
             _series_resistance_evaporation_flux_kg_m2_s,
         )
         from simulator.evaporation import (
@@ -3721,13 +3722,6 @@ class ExtractionMixin:
                 raise evaporation_flux_refusal_from_configuration_error(
                     exc
                 ) from exc
-            # Kn-domain validity for viscous P_bulk applies here too: the
-            # C7 0.01–0.1 mbar shell-route band sits above VISCOUS_KNUDSEN_MAX
-            # at typical hold T / D, so the same transport-model validity
-            # C7-specific diagnostic-limited policy suppresses
-            # ledger-authoritative extent. The authoritative EVAPORATION_FLUX
-            # provider refuses this state. Not a Kn safety/coating gate;
-            # t-379 (0.7) lifts the missing-model restriction.
         else:
             try:
                 series_flux = _series_resistance_evaporation_flux_kg_m2_s(
@@ -3743,8 +3737,6 @@ class ExtractionMixin:
                     exc
                 ) from exc
         hold_time_s = hold_time_h * 3600.0
-        from simulator.transport_regime import continuum_validity_refuses
-
         domain_diag = viscous_p_bulk_out_of_domain_diagnostic(
             knudsen_number=float(series_flux.knudsen_number),
             overhead_pressure_pa=overhead_pressure_pa,
@@ -3754,10 +3746,9 @@ class ExtractionMixin:
             campaign_name='C7_CA_ALUMINOTHERMIC',
             asking_site='extraction.c7_ca_transport',
         )
+        continuation_notice = _continuum_film_extrapolation_notice(domain_diag)
+        domain_diag = continuation_notice or domain_diag
         flux_kg_s_m2 = float(series_flux.flux_kg_s_m2)
-        if continuum_validity_refuses(domain_diag):
-            # C7-specific diagnostic-limited suppression; not provider parity.
-            flux_kg_s_m2 = 0.0
         ca_transport_mol = (
             flux_kg_s_m2
             * area_m2
@@ -3803,9 +3794,7 @@ class ExtractionMixin:
                     'series_resistance_frozen_skull_stir_ceiling',
                 )
             )
-        if continuum_validity_refuses(domain_diag):
-            transport_refusal = 'viscous_p_bulk_transport_out_of_domain'
-        elif (
+        if (
             cf7_ca_shell_route_active
             and C7_MIN_TOTAL_PRESSURE_MBAR
             <= p_total_mbar
@@ -3844,7 +3833,7 @@ class ExtractionMixin:
             # caller's transport_diag splice.
             diagnostic['silent_zero_notes'] = [dict(n) for n in _c7_sz_notes]
         if domain_diag is not None:
-            # Shared validity vocabulary on the C7 diagnostic-limited path.
+            # Preserve domain provenance with the shared continuation authority.
             diagnostic.update(
                 {
                     'authority_class': domain_diag['authority_class'],
@@ -3869,6 +3858,8 @@ class ExtractionMixin:
                     'knudsen_number': domain_diag['knudsen_number'],
                 }
             )
+        if continuation_notice is not None:
+            diagnostic['continuum_extrapolation_notice'] = continuation_notice
         return extent_mol, diagnostic
 
     def _step_c7_ca_aluminothermic(self) -> None:

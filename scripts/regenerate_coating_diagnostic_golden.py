@@ -33,7 +33,7 @@ PIN_RE = re.compile(
 
 
 def produce_bytes() -> bytes:
-    run = PyrolysisRun(
+    payload = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
         hours=24,
@@ -44,10 +44,11 @@ def produce_bytes() -> bytes:
             "started_at_utc": "2026-05-15T00:00:00Z",
             "kernel_commit_sha": "goal-18-fixture",
         },
-    )
+    ).run()
+    payload.pop("melt_redox_gate_floor_fallback_engagement", None)
     return (
         json.dumps(
-            run.run(),
+            payload,
             indent=2,
             sort_keys=False,
             allow_nan=False,

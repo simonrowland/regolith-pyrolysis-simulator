@@ -3355,14 +3355,8 @@ def test_c7_transport_uses_upstream_headspace_not_downstream_residual() -> None:
     assert diagnostic["c7_ca_p_bulk_pa"] == pytest.approx(300.0)
 
 
-def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> None:
-    """Bug B residual teeth: reverify probe (T=2023.15 K, D=0.12 m, P=3.632 Pa).
-
-    Both the C7 ledger path and native-Fe partition must soft-suppress
-    ledger-authoritative yields with the typed validity vocabulary
-    (not a Kn safety/coating gate). At P=100 Pa (Kn≈0.0036, 0.6.3 floor)
-    both paths behave normally — no domain suppression.
-    """
+def test_c7_and_native_fe_predict_flagged_yields_at_transitional_kn_probe() -> None:
+    """b1002: shared continuum continuation supplies finite capacity, flagged."""
     # --- transitional probe: Kn≈0.1 ---
     sim = _make_sim()
     sim.melt.temperature_C = 1750.0
@@ -3383,14 +3377,14 @@ def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> N
     )
     extent, c7_diag = sim._c7_transport_extent_mol(cfg, ca_per_extent=3.0)
 
-    assert extent == pytest.approx(0.0)
-    assert c7_diag["transport_ca_mol"] == pytest.approx(0.0)
-    assert c7_diag["c7_ca_flux_kg_s_m2"] == pytest.approx(0.0)
-    assert c7_diag["c7_transport_refusal"] == (
-        "viscous_p_bulk_transport_out_of_domain"
-    )
-    assert c7_diag["ledger_yields_authorized"] is False
-    assert c7_diag["authority_class"] == "diagnostic-limited"
+    assert extent > 0.0
+    assert c7_diag["transport_ca_mol"] > 0.0
+    assert c7_diag["c7_ca_flux_kg_s_m2"] > 0.0
+    assert c7_diag["R_gas"] > 0.0
+    assert c7_diag["c7_transport_refusal"] == ""
+    assert c7_diag["ledger_yields_authorized"] is True
+    assert c7_diag["authority_class"] == "extrapolated"
+    assert c7_diag["continuum_extrapolation_notice"]["authority_level"] == "extrapolated"
     assert c7_diag["reason"] == "viscous_p_bulk_transport_out_of_domain"
     assert c7_diag["p_bulk_transport_domain"] == "out_of_domain_transitional"
     assert c7_diag["knudsen_number"] == pytest.approx(0.100002, rel=1e-3)
@@ -3399,20 +3393,23 @@ def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> N
     assert "not_coating_gate" in c7_diag["framing"]
 
     native = sim._native_fe_partition_diagnostic(1.0)
-    assert native["native_fe_vapor_mol"] == pytest.approx(0.0)
-    assert native["native_fe_tap_mol"] == pytest.approx(1.0)
-    assert native["ledger_yields_authorized"] is False
-    assert native["authority_class"] == "diagnostic-limited"
+    assert native["native_fe_vapor_mol"] > 0.0
+    assert native["native_fe_vapor_mol"] + native["native_fe_tap_mol"] == pytest.approx(1.0)
+    assert native["ledger_yields_authorized"] is True
+    assert native["authority_class"] == "extrapolated"
+    assert native["continuum_extrapolation_notice"]["authority_level"] == "extrapolated"
     assert native["reason"] == "viscous_p_bulk_transport_out_of_domain"
     assert native["p_bulk_transport_domain"] == "out_of_domain_transitional"
     assert "transport_model_validity_domain" in native["framing"]
     series = native["series_resistance"]
-    assert series["authority_class"] == "diagnostic-limited"
+    assert series["authority_class"] == "extrapolated"
+    assert series["continuum_extrapolation_notice"]["authority_level"] == "extrapolated"
+    assert series["r_gas"] > 0.0
     assert series["authority_reason"] == (
         "viscous_p_bulk_transport_out_of_domain"
     )
     assert series["p_bulk_transport_domain"] == "out_of_domain_transitional"
-    assert series["ledger_yields_authorized"] is False
+    assert series["ledger_yields_authorized"] is True
     assert "transport_model_validity_domain" in series["framing"]
 
     # --- viscous floor: P=100 Pa, Kn≈0.0036 — normal behavior ---
