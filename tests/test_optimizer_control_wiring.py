@@ -32,7 +32,8 @@ def test_default_resolved_input_pin():
     melt = MeltState(campaign=CampaignPhase.C0B)
     assert manager.get_temp_target(CampaignPhase.C0B, 0, melt) == (1250.0, 30.0)
     assert manager._max_hold_hr(CampaignPhase.C0B) == 3.0
-    assert manager._max_hold_hr(CampaignPhase.C2A) == 30.0
+    manager.configure_campaign(MeltState(temperature_C=1670), CampaignPhase.C2A)
+    assert manager._max_hold_hr(CampaignPhase.C2A) == 99.0
     assert manager.c4_max_temp_C == 1670.0
     assert manager._configured_max_hold_hr(CampaignPhase.C3_K, "C3_K", "A") == 12.0
     assert manager._configured_max_hold_hr(CampaignPhase.C3_NA, "C3_NA", "default") == 35.0

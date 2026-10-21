@@ -73,7 +73,7 @@ def test_canonical_sequence_recovers_mg_before_final_boiloff_and_skips_mre() -> 
         7.5,
     )
     assert "min_hold_hr" not in manager._campaign_overrides(CampaignPhase.C2A)
-    assert manager._campaign_overrides(CampaignPhase.C2A)["max_hours"] == 160.0
+    assert manager._max_hold_hr(CampaignPhase.C2A) == 160.0
     # 2026-07-22 B1 C6-continue routing fix: noninteractive branch-two
     # batches auto-proceed into C6 after the final C2A bake-out (Mandate
     # section 2 — thermite needs no electrolysis; C5 stays skipped).

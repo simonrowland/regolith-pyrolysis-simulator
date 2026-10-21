@@ -180,7 +180,9 @@ campaigns:
       threshold: 0.05
       species_monitored: ["Na", "K", "Fe", "SiO"]
       SiO_target: "target a(SiO2) reduction reached"
-    max_hold_hr: 30
+    # Null selects the phase-entry thermal acquisition + extraction-window
+    # deadline in CampaignManager. A numeric recipe request owns the cap.
+    max_hold_hr: null
     soft_endpoint:
       type: "total_evaporation_rate_below_after_min_hold"
       min_hold_hr: 18

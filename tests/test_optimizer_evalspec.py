@@ -2423,7 +2423,11 @@ def test_active_recipe_patch_max_hold_tightens_carrier_seed_cap() -> None:
         )
 
 
-def test_recipe_patch_max_hold_cannot_elevate_catalog_validated_cap() -> None:
+def test_recipe_patch_max_hold_cannot_elevate_explicit_catalog_cap(monkeypatch) -> None:
+    # The stock C2A default is now automatic. Keep a finite catalog-cap
+    # fixture here so this guard still proves the same 30 h refusal.
+    monkeypatch.setattr(profiles_module, '_campaign_max_hold_hr_for_profile',
+                        lambda source, campaign: 30.0)
     profile = _c2a_window_profile(1050.0, 1600.0, 146)
 
     with pytest.raises(
@@ -2540,7 +2544,9 @@ def test_active_thermal_window_seed_boundary_contract(
         assert local_furnace[0] == pytest.approx(expected_furnace_C)
 
 
-def test_recipe_without_local_max_hold_does_not_borrow_other_seed_cap() -> None:
+def test_recipe_without_local_max_hold_does_not_borrow_other_seed_cap(monkeypatch) -> None:
+    monkeypatch.setattr(profiles_module, '_campaign_max_hold_hr_for_profile',
+                        lambda source, campaign: 30.0)
     profile = _c2a_window_profile(1050.0, 1600.0, 29)
     profile["seed_recipes"].append({
         "id": "other-seed",
@@ -3809,3 +3815,11 @@ def test_empty_data_digest_metadata_value_raises() -> None:
 def test_feedstock_recipe_digest_rejects_bad_numeric_values(bad_value: float) -> None:
     with pytest.raises(ValueError, match="NaN and infinity"):
         feedstock_recipe_digest({"SiO2": bad_value})
+
+
+def test_c2a_automatic_default_does_not_shadow_a_measured_window_cap():
+    spec, config = _build_eval_inputs(
+        RecipePatch({}), "lunar_mare_low_ti", "internal-analytical",
+        _c2a_window_profile(1050, 1600, 146), RecipeSchema())
+    assert spec.hours == config.hours == 148
+    assert config.runtime_campaign_overrides["C2A_continuous"]["max_hours"] == 148

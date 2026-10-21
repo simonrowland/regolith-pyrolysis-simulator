@@ -559,7 +559,11 @@ def test_runtime_loader_refuses_over_cap_stored_thermal_window_profile() -> None
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
-def test_default_c2a_profile_still_refuses_over_campaign_cap() -> None:
+def test_c2a_profile_still_refuses_over_explicit_campaign_cap(monkeypatch) -> None:
+    # Automatic C2A defaults do not impose a static 30 h ceiling. An
+    # explicitly configured ceiling retains the original refusal contract.
+    monkeypatch.setattr(profiles, '_campaign_max_hold_hr_for_profile',
+                        lambda source, campaign: 30.0)
     profile = _profile_copy("lunar_mare_low_ti")
     profile["run"].update({"campaign": "C2A_continuous", "hours": 29})
     profile["fidelities"] = {"internal-analytical": {"backend_name": "internal-analytical"}}

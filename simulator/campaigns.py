@@ -341,8 +341,7 @@ class CampaignManager:
         self.last_c2a_staged_termination: dict[str, object] | None = None
         self._pending_c3_na_scoped_overrides: dict | None = None
         self._active_c3_na_scoped_overrides: dict | None = None
-        self._pending_post_mg_c2a_overrides: dict | None = None
-        self._active_post_mg_c2a_overrides: dict | None = None
+        self._active_c2a_default_limits: dict | None = None
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
         self.last_c4_termination: dict[str, object] | None = None
 
@@ -632,9 +631,9 @@ class CampaignManager:
         merged: dict = {}
         if (
             campaign == CampaignPhase.C2A
-            and self._active_post_mg_c2a_overrides
+            and self._active_c2a_default_limits
         ):
-            merged.update(self._active_post_mg_c2a_overrides)
+            merged.update(self._active_c2a_default_limits)
         if (
             campaign == CampaignPhase.C3_NA
             and self._active_c3_na_scoped_overrides
@@ -793,6 +792,9 @@ class CampaignManager:
             if duration is not None:
                 return duration
         value = cfg.get('max_hold_hr')
+        if (campaign == CampaignPhase.C2A and value is None
+                and self._active_c2a_default_limits is not None):
+            value = self._active_c2a_default_limits['max_hours']
         label = f"{self._campaign_config_key(campaign)}.max_hold_hr"
         for key in path:
             label = f"{label}.{key}"
@@ -1486,14 +1488,17 @@ class CampaignManager:
             self._pending_c3_na_scoped_overrides = None
             self._active_c3_na_scoped_overrides = None
 
+        self._active_c2a_default_limits = None
         if campaign == CampaignPhase.C2A:
-            self._active_post_mg_c2a_overrides = (
-                self._pending_post_mg_c2a_overrides
-            )
-            self._pending_post_mg_c2a_overrides = None
-        else:
-            self._pending_post_mg_c2a_overrides = None
-            self._active_post_mg_c2a_overrides = None
+            cfg = self._campaign_config(campaign)
+            overrides = self._campaign_overrides(campaign)
+            explicit_runtime_cap = any(
+                self._float(overrides.get(key), 0.0) > 0
+                for key in ('max_hours', 'hold_time_h', 'duration_h'))
+            if ('max_hold_hr' in cfg and cfg['max_hold_hr'] is None
+                    and self._scalar_config_float(cfg, 'duration_h') is None
+                    and not explicit_runtime_cap):
+                self._active_c2a_default_limits = self._c2a_default_limits(melt)
 
         if campaign == CampaignPhase.C2A_STAGED:
             self._c2a_staged_stage_idx = 0
@@ -1732,6 +1737,47 @@ class CampaignManager:
                 CampaignPhase.C2A, 'early_ramp_1050_1320C'))
         return (self.furnace_max_T_C, self._campaign_rate_band_midpoint(
             CampaignPhase.C2A, 'peak_SiO_window_1400_1600C'))
+
+    def _c2a_default_limits(self, melt: MeltState) -> dict[str, float]:
+        """Resolve the automatic deadline once, from the phase-entry state."""
+        temperature_C = self._required_float(melt.temperature_C, 'C2A.temperature_C')
+        if not math.isfinite(temperature_C):
+            raise MalformedRecipeError('C2A automatic deadline requires a finite entry temperature')
+        target_C, _ = self.get_temp_target(CampaignPhase.C2A, 0, melt)
+        acquisition_hr = 0.0
+        while temperature_C < target_C:
+            upper_C, rate = self._c2a_ramp_band(temperature_C)
+            _, rate = self._apply_ramp_override(CampaignPhase.C2A, target_C, rate)
+            if not math.isfinite(rate) or rate <= 0:
+                raise MalformedRecipeError('C2A automatic deadline requires a positive finite ramp')
+            next_C = min(upper_C, target_C)
+            acquisition_hr += (next_C - temperature_C) / rate
+            temperature_C = next_C
+        cfg = self._campaign_config(CampaignPhase.C2A)
+        window = cfg.get('duration_h')
+        if not isinstance(window, (list, tuple)) or len(window) != 2:
+            raise MalformedRecipeError('C2A automatic deadline requires a two-element duration_h window')
+        margin_hr = self._required_float(window[1], 'C2A.duration_h[1]')
+        minimum_hr = self._endpoint_float(
+            CampaignPhase.C2A, self._configured_endpoint(CampaignPhase.C2A, 'soft_endpoint'),
+            'min_hold_hr')
+        if not math.isfinite(margin_hr) or margin_hr < minimum_hr:
+            raise MalformedRecipeError('C2A extraction window must cover the depletion minimum hold')
+        # Premise: the cap is a safety deadline, not the depletion endpoint.
+        # t_acquire = sum(delta_T / active_rate): C / (C/h) = h.
+        # Round acquisition UP to whole simulator ticks, then add the YAML
+        # extraction-window upper endpoint as the depletion margin. At entry
+        # 1670 C, target 2200 C, rate 7.5 C/h: ceil(530/7.5) + 28 = 99 h.
+        # An already-hot charge has zero acquisition time; its cap is just
+        # the extraction window. Numeric max_hold_hr requests bypass this
+        # default, including requests equal to the former 30 h default.
+        acquisition_ticks = math.ceil(acquisition_hr)
+        return {
+            'max_hours': acquisition_ticks + margin_hr,
+            # A quiet sample during acquisition is not proof that the
+            # charge depleted at its selected operating temperature.
+            'min_hold_hr': max(minimum_hr, acquisition_ticks),
+        }
 
     def _get_base_temp_target(self, campaign: CampaignPhase,
                                campaign_hour: int,
@@ -3021,12 +3067,6 @@ class CampaignManager:
         elif current == CampaignPhase.C4:
             if self.c5_enabled:
                 return CampaignPhase.C5
-            # The final pass uses the same searched maximum and soft endpoint
-            # owner as the initial C2A pass. A scoped literal must not replace
-            # an optimizer request on re-entry after Mg recovery.
-            self._pending_post_mg_c2a_overrides = {
-                'max_hours': self._max_hold_hr(CampaignPhase.C2A),
-            }
             # Mark A-family paths for the final-pass C2A successor above;
             # path 'B' keeps its operator-chosen record (the marker used to
             # clobber it, corrupting the reported path).
