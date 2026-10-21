@@ -12512,7 +12512,7 @@ class Migrator:
         # (not the parent observation's). A row-local map describes that row
         # (often an evaporation residue), so it never promotes to the sample.
         self._row_local_printed_observations: set[str] = set()
-        # Compilation record JSON paths registered as Work assets (not INDEX).
+        # Declared source assets not present in INDEX, including table CSVs.
         self._work_extra_assets: dict[str, dict[str, SourceFile]] = defaultdict(dict)
         # t-1123a: per-source printed liquidus / plateau records (phase_field.py).
         self._phase_field_records: dict[str, PhaseFieldRecords | None] = {}
@@ -12559,6 +12559,7 @@ class Migrator:
         source_id: str,
         index_row: Mapping[str, Any] | None,
         source_method_uncertainty: SourceMethodUncertainty | None = None,
+        source_files: Mapping[str, Any] | None = None,
     ) -> Work:
         work_id, canonical_doi = work_id_for(
             citation=citation,
@@ -12594,7 +12595,20 @@ class Migrator:
                     f"conflicting source method uncertainty for {source_id}"
                 )
             source_method_uncertainties[source_id] = source_method_uncertainty
+        if source_files is not None:
+            if not isinstance(source_files, Mapping):
+                raise ValueError("extract source_files must be a mapping")
+            for payload in source_files.get("files") or ():
+                asset = _source_file_from_plain(payload)
+                existing = self._work_extra_assets[work_id].get(asset.asset_id)
+                if existing is not None and existing != asset:
+                    raise ValueError(
+                        f"conflicting declared source asset {asset.asset_id!r}"
+                    )
+                self._work_extra_assets[work_id][asset.asset_id] = asset
         pack = source_files_for(source_id, index_row)
+        if source_files is not None and source_files.get("corpus_repo"):
+            pack = replace(pack, corpus_repo=str(source_files["corpus_repo"]))
         merged = self._merge_extra_assets(work_id, list(pack.files))
         work = Work(
             work_id=work_id,
@@ -13779,6 +13793,7 @@ class Migrator:
             source_id=source_id,
             index_row=index_row,
             source_method_uncertainty=source_method_uncertainty,
+            source_files=doc.get("source_files"),
         )
         experiment_refs = self._lift_extract_registries(
             doc, work=work, source_key=rel
@@ -17470,29 +17485,28 @@ class Migrator:
                     locator=point_locator,
                 ),
             }
-        if q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY} and (
-            identity.composition is None or not identity.composition.is_value
-        ):
+        if identity.composition is None or not identity.composition.is_value:
             located_composition = (point_conditions or {}).get("composition")
             if (
                 isinstance(located_composition, Located)
                 and located_composition.state.is_value
             ):
                 raw_composition = located_composition.state.value
-                converted_composition = (
-                    Located(State.of(raw_composition))
-                    if isinstance(raw_composition, Composition)
-                    else _composition_located_from_plain(
+                if isinstance(raw_composition, Composition):
+                    identity = replace(
+                        identity, composition=State.of(raw_composition)
+                    )
+                elif q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY}:
+                    converted_composition = _composition_located_from_plain(
                         {
                             "amount_basis": AmountBasis.MASS_PERCENT.value,
                             "components": raw_composition,
                         }
                     )
-                )
-                if converted_composition.state.is_value:
-                    identity = replace(
-                        identity, composition=converted_composition.state
-                    )
+                    if converted_composition.state.is_value:
+                        identity = replace(
+                            identity, composition=converted_composition.state
+                        )
         if q_token_point is Quantity.VALENCE_RATIO and (
             identity.total_pressure_Pa is None
             or not identity.total_pressure_Pa.is_value
@@ -17509,15 +17523,6 @@ class Migrator:
                     identity = replace(
                         identity, total_pressure_Pa=State.of(pressure)
                     )
-        if printed_phase_kind is not None and (
-            identity.composition is None or not identity.composition.is_value
-        ):
-            located_composition = (point_conditions or {}).get("composition")
-            if (
-                isinstance(located_composition, Located)
-                and located_composition.state.is_value
-            ):
-                identity = replace(identity, composition=located_composition.state)
         child_notices = list(notices)
         parent_hold_notice = _hold_reason_notice(
             parent_reason,

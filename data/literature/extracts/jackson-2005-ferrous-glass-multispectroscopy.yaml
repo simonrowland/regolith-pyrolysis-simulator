@@ -1,0 +1,634 @@
+schema_version: literature_extract.v1
+source_id: jackson-2005-ferrous-glass-multispectroscopy
+figure_policy: Figures 1–10 are deferred to a figure pass; no numeric figure points are stored.
+source:
+  citation: 'Jackson, W. E., Farges, F., Yeager, M., Mabrouk, P. A., Rossano, S., Waychunas, G. A., Solomon, E. I. & Brown, G. E. Jr. (2005). Multi-spectroscopic study of Fe(II) in silicate glasses: Implications for the coordination environment of Fe(II) in silicate melts. Geochimica et Cosmochimica Acta, 69(17), 4315–4332.'
+  doi: 10.1016/j.gca.2005.01.008
+  year: 2005
+  corpus_asset: raw/jackson-2005-ferrous-glass-multispectroscopy/jackson-2005-ferrous-glass-multispectroscopy.pdf
+extraction:
+  method: Born-digital pdftotext-layout transcription. Tables 1–4 were transcribed by hand and checked against 600 dpi renders of physical PDF pages 4, 7, 9, and 10. The seven glass formulas were checked against the 600 dpi render of physical page 2. Figures 1–10 are context-only records with no numeric points.
+  date: '2026-10-19'
+  worker: fam15-1019
+  provenance_path: text/jackson-2005-ferrous-glass-multispectroscopy/pdftotext-layout.txt
+  source_path: corpus/raw/jackson-2005-ferrous-glass-multispectroscopy/jackson-2005-ferrous-glass-multispectroscopy.pdf
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[jackson_2005_mossbauer_li2_fe3_fraction].values.points[0].value
+  value: '7'
+  note: Table 1, LI2; physical PDF page 4, 600 dpi render.
+- path: species.Fe.observations[jackson_2005_mossbauer_rb2_fe3_fraction].values.points[0].value
+  value: '22'
+  note: Table 1, RB2; physical PDF page 4, 600 dpi render.
+- path: species.Fe.observations[jackson_2005_mossbauer_nc6_fe3_fraction].values.points[0].value
+  value: '10'
+  note: Table 1, NC6; physical PDF page 4, 600 dpi render.
+- path: species.Fe.observations[jackson_2005_xanes_rb2_fe3_fraction].values.points[0].value
+  value: '15'
+  note: XANES estimate in section 3.2.1; physical PDF page 7.
+species:
+  Fe:
+    observations:
+    - observation_id: jackson_2005_mossbauer_li2_fe3_fraction
+      type: concentration_series
+      locator: {page: 4, published_page: 4318, pdf_page_index: 3, table: '1', row: LI2, column: '% Fe(III)'}
+      phase: glass
+      regime: quench_equilibration
+      method_as_printed: 57Fe Mössbauer spectroscopy; shape-independent distribution model
+      units: '%'
+      uncertainty:
+        note: Table 1 prints no row-specific uncertainty for % Fe(III).
+      quench_note: The glass was water-quenched at an estimated rate of approximately 10^2 K/s; the paper does not state whether the Fe redox ratio was preserved during quenching.
+      derivation:
+        relation: Table 1 footnote b states that the Fe(III) fraction was derived from the 57Fe Mössbauer spectrum using the shape-independent distribution (SID) model.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 4, published_page: 4318, pdf_page_index: 3, figure: '1', note: Figure 1 includes the LI2 Mössbauer spectrum; numerical spectrum-fit inputs are not tabulated.}
+        output_unit: '%'
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        valence_basis:
+          numerator_oxidation_states: [3]
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_as_printed: Mössbauer results; % Fe(III) derived using the shape-independent distribution (SID) model.
+        points:
+        - sample_as_published: LI2
+          row_as_printed: LI2
+          value: '7'
+          value_as_published: '7'
+          T_K: '300'
+          composition_as_published: {formula: Li2FeSi3O8, basis: nominal composition}
+          point_conditions:
+            sample_id: {state: {tag: value, value: LI2}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            temperature_K: {state: {tag: value, value: '300'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Mössbauer Spectroscopy}}
+            composition: {state: {tag: value, value: {basis: elemental, amount_basis: mol_inventory, components: [[Li, '2'], [Fe, '1'], [Si, '3'], [O, '8']]}}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            fO2_Pa: {state: {tag: unknown, reason: The paper reports no numeric oxygen fugacity or partial pressure.}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            fO2_control: {state: {tag: unknown, reason: 'A controlled Ar or N2 atmosphere and metallic iron crucible are reported, but no oxygen buffer or gas ratio is printed.'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            total_pressure_Pa: {state: {tag: value, value: '100000'}, locator: {page: 1, pdf_page_index: 0, section: Abstract, note: The abstract states 1 bar; represented in canonical Pa.}}
+            atmosphere: {state: {tag: value, value: controlled atmosphere (Ar or N2)}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+          quench_statement:
+            text: The melts were quenched to glasses by placing the bottom portion of the crucible in water; estimated quench rate approximately 10^2 K/s.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}
+          locator: {page: 4, published_page: 4318, pdf_page_index: 3, table: '1', row: LI2, column: '% Fe(III)'}
+    - observation_id: jackson_2005_mossbauer_rb2_fe3_fraction
+      type: concentration_series
+      locator: {page: 4, published_page: 4318, pdf_page_index: 3, table: '1', row: RB2, column: '% Fe(III)'}
+      phase: glass
+      regime: quench_equilibration
+      method_as_printed: 57Fe Mössbauer spectroscopy; shape-independent distribution model
+      units: '%'
+      uncertainty:
+        note: Table 1 prints no row-specific uncertainty for % Fe(III).
+      quench_note: The glass was water-quenched at an estimated rate of approximately 10^2 K/s; the paper does not state whether the Fe redox ratio was preserved during quenching. The Results text describes RB2 as approximately 20% Fe(III) and cites Table 1; this is the same Mössbauer result, not a second observation.
+      derivation:
+        relation: Table 1 footnote b states that the Fe(III) fraction was derived from the 57Fe Mössbauer spectrum using the shape-independent distribution (SID) model.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 4, published_page: 4318, pdf_page_index: 3, figure: '1', note: Figure 1 includes the RB2 Mössbauer spectrum; numerical spectrum-fit inputs are not tabulated.}
+        output_unit: '%'
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        valence_basis:
+          numerator_oxidation_states: [3]
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_as_printed: Mössbauer results; % Fe(III) derived using the shape-independent distribution (SID) model.
+        points:
+        - sample_as_published: RB2
+          row_as_printed: RB2
+          value: '22'
+          value_as_published: '22'
+          T_K: '300'
+          composition_as_published: {formula: Rb2FeSi3O8, basis: nominal composition}
+          additional_printed_form: {text: approximately 20% Fe(III), approximate: true, locator: {page: 3, published_page: 4317, pdf_page_index: 2, section: Results, note: The prose estimate refers to the same RB2 Mössbauer result as Table 1.}}
+          point_conditions:
+            sample_id: {state: {tag: value, value: RB2}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            temperature_K: {state: {tag: value, value: '300'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Mössbauer Spectroscopy}}
+            composition: {state: {tag: value, value: {basis: elemental, amount_basis: mol_inventory, components: [[Rb, '2'], [Fe, '1'], [Si, '3'], [O, '8']]}}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            fO2_Pa: {state: {tag: unknown, reason: The paper reports no numeric oxygen fugacity or partial pressure.}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            fO2_control: {state: {tag: unknown, reason: 'A controlled Ar or N2 atmosphere and metallic iron crucible are reported, but no oxygen buffer or gas ratio is printed.'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            total_pressure_Pa: {state: {tag: value, value: '100000'}, locator: {page: 1, pdf_page_index: 0, section: Abstract, note: The abstract states 1 bar; represented in canonical Pa.}}
+            atmosphere: {state: {tag: value, value: controlled atmosphere (Ar or N2)}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+          quench_statement:
+            text: The melts were quenched to glasses by placing the bottom portion of the crucible in water; estimated quench rate approximately 10^2 K/s.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}
+          locator: {page: 4, published_page: 4318, pdf_page_index: 3, table: '1', row: RB2, column: '% Fe(III)'}
+    - observation_id: jackson_2005_mossbauer_nc6_fe3_fraction
+      type: concentration_series
+      locator: {page: 4, published_page: 4318, pdf_page_index: 3, table: '1', row: NC6, column: '% Fe(III)'}
+      phase: glass
+      regime: quench_equilibration
+      method_as_printed: 57Fe Mössbauer spectroscopy; shape-independent distribution model
+      units: '%'
+      uncertainty:
+        note: Table 1 prints no row-specific uncertainty for % Fe(III).
+      quench_note: The glass was water-quenched at an estimated rate of approximately 10^2 K/s; the paper does not state whether the Fe redox ratio was preserved during quenching.
+      derivation:
+        relation: Table 1 footnote b states that the Fe(III) fraction was derived from the 57Fe Mössbauer spectrum using the shape-independent distribution (SID) model.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 4, published_page: 4318, pdf_page_index: 3, figure: '1', note: Figure 1 includes the NC6 Mössbauer spectrum; numerical spectrum-fit inputs are not tabulated.}
+        output_unit: '%'
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        valence_basis:
+          numerator_oxidation_states: [3]
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_as_printed: Mössbauer results; % Fe(III) derived using the shape-independent distribution (SID) model.
+        points:
+        - sample_as_published: NC6
+          row_as_printed: NC6
+          value: '10'
+          value_as_published: '10'
+          T_K: '300'
+          composition_as_published: {formula: Na1.46Ca0.24Fe1.08Si2.97O8, basis: electron-microprobe cation proportions normalized to O8}
+          point_conditions:
+            sample_id: {state: {tag: value, value: NC6}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            temperature_K: {state: {tag: value, value: '300'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Mössbauer Spectroscopy}}
+            composition: {state: {tag: value, value: {basis: elemental, amount_basis: mol_inventory, components: [[Na, '1.46'], [Ca, '0.24'], [Fe, '1.08'], [Si, '2.97'], [O, '8']]}}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            fO2_Pa: {state: {tag: unknown, reason: The paper reports no numeric oxygen fugacity or partial pressure.}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            fO2_control: {state: {tag: unknown, reason: 'A controlled Ar or N2 atmosphere and metallic iron crucible are reported, but no oxygen buffer or gas ratio is printed.'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            total_pressure_Pa: {state: {tag: value, value: '100000'}, locator: {page: 1, pdf_page_index: 0, section: Abstract, note: The abstract states 1 bar; represented in canonical Pa.}}
+            atmosphere: {state: {tag: value, value: controlled atmosphere (Ar or N2)}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+          quench_statement:
+            text: The melts were quenched to glasses by placing the bottom portion of the crucible in water; estimated quench rate approximately 10^2 K/s.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}
+          locator: {page: 4, published_page: 4318, pdf_page_index: 3, table: '1', row: NC6, column: '% Fe(III)'}
+    - observation_id: jackson_2005_xanes_rb2_fe3_fraction
+      type: concentration_series
+      locator: {page: 7, published_page: 4321, pdf_page_index: 6, section: '3.2.1 Pre-edge features', note: The authors estimate 15(±5) atom% of total Fe as ferric iron from XANES pre-edge position; Table 2b contains supporting spectral fits.}
+      phase: glass
+      regime: quench_equilibration
+      method_as_printed: Fe K-edge XANES pre-edge calibration
+      units: '%'
+      uncertainty: {value: '5', units: '%', as_printed: '±5 atom%', confidence_level: not_stated, notice: confidence level not stated, locator: {page: 7, published_page: 4321, pdf_page_index: 6, section: '3.2.1 Pre-edge features'}}
+      quench_note: The glass was water-quenched at an estimated rate of approximately 10^2 K/s; the paper does not state whether the Fe redox ratio was preserved during quenching.
+      derivation:
+        relation: The RB2 ferric fraction was estimated by calibrating the XANES pre-edge position against iron oxidation state using Wilke et al. (1999, 2001).
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 6, published_page: 4320, pdf_page_index: 5, figure: '3', note: 'The RB2 XANES pre-edge spectrum is shown, but its numerical spectral inputs are not tabulated.'}
+        output_unit: '%'
+        attribution: Wilke et al. (1999, 2001) calibration, as cited by Jackson et al.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        valence_basis:
+          numerator_oxidation_states: [3]
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        points:
+        - sample_as_published: RB2
+          row_as_printed: RB2
+          value: '15'
+          value_as_published: '15'
+          T_K: '298'
+          composition_as_published: {formula: Rb2FeSi3O8, basis: nominal composition}
+          point_conditions:
+            sample_id: {state: {tag: value, value: RB2}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            temperature_K: {state: {tag: value, value: '298'}, locator: {page: 1, pdf_page_index: 0, section: Abstract, note: The abstract gives 298 K for the multi-spectroscopic study; the XANES method does not state another temperature.}}
+            composition: {state: {tag: value, value: {basis: elemental, amount_basis: mol_inventory, components: [[Rb, '2'], [Fe, '1'], [Si, '3'], [O, '8']]}}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            fO2_Pa: {state: {tag: unknown, reason: The paper reports no numeric oxygen fugacity or partial pressure.}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            fO2_control: {state: {tag: unknown, reason: 'A controlled Ar or N2 atmosphere and metallic iron crucible are reported, but no oxygen buffer or gas ratio is printed.'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+            total_pressure_Pa: {state: {tag: value, value: '100000'}, locator: {page: 1, pdf_page_index: 0, section: Abstract, note: The abstract states 1 bar; represented in canonical Pa.}}
+            atmosphere: {state: {tag: value, value: controlled atmosphere (Ar or N2)}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+          quench_statement:
+            text: The melts were quenched to glasses by placing the bottom portion of the crucible in water; estimated quench rate approximately 10^2 K/s.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}
+          locator: {page: 7, published_page: 4321, pdf_page_index: 6, section: '3.2.1 Pre-edge features', note: This prose estimate is distinct from the Table 1 Mössbauer estimate for RB2.}
+    context:
+    - observation_id: jackson_2005_sample_compositions_nbo_t_and_estimated_tg
+      type: textual_fact
+      locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}
+      phase: glass
+      units: normalized elemental formula; NBO/T dimensionless; Tg K
+      attribution: Authors' sample preparation and estimates; Toplis (1998) is the stated Tg method.
+      values:
+        quantity_as_printed: Sample formulas, NBO/T ratios, minor Cr2O3 contents, and estimated glass transition temperatures
+        candidate_tokens: [equilibrium_phase_composition, transition_temperature, valence_ratio]
+        method_class: measured_direct for microprobe cation proportions; model_derived for NBO/T and estimated Tg
+        schema_gap: The normalized cation formulas cannot be represented as oxide compositions without reconstructing oxides. NBO/T has no quantity token. The Tg estimates are model-based Toplis estimates rather than measured glass transitions; their inputs are not stored as typed oxide compositions. The nominal 0.3 wt.% Cr2O3 additions are preparation data; the separate approximately 2.0 wt.% Cr2O3 values found in NC1 and NC2 are typed below as component compositions.
+        sample_formulas:
+          LI2: Li2FeSi3O8 (nominal)
+          RB2: Rb2FeSi3O8 (nominal)
+          NA1: Na1.08Fe1.17Si3.13O8
+          NC6: Na1.46Ca0.24Fe1.08Si2.97O8
+          NC2: Na1.09Ca0.51Fe0.72Si3.10O8
+          NC1: Na0.99Ca0.92Fe0.24Si3.17O8
+          BAS: Na0.29Mg0.53Ca0.52Fe0.56Al0.91Si2.44O8
+        microprobe_cation_proportions_basis: relative to eight oxygens, for NA1, NC6, NC2, NC1, BAS
+        minor_chromium_as_printed: 'Cr2O3: 0.3 wt.% incorporated in NA1, NC6, and BAS; approximately 2.0 wt.% found in NC1 and NC2 from reaction with the iron crucibles.'
+        NBO_T_as_printed:
+          LI2: '1.33'
+          RB2: '1.33'
+          NA1: '1.09'
+          NC6: '1.38'
+          NC2: '1.15'
+          NC1: '1.04'
+          BAS: '1.05'
+        estimated_Tg_K_as_printed:
+          RB2: 500–550
+          LI2: 500–550
+          BAS: '1050'
+          NA1: '900'
+          NC6: '650'
+          NC2: '750'
+          NC1: '800'
+        Tg_estimated_uncertainty_as_printed: '±50 K'
+        Tg_method_as_printed: Toplis (1998), assuming Fe(II) connects to nonbridging oxygens similarly to Ca(II).
+        estimated_quench_rate_as_printed: 'approximately 10^2 K/s'
+        quench_temperature_note: Fictive temperatures are not experimentally determined; the authors estimate they are unlikely to differ from Tg by more than 50–100 K.
+    - observation_id: jackson_2005_table1_mossbauer_fit_parameters
+      type: table_record
+      locator: {page: 4, published_page: 4318, pdf_page_index: 3, table: '1'}
+      phase: glass
+      units: isomer shift and quadrupole splitting mm/s; Lorentzian fraction and misfit percent as printed
+      values:
+        quantity_as_printed: Mössbauer isomer shift, quadrupole splitting, Lorentzian fraction, and fit misfit for seven ferrosilicate glasses
+        candidate_tokens: [valence_ratio, equilibrium_phase_composition]
+        quantity_token: unavailable
+        method_class: measured_reduced
+        schema_gap: The valence_ratio token fits the separately typed Fe(III) fractions, but no quantity token represents isomer shift, quadrupole splitting, Lorentzian fraction, or Mössbauer fit misfit.
+        rows:
+        - {sample: LI2, isomer_shift_mm_s: '1.04', quadrupole_splitting_mm_s: '1.87', Lorentzian_fraction_percent: '0.43', misfit_RMS: '1.28', misfit_percent: '0.14', FeIII_percent: '7'}
+        - {sample: RB2, isomer_shift_mm_s: '0.93', quadrupole_splitting_mm_s: '1.98', Lorentzian_fraction_percent: '1.0', misfit_RMS: '1.66', misfit_percent: '0.77', FeIII_percent: '22'}
+        - {sample: NA1, isomer_shift_mm_s: '1.01', quadrupole_splitting_mm_s: '1.79', Lorentzian_fraction_percent: '0.41', misfit_RMS: '1.05', misfit_percent: '0.06', FeIII_percent: not_reported}
+        - {sample: NC6, isomer_shift_mm_s: '0.98', quadrupole_splitting_mm_s: '1.81', Lorentzian_fraction_percent: '0.40', misfit_RMS: '1.18', misfit_percent: '0.05', FeIII_percent: '10'}
+        - {sample: NC2, isomer_shift_mm_s: '1.02', quadrupole_splitting_mm_s: '1.84', Lorentzian_fraction_percent: '0.44', misfit_RMS: '1.83', misfit_percent: '0.23', FeIII_percent: not_reported}
+        - {sample: NC1, isomer_shift_mm_s: '0.99', quadrupole_splitting_mm_s: '1.85', Lorentzian_fraction_percent: '0.45', misfit_RMS: '0.91', misfit_percent: '0.16', FeIII_percent: not_reported}
+        - {sample: BAS, isomer_shift_mm_s: '1.04', quadrupole_splitting_mm_s: '1.88', Lorentzian_fraction_percent: '0.26', misfit_RMS: '0.92', misfit_percent: '0.04', FeIII_percent: not_reported}
+        average_error_as_printed: {isomer_shift_mm_s: '0.02', quadrupole_splitting_mm_s: '0.05', Lorentzian_fraction_percent: '0.01'}
+        footnotes: {a: 'Weighted values of two doublet fits relative to Fe(0)', b: 'Fe(III) values derived using SID model', c: 'RB2 Lorentzian fraction fixed because of high Fe(III) content'}
+    - observation_id: jackson_2005_table2a_model_compound_xanes_preedge
+      type: table_record
+      locator: {page: 7, published_page: 4321, pdf_page_index: 6, table: '2a'}
+      phase: model compounds
+      units: normalized height, integrated area, and Rb dimensionless; position, width, centroid, and splitting eV
+      values:
+        quantity_as_printed: Fe K-edge pre-edge fitting parameters for eight Fe-bearing model compounds
+        candidate_tokens: [valence_ratio]
+        quantity_token: unavailable
+        method_class: model_derived
+        schema_gap: The valence_ratio token was considered because XANES is oxidation-state sensitive, but Table 2a reports fitted pre-edge heights, positions, widths, areas, centroids, splittings, and correlations rather than a valence ratio.
+        model_compound_rows:
+        - sample: Staurolite [4]Fe(II)
+          normalized_height: ['0.090', '0.035']
+          position_eV: ['7111.68', '7113.14']
+          width_eV: ['1.53', '1.53']
+          integrated_area: ['0.153', '0.059']
+          sum_integrated_areas: '0.212'
+          centroid_eV: '7112.09'
+          component_splitting_eV: '1.5'
+          Rb: '0.999'
+        - sample: Grandidierite [5]Fe(II)
+          normalized_height: ['0.060', '0.026']
+          position_eV: ['7111.69', '7113.35']
+          width_eV: ['1.44', '1.44']
+          integrated_area: ['0.097', '0.030']
+          sum_integrated_areas: '0.127'
+          centroid_eV: '7112.07'
+          component_splitting_eV: '1.7'
+          Rb: '0.998'
+        - sample: Siderite [6]Fe(II)
+          normalized_height: ['0.018', '0.012', '0.010']
+          position_eV: ['7111.25', '7112.09', '7113.46']
+          width_eV: ['1.36', '1.36', '1.36']
+          integrated_area: ['0.029', '0.019', '0.015']
+          sum_integrated_areas: '0.063'
+          centroid_eV: '7112.04'
+          component_splitting_eV: '2.1'
+          Rb: '0.999'
+        - sample: Fayalite [6]Fe(II)
+          normalized_height: ['0.017', '0.015', '0.014']
+          position_eV: ['7111.36', '7111.73', '7113.30']
+          width_eV: ['1.88', '1.88', '1.88']
+          integrated_area: ['0.039', '0.033', '0.033']
+          sum_integrated_areas: '0.105'
+          centroid_eV: '7112.09'
+          component_splitting_eV: '1.9'
+          Rb: '0.999'
+        - sample: 'γ-Fe:LiAlO2 [4]Fe(III)'
+          normalized_height: ['0.010', '0.164']
+          position_eV: ['7111.73', '7113.61']
+          width_eV: ['1.63', '1.63']
+          integrated_area: ['0.020', '0.330']
+          sum_integrated_areas: '0.350'
+          centroid_eV: '7113.51'
+          component_splitting_eV: '1.9'
+          Rb: '0.999'
+        - sample: Yoderite [5]Fe(III)
+          normalized_height: ['0.083', '0.009']
+          position_eV: ['7113.39', '7115.21']
+          width_eV: ['1.77', '1.77']
+          integrated_area: ['0.180', '0.020']
+          sum_integrated_areas: '0.200'
+          centroid_eV: '7113.58'
+          component_splitting_eV: '1.8'
+          Rb: '0.999'
+        - sample: Andradite [6]Fe(III)
+          normalized_height: ['0.021', '0.018']
+          position_eV: ['7112.82', '7114.28']
+          width_eV: ['1.36', '1.36']
+          integrated_area: ['0.035', '0.030']
+          sum_integrated_areas: '0.066'
+          centroid_eV: '7113.53'
+          component_splitting_eV: '1.5'
+          Rb: '0.999'
+        - sample: Acmite [6]Fe(III)
+          normalized_height: ['0.022', '0.031']
+          position_eV: ['7112.70', '7114.06']
+          width_eV: ['1.65', '1.65']
+          integrated_area: ['0.045', '0.061']
+          sum_integrated_areas: '0.107'
+          centroid_eV: '7113.48'
+          component_splitting_eV: '1.4'
+          Rb: '0.999'
+        average_error_as_printed: {normalized_height: '0.005', position_eV: '0.05', width_eV: '0.003', integrated_area: '0.005', sum_integrated_areas: '0.005', centroid_eV: '0.05', component_splitting_eV: '0.2'}
+        footnotes: {a: 'Width was allowed to vary but constrained to one shared value for all lines', b: 'Rb is correlation between experimental spectra and the sum of modeled lines'}
+    - observation_id: jackson_2005_table2b_glass_xanes_preedge
+      type: table_record
+      locator: {page: 7, published_page: 4321, pdf_page_index: 6, table: '2b'}
+      phase: glass
+      units: normalized height, integrated area, and Rb dimensionless; position, width, centroid, and splitting eV
+      values:
+        quantity_as_printed: Fe K-edge pre-edge fitting parameters for seven ferrosilicate glasses
+        candidate_tokens: [valence_ratio]
+        quantity_token: unavailable
+        method_class: model_derived
+        schema_gap: The valence_ratio token was considered because XANES is oxidation-state sensitive. Table 2b reports fitted pre-edge components and model fit quality, not ferric fractions; the separate RB2 ferric estimate in the Results text is typed above.
+        glass_rows:
+        - {sample: LI2, normalized_height: ['0.062', '0.025'], position_eV: ['7111.80', '7113.20'], width_eV: ['1.69', '1.69'], integrated_area: ['0.128', '0.051'], sum_integrated_areas: '0.179', centroid_eV: '7112.20', component_splitting_eV: '1.4', Rb: '0.999'}
+        - {sample: RB2, normalized_height: ['0.050', '0.027'], position_eV: ['7111.84', '7113.34'], width_eV: ['1.67', '1.67'], integrated_area: ['0.101', '0.054'], sum_integrated_areas: '0.155', centroid_eV: '7112.36', component_splitting_eV: '1.5', Rb: '0.998'}
+        - {sample: NA1, normalized_height: ['0.058', '0.033'], position_eV: ['7111.72', '7113.24'], width_eV: ['1.74', '1.74'], integrated_area: ['0.121', '0.070'], sum_integrated_areas: '0.191', centroid_eV: '7112.28', component_splitting_eV: '1.5', Rb: '0.999'}
+        - {sample: NC6, normalized_height: ['0.056', '0.023'], position_eV: ['7111.80', '7113.19'], width_eV: ['1.71', '1.71'], integrated_area: ['0.116', '0.048'], sum_integrated_areas: '0.164', centroid_eV: '7112.21', component_splitting_eV: '1.4', Rb: '0.999'}
+        - {sample: NC2, normalized_height: ['0.051', '0.018'], position_eV: ['7111.86', '7113.07'], width_eV: ['1.70', '1.70'], integrated_area: ['0.105', '0.037'], sum_integrated_areas: '0.142', centroid_eV: '7112.18', component_splitting_eV: '1.2', Rb: '0.999'}
+        - {sample: NC1, normalized_height: ['0.043', '0.017'], position_eV: ['7111.80', '7112.97'], width_eV: ['1.56', '1.56'], integrated_area: ['0.082', '0.033'], sum_integrated_areas: '0.115', centroid_eV: '7112.14', component_splitting_eV: '1.2', Rb: '0.998'}
+        - {sample: BAS, normalized_height: ['0.044', '0.015'], position_eV: ['7111.90', '7113.04'], width_eV: ['1.59', '1.59'], integrated_area: ['0.085', '0.029'], sum_integrated_areas: '0.114', centroid_eV: '7112.19', component_splitting_eV: '1.1', Rb: '0.998'}
+        average_error_as_printed: {normalized_height: '0.005', position_eV: '0.05', width_eV: '0.003', integrated_area: '0.005', sum_integrated_areas: '0.005', centroid_eV: '0.05', component_splitting_eV: '0.2'}
+        footnotes: {a: 'Width was allowed to vary but constrained to one shared value for all lines', b: 'Rb is correlation between experimental spectra and the sum of modeled lines'}
+    - observation_id: jackson_2005_table3_exafs_fit_parameters
+      type: table_record
+      locator: {page: 9, published_page: 4323, pdf_page_index: 8, table: '3'}
+      phase: glass
+      units: coordination numbers dimensionless; distances Å; Δσ² Å²; ΔE0 eV; χ² dimensionless
+      values:
+        quantity_as_printed: Fe K-edge EXAFS harmonic and anharmonic fitted coordination, bond-distance, and model-quality parameters
+        candidate_tokens: [valence_ratio, equilibrium_phase_composition]
+        quantity_token: unavailable
+        method_class: model_derived
+        schema_gap: Candidate composition and valence tokens do not represent fitted nearest-neighbor coordination, Fe–O distances, Debye–Waller difference, edge shift, or fit statistic.
+        rows:
+        - {sample: LI2, average_neighbors: '4.0', harmonic_FeO_distance_A: '2.00', anharmonic_FeO_distance_A: '2.03', average_coordination_number_Fe: '4.7', delta_sigma_squared_A2: '0.0144', delta_E0_eV: '7110.9', chi_squared_anharmonic: '0.019'}
+        - {sample: RB2, average_neighbors: '4.2', harmonic_FeO_distance_A: '1.97', anharmonic_FeO_distance_A: '2.00', average_coordination_number_Fe: '4.3', delta_sigma_squared_A2: '0.0144', delta_E0_eV: '7111.8', chi_squared_anharmonic: '0.016'}
+        - {sample: NA1, average_neighbors: '4.1', harmonic_FeO_distance_A: '1.94', anharmonic_FeO_distance_A: '1.97', average_coordination_number_Fe: '3.9', delta_sigma_squared_A2: '0.0144', delta_E0_eV: '7107.8', chi_squared_anharmonic: '0.015'}
+        - {sample: NC6, average_neighbors: '4.7', harmonic_FeO_distance_A: '1.96', anharmonic_FeO_distance_A: '2.02', average_coordination_number_Fe: '4.5', delta_sigma_squared_A2: '0.0081', delta_E0_eV: '7109.5', chi_squared_anharmonic: '0.061'}
+        - {sample: NC2, average_neighbors: '4.6', harmonic_FeO_distance_A: '1.96', anharmonic_FeO_distance_A: '2.02', average_coordination_number_Fe: '4.5', delta_sigma_squared_A2: '0.0121', delta_E0_eV: '7108.4', chi_squared_anharmonic: '0.088'}
+        - {sample: NC1, average_neighbors: '5.4', harmonic_FeO_distance_A: '2.03', anharmonic_FeO_distance_A: '2.06', average_coordination_number_Fe: '5.0', delta_sigma_squared_A2: '0.0121', delta_E0_eV: '7113.8', chi_squared_anharmonic: '0.028'}
+        - {sample: BAS, average_neighbors: '5.7', harmonic_FeO_distance_A: '2.04', anharmonic_FeO_distance_A: '2.07', average_coordination_number_Fe: '5.2', delta_sigma_squared_A2: '0.0121', delta_E0_eV: '7112.9', chi_squared_anharmonic: '0.003'}
+        average_error_as_printed: {average_neighbors: '0.5', harmonic_FeO_distance_A: '0.02', anharmonic_FeO_distance_A: '0.02', average_coordination_number_Fe: '0.2', delta_sigma_squared_A2: '0.0001', delta_E0_eV: '2.0'}
+        footnotes: {a: Determined in least-squares fits of EXAFS data, b: Coordination numbers determined by comparing EXAFS-derived Fe–O distance with model-compound correlation}
+    - observation_id: jackson_2005_table4_optical_band_positions
+      type: table_record
+      locator: {page: 10, published_page: 4324, pdf_page_index: 9, table: '4'}
+      phase: glass
+      units: cm−1
+      values:
+        quantity_as_printed: High- and low-frequency optical absorption bands in seven ferrosilicate glasses
+        candidate_tokens: [valence_ratio, transition_temperature]
+        quantity_token: unavailable
+        method_class: measured_direct
+        schema_gap: The valence_ratio token does not represent optical band wavenumber, and transition_temperature is not an electronic-transition wavenumber.
+        rows:
+        - {sample: LI2, high_frequency: '9160', low_frequency: '4880'}
+        - {sample: RB2, high_frequency: '8140', low_frequency: '4800'}
+        - {sample: NA1, high_frequency: '8680', low_frequency: '5040'}
+        - {sample: NC6, high_frequency: '9200', low_frequency: '5320'}
+        - {sample: NC2, high_frequency: '8520', low_frequency: '5000'}
+        - {sample: NC1, high_frequency: '9080', low_frequency: '4960'}
+        - {sample: BAS, high_frequency: '9120', low_frequency: '5440'}
+        average_error_as_printed: {high_frequency: '20', low_frequency: '20'}
+    - observation_id: jackson_2005_figure1_mossbauer_spectra
+      type: figure_record
+      locator: {page: 4, published_page: 4318, pdf_page_index: 3, figure: '1'}
+      panel: whole_figure
+      attribution: Jackson et al. (2005), measured 57Fe Mössbauer spectra.
+      units: transmission; velocity mm/s
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for a Mössbauer spectrum.
+        species: [Fe]
+        phase: quenched ferrosilicate glass
+        temperature_as_printed: 300 K
+        axes_as_printed: {x: Doppler velocity (mm/s), y: transmission (arbitrary scale)}
+        caption: 57Fe Mössbauer spectra for six selected ferrosilicate glasses.
+        series: [{name: six selected glass spectra, marker: continuous spectra, marker_count: 0}]
+        digitisation: deferred to a figure pass
+    - observation_id: jackson_2005_figure2_mossbauer_distribution
+      type: figure_record
+      locator: {page: 5, published_page: 4319, pdf_page_index: 4, figure: '2'}
+      panel: 3D views and contour plots
+      attribution: Jackson et al. (2005); Lorentzian probability function calculation attributed to Rossano et al. (1999).
+      units: isomer shift and quadrupole splitting mm/s; probability function dimensionless
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for Mössbauer probability distributions.
+        species: [Fe]
+        phase: quenched ferrosilicate glass
+        temperature_as_printed: 300 K
+        axes_as_printed: {x: 'isomer shift (IS, mm/s)', y: 'quadrupole splitting (QS, mm/s)', z: Lorentzian probability function}
+        caption: 3D Mössbauer data analysis (isomer shift and quadrupole splitting vs Lorentzian probability function) for three selected glasses; left, 3D views; right, contour plots.
+        series: [{name: LI2, marker: surface and contours, marker_count: 0}, {name: NC6, marker: surface and contours, marker_count: 0}, {name: RB2, marker: surface and contours, marker_count: 0}]
+        digitisation: deferred to a figure pass
+    - observation_id: jackson_2005_figure3_xanes_spectra
+      type: figure_record
+      locator: {page: 6, published_page: 4320, pdf_page_index: 5, figure: '3'}
+      panel: A-D
+      attribution: Jackson et al. (2005), measured Fe K-edge XANES spectra; model-compound spectra are identified in the caption.
+      units: energy eV; normalized absorption and normalized pre-edge intensity
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for XANES spectral curves or normalized pre-edge intensity.
+        species: [Fe]
+        phase: glass samples and mineral model compounds
+        temperature_as_printed: 298 K for the multi-spectroscopic study; model-compound temperature not stated
+        axes_as_printed: {x: Energy (eV), y: normalized XANES or normalized pre-edge intensity, panels: A-D}
+        caption: Fe K-edge XANES spectra for glasses and model compounds; panels show normalized spectra, pre-edge spectra, glass spectra, and their Gaussian pre-edge deconvolution.
+        series: [{name: model compounds, marker: spectral curves, marker_count: 0}, {name: seven ferrosilicate glasses, marker: spectral curves, marker_count: 0}, {name: Gaussian pre-edge components, marker: dashed fitted curves, marker_count: 0}]
+        digitisation: deferred to a figure pass
+    - observation_id: jackson_2005_figure4_preedge_comparison
+      type: figure_record
+      locator: {page: 8, published_page: 4322, pdf_page_index: 7, figure: '4'}
+      panel: whole_figure
+      attribution: Modified after Wilke et al. (2001), with seven glass samples added by Jackson et al. (2005).
+      units: normalized area; centroid position eV
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for normalized XANES pre-edge area versus centroid position.
+        species: [Fe]
+        phase: model compounds, binary mechanical mixtures, and ferrosilicate glass
+        temperature_as_printed: not stated for model-compound comparison; glass data belong to the study at 298 K
+        axes_as_printed: {x: pre-edge centroid position (eV), y: normalized area}
+        caption: Pre-edge information for Fe(II) and Fe(III) model compounds with four-, five-, and six-coordination and selected binary mechanical mixtures, compared with the present glass samples (solid squares).
+        series: [{name: seven present-work glass samples, marker: solid squares, marker_count: 7}, {name: model-compound and binary-mixture comparison data from Wilke et al. (2001), marker: multiple open and filled symbols, marker_count: 'not enumerated; figure values deferred'}]
+        digitisation: deferred to a figure pass
+    - observation_id: jackson_2005_figure5_exafs_spectra
+      type: figure_record
+      locator: {page: 9, published_page: 4323, pdf_page_index: 8, figure: '5'}
+      panel: A-B
+      attribution: Jackson et al. (2005), measured Fe K-edge EXAFS spectra and Fourier transforms.
+      units: k (Å−1), R + Δ (Å), k3-weighted χ(k), Fourier-transform amplitude
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for EXAFS spectra or Fourier-transform amplitudes.
+        species: [Fe]
+        phase: quenched ferrosilicate glass
+        temperature_as_printed: 298 K for the multi-spectroscopic study
+        axes_as_printed: {panel_A_x: k (Å−1), panel_A_y: normalized k3-weighted χ(k), panel_B_x: R + Δ (Å), panel_B_y: Fourier-transform amplitude}
+        caption: Normalized, k3-weighted EXAFS spectra collected at the Fe K-edge for seven glasses and their corresponding Fourier transforms; R + Δ distances are uncorrected for phase shifts.
+        series: [{name: seven ferrosilicate glasses, marker: continuous spectra and Fourier transforms, marker_count: 0}]
+        digitisation: deferred to a figure pass
+    - observation_id: jackson_2005_figure6_optical_spectra
+      type: figure_record
+      locator: {page: 10, published_page: 4324, pdf_page_index: 9, figure: '6'}
+      panel: whole_figure
+      attribution: Jackson et al. (2005), measured UV-Vis-NIR absorption spectra.
+      units: wavenumber cm−1; absorbance
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for an optical absorption spectrum or its band intensity.
+        species: [Fe]
+        phase: ferrosilicate glass
+        temperature_as_printed: room temperature
+        axes_as_printed: {x: wavenumber (cm−1), y: absorbance}
+        caption: Optical (UV-Vis-NIR) spectra for six glasses, showing bands located near 9000 cm−1 that are indicative of ferrous iron.
+        series: [{name: six glass absorption spectra, marker: continuous spectra, marker_count: 0}]
+        digitisation: deferred to a figure pass
+    - observation_id: jackson_2005_figure7_nc6_absorbance_mcd
+      type: figure_record
+      locator: {page: 10, published_page: 4324, pdf_page_index: 9, figure: '7'}
+      panel: whole_figure
+      attribution: Jackson et al. (2005), absorbance and MCD measurements of NC6.
+      units: wavenumber cm−1; absorbance and MCD arbitrary units
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for optical absorbance or magnetic circular dichroism spectra.
+        species: [Fe]
+        phase: glass sample NC6, polished slice and powder
+        temperature_as_printed: absorbance at room temperature; MCD at 4.2 K and 7 T
+        axes_as_printed: {x: wavenumber (cm−1), y: absorbance or MCD signal (arbitrary units)}
+        caption: NC6 slice absorbance, slice MCD, and powder MCD spectra; absorbance was recorded at room temperature and MCD at 4.2 K with a 7-T applied field.
+        series: [{name: NC6 slice absorbance, marker: continuous spectrum, marker_count: 0}, {name: NC6 slice MCD, marker: continuous spectrum, marker_count: 0}, {name: NC6 powder MCD, marker: continuous spectrum, marker_count: 0}]
+        digitisation: deferred to a figure pass
+    - observation_id: jackson_2005_figure8_nc6_mcd_spectra
+      type: figure_record
+      locator: {page: 11, published_page: 4325, pdf_page_index: 10, figure: '8'}
+      panel: A-B
+      attribution: Jackson et al. (2005), measured MCD spectra; Gaussian fits generated independently with Levenberg-Marquardt analysis.
+      units: wavenumber cm−1; MCD absorbance arbitrary units
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for MCD spectra or their Gaussian fit curves.
+        species: [Fe]
+        phase: glass sample NC6, polished slice and powder
+        temperature_as_printed: 4.2 K; 7 T applied field
+        axes_as_printed: {x: wavenumber (cm−1), y: MCD absorbance (arbitrary units)}
+        caption: MCD spectra at 4.2 K and 7 Tesla for glass sample NC6; panel A, slice; panel B, powder; Gaussian fits were generated independently.
+        series: [{name: NC6 slice measured spectrum, marker: continuous spectrum, marker_count: 0}, {name: NC6 powder measured spectrum, marker: continuous spectrum, marker_count: 0}, {name: Gaussian fit curves, marker: fitted curves, marker_count: 0}]
+        digitisation: deferred to a figure pass
+    - observation_id: jackson_2005_figure9_nc6_mcd_saturation
+      type: figure_record
+      locator: {page: 11, published_page: 4325, pdf_page_index: 10, figure: '9'}
+      panel: A-C
+      attribution: Jackson et al. (2005), measured MCD saturation magnetization of NC6 slice.
+      units: βH/2kT dimensionless; MCD amplitude arbitrary units
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for MCD saturation curves.
+        species: [Fe]
+        phase: glass sample NC6, polished slice
+        temperature_as_printed: 1.8, 2.2, 3.0, 4.2, 10, 25, and 50 K; applied magnetic field up to 7 T
+        axes_as_printed: {x: βH/2kT, y: MCD amplitude (arbitrary units), panels: {A: '4750 cm−1', B: '6900 cm−1', C: '9500 cm−1'}}
+        caption: Saturation magnetization behavior of glass sample NC6 at 4750, 6900, and 9500 cm−1; MCD amplitude is plotted against βH/2kT for seven stated temperatures.
+        series: [{name: seven temperature series in panels A-C, marker: temperature-coded discrete symbols with connecting curves, marker_count: 'not enumerated; figure values deferred'}]
+        digitisation: deferred to a figure pass
+    - observation_id: jackson_2005_figure10_bond_valence_models
+      type: figure_record
+      locator: {page: 13, published_page: 4327, pdf_page_index: 12, figure: '10'}
+      panel: whole_figure
+      attribution: Jackson et al. (2005), bond-valence model calculations.
+      units: bond valence as printed
+      values:
+        quantity: unavailable
+        schema_gap: The store has no quantity token for bond-valence model diagrams.
+        species: [Fe, O, Si, Na, Ca]
+        phase: model glass networks
+        temperature_as_printed: not stated for Figure 10
+        axes_as_printed: schematic bond-valence model, no numeric axes
+        caption: Bond-valence models for three of the general glass compositions examined in this study.
+        series: [{name: three glass-composition models, marker: bond-network diagrams, marker_count: 0}]
+        digitisation: deferred to a figure pass
+  Cr2O3:
+    observations:
+    - observation_id: jackson_2005_nc1_cr2o3_found_composition
+      type: equilibrium_phase_composition
+      locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation, note: The authors report approximately 2.0 wt.% Cr2O3 found in sample NC1 after reaction with the iron crucible.}
+      phase: glass
+      regime: tabulation
+      units: wt.%
+      point_conditions:
+        sample_id: {state: {tag: value, value: NC1}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+        temperature_K: {state: {tag: unknown, reason: No temperature for the composition analysis is printed.}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+        composition: {state: {tag: unknown, reason: 'The paper gives a normalized elemental formula and this individual Cr2O3 component, not a complete oxide composition.'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: oxide wt.%
+        component_as_published: Cr2O3
+        value: '2.0'
+        value_as_published: '~2.0 wt.%'
+        approximate: true
+        method_class: measured_direct
+        method: The Cr2O3 content is reported as found; the paper does not state its analysis method separately from the glass-composition analysis.
+    - observation_id: jackson_2005_nc2_cr2o3_found_composition
+      type: equilibrium_phase_composition
+      locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation, note: The authors report approximately 2.0 wt.% Cr2O3 found in sample NC2 after reaction with the iron crucible.}
+      phase: glass
+      regime: tabulation
+      units: wt.%
+      point_conditions:
+        sample_id: {state: {tag: value, value: NC2}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+        temperature_K: {state: {tag: unknown, reason: No temperature for the composition analysis is printed.}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+        composition: {state: {tag: unknown, reason: 'The paper gives a normalized elemental formula and this individual Cr2O3 component, not a complete oxide composition.'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: oxide wt.%
+        component_as_published: Cr2O3
+        value: '2.0'
+        value_as_published: '~2.0 wt.%'
+        approximate: true
+        method_class: measured_direct
+        method: The Cr2O3 content is reported as found; the paper does not state its analysis method separately from the glass-composition analysis.
