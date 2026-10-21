@@ -6618,6 +6618,200 @@ def test_printed_unresolved_redox_reference_stays_unknown() -> None:
     assert calibration_residual.source_relation is SourceRelation.TRAINING
 
 
+def test_complete_ancestry_outputs_are_pinned() -> None:
+    """b-979: complete walks and their consumer decisions, before the owner change.
+
+    A shared parent stays in both branches. A registered table stays a
+    resolved coefficient. Located not_printed stays a successful walk.
+    The redox split still labels a complete reference against a resolved
+    table.
+    """
+
+    from simulator.battery.enums import RawInputStatus
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        _inputs_registered_under_work,
+        _observation_lineage,
+        _table_ids,
+        bound_work_inputs,
+    )
+
+    work = replace(
+        F.work("pin-work"),
+        source_ids=("pin-work", "pin-source"),
+    )
+    pdf, table = work.source_files.files
+    work = replace(
+        work,
+        source_files=replace(
+            work.source_files,
+            files=(
+                replace(pdf, asset_id="pin-pdf"),
+                replace(table, asset_id="pin-table"),
+            ),
+        ),
+    )
+    experiment = F.tabulation_experiment(
+        experiment_id="pin-exp", work_id=work.work_id
+    )
+    parent = F.observation(
+        "pin-parent",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="pin-source",
+    )
+    left = F.observation(
+        "pin-left",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="pin-source",
+        derived_from=(parent.observation_id,),
+        derivation=Derivation(
+            relation="shared parent",
+            inputs=(parent.observation_id,),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
+    )
+    right = replace(left, observation_id="pin-right")
+    unprinted = F.observation(
+        "pin-unprinted",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="pin-source",
+        derived_from=(),
+        derivation=Derivation(
+            relation="inputs not printed",
+            inputs=(),
+            parameters=(),
+            output_unit="dimensionless",
+            raw_inputs=Located(
+                State.of(RawInputStatus.NOT_PRINTED),
+                locator=F.loc(),
+            ),
+        ),
+    )
+    table_reader = replace(parent, observation_id="pin-reader", read_from="pin-table")
+    ref_work = replace(F.work("pin-ref-work"), source_ids=("pin-ref-work",))
+    ref_experiment = F.tabulation_experiment(
+        experiment_id="pin-ref-exp", work_id=ref_work.work_id
+    )
+    reference = F.observation(
+        "pin-ref",
+        ref_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="pin-ref-work",
+    )
+    observations = {
+        row.observation_id: row
+        for row in (parent, left, right, unprinted, table_reader, reference)
+    }
+    experiments = {
+        experiment.experiment_id: experiment,
+        ref_experiment.experiment_id: ref_experiment,
+    }
+    works = {work.work_id: work, ref_work.work_id: ref_work}
+    table_ids = _table_ids(works)
+
+    assert _observation_lineage(parent.observation_id, observations, table_ids) == {
+        parent.observation_id
+    }
+    assert _observation_lineage(left.observation_id, observations, table_ids) == {
+        left.observation_id,
+        parent.observation_id,
+    }
+    assert _observation_lineage(right.observation_id, observations, table_ids) == {
+        right.observation_id,
+        parent.observation_id,
+    }
+    assert _observation_lineage(
+        unprinted.observation_id, observations, table_ids
+    ) == {unprinted.observation_id}
+    assert _observation_lineage(
+        table_reader.observation_id, observations, table_ids
+    ) == {table_reader.observation_id, "pin-table"}
+
+    expected_alias = {
+        parent.observation_id,
+        left.observation_id,
+        right.observation_id,
+        unprinted.observation_id,
+        table_reader.observation_id,
+        "pin-table",
+    }
+
+    def assert_alias_complete() -> None:
+        for alias in (work.work_id, "pin-source", "pin-pdf"):
+            assert (
+                _inputs_registered_under_work(
+                    work, observations, experiments, table_ids
+                )
+                == expected_alias
+            )
+            assert lineage_complete_for(
+                (alias,),
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            ) is True
+            assert (
+                resolve_source_relation(
+                    reference,
+                    (alias,),
+                    True,
+                    works=works,
+                    observations=observations,
+                    experiments=experiments,
+                )
+                is SourceRelation.INDEPENDENT
+            )
+        assert lineage_complete_for(
+            ("pin-table",),
+            works=works,
+            observations=observations,
+            experiments=experiments,
+        ) is True
+        assert (
+            resolve_source_relation(
+                table_reader,
+                ("pin-table",),
+                True,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            )
+            is SourceRelation.SAME_INPUT
+        )
+
+    assert_alias_complete()
+    with bound_work_inputs(works, observations, experiments):
+        assert_alias_complete()
+
+    identity = _fe_ratio_identity()
+    complete = F.observation(
+        "pin-redox",
+        "exp-1",
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    assert _compile_redox(complete)[0].source_relation is SourceRelation.INDEPENDENT
+    calibration = replace(
+        complete,
+        observation_id="pin-redox-calibration",
+        evidence=replace(complete.evidence, attribution="K&C88+; K&C91"),
+    )
+    assert _compile_redox(calibration)[0].source_relation is SourceRelation.TRAINING
+
+
 def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     from simulator.battery.score import (
         ENGINE_COEFFICIENT_SOURCES,
