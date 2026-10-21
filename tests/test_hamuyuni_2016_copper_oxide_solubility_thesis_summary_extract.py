@@ -43,7 +43,7 @@ def test_hamuyuni_printed_solubilities_are_preserved_as_context() -> None:
         "hamuyuni_cao_liquid_copper_and_cao_in_cuo_context": (38, ("4.35 wt.%", "≤1 wt.%")),
         "hamuyuni_cuo_in_solid_phases_context": (41, ("0.5 to 2.23 wt.%",)),
         "hamuyuni_cuo_in_calcium_aluminate_phases_context": (42, ("1.0 to 2.5 wt.%", "nearly ≥0.5 wt.%", "≥1.25 wt.%")),
-        "hamuyuni_liquidus_deviation_context": (43, ("1350 and 1400 °C", "up to 40 wt.%")),
+        "hamuyuni_liquidus_deviation_context": (47, ("1350 and 1400 °C", "up to 40 wt.%")),
     }
     by_id = {record["observation_id"]: record for record in records}
     for record_id, (page, printed_values) in expected.items():
