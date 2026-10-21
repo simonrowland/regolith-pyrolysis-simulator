@@ -78,12 +78,17 @@ def test_static_pressure_scoring_uses_solid_surface_band(
         Decimal(str(expected)), source_id="primary-solid-reference")
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment)
-    assert float(prediction.value) == pytest.approx(expected, rel=2e-6)
     assert prediction.identity is identity
     if reservoir_phase is Phase.CR:
+        assert float(prediction.value) == pytest.approx(expected, rel=2e-6)
         assert prediction.authority is Authority.CERTIFIED
         assert prediction.notices == ()
     else:
+        # Independent printed JANAF Mg-003/Ca-004 liquid formation rows:
+        # log Kf=-0.356 at Mg500 and -0.390 at Ca600, relative to the stable
+        # crystal (alpha Ca here). These are liquid/solid pressure ratios.
+        factor = 2.269864851883822 if species == "Mg" else 2.454708915685031
+        assert float(prediction.value) == pytest.approx(expected * factor, rel=0.005)
         assert prediction.authority is Authority.EXTRAPOLATED
         notice, = prediction.notices
         assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
@@ -93,6 +98,56 @@ def test_static_pressure_scoring_uses_solid_surface_band(
         assert notice.authority is Authority.EXTRAPOLATED
     low, high = prediction.certified_band["temperature_K"]
     assert low <= temperature <= high
+
+
+@pytest.mark.parametrize(("species", "temperature"), [("Mg", 923.0), ("Ca", 1115.0)])
+def test_liquid_solid_pressure_equality_at_published_fusion_temperature(species, temperature):
+    from engines.builtin.vapor_pressure import _liquid_reference_pressure_from_solid
+
+    # JANAF Mg-003 CRYSTAL<->LIQUID / Ca-004 BETA<->LIQUID annotations.
+    pressure, unavailable = _liquid_reference_pressure_from_solid(species, temperature, 1.25)
+    assert pressure == 1.25
+    assert unavailable is None
+
+
+@pytest.mark.parametrize(("species", "temperature", "expected"), [
+    ("Mg", "500", 4.06446e-5), ("Ca", "600", 2.38232e-5),
+])
+@pytest.mark.parametrize("missing", ["row", "log_kf"])
+def test_liquid_pressure_flags_unavailable_fusion_term(
+    monkeypatch, species, temperature, expected, missing,
+):
+    from simulator.reference_data import janaf
+
+    original = janaf.load_table_document
+
+    def incomplete_liquid_table(path):
+        from copy import deepcopy
+
+        document = deepcopy(original(path))
+        if path.stem in {"Mg-003", "Ca-004"}:
+            rows = document["table"]["values"]
+            if missing == "row":
+                rows[:] = [r for r in rows if r["temperature"]["value"] != float(temperature)]
+            else:
+                row = next(r for r in rows if r["temperature"]["value"] == float(temperature))
+                row["log10_formation_equilibrium_constant"]["value"] = None
+        return document
+
+    monkeypatch.setattr(janaf, "load_table_document", incomplete_liquid_table)
+    T = Decimal(temperature)
+    experiment = F.tabulation_experiment(method=MethodToken.STATIC_EQUILIBRIUM, T_K=T)
+    identity = F.psat_identity(species, T_K=T, reservoir_phase=Phase.L)
+    reference = F.observation(
+        "missing-fusion", experiment.experiment_id, identity,
+        Decimal(str(expected)), source_id="primary-solid-reference")
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment)
+    assert float(prediction.value) == pytest.approx(expected, rel=2e-6)
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert prediction.identity is identity
+    notice, = prediction.notices
+    assert "phase_mismatch" in notice.reason
+    assert "fusion term unavailable" in notice.reason
 
 
 @pytest.mark.parametrize("temperature", [496.0, 500.0, 600.0, 658.0])

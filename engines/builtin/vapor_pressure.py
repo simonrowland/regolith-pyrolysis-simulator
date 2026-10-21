@@ -2202,6 +2202,58 @@ def wall_condensation_antoine_coefficients(
     return {}, COEFF_BLOCK_PURE_COMPONENT
 
 
+def _liquid_reference_pressure_from_solid(
+    species: str, temperature_K: float, solid_pressure_pa: float,
+) -> tuple[float, str | None]:
+    """Convert a stable-solid pressure using a printed JANAF liquid row."""
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    table_id = {"Mg": "Mg-003", "Ca": "Ca-004"}.get(species)
+    if table_id is None:
+        return solid_pressure_pa, f"fusion term unavailable: no liquid table for {species}"
+    try:
+        table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
+    except (OSError, ValueError) as exc:
+        return solid_pressure_pa, f"fusion term unavailable: {table_id}: {exc}"
+
+    # JANAF's coexistence annotations have no numeric formation cells.
+    # They explicitly establish mu_l = mu_stable_s at their printed T.
+    for annotation in table.get("parse_ambiguities", []):
+        fields = annotation.get("raw_line", "").split("\t")
+        if (
+            fields[-1] in {"CRYSTAL <--> LIQUID", "BETA <--> LIQUID"}
+            and float(fields[0]) == temperature_K
+        ):
+            return solid_pressure_pa, None
+
+    for row in table.get("values", []):
+        if row["temperature"]["value"] != temperature_K:
+            continue
+        log_kf = row.get("log10_formation_equilibrium_constant", {}).get("value")
+        if log_kf is None:
+            break
+        # Premise: ideal monatomic gas at equilibrium has
+        # mu_g^0 + RT ln(P_s/p0)=mu_s and likewise for the liquid.
+        # Subtract: ln(P_l/P_s)=(mu_l-mu_s)/(RT)=DeltaG_fus/(RT).
+        # JANAF liquid formation is relative to the stable elemental solid:
+        # log10 Kf,l=-DeltaG_fus/(RT ln(10)), hence P_l=P_s*10**(-log Kf,l).
+        # In the Ca low-T band that solid is alpha Ca, so this includes the
+        # full liquid-minus-alpha difference, not only beta-to-liquid fusion.
+        # Units: (J/mol)/((J/mol/K)*K) is dimensionless; P_l retains Pa.
+        # At coexistence DeltaG_fus=0, Kf,l=1 and P_l=P_s.
+        try:
+            pressure = solid_pressure_pa * 10.0 ** (-float(log_kf))
+        except (ValueError, OverflowError):
+            break
+        if math.isfinite(pressure) and pressure > 0.0:
+            return pressure, None
+        break
+    return solid_pressure_pa, (
+        f"fusion term unavailable: {table_id} has no usable liquid log Kf row "
+        f"at {temperature_K:g} K"
+    )
+
+
 def vapor_pressure_valid_range_K(
     row: Mapping[str, Any] | None,
     coefficient_block: str | None,
