@@ -2106,7 +2106,11 @@ def _coating_from_upstream_deposit_fraction_report(
         authority,
         include_coverage_unknown=True,
     )
-    if unavailable_reason and certain_deposit_kg <= limit_kg:
+    if unavailable_reason and (
+        certain_deposit_kg <= limit_kg
+        or report.get("wall_quantity_unavailable") is True
+        or authority.get("wall_quantity_unavailable") is True
+    ):
         return _coating_fraction_unavailable_margin(
             report=report,
             authority=authority,
@@ -2675,13 +2679,43 @@ def _coating_wall_quantity_unavailable(
 
     mappings = [source for source in sources if isinstance(source, Mapping)]
     refused_species = _coating_wall_refused_species(*mappings)
+    bounds: dict[str, float] = {}
+    if refused_species:
+        for source in mappings:
+            bounds.update(_coating_refused_flux_bounds(source, refused_species))
+
+    # A null bucket is unknown mass for its recorded species. Only a finite
+    # bound on that refused species replaces the unknown; an unrefused or
+    # unbounded null leaves the total upper bound unknown. A complete bound
+    # equal to the d-045 limit is clear because the gate violates only above it.
     for source in mappings:
-        if source.get("wall_quantity_unavailable") is True and not refused_species:
-            return str(
+        if source.get("wall_quantity_unavailable") is True:
+            reason = str(
                 source.get("status_reason")
                 or source.get("message")
                 or "wall quantity unavailable"
             )
+            raw_unavailable_species = source.get(
+                "wall_quantity_unavailable_species"
+            )
+            if isinstance(raw_unavailable_species, str):
+                unavailable_species = (raw_unavailable_species,)
+            elif isinstance(
+                raw_unavailable_species,
+                (tuple, list, set, frozenset),
+            ):
+                unavailable_species = tuple(
+                    str(item) for item in raw_unavailable_species if str(item)
+                )
+            else:
+                return reason
+            if not unavailable_species:
+                return reason
+            if any(
+                species not in refused_species or species not in bounds
+                for species in unavailable_species
+            ):
+                return reason
         code = str(source.get("code", "")).lower()
         if (
             "saturation_pressure_refused" in code
@@ -2714,9 +2748,6 @@ def _coating_wall_quantity_unavailable(
             )
     if not refused_species:
         return ""
-    bounds: dict[str, float] = {}
-    for source in mappings:
-        bounds.update(_coating_refused_flux_bounds(source, refused_species))
     missing = _coating_missing_refused_flux_bounds(refused_species, bounds)
     if not missing:
         return ""

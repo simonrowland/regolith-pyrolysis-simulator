@@ -841,6 +841,29 @@ def test_d045_certain_deposit_equal_to_limit_is_clear_without_refused_species() 
     assert coating.status_payload["coating_violation_reasons"] == []
 
 
+def test_d045_refused_flux_upper_bound_equal_to_limit_is_clear() -> None:
+    limit = _d045_coating().status_payload[
+        "upstream_wall_deposit_limit_kg_per_campaign"
+    ]
+    coating = _d045_coating(
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["CrO2"],
+        },
+        wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign={
+            "CrO2": limit,
+        },
+    )
+
+    upper = coating.status_payload[
+        "upstream_wall_deposit_upper_bound_kg_per_campaign"
+    ]
+    assert upper == limit
+    assert coating.feasible
+    assert coating.status_payload["coating_verdict"] == "clear"
+
+
 def test_d045_refused_species_without_flux_bound_is_unavailable() -> None:
     report = _d045_report(
         sticking_alpha_authority={

@@ -1685,7 +1685,7 @@ def _trace_with_optimizer_coating_report(
         )
     normalized_deposit: dict[tuple[str, str], float] = {}
     by_species: dict[str, float] = {}
-    null_deposit_entry = False
+    null_deposit_species: list[str] = []
     for key, raw_kg in raw_deposit.items():
         if not isinstance(key, tuple) or len(key) != 2:
             raise CoatingFeasibilityReportError(
@@ -1694,7 +1694,7 @@ def _trace_with_optimizer_coating_report(
         if raw_kg is None:
             # b-808: a null kilogram is unknown. Leave it out of the numeric
             # sum; do not price it as a measured zero.
-            null_deposit_entry = True
+            null_deposit_species.append(str(key[1]))
             continue
         try:
             kg = float(raw_kg)
@@ -1762,8 +1762,11 @@ def _trace_with_optimizer_coating_report(
         output_status = "non-authoritative-threshold"
         status_reason = "resinter threshold is not grounded"
     report = dict(runner_report)
-    if null_deposit_entry:
+    if null_deposit_species:
         report["wall_quantity_unavailable"] = True
+        report["wall_quantity_unavailable_species"] = sorted(
+            null_deposit_species
+        )
     report.update(
         campaigns_to_resinter_worst_segment=campaigns,
         campaigns_to_resinter_total=aggregate_campaigns,

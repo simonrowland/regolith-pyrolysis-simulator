@@ -3242,6 +3242,101 @@ def test_optimizer_overlay_null_wall_deposit_entry_is_unavailable() -> None:
     assert coating.status == "unavailable"
     assert coating.observed is None
     assert coating.status_payload["coating_verdict"] == "unavailable"
+    assert coating.status_payload[
+        "upstream_wall_deposit_upper_bound_kg_per_campaign"
+    ] is None
+
+
+def test_optimizer_overlay_null_species_does_not_hide_behind_other_refusal() -> None:
+    trace = _trace()
+    trace.wall_deposit_by_segment_species_kg = {("hot_wall", "SiO"): None}
+    trace.wall_deposit_sticking_authority = {
+        "authoritative_for_deposit_mass": False,
+        "code": "wall_saturation_pressure_refused",
+        "wall_saturation_pressure_refused_species": ["CrO2"],
+    }
+    snapshot = _snapshot()
+    snapshot.duration_h = 2.0
+    snapshot.evap_flux = EvaporationFlux(species_kg_hr={"CrO2": 1.0e-4})
+    execution = _execution(trace=trace, snapshots=(snapshot,))
+    overlay = evaluate_module._trace_with_optimizer_coating_report(
+        execution,
+        PhysicsConstraintSet(active_gates=("coating",)),
+        spec=SimpleNamespace(mass_kg=1.0),
+    )
+    coating = PhysicsConstraintSet(active_gates=("coating",)).coating(overlay)
+
+    assert coating.status_payload["coating_verdict"] == "unavailable", (
+        "verdict="
+        f"{coating.status_payload['coating_verdict']}, certain="
+        f"{coating.status_payload['certain_upstream_deposit_kg_per_campaign']}, "
+        "upper="
+        f"{coating.status_payload['upstream_wall_deposit_upper_bound_kg_per_campaign']}"
+    )
+    assert overlay.wall_fouling_report["wall_quantity_unavailable_species"] == [
+        "SiO"
+    ]
+    assert overlay.wall_fouling_report[
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+    ] == {"CrO2": pytest.approx(2.0e-4)}
+    assert not coating.feasible
+    assert coating.status == "unavailable"
+    assert coating.observed is None
+    assert coating.status_payload[
+        "certain_upstream_deposit_kg_per_campaign"
+    ] == pytest.approx(0.0)
+    assert coating.status_payload[
+        "upstream_wall_deposit_upper_bound_kg_per_campaign"
+    ] is None
+
+
+def test_optimizer_overlay_null_refused_species_without_bound_is_unavailable() -> None:
+    trace = _trace()
+    trace.wall_deposit_by_segment_species_kg = {("hot_wall", "CrO2"): None}
+    trace.wall_deposit_sticking_authority = {
+        "authoritative_for_deposit_mass": False,
+        "code": "wall_saturation_pressure_refused",
+        "wall_saturation_pressure_refused_species": ["CrO2"],
+    }
+    overlay = evaluate_module._trace_with_optimizer_coating_report(
+        _execution(trace=trace),
+        PhysicsConstraintSet(active_gates=("coating",)),
+        spec=SimpleNamespace(mass_kg=1.0),
+    )
+    coating = PhysicsConstraintSet(active_gates=("coating",)).coating(overlay)
+
+    assert overlay.wall_fouling_report["wall_quantity_unavailable_species"] == [
+        "CrO2"
+    ]
+    assert not coating.feasible
+    assert coating.status == "unavailable"
+    assert coating.observed is None
+    assert coating.status_payload[
+        "upstream_wall_deposit_upper_bound_kg_per_campaign"
+    ] is None
+
+
+def test_optimizer_overlay_null_species_keeps_gate_unavailable_over_limit() -> None:
+    trace = _trace()
+    trace.wall_deposit_by_segment_species_kg = {
+        ("hot_wall", "SiO"): None,
+        ("hot_wall", "Fe"): 6.0e-4,
+    }
+    overlay = evaluate_module._trace_with_optimizer_coating_report(
+        _execution(trace=trace),
+        PhysicsConstraintSet(active_gates=("coating",)),
+        spec=SimpleNamespace(mass_kg=1.0),
+    )
+    coating = PhysicsConstraintSet(active_gates=("coating",)).coating(overlay)
+
+    assert coating.status == "unavailable"
+    assert coating.status_payload["coating_verdict"] == "unavailable"
+    assert coating.status_payload[
+        "certain_upstream_deposit_kg_per_campaign"
+    ] == pytest.approx(6.0e-4)
+    assert coating.status_payload[
+        "upstream_wall_deposit_upper_bound_kg_per_campaign"
+    ] is None
 
 
 def test_optimizer_overlay_null_refused_species_stays_flux_bounded() -> None:
@@ -3268,6 +3363,9 @@ def test_optimizer_overlay_null_refused_species_stays_flux_bounded() -> None:
     assert coating.feasible
     assert coating.status == "warning"
     assert coating.status_payload["coating_warning_flags"][0]["species"] == "CrO2"
+    assert coating.status_payload[
+        "upstream_wall_deposit_upper_bound_kg_per_campaign"
+    ] == pytest.approx(4.0e-4)
 
     from simulator.cost_parameters import CostParameters
 
