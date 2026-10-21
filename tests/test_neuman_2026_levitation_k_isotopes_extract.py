@@ -14,7 +14,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Quantity
-from simulator.battery.migrate import Migrator, REPO_ROOT, load_index, source_files_for
+from simulator.battery.migrate import Migrator, REPO_ROOT, source_files_for
 from tests.literature_extract_test_helpers import (
     assert_no_unavailable_observation_values,
     iter_locators,
@@ -188,8 +188,29 @@ def _expected_species_rows(document: dict) -> Counter:
     return expected
 
 
+def _index_row() -> dict:
+    return {
+        "source_id": SID,
+        "pdf_path": f"raw/{SID}/{SID}.pdf",
+        "pdf_sha256": "0f745b41c8f76c6b5c77ba7c44275d59f5a910f4e1f236a93c10632c4358720e",
+        "corpus": {
+            "raw": {
+                "path": f"raw/{SID}/{SID}.pdf",
+                "present": True,
+                "sha256": "0f745b41c8f76c6b5c77ba7c44275d59f5a910f4e1f236a93c10632c4358720e",
+            },
+            "tables": {
+                "path": f"tables/{SID}",
+                "exists": True,
+                "file_count": 2,
+            },
+            "commit": "f63ace28d3a18987c0d5443c578a5e698655bfdc",
+        },
+    }
+
+
 def _migrate(document: dict):
-    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator = Migrator(root=REPO_ROOT, index={SID: _index_row()}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     assert migrator.result.validation is not None
@@ -286,22 +307,31 @@ def test_printed_loss_summaries_and_registered_supplement_context_are_preserved(
     assert len(supplement["values"]["rows"]) == 49
 
     assert all(
-        "starting_weight_g" not in row and "ending_weight_g" not in row
+        "starting_weight_g_as_printed" in row
+        and "ending_weight_g_as_printed" in row
         for row in supplement["values"]["rows"]
     )
 
 
 def test_derived_supplementary_mass_loss_rows_migrate_and_pin_values() -> None:
-    index_row = load_index(REPO_ROOT / "data/literature/INDEX.yaml")[SID]
+    # INDEX is assembled once per offer; inject this builder-shaped source row.
+    index_row = _index_row()
     table_asset = next(
         asset
         for asset in source_files_for(SID, index_row).files
         if asset.asset_id == f"tables:{SID}"
     )
+    pdf_asset = next(
+        asset
+        for asset in source_files_for(SID, index_row).files
+        if asset.asset_id == f"pdf:{SID}"
+    )
+    assert pdf_asset.role.name == "PDF"
     assert table_asset.role.name == "TABLE_CSV"
     assert table_asset.path == f"tables/{SID}"
 
-    rows = _migrate(_document())
+    document = _document()
+    rows = _migrate(document)
     mass_loss = [
         row
         for row in rows
@@ -322,9 +352,20 @@ def test_derived_supplementary_mass_loss_rows_migrate_and_pin_values() -> None:
     )
 
     pinned = {
-        "1-2": "0.023379515092",
-        "1-4": "0.171697626419",
+        "1-2": "0.023500309215",
+        "1-4": "0.171612903226",
         "3-5": "0.053664166186",
+    }
+    sample_1_2 = next(
+        point
+        for point in _source_observations(document)[
+            "neuman_2026_supplementary_table_s1_basalt_mass_loss_fraction"
+        ][1]["values"]["points"]
+        if point["sample_id"] == "1-2"
+    )
+    assert sample_1_2["derivation_parameters"] == {
+        "starting_weight_g_as_printed": "0.01617",
+        "ending_weight_g_as_printed": "0.01579",
     }
 
     def pinned_values(observations):
@@ -347,7 +388,7 @@ def test_derived_supplementary_mass_loss_rows_migrate_and_pin_values() -> None:
         for row in mass_loss
         if row.locator.note and "CSV row 1-2;" in row.locator.note
     )
-    mutated_value = replace(target.value, point=Decimal("0.023379515093"))
+    mutated_value = replace(target.value, point=Decimal("0.023500309216"))
     mutated_row = replace(target, value=mutated_value)
     mutated_rows = [mutated_row if row is target else row for row in mass_loss]
     mutated = pinned_values(mutated_rows)
