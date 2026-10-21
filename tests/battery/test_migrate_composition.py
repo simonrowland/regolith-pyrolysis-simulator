@@ -48,7 +48,7 @@ from simulator.battery.records import (
     Locator,
     as_decimal,
 )
-from tests.battery.factories import tabulation_experiment
+from tests.battery.factories import migrate_one_extract, tabulation_experiment
 from tests.battery.test_migrate import (
     FIXTURE_EXTRACT,
     _migrate_real_extract,
@@ -296,8 +296,7 @@ def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
     assert _initial_oxide_map_from_values(values, refusal_reason=refusal) is None
     assert refusal == []
 
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
     source_experiment = migrator.result.experiments[
         "10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay"
     ]
@@ -320,8 +319,7 @@ def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
     )
     assert selected.initial_composition is not None
 
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
     migrator.finalize()
     experiment = migrator.result.experiments[
         "10.6028/nbs.ir.81-2279::experiment::hastie-1981-k1-kms"
@@ -353,8 +351,7 @@ def test_volovetskii_starting_glass_material_state_is_initial() -> None:
     assert expected is not None and not expected.state.is_value
     assert "unsupported numeric component(s): Cl" in expected.state.reason
 
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
     migrator.finalize()
     row = next(
         row
@@ -447,8 +444,7 @@ def _assert_plante_observations_use_analyzed_composition(
 
 def test_plante_section_4_1_detection_limits_have_no_vacuum_conditions() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
 
     observation = migrator.result.observations[
         "kems-027-plante-hastie-1983::plante_hastie_1983_detection_limits_quoted"
@@ -502,8 +498,7 @@ def test_plante_glass_initials_use_analyzed_printed_map_by_name(
         return convert(wt)
 
     monkeypatch.setattr(migrate_module, "wt_pct_to_mole_fraction", record_map)
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
     migrated_id = next(
         key
         for key in migrator.result.experiments
@@ -758,8 +753,6 @@ def test_round9_catalogue_composition_note_does_not_change_admission() -> None:
         if note is not None:
             row["values"]["composition_derivation"] = note
 
-        migrator = Migrator(REPO_ROOT)
-
         def load_fixture(candidate):
             return document if candidate == source else original_load(candidate)
 
@@ -768,7 +761,7 @@ def test_round9_catalogue_composition_note_does_not_change_admission() -> None:
             "load_yaml",
             load_fixture,
         ):
-            migrator._migrate_extract(source)
+            migrator = migrate_one_extract(REPO_ROOT, source)
             migrator.finalize()
 
         observation = next(iter(migrator.result.observations.values()))
@@ -818,8 +811,7 @@ def test_round9_catalogue_composition_note_does_not_change_admission() -> None:
 def test_plante_fig19_points_keep_pooled_sample_unknown_and_gas_phase() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
-    migrator = Migrator()
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
     source_points = {
         row["observation_id"]: row["values"]["points"]
         for species in doc["species"].values()
@@ -1106,8 +1098,7 @@ def test_markova_point_refusal_mutation_proof(monkeypatch: pytest.MonkeyPatch) -
         lambda candidate: doc if candidate == path else original_load_yaml(candidate),
     )
     target_t = migrate_module.as_decimal(point["T_C"]) + Decimal("273.15")
-    migrator = Migrator(REPO_ROOT)
-    migrator._migrate_extract(path)
+    migrator = migrate_one_extract(REPO_ROOT, path)
     prefix = f"{doc['source_id']}::{raw['observation_id']}"
     row = next(
         observation
@@ -1494,8 +1485,9 @@ def test_duplicate_mass_percent_pairs_are_refused_without_collapsing(
 def test_real_pretyped_experiment_initials_match_printed_composition_owner(
     source: str, expected_experiments: int
 ) -> None:
-    migrator = Migrator()
-    migrator._migrate_extract(REPO_ROOT / "data/literature/extracts" / f"{source}.yaml")
+    migrator = migrate_one_extract(
+        REPO_ROOT, REPO_ROOT / "data/literature/extracts" / f"{source}.yaml"
+    )
     experiments = [
         experiment
         for experiment in migrator.result.experiments.values()
@@ -2040,8 +2032,7 @@ def test_conflicting_owner_selected_initials_are_withheld_with_migration_issue(
 
 def test_bischof_measured_and_nominal_initials_remain_conflicted() -> None:
     source = REPO_ROOT / "data/literature/extracts/kems-137-bischof-2023.yaml"
-    migrator = Migrator()
-    migrator._migrate_extract(source)
+    migrator = migrate_one_extract(REPO_ROOT, source)
     migrator.finalize()
 
     expected_runs = {"an-di-1-low", "an-di-2-low", "an-di-3-high"}

@@ -10,6 +10,7 @@ import yaml
 from simulator.battery.migrate import _initial_compositions_conflict, load_yaml, migrate
 from simulator.battery.records import INITIAL_CHARGE_ONLY_PROXY_FLAG, as_decimal
 from simulator.battery.waypoints import normalized_composition
+from tests.battery.factories import migrate_one_extract
 from tests.battery.test_migrate import (
     FIXTURE_EXTRACT,
     _named_extract,
@@ -432,10 +433,12 @@ def test_prose_declared_printed_composition_does_not_own_the_sample(tmp_path: Pa
 
 
 def _migrate_real(name: str):
-    from simulator.battery.migrate import Migrator
-
-    migrator = Migrator(root=_REPO_ROOT, index={}, aliases={})
-    migrator._migrate_extract(_REPO_ROOT / "data/literature/extracts" / f"{name}.yaml")
+    migrator = migrate_one_extract(
+        root=_REPO_ROOT,
+        path=_REPO_ROOT / "data/literature/extracts" / f"{name}.yaml",
+        index={},
+        aliases={},
+    )
     migrator.finalize()
     return migrator.result
 

@@ -14,10 +14,10 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import (
-    Migrator,
     fe3_fe2_ratio_from_ferric_fraction,
     wt_pct_to_mole_fraction,
 )
+from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
     resolve_fidelity_sample,
@@ -29,8 +29,7 @@ EXTRACT = ROOT / "data/literature/extracts/volovetskii-2012-iron-redox.yaml"
 
 
 def _migrate_extract():
-    migrator = Migrator(root=ROOT)
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(root=ROOT, path=EXTRACT)
     migrator.finalize()
     return migrator.result
 
