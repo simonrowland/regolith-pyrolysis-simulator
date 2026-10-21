@@ -358,16 +358,19 @@ campaigns:
     label: "Deprecated Na/K Metallothermic Polish"
     JANAF_4th_multiphase_status: >
       K/FeO is refused throughout practical melt temperatures (formal
-      crossover 836 C). Na/FeO survives only below 1181.5 C and is therefore
-      used only by the C2A_staged 1150 C FeO cleanup override. Cr2O3 can pass
-      when its in-band margin is positive; TiO2 is refused and MnO is not a
-      supported C3 target.
+      crossover 836 C). Na/FeO survives only below 1181.5 C. The default
+      C3_NA dispatch targets that cool FeO cleanup; cr_ti remains an
+      explicit request. TiO2 is refused and MnO is not a supported C3 target.
     pO2_mbar_default: 1.0
     p_total_mbar_default: 1.0
     sequencing: "legacy K-first then Na; physics gate may refuse all targets"
+    # null doses: credit-line default from c3_alkali_credit_default_kg
+    # (plant-band midpoint times charge_kg/1000). An explicit number is
+    # an absolute kg override. skip false means C3 runs.
     alkali_dosing:
-      Na_kg: 0.0
-      K_kg: 0.0
+      Na_kg: null
+      K_kg: null
+    skip: false
     K_phase:
       name: "Deprecated K FeO reduction diagnostic"
       T_inject_C: [760, 820]
@@ -420,8 +423,12 @@ campaigns:
   # --------------------------------------------------------------------------
   # C4 -- Mg Selective Pyrolysis (Branch Two)
   # --------------------------------------------------------------------------
+  # d-212: the millibar Mg hold is retired from the default sequence.
+  # Mg and Ca leave in the hard-vacuum CROWN stage. skip false opts C4
+  # back in. The final C2A ramp replaces this stage's 10 C/h bridge.
   C4:
     label: "Mg Selective Pyrolysis (Branch Two)"
+    skip: true
     temp_range_C: [1580, 1670]
     max_target_acquisition_hr: 60       # 42 h nominal preheat from 1160 C at 10 C/h, plus latent-cooling margin
     max_process_wall_clock_hr: 40       # finite wall clock around the 20 in-window reaction ticks

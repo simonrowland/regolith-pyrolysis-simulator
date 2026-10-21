@@ -82,8 +82,10 @@ def test_runner_recipe_cli_honors_setpoints_patch(tmp_path: Path) -> None:
     assert completed.returncode == 0, completed.stderr
     payload = json.loads(output_path.read_text(encoding="utf-8"))
     assert payload["run_metadata"]["additives_kg"] == {}
+    # Omitted K is not "off": a null dose is the reference-charge credit default.
     assert payload["run_metadata"]["c3_alkali_credit_dose_kg_by_species"] == {
-        "Na": 12.0
+        "K": 23.0,
+        "Na": 12.0,
     }
     assert payload["run_metadata"]["c3_alkali_credit_drawn_kg_by_species"][
         "Na"
@@ -269,7 +271,8 @@ def test_save_recipe_helper_round_trips_saved_recipe_through_runner(
     assert payload["status"] == "ok"
     assert payload["run_metadata"]["additives_kg"] == {}
     assert payload["run_metadata"]["c3_alkali_credit_dose_kg_by_species"] == {
-        "Na": 7.0
+        "K": 23.0,
+        "Na": 7.0,
     }
     assert payload["run_metadata"]["c3_alkali_credit_drawn_kg_by_species"][
         "Na"

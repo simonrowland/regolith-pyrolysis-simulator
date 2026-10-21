@@ -312,6 +312,17 @@ def _capture_post_mg_c2a_hold_limit(monkeypatch, campaign_mgr) -> dict:
     return limits
 
 
+def _opt_in_c4(setpoints: dict) -> dict:
+    """These closures drive the legal C4 end. d-212 makes that opt-in."""
+    patched = dict(setpoints)
+    campaigns = dict(patched.get("campaigns") or {})
+    c4 = dict(campaigns.get("C4") or {})
+    c4["skip"] = False
+    campaigns["C4"] = c4
+    patched["campaigns"] = campaigns
+    return patched
+
+
 def _assert_staged_route_extent(sim, post_mg_c2a_hold_limit: dict) -> None:
     campaign_mgr = sim.campaign_mgr
     snapshots = sim.record.snapshots
@@ -564,9 +575,11 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
     freeze_gate_enabled,
 ):
     feedstocks = _load_data_yaml("feedstocks.yaml")
-    setpoints = _set_freeze_gate(
-        _load_data_yaml("setpoints.yaml"),
-        enabled=freeze_gate_enabled,
+    setpoints = _opt_in_c4(
+        _set_freeze_gate(
+            _load_data_yaml("setpoints.yaml"),
+            enabled=freeze_gate_enabled,
+        )
     )
     vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
     sim = _build_sim(
@@ -650,7 +663,7 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal(
     # individual transition passed. Guard that prefix across either lawful C4
     # end and the resulting staged route.
     feedstocks = _load_data_yaml("feedstocks.yaml")
-    setpoints = _load_data_yaml("setpoints.yaml")
+    setpoints = _opt_in_c4(_load_data_yaml("setpoints.yaml"))
     vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
     setpoints = dict(setpoints)
     kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})

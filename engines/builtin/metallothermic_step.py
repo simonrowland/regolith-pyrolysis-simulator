@@ -433,9 +433,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             )
 
         K_available_kg = float(controls.get("reagent_available_kg") or 0.0)
-        if K_available_kg <= 0.01:
+        if K_available_kg <= 0.0:
             return self._empty_result(
-                "c3_k_shuttle skipped: K reagent below 0.01 kg threshold",
+                "c3_k_shuttle skipped: K reagent unavailable",
                 control_audit=control_audit,
             )
 
@@ -616,9 +616,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             )
 
         Na_available_kg = float(controls.get("reagent_available_kg") or 0.0)
-        if Na_available_kg <= 0.01:
+        if Na_available_kg <= 0.0:
             return self._empty_result(
-                "c3_na_shuttle skipped: Na reagent below 0.01 kg threshold",
+                "c3_na_shuttle skipped: Na reagent unavailable",
                 control_audit=control_audit,
             )
 

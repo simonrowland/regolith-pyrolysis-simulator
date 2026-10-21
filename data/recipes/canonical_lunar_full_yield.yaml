@@ -16,4 +16,7 @@ campaigns:
       Na_kg: 140.0
       K_kg: 56.0
   C4:
+    # Opt back into the millibar Mg hold. The plant default skips it.
+    # Categorical recipe knob: the string, not a YAML boolean.
+    skip: "false"
     temp_range_C: [1580, 1670]

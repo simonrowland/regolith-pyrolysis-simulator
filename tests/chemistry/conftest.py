@@ -188,11 +188,19 @@ def full_builtin_provider_run(request):
     """Run one canonical C0 -> C6 input for all provider-family consumers."""
 
     feedstock_key, additives_kg = request.param
+    # d-212 retired C4 from the default sequence. This fixture is the
+    # canonical C0→C6 input, which still takes the opt-in C4 path.
+    setpoints = dict(_load_yaml("setpoints.yaml"))
+    campaigns = dict(setpoints.get("campaigns") or {})
+    c4 = dict(campaigns.get("C4") or {})
+    c4["skip"] = False
+    campaigns["C4"] = c4
+    setpoints["campaigns"] = campaigns
     sim = _build_sim(
         feedstock_key,
         _load_yaml("vapor_pressures.yaml"),
         _load_yaml("feedstocks.yaml"),
-        _load_yaml("setpoints.yaml"),
+        setpoints,
         additives_kg=additives_kg,
     )
     sim.start_campaign(CampaignPhase.C0)

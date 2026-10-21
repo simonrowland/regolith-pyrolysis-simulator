@@ -835,6 +835,33 @@ def test_k_shuttle_draws_from_process_reagent_inventory():
         "Fe"
     ] == pytest.approx(sim.train.stages[1].collected_kg["Fe"])
     _assert_product_matches_account(sim, "process.metal_phase", "Fe")
+    # d-212: dosed K and native K vapour share overhead_gas. A later
+    # partial capture (the hour-37 ProposalRejected) is legal only once
+    # that pool is declared amalgamated. The mark is the production one.
+    assert ("process.overhead_gas", "K") in sim.atom_ledger._amalgamated_pool_elements
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"K": 0.010},
+        material_origin="feedstock",
+        source="native K vapour",
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"K": 0.010},
+        material_origin="reagent",
+        source="dosed K vapour",
+    )
+    sim.atom_ledger.move(
+        "condense_partial_K",
+        "process.overhead_gas",
+        "process.condensation_train",
+        {"K": 0.005},
+    )
+    sim.atom_ledger.assert_balanced()
+    captured = sim.atom_ledger.origin_atom_moles_by_account()[
+        "process.condensation_train"
+    ]["K"]
+    assert captured["feedstock"] == pytest.approx(captured["reagent"])
 
 
 def test_na_shuttle_metals_are_reported_from_process_metal_phase():

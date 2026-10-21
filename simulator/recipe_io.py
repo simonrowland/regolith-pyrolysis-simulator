@@ -44,6 +44,25 @@ def load_recipe_patch(
     return normalize_recipe_patch(payload, source=str(recipe_path), schema=schema)
 
 
+def load_recipe_patch_for_charge(
+    path: str | Path,
+    charge_kg: float,
+) -> dict[str, Any]:
+    """Load a recipe against the charge-scaled C3 dose deadband.
+
+    ``--recipe`` is an optimizer setpoints patch of absolute kilograms.
+    A 1 kg credit dose (Na 0.110 kg, K 0.023 kg) is below the reference
+    deadband (Na 1.4 kg, K 0.56 kg). Loading it on the unscaled schema
+    strips both leaves and ``normalize_recipe_patch`` then refuses an
+    empty patch. The run's charge mass scales that deadband first.
+    """
+
+    return load_recipe_patch(
+        path,
+        schema=RecipeSchema().scaled_for_charge(charge_kg),
+    )
+
+
 def read_recipe_metadata(path: str | Path) -> dict[str, Any]:
     """Read only the optional UI metadata block from a recipe YAML file."""
 

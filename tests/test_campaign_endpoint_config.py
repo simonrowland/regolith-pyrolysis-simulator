@@ -314,6 +314,66 @@ def test_c4_unreachable_window_is_typed_acquisition_refusal() -> None:
     )
 
 
+def _c4_heating_snapshot(temperature_C: float) -> HourSnapshot:
+    return HourSnapshot(
+        campaign=CampaignPhase.C4,
+        temperature_C=temperature_C,
+        evap_flux=_flux(Mg=0.0),
+        nominal_ramp_rate_C_hr=10.0,
+        actual_ramp_rate_C_hr=10.0,
+        throttle_reason="",
+    )
+
+
+def test_cold_c4_handoff_is_not_refused_at_the_design_budget() -> None:
+    """A 1 h C3 leaves C4 near 475 C. The 60 h budget is the climb from
+    1160 C. Hour 60 still below 1580 C must not raise
+    c4_target_window_not_acquired. The same cold handoff refuses once
+    the added climb is spent, and configure_campaign's entry wins over
+    a warmer later snapshot.
+    """
+    manager = CampaignManager(_setpoints())
+    below_window = [
+        _c4_heating_snapshot(475.0 + 10.0 * hour)
+        for hour in range(59)
+    ]
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 59, temperature_C=1065.0),
+        _flux(Mg=0.0),
+        CondensationTrain(),
+        BatchRecord(snapshots=below_window),
+    ) is False
+
+    stuck = [_c4_heating_snapshot(475.0) for _ in range(128)]
+    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C4, 128, temperature_C=475.0),
+            _flux(Mg=0.0),
+            CondensationTrain(),
+            BatchRecord(snapshots=stuck),
+        )
+    assert refusal.value.reason == "c4_target_window_not_acquired"
+    assert refusal.value.diagnostic["acquisition_limit_source"].endswith(
+        "+cold_handoff"
+    )
+    assert refusal.value.diagnostic["acquisition_limit_hr"] == pytest.approx(
+        128.5
+    )
+
+    configured = CampaignManager(_setpoints())
+    configured.configure_campaign(
+        _melt(CampaignPhase.C4, 0, temperature_C=475.0),
+        CampaignPhase.C4,
+    )
+    warmer = [_c4_heating_snapshot(1000.0) for _ in range(80)]
+    assert configured.check_endpoint(
+        _melt(CampaignPhase.C4, 80, temperature_C=1000.0),
+        _flux(Mg=0.0),
+        CondensationTrain(),
+        BatchRecord(snapshots=warmer),
+    ) is False
+
+
 def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
     """Loop-3 full transport holds must not spend max_target_acquisition_hr.
 

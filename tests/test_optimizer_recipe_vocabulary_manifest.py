@@ -42,10 +42,13 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # C3 leaves C0.temp_range_C and the C2A early-ramp path in the full
     # allowlist but disables both for search; this changes conditional subspace
     # dimensions and derived digests.
+    # d-212 (2026-10-20) added searchable campaigns.C3.skip and campaigns.C4.skip.
+    # Both are unguarded, so each conditional subspace grew by 2: [59, 65] -> [61, 67].
+    # bounds_digest and payload_digest moved with those two leaves.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "1a1cb3658e83c6ac45b5ca8ff0feae4a653349fee76c76dbf767d679d1534751"
+        "c07bd7a7192ef0e7a94b8bf01a29a25416f06555a356541d3d6175f8560a20c6"
     )
-    assert digest == "0ab21330293ea06c2da8ed3e618c5410f69a39b8fa6abc87898daba5f3a85bcd"
+    assert digest == "18fb18127bd5027229718bab4a1c2316750a457f3ca5535ed96906b096356496"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
@@ -60,4 +63,4 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         for path in paths
         for prefix in forbidden_future_prefixes
     )
-    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [59, 65]
+    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [61, 67]
