@@ -1383,7 +1383,7 @@ def predict_mass_loss_fraction(
         channels = []
         for species, (parent, *_rest) in gas_channels:
             species = str(species)
-            if parent is None:
+            if not parent:
                 alpha, provenance = 1.0, "stoichiometric oxygen coproduct"
             elif bound_channel is not None:
                 alpha = 1.0 if species == bound_channel else 0.0
@@ -1395,7 +1395,7 @@ def predict_mass_loss_fraction(
                 alpha = 1.0 if upper_bound else 0.0
                 provenance = ("alpha<=1 preheat bound; not sourced coefficient" if upper_bound
                               else "unsourced channel excluded from point loss")
-            channels.append(ResidueChannel(species, species, parent, alpha, provenance))
+            channels.append(ResidueChannel(species, species, parent or None, alpha, provenance))
         pressure_model = _make_residue_pressure_model(
             engine, gas_channels, gas_pack, temperature_K=at_K,
             total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,

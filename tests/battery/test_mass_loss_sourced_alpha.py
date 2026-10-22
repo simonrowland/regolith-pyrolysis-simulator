@@ -238,8 +238,8 @@ def test_r11_hand_computed_hkl_and_shrinking_area(fig3_source, r11_inputs):
     assert result.atom_closure["O"] == pytest.approx(0.0, abs=1e-14)
 
 
-@pytest.fixture
-def prescribed_pressure_engine(monkeypatch, fig3_source):
+@pytest.fixture(params=[None, ""], ids=["none-parent", "openimcc-empty-parent"])
+def prescribed_pressure_engine(monkeypatch, fig3_source, request):
     import sys
     from types import ModuleType
     import simulator.battery.residue as residue
@@ -251,7 +251,7 @@ def prescribed_pressure_engine(monkeypatch, fig3_source):
     monkeypatch.setitem(sys.modules, "openimcc", package)
 
     def gas_channels(*_):
-        channels = [("Mg", ("MgO", 1.0, -0.5)), ("O2", (None, 0.0, 1.0))]
+        channels = [("Mg", ("MgO", 1.0, -0.5)), ("O2", (request.param, 0.0, 1.0))]
         if state["unsourced_ca"]:
             channels.insert(1, ("Ca", ("CaO", 1.0, -0.5)))
         return tuple(channels), ()
