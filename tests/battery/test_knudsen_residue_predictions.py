@@ -23,13 +23,14 @@ from simulator.battery.residue import (
 )
 
 
-def test_langmuir_pressure_refactor_numeric_pin():
+@pytest.mark.parametrize("oxygen_parent", (None, ""))
+def test_langmuir_pressure_refactor_numeric_pin(oxygen_parent):
     result = integrate_residue_inventory(
         {"FeO": 1.0, "MgO": 2.0},
         (
             ResidueChannel("Fe", "Fe", "FeO", 1.0, "pin"),
             ResidueChannel("Mg", "Mg", "MgO", 1.0, "pin"),
-            ResidueChannel("O2", "O2", None, 1.0, "pin"),
+            ResidueChannel("O2", "O2", oxygen_parent, 1.0, "pin"),
         ),
         lambda n, p: {
             "Fe": 5e-8 * 10 ** (-p / 2),
@@ -370,12 +371,13 @@ def test_post_selection_refusal_preserves_oxygen_caveat_and_extent(extent_point,
     assert any("SC-360" in n.reason for n in residual.notices)
 
 
-def _real_analytical_cmas_pressure(temperature_K):
+def _real_analytical_cmas_pressure(temperature_K, inventory=None):
     openimcc = pytest.importorskip("openimcc")
     from simulator.battery.residue import _make_residue_pressure_model
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     pack = openimcc.load_gas_datapack()
-    inventory = {"SiO2": 0.44, "Al2O3": 0.05, "FeO": 0.08, "MgO": 0.36, "CaO": 0.07}
+    if inventory is None:
+        inventory = {"SiO2": 0.44, "Al2O3": 0.05, "FeO": 0.08, "MgO": 0.36, "CaO": 0.07}
     channels, omissions = battery._openimcc_gas_channels_and_omission_notices(tuple(inventory), pack)
     assert not omissions
     pressure_model = _make_residue_pressure_model(
@@ -433,14 +435,16 @@ def test_oxygen_projection_failure_has_typed_pressure_reason(monkeypatch, failur
     assert exc.value.reason == "residue_oxygen_pressure_unavailable"
 
 
-def test_closure_continues_after_parent_exhaustion_with_atom_and_mass_closure():
+@pytest.mark.parametrize("oxygen_parent", (None, ""))
+def test_closure_continues_after_parent_exhaustion_with_atom_and_mass_closure(oxygen_parent):
     from simulator.accounting.formulas import parse_formula
     channels = tuple(ResidueChannel(s, s, p, 1.0, "stoichiometric packets")
-                     for s, p in (("Fe", "FeO"), ("Mg", "MgO"), ("O2", None)))
+                     for s, p in (("Fe", "FeO"), ("Mg", "MgO"),
+                                  ("O", oxygen_parent), ("O2", oxygen_parent)))
     def pressure(n, p, temperature):
         return {"Fe": 1e-8 * 10**(-p / 2) if n.get("FeO", 0) > 0 else 0.0,
                 "Mg": 1e-10 * 10**(-p / 2) if n.get("MgO", 0) > 0 else 0.0,
-                "O2": 1e5 * 10**p}
+                "O": 1e-6 * 10**(p / 2), "O2": 1e5 * 10**p}
     initial = {"FeO": 0.01, "MgO": 1.0}
     result = integrate_knudsen_residue_inventory(
         initial, channels, pressure, temperature_path=((0.2, 2000),),
@@ -449,6 +453,8 @@ def test_closure_continues_after_parent_exhaustion_with_atom_and_mass_closure():
     # FeO is exhausted. The remaining 80% of initial mass is entirely MgO:
     # .8*(.01*.071844+.040304)/.040304 = .8142604208019056 mol.
     assert result.residue_mol["FeO"] == 0.0
+    assert result.evaporated_mol["O"] > 0.0
+    assert result.evaporated_mol["O2"] > 0.0
     assert result.residue_mol["MgO"] == pytest.approx(0.8142604208019056, abs=1e-10)
     assert result.retained_oxygen_atoms_mol == pytest.approx(0.8142604208019056, abs=1e-10)
     assert max(abs(v) for v in result.atom_closure_mol.values()) < 1e-12
@@ -490,3 +496,51 @@ def test_real_analytical_closure_and_extent_preserve_exponent_contract_refusal()
         )
     assert extent.value.reason == root.value.reason
     assert extent.value.detail == root.value.detail
+
+
+@pytest.mark.parametrize("oxygen_parent", (None, ""))
+@pytest.mark.parametrize("oxygen_species", ("O", "O2"))
+@pytest.mark.parametrize("invalid", (None, float("nan"), -1.0))
+def test_parentless_oxygen_pressure_is_required_and_validated(oxygen_parent, oxygen_species, invalid):
+    channels = (ResidueChannel("FeO", "FeO", "FeO", 1.0, "pressure guard"),
+                ResidueChannel("O", "O", oxygen_parent, 1.0, "pressure guard"),
+                ResidueChannel("O2", "O2", oxygen_parent, 1.0, "pressure guard"))
+    pressures = {"FeO": 1.0, "O": 0.0, "O2": 0.0}
+    if invalid is None:
+        del pressures[oxygen_species]
+    else:
+        pressures[oxygen_species] = invalid
+    with pytest.raises(ResidueInventoryRefusal) as exc:
+        integrate_knudsen_residue_inventory(
+            {"FeO": 1.0}, channels, lambda *args: pressures,
+            temperature_path=((0.05, 2000),), measured_mass_loss_fraction=0.05,
+            near_saturated=True, source_fO2_log_by_interval=(-10,),
+        )
+    assert exc.value.reason == ("channel_missing" if invalid is None else "residue_pressure_invalid")
+    assert exc.value.detail == oxygen_species
+
+
+@pytest.mark.parametrize("temperature_K,extent,wt", (
+    (1748.15, 0.0146, {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95}),
+    (1749.15, 0.0117, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
+))
+def test_real_markova_first_interval_preserves_unproven_missing_channel(temperature_K, extent, wt):
+    from simulator.accounting.formulas import parse_formula
+    from simulator.battery.residue import _channel_terms, _residue_oxygen_balance
+    inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
+    inventory, gas_channels, pressure = _real_analytical_cmas_pressure(temperature_K, inventory)
+    channels = tuple(ResidueChannel(s, s, parent, 1.0, "printed Markova first interval")
+                     for s, (parent, _, _) in gas_channels)
+    with pytest.raises(ResidueInventoryRefusal) as root:
+        _residue_oxygen_balance(_channel_terms(channels), inventory,
+                                lambda p: pressure(inventory, p), temperature_K)
+    assert root.value.reason == "residue_pressure_channels_missing"
+    assert root.value.detail == "Al"
+    with pytest.raises(ResidueInventoryRefusal) as result:
+        integrate_knudsen_residue_inventory(
+            inventory, channels, lambda n, p, t: pressure(n, p),
+            temperature_path=((extent, temperature_K),), measured_mass_loss_fraction=extent,
+            near_saturated=True, source_fO2_log_by_interval=(None,),
+        )
+    assert result.value.reason == root.value.reason
+    assert result.value.detail == root.value.detail
