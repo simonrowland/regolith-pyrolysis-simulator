@@ -260,3 +260,28 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         if record.get("type") == "model_results"
     )
     assert len(model["values"]["printed_rows"]) == 25
+
+
+def test_lvp1_table1_redox_cell_is_empty_in_excess_oxygen_context() -> None:
+    # Main PDF page 3, Table 1: the LVP-1 redox cell is blank. The PtO2-powder
+    # fact lives only in the supplement (page 5), never on this printed row.
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+
+    def walk(node):
+        if isinstance(node, dict):
+            yield node
+            for value in node.values():
+                yield from walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                yield from walk(value)
+
+    lvp1_rows = [
+        node
+        for node in walk(document)
+        if node.get("sample_id_as_published") == "LVP-1"
+        and "redox_condition_as_published" in node
+        and (node.get("locator") or {}).get("table") == "1"
+    ]
+    assert len(lvp1_rows) == 1
+    assert lvp1_rows[0]["redox_condition_as_published"] == ""
