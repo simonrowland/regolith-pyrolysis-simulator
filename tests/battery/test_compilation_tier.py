@@ -61,6 +61,10 @@ from simulator.battery.score import (
 )
 from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
 from tests.battery import factories as F
+from tests.engine_availability import (
+    magemin_binary_available,
+    thermoengine_package_available,
+)
 
 _PRINTED_DFG = Decimal("-3.886")
 _PRINTED_LOGK = Decimal("0.092")
@@ -5420,3 +5424,163 @@ def test_fusion_janaf_tables_do_not_make_other_works_training() -> None:
     )
     assert residual.numeric is not None
     assert residual.source_relation is SourceRelation.INDEPENDENT
+
+
+def _printed_janaf_entropy(table_id: str, temperature_K: float) -> Decimal:
+    """Entropy ``as_published`` at one printed JANAF temperature."""
+
+    from simulator.melt_backend.pure_phase_janaf_score import load_janaf_table
+
+    document = load_janaf_table(table_id)
+    for row in (document.get("table") or {}).get("values") or []:
+        temperature = (row.get("temperature") or {}).get("value")
+        if temperature is None or float(temperature) != float(temperature_K):
+            continue
+        published = (row.get("entropy") or {}).get("as_published")
+        assert published not in (None, "")
+        return Decimal(str(published).strip())
+    raise AssertionError(f"{table_id} has no entropy row at {temperature_K} K")
+
+
+def _crystal_thermo_identity(formula: str, polymorph: str | None, temperature_K: Decimal):
+    identity = F.oxide_identity(
+        formula,
+        Phase.CR,
+        T_K=temperature_K,
+        per=PerBasis.MOL_SPECIES,
+        polymorph=polymorph if polymorph is not None else Polymorph.RUTILE.value,
+    )
+    if polymorph is None:
+        identity = replace(
+            identity,
+            species=replace(
+                identity.species,
+                polymorph=State.unknown("printed polymorph unknown"),
+            ),
+        )
+    return _pure_standard_identity(identity, Quantity.S)
+
+
+def _close_cached_backend(engine: Engine) -> None:
+    from simulator.battery import compilation_tier
+
+    backend = compilation_tier._BACKENDS.pop(engine, None)
+    close = getattr(backend, "close", None)
+    if close is not None:
+        close()
+
+
+def test_magemin_lunar_unset_tio2_entropy_matches_janaf_o045() -> None:
+    """Unset TiO2 at 2000 K is ig ``ru``. O-045 does not name a polymorph.
+
+    2000 K is inside 1950–2473 K and below the O-045 crystal–liquid
+    point at 2130 K. The 2% band is the accessor's S band: a divisor
+    of two would miss it.
+    """
+
+    expected = _printed_janaf_entropy("O-045", 2000.0)
+    observation = F.observation(
+        "tio2-unset-s-2000",
+        "exp-1",
+        _crystal_thermo_identity("TiO2", None, Decimal("2000")),
+        expected,
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    held = predict_thermo_attempt(
+        Engine.MAGEMIN, observation, invoke_pure_phase=False
+    )
+    assert held.value is None
+    assert held.refusal_detail["reason"] == "pure-phase-call-required"
+    assert held.refusal_detail["symbol"] == "ru"
+    if not magemin_binary_available():
+        pytest.skip("no MAGEMin binary")
+    try:
+        attempt = predict_thermo_attempt(Engine.MAGEMIN, observation)
+    finally:
+        _close_cached_backend(Engine.MAGEMIN)
+    assert attempt.refusal_reason is None
+    assert attempt.unit == "J_per_declared_mol_basis_per_K"
+    assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
+
+
+def test_thermoengine_lunar_rutile_entropy_matches_janaf_o043() -> None:
+    """Rutile at 2000 K is Berman ``Rt``. O-043 prints the rutile table.
+
+    Same lunar point and 2% S band as the MAGEMin TiO2 test.
+    """
+
+    expected = _printed_janaf_entropy("O-043", 2000.0)
+    observation = F.observation(
+        "tio2-rutile-s-2000",
+        "exp-1",
+        _crystal_thermo_identity("TiO2", Polymorph.RUTILE.value, Decimal("2000")),
+        expected,
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    held = predict_thermo_attempt(
+        Engine.THERMOENGINE, observation, invoke_pure_phase=False
+    )
+    assert held.value is None
+    assert held.refusal_detail["reason"] == "pure-phase-call-required"
+    assert held.refusal_detail["symbol"] == "Rt"
+    if not thermoengine_package_available():
+        pytest.skip("ThermoEngine package unavailable")
+    try:
+        attempt = predict_thermo_attempt(Engine.THERMOENGINE, observation)
+    finally:
+        _close_cached_backend(Engine.THERMOENGINE)
+    assert attempt.refusal_reason is None
+    assert attempt.unit == "J_per_declared_mol_basis_per_K"
+    assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
+
+
+def test_ambiguous_pure_phase_cases_stay_refused() -> None:
+    """Rutile and anatase stay off unlabeled ``ru``. Unset CaSiO3 stays off ``Wo``.
+
+    ``pWo`` is on the ThermoEngine map so unset CaSiO3 is not the unique
+    CaSiO3 candidate. Wollastonite still resolves to ``Wo``.
+    """
+
+    def forbid_engine(*_args, **_kwargs):
+        raise AssertionError("ambiguous identity must refuse before an engine call")
+
+    for polymorph in (Polymorph.RUTILE.value, Polymorph.ANATASE.value):
+        observation = F.observation(
+            f"tio2-{polymorph}",
+            "exp-1",
+            _crystal_thermo_identity("TiO2", polymorph, Decimal("2000")),
+            Decimal("1"),
+        )
+        attempt = predict_thermo_attempt(
+            Engine.MAGEMIN, observation, pure_phase=forbid_engine
+        )
+        assert attempt.value is None
+        assert attempt.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+
+    unset = F.observation(
+        "casio3-unset",
+        "exp-1",
+        _crystal_thermo_identity("CaSiO3", None, Decimal("1000")),
+        Decimal("1"),
+    )
+    refused = predict_thermo_attempt(
+        Engine.THERMOENGINE, unset, pure_phase=forbid_engine
+    )
+    assert refused.value is None
+    assert refused.refusal_detail["reason"] == "pure-phase-polymorph-unresolved"
+
+    named = F.observation(
+        "casio3-wollastonite",
+        "exp-1",
+        _crystal_thermo_identity(
+            "CaSiO3", Polymorph.WOLLASTONITE.value, Decimal("1000")
+        ),
+        Decimal("1"),
+    )
+    held = predict_thermo_attempt(
+        Engine.THERMOENGINE, named, invoke_pure_phase=False
+    )
+    assert held.refusal_detail["reason"] == "pure-phase-call-required"
+    assert held.refusal_detail["symbol"] == "Wo"
