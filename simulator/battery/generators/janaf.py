@@ -3082,6 +3082,126 @@ def _missing_node_for_interpolation(
     return None
 
 
+@dataclass(frozen=True)
+class JANAFTabulatedGas:
+    """Cp, S, and H−H298 from one phase-g JANAF table at one temperature."""
+
+    table_id: str
+    heat_capacity: Decimal
+    entropy: Decimal
+    enthalpy_increment: Decimal
+    low_K: Decimal
+    high_K: Decimal
+    bracket_width_K: Decimal
+
+
+_GAS_THERMO_COLUMNS = ("heat_capacity", "entropy", "enthalpy_increment")
+
+
+@lru_cache(maxsize=1)
+def _janaf_gas_table_ids() -> dict[str, tuple[str, ...]]:
+    """Neutral phase-g table ids keyed by formula_normalised."""
+
+    manifest = load_manifest()
+    grouped: dict[str, list[str]] = {}
+    for entry in manifest.get("entries") or ():
+        if not isinstance(entry, Mapping):
+            continue
+        if str(entry.get("phase") or "") != "g":
+            continue
+        if entry.get("charge") not in (0, "0"):
+            continue
+        formula = str(entry.get("formula_normalised") or "")
+        table_id = str(entry.get("table_id") or "")
+        if formula and table_id:
+            grouped.setdefault(formula, []).append(table_id)
+    return {formula: tuple(table_ids) for formula, table_ids in grouped.items()}
+
+
+@lru_cache(maxsize=None)
+def _cached_table_property_points(
+    table_id: str, property_name: str
+) -> tuple[tuple[tuple[Decimal, Decimal], ...], str, tuple[Decimal, ...]]:
+    """Hash-checked property nodes. Same reader as fusion enthalpy."""
+
+    return _fusion_property_points(table_id, property_name)
+
+
+def janaf_tabulated_gas_thermo(
+    formula: str, temperature_K: Decimal
+) -> JANAFTabulatedGas:
+    """Linear Cp, S, and H−H298 from the unique neutral gas JANAF table.
+
+    Points come from `_fusion_property_points` (the hash-checked table
+    reader). The chord is `_interpolate_table_points` with extrapolation
+    left off. At a tabulated temperature the value is that printed node,
+    so the interpolation remainder is 0 and `bracket_width_K` is 0.
+    Between nodes T_i and T_{i+1} spaced h apart, the value is the chord:
+    its distance from either printed endpoint is at most |y_{i+1} − y_i|.
+    For a twice differentiable curve the Lagrange remainder against the
+    unknown smooth function is at most h²/8 · max|f''| on that interval.
+    This function does not estimate f''. A missing 100 K grid node inside
+    the bracket, a temperature outside the first and last nodes, or two
+    gas tables for one formula raises ValueError. The polynomial is not
+    continued past the table.
+    """
+
+    temperature_K = Decimal(temperature_K)
+    table_ids = _janaf_gas_table_ids().get(formula, ())
+    if not table_ids:
+        raise ValueError(f"no JANAF gas table for {formula}")
+    if len(table_ids) != 1:
+        joined = ", ".join(table_ids)
+        raise ValueError(f"ambiguous JANAF gas tables for {formula}: {joined}")
+    table_id = table_ids[0]
+    series = {
+        name: _cached_table_property_points(table_id, name)
+        for name in _GAS_THERMO_COLUMNS
+    }
+    values: dict[str, Decimal] = {}
+    low_K: Decimal | None = None
+    high_K: Decimal | None = None
+    bracket_width_K = Decimal(0)
+    for name, (points, _digest, missing) in series.items():
+        temperatures = tuple(point[0] for point in points)
+        if len(temperatures) != len(set(temperatures)):
+            raise ValueError(f"{table_id}: duplicate temperature in {name}")
+        if temperature_K < points[0][0] or temperature_K > points[-1][0]:
+            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+        missing_node = _missing_node_for_interpolation(
+            points, missing, temperature_K
+        )
+        if missing_node is not None:
+            raise ValueError(
+                f"JANAF {name} interpolation spans missing grid node "
+                f"{missing_node} K at {temperature_K} K"
+            )
+        values[name] = _interpolate_table_points(points, temperature_K)
+        if name == "heat_capacity":
+            low_K = points[0][0]
+            high_K = points[-1][0]
+            if any(node == temperature_K for node in temperatures):
+                bracket_width_K = Decimal(0)
+            else:
+                left, right = next(
+                    (earlier, later)
+                    for earlier, later in zip(points, points[1:])
+                    if earlier[0] <= temperature_K <= later[0]
+                )
+                bracket_width_K = right[0] - left[0]
+    if low_K is None or high_K is None:
+        raise ValueError(f"{table_id}: JANAF gas table has no heat capacity")
+    return JANAFTabulatedGas(
+        table_id=table_id,
+        heat_capacity=values["heat_capacity"],
+        entropy=values["entropy"],
+        enthalpy_increment=values["enthalpy_increment"],
+        low_K=low_K,
+        high_K=high_K,
+        bracket_width_K=bracket_width_K,
+    )
+
+
 def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy:
     """Read ΔG_fus and its own cr/l table crossing from hash-checked JANAF rows."""
 

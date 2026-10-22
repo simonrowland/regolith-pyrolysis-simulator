@@ -2529,6 +2529,99 @@ def test_vaporock_gas_in_band_outputs_are_pinned() -> None:
             assert attempt.notices == ()
 
 
+def _printed_janaf_node(table_id: str, temperature: Decimal, column: str) -> Decimal:
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    for row in document["table"]["values"]:
+        if Decimal(str(row["temperature"]["as_published"])) == temperature:
+            return Decimal(str(row[column]["as_published"]))
+    raise AssertionError(f"{table_id} has no {column} node at {temperature} K")
+
+
+def _printed_janaf_bracket(
+    table_id: str, temperature: Decimal, column: str
+) -> tuple[Decimal, Decimal, Decimal, Decimal]:
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    points = []
+    for row in document["table"]["values"]:
+        cell = row[column]
+        token = cell.get("as_published")
+        if token in (None, ""):
+            continue
+        points.append(
+            (
+                Decimal(str(row["temperature"]["as_published"])),
+                Decimal(str(token)),
+            )
+        )
+    points.sort()
+    for (left_T, left_y), (right_T, right_y) in zip(points, points[1:]):
+        if left_T <= temperature <= right_T:
+            return left_T, left_y, right_T, right_y
+    raise AssertionError(f"{table_id} {column} does not bracket {temperature} K")
+
+
+def test_janaf_tabulated_gas_thermo_matches_printed_nodes() -> None:
+    """Tabulated nodes are exact. An interior point is the printed chord.
+
+    Cr, CaO, Na2, and MgO are the rows whose Shomate continuation is
+    physically invalid. 1050 K sits between CaO's printed 1000 K and
+    1100 K nodes. 6500 K is past every gas table's last node.
+    """
+
+    import pytest
+
+    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
+
+    nodes = (
+        ("Cr", Decimal("500"), "Cr-005"),
+        ("CaO", Decimal("1000"), "Ca-030"),
+        ("Na2", Decimal("500"), "Na-011"),
+        ("MgO", Decimal("100"), "Mg-011"),
+    )
+    for formula, temperature, table_id in nodes:
+        sample = janaf_tabulated_gas_thermo(formula, temperature)
+        assert sample.table_id == table_id
+        assert sample.bracket_width_K == 0
+        assert sample.low_K == 0
+        assert sample.high_K == Decimal("6000")
+        assert sample.heat_capacity == _printed_janaf_node(
+            table_id, temperature, "heat_capacity"
+        )
+        assert sample.entropy == _printed_janaf_node(table_id, temperature, "entropy")
+        assert sample.enthalpy_increment == _printed_janaf_node(
+            table_id, temperature, "enthalpy_increment"
+        )
+        assert sample.heat_capacity > 0
+        assert sample.entropy > 0
+        assert sample.enthalpy_increment.is_finite()
+
+    interior_T = Decimal("1050")
+    interior = janaf_tabulated_gas_thermo("CaO", interior_T)
+    left_T, left_y, right_T, right_y = _printed_janaf_bracket(
+        "Ca-030", interior_T, "heat_capacity"
+    )
+    chord = left_y + (right_y - left_y) * (interior_T - left_T) / (right_T - left_T)
+    assert left_T < interior_T < right_T
+    assert interior.bracket_width_K == right_T - left_T
+    assert interior.heat_capacity == chord
+    assert abs(interior.heat_capacity - left_y) <= abs(right_y - left_y)
+
+    zero = janaf_tabulated_gas_thermo("Cr", Decimal("0"))
+    assert zero.heat_capacity == 0
+    assert zero.entropy == 0
+
+    with pytest.raises(ValueError, match="outside the JANAF table range"):
+        janaf_tabulated_gas_thermo("Cr", Decimal("6500"))
+    with pytest.raises(ValueError, match="no JANAF gas table"):
+        janaf_tabulated_gas_thermo("O2", Decimal("500"))
+    with pytest.raises(ValueError, match="ambiguous JANAF gas tables"):
+        janaf_tabulated_gas_thermo("HONO", Decimal("500"))
+
+
 def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
     import pytest
 
@@ -2572,7 +2665,7 @@ def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
     assert residuals[0].source_relation is SourceRelation.SAME_INPUT
 
 
-def test_vaporock_gas_refuses_missing_species_and_out_of_interval() -> None:
+def test_vaporock_gas_refuses_missing_and_charged_species() -> None:
     import pytest
 
     pytest.importorskip("vaporock.equil")
@@ -2596,19 +2689,135 @@ def test_vaporock_gas_refuses_missing_species_and_out_of_interval() -> None:
     )
     assert missing.value is None
     assert missing.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert missing.refusal_detail["reason"] == "vaporock-species-not-in-janaf-table"
 
-    outside = predict_thermo_attempt(
-        Engine.VAPOROCK,
-        F.observation(
-            "potassium-below-table",
-            "exp-1",
-            _gas_thermo(temperature_K=Decimal("1000")),
-            Decimal("0"),
-        ),
-    )
-    assert outside.value is None
-    assert outside.refusal_reason is RefusalReason.UNSUPPORTED
-    assert outside.refusal_detail["reason"] == "vaporock-temperature-outside-janaf-row"
+
+_OUTSIDE_SHOMATE_TABLE_CASES = (
+    ("Cr", Decimal("500"), "Cr-005"),
+    ("CaO", Decimal("1000"), "Ca-030"),
+    ("Na2", Decimal("500"), "Na-011"),
+    ("MgO", Decimal("100"), "Mg-011"),
+    ("K", Decimal("1000"), "K-005"),
+    ("Fe", Decimal("2200"), "Fe-008"),
+)
+
+
+def test_vaporock_gas_outside_shomate_uses_janaf_table() -> None:
+    """Outside the Shomate row, the attempt returns the printed gas-table node.
+
+    Cr 500 K, CaO 1000 K, Na2 500 K, and MgO 100 K are the continuations
+    that go non-positive on the polynomial. K 1000 K is 39.54 K below its
+    first Shomate row. Fe 2200 K is the lunar shape, below its only row.
+    Each temperature is a printed JANAF node, so the interpolation
+    remainder is 0.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    from simulator.battery.compilation_tier import _JANAF_TABLE_NOTICE
+
+    columns = {
+        Quantity.CP: "heat_capacity",
+        Quantity.S: "entropy",
+        Quantity.H_MINUS_H298: "enthalpy_increment",
+    }
+    for formula, temperature, table_id in _OUTSIDE_SHOMATE_TABLE_CASES:
+        for quantity, column in columns.items():
+            printed = _printed_janaf_node(table_id, temperature, column)
+            attempt = predict_thermo_attempt(
+                Engine.VAPOROCK,
+                F.observation(
+                    f"table-{formula}-{quantity.value}-{temperature}",
+                    "exp-1",
+                    _gas_thermo(formula, quantity, temperature),
+                    printed,
+                ),
+            )
+            assert attempt.refusal_reason is None
+            assert attempt.value == printed
+            assert attempt.authority is Authority.BRIDGE
+            assert attempt.authority is not Authority.EXTRAPOLATED
+            assert len(attempt.notices) == 1
+            notice = attempt.notices[0]
+            assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+            assert notice.authority is Authority.BRIDGE
+            assert notice.reason == f"{_JANAF_TABLE_NOTICE}; table_id={table_id}"
+            assert notice.band == "[0, 6000] K"
+            assert f"janaf_table_id={table_id}" in attempt.call_evidence
+
+
+def test_vaporock_gas_outside_janaf_table_stays_refused() -> None:
+    """Past the tabulated gas table, the refusal is the base token.
+
+    K at 6500 K is above its Shomate end and above K-005. No continuation
+    and no clamp.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
+        outside = predict_thermo_attempt(
+            Engine.VAPOROCK,
+            F.observation(
+                f"potassium-above-table-{quantity.value}",
+                "exp-1",
+                _gas_thermo("K", quantity, Decimal("6500")),
+                Decimal("0"),
+            ),
+        )
+        assert outside.value is None
+        assert outside.refusal_reason is RefusalReason.UNSUPPORTED
+        assert (
+            outside.refusal_detail["reason"]
+            == "vaporock-temperature-outside-janaf-row"
+        )
+
+
+def test_tabulated_gas_attempt_refuses_nonpositive_heat_capacity(monkeypatch) -> None:
+    """Cp > 0, S > 0, and a finite H are one gate for every quantity.
+
+    The installed positive-temperature nodes of these gas tables are
+    admissible. Cr-005 at 0 K is not (Cp = 0, S = 0), and a non-positive
+    temperature never reaches this path. Substitute that inadmissible
+    sample at a positive temperature and require Cp, S, and H−H298 all
+    to refuse with no number.
+    """
+
+    from simulator.battery.compilation_tier import _vaporock_tabulated_gas_attempt
+    from simulator.battery.generators import janaf as janaf_module
+    from simulator.battery.generators.janaf import JANAFTabulatedGas
+
+    def nonpositive(_formula: str, _temperature: Decimal) -> JANAFTabulatedGas:
+        return JANAFTabulatedGas(
+            table_id="Cr-005",
+            heat_capacity=Decimal("0"),
+            entropy=Decimal("0"),
+            enthalpy_increment=Decimal("-6.197"),
+            low_K=Decimal("0"),
+            high_K=Decimal("6000"),
+            bracket_width_K=Decimal("0"),
+        )
+
+    monkeypatch.setattr(janaf_module, "janaf_tabulated_gas_thermo", nonpositive)
+    for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
+        attempt = _vaporock_tabulated_gas_attempt(
+            "Cr",
+            quantity,
+            Decimal("500"),
+            origin="chromium-nonpositive",
+            species_name="Cr(g)",
+            call_evidence="test",
+        )
+        assert attempt.value is None
+        assert attempt.refusal_reason is RefusalReason.METRIC_DOMAIN
+        assert (
+            attempt.refusal_detail["reason"]
+            == "vaporock-janaf-table-thermo-not-admissible"
+        )
 
 
 def test_vaporock_import_failure_is_a_typed_unavailable_refusal(monkeypatch) -> None:

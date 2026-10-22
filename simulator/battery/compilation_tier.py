@@ -1029,6 +1029,125 @@ def _pure_phase_attempt(
     )
 
 
+_JANAF_TABLE_NOTICE = (
+    "Shomate segment does not cover T; JANAF tabulated values used"
+)
+
+
+def _vaporock_tabulated_gas_attempt(
+    formula: str,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    *,
+    origin: str,
+    species_name: str,
+    call_evidence: str,
+) -> ThermoAttempt:
+    """Outside every Shomate row, read the phase-g JANAF table or refuse.
+
+    The table's in-grid value is BRIDGE, the same authority as an in-range
+    JANAF fusion read in this module. The table document has no separate
+    authority field. This is not an extrapolated Shomate continuation.
+    Cp > 0, S > 0, and a finite H−H298 are required together, so a request
+    for one quantity cannot return a number from a branch the others reject.
+    """
+
+    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
+
+    table_formula = formula[:-3] if formula.endswith("(g)") else formula
+    try:
+        sample = janaf_tabulated_gas_thermo(table_formula, temperature_K)
+    except ValueError as exc:
+        text = str(exc)
+        extra = {"engine": Engine.VAPOROCK.value, "species": species_name}
+        if text.startswith("ambiguous JANAF gas tables"):
+            return _refuse(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "vaporock-janaf-gas-table-ambiguous",
+                quantity=quantity,
+                origin=origin,
+                extra=extra,
+                call_evidence=call_evidence,
+            )
+        if (
+            text.startswith("no JANAF gas table")
+            or "outside the JANAF table range" in text
+            or "fewer than two" in text
+        ):
+            # Same refusal the in-band selector used when no row contained T.
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "vaporock-temperature-outside-janaf-row",
+                quantity=quantity,
+                origin=origin,
+                extra=extra,
+                call_evidence=call_evidence,
+            )
+        if "missing grid node" in text or "duplicate temperature" in text:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "vaporock-janaf-table-gap",
+                quantity=quantity,
+                origin=origin,
+                extra=extra,
+                call_evidence=call_evidence,
+            )
+        return _refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "vaporock-janaf-table-unreadable",
+            quantity=quantity,
+            origin=origin,
+            extra={**extra, "detail": text},
+            call_evidence=call_evidence,
+        )
+
+    heat_capacity = sample.heat_capacity
+    entropy = sample.entropy
+    enthalpy = sample.enthalpy_increment
+    admissible = (
+        heat_capacity.is_finite()
+        and heat_capacity > 0
+        and entropy.is_finite()
+        and entropy > 0
+        and enthalpy.is_finite()
+    )
+    if not admissible:
+        return _refuse(
+            RefusalReason.METRIC_DOMAIN,
+            "vaporock-janaf-table-thermo-not-admissible",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            call_evidence=call_evidence,
+        )
+    value = {
+        Quantity.CP: heat_capacity,
+        Quantity.S: entropy,
+        Quantity.H_MINUS_H298: enthalpy,
+    }[quantity]
+    return ThermoAttempt(
+        value=value,
+        unit=QUANTITY_UNITS[quantity],
+        authority=Authority.BRIDGE,
+        notices=(
+            Notice(
+                kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                affected_quantities=(quantity,),
+                reason=f"{_JANAF_TABLE_NOTICE}; table_id={sample.table_id}",
+                origin=origin,
+                band=(
+                    f"[{_decimal_token(sample.low_K)}, "
+                    f"{_decimal_token(sample.high_K)}] K"
+                ),
+                authority=Authority.BRIDGE,
+            ),
+        ),
+        refusal_reason=None,
+        refusal_detail={},
+        call_evidence=f"{call_evidence}:janaf_table_id={sample.table_id}",
+    )
+
+
 def _vaporock_gas_attempt(
     identity: Identity,
     quantity: Quantity,
@@ -1138,12 +1257,14 @@ def _vaporock_gas_attempt(
         if temperature > float(row["T_min"]) and temperature <= float(row["T_max"])
     )
     if not matching_rows:
-        return _refuse(
-            RefusalReason.UNSUPPORTED,
-            "vaporock-temperature-outside-janaf-row",
-            quantity=quantity,
+        # Do not continue the Shomate row. Cr(g) at 500 K on that polynomial
+        # is about −49 J/(mol·K); the gas table's own 500 K node is 20.786.
+        return _vaporock_tabulated_gas_attempt(
+            formula,
+            quantity,
+            temperature_K,
             origin=origin,
-            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            species_name=species_name,
             call_evidence=call_evidence,
         )
     if len(matching_rows) != 1:
