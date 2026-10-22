@@ -336,6 +336,9 @@ def test_sio_stage_band_flux_uses_cold_wall_gate(
     assert route.condensed_for_species("SiO") > 0.0
     assert captured_below_floor_alphas
     assert captured_below_floor_alphas == pytest.approx(
+        [captured_below_floor_alphas[0]] * len(captured_below_floor_alphas)
+    )
+    assert captured_below_floor_alphas == pytest.approx(
         [1.0] * len(captured_below_floor_alphas)
     )
 
