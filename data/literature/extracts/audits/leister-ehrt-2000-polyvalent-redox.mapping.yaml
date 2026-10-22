@@ -1,0 +1,28 @@
+source_id: leister-ehrt-2000-polyvalent-redox
+source: ../regolith-sources/_incoming/leister-ehrt-2000-polyvalent-redox/leister-ehrt-2000-polyvalent-redox.pdf
+extraction_mode: manual_600dpi_render_checked
+table_tool: unavailable in this seat
+mappings:
+  - table: 'Tab. 1'
+    page: 5
+    columns: [Temperature_C, Atmosphere, Glass_A_Fe3_Fe2_percent, Glass_B_Fe3_Fe2_percent, Glass_C_Fe3_Fe2_percent]
+    typed_as:
+      - species.Fe.observations[leister_2000_fe_table1_glass_a].values.points
+      - species.Fe.observations[leister_2000_fe_table1_glass_b].values.points
+      - species.Fe.observations[leister_2000_fe_table1_glass_c].values.points
+    transform: Printed Fe3+/Fe2+ percentage pair -> Fe3_over_FeT fraction for the existing fe3_fe2_ratio migrator; preserve both percentages and the printed pair.
+  - table: 'Tab. 2'
+    page: 7
+    columns: [Temperature_C, Atmosphere, Glass_A_V5_V4_V3_percent, Glass_B_V5_V4_V3_percent, Glass_C_V5_V4_V3_percent]
+    typed_as: species.V.context[leister_2000_v_table2].values.points
+    reason: no matching V valence-distribution token
+  - table: 'Tab. 3'
+    page: 8
+    columns: [Temperature_C, Atmosphere, Glass_A_Cr6_Cr3_percent, Glass_B_Cr6_Cr3_percent, Glass_C_Cr6_Cr3_Cr2_percent]
+    typed_as: species.Cr.context[leister_2000_cr_table3].values.points
+    reason: no matching Cr valence-distribution token
+  - table: 'Tab. 4'
+    page: 8
+    columns: [Temperature_C, Atmosphere, Glass_A_Ti4_Ti3_percent, Glass_B_Ti4_Ti3_percent, Glass_C_Ti4_Ti3_percent]
+    typed_as: species.Ti.context[leister_2000_ti_table4].values.points
+    reason: no matching Ti valence-distribution token

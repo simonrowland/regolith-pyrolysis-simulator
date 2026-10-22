@@ -1,0 +1,95 @@
+source_id: babaian-2024-fe-mg-si-air-equilibria
+extraction_mode: manual_600dpi_render_checked
+table_tool: copied from offer-21 commit 57eef5488 into scratch; MinerU draft converted the Table 3 page only
+table_tool_compare: >-
+  compare reported total=0 because it does not recognize d-223 scalar component_amount observations; all Table 3 cells were
+  independently checked against the physical page 10 render and the born-digital PDF text.
+mappings:
+  - table: '1'
+    page: 5
+    columns:
+      - Experiment
+      - Phase
+      - Measurement
+      - SiO2 (mol.%)
+      - FeO1.5 (mol.%)
+      - MgO (mol.%)
+      - Old total (wt.%)
+    disposition: context only
+    candidate_quantity_tokens:
+      - equilibrium_phase_composition
+    reason: >-
+      All nine rows report solid-phase compositions. The d-223 phase_role enum has no solid role, so each complete row is
+      retained in context with its UQ/ANU/corrected attribution and printed old total.
+  - table: '2'
+    page_range: '6-7'
+    columns:
+      - Substrate
+      - Mixture
+      - Preheat T (°C)
+      - Final equilibration T (°C)
+      - Time (h)
+      - Phase
+      - SiO2 (mol.%)
+      - FeO1.5 (mol.%)
+      - MgO (mol.%)
+    typed_as:
+      - one equilibrium_phase_composition observation per nonzero printed component for every liquid phase
+    component_species:
+      - SiO2
+      - FeO1.5
+      - MgO
+    identity:
+      phase_role: melt
+      basis: mole_fraction
+      amount: printed oxide mol.% shifted exactly two decimal places to mole fraction; original printed figure and mol.% unit retained in component_amount_as_published
+      sigma: printed standard deviation, retained in mol.% units when nonzero
+      temperature: final equilibration T_C is carried by values.T_C and point_conditions.T_C with the Table 2 row locator
+      atmosphere: air from the Table 2 caption, carried by point_conditions.atmosphere
+      sample_binding: sample id, substrate, preheat and printed time remain bound to each experiment
+      quench: CaCl2-H2O or MgCl2-H2O brine at approximately -20°C, as described on physical page 4
+    filing:
+      liquid_with_only_olivine: species.MgO
+      liquid_with_only_spinel_or_monoxide: species.FeO
+      liquid_with_silica_polymorph_or_multiple_coexisting_solids: species.SiO2
+      two_liquid_tie_lines: species.SiO2
+    untyped_rows:
+      solid_phase_compositions: context records preserve each printed component, including detection limits; no d-223 solid phase_role exists
+    audit:
+      printed_phase_rows: 113
+      typed_liquid_phase_rows: 49
+      context_solid_phase_rows: 64
+      typed_scalar_observations: 144
+      zero_mol_percent_context_rows: 3
+      row_column_assignment: checked against 600 dpi renders of physical pages 6 and 7
+  - table: '3'
+    page: 10
+    columns:
+      - Reaction
+      - Type
+      - T (°C)
+      - Liquid FeO1.5 (mol.%)
+      - Liquid MgO (mol.%)
+      - Liquid SiO2 (mol.%)
+      - Reference
+    typed_as:
+      - one equilibrium_phase_composition observation per printed liquid component for present-study experimental data
+      - one equilibrium_phase_composition observation per printed liquid component for quoted measured data
+    identity:
+      phase_role: melt
+      basis: mole_fraction
+      amount: printed oxide mol.% shifted exactly two decimal places to mole fraction; original printed figure and mol.% unit retained in component_amount_as_published
+      sigma: printed standard deviation, retained in mol.% units when nonzero
+    typed_rows:
+      present_study_experiment: 1637°C invariant composition (three components)
+      quoted_measurements: six rows attributed to references 38), 39), and 40) (eighteen components total)
+    context_rows:
+      - model-derived compositions at 1718, 1637, 1387, and 1410°C
+      - temperature-only rows at 1717 and 1714°C, references 10) and 11)
+      - 1723°C present-study composition is the same FMS7 observation already in Table 2; both printed compositions are retained in that row's note
+    audit:
+      row_column_assignment: checked against the 600 dpi render of physical page 10
+  - figures: '1-7'
+    typed_as: context figure records, no numeric points
+    digitisation: deferred to a figure pass
+    marker_counts: deferred to figure pass; no plotted values estimated

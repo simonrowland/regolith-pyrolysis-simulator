@@ -1,0 +1,3760 @@
+schema_version: literature_extract.v1
+source_id: abdullah-2013-redox-acid-base-soda-lime-silicate-thesis
+source:
+  citation: 'Abdullah, T. K. (2013). Study of the redox and acid-base properties of soda-lime silicate glass: application
+    to the high temperature corrosion of nickel-based alloys and ceramic materials. Doctoral thesis, Université
+    de Lorraine.'
+  year: 2013
+extraction:
+  method: Manual transcription from born-digital pdftotext-layout.txt because no table-tool executable is available
+    in this seat. Tables 4.8 (PDF page 151), 5.3 (page 211), and 5.4 (page 213) were checked cell by cell against
+    600 dpi renders. Figures 5.24 and 5.25 are recorded with digitisation deferred. Cr solubility values repeated
+    in Tables 4.8 and 5.3 are stored once with the secondary locator noted.
+  date: '2026-10-22'
+  worker: fam41-1022
+  provenance_path: data/literature/extracts/abdullah-2013-redox-acid-base-soda-lime-silicate-thesis.yaml
+review_status: draft
+experiments:
+- experiment_id: abdullah_2013_t4_8_n2s_quoted_khedim99_air
+  method: quoted_attributed
+  description: Table 4.8 identifies its N2S column as reference 99 (Khedim, 2008).
+  locator:
+    pdf_page_index: 150
+    page: 151
+    table: '4.8'
+    row: N2S, 1200 °C and 1250 °C
+- experiment_id: abdullah_2013_t5_3_t1200_air
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1200 °C; Air
+- experiment_id: abdullah_2013_t5_3_t1200_co_coo
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1200 °C; Co/CoO
+- experiment_id: abdullah_2013_t5_3_t1200_cu_cu2o
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1200 °C; Cu/Cu2O
+- experiment_id: abdullah_2013_t5_3_t1200_fe3o4_fe2o3
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1200 °C; Fe3O4/Fe2O3
+- experiment_id: abdullah_2013_t5_3_t1200_fe_feo
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1200 °C; Fe/FeO
+- experiment_id: abdullah_2013_t5_3_t1200_feo_fe3o4
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1200 °C; FeO/Fe3O4
+- experiment_id: abdullah_2013_t5_3_t1200_ni_nio
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1200 °C; Ni/NiO
+- experiment_id: abdullah_2013_t5_3_t1300_air
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1300 °C; Air
+- experiment_id: abdullah_2013_t5_3_t1300_co_coo
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1300 °C; Co/CoO
+- experiment_id: abdullah_2013_t5_3_t1300_fe_feo
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1300 °C; Fe/FeO
+- experiment_id: abdullah_2013_t5_3_t1300_feo_fe3o4
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1300 °C; FeO/Fe3O4
+- experiment_id: abdullah_2013_t5_3_t1300_ni_nio
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1300 °C; Ni/NiO
+- experiment_id: abdullah_2013_t5_3_t1350_air
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1350 °C; Air
+- experiment_id: abdullah_2013_t5_3_t1350_co_coo
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1350 °C; Co/CoO
+- experiment_id: abdullah_2013_t5_3_t1350_fe_feo
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1350 °C; Fe/FeO
+- experiment_id: abdullah_2013_t5_3_t1350_feo_fe3o4
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1350 °C; FeO/Fe3O4
+- experiment_id: abdullah_2013_t5_3_t1350_ni_nio
+  method: quench_equilibration
+  description: Closed silica-tube heat treatment with the printed metal/metal-oxide buffer; the tube was directly
+    quenched in air after heat treatment.
+  locator:
+    pdf_page_index: 78
+    page: 79
+    section: 3.2.2.2 Control of the experimental parameters
+  conditions_locator:
+    pdf_page_index: 210
+    page: 211
+    table: '5.3'
+    row: 1350 °C; Ni/NiO
+species:
+  Cr:
+    observations: []
+    context:
+    - observation_id: abdullah_2013_t4_8_n2s_t1200_air_khedim99
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t4_8_n2s_quoted_khedim99_air
+      locator: &id001
+        pdf_page_index: 150
+        page: 151
+        table: '4.8'
+        row: N2S, 1200 °C
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '2.13(± 0.11)'
+        phase_label: melt
+        phase_label_as_published: Glasses
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: N2S
+        sample_composition_as_published: Na2O-2SiO2 (N2S)
+        buffer_as_published: Air
+        method_class: quoted_attributed
+        attribution: Khedim, H. Etude de la limite de solubilite de la chromine (Cr2O3) dans les silicates
+          fondus-determination de grandeurs thermodynamiques et physicochimiques. PhD Thesis Université Henri Poincaré
+          (2008).
+        attribution_reference_number_as_published: '99'
+        admission_status: admitted
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id001
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id001
+      uncertainty:
+        reported_status: printed
+        sigma: 0.11
+        units: at.%
+    - observation_id: abdullah_2013_t4_8_n2s_t1250_air_khedim99
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t4_8_n2s_quoted_khedim99_air
+      locator: &id002
+        pdf_page_index: 150
+        page: 151
+        table: '4.8'
+        row: N2S, 1250 °C
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '2.76(± 0.15)'
+        phase_label: melt
+        phase_label_as_published: Glasses
+        basis: at_percent
+        T_C: 1250
+        sample_id_as_published: N2S
+        sample_composition_as_published: Na2O-2SiO2 (N2S)
+        buffer_as_published: Air
+        method_class: quoted_attributed
+        attribution: Khedim, H. Etude de la limite de solubilite de la chromine (Cr2O3) dans les silicates
+          fondus-determination de grandeurs thermodynamiques et physicochimiques. PhD Thesis Université Henri Poincaré
+          (2008).
+        attribution_reference_number_as_published: '99'
+        admission_status: admitted
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1250
+            locator: *id002
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id002
+      uncertainty:
+        reported_status: printed
+        sigma: 0.15
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_air_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_air
+      locator: &id003
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Air; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.74 ± (0.06)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id003
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id003
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id003
+        also_reported_at:
+          pdf_page_index: 150
+          page: 151
+          table: '4.8'
+          row: NC3S, 1200 °C
+        note: The same value is also printed in Table 4.8, PDF page 151, row NC3S, 1200 °C; retained once here.
+      uncertainty:
+        reported_status: printed
+        sigma: 0.06
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_air_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_air
+      locator: &id004
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Air; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.55 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id004
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id004
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id004
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_air_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_air
+      locator: &id005
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Air; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.44 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id005
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id005
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id005
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_air_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_air
+      locator: &id006
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Air; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.42 (±0.06)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id006
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id006
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id006
+        also_reported_at:
+          pdf_page_index: 150
+          page: 151
+          table: '4.8'
+          row: NC6S, 1200 °C
+        note: The same value is also printed in Table 4.8, PDF page 151, row NC6S, 1200 °C; retained once here.
+      uncertainty:
+        reported_status: printed
+        sigma: 0.06
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_co_coo_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_co_coo
+      locator: &id007
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Co/CoO; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.27 (±0.04)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id007
+          fO2_log:
+            state:
+              tag: value
+              value: '-9.25'
+            locator: *id007
+      uncertainty:
+        reported_status: printed
+        sigma: 0.04
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_co_coo_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_co_coo
+      locator: &id008
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Co/CoO; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.33 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id008
+          fO2_log:
+            state:
+              tag: value
+              value: '-9.25'
+            locator: *id008
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_co_coo_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_co_coo
+      locator: &id009
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Co/CoO; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.29 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id009
+          fO2_log:
+            state:
+              tag: value
+              value: '-9.25'
+            locator: *id009
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_co_coo_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_co_coo
+      locator: &id010
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Co/CoO; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.25 (±0.01)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id010
+          fO2_log:
+            state:
+              tag: value
+              value: '-9.25'
+            locator: *id010
+      uncertainty:
+        reported_status: printed
+        sigma: 0.01
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_cu_cu2o_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_cu_cu2o
+      locator: &id011
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Cu/Cu2O; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.26 (±0.01)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Cu/Cu2O
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id011
+          fO2_log:
+            state:
+              tag: value
+              value: '-4.25'
+            locator: *id011
+      uncertainty:
+        reported_status: printed
+        sigma: 0.01
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_cu_cu2o_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_cu_cu2o
+      locator: &id012
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Cu/Cu2O; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.30 (±0.01)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Cu/Cu2O
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id012
+          fO2_log:
+            state:
+              tag: value
+              value: '-4.25'
+            locator: *id012
+      uncertainty:
+        reported_status: printed
+        sigma: 0.01
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_cu_cu2o_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_cu_cu2o
+      locator: &id013
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Cu/Cu2O; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.29 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Cu/Cu2O
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id013
+          fO2_log:
+            state:
+              tag: value
+              value: '-4.25'
+            locator: *id013
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_cu_cu2o_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_cu_cu2o
+      locator: &id014
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Cu/Cu2O; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.26 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Cu/Cu2O
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id014
+          fO2_log:
+            state:
+              tag: value
+              value: '-4.25'
+            locator: *id014
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_fe3o4_fe2o3_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_fe3o4_fe2o3
+      locator: &id015
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Fe3O4/Fe2O3; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.56 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Fe3O4/Fe2O3
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id015
+          fO2_log:
+            state:
+              tag: value
+              value: '-1.64'
+            locator: *id015
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_fe3o4_fe2o3_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_fe3o4_fe2o3
+      locator: &id016
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Fe3O4/Fe2O3; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.33 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Fe3O4/Fe2O3
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id016
+          fO2_log:
+            state:
+              tag: value
+              value: '-1.64'
+            locator: *id016
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_fe3o4_fe2o3_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_fe3o4_fe2o3
+      locator: &id017
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Fe3O4/Fe2O3; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.31 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Fe3O4/Fe2O3
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id017
+          fO2_log:
+            state:
+              tag: value
+              value: '-1.64'
+            locator: *id017
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_fe3o4_fe2o3_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_fe3o4_fe2o3
+      locator: &id018
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Fe3O4/Fe2O3; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.26 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Fe3O4/Fe2O3
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id018
+          fO2_log:
+            state:
+              tag: value
+              value: '-1.64'
+            locator: *id018
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_fe_feo_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_fe_feo
+      locator: &id019
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Fe/FeO; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.36 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id019
+          fO2_log:
+            state:
+              tag: value
+              value: '-11.89'
+            locator: *id019
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_fe_feo_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_fe_feo
+      locator: &id020
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Fe/FeO; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.45 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id020
+          fO2_log:
+            state:
+              tag: value
+              value: '-11.89'
+            locator: *id020
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_fe_feo_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_fe_feo
+      locator: &id021
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Fe/FeO; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.45 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id021
+          fO2_log:
+            state:
+              tag: value
+              value: '-11.89'
+            locator: *id021
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_fe_feo_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_fe_feo
+      locator: &id022
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Fe/FeO; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.53 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id022
+          fO2_log:
+            state:
+              tag: value
+              value: '-11.89'
+            locator: *id022
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_feo_fe3o4_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_feo_fe3o4
+      locator: &id023
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; FeO/Fe3O4; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.31 (±0.01)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id023
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.49'
+            locator: *id023
+      uncertainty:
+        reported_status: printed
+        sigma: 0.01
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_feo_fe3o4_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_feo_fe3o4
+      locator: &id024
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; FeO/Fe3O4; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.34 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id024
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.49'
+            locator: *id024
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_feo_fe3o4_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_feo_fe3o4
+      locator: &id025
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; FeO/Fe3O4; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.30 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id025
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.49'
+            locator: *id025
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_feo_fe3o4_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_feo_fe3o4
+      locator: &id026
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; FeO/Fe3O4; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.28 (±0.01)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id026
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.49'
+            locator: *id026
+      uncertainty:
+        reported_status: printed
+        sigma: 0.01
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_ni_nio_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_ni_nio
+      locator: &id027
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Ni/NiO; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.25 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id027
+          fO2_log:
+            state:
+              tag: value
+              value: '-7.65'
+            locator: *id027
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_ni_nio_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_ni_nio
+      locator: &id028
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Ni/NiO; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.29 (±0.01)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id028
+          fO2_log:
+            state:
+              tag: value
+              value: '-7.65'
+            locator: *id028
+      uncertainty:
+        reported_status: printed
+        sigma: 0.01
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_ni_nio_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_ni_nio
+      locator: &id029
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Ni/NiO; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.27 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id029
+          fO2_log:
+            state:
+              tag: value
+              value: '-7.65'
+            locator: *id029
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1200_ni_nio_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1200_ni_nio
+      locator: &id030
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1200 °C; Ni/NiO; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.26 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1200
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1200
+            locator: *id030
+          fO2_log:
+            state:
+              tag: value
+              value: '-7.65'
+            locator: *id030
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_air_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_air
+      locator: &id031
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Air; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.84 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id031
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id031
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id031
+        also_reported_at:
+          pdf_page_index: 150
+          page: 151
+          table: '4.8'
+          row: NC3S, 1300 °C
+        note: The same value is also printed in Table 4.8, PDF page 151, row NC3S, 1300 °C; retained once here.
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_air_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_air
+      locator: &id032
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Air; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.67 (±0.05)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id032
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id032
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id032
+      uncertainty:
+        reported_status: printed
+        sigma: 0.05
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_air_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_air
+      locator: &id033
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Air; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.45 (±0.05)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id033
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id033
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id033
+      uncertainty:
+        reported_status: printed
+        sigma: 0.05
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_air_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_air
+      locator: &id034
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Air; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.50 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id034
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id034
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id034
+        also_reported_at:
+          pdf_page_index: 150
+          page: 151
+          table: '4.8'
+          row: NC6S, 1300 °C
+        note: The same value is also printed in Table 4.8, PDF page 151, row NC6S, 1300 °C; retained once here.
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_co_coo_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_co_coo
+      locator: &id035
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Co/CoO; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.38 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id035
+          fO2_log:
+            state:
+              tag: value
+              value: '-8.20'
+            locator: *id035
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_co_coo_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_co_coo
+      locator: &id036
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Co/CoO; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.41 (±0.01)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id036
+          fO2_log:
+            state:
+              tag: value
+              value: '-8.20'
+            locator: *id036
+      uncertainty:
+        reported_status: printed
+        sigma: 0.01
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_co_coo_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_co_coo
+      locator: &id037
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Co/CoO; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.43 (±0.01)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id037
+          fO2_log:
+            state:
+              tag: value
+              value: '-8.20'
+            locator: *id037
+      uncertainty:
+        reported_status: printed
+        sigma: 0.01
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_co_coo_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_co_coo
+      locator: &id038
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Co/CoO; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.42 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id038
+          fO2_log:
+            state:
+              tag: value
+              value: '-8.20'
+            locator: *id038
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_fe_feo_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_fe_feo
+      locator: &id039
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Fe/FeO; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.70 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id039
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.71'
+            locator: *id039
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_fe_feo_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_fe_feo
+      locator: &id040
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Fe/FeO; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.50 (±0.06)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id040
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.71'
+            locator: *id040
+      uncertainty:
+        reported_status: printed
+        sigma: 0.06
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_fe_feo_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_fe_feo
+      locator: &id041
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Fe/FeO; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.66 (±0.07)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id041
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.71'
+            locator: *id041
+      uncertainty:
+        reported_status: printed
+        sigma: 0.07
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_fe_feo_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_fe_feo
+      locator: &id042
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Fe/FeO; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.66 (±0.11)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id042
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.71'
+            locator: *id042
+      uncertainty:
+        reported_status: printed
+        sigma: 0.11
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_feo_fe3o4_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_feo_fe3o4
+      locator: &id043
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; FeO/Fe3O4; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.52 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id043
+          fO2_log:
+            state:
+              tag: value
+              value: '-9.15'
+            locator: *id043
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_feo_fe3o4_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_feo_fe3o4
+      locator: &id044
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; FeO/Fe3O4; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.47 (±0.01)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id044
+          fO2_log:
+            state:
+              tag: value
+              value: '-9.15'
+            locator: *id044
+      uncertainty:
+        reported_status: printed
+        sigma: 0.01
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_feo_fe3o4_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_feo_fe3o4
+      locator: &id045
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; FeO/Fe3O4; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.45 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id045
+          fO2_log:
+            state:
+              tag: value
+              value: '-9.15'
+            locator: *id045
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_feo_fe3o4_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_feo_fe3o4
+      locator: &id046
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; FeO/Fe3O4; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.38 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id046
+          fO2_log:
+            state:
+              tag: value
+              value: '-9.15'
+            locator: *id046
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_ni_nio_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_ni_nio
+      locator: &id047
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Ni/NiO; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.30 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id047
+          fO2_log:
+            state:
+              tag: value
+              value: '-6.60'
+            locator: *id047
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_ni_nio_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_ni_nio
+      locator: &id048
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Ni/NiO; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.38 (±0.04)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id048
+          fO2_log:
+            state:
+              tag: value
+              value: '-6.60'
+            locator: *id048
+      uncertainty:
+        reported_status: printed
+        sigma: 0.04
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_ni_nio_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_ni_nio
+      locator: &id049
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Ni/NiO; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.39 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id049
+          fO2_log:
+            state:
+              tag: value
+              value: '-6.60'
+            locator: *id049
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1300_ni_nio_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1300_ni_nio
+      locator: &id050
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1300 °C; Ni/NiO; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.34 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1300
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1300
+            locator: *id050
+          fO2_log:
+            state:
+              tag: value
+              value: '-6.60'
+            locator: *id050
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_air_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_air
+      locator: &id051
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Air; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '1.05 (±0.04)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id051
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id051
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id051
+      uncertainty:
+        reported_status: printed
+        sigma: 0.04
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_air_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_air
+      locator: &id052
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Air; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.65 (±0.05)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id052
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id052
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id052
+      uncertainty:
+        reported_status: printed
+        sigma: 0.05
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_air_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_air
+      locator: &id053
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Air; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.57 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id053
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id053
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id053
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_air_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_air
+      locator: &id054
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Air; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.54 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Air
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id054
+          fO2_log:
+            state:
+              tag: value
+              value: '-0.67'
+            locator: *id054
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator: *id054
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_co_coo_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_co_coo
+      locator: &id055
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Co/CoO; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.49 (±0.01)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id055
+          fO2_log:
+            state:
+              tag: value
+              value: '-7.72'
+            locator: *id055
+      uncertainty:
+        reported_status: printed
+        sigma: 0.01
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_co_coo_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_co_coo
+      locator: &id056
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Co/CoO; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.50 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id056
+          fO2_log:
+            state:
+              tag: value
+              value: '-7.72'
+            locator: *id056
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_co_coo_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_co_coo
+      locator: &id057
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Co/CoO; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.48 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id057
+          fO2_log:
+            state:
+              tag: value
+              value: '-7.72'
+            locator: *id057
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_co_coo_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_co_coo
+      locator: &id058
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Co/CoO; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.43 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Co/CoO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id058
+          fO2_log:
+            state:
+              tag: value
+              value: '-7.72'
+            locator: *id058
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_fe_feo_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_fe_feo
+      locator: &id059
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Fe/FeO; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.97 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id059
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.17'
+            locator: *id059
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_fe_feo_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_fe_feo
+      locator: &id060
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Fe/FeO; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '1.05 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id060
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.17'
+            locator: *id060
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_fe_feo_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_fe_feo
+      locator: &id061
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Fe/FeO; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.96 (±0.04)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id061
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.17'
+            locator: *id061
+      uncertainty:
+        reported_status: printed
+        sigma: 0.04
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_fe_feo_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_fe_feo
+      locator: &id062
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Fe/FeO; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.92 (±0.13)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Fe/FeO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id062
+          fO2_log:
+            state:
+              tag: value
+              value: '-10.17'
+            locator: *id062
+      uncertainty:
+        reported_status: printed
+        sigma: 0.13
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_feo_fe3o4_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_feo_fe3o4
+      locator: &id063
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; FeO/Fe3O4; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.62 (±0.06)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id063
+          fO2_log:
+            state:
+              tag: value
+              value: '-8.54'
+            locator: *id063
+      uncertainty:
+        reported_status: printed
+        sigma: 0.06
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_feo_fe3o4_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_feo_fe3o4
+      locator: &id064
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; FeO/Fe3O4; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.58 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id064
+          fO2_log:
+            state:
+              tag: value
+              value: '-8.54'
+            locator: *id064
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_feo_fe3o4_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_feo_fe3o4
+      locator: &id065
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; FeO/Fe3O4; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.53 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id065
+          fO2_log:
+            state:
+              tag: value
+              value: '-8.54'
+            locator: *id065
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_feo_fe3o4_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_feo_fe3o4
+      locator: &id066
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; FeO/Fe3O4; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.38 (±0.03)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: FeO/Fe3O4
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id066
+          fO2_log:
+            state:
+              tag: value
+              value: '-8.54'
+            locator: *id066
+      uncertainty:
+        reported_status: printed
+        sigma: 0.03
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_ni_nio_nc3s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_ni_nio
+      locator: &id067
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Ni/NiO; NC3S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.38 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC3S
+        sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id067
+          fO2_log:
+            state:
+              tag: value
+              value: '-6.13'
+            locator: *id067
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_ni_nio_nc4s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_ni_nio
+      locator: &id068
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Ni/NiO; NC4S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.40 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC4S
+        sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id068
+          fO2_log:
+            state:
+              tag: value
+              value: '-6.13'
+            locator: *id068
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_ni_nio_nc5s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_ni_nio
+      locator: &id069
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Ni/NiO; NC5S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.41 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC5S
+        sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id069
+          fO2_log:
+            state:
+              tag: value
+              value: '-6.13'
+            locator: *id069
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_t5_3_t1350_ni_nio_nc6s
+      type: context_only
+      units: at.% as printed
+      experiment: abdullah_2013_t5_3_t1350_ni_nio
+      locator: &id070
+        pdf_page_index: 210
+        page: 211
+        table: '5.3'
+        row: 1350 °C; Ni/NiO; NC6S
+      values:
+        quantity_as_published: equilibrium_phase_composition
+        formula: Cr
+        component_amount_as_published: '0.42 (±0.02)'
+        phase_label: melt
+        phase_label_as_published: NCxS melt
+        basis: at_percent
+        T_C: 1350
+        sample_id_as_published: NC6S
+        sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
+        buffer_as_published: Ni/NiO
+        log_fO2_reference_note: The table prints log fO2 without a reference pressure; its signed value is kept
+          verbatim in point_conditions.fO2_log using the project bar convention.
+        method_class: measured_direct
+        analytical_method: Electron-probe micro-analysis (EPMA), CAMECA SX 100 with wavelength-dispersive spectrometry.
+        admission_status: admitted
+        quench_provenance_as_published: The silica tube was directly quenched in air immediately after the heat
+          treatment.
+        quench_locator:
+          pdf_page_index: 78
+          page: 79
+          section: 3.2.2.2 Control of the experimental parameters
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1350
+            locator: *id070
+          fO2_log:
+            state:
+              tag: value
+              value: '-6.13'
+            locator: *id070
+      uncertainty:
+        reported_status: printed
+        sigma: 0.02
+        units: at.%
+    - observation_id: abdullah_2013_figure_5_24_arrhenius_regression
+      type: model_derived
+      locator:
+        pdf_page_index: 211
+        page: 212
+        figure: '5.24'
+      units: printed regression coefficients and R²
+      values:
+        method_class: model_derived
+        quantity_as_published: linear fit of ln dissolved Cr (at.%) against 10^4/T for NC3S
+        candidate_quantity_tokens: []
+        reason_untyped: The printed regression coefficients and R² values are fitted model parameters; no matching
+          quantity token exists.
+        series:
+        - buffer_as_published: Air
+          equation_as_published: y = -0,5046x + 3,1066
+          slope_as_published: -0,5046
+          intercept_as_published: 3,1066
+          R_squared_as_published: 0,8779
+        - buffer_as_published: Ni/NiO
+          equation_as_published: y = -0,6259x + 2,8391
+          slope_as_published: -0,6259
+          intercept_as_published: 2,8391
+          R_squared_as_published: 0,9467
+        - buffer_as_published: Co/CoO
+          equation_as_published: y = -0,9478x + 5,0925
+          slope_as_published: -0,9478
+          intercept_as_published: 5,0925
+          R_squared_as_published: 0,9869
+        - buffer_as_published: Fe/FeO
+          equation_as_published: y = -1,5801x + 9,6965
+          slope_as_published: -1,5801
+          intercept_as_published: 9,6965
+          R_squared_as_published: 0,9994
+    - observation_id: abdullah_2013_t5_4_activation_energy_air
+      type: model_derived
+      locator:
+        pdf_page_index: 212
+        page: 213
+        table: '5.4'
+        row: Air (-0.67); Ea
+      units: kJ/mol
+      values:
+        method_class: model_derived
+        quantity_as_published: activation energy (Ea) for Cr2O3 dissolution
+        candidate_quantity_tokens: []
+        reason_untyped: No activation-energy quantity token exists; the paper determines these values from an Arrhenius
+          fit.
+        buffer_as_published: Air
+        log_fO2_as_published: '-0.67'
+        activation_energy_kJ_per_mol_as_published: 42.0
+        figure_reference_as_published: 'Table 5.4 caption: Figure 5.23; adjacent prose identifies the Arrhenius
+          plot as Figure 5.24.'
+    - observation_id: abdullah_2013_t5_4_activation_energy_ni_nio
+      type: model_derived
+      locator:
+        pdf_page_index: 212
+        page: 213
+        table: '5.4'
+        row: Ni/NiO (-7.65); Ea
+      units: kJ/mol
+      values:
+        method_class: model_derived
+        quantity_as_published: activation energy (Ea) for Cr2O3 dissolution
+        candidate_quantity_tokens: []
+        reason_untyped: No activation-energy quantity token exists; the paper determines these values from an Arrhenius
+          fit.
+        buffer_as_published: Ni/NiO
+        log_fO2_as_published: '-7.65'
+        activation_energy_kJ_per_mol_as_published: 52.0
+        figure_reference_as_published: 'Table 5.4 caption: Figure 5.23; adjacent prose identifies the Arrhenius
+          plot as Figure 5.24.'
+    - observation_id: abdullah_2013_t5_4_activation_energy_co_coo
+      type: model_derived
+      locator:
+        pdf_page_index: 212
+        page: 213
+        table: '5.4'
+        row: Co/CoO (-9.25); Ea
+      units: kJ/mol
+      values:
+        method_class: model_derived
+        quantity_as_published: activation energy (Ea) for Cr2O3 dissolution
+        candidate_quantity_tokens: []
+        reason_untyped: No activation-energy quantity token exists; the paper determines these values from an Arrhenius
+          fit.
+        buffer_as_published: Co/CoO
+        log_fO2_as_published: '-9.25'
+        activation_energy_kJ_per_mol_as_published: 78.8
+        figure_reference_as_published: 'Table 5.4 caption: Figure 5.23; adjacent prose identifies the Arrhenius
+          plot as Figure 5.24.'
+    - observation_id: abdullah_2013_t5_4_activation_energy_fe_feo
+      type: model_derived
+      locator:
+        pdf_page_index: 212
+        page: 213
+        table: '5.4'
+        row: Fe/FeO (-11.89); Ea
+      units: kJ/mol
+      values:
+        method_class: model_derived
+        quantity_as_published: activation energy (Ea) for Cr2O3 dissolution
+        candidate_quantity_tokens: []
+        reason_untyped: No activation-energy quantity token exists; the paper determines these values from an Arrhenius
+          fit.
+        buffer_as_published: Fe/FeO
+        log_fO2_as_published: '-11.89'
+        activation_energy_kJ_per_mol_as_published: 131.4
+        figure_reference_as_published: 'Table 5.4 caption: Figure 5.23; adjacent prose identifies the Arrhenius
+          plot as Figure 5.24.'
+    - observation_id: abdullah_2013_figure_5_24_cr_solubility_arrhenius
+      type: figure_only
+      locator:
+        pdf_page_index: 211
+        page: 212
+        figure: '5.24'
+      units: ln at.% Cr; 10^4/T (K^-1)
+      values:
+        method_class: figure_only
+        quantity_as_published: Cr solubility in NC3S versus reciprocal temperature at different fO2
+        formula: Cr
+        phase_role_as_published: melt
+        temperature_C:
+        - 1200
+        - 1300
+        - 1350
+        axes:
+          x:
+            label: 10^4/T (K^-1)
+            range_as_printed:
+            - '6.1'
+            - '6.9'
+          y:
+            label: ln at.% Cr (dissolved)
+            range_as_printed:
+            - '-1.6'
+            - '0.2'
+        caption_as_published: Correlation of the Cr solubility in NC3S with temperature (T = 1200°C, 1300°C and
+          1350°C) for different fO2.
+        panel: single panel
+        series:
+        - label_as_published: Air
+          temperature_C:
+          - 1200
+          - 1300
+          - 1350
+          marker_count: 3
+        - label_as_published: Ni/NiO
+          temperature_C:
+          - 1200
+          - 1300
+          - 1350
+          marker_count: 3
+        - label_as_published: Co/CoO
+          temperature_C:
+          - 1200
+          - 1300
+          - 1350
+          marker_count: 3
+        - label_as_published: Fe/FeO
+          temperature_C:
+          - 1200
+          - 1300
+          - 1350
+          marker_count: 3
+        attribution_as_published: present work
+        numeric_points_digitised: false
+        digitisation: deferred to a figure pass
+    - observation_id: abdullah_2013_figure_5_25_cr_solubility_vs_fo2
+      type: figure_only
+      locator:
+        pdf_page_index: 213
+        page: 214
+        figure: '5.25'
+      units: at.% Cr; log fO2 (reference pressure not stated)
+      values:
+        method_class: figure_only
+        quantity_as_published: Cr solubility versus oxygen fugacity for selected NCxS melts
+        formula: Cr
+        phase_role_as_published: melt
+        axes:
+          x:
+            label: log fO2
+            range_as_printed:
+            - '-14'
+            - '0'
+          y:
+            label: at.% Cr
+            range_as_printed:
+            - '0'
+            - '1.00'
+        caption_as_published: The plots of Cr solubility as a function of oxygen fugacity for two different temperatures
+          and two different compositions. The dotted lines are guides to the eyes.
+        panel: single panel
+        series:
+        - label_as_published: NC3S 1200°C
+          formula: Cr
+          sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+          phase_role_as_published: melt
+          temperature_C: 1200
+          marker_count: 7
+        - label_as_published: NC3S 1300°C
+          formula: Cr
+          sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
+          phase_role_as_published: melt
+          temperature_C: 1300
+          marker_count: 5
+        - label_as_published: NC5S 1200°C
+          formula: Cr
+          sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
+          phase_role_as_published: melt
+          temperature_C: 1200
+          marker_count: 7
+        attribution_as_published: present work
+        numeric_points_digitised: false
+        digitisation: deferred to a figure pass
