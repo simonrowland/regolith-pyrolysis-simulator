@@ -135,9 +135,17 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         observation.observation_id.split("::", 1)[1]: observation
         for observation in migrator.result.observations.values()
     }
+    raw_observations = {
+        observation["observation_id"]: observation
+        for species in document["species"].values()
+        for observation in species.get("observations", [])
+    }
     assert len(observations) == len(table1) + len(s2) + 1
     for row in table1 + s2:
         observation = observations[row["observation_id"]]
+        assert raw_observations[row["observation_id"]]["values"][
+            "oxygen_source_as_published"
+        ] == row["oxygen_source"]
         assert observation.value.kind is ValueKind.POINT
         assert observation.value.point == Decimal(row["component_amount"])
         assert observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
@@ -163,13 +171,16 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         if hasattr(pressure_value, "point"):
             pressure_value = pressure_value.point
         assert Decimal(str(pressure_value)) == Decimal(row["total_pressure_Pa"])
-        buffer_text = experiments[row["experiment"]]["fO2_control"]["buffer"]["state"]["value"]
+        buffer_state = experiments[row["experiment"]]["fO2_control"]["buffer"]["state"]
         if row["experiment"] == "xu_2026_lvp_1":
-            assert buffer_text == "PtO2"
+            assert row["oxygen_source"] == ""
+            assert buffer_state == {"tag": "unknown", "reason": "not_published"}
         elif row["oxygen_source"] == "PtO2":
+            buffer_text = buffer_state["value"]
             assert "PtO2 powder" in buffer_text
             assert "log fO2 ≈ 0" in buffer_text
         else:
+            buffer_text = buffer_state["value"]
             assert "No PtO2 powder" in buffer_text
         assert observation.identity.fO2_Pa.is_unknown
         assert not observation.notices

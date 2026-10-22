@@ -30,9 +30,9 @@ mappings:
       basis: wt_percent
       temperature: values.T_C plus point_conditions.T_C from the Table 1 row
       pressure: point_conditions.total_pressure_Pa and experiment.pressure_environment.total_pressure_Pa; GPa and atm converted to Pa
-      oxygen_source: printed PtO2 or No PtO2; no actual run fO2 is inferred
+      oxygen_source: "printed PtO2 or No PtO2 where present; blank LVP-1 cell remains unreported, and no actual run fO2 is inferred"
       sample_binding: every component binds to the Table 1 LVP sample and row
-      quench: piston-cylinder products were power-cut and fell below 100°C in <7 s; cubic-press products were power-cut and fell below glass transition in <2 s; LVP-1 was water-quenched as stated in supplement page 4
+      quench: the single 1-atm LVP-1 sample was water-quenched as stated in supplement page 5
     audit:
       typed_scalar_observations: 273
       row_column_assignment: every Table 1 mean and 1-sd cell checked against the 600 dpi render of physical page 3

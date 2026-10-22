@@ -69,8 +69,8 @@ experiments:
       value: commanded
     buffer:
       state:
-        tag: value
-        value: PtO2
+        tag: unknown
+        reason: not_published
       locator: *id001
   thermal_schedule:
     method:
@@ -79,8 +79,8 @@ experiments:
         value: box furnace; temperature calibrated using the melting point of gold
       locator:
         source_path: XuEtAl_Suppl_0820.pdf
-        pdf_page_index: 3
-        page: 4
+        pdf_page_index: 4
+        page: 5
         section: High-pressure, high-temperature experiments
     total_duration_s:
       state:
@@ -1270,7 +1270,7 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
@@ -1278,8 +1278,8 @@ species:
         quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
-          pdf_page_index: 3
-          page: 4
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
           note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
@@ -1322,18 +1322,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1374,18 +1374,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1426,18 +1426,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1478,18 +1478,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1530,18 +1530,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1582,18 +1582,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1634,18 +1634,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1686,18 +1686,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1738,18 +1738,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1786,18 +1786,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1838,18 +1838,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -1886,18 +1886,18 @@ species:
         analysis_id_as_published: Table 1 sample mean
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         pressure_as_published: 1 atm
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 4
+          page: 5
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:
@@ -15421,7 +15421,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15470,7 +15470,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15513,7 +15513,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15556,7 +15556,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15599,7 +15599,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15642,7 +15642,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15685,7 +15685,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15728,7 +15728,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15771,7 +15771,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15814,7 +15814,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15857,7 +15857,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-1 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15900,7 +15900,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15949,7 +15949,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -15992,7 +15992,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16035,7 +16035,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16078,7 +16078,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16121,7 +16121,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16164,7 +16164,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16207,7 +16207,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16250,7 +16250,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16293,7 +16293,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16336,7 +16336,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-2 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16379,7 +16379,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16428,7 +16428,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16471,7 +16471,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16514,7 +16514,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16557,7 +16557,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16600,7 +16600,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16643,7 +16643,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16686,7 +16686,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16729,7 +16729,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16772,7 +16772,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
@@ -16815,7 +16815,7 @@ species:
         analysis_id_as_published: 'MORB+PtO2 1atm 1400 5min-3 '
         assemblage_id: xu_2026_lvp_1
         assemblage_as_published: quenched glass
-        oxygen_source_as_published: PtO2
+        oxygen_source_as_published: ''
         method_class: measured_direct
         analytical_method: individual EPMA analysis, as displayed in Supplementary Table S2
         admission_status: admitted
