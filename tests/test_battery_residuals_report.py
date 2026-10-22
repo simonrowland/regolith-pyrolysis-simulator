@@ -456,3 +456,46 @@ def test_rowdiff_and_band_peak_memory_stay_compact(tmp_path: Path) -> None:
     assert band.stats[0].n == n
     assert band.stats[0].median == Decimal("0.2")
     assert band_peak < 20_000_000
+
+
+class _AddedCount:
+    """Count added-row lines without retaining them."""
+
+    def __init__(self) -> None:
+        self.added = 0
+
+    def write(self, text: str) -> int:
+        if text.startswith("added_row"):
+            self.added += 1
+        return len(text)
+
+
+@pytest.mark.nightly
+def test_rowdiff_empty_base_and_unique_tip_stay_compact(tmp_path: Path) -> None:
+    """An empty base retains each tip key string, not a RowView.
+
+    A set of these 100_000 keys traced 13_384_428 bytes, 134 bytes per key.
+    This call traced 13_390_297. The cap is 160 bytes per key, restated from
+    that measured cost. A RowView per row of the same ledger traced
+    45_816_746 bytes, 458 bytes per key, and is over the cap.
+    """
+
+    n = 100_000
+    bytes_per_tip_key = 160
+    base = tmp_path / "base.jsonl"
+    tip = tmp_path / "tip.jsonl"
+    base.write_text('{"kind":"battery_store_stamp","revision":"mem"}\n', encoding="utf-8")
+    _write_ledger(tip, n, "0.4")
+    sink = _AddedCount()
+
+    tracemalloc.start()
+    report = rowdiff_report(base, tip, show=5, out=sink)
+    _current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    assert report.base_rows == 0
+    assert report.tip_rows == n
+    assert report.value_move_count == 0
+    assert report.added == ()
+    assert sink.added == n
+    assert peak < n * bytes_per_tip_key
