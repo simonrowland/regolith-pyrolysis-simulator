@@ -2924,6 +2924,26 @@ _OUTSIDE_SEGMENT_PIN = (
     ("ZrO2", Phase.CR, "2700", "ii", "Zr", (2125.0, 2600.0), "Zr(L)", False),
 )
 
+# Metal phase on the segment the same-phase rows continue. The factory
+# default is liquid, which is a different reaction for a solid or gas segment.
+_SAME_PHASE_METAL = {
+    ("CaO", "1000"): Phase.CR,
+    ("CaO", "3100"): Phase.G,
+    ("CaO", "800"): Phase.CR,
+    ("Al2O3", "1000"): Phase.L,
+    ("Al2O3", "2700"): Phase.L,
+    ("FeO", "3100"): Phase.L,
+    ("MgO", "1000"): Phase.L,
+    ("MgO", "3100"): Phase.G,
+    ("TiO2", "1000"): Phase.CR,
+    ("TiO2", "3600"): Phase.L,
+    ("SiO2", "3500"): Phase.L,
+    ("Na2O", "3000"): Phase.G,
+    ("Cr2O3", "400"): Phase.CR,
+    ("NiO", "700"): Phase.CR,
+    ("MnO", "1000"): Phase.CR,
+}
+
 
 @pytest.mark.parametrize(
     ("formula", "phase", "temperature", "polymorph", "metal", "segment", "fragment", "same_phase"),
@@ -2956,6 +2976,7 @@ def test_outside_segment_refusals_are_pinned(
         T_K=Decimal(temperature),
         per=PerBasis.MOL_SPECIES,
         metal_formula=metal,
+        metal_phase=_SAME_PHASE_METAL.get((formula, temperature), Phase.L),
         polymorph=crystal_polymorph,
     )
     attempt = predict_thermo_attempt(
@@ -3012,6 +3033,126 @@ def test_outside_segment_refusals_are_pinned(
             attempt.value,
             Decimal(temperature),
         )
+
+
+def _cao_3100_attempt(
+    metal_phase: Phase,
+    pressure_Pa: Decimal,
+    quantity: Quantity,
+    *,
+    oxide_phase: Phase | None = None,
+):
+    identity = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("3100"),
+        metal_phase=metal_phase,
+        per=PerBasis.MOL_SPECIES,
+        p_std=pressure_Pa,
+    )
+    if oxide_phase is not None:
+        reaction = identity.reaction.value
+        terms = tuple(
+            replace(
+                term,
+                species=replace(term.species, phase=oxide_phase),
+            )
+            if term.coefficient > 0 and term.species.formula == "CaO"
+            else term
+            for term in reaction.terms
+        )
+        identity = replace(identity, reaction=State.of(replace(reaction, terms=terms)))
+    return predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "cao-3100-phase",
+            "exp-1",
+            replace(identity, quantity=quantity),
+            Decimal("0"),
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("quantity", "pressure_Pa"),
+    [
+        (Quantity.DELTA_FG, Decimal("100000")),
+        (Quantity.DELTA_FG, Decimal("101325")),
+        (Quantity.LOG10_KF, Decimal("100000")),
+        (Quantity.LOG10_KF, Decimal("101325")),
+    ],
+    ids=["delta_fG-1bar", "delta_fG-1atm", "log10_Kf-1bar", "log10_Kf-1atm"],
+)
+def test_extension_matches_the_requested_reaction_phases(
+    quantity: Quantity,
+    pressure_Pa: Decimal,
+) -> None:
+    """A same-phase extension is refused when the requested metal or oxide
+    phase is not the segment's phase, at the fit pressure and at 1 atm.
+    """
+
+    gas = _cao_3100_attempt(Phase.G, pressure_Pa, quantity)
+    assert gas.value is not None
+    assert gas.authority is Authority.EXTRAPOLATED
+    assert gas.refusal_reason is None
+    bar_gibbs = _cao_3100_attempt(Phase.G, Decimal("100000"), Quantity.DELTA_FG)
+    if pressure_Pa == Decimal("100000"):
+        gibbs = bar_gibbs.value
+    else:
+        shift = standard_pressure_delta_g_kJ_per_mol(
+            Fraction(-3, 2),
+            Decimal("3100"),
+            Decimal("100000"),
+            Decimal("101325"),
+        )
+        gibbs = bar_gibbs.value + shift
+    if quantity is Quantity.DELTA_FG:
+        assert gas.value == gibbs
+    else:
+        assert gas.value == log10K_from_delta_fG_kJ_mol(gibbs, Decimal("3100"))
+
+    for metal_phase in (Phase.CR, Phase.L):
+        refused = _cao_3100_attempt(metal_phase, pressure_Pa, quantity)
+        assert refused.value is None
+        assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+        assert refused.refusal_detail["reason"] == (
+            "identity-mismatch-element-reference-phase"
+        )
+        assert refused.refusal_detail["element"] == "Ca"
+        assert refused.refusal_detail["cell_phase"] == metal_phase.value
+        assert refused.refusal_detail["segment_phase"] == Phase.G.value
+
+    oxide = _cao_3100_attempt(
+        Phase.G,
+        pressure_Pa,
+        quantity,
+        oxide_phase=Phase.L,
+    )
+    assert oxide.value is None
+    assert oxide.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert oxide.refusal_detail["element"] == "CaO"
+    assert oxide.refusal_detail["cell_phase"] == Phase.L.value
+    assert oxide.refusal_detail["segment_phase"] == Phase.CR.value
+
+
+def test_in_range_reference_phase_stays_unchecked_at_fit_pressure() -> None:
+    """1800 K is inside the Ca(g) segment. At 1 bar a crystal-Ca request
+    still returns that segment. The extension check does not move this guard.
+    """
+
+    identity = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1800"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-1800-cr-bar", "exp-1", identity, Decimal("0")),
+    )
+    assert attempt.value is not None
+    assert attempt.refusal_reason is None
+    assert ellingham_same_phase_extension("Ca", 1800.0) is None
 
 
 def test_quoted_compilation_row_is_not_omitted() -> None:

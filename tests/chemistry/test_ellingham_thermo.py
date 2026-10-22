@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import math
+
 import pytest
 
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
     ELLINGHAM_EXTENSION_AUTHORITY,
+    ELLINGHAM_EXTENSION_ERROR_ENVELOPE_KJ_PER_MOL,
     ELLINGHAM_METAL_PHASE_CONDENSED,
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_OUTSIDE_SEGMENT_REASON,
@@ -15,6 +18,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_authority_limit,
     ellingham_authority_diagnostic,
     ellingham_delta_g_kj_per_mol_o2,
+    ellingham_extension_error_bound_dex,
     ellingham_fit_extrapolation,
     ellingham_fit_segments,
     ellingham_metal_phase_kind,
@@ -37,6 +41,19 @@ def _delta_g_jump_at_breakpoint(species: str, temperature_K: float) -> float:
     return after.delta_g_kJ_per_mol_O2(
         temperature_K
     ) - before.delta_g_kJ_per_mol_O2(temperature_K)
+
+
+def _envelope_dex(temperature_K: float) -> tuple[float, float]:
+    """δlog10 K = δG / (R T ln 10), written out here.
+
+    R is the CODATA value 8.31446261815324 J/(mol·K). δG is the named
+    envelope in kJ/mol, converted to J/mol. This is not a call to the owner.
+    """
+
+    gas_constant = 8.31446261815324
+    median_kJ, maximum_kJ = (0.72, 4.76)
+    scale = gas_constant * temperature_K * math.log(10.0)
+    return (median_kJ * 1000.0 / scale, maximum_kJ * 1000.0 / scale)
 
 
 @pytest.mark.parametrize(
@@ -194,14 +211,6 @@ def test_mn_reconstructed_tail_is_computable_but_not_authoritative() -> None:
 
 
 @pytest.mark.parametrize(
-    ("species", "breakpoint_K", "phase_fragment"),
-    [
-        ("Na", 1156.1, "Na(g)"),
-        ("Mn", 1360.0, "Mn(gamma,s)"),
-        ("Mn", 1410.0, "Mn(delta,s)"),
-    ],
-)
-@pytest.mark.parametrize(
     ("species", "temperature_K", "edge_K", "distance_K", "notice_reason"),
     [
         (
@@ -270,7 +279,34 @@ def test_same_phase_extension_names_the_nearest_segment(
     assert extension["segment_edge_K"] == edge_K
     assert extension["extension_distance_K"] == distance_K
     assert extension["original_refusal_reason"] == ELLINGHAM_OUTSIDE_SEGMENT_REASON
-    assert extension["notice_reason"] == notice_reason
+    median_dex, maximum_dex = _envelope_dex(temperature_K)
+    assert extension["error_bound_dex_median"] == pytest.approx(median_dex)
+    assert extension["error_bound_dex_max"] == pytest.approx(maximum_dex)
+    prefix, median_text, maximum_text = extension["notice_reason"].rsplit("; ", 2)
+    assert prefix == notice_reason
+    assert median_text.startswith("error_bound_dex_median=")
+    assert maximum_text.startswith("error_bound_dex_max=")
+    assert float(median_text.split("=", 1)[1]) == pytest.approx(median_dex)
+    assert float(maximum_text.split("=", 1)[1]) == pytest.approx(maximum_dex)
+
+
+def test_extension_error_bound_dex_shows_the_low_temperature_blowup() -> None:
+    """4.76 kJ/mol is about 2.49 dex at 100 K and about 0.12 dex at 2000 K."""
+
+    assert ELLINGHAM_EXTENSION_ERROR_ENVELOPE_KJ_PER_MOL == (0.72, 4.76)
+    median_100, maximum_100 = _envelope_dex(100.0)
+    median_2000, maximum_2000 = _envelope_dex(2000.0)
+    assert ellingham_extension_error_bound_dex(100.0) == pytest.approx(
+        (median_100, maximum_100)
+    )
+    assert ellingham_extension_error_bound_dex(2000.0) == pytest.approx(
+        (median_2000, maximum_2000)
+    )
+    assert maximum_100 == pytest.approx(2.49, abs=0.01)
+    assert maximum_2000 == pytest.approx(0.12, abs=0.01)
+    ti = ellingham_same_phase_extension("Ti", 100.0)
+    assert ti is not None
+    assert ti["error_bound_dex_max"] == pytest.approx(maximum_100)
 
 
 @pytest.mark.parametrize(
@@ -311,6 +347,14 @@ def test_formation_extension_does_not_change_the_runtime_clamp() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("species", "breakpoint_K", "phase_fragment"),
+    [
+        ("Na", 1156.1, "Na(g)"),
+        ("Mn", 1360.0, "Mn(gamma,s)"),
+        ("Mn", 1410.0, "Mn(delta,s)"),
+    ],
+)
 def test_ellingham_shared_breakpoints_select_next_segment(
     species: str,
     breakpoint_K: float,

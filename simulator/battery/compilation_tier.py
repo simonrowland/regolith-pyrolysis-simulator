@@ -459,6 +459,57 @@ def _refuse(
     )
 
 
+def _explicit_reaction(identity: Identity):
+    reaction_state = identity.reaction
+    if isinstance(reaction_state, State) and reaction_state.is_value:
+        return reaction_state.value
+    return None
+
+
+def _element_reference_phase_mismatch(
+    segment: EllinghamFitSegment,
+    reaction,
+    *,
+    include_products: bool,
+) -> dict[str, object] | None:
+    """First requested phase that is not the phase on this segment.
+
+    The pressure transform compares elemental reactants only. An extension
+    also compares the oxide: that request is a different reaction even at
+    the fit pressure. O2 is the shared gas, not a reference phase. The
+    caller refuses an unknown reaction or an unknown phase on its own path.
+    """
+
+    basis = (
+        segment.phase_basis
+        if include_products
+        else segment.phase_basis.split("->", 1)[0]
+    )
+    segment_phases = {
+        formula: _product_phase(token)[0]
+        for formula, token in _PHASED_SPECIES_RE.findall(basis)
+        if formula != "O2"
+    }
+    reaction_phases = tuple(phase_token(term.species) for term in reaction.terms)
+    for term, cell_phase in zip(reaction.terms, reaction_phases):
+        if cell_phase is None or term.species.formula == "O2":
+            continue
+        if term.coefficient >= 0 and not include_products:
+            continue
+        if term.coefficient == 0:
+            continue
+        segment_phase = segment_phases.get(term.species.formula)
+        if segment_phase is not cell_phase:
+            return {
+                "element": term.species.formula,
+                "cell_phase": cell_phase.value,
+                "segment_phase": (
+                    None if segment_phase is None else segment_phase.value
+                ),
+            }
+    return None
+
+
 def _ellingham_attempt(
     identity: Identity,
     quantity: Quantity,
@@ -578,6 +629,29 @@ def _ellingham_attempt(
                 },
                 call_evidence=call + ":outside-segment",
             )
+        # The fit pressure is 1 bar, so the pressure transform below does
+        # not run and would not compare phases. The extension still has to
+        # be the reaction that was asked for. In-range attempts keep the
+        # old placement: this check runs only for an extension.
+        reaction = _explicit_reaction(identity)
+        if reaction is not None:
+            reaction_phases = tuple(
+                phase_token(term.species) for term in reaction.terms
+            )
+            if all(phase is not None for phase in reaction_phases):
+                mismatch = _element_reference_phase_mismatch(
+                    segment,
+                    reaction,
+                    include_products=True,
+                )
+                if mismatch is not None:
+                    return _refuse(
+                        RefusalReason.IDENTITY_MISMATCH,
+                        "identity-mismatch-element-reference-phase",
+                        quantity=quantity,
+                        origin=origin,
+                        extra=mismatch,
+                    )
 
     # dG is kJ/mol O2. mol-species divides by n_ox (mol oxide per mol O2).
     dG = Decimal(str(segment.delta_g_kJ_per_mol_O2(temperature)))
@@ -608,12 +682,7 @@ def _ellingham_attempt(
                     quantity=quantity,
                     origin=origin,
                 )
-            reaction_state = identity.reaction
-            reaction = (
-                reaction_state.value
-                if isinstance(reaction_state, State) and reaction_state.is_value
-                else None
-            )
+            reaction = _explicit_reaction(identity)
             reaction_phases = (
                 tuple(phase_token(term.species) for term in reaction.terms)
                 if reaction is not None
@@ -622,31 +691,19 @@ def _ellingham_attempt(
             if reaction is not None and all(
                 phase is not None for phase in reaction_phases
             ):
-                segment_reactant_phases = {
-                    formula: _product_phase(token)[0]
-                    for formula, token in _PHASED_SPECIES_RE.findall(
-                        segment.phase_basis.split("->", 1)[0]
+                mismatch = _element_reference_phase_mismatch(
+                    segment,
+                    reaction,
+                    include_products=False,
+                )
+                if mismatch is not None:
+                    return _refuse(
+                        RefusalReason.IDENTITY_MISMATCH,
+                        "identity-mismatch-element-reference-phase",
+                        quantity=quantity,
+                        origin=origin,
+                        extra=mismatch,
                     )
-                    if formula != "O2"
-                }
-                for term, cell_phase in zip(reaction.terms, reaction_phases):
-                    if term.coefficient >= 0 or term.species.formula == "O2":
-                        continue
-                    segment_phase = segment_reactant_phases.get(term.species.formula)
-                    if segment_phase is not cell_phase:
-                        return _refuse(
-                            RefusalReason.IDENTITY_MISMATCH,
-                            "identity-mismatch-element-reference-phase",
-                            quantity=quantity,
-                            origin=origin,
-                            extra={
-                                "element": term.species.formula,
-                                "cell_phase": cell_phase.value,
-                                "segment_phase": (
-                                    None if segment_phase is None else segment_phase.value
-                                ),
-                            },
-                        )
             if reaction is None:
                 return _refuse(
                     RefusalReason.IDENTITY_UNKNOWN,

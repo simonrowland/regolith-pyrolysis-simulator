@@ -1,11 +1,12 @@
 """Canonical Ellingham thermodynamic table (single source of truth).
 
-Pure data leaf -- imports nothing from ``simulator`` or ``engines`` so it can
-be imported at module level by both the builtin vapor provider
-(:mod:`engines.builtin.vapor_pressure`) and the legacy equilibrium fallback
+Data leaf. The only ``simulator`` import is ``physical_constants``, which
+imports nothing else, so this module can still be imported at module level
+by both the builtin vapor provider (:mod:`engines.builtin.vapor_pressure`)
+and the legacy equilibrium fallback
 (:class:`simulator.equilibrium.EquilibriumMixin`) WITHOUT closing an import
 cycle (``simulator.core -> equilibrium -> vapor_pressure -> _common ->
-capabilities -> simulator -> core``). Keep this module dependency-free.
+capabilities -> simulator -> core``). Do not import the battery or an engine.
 
 Tuple per species: ``(dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)``
   n_M  = moles of metal per mol O2 in the decomposition reaction
@@ -18,6 +19,8 @@ import math
 from dataclasses import dataclass
 from typing import Any
 
+from simulator.physical_constants import GAS_CONSTANT
+
 # Default valid temperature window of the legacy linear high-T refit (K).
 # CF-2-lite keeps refractory species on this band; mbar-regime species use the
 # per-species segments below.
@@ -28,6 +31,11 @@ ELLINGHAM_AUTHORITY_LIMIT_FLAG = "authority_limited_by_ellingham_fit_range"
 # Same-phase extension keeps this text as the original reason on the notice.
 ELLINGHAM_OUTSIDE_SEGMENT_REASON = "ellingham-formation-outside-segment"
 ELLINGHAM_EXTENSION_AUTHORITY = "extrapolated"
+# |predicted − printed JANAF ΔfG| on the 60 extended formation temperatures
+# the JANAF tables contain (t-1468 census). Per mol oxide. Median, then max.
+# Owner decision d-249: this envelope is not a distance cap. Each extended
+# row carries it converted to dex at that row's T.
+ELLINGHAM_EXTENSION_ERROR_ENVELOPE_KJ_PER_MOL = (0.72, 4.76)
 ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG = (
     "authority_limited_by_reconstructed_ellingham_segment"
 )
@@ -1164,16 +1172,40 @@ def _domain_contains(
     domain: tuple[float, float | None],
     temperature_K: float,
 ) -> bool:
+    """Membership of an intersection. The endpoint rule lives on the interval."""
+
     low, high = domain
-    if temperature_K < low:
-        return False
-    if high is None:
-        return True
-    return temperature_K < high
+    return _phase_interval("domain", low, high, "intersection").contains(temperature_K)
 
 
 def _k_text(value: float) -> str:
     return format(value, ".12g")
+
+
+def ellingham_extension_error_bound_dex(
+    temperature_K: float,
+) -> tuple[float, float]:
+    """Median and maximum |Δlog10 K| of the formation envelope at T.
+
+    Premise: log10 K = −ΔG / (R T ln 10), so an error δG in ΔG maps to
+    δlog10 K = δG / (R T ln 10). The sign does not change the bound.
+    Units: δG in J/mol, R in J/(mol·K), T in K; the quotient is
+    dimensionless dex.
+    Sanity: 4.76 kJ/mol at 100 K is about 2.49 dex, and at 2000 K about
+    0.12 dex.
+
+    ``log10K_from_delta_fG_kJ_mol`` is the signed equilibrium constant.
+    It stays in the battery identity module: this leaf cannot import the
+    battery. Both use ``GAS_CONSTANT``.
+    """
+
+    T_K = _finite_temperature_K(temperature_K)
+    if T_K <= 0.0:
+        raise ValueError("temperature_K must be positive")
+    median_kJ, maximum_kJ = ELLINGHAM_EXTENSION_ERROR_ENVELOPE_KJ_PER_MOL
+    # kJ/mol per dex. Dividing the envelope by this scale is δG/(R T ln 10).
+    per_dex_kJ = (GAS_CONSTANT * T_K * math.log(10.0)) / 1000.0
+    return (median_kJ / per_dex_kJ, maximum_kJ / per_dex_kJ)
 
 
 def ellingham_same_phase_extension(
@@ -1217,6 +1249,7 @@ def ellingham_same_phase_extension(
         edge = high
     band = f"{_k_text(low)}-{_k_text(high)}"
     distance_text = _k_text(nearest_distance)
+    dex_median, dex_max = ellingham_extension_error_bound_dex(T_K)
     return {
         "species": key,
         "segment": nearest,
@@ -1227,12 +1260,16 @@ def ellingham_same_phase_extension(
         "phase_domain_K": domain,
         "phase_basis": nearest.phase_basis,
         "original_refusal_reason": ELLINGHAM_OUTSIDE_SEGMENT_REASON,
+        "error_bound_dex_median": dex_median,
+        "error_bound_dex_max": dex_max,
         "notice_reason": (
             f"authority={ELLINGHAM_EXTENSION_AUTHORITY}; "
             f"segment_band_K={band}; "
             f"segment_edge_K={_k_text(edge)}; "
             f"extension_distance_K={distance_text}; "
-            f"original_refusal_reason={ELLINGHAM_OUTSIDE_SEGMENT_REASON}"
+            f"original_refusal_reason={ELLINGHAM_OUTSIDE_SEGMENT_REASON}; "
+            f"error_bound_dex_median={_k_text(dex_median)}; "
+            f"error_bound_dex_max={_k_text(dex_max)}"
         ),
     }
 
