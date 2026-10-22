@@ -584,15 +584,25 @@ def parse_species_formula(
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
     text = text.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
-
+    # formula_composition reads the ASCII-dot water-adduct separator as a
+    # decimal count. Refuse that normalized form first; raw fast-path results
+    # and explicit middle-dot hydrates stay unchanged.
+    if "·" not in text and re.search(r"\.\d+H2O", text):
+        return None
     annotation = re.search(r"\(([^()]*)\)$", text)
     if annotation is not None:
         label = annotation.group(1).strip().lower()
         phase_labels = {
             "c": Phase.CR,
             "cr": Phase.CR,
+            "s": Phase.CR,
+            "solid": Phase.CR,
             "l": Phase.L,
+            "liq": Phase.L,
+            "liquid": Phase.L,
             "g": Phase.G,
+            "gas": Phase.G,
+            "vapor": Phase.G,
             "aq": Phase.AQ,
         }
         annotated_phase = phase_labels.get(label)
