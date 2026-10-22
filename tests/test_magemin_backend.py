@@ -3620,7 +3620,9 @@ def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
     assert any("refused projected/dropped non-basis" in w for w in result.warnings)
 
 
-def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
+def test_magemin_subprocess_runs_in_fresh_temp_cwd(
+    monkeypatch, tmp_path, magemin_openmpi_tmpdir, tmp_path_factory
+):
     """MAGEMin appends _pseudosection_output.txt to its CWD; isolate per call."""
     captured: dict = {}
 
@@ -3632,6 +3634,8 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
     def fake_subprocess_run(args, **kwargs):
         captured["args"] = list(args)
         captured["cwd"] = kwargs.get("cwd")
+        child_env = kwargs.get("env")
+        captured["env"] = dict(os.environ if child_env is None else child_env)
         return FakeCompleted()
 
     fake_binary = tmp_path / "MAGEMin"
@@ -3675,6 +3679,15 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
     binary_arg = Path(captured["args"][0])
     assert binary_arg.is_absolute()
     assert binary_arg == fake_binary.resolve()
+    # OpenMPI uses TMPDIR for session files. Normal teardown removes this
+    # fixture-owned directory; pytest retention handles an interrupted run.
+    expected_openmpi_tmpdir = (
+        tmp_path_factory.getbasetemp() / "magemin-openmpi"
+    ).resolve()
+    assert magemin_openmpi_tmpdir.resolve() == expected_openmpi_tmpdir
+    assert Path(captured["env"].get("TMPDIR", "")).resolve() == (
+        expected_openmpi_tmpdir
+    )
 
 
 def test_magemin_subprocess_launches_are_serialized_across_callers(

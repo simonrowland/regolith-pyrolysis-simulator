@@ -169,6 +169,7 @@ def test_resistances_move_monotonically_with_kn_and_stir_axes():
         ).r_melt
         for axial in (0.0, 1.0, 4.0, MAX_STIR_FACTOR, 1000.0)
     ]
+    assert melt_by_axial == [melt_by_axial[0]] * len(melt_by_axial)
     assert melt_by_axial == [0.0] * 5
 
     gas_by_radial = [
