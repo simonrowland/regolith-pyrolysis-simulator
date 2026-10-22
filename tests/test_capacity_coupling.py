@@ -993,6 +993,7 @@ def test_catalog_intrinsic_fo2_refuses_without_exact_solve_diagnostic():
 
 def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     sim = _real_capacity_sim()
+    sim.campaign_mgr.campaigns["C0"]["p_total_mbar_default"] = 0.0
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0
     monkeypatch.setattr(
@@ -1146,6 +1147,33 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     with pytest.raises(CapacityCouplingRefusalError, match="finite_capacity_engaged"):
         enforced.step()
     assert calls == [True]
+
+
+def test_default_off_c0_cover_does_not_apply_pipe_cap():
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    assert sim.melt.p_total_mbar == 1.0
+    assert sim.melt.background_gas_species == "Ar"
+    sim.melt.temperature_C = 1600.0
+    transport_calls = _record_transport_estimates(sim)
+
+    snapshot = sim.step()
+
+    assert transport_calls
+    # These are the owner values at the configured dry 1 mbar Ar cover.
+    for owner_result in transport_calls:
+        assert owner_result["demand_kg_hr"] == pytest.approx(
+            0.0642367, rel=1.0e-5
+        )
+        assert owner_result["capacity_kg_hr"] == pytest.approx(
+            2.60054, rel=1.0e-5
+        )
+        assert owner_result["demand_kg_hr"] < owner_result["capacity_kg_hr"]
+    bakeout = getattr(sim, "_last_subsolidus_bakeout", None) or {}
+    assert "transport_cap" not in bakeout
+    assert snapshot.evap_flux.total_kg_hr == pytest.approx(
+        0.06423670196107581, rel=0.0, abs=1.0e-12
+    )
 
 
 def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():

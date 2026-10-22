@@ -12968,6 +12968,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             exchange_direction='none:campaign_start',
         )
         if campaign == CampaignPhase.C0:
+            # Equipment sizing owns the runtime crucible area, pipe, and
+            # condenser geometry used by the C0 transport calculation.
+            # Apply it before forecasting so the predicted exit matches the
+            # geometry the first C0 step will use.
+            self._get_turbine_spec()
             self.campaign_mgr.c0_exit_prediction = self._predict_c0_exit()
 
         # Initialize shuttle inventory when entering C3 phases
@@ -13832,6 +13837,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 else math.inf
             )
             hold_hr = min(runtime_exit_window_hr, max_runtime_hr)
+            # Estimate the load-time mixture remaining after the capped hold
+            # using the candidate-temperature capacity owner. This is notice
+            # data only; it does not mutate the ledgered gas inventory.
+            evacuated_gas_mass_kg = min(
+                gas_mass_kg,
+                capacity_kg_hr * hold_hr,
+            )
+            unreleased_gas_mass_kg = max(
+                0.0,
+                gas_mass_kg - evacuated_gas_mass_kg,
+            )
+            unreleased_gas_fraction = (
+                unreleased_gas_mass_kg / gas_mass_kg
+                if gas_mass_kg > 0.0
+                else 0.0
+            )
+            unreleased_gas_inventory_kg = {
+                str(species): float(kg) * unreleased_gas_fraction
+                for species, kg in gas_species.items()
+                if float(kg) > 0.0 and unreleased_gas_fraction > 0.0
+            }
             integrated = self._apply_analytic_evaporation_depletion(
                 limited_flux,
                 dt_hr=hold_hr,
@@ -13862,6 +13888,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'requested_exit_window_hr': exit_window_hr,
                 'runtime_exit_window_hr': runtime_exit_window_hr,
                 'hold_used_for_budget_hr': hold_hr,
+                'evacuation_max_hold_hr': max_hold_hr,
+                'evacuation_bound_unmet': t_evac_hr > max_hold_hr,
+                'evacuation_bound_unmet_hr': max(
+                    0.0,
+                    t_evac_hr - max_hold_hr,
+                ),
+                'evacuation_unreleased_gas_mass_kg': unreleased_gas_mass_kg,
+                'evacuation_unreleased_gas_inventory_kg': (
+                    unreleased_gas_inventory_kg
+                ),
                 'Na_plus_K_to_train_kg': alkali_to_train_kg,
                 'Na_plus_K_feed_mass_kg': alkali_feed_mass_kg,
                 'Na_plus_K_feed_loss_fraction': loss_fraction,

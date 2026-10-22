@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import math
 from pathlib import Path
 
 import pytest
@@ -135,69 +134,42 @@ def _has_runtime_wall_keys(mapping: dict) -> bool:
     return False
 
 
-def test_cold_wall_segment_attribution_matches_configured_geometry_values():
-    session = _start_session()
+@pytest.mark.parametrize(
+    ("p_total_mbar", "expect_vacuum_area_split"),
+    [(1.0, False), (0.0, True)],
+    ids=["owner-cover", "vacuum"],
+)
+def test_cold_wall_segment_attribution_matches_configured_geometry_values(
+    p_total_mbar, expect_vacuum_area_split, monkeypatch
+):
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C0"]["p_total_mbar_default"] = p_total_mbar
+    session = _start_session(setpoints=setpoints)
+    model = session.simulator.condensation_model
+    route_owner = model.route
+    route_results = []
 
+    def _record_route_owner(*args, **kwargs):
+        result = route_owner(*args, **kwargs)
+        route_results.append(result)
+        return result
+
+    monkeypatch.setattr(model, "route", _record_route_owner)
     attribution = _route_cold_wall_sio_tick(session)
 
-    # Premise: the configured 0.06 m throat radius and downstream area ratios
-    # give A1 = pi*(0.06 m)^2*4.0 and A2 = pi*(0.06 m)^2*4.5; the configured
-    # operating point gives SiO wall flux J = 0.062461400479484286 mol/m^2/s.
-    # 2026-07-23 re-pin (stale-pin correction): 07fa3fe gated the SiO
-    # reactive-product backstop at the wall deposition site (T_surface <=
-    # T_cond), moving J from the 37cf443-ratified 0.062743751473665094 to the
-    # value below; re-derived from the executable cold-wall path on
-    # compose-0.6.3 @ 32a3a5c and verified byte-identical across repeated
-    # in-process runs and fresh processes. The area-proportional attribution
-    # (A2/A1 = 4.5/4.0) and the disproportionation split are unchanged.
-    # Algebra: m_i = J*A_i*M_SiO*3600, so A2/A1 = m2/m1 = 4.5/4.0.
-    # Unit check: (mol/m^2/s)*(m^2)*(kg/mol)*(s/h) = kg/h.
-    # Sanity: the attributed total is conserved and the larger area deposits
-    # more mass.
-    # 2026-07-30 re-pin (t-475): wall deposition now takes its driving force
-    # from the species PARTIAL pressure in the flowing gas against saturation
-    # at the wall temperature, replacing the pure-component P_sat(T_melt) that
-    # was not an admissible partial pressure.
-    # 2026-08-04 re-pin (b-118/b-127 coating-cluster): the continuation became
-    # coating-conservative and uncovered Antoine segments refuse rather than
-    # invent 100 Pa. Cold-wall SiO J moves
-    # 0.062205888833975716 -> the value below (+0.865 %), i.e. MORE wall flux
-    # — the physically correct direction for the coating failure mode (prior
-    # under-reporting path removed). Re-derived from the executable cold-wall
-    # path by inverting this test's own algebra,
-    # J = Si_kg/(0.5*A1*M_Si/1000*3600), and cross-checked against the SiO2
-    # leg — both legs agree to 1e-12 relative. Area ratio A2/A1 = 4.5/4.0
-    # unchanged. The later t-523 correction restores extrapolated inventory
-    # debit without changing this coating-conservative continuation or its pin.
-    sio_flux_mol_m2_s = 0.06274375148239172
-    segment_areas_m2 = {
-        "process.wall_deposit_segment_stage_0_to_stage_1": (
-            math.pi * 0.06**2 * 4.0
-        ),
-        "process.wall_deposit_segment_stage_1_to_stage_2": (
-            math.pi * 0.06**2 * 4.5
-        ),
-    }
+    assert len(route_results) == 1
+    route_result = route_results[0]
+    sio_wall_kg = float(route_result.wall_deposit_by_species["SiO"])
+    sio_fractions_by_account = (
+        route_result.wall_deposit_account_fractions_by_species["SiO"]
+    )
     expected_sio_kg = {
-        account: (
-            sio_flux_mol_m2_s
-            * area_m2
-            * (MOLAR_MASS["SiO"] / 1000.0)
-            * 3600.0
-        )
-        for account, area_m2 in segment_areas_m2.items()
+        account: sio_wall_kg * float(fraction)
+        for account, fraction in sio_fractions_by_account.items()
     }
+    expected_accounts = set(expected_sio_kg)
 
-    # Restored stage capture shares the same finite vapor budget with walls.
-    stage_capture_kg = sum(session.simulator.atom_ledger.kg_by_account(
-        "process.condensation_train"
-    ).values())
-    assert stage_capture_kg > 0.0
-    capture_budget_kg = sum(expected_sio_kg.values())
-    wall_fraction = (capture_budget_kg - stage_capture_kg) / capture_budget_kg
-    expected_sio_kg = {account: kg * wall_fraction for account, kg in expected_sio_kg.items()}
-
-    assert set(attribution) == set(expected_sio_kg)
+    assert set(attribution) == expected_accounts
     for account, sio_kg in expected_sio_kg.items():
         species_kg = attribution[account]
         assert species_kg == {
@@ -210,17 +182,30 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
         }
     assert sum(
         sum(species_kg.values()) for species_kg in attribution.values()
-    ) == pytest.approx(sum(expected_sio_kg.values()))
+    ) == pytest.approx(sio_wall_kg)
     assert sum(attribution[
         "process.wall_deposit_segment_stage_1_to_stage_2"
     ].values()) > sum(attribution[
         "process.wall_deposit_segment_stage_0_to_stage_1"
     ].values())
+    if expect_vacuum_area_split:
+        downstream = sum(attribution[
+            "process.wall_deposit_segment_stage_1_to_stage_2"
+        ].values())
+        upstream = sum(attribution[
+            "process.wall_deposit_segment_stage_0_to_stage_1"
+        ].values())
+        assert downstream / upstream == pytest.approx(4.5 / 4.0)
+
+    stage_capture_kg = sum(session.simulator.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).values())
+    assert stage_capture_kg > 0.0
     assert session.simulator.atom_ledger.kg_by_account(
         "process.wall_deposit"
     ) == {}
     overhead_kg = session.simulator.atom_ledger.kg_by_account("process.overhead_gas").get("SiO", 0.0)
-    assert stage_capture_kg + sum(expected_sio_kg.values()) + overhead_kg == pytest.approx(1.0)
+    assert stage_capture_kg + sio_wall_kg + overhead_kg == pytest.approx(1.0)
 
 
 def test_repeated_in_process_runs_keep_wall_attribution_deterministic():

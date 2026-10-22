@@ -294,6 +294,10 @@ def c0_exit_record(
         "ramp_authority": "owner_fiat",
         "ramp_model_bounded": False,
         **dict(prediction),
+        "evacuation_bound_backstop_fired": bool(
+            backstop == "maximum_hold"
+            and prediction.get("evacuation_bound_unmet") is True
+        ),
         "unreleased_inventory_at_exit": {"targets": unreleased_targets},
         "sulfates_routed_to": "melt_or_C0b",
     }

@@ -1,6 +1,7 @@
 from copy import deepcopy
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.core import Atmosphere, CampaignPhase, PyrolysisSimulator
@@ -55,17 +56,33 @@ def test_c0_start_predicts_exit_from_live_flux_and_caps_the_ramp():
     )
     sim = _sim(feedstocks)
     sim.load_batch("lunar_mare_low_ti", 1000.0)
-    sim._get_turbine_spec()
     sim.campaign_mgr.last_c0_exit = {"backstop": "maximum_hold"}
     sim.start_campaign(CampaignPhase.C0)
 
     prediction = sim.campaign_mgr.c0_exit_prediction
     assert sim.campaign_mgr.last_c0_exit is None
+    assert sim._equipment is not None
+    assert sim.melt.melt_surface_area_m2 == (
+        sim._equipment.crucible.melt_surface_area_m2
+    )
+    assert sim._overhead_condenser_geometry_config["initial_throat_area_m2"] == (
+        sim._equipment.pipe.initial_throat_area_m2
+    )
     assert prediction["prediction_status"] == "ok"
     assert prediction["T_exit_C"] == 950.0
     assert prediction["t_evac_hr"] == 0.0
     assert prediction["alkali_retention_budget_fraction"] == 1.0e-3
     assert prediction["Na_plus_K_feed_loss_fraction"] <= 1.0e-3
+    predicted_temperature_C = sim.melt.temperature_C
+    sim.melt.temperature_C = prediction["C_evac_temperature_C"]
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    inlet = sim._subsolidus_transport_inlet_flux(
+        sim._calculate_evaporation(sim._get_equilibrium())
+    )
+    expected_capacity_kg_hr = sim._c0_pipe_capacity_kg_hr(inlet)
+    sim.melt.temperature_C = predicted_temperature_C
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    assert prediction["C_evac_kg_hr"] == expected_capacity_kg_hr
     target_C, _ramp = sim.campaign_mgr.get_temp_target(
         CampaignPhase.C0, 0, sim.melt
     )
@@ -78,7 +95,6 @@ def test_c0_comet_missing_alkali_inventory_does_not_predict_zero_loss():
     )
     sim = _sim(feedstocks)
     sim.load_batch("comet_nucleus", 1000.0)
-    sim._get_turbine_spec()
     sim.start_campaign(CampaignPhase.C0)
 
     prediction = sim.campaign_mgr.c0_exit_prediction
@@ -87,6 +103,36 @@ def test_c0_comet_missing_alkali_inventory_does_not_predict_zero_loss():
     )
     assert prediction["T_exit_C"] is None
     assert prediction["M_C0_gas_kg"] > 0.0
+
+
+def test_c0_prediction_flags_unmet_evacuation_and_remaining_load_gas():
+    feedstocks = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
+    )
+    sim = _sim(feedstocks)
+    sim.load_batch("ci_carbonaceous_chondrite", 1000.0)
+    sim.start_campaign(CampaignPhase.C0)
+
+    prediction = sim.campaign_mgr.c0_exit_prediction
+
+    assert prediction["evacuation_bound_unmet"] is True
+    assert prediction["evacuation_max_hold_hr"] == 25.0
+    assert prediction["evacuation_bound_unmet_hr"] == pytest.approx(
+        31.135503658452762
+    )
+    assert prediction["evacuation_unreleased_gas_mass_kg"] == pytest.approx(
+        98.10306159203087
+    )
+    assert prediction["evacuation_unreleased_gas_inventory_kg"] == pytest.approx(
+        {
+            "CH4": 1.5071132259442865,
+            "CO": 4.633943479528104,
+            "CO2": 6.298982890899267,
+            "H2": 1.5666077480278489,
+            "H2O": 82.98988248121516,
+            "N2": 1.106531766416202,
+        }
+    )
 
 
 def test_stage0_mars_feedstock_uses_configured_argon_cover():

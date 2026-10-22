@@ -334,7 +334,16 @@ def test_c0_computed_exit_uses_temperature_and_evacuation_bound():
     assert metadata["c0_exit"] == notice
 
     backstop = CampaignManager(_setpoints())
-    backstop.c0_exit_prediction = {**prediction, "runtime_exit_window_hr": 30.0}
+    backstop.c0_exit_prediction = {
+        **prediction,
+        "t_evac_hr": 56.0,
+        "runtime_exit_window_hr": 56.0,
+        "evacuation_max_hold_hr": 25.0,
+        "evacuation_bound_unmet": True,
+        "evacuation_bound_unmet_hr": 31.0,
+        "evacuation_unreleased_gas_mass_kg": 21.0,
+        "evacuation_unreleased_gas_inventory_kg": {"H2O": 21.0},
+    }
     assert backstop.check_endpoint(
         _melt(CampaignPhase.C0, 25, temperature_C=25.0),
         _flux(),
@@ -344,7 +353,14 @@ def test_c0_computed_exit_uses_temperature_and_evacuation_bound():
     assert backstop.last_c0_exit["outcome"] == "incomplete"
     assert backstop.last_c0_exit["backstop"] == "maximum_hold"
     assert backstop.last_c0_exit["T_exit_C"] == 900.0
-    assert backstop.last_c0_exit["t_evac_hr"] == 8.0
+    assert backstop.last_c0_exit["t_evac_hr"] == 56.0
+    assert backstop.last_c0_exit["evacuation_bound_unmet"] is True
+    assert backstop.last_c0_exit["evacuation_bound_unmet_hr"] == 31.0
+    assert backstop.last_c0_exit["evacuation_unreleased_gas_mass_kg"] == 21.0
+    assert backstop.last_c0_exit["evacuation_unreleased_gas_inventory_kg"] == {
+        "H2O": 21.0
+    }
+    assert backstop.last_c0_exit["evacuation_bound_backstop_fired"] is True
     assert c0_exit_run_notice(SimpleNamespace(campaign_mgr=backstop)) == (
         backstop.last_c0_exit
     )
