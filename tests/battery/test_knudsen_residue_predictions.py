@@ -544,3 +544,27 @@ def test_real_markova_first_interval_preserves_unproven_missing_channel(temperat
         )
     assert result.value.reason == root.value.reason
     assert result.value.detail == root.value.detail
+
+
+@pytest.mark.parametrize("temperature_K,wt", (
+    (1748.15, {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95}),
+    (1749.15, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
+))
+def test_markova_bracket_top_callback_refuses_unproven_missing_al(temperature_K, wt):
+    """Today's real callback at log10 pO2 = 0 cannot tell omitted Al from a missing channel."""
+    from simulator.accounting.formulas import parse_formula
+    inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
+    inventory, _channels, pressure = _real_analytical_cmas_pressure(temperature_K, inventory)
+    with pytest.raises(ResidueInventoryRefusal) as exc:
+        pressure(inventory, 0.0)
+    assert exc.value.reason == "residue_pressure_channels_missing"
+    assert exc.value.detail == "Al"
+
+
+def test_analytical_callback_at_2000k_returns_finite_al():
+    """Passing real callback: Al is reported, so the channel is not a refusal."""
+    inventory, _channels, pressure = _real_analytical_cmas_pressure(2000)
+    predicted = pressure(inventory, -10)
+    assert "Al" in predicted
+    assert math.isfinite(predicted["Al"])
+    assert predicted["Al"] > 0.0
