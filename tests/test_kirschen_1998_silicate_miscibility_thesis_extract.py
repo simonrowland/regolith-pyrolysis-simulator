@@ -10,7 +10,9 @@ from tests.battery.factories import migrate_one_extract
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID = "kirschen-1998-silicate-miscibility-thesis"
+ARTICLE_ID = "kirschen-decapitani-1999-liquid-miscibility"
 EXTRACT = ROOT / f"data/literature/extracts/{SOURCE_ID}.yaml"
+ARTICLE_EXTRACT = ROOT / f"data/literature/extracts/{ARTICLE_ID}.yaml"
 
 
 def _migrated_rows():
@@ -26,7 +28,7 @@ def _migrated_rows():
         for formula, species in document["species"].items()
         for row in species.get("observations", [])
     }
-    assert len(raw_rows) == len(result.observations) == 530
+    assert len(raw_rows) == len(result.observations) == 64
     for observation_id, observation in result.observations.items():
         formula, raw = raw_rows[observation_id]
         values = raw["values"]
@@ -72,76 +74,77 @@ def _migrated_rows():
         )
         assert observation.locator.page == raw["locator"]["page"]
         assert observation.locator.pdf_page_index == raw["locator"]["page"] - 1
-    assert len(result.experiments) == len(document["experiments"]) == 90
+    assert len(result.experiments) == len(document["experiments"])
     return document, result
 
 
-def test_all_component_rows_migrate_with_species_and_temperature() -> None:
+def test_remaining_unique_component_rows_migrate_with_identity_and_temperature() -> None:
     _migrated_rows()
 
 
-def test_stmc_4_grid_matches_independent_600_dpi_transcription() -> None:
-    document, result = _migrated_rows()
-    source_rows = {
-        row["observation_id"]: row
-        for species in document["species"].values()
-        for row in species.get("observations", [])
+def test_journal_repeats_are_linked_context_and_stmc_grid_matches_render() -> None:
+    document, _ = _migrated_rows()
+    linked = [
+        context
+        for context in document["species"]["SiO2"]["context"]
+        if context.get("type") == "duplicate_measurement_context"
+        and context.get("values", {}).get("published_source_id") == ARTICLE_ID
+    ]
+    linked_ids = {
+        observation_id
+        for context in linked
+        for observation_id in context["values"]["published_observation_ids"]
     }
-    # Independently transcribed from the 600 dpi render of physical PDF p. 47.
+    article = yaml.safe_load(ARTICLE_EXTRACT.read_text(encoding="utf-8"))
+    article_ids = {
+        row["observation_id"]
+        for row in article["species"]["SiO2"]["observations"]
+        if row["values"].get("component_amount")
+    }
+    assert linked_ids == article_ids
+    assert len(linked_ids) == 466
+
+    contexts = {
+        (row["values"]["sample_id_as_printed"], row["values"]["phase_order"]): row
+        for row in linked
+    }
+    # Independently transcribed from the 600 dpi render of thesis PDF p. 47.
     grid = {
-        ("STMC 4-1", "stmc_4_1", 1610, 1): {
+        ("STMC 4-1", 1): {
             "CaO": ("0.18", "0.04"),
             "MgO": ("0.16", "0.03"),
             "SiO2": ("10.38", "0.86"),
             "TiO2": ("88.50", "1.33"),
         },
-        ("STMC 4-1", "stmc_4_1", 1610, 2): {
+        ("STMC 4-1", 2): {
             "CaO": ("8.38", "0.34"),
             "MgO": ("5.74", "0.25"),
             "SiO2": ("55.57", "1.13"),
             "TiO2": ("30.74", "0.53"),
         },
-        ("STMC 4-2", "stmc_4_2", 1551, 1): {
+        ("STMC 4-2", 1): {
             "CaO": ("0.18", "0.04"),
             "MgO": ("0.16", "0.03"),
             "SiO2": ("88.50", "1.33"),
             "TiO2": ("10.38", "0.86"),
         },
-        ("STMC 4-2", "stmc_4_2", 1551, 2): {
+        ("STMC 4-2", 2): {
             "CaO": ("8.38", "0.34"),
             "MgO": ("5.74", "0.25"),
             "SiO2": ("30.74", "0.53"),
             "TiO2": ("55.57", "1.13"),
         },
     }
-    for (sample, sample_token, temperature, phase_order), components in grid.items():
-        run_experiment_id = None
-        for component, (amount, sigma) in components.items():
-            raw_id = (
-                f"{SOURCE_ID}::kirschen_1998_ii_1_{sample_token}_"
-                f"phase{phase_order}_{component.lower()}"
-            )
-            observation = result.observations[raw_id]
-            assert observation.value.point == Decimal(amount)
-            assert observation.identity.temperature_K.value == (
-                Decimal(str(temperature)) + Decimal("273.15")
-            )
-            assert observation.locator.page == 47
-            assert observation.locator.pdf_page_index == 46
-            assert observation.locator.published_page == "II-32"
-            assert observation.point_conditions["temperature_K"].locator.page == 47
-            assert observation.experiment_id.endswith(
-                f"::experiment::kirschen_1998_ii_1_{sample_token}"
-            )
-            if run_experiment_id is None:
-                run_experiment_id = observation.experiment_id
-            assert observation.experiment_id == run_experiment_id
-            # The corresponding raw scalar carries sigma alongside value in wt%.
-            source_row = source_rows[
-                f"kirschen_1998_ii_1_{sample_token}_phase{phase_order}_{component.lower()}"
-            ]
-            assert source_row["values"]["component_amount"]["sigma"] == sigma
-            assert observation.identity.species.formula == component
+    for key, components in grid.items():
+        values = contexts[key]["values"]
+        assert values["composition_wt_percent_as_printed"] == {
+            formula: amount for formula, (amount, _sigma) in components.items()
+        }
+        assert values["one_sigma_wt_percent_as_printed"] == {
+            formula: sigma for formula, (_amount, sigma) in components.items()
+        }
+        assert values["published_source_id"] == ARTICLE_ID
+        assert len(values["published_observation_ids"]) == 4
 
 
 def test_table_iii_footnote_sample_and_oxygen_condition_migrate() -> None:
