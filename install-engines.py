@@ -5,16 +5,17 @@ Companion to install-dependencies.py. That script installs the simulator's own
 runtime dependencies into .venv; this one installs the optional open-source
 thermodynamic engines:
 
-  * PetThermoTools, Thermobar, PySulfSat, VapoRock - cloned next to the repo and
-    installed editable into .venv so their source stays browsable for debugging.
+  * PetThermoTools, Thermobar, PySulfSat, VapoRock - pinned clones installed
+    editable into .venv so their source stays browsable for debugging.
   * MAGEMin - C library + executable, compiled from source.
   * ThermoEngine - Objective-C/C dylibs + a Cython package, compiled from source.
     VapoRock cannot be imported without it.
+  * alphaMELTS - the pinned macOS arm64 app, when a verified release URL is set.
 
-Everything is idempotent: existing clones, brew formulae, and builds are reused.
-Pass --update to refresh the engine clones to the latest upstream commit
-(rebuilding the natives and reinstalling the editables) -- this is the
-cluster "engines-update" path: run it on every node the same day.
+Engine source pins and build commands live in engines/engines.lock.toml.
+Versioned installs live under ~/repos/engine-bin/<engine>/<pin>/ and are shared
+by every checkout on the host. Existing clones at a different pin are preserved.
+The installer is idempotent; change the lock to update an engine.
 
 Only macOS on Apple Silicon is supported. The native builds (MAGEMin, ThermoEngine)
 have platform-specific Makefile assumptions; other platforms must follow each
@@ -22,12 +23,11 @@ project's own build instructions.
 
 Usage: python3 install-engines.py
        python3 install-engines.py --skip-compiles   # clones + pip installs only
-       python3 install-engines.py --update          # pull clones to latest upstream, then rebuild
+       python3 install-engines.py --check           # read-only lock drift report
 """
 
 from __future__ import annotations
 
-import importlib.metadata
 import os
 import platform
 import shutil
@@ -36,15 +36,16 @@ import sys
 from pathlib import Path
 
 from simulator.engine_local_config import (
-    EngineIdentity,
-    EngineLocalConfig,
-    EnginePaths,
+    EngineCheckReport,
+    EngineLock,
     THERMOENGINE_DYLIBS,
-    find_alphamelts_binary,
+    checkout_matches_pin,
+    check_engine_install,
+    engine_install_path,
+    engine_install_root,
     git_rev,
-    sha256_combined,
-    sha256_file,
-    write_config,
+    load_engine_lock,
+    write_locked_config,
 )
 
 
@@ -70,40 +71,10 @@ def _repo_root() -> Path:
 
 
 ROOT = _repo_root()
-PARENT = ROOT.parent                      # engine clones are siblings of the repo
 VENV_DIR = ROOT / ".venv"
-ENGINES_DIR = ROOT / "engines"
-HOME_LIB = Path.home() / "lib"            # on dyld's default fallback search path
-
-# (name, clone URL) - cloned into PARENT, skipped if the directory already exists.
-SIBLING_REPOS = [
-    ("PetThermoTools", "https://github.com/gleesonm1/PetThermoTools.git"),
-    ("Thermobar",      "https://github.com/PennyWieser/Thermobar.git"),
-    ("PySulfSat",      "https://github.com/PennyWieser/PySulfSat.git"),
-    ("VapoRock",       "https://gitlab.com/ENKI-portal/vaporock.git"),
-    ("MAGEMin",        "https://github.com/ComputationalThermodynamics/MAGEMin.git"),
-    ("ThermoEngine",   "https://gitlab.com/ENKI-portal/ThermoEngine.git"),
-]
-
-# (sibling dir, pip target within it) - order matters: PetThermoTools and Thermobar
-# share numpy/scipy pins, so PetThermoTools must resolve the environment first.
-EDITABLE_INSTALLS = [
-    ("PetThermoTools", "."),
-    ("Thermobar",      "."),
-    ("PySulfSat",      "."),
-    ("VapoRock",       "src"),             # the importable package lives in src/
-]
+ENGINE_ROOT = engine_install_root()
 
 BREW_BUILD_DEPS = ["nlopt", "open-mpi", "gsl"]
-
-# ThermoEngine's Makefile and setup.py hardcode /usr/local for gsl, which is wrong
-# on Apple Silicon. Injecting these lets clang find the Homebrew gsl without
-# patching upstream files or writing to the root-owned /usr/local.
-BREW_PREFIX = "/opt/homebrew"
-BUILD_ENV = {
-    "CPATH": f"{BREW_PREFIX}/include",
-    "LIBRARY_PATH": f"{BREW_PREFIX}/lib",
-}
 
 # --------------------------------------------------------------------------
 # Output helpers
@@ -182,42 +153,50 @@ def ensure_tools(skip_compiles: bool) -> None:
 # Steps
 # --------------------------------------------------------------------------
 
-def clone_siblings(update: bool = False) -> None:
-    _hdr("Cloning engine repositories (siblings of the repo)")
-    PARENT.mkdir(parents=True, exist_ok=True)
-    for name, url in SIBLING_REPOS:
-        dest = PARENT / name
+def clone_locked_sources(lock: EngineLock, root: Path) -> None:
+    _hdr("Installing pinned engine source checkouts")
+    root.mkdir(parents=True, exist_ok=True)
+    for key, pin in sorted(lock.engines.items()):
+        if pin.source_kind != "git":
+            continue
+        dest = engine_install_path(lock, root, key)
+        dest.parent.mkdir(parents=True, exist_ok=True)
         if dest.exists():
-            if not update:
-                _record(f"{name}: preexisting ({dest})")
+            actual_commit = git_rev(dest)
+            if actual_commit != pin.pin:
+                _record(
+                    f"{pin.name}: REFUSED - {dest} is at {actual_commit}, "
+                    f"expected {pin.pin}; existing data was preserved"
+                )
                 continue
-            # --update: replace the clone with a fresh checkout of the latest
-            # upstream default-branch HEAD. This is the simplest correct "pull
-            # to latest": the in-place ThermoEngine py3.12 patch and any stale
-            # build artifacts are discarded, and the patch/build/install steps
-            # below regenerate everything against the new source. We track HEAD,
-            # not tags: VapoRock's only tag (v0.1) predates its importable src/
-            # layout and ThermoEngine's only tag (v1.0.0) is older than its
-            # validated build -- so "latest" = default-branch HEAD, which is
-            # also what fixes the stale-vaporock issue.
-            shutil.rmtree(dest)
-            _record(f"{name}: removed for --update refresh")
-        _run(["git", "clone", "--depth", "1", url, str(dest)])
-        _record(f"{name}: cloned")
+            _record(f"{pin.name}: pinned clone preexisting ({dest})")
+            continue
+        try:
+            _run(["git", "clone", "--no-checkout", pin.url, str(dest)])
+            _run(["git", "-C", str(dest), "checkout", "--detach", pin.pin])
+            _record(f"{pin.name}: cloned at {pin.pin}")
+        except subprocess.CalledProcessError as exc:
+            _record(f"{pin.name}: clone FAILED ({exc})")
 
 
-def editable_installs(python: Path) -> None:
+def editable_installs(python: Path, lock: EngineLock, root: Path) -> None:
     _hdr("Installing pure-Python tools (editable) into .venv")
-    for name, subdir in EDITABLE_INSTALLS:
-        target = PARENT / name / subdir
+    for key, pin in sorted(lock.engines.items()):
+        if pin.source_kind != "git" or pin.editable_subdir is None:
+            continue
+        source = engine_install_path(lock, root, key)
+        target = source / pin.editable_subdir
+        if not checkout_matches_pin(pin, source):
+            _record(f"{pin.name}: REFUSED - editable install source is not at {pin.pin}")
+            continue
         if not target.exists():
-            _record(f"{name}: SKIPPED - {target} missing (clone step failed?)")
+            _record(f"{pin.name}: SKIPPED - {target} missing (clone step failed?)")
             continue
         try:
             _run([python, "-m", "pip", "install", "-e", str(target)])
-            _record(f"{name}: pip install -e ok")
+            _record(f"{pin.name}: pip install -e ok")
         except subprocess.CalledProcessError as exc:
-            _record(f"{name}: pip install FAILED ({exc})")
+            _record(f"{pin.name}: pip install FAILED ({exc})")
 
 
 def brew_deps() -> None:
@@ -234,19 +213,18 @@ def brew_deps() -> None:
         _record(f"{formula}: installed")
 
 
-def build_magemin() -> None:
+def build_magemin(lock: EngineLock, root: Path) -> None:
     _hdr("Compiling MAGEMin (C library + executable)")
-    src = PARENT / "MAGEMin"
-    if not src.exists():
-        _record("MAGEMin: SKIPPED - clone missing")
+    pin = lock.engines["magemin"]
+    src = engine_install_path(lock, root, "magemin")
+    if not checkout_matches_pin(pin, src):
+        _record(f"MAGEMin: SKIPPED - source is not at locked commit {pin.pin}")
         return
     try:
-        _run(["make", "clean"], cwd=src)
-        _run(["make", "all"], cwd=src)     # MAGEMin executable
-        _run(["make", "lib"], cwd=src)     # libMAGEMin.dylib
-        exe, lib = src / "MAGEMin", src / "libMAGEMin.dylib"
-        if exe.exists() and lib.exists():
-            _record(f"MAGEMin: built ({exe.name} + {lib.name})")
+        for command in pin.build_commands:
+            _run(list(command), cwd=src, extra_env=dict(pin.build_env))
+        if all((src / artifact).is_file() for artifact in pin.artifacts):
+            _record(f"MAGEMin: built from {pin.pin}")
         else:
             _record("MAGEMin: build ran but artifacts missing")
     except subprocess.CalledProcessError as exc:
@@ -294,195 +272,76 @@ def _patch_thermoengine_py312(src: Path) -> None:
             _record("ThermoEngine: patched chemistry.py (Comp unsafe_hash)")
 
 
-def build_thermoengine(python: Path) -> None:
+def build_thermoengine(python: Path, lock: EngineLock, root: Path) -> None:
     _hdr("Compiling ThermoEngine (Objective-C/C dylibs + Cython package)")
-    src = PARENT / "ThermoEngine"
-    if not src.exists():
-        _record("ThermoEngine: SKIPPED - clone missing")
+    pin = lock.engines["thermoengine"]
+    src = engine_install_path(lock, root, "thermoengine")
+    if not checkout_matches_pin(pin, src):
+        _record(f"ThermoEngine: SKIPPED - source is not at locked commit {pin.pin}")
         return
-    _patch_thermoengine_py312(src)
+    if "python312-hashability" in pin.patches:
+        _patch_thermoengine_py312(src)
     try:
-        _run(["make", "clean"], cwd=src)
-        _run(["make", "all"], cwd=src, extra_env=BUILD_ENV)
+        for command in pin.build_commands:
+            _run(list(command), cwd=src, extra_env=dict(pin.build_env))
     except subprocess.CalledProcessError as exc:
         _record(f"ThermoEngine: dylib build FAILED ({exc})")
         return
 
-    # The thermoengine package resolves its dylibs through
-    # ctypes.util.find_library(), which searches ~/lib by default. Staging the
-    # build output there avoids both /usr/local writes and upstream patches.
-    HOME_LIB.mkdir(parents=True, exist_ok=True)
+    dylib_dir = src / (pin.runtime_directory or "lib")
+    dylib_dir.mkdir(parents=True, exist_ok=True)
     staged = []
     for dylib in THERMOENGINE_DYLIBS:
         built = src / "src" / dylib
         if built.exists():
-            shutil.copy2(built, HOME_LIB / dylib)
+            shutil.copy2(built, dylib_dir / dylib)
             staged.append(dylib)
     if len(staged) != len(THERMOENGINE_DYLIBS):
         _record(f"ThermoEngine: only staged {staged} - expected {list(THERMOENGINE_DYLIBS)}")
         return
-    _record(f"ThermoEngine: dylibs built and staged in {HOME_LIB}")
+    _record(f"ThermoEngine: dylibs built and staged in {dylib_dir}")
 
     try:
         _run([python, "-m", "pip", "install", "-e", str(src / "thermoengine")],
-             extra_env=BUILD_ENV)
+             extra_env=dict(pin.build_env))
         _record("ThermoEngine: pip install -e ok")
     except subprocess.CalledProcessError as exc:
         _record(f"ThermoEngine: pip install FAILED ({exc})")
 
 
-def check_alphamelts() -> None:
-    _hdr("Checking alphaMELTS binary")
-    candidates = [
-        ENGINES_DIR / "alphamelts" / "run_alphamelts.command",
-        ENGINES_DIR / "alphamelts" / "alphamelts",
-    ]
-    found = next((c for c in candidates if c.exists()), None)
-    on_path = shutil.which("alphamelts")
-    if found:
-        _record(f"alphaMELTS: present ({found})")
-    elif on_path:
-        _record(f"alphaMELTS: present on PATH ({on_path})")
+def alpha_artifact_notice(lock: EngineLock, root: Path) -> None:
+    pin = lock.engines["alphamelts"]
+    artifact = engine_install_path(lock, root, "alphamelts") / (
+        pin.runtime_artifact or "alphamelts2"
+    )
+    if artifact.is_file():
+        _record(f"alphaMELTS: staged at {artifact}")
     else:
         _record(
-            "alphaMELTS: not found - download the macOS arm build from "
-            "https://magmasource.caltech.edu/alphamelts/ and extract it to "
-            "engines/alphamelts/ (PetThermoTools uses it for MELTS-family models)."
+            f"alphaMELTS: missing {artifact}; run install-dependencies.py to "
+            "download the locked archive and verify its checksum"
         )
 
 
-def _binary_version_line(binary: Path, *, db: str | None = None) -> str:
-    command = [str(binary), "--version"]
-    if db:
-        command.extend(["--db", db])
-    try:
-        proc = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            timeout=10,
+def print_check_report(report: EngineCheckReport) -> int:
+    _hdr(f"Read-only engine check on {report.host}")
+    for key, relative, digest in report.artifact_shas:
+        _record(f"artifact sha256 {key}/{relative}: {digest}")
+    for drift in report.drifts:
+        _record(
+            f"{drift.severity.upper()} {drift.code} {drift.engine} "
+            f"{drift.path}: {drift.message}"
         )
-        lines = (proc.stdout or proc.stderr).strip().splitlines()
-        if proc.returncode == 0 and lines:
-            return lines[0].strip()
-    except (OSError, subprocess.TimeoutExpired):
-        pass
-    return f"{binary.name} ({binary})"
-
-
-def _package_version(*distribution_names: str) -> str:
-    for name in distribution_names:
-        try:
-            return str(importlib.metadata.version(name))
-        except importlib.metadata.PackageNotFoundError:
-            continue
-    return "unknown"
-
-
-def _thermoengine_version_string() -> str:
-    try:
-        import thermoengine
-        from thermoengine import model
-
-        database = model.Database(database="Berman", liq_mod="v1.0", calib=True)
-        melts_version = "1.0.2"
-        liq_model = "v1.0"
-        _ = database.get_phase("Liq")
-        _ = melts_version, liq_model, thermoengine
-        return f"thermoengine MELTS {melts_version} (liq_mod {liq_model})"
-    except Exception:
-        return "thermoengine MELTS 1.0.2 (liq_mod v1.0)"
-
-
-def _thermoengine_digest(dylib_dir: Path, clone_root: Path) -> str:
-    parts: list[bytes] = []
-    for name in THERMOENGINE_DYLIBS:
-        path = dylib_dir / name
-        if path.is_file():
-            parts.append(path.read_bytes())
-    parts.append(git_rev(clone_root).encode("utf-8"))
-    return sha256_combined(*parts)
-
-
-def write_local_config(python: Path) -> None:
-    _hdr("Writing engines/engines.local.toml")
-
-    dylib_dir = HOME_LIB if HOME_LIB.is_dir() else None
-    alphamelts_binary = find_alphamelts_binary(ENGINES_DIR / "alphamelts")
-    if alphamelts_binary is None:
-        on_path = shutil.which("alphamelts")
-        if on_path:
-            alphamelts_binary = Path(on_path)
-
-    magemin_binary = PARENT / "MAGEMin" / "MAGEMin"
-    if not magemin_binary.exists():
-        magemin_binary = ENGINES_DIR / "magemin" / "MAGEMin"
-    if not magemin_binary.exists():
-        magemin_binary = None
-
-    paths = EnginePaths(
-        thermoengine_dylib_dir=dylib_dir,
-        alphamelts_binary_path=alphamelts_binary,
-        magemin_binary_path=magemin_binary if magemin_binary and magemin_binary.exists() else None,
+    if not report.drifts:
+        _record("engine root and local config match the lock")
+    _record(
+        "Compare artifact sha256 lines across hosts; native build differences are "
+        "informational because locked source commits are authoritative."
     )
-
-    identities: dict[str, EngineIdentity] = {}
-
-    if alphamelts_binary is not None and alphamelts_binary.is_file():
-        identities["alphamelts"] = EngineIdentity(
-            name="alphamelts",
-            version=_binary_version_line(alphamelts_binary),
-            digest=sha256_file(alphamelts_binary),
-        )
-    else:
-        _record("engines.local.toml: alphaMELTS binary missing; identity skipped")
-
-    if magemin_binary is not None and magemin_binary.is_file():
-        identities["magemin"] = EngineIdentity(
-            name="magemin",
-            version=_binary_version_line(magemin_binary, db="ig"),
-            digest=sha256_file(magemin_binary),
-            extra={"db": "ig"},
-        )
-    else:
-        _record("engines.local.toml: MAGEMin binary missing; identity skipped")
-
-    if dylib_dir is not None:
-        thermo_clone = PARENT / "ThermoEngine"
-        identities["thermoengine"] = EngineIdentity(
-            name="thermoengine",
-            version=_thermoengine_version_string(),
-            digest=_thermoengine_digest(dylib_dir, thermo_clone),
-        )
-    else:
-        _record("engines.local.toml: ThermoEngine dylib_dir missing; identity skipped")
-
-    vaporock_clone = PARENT / "VapoRock"
-    if vaporock_clone.is_dir():
-        identities["vaporock"] = EngineIdentity(
-            name="vaporock",
-            version=_package_version("vaporock"),
-            digest=f"sha256:{git_rev(vaporock_clone)}",
-        )
-
-    pysulfsat_clone = PARENT / "PySulfSat"
-    if pysulfsat_clone.is_dir():
-        identities["pysulfsat"] = EngineIdentity(
-            name="pysulfsat",
-            version=_package_version("PySulfSat", "pysulfsat"),
-            digest=f"sha256:{git_rev(pysulfsat_clone)}",
-        )
-
-    if not identities:
-        _record("engines.local.toml: no engine identities resolved; not written")
-        return
-
-    config = EngineLocalConfig(paths=paths, identities=identities)
-    written = write_config(config)
-    _record(f"engines.local.toml: written ({written})")
+    return 1 if report.has_errors else 0
 
 
-def verify(python: Path) -> None:
+def verify(python: Path, lock: EngineLock, root: Path) -> None:
     _hdr("Verifying engine availability")
     checks = [
         ("petthermotools", "import petthermotools; print(petthermotools.__version__)"),
@@ -502,10 +361,16 @@ def verify(python: Path) -> None:
             tail = (proc.stderr.strip().splitlines() or ["unknown error"])[-1]
             _record(f"{label}: import FAILED - {tail}")
 
-    magemin = PARENT / "MAGEMin" / "MAGEMin"
-    if magemin.exists():
-        proc = subprocess.run([str(magemin), "--version"],
-                              capture_output=True, text=True)
+    magemin_pin = lock.engines["magemin"]
+    magemin = engine_install_path(lock, root, "magemin") / (
+        magemin_pin.runtime_artifact or "MAGEMin"
+    )
+    if checkout_matches_pin(
+        magemin_pin, engine_install_path(lock, root, "magemin")
+    ) and magemin.exists():
+        proc = subprocess.run(
+            [str(magemin), "--version"], capture_output=True, text=True
+        )
         out = (proc.stdout or proc.stderr).strip().splitlines()
         _record(f"MAGEMin: runs ({out[0] if out else 'no version output'})")
     else:
@@ -518,25 +383,31 @@ def verify(python: Path) -> None:
 
 def main() -> int:
     args = set(sys.argv[1:])
+    check_only = "--check" in args
     skip_compiles = "--skip-compiles" in args
-    update = "--update" in args
-    unknown = args - {"--skip-compiles", "--update"}
+    unknown = args - {"--skip-compiles", "--check"}
     if unknown:
         raise SystemExit(f"Unknown argument(s): {', '.join(sorted(unknown))}\n{__doc__}")
+
+    if check_only:
+        if args != {"--check"}:
+            raise SystemExit("--check cannot be combined with installer options")
+        lock = load_engine_lock()
+        report = check_engine_install(lock, ENGINE_ROOT)
+        return print_check_report(report)
 
     ensure_platform()
     ensure_tools(skip_compiles)
     python = _venv_python()
+    lock = load_engine_lock()
 
     print(f"Repo:   {ROOT}")
     print(f"Venv:   {VENV_DIR}")
-    print(f"Clones: {PARENT}")
-    if update:
-        print("Mode:   --update (refresh engine clones to latest upstream HEAD)")
+    print(f"Engines: {ENGINE_ROOT}")
 
-    # Pure-Python engines first.
-    clone_siblings(update=update)
-    editable_installs(python)
+    clone_locked_sources(lock, ENGINE_ROOT)
+    editable_installs(python, lock, ENGINE_ROOT)
+    alpha_artifact_notice(lock, ENGINE_ROOT)
 
     # Heavy native builds last, so a failed compile never blocks the rest.
     if skip_compiles:
@@ -544,18 +415,21 @@ def main() -> int:
         _record("MAGEMin / ThermoEngine: skipped")
     else:
         brew_deps()
-        build_magemin()
-        build_thermoengine(python)
+        build_magemin(lock, ENGINE_ROOT)
+        build_thermoengine(python, lock, ENGINE_ROOT)
 
-    check_alphamelts()
-    verify(python)
-    write_local_config(python)
+    verify(python, lock, ENGINE_ROOT)
+    written = write_locked_config(lock, ENGINE_ROOT)
+    _record(f"engines.local.toml: written from lock ({written})")
+    check_status = print_check_report(
+        check_engine_install(lock, ENGINE_ROOT)
+    )
 
     _hdr("Summary")
     for line in _REPORT:
         print(f"  {line}")
-    print(f"\nDone. Engines installed against {python}")
-    return 0
+    print(f"\nDone. Engines provisioned against {python}")
+    return check_status
 
 
 if __name__ == "__main__":

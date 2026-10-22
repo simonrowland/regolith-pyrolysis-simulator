@@ -38,17 +38,21 @@ The launcher binds to `127.0.0.1:3000` by default. Override with `REGOLITH_HOST`
 python3 install-engines.py
 ```
 
-This clones and installs PetThermoTools, Thermobar, PySulfSat, and VapoRock as editable siblings of the repo, then compiles MAGEMin and ThermoEngine from source. The alphaMELTS binary is not bundled; see `engines/alphamelts/` for placement notes. The installer is idempotent: existing builds are reused.
+The installers use `engines/engines.lock.toml` and place engine sources and
+artifacts under `~/repos/engine-bin/<engine>/<pin>/`, shared by every checkout.
+`install-dependencies.py` downloads and verifies the pinned alphaMELTS archive;
+`install-engines.py` installs the pinned editable packages and builds MAGEMin
+and ThermoEngine. Existing versioned builds are reused.
 
-Only PetThermoTools is declared in `[project.dependencies]`, so that one comes in with `pip install -e .`. **VapoRock is deliberately *not* a pip dependency**: `import vaporock` hard-requires the native ThermoEngine build (a Cython extension linking system GSL and Objective-C/C dylibs), which pip cannot compile. VapoRock and ThermoEngine are provisioned only by `install-engines.py`, as are MAGEMin and the remaining editable-sibling clones.
+Only PetThermoTools is declared in `[project.dependencies]`, so that one comes in with `pip install -e .`. **VapoRock is deliberately *not* a pip dependency**: `import vaporock` hard-requires the native ThermoEngine build (a Cython extension linking system GSL and Objective-C/C dylibs), which pip cannot compile. VapoRock and ThermoEngine are provisioned only by `install-engines.py`, as are MAGEMin and the other editable clones.
 
-Skip the native compiles (editable sibling clones only — PetThermoTools, Thermobar, PySulfSat, VapoRock — with no MAGEMin / ThermoEngine build):
+Skip the native compiles (editable clones only — PetThermoTools, Thermobar, PySulfSat, VapoRock — with no MAGEMin / ThermoEngine build):
 
 ```bash
 python3 install-engines.py --skip-compiles
 ```
 
-Note that with `--skip-compiles` the VapoRock clone is installed but will still fail to import, because ThermoEngine was not built. Use `python3 install-engines.py --update` to pull the engine clones to their latest upstream commit and rebuild the natives.
+Note that with `--skip-compiles` the VapoRock clone is installed but will still fail to import, because ThermoEngine was not built. Check for drift without changing files with `python3 install-engines.py --check`. To bump a source, review a commit that changes its pin in `engines/engines.lock.toml`; `--update` has been removed.
 
 With the operational chain installed, the active backend selection log line (see `docs/melt-backends.md`) confirms the selected `MeltBackend`; `run_metadata.engines_used.registry.vapor_pressure` shows `authoritative: "builtin-vapor-pressure"` with VapoRock, when importable, under `shadows`. Silent fallback to backend vapor pressures is forbidden unless `chemistry_kernel.allow_fallback_vapor: true` is set in setpoints.
 

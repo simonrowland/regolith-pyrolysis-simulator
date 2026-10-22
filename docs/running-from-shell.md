@@ -8,6 +8,26 @@ All commands assume you are **in the repo root** and use the project venv
 (`./.venv/bin/python`). Create it with `python3 install-dependencies.py` (and
 `install-engines.py` for the real thermochemistry engines).
 
+## Install and check pinned engines
+
+`install-dependencies.py` installs the base Python environment and the
+checksum-verified alphaMELTS app. Then run:
+
+```bash
+python3 install-engines.py
+python3 install-engines.py --check
+```
+
+The reviewed pins and build commands live in `engines/engines.lock.toml`.
+Engine sources and artifacts live at `~/repos/engine-bin/<engine>/<pin>/`,
+shared by checkouts and worktrees. `--check` compares the lock with that engine
+root and this checkout's `engines/engines.local.toml`, and scans `~/repos` for
+extra engine builds. It reports wrong source revisions, missing artifacts, and
+config path or identity-digest drift. It also prints artifact SHA-256 values
+for comparison across hosts. Different native artifact hashes are warnings;
+the locked source pin remains authoritative. Change a reviewed lock entry to
+bump an engine; `--update` no longer follows upstream HEAD.
+
 ---
 
 ## 1. Fire one simulation (the canonical command)

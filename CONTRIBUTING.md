@@ -104,7 +104,8 @@ with no cross-module coupling.
 | Process docs (public) | `docs/` |
 | Plans, reviews, RAG corpus | `docs-private/` (gitignored) |
 | Tests | `tests/test_<module>.py` |
-| Engine binaries / data | `engines/` (managed by `install-engines.py`) |
+| Engine binaries / checkouts | `~/repos/engine-bin/<engine>/<pin>/` (managed by the locked installers) |
+| Engine adapters and lock | `engines/` |
 
 If you're not sure where something goes, the `file-map.md` slice in
 `docs-private/rag/` is the source of truth — it's regenerated from the

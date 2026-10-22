@@ -255,17 +255,26 @@ python3 install-dependencies.py
 
 It uses `uv` when available and falls back to `pip` automatically. If you are
 not already inside a virtual environment, it creates `.venv` and installs
-`requirements.txt` there. It also downloads alphaMELTS 2.3.1 into
-`engines/alphamelts/`. Then run the command it prints and open
+`requirements.txt` there. It also downloads the locked alphaMELTS 2.3.1 app
+into `~/repos/engine-bin/alphaMELTS/<archive-sha>/`. Then run the command it prints and open
 `http://localhost:3000/`.
 
 Engine provisioning is a second installation stage: PetThermoTools, Thermobar,
-PySulfSat and VapoRock come from editable sibling clones; ThermoEngine and
-MAGEMin require native builds. Run the provisioning script after base setup:
+PySulfSat and VapoRock come from pinned editable clones; ThermoEngine and
+MAGEMin require native builds. All engines live in the host-wide
+`~/repos/engine-bin/<engine>/<pin>/` layout shared by checkouts. Run the
+provisioning script after base setup:
 
 ```bash
 python3 install-engines.py
+python3 install-engines.py --check
 ```
+
+`--check` is read-only: it reports lock drift, extra engine builds under
+`~/repos`, the local TOML path/digest drift, and each host artifact SHA-256.
+Native artifact SHA differences are informational because the committed source
+pin is authoritative. To bump a source, edit and review `engines/engines.lock.toml`;
+`--update` has been removed.
 
 The simulator runs without them, on the built-in analytical model. See
 [Melt Chemistry Backends](#melt-chemistry-backends) for what that costs you.
@@ -310,8 +319,9 @@ by `install-dependencies.py`. The base lock excludes installer-owned engines.
 An exact `uv sync` removes those installations: sync first, then provision
 engines again. After provisioning, use `.venv/bin/python` or `uv run --no-sync`.
 A fresh uv venv needs `.venv/bin/python -m ensurepip --upgrade` before the
-pip-based engine installer. Preserve validated sibling revisions and check
-engine imports explicitly; installer exit status alone does not prove success.
+pip-based engine installer. The engine lock records the validated source pins;
+check engine imports explicitly because installer exit status alone does not
+prove success.
 
 ## Melt Chemistry Backends
 
@@ -355,15 +365,11 @@ explicit source-selection change. The per-intent authority table is in `AGENTS.m
 §"Chemistry-engine policy", with the operator-facing version in
 [`docs/melt-backends.md`](docs/melt-backends.md).
 
-**Where the alphaMELTS binary is looked for**, in order:
-
-1. `alphamelts_binary_path` in `engines/engines.local.toml` (machine-local, gitignored).
-2. `engines/alphamelts/run_alphamelts.command`.
-3. `engines/alphamelts/` and one level of its subdirectories, for `alphamelts2`,
-   `alphamelts_macos`, `alphamelts_linux`, or `alphamelts_win64.exe`.
-4. `alphamelts` on `PATH`.
-
-`python3 install-dependencies.py` populates (2)/(3) for you.
+The supported alphaMELTS path is `alphamelts_binary_path` in the generated,
+machine-local `engines/engines.local.toml`; it points to the locked app under
+`~/repos/engine-bin/alphaMELTS/<archive-sha>/`. `install-dependencies.py`
+downloads and verifies the release archive, and `install-engines.py` writes the
+shared local config from the lock.
 
 ## Model Status
 

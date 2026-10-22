@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import os
-import hashlib
 import platform
 import shutil
 import subprocess
@@ -14,37 +13,19 @@ import venv
 import zipfile
 from pathlib import Path
 
+from simulator.engine_local_config import (
+    artifact_for_platform,
+    engine_install_path,
+    engine_install_root,
+    load_engine_lock,
+    sha256_file,
+)
+
 
 ROOT = Path(__file__).resolve().parent
 VENV_DIR = ROOT / ".venv"
 REQUIREMENTS = ROOT / "requirements.txt"
 MIN_PYTHON = (3, 12)
-ALPHAMELTS_VERSION = "2.3.1"
-ALPHAMELTS_RELEASE = (
-    "https://github.com/magmasource/alphaMELTS/releases/download/v2.3.1"
-)
-ALPHAMELTS_ASSETS = {
-    ("Darwin", "arm64"): (
-        "alphamelts-app-2.3.1-macos-arm64.zip",
-        "f233ff5180df4e8318af922183beb85c20c33c28d3cb1be1254916f856327136",
-        "alphamelts_macos",
-    ),
-    ("Darwin", "x86_64"): (
-        "alphamelts-app-2.3.1-macos-x86_64.zip",
-        "68017f2bb67547524bb6bbe940304c5ddf72a1e98cc0092b072b7e267b4a0f0c",
-        "alphamelts_macos",
-    ),
-    ("Linux", "x86_64"): (
-        "alphamelts-app-2.3.1-linux.zip",
-        "d8c26879a6c84807d976181d5132ab0107d90598f20ad9798eac4822403effbb",
-        "alphamelts_linux",
-    ),
-    ("Windows", "AMD64"): (
-        "alphamelts-app-2.3.1-win64.zip",
-        "a7df461a261ded5347abbd95dd55cbbc489ae9fa7697903a31db8c13e5a5d6c6",
-        "alphamelts_win64.exe",
-    ),
-}
 
 
 def _is_venv() -> bool:
@@ -113,26 +94,6 @@ def _install_with_pip(python: Path) -> None:
     _run([python, "-m", "pip", "install", "-r", REQUIREMENTS])
 
 
-def _alpha_asset() -> tuple[str, str, str]:
-    system = platform.system()
-    machine = platform.machine()
-    key = (system, machine)
-    if key not in ALPHAMELTS_ASSETS:
-        raise SystemExit(
-            "No bundled alphaMELTS app asset is configured for "
-            f"{system}/{machine}"
-        )
-    return ALPHAMELTS_ASSETS[key]
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def _download(url: str, target: Path) -> None:
     print(f"Downloading {url}", flush=True)
     with urllib.request.urlopen(url) as response:
@@ -174,16 +135,36 @@ def _write_runner(engine_dir: Path, package_dir: Path, binary_name: str) -> None
 
 
 def _install_alphamelts() -> None:
-    filename, expected_hash, binary_name = _alpha_asset()
-    engine_dir = ROOT / "engines" / "alphamelts"
-    engine_dir.mkdir(parents=True, exist_ok=True)
-    zip_path = engine_dir / filename
-    package_dir = engine_dir / filename.removesuffix(".zip")
+    system, machine = platform.system(), platform.machine()
+    lock = load_engine_lock()
+    pin = lock.engines["alphamelts"]
+    try:
+        asset = artifact_for_platform(pin, f"{system}-{machine}")
+    except ValueError as exc:
+        raise SystemExit(f"No locked alphaMELTS app asset for {system}/{machine}") from exc
+    filename = asset.archive_filename
+    expected_hash = asset.pin
+    binary_name = asset.binary_name
+    version = pin.version
+    url = asset.url
+    engine_dir = engine_install_path(
+        lock,
+        engine_install_root(),
+        "alphamelts",
+        platform_key=f"{system}-{machine}",
+    )
+    package_dir = engine_dir / Path(asset.runtime_artifact).parent
     binary = package_dir / binary_name
 
-    if not zip_path.exists() or _sha256(zip_path) != expected_hash:
-        _download(f"{ALPHAMELTS_RELEASE}/{filename}", zip_path)
-    actual_hash = _sha256(zip_path)
+    engine_dir.mkdir(parents=True, exist_ok=True)
+    zip_path = engine_dir / filename
+
+    if (
+        not zip_path.exists()
+        or sha256_file(zip_path).removeprefix("sha256:") != expected_hash
+    ):
+        _download(url, zip_path)
+    actual_hash = sha256_file(zip_path).removeprefix("sha256:")
     if actual_hash != expected_hash:
         raise SystemExit(
             f"alphaMELTS archive hash mismatch for {filename}: {actual_hash}"
@@ -192,9 +173,19 @@ def _install_alphamelts() -> None:
     if not binary.exists():
         if package_dir.exists():
             shutil.rmtree(package_dir)
-        print(f"Extracting alphaMELTS {ALPHAMELTS_VERSION}", flush=True)
+        print(f"Extracting alphaMELTS {version}", flush=True)
         with zipfile.ZipFile(zip_path) as archive:
             archive.extractall(engine_dir)
+    if not binary.is_file():
+        raise SystemExit(f"alphaMELTS binary missing after extraction: {binary}")
+
+    if asset.reference_sha256 is not None:
+        actual_binary_hash = sha256_file(binary).removeprefix("sha256:")
+        if actual_binary_hash != asset.reference_sha256:
+            raise SystemExit(
+                "alphaMELTS binary hash mismatch: "
+                f"expected {asset.reference_sha256}, found {actual_binary_hash}"
+            )
 
     _write_runner(engine_dir, package_dir, binary_name)
     print(f"alphaMELTS installed: {engine_dir / 'run_alphamelts.command'}")
