@@ -1,0 +1,2833 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml
+observations:
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_cool
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident_average
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1613.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_cool
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LC1-1_average_cooling
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1613.5'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LC1-1_average_cooling
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_heat
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident_average
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1617'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_heat
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LC1-1_average_heating
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1617'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LC1-1_average_heating
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool1
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1614'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool1
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LC1-1
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1614'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LC1-1
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool2
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1613'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool2
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LC1-1
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1613'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LC1-1
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat1
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1619'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat1
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LC1-1
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1619'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LC1-1
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat2
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1615'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat2
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LC1-1
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1615'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LC1-1
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_cool
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-MgO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident_average
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1700.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_cool
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LM1-1_average_cooling
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700.5'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LM1-1_average_cooling
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_heat
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-MgO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident_average
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1696'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_heat
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LM1-1_average_heating
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1696'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LM1-1_average_heating
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool1
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-MgO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1699'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool1
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LM1-1
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1699'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LM1-1
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool2
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-MgO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1702'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool2
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LM1-1
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1702'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LM1-1
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat1
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-MgO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1700'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat1
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LM1-1
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LM1-1
+- observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat2
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2O-MgO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: thermal_incident
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1692'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat2
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 370
+    published_page: 339
+    pdf_page_index: 369
+    table: A.1
+    note: row=LM1-1
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1692'
+      locator:
+        page: 370
+        published_page: 339
+        pdf_page_index: 369
+        table: A.1
+        note: row=LM1-1
+- observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm0_melting
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: unknown
+        reason: phase string 'congruent melting' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1477.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm0_melting
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 402
+    published_page: 371
+    pdf_page_index: 401
+    table: B.2
+    note: row=LSM-0
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1477.15'
+      locator:
+        page: 402
+        published_page: 371
+        pdf_page_index: 401
+        table: B.2
+        note: row=LSM-0
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1204'
+            locator:
+              page: 402
+              published_page: 371
+              pdf_page_index: 401
+              table: B.2
+              note: row=LSM-0
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 402
+              published_page: 371
+              pdf_page_index: 401
+              table: B.2
+              note: row=LSM-0
+        output_unit: K
+- observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm3_li2mg_sio4_transition
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2MgSiO4
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'solid_solid_transition' (solid -> solid) in values.property_kind;
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_solid_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1267.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm3_li2mg_sio4_transition
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 402
+    published_page: 371
+    pdf_page_index: 401
+    table: B.2
+    note: row=LSM-3
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1267.15'
+      locator:
+        page: 402
+        published_page: 371
+        pdf_page_index: 401
+        table: B.2
+        note: row=LSM-3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '994'
+            locator:
+              page: 402
+              published_page: 371
+              pdf_page_index: 401
+              table: B.2
+              note: row=LSM-3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 402
+              published_page: 371
+              pdf_page_index: 401
+              table: B.2
+              note: row=LSM-3
+        output_unit: K
+- observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm4_li2mg_sio4_transition
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2MgSiO4
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'solid_solid_transition' (solid -> solid) in values.property_kind;
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_solid_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1270.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm4_li2mg_sio4_transition
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 402
+    published_page: 371
+    pdf_page_index: 401
+    table: B.2
+    note: row=LSM-4
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1270.15'
+      locator:
+        page: 402
+        published_page: 371
+        pdf_page_index: 401
+        table: B.2
+        note: row=LSM-4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '997'
+            locator:
+              page: 402
+              published_page: 371
+              pdf_page_index: 401
+              table: B.2
+              note: row=LSM-4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 402
+              published_page: 371
+              pdf_page_index: 401
+              table: B.2
+              note: row=LSM-4
+        output_unit: K
+- observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_li2mg_sio4_transition
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2MgSiO4
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'solid_solid_transition' (solid -> solid) in values.property_kind;
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_solid_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1277.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_li2mg_sio4_transition
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 402
+    published_page: 371
+    pdf_page_index: 401
+    table: B.2
+    note: row=LSM-5
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1277.15'
+      locator:
+        page: 402
+        published_page: 371
+        pdf_page_index: 401
+        table: B.2
+        note: row=LSM-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1004'
+            locator:
+              page: 402
+              published_page: 371
+              pdf_page_index: 401
+              table: B.2
+              note: row=LSM-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 402
+              published_page: 371
+              pdf_page_index: 401
+              table: B.2
+              note: row=LSM-5
+        output_unit: K
+- observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_melting
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2MgSiO4
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1738.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_melting
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 402
+    published_page: 371
+    pdf_page_index: 401
+    table: B.2
+    note: row=LSM-5
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1738.15'
+      locator:
+        page: 402
+        published_page: 371
+        pdf_page_index: 401
+        table: B.2
+        note: row=LSM-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1465'
+            locator:
+              page: 402
+              published_page: 371
+              pdf_page_index: 401
+              table: B.2
+              note: row=LSM-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 402
+              published_page: 371
+              pdf_page_index: 401
+              table: B.2
+              note: row=LSM-5
+        output_unit: K
+- observation_id: konar-2018-alkali-cmas-thesis::konar_c3_glass_lac1_2_al2o3
+  experiment_id: 10.82308/34018::experiment::konar_c3_lac1_2_1470C_quench
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1743.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Li2O
+          - '0.25'
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.488'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam49-1022
+      date: '2026-10-22'
+      evidence:
+        page: 434
+        published_page: 403
+        pdf_page_index: 433
+        table: C.3
+        note: row=LAC1-2_glass
+  notices: []
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 434
+    published_page: 403
+    pdf_page_index: 433
+    table: C.3
+    note: row=LAC1-2_glass
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 434
+        published_page: 403
+        pdf_page_index: 433
+        table: C.3
+        note: row=LAC1-2_glass
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1470'
+            locator:
+              page: 434
+              published_page: 403
+              pdf_page_index: 433
+              table: C.3
+              note: row=LAC1-2_glass
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 434
+              published_page: 403
+              pdf_page_index: 433
+              table: C.3
+              note: row=LAC1-2_glass
+        output_unit: K
+- observation_id: konar-2018-alkali-cmas-thesis::konar_c3_glass_lac1_2_cao
+  experiment_id: 10.82308/34018::experiment::konar_c3_lac1_2_1470C_quench
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1743.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Li2O
+          - '0.25'
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.344'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam49-1022
+      date: '2026-10-22'
+      evidence:
+        page: 434
+        published_page: 403
+        pdf_page_index: 433
+        table: C.3
+        note: row=LAC1-2_glass
+  notices: []
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 434
+    published_page: 403
+    pdf_page_index: 433
+    table: C.3
+    note: row=LAC1-2_glass
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 434
+        published_page: 403
+        pdf_page_index: 433
+        table: C.3
+        note: row=LAC1-2_glass
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1470'
+            locator:
+              page: 434
+              published_page: 403
+              pdf_page_index: 433
+              table: C.3
+              note: row=LAC1-2_glass
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 434
+              published_page: 403
+              pdf_page_index: 433
+              table: C.3
+              note: row=LAC1-2_glass
+        output_unit: K
+- observation_id: konar-2018-alkali-cmas-thesis::konar_c3_glass_lac1_2_li2o
+  experiment_id: 10.82308/34018::experiment::konar_c3_lac1_2_1470C_quench
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Li2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1743.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Li2O
+          - '0.25'
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.168'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam49-1022
+      date: '2026-10-22'
+      evidence:
+        page: 434
+        published_page: 403
+        pdf_page_index: 433
+        table: C.3
+        note: row=LAC1-2_glass
+  notices: []
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 434
+    published_page: 403
+    pdf_page_index: 433
+    table: C.3
+    note: row=LAC1-2_glass
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 434
+        published_page: 403
+        pdf_page_index: 433
+        table: C.3
+        note: row=LAC1-2_glass
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1470'
+            locator:
+              page: 434
+              published_page: 403
+              pdf_page_index: 433
+              table: C.3
+              note: row=LAC1-2_glass
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 434
+              published_page: 403
+              pdf_page_index: 433
+              table: C.3
+              note: row=LAC1-2_glass
+        output_unit: K
+- observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s0_3_melting_point
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1352'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_t5_2_s0_3_melting_point
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 184
+    published_page: 153
+    pdf_page_index: 183
+    table: '5.2'
+    note: row=S0-3
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1352'
+      locator:
+        page: 184
+        published_page: 153
+        pdf_page_index: 183
+        table: '5.2'
+        note: row=S0-3
+- observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s2_3_li3nasi4_transition
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li3NaSiO4
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'solid_solid_transition' (solid -> solid) in values.property_kind;
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_solid_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '747'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_t5_2_s2_3_li3nasi4_transition
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 184
+    published_page: 153
+    pdf_page_index: 183
+    table: '5.2'
+    note: row=S2-3
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '747'
+      locator:
+        page: 184
+        published_page: 153
+        pdf_page_index: 183
+        table: '5.2'
+        note: row=S2-3
+- observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s3_3_li3nasi4_transition
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li3NaSiO4
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'solid_solid_transition' (solid -> solid) in values.property_kind;
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_solid_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '765'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_t5_2_s3_3_li3nasi4_transition
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 184
+    published_page: 153
+    pdf_page_index: 183
+    table: '5.2'
+    note: row=S3-3
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '765'
+      locator:
+        page: 184
+        published_page: 153
+        pdf_page_index: 183
+        table: '5.2'
+        note: row=S3-3
+- observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s4_3_li3nasi4_transition
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li3NaSiO4
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'solid_solid_transition' (solid -> solid) in values.property_kind;
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_solid_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '743'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_t5_2_s4_3_li3nasi4_transition
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 184
+    published_page: 153
+    pdf_page_index: 183
+    table: '5.2'
+    note: row=S4-3
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '743'
+      locator:
+        page: 184
+        published_page: 153
+        pdf_page_index: 183
+        table: '5.2'
+        note: row=S4-3
+- observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s4_3_li4sio4_transition
+  experiment_id: 10.82308/34018::konar-2018-alkali-cmas-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li4SiO4
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'solid_solid_transition' (solid -> solid) in values.property_kind;
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_solid_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '940'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: konar-2018-alkali-cmas-thesis::konar_t5_2_s4_3_li4sio4_transition
+  source_id: konar-2018-alkali-cmas-thesis
+  locator:
+    page: 184
+    published_page: 153
+    pdf_page_index: 183
+    table: '5.2'
+    note: row=S4-3
+  read_from: unknown:konar-2018-alkali-cmas-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '940'
+      locator:
+        page: 184
+        published_page: 153
+        pdf_page_index: 183
+        table: '5.2'
+        note: row=S4-3

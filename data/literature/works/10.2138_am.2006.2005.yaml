@@ -1,0 +1,879 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2138/am.2006.2005
+  citation: 'Dachs E, Geiger CA (2006). Heat capacities and entropies of mixing of pyrope-grossular (Mg3Al2Si3O12-Ca3Al2Si3O12)
+    garnet solid solutions: A low-temperature calorimetric and a thermodynamic investigation. American Mineralogist 91:894-906.'
+  source_ids:
+  - dachs-geiger-2006-pyrope-grossular
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:dachs-geiger-2006-pyrope-grossular
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2138/am.2006.2005
+experiments:
+- experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am.2006.2005
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+context:
+- observation_id: dachs_geiger_2006_intermediate_solution_entropies
+  type: calorimetric_entropy_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 900
+    table: '3'
+  units: J/mol/K, T = 298.15 K
+  values:
+    quantity: S and excess entropy ΔSxs
+    method_class: measured_reduced and model_derived
+    table2_locator:
+      page: 6
+      pdf_page_index: 5
+      published_page: 899
+      table: '2'
+    note: Intermediate solid-solution and excess entropies remain context; pure-endmember values are transcribed separately.
+  context_id: dachs-geiger-2006-pyrope-grossular::context::dachs_geiger_2006_intermediate_solution_entropies
+  work_id: 10.2138/am.2006.2005
+  source_id: dachs-geiger-2006-pyrope-grossular
+  species: Mg3Al2Si3O12
+- observation_id: dachs_geiger_2006_pyrope_entropy_g97_context
+  type: calorimetric_entropy_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 899
+    table: '2'
+  units: J/mol/K
+  values:
+    quantity: S
+    method_class: quoted_attributed
+    entropy: '274.45'
+    T_K: '298.15'
+    sigma: '0.27'
+    attribution: Gottschalk (1997)
+    note: 'Footnote ‡: based on Kolesnik et al. (1977) Cp of a natural garnet with 18.8 mol% almandine and 8.2 mol% grossular;
+      this is not endmember pyrope.'
+  uncertainty:
+    reported_status: printed
+    value: '0.27'
+    units: J/mol/K
+  context_id: dachs-geiger-2006-pyrope-grossular::context::dachs_geiger_2006_pyrope_entropy_g97_context
+  work_id: 10.2138/am.2006.2005
+  source_id: dachs-geiger-2006-pyrope-grossular
+  species: Mg3Al2Si3O12
+- observation_id: dachs_geiger_2006_table_1_continued_printed_values_context
+  type: printed_table_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 897
+    table: 1 continued
+  units: as printed in table caption and column headers
+  values:
+    quantity_as_printed: piecewise Cp polynomial coefficients
+    method_class: model_derived
+    printed_rows:
+    - - FW
+      - '422.059'
+      - '422.059'
+      - '427.358'
+      - '439.094'
+      - '445.722'
+      - '445.722'
+      - '450.452'
+      - '450.452'
+    - - SW
+      - '24.05'
+      - '21.91'
+      - '23.22'
+      - '21.02'
+      - '25.01'
+      - '25.01'
+      - '25.81'
+      - '25.81'
+    - - ' $X_{Gr}$ '
+      - '0.400'
+      - '0.414'
+      - '0.512'
+      - '0.760'
+      - '0.904'
+      - '0.904'
+      - '1.000'
+      - '1.000'
+    - - ' $k_{6}$ '
+      - '6.9651E-05'
+      - '9.9837E-05'
+      - '1.0331E-04'
+      - '1.8543E-04'
+      - '2.2054E-04'
+      - '1.8920E-04'
+      - '1.0233E-04'
+      - '6.9161E-05'
+    - - ' $T_{1}$ '
+      - '5.88'
+      - '6.41'
+      - '6.06'
+      - '6.23'
+      - '6.45'
+      - '5.43'
+      - '7.24'
+      - '5.95'
+    - - ' $k_{o}$ '
+      - '7.7404E+00'
+      - '4.5351E+00'
+      - '8.9892E-01'
+      - '-2.3943E+01'
+      - '-1.7803E+01'
+      - '-1.8336E+01'
+      - '-1.0069E+01'
+      - '-1.0677E+01'
+    - - ' $k_{1}$ '
+      - '-1.3437E+01'
+      - '-5.7324E+00'
+      - '3.3294E+00'
+      - '5.8291E+01'
+      - '4.1048E+01'
+      - '4.2092E+01'
+      - '2.4437E+01'
+      - '2.5841E+01'
+    - - ' $k_{2}$ '
+      - '6.8000E+00'
+      - '-2.7401E+01'
+      - '-6.3766E+01'
+      - '-2.5660E+02'
+      - '-1.6450E+02'
+      - '-1.6532E+02'
+      - '-1.1368E+02'
+      - '-1.1777E+02'
+    - - ' $k_{3}$ '
+      - '3.2167E+01'
+      - '9.6852E+01'
+      - '1.5626E+02'
+      - '4.7853E+02'
+      - '2.9918E+02'
+      - '2.9538E+02'
+      - '2.2369E+02'
+      - '2.2693E+02'
+    - - ' $k_{4}$ '
+      - '-5.5529E-01'
+      - '-4.1281E-01'
+      - '-3.0127E-01'
+      - '9.6461E-01'
+      - '8.4074E-01'
+      - '8.7111E-01'
+      - '4.4631E-01'
+      - '4.7118E-01'
+    - - ' $k_{5}$ '
+      - '2.1478E-02'
+      - '1.7278E-02'
+      - '1.7728E-02'
+      - '-2.1210E-02'
+      - '-2.3783E-02'
+      - '-2.4727E-02'
+      - '-1.4218E-02'
+      - '-1.4807E-02'
+    - - ' $k_{6}$ '
+      - '-8.3552E-05'
+      - '-3.5213E-05'
+      - '-8.7353E-05'
+      - '3.3141E-04'
+      - '3.9309E-04'
+      - '4.0393E-04'
+      - '3.1578E-04'
+      - '3.2120E-04'
+    - - ' $T_{2}$ '
+      - '25.41'
+      - '26.78'
+      - '31.47'
+      - '30.72'
+      - '30.46'
+      - '30.93'
+      - '29.05'
+      - '36.48'
+    - - ' $k_{2}$ '
+      - '5.6647E+02'
+      - '6.3091E+02'
+      - '1.0051E+03'
+      - '2.1973E+03'
+      - '2.7398E+03'
+      - '2.8266E+03'
+      - '2.1899E+03'
+      - '2.1806E+03'
+    - - ' $k_{4}$ '
+      - '-3.0896E-01'
+      - '-3.1509E-01'
+      - '-3.1002E-01'
+      - '-4.0096E-01'
+      - '-4.9496E-01'
+      - '-5.0022E-01'
+      - '-5.1079E-01'
+      - '-5.1611E-01'
+    - - ' $k_{5}$ '
+      - '1.7537E-02'
+      - '1.7624E-02'
+      - '1.7293E-02'
+      - '1.8079E-02'
+      - '1.9225E-02'
+      - '1.9360E-02'
+      - '1.9878E-02'
+      - '2.0130E-02'
+    - - ' $k_{6}$ '
+      - '-5.3395E-05'
+      - '-5.3468E-05'
+      - '-5.1303E-05'
+      - '-5.2771E-05'
+      - '-5.6402E-05'
+      - '-5.7262E-05'
+      - '-6.0534E-05'
+      - '-6.1905E-05'
+    - - ' $T_{3}$ '
+      - '124.01'
+      - '123.56'
+      - '144.86'
+      - '154.05'
+      - '124.35'
+      - '124.96'
+      - '126.45'
+      - '122.52'
+    - - ' $k_{o}$ '
+      - '7.7636E+02'
+      - '8.0952E+02'
+      - '7.5273E+02'
+      - '7.4573E+02'
+      - '7.9397E+02'
+      - '7.7818E+02'
+      - '7.9318E+02'
+      - '7.4905E+02'
+    - - ' $k_{1}$ '
+      - '-7.9116E+03'
+      - '-8.6563E+03'
+      - '-7.4598E+03'
+      - '-7.1977E+03'
+      - '-8.1559E+03'
+      - '-7.8285E+03'
+      - '-8.2725E+03'
+      - '-7.2456E+03'
+    - - ' $k_{2}$ '
+      - '3.5384E+05'
+      - '1.5533E+06'
+      - '-4.0585E+04'
+      - '-7.5903E+05'
+      - '3.9494E+05'
+      - '-6.6162E+04'
+      - '8.3929E+05'
+      - '-7.6160E+05'
+    - - ' $k_{3}$ '
+      - '7.7572E+07'
+      - '-6.0548E+06'
+      - '9.4485E+07'
+      - '1.4844E+08'
+      - '7.5630E+07'
+      - '1.0657E+08'
+      - '4.2462E+07'
+      - '1.4992E+08'
+    - - ' $T_{4}$ '
+      - '298.15'
+      - '298.15'
+      - '255.68'
+      - '263.00'
+      - '298.15'
+      - '298.15'
+      - '298.15'
+      - '298.15'
+    - - ' $k_{o}$ '
+      - ''
+      - ''
+      - '5.9772E+02'
+      - '5.5952E+02'
+      - ''
+      - ''
+      - ''
+      - ''
+    - - ' $k_{1}$ '
+      - ''
+      - ''
+      - '-2.9429E+03'
+      - '-1.4371E+03'
+      - ''
+      - ''
+      - ''
+      - ''
+    - - ' $k_{2}$ '
+      - ''
+      - ''
+      - '-1.4797E+07'
+      - '-2.2276E+07'
+      - ''
+      - ''
+      - ''
+      - ''
+    - - ' $k_{3}$ '
+      - ''
+      - ''
+      - '1.7367E+09'
+      - '2.7333E+09'
+      - ''
+      - ''
+      - ''
+      - ''
+    - - ' $T_{max}$ '
+      - ''
+      - ''
+      - '1200.00'
+      - '1200.00'
+      - ''
+      - ''
+      - ''
+      - ''
+    - - ' $C_{p}^{298.15}$ '
+      - '325.1'
+      - '325.5'
+      - '326.4'
+      - '328.8'
+      - '328.9'
+      - '328.1'
+      - '325.1'
+      - '326.5'
+    - - ' $S_{298.15}^{cal}$ '
+      - '265.11'
+      - '265.44'
+      - '265.480'
+      - '262.44'
+      - '259.58'
+      - '259.23'
+      - '257.86'
+      - '259.47'
+    note: Raw body cell strings from the table-tool draft; model/fit data remain context-only.
+  context_id: dachs-geiger-2006-pyrope-grossular::context::dachs_geiger_2006_table_1_continued_printed_values_context
+  work_id: 10.2138/am.2006.2005
+  source_id: dachs-geiger-2006-pyrope-grossular
+  species: Mg3Al2Si3O12
+- observation_id: dachs_geiger_2006_table_1_printed_values_context
+  type: printed_table_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 897
+    table: '1'
+  units: as printed in table caption and column headers
+  values:
+    quantity_as_printed: piecewise Cp polynomial coefficients
+    method_class: model_derived
+    printed_rows:
+    - - FW
+      - '403.129'
+      - '403.129'
+      - '403.129'
+      - '403.129'
+      - '407.955'
+      - '407.955'
+      - '407.955'
+      - '415.716'
+    - - SW
+      - '23.74'
+      - '23.74'
+      - '27.17'
+      - '27.17'
+      - '22.44'
+      - '22.44'
+      - '16.75'
+      - '21.22'
+    - - ' $X_{Gr}$ '
+      - '0.000'
+      - '0.000'
+      - '0.000'
+      - '0.000'
+      - '0.102'
+      - '0.102'
+      - '0.102'
+      - '0.264'
+    - - ' $k_{6}$ '
+      - '8.7622E-05'
+      - '9.5293E-05'
+      - '9.5140E-05'
+      - '1.4172E-04'
+      - '9.5416E-05'
+      - '1.0448E-04'
+      - '8.2806E-05'
+      - '7.7958E-05'
+    - - ' $T_{1}$ '
+      - '4.94'
+      - '6.32'
+      - '8.35'
+      - '5.07'
+      - '6.20'
+      - '5.92'
+      - '5.90'
+      - '5.32'
+    - - ' $k_{o}$ '
+      - '6.1266E+00'
+      - '-6.7024E+00'
+      - '-1.0340E+01'
+      - '-3.9297E+00'
+      - '-4.9740E+00'
+      - '-8.5034E+00'
+      - '-6.1028E+00'
+      - '1.1268E+01'
+    - - ' $k_{1}$ '
+      - '-1.5085E+01'
+      - '1.5712E+01'
+      - '2.4072E+01'
+      - '8.3704E+00'
+      - '1.2578E+01'
+      - '2.0655E+01'
+      - '1.5356E+01'
+      - '-2.5158E+01'
+    - - ' $k_{2}$ '
+      - '6.3672E+01'
+      - '-7.0451E+01'
+      - '-1.0298E+02'
+      - '-3.0553E+01'
+      - '-6.9046E+01'
+      - '-9.8811E+01'
+      - '-8.0987E+01'
+      - '8.7591E+01'
+    - - ' $k_{3}$ '
+      - '-1.1189E+02'
+      - '1.3764E+02'
+      - '1.9511E+02'
+      - '5.5310E+01'
+      - '1.4813E+02'
+      - '1.9658E+02'
+      - '1.6863E+02'
+      - '-1.4400E+02'
+    - - ' $k_{4}$ '
+      - '-2.2049E-01'
+      - '3.4151E-01'
+      - '5.1740E-01'
+      - '2.4893E-01'
+      - '2.3134E-01'
+      - '4.0001E-01'
+      - '2.7519E-01'
+      - '-5.4746E-01'
+    - - ' $k_{5}$ '
+      - '2.2090E-03'
+      - '-1.4139E-02'
+      - '-1.9856E-02'
+      - '-1.2339E-02'
+      - '-1.0461E-02'
+      - '-1.5670E-02'
+      - '-1.1412E-02'
+      - '1.4647E-02'
+    - - ' $k_{6}$ '
+      - '2.1026E-04'
+      - '4.0184E-04'
+      - '4.6839E-04'
+      - '3.8403E-04'
+      - '3.6882E-04'
+      - '4.3264E-04'
+      - '3.7626E-04'
+      - '6.4288E-05'
+    - - ' $T_{2}$ '
+      - '38.26'
+      - '34.85'
+      - '32.84'
+      - '22.55'
+      - '33.85'
+      - '33.26'
+      - '34.96'
+      - '33.62'
+    - - ' $k_{2}$ '
+      - '-1.0482E+03'
+      - '6.2965E+02'
+      - '8.2777E+02'
+      - '1.0684E+03'
+      - '7.8604E+02'
+      - '8.4687E+02'
+      - '6.3521E+02'
+      - '3.2515E+02'
+    - - ' $k_{4}$ '
+      - '-3.5115E-01'
+      - '-4.4361E-01'
+      - '-4.5651E-01'
+      - '-4.6609E-01'
+      - '-4.2969E-01'
+      - '-4.3664E-01'
+      - '-4.1830E-01'
+      - '-3.5309E-01'
+    - - ' $k_{5}$ '
+      - '1.9031E-02'
+      - '2.1107E-02'
+      - '2.1038E-02'
+      - '2.1125E-02'
+      - '2.0832E-02'
+      - '2.1029E-02'
+      - '2.0677E-02'
+      - '1.9034E-02'
+    - - ' $k_{6}$ '
+      - '-6.0787E-05'
+      - '-7.2071E-05'
+      - '-7.1352E-05'
+      - '-7.0893E-05'
+      - '-7.0376E-05'
+      - '-7.1295E-05'
+      - '-6.9870E-05'
+      - '-6.1431E-05'
+    - - ' $T_{3}$ '
+      - '147.69'
+      - '126.80'
+      - '129.05'
+      - '109.83'
+      - '128.88'
+      - '128.98'
+      - '130.99'
+      - '134.22'
+    - - ' $k_{o}$ '
+      - '7.3447E+02'
+      - '7.7157E+02'
+      - '7.4371E+02'
+      - '7.7987E+02'
+      - '7.6703E+02'
+      - '7.6835E+02'
+      - '7.4054E+02'
+      - '7.2527E+02'
+    - - ' $k_{1}$ '
+      - '-7.1571E+03'
+      - '-7.9359E+03'
+      - '-7.2737E+03'
+      - '-8.1262E+03'
+      - '-7.8176E+03'
+      - '-7.8255E+03'
+      - '-7.2761E+03'
+      - '-6.8377E+03'
+    - - ' $k_{2}$ '
+      - '-3.2434E+05'
+      - '7.2453E+05'
+      - '-4.4699E+05'
+      - '1.1073E+06'
+      - '6.9570E+05'
+      - '6.6248E+05'
+      - '4.9575E+03'
+      - '-1.0184E+06'
+    - - ' $k_{3}$ '
+      - '1.1825E+08'
+      - '4.9626E+07'
+      - '1.3231E+08'
+      - '1.7931E+07'
+      - '4.2263E+07'
+      - '4.6081E+07'
+      - '8.5178E+07'
+      - '1.6549E+08'
+    - - ' $T_{4}$ '
+      - '298.15'
+      - '298.15'
+      - '298.15'
+      - '298.15'
+      - '260.11'
+      - '263.80'
+      - '257.97'
+      - '274.50'
+    - - ' $k_{o}$ '
+      - ''
+      - ''
+      - ''
+      - ''
+      - '5.7403E+02'
+      - '5.7038E+02'
+      - '5.7196E+02'
+      - '5.8285E+02'
+    - - ' $k_{1}$ '
+      - ''
+      - ''
+      - ''
+      - ''
+      - '-2.2742E+03'
+      - '-2.1395E+03'
+      - '-2.2028E+03'
+      - '-2.3619E+03'
+    - - ' $k_{2}$ '
+      - ''
+      - ''
+      - ''
+      - ''
+      - '-1.7174E+07'
+      - '-1.8075E+07'
+      - '-1.7515E+07'
+      - '-1.8511E+07'
+    - - ' $k_{3}$ '
+      - ''
+      - ''
+      - ''
+      - ''
+      - '2.0381E+09'
+      - '2.1966E+09'
+      - '2.0763E+09'
+      - '2.3254E+09'
+    - - ' $T_{max}$ '
+      - ''
+      - ''
+      - ''
+      - ''
+      - '1200.00'
+      - '1200.00'
+      - '1200.00'
+      - '1200.00'
+    - - ' $C_{p}^{298.15}$ '
+      - '320.8'
+      - '322.0'
+      - '322.4'
+      - '322.4'
+      - '326.0'
+      - '326.0'
+      - '325.7'
+      - '325.6'
+    - - ' $S_{298.15}^{cal}$ '
+      - '265.94'
+      - '265.81'
+      - '264.20'
+      - '265.01'
+      - '268.09'
+      - '268.65'
+      - '268.06'
+      - '267.48'
+    note: Raw body cell strings from the table-tool draft; model/fit data remain context-only.
+  context_id: dachs-geiger-2006-pyrope-grossular::context::dachs_geiger_2006_table_1_printed_values_context
+  work_id: 10.2138/am.2006.2005
+  source_id: dachs-geiger-2006-pyrope-grossular
+  species: Mg3Al2Si3O12
+- observation_id: dachs_geiger_2006_table_3_printed_values_context
+  type: printed_table_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 900
+    table: '3'
+  units: as printed in table caption and column headers
+  values:
+    quantity_as_printed: calorimetric entropy and excess entropy data
+    method_class: measured_reduced and model_derived
+    printed_rows:
+    - - Py
+      - Py-1*
+      - '0.000'
+      - 265.94±0.23
+      - 0.00±0.33
+      - ''
+      - 0±0.34
+      - ''
+    - - Py90Gr10
+      - Py90Gr10-1†
+      - '0.102'
+      - 268.09±0.22
+      - 2.81±0.31
+      - 30.7±3.4
+      - 2.97±0.31
+      - 32.5±3.4
+    - - Py90Gr10
+      - Py90Gr10-2†
+      - '0.102'
+      - 268.65±0.21
+      - 3.37±0.30
+      - 36.8±3.3
+      - 3.53±0.31
+      - 38.6±3.3
+    - - Py90Gr10
+      - Py90Gr10-3†
+      - '0.102'
+      - 268.06±0.27
+      - 2.78±0.35
+      - 30.4±3.8
+      - 2.94±0.35
+      - 32.1±3.8
+    - - Py75Gr25
+      - Py75Gr25-1†
+      - '0.264'
+      - 267.48±0.24
+      - 3.25±0.31
+      - 16.7±1.6
+      - 3.67±0.31
+      - 18.9±1.6
+    - - Py60Gr40
+      - Py60Gr40-1*
+      - '0.400'
+      - 265.11±0.22
+      - 1.76±0.29
+      - 7.3±1.2
+      - 2.40±0.29
+      - 10.0±1.2
+    - - Py60Gr40
+      - Py60Gr40-2†
+      - '0.414'
+      - 265.44±0.24
+      - 2.18±0.30
+      - 9.0±1.2
+      - 2.85±0.31
+      - 11.7±1.3
+    - - ' $Py_{60}Gr_{40}$ '
+      - HW80*‡
+      - '0.400'
+      - '268.32'
+      - 4.50±0.30
+      - 18.8±1.3
+      - 4.50±0.30
+      - 18.8±1.3
+    - - ' $Py_{50}Gr_{50}$ '
+      - ' $Py_{50}Gr_{50}-1\dagger$ '
+      - '0.512'
+      - 265.48±0.23
+      - 2.85±0.29
+      - 11.4±1.2
+      - 3.68±0.30
+      - 14.7±1.2
+    - - ' $Py_{25}Gr_{75}$ '
+      - ' $Py_{25}Gr_{75}-1\dagger$ '
+      - '0.760'
+      - 262.44±0.25
+      - 1.42±0.33
+      - 7.8±1.8
+      - 2.64±0.33
+      - 14.5±1.8
+    - - ' $Py_{10}Gr_{90}$ '
+      - ' $Py_{10}Gr_{90}-1\dagger$ '
+      - '0.904'
+      - 259.58±0.23
+      - -0.51±0.33
+      - -5.9±3.8
+      - 0.94±0.33
+      - 10.9±3.8
+    - - ' $Py_{10}Gr_{90}$ '
+      - ' $Py_{10}Gr_{90}-2\dagger$ '
+      - '0.904'
+      - 259.23±0.22
+      - -0.86±0.32
+      - -9.9±3.7
+      - 0.59±0.33
+      - 6.8±3.8
+    - - Gr
+      - Gr-2*
+      - '1.000'
+      - 259.47±0.25
+      - 0.00±0.36
+      - ''
+      - ''
+      - ''
+    - - Gr
+      - Gr-1*
+      - '1.000'
+      - 257.86±0.26
+      - ''
+      - ''
+      - 0±0.36
+      - ''
+    note: All sample values remain context because intermediate garnets have XGr identities, not single species formulas;
+      excess entropy has no token.
+  context_id: dachs-geiger-2006-pyrope-grossular::context::dachs_geiger_2006_table_3_printed_values_context
+  work_id: 10.2138/am.2006.2005
+  source_id: dachs-geiger-2006-pyrope-grossular
+  species: Mg3Al2Si3O12
+- observation_id: dachs_geiger_2006_table_4_printed_values_context
+  type: printed_table_context
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 901
+    table: '4'
+  units: as printed in table caption and column headers
+  values:
+    quantity_as_printed: Redlich-Kister and Margules fit parameters
+    method_class: model_derived
+    printed_rows:
+    - - Model 1
+      - 11.8 ± 0.5
+      - 39.7 ± 3.2
+      - -7.4 ± 3.4
+      - 27.9 ± 1.4
+    - - Model 2
+      - 15.1 ± 0.5
+      - 27.2 ± 3.1
+      - 3.8 ± 3.4
+      - 24.8 ± 1.5
+    - - BA96
+      - ''
+      - ''
+      - '18.79'
+      - '18.79'
+    - - G96
+      - ''
+      - ''
+      - 17.34 (11.01)*
+      - 17.34 (11.01)*
+    - - M97
+      - ''
+      - ''
+      - 2.49 ± 5.16
+      - 20.82 ± 3.23
+    note: Raw body cell strings from the table-tool draft; model/fit data remain context-only.
+  context_id: dachs-geiger-2006-pyrope-grossular::context::dachs_geiger_2006_table_4_printed_values_context
+  work_id: 10.2138/am.2006.2005
+  source_id: dachs-geiger-2006-pyrope-grossular
+  species: Mg3Al2Si3O12
+- observation_id: dachs_geiger_2006_table_5_printed_values_context
+  type: printed_table_context
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 902
+    table: '5'
+  units: as printed in table caption and column headers
+  values:
+    quantity_as_printed: calculated solvus critical temperatures
+    method_class: model_derived
+    printed_rows:
+    - - Ganguly et al. (1996)
+      - '1247'
+      - '927'
+      - '523'
+      - '529'
+    - - Berman and Aranovich (1996)
+      - '1327'
+      - '991'
+      - '577'
+      - '575'
+    - - Newton et al. (1977)
+      - '853'
+      - '614'
+      - '335'
+      - '326'
+    note: Raw body cell strings from the table-tool draft; model/fit data remain context-only.
+  context_id: dachs-geiger-2006-pyrope-grossular::context::dachs_geiger_2006_table_5_printed_values_context
+  work_id: 10.2138/am.2006.2005
+  source_id: dachs-geiger-2006-pyrope-grossular
+  species: Mg3Al2Si3O12

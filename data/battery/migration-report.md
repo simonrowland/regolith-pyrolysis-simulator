@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 71579
-records out (observations): 149228
-works: 411
-experiments: 5562
-queue size: 103433
+rows in: 71645
+records out (observations): 149294
+works: 418
+experiments: 5566
+queue size: 103548
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 348
@@ -14,22 +14,22 @@ hard issues: 3334
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 409 (mismatch) |
-| doi_works | 56 | 216 (mismatch) |
-| no_doi_works | 91 | 195 (mismatch) |
-| admission_statuses | 374 | 23037 (mismatch) |
+| citations | 147 | 416 (mismatch) |
+| doi_works | 56 | 222 (mismatch) |
+| no_doi_works | 91 | 196 (mismatch) |
+| admission_statuses | 374 | 23040 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 697 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1637 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
-| formulas | 1625 | 18262 (mismatch) |
+| formulas | 1625 | 18287 (mismatch) |
 | equipment_payloads | 670 | 955 (mismatch) |
-| absent_admissions | 3511 | 6927 (mismatch) |
+| absent_admissions | 3511 | 6990 (mismatch) |
 | absent_classes | 2174 | 2118 (mismatch) |
 | range_only_T | 3125 | 2623 (mismatch) |
-| system_like_phases | 1065 | 2818 (mismatch) |
-| missing_phases | 237 | 1108 (mismatch) |
+| system_like_phases | 1065 | 2819 (mismatch) |
+| missing_phases | 237 | 1129 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
@@ -17972,6 +17972,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/1997jonesthermo.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml` | 8 | 9 | 33 |
 | `data/literature/extracts/abdul-2023-cao-sio2-calphad.yaml` | 2 | 13 | 2 |
+| `data/literature/extracts/abdul-2023-clinker-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/abdullah-2013-redox-acid-base-soda-lime-silicate-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml` | 20 | 47 | 96 |
 | `data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml` | 28 | 28 | 80 |
@@ -18002,6 +18003,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/borisov-veksler-2021-k-fe-supplement.yaml` | 10092 | 10092 | 11447 |
 | `data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml` | 9 | 9 | 46 |
 | `data/literature/extracts/boulliung-wood-2022-so2-solubility-silicate-melts.yaml` | 3 | 3 | 14 |
+| `data/literature/extracts/brillo-2025-al-ti-thermophysical.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/britt-2019-asteroid-simulants.yaml` | 9 | 9 | 38 |
 | `data/literature/extracts/burcat-third-millennium.yaml` | 37 | 37 | 111 |
 | `data/literature/extracts/busemann-2000-phase-q-noble-gases.yaml` | 40 | 308 | 496 |
@@ -18014,6 +18016,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml` | 6 | 6 | 23 |
 | `data/literature/extracts/costa-2016-lpsc-forsterite-olivine-vaporization.yaml` | 8 | 8 | 8 |
 | `data/literature/extracts/costa-jacobson-2015.yaml` | 1 | 1 | 3 |
+| `data/literature/extracts/dachs-geiger-2006-pyrope-grossular.yaml` | 23 | 23 | 29 |
 | `data/literature/extracts/datz-1961-na2cl2.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/datz-and-smith-1961.yaml` | 3 | 3 | 12 |
 | `data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml` | 1 | 1 | 5 |
@@ -18026,6 +18029,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` | 2 | 2 | 7 |
 | `data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml` | 1 | 43 | 1 |
 | `data/literature/extracts/farah-1998-vanadium-silicate-melts-thesis.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/farmer-oneill-2023-mgo-zno-miscibility.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/fdm879.yaml` | 6 | 8 | 26 |
 | `data/literature/extracts/fegley-2016-rock-steam-solubility.yaml` | 5 | 75 | 179 |
 | `data/literature/extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml` | 28 | 109 | 164 |
@@ -18062,6 +18066,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ivtan-mno-coo-thermo.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/jaggi-2021-mercury-atmosphere.yaml` | 3 | 7 | 4 |
 | `data/literature/extracts/janaf-4th.yaml` | 51 | 51 | 224 |
+| `data/literature/extracts/janz-1979-nsrds61-part2-molten-salt-properties.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/jgr-p-2024-mars-sam-clay-sulfate-ega.yaml` | 50 | 50 | 100 |
 | `data/literature/extracts/jsc-a16-special-samples.yaml` | 3 | 18 | 27 |
 | `data/literature/extracts/jsc-lunar-catalog-12023.yaml` | 12 | 16 | 52 |
@@ -18158,6 +18163,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kirschen-1998-silicate-miscibility-thesis.yaml` | 21 | 21 | 0 |
 | `data/literature/extracts/kirschen-1999-si-ti-al-miscibility.yaml` | 51 | 51 | 8 |
 | `data/literature/extracts/kirschen-decapitani-1999-liquid-miscibility.yaml` | 576 | 576 | 110 |
+| `data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml` | 25 | 25 | 64 |
 | `data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml` | 4 | 56 | 64 |
 | `data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml` | 3 | 127 | 134 |
 | `data/literature/extracts/kropf-2009-alkalis-chondrules-thesis.yaml` | 0 | 0 | 1 |
@@ -18331,6 +18337,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 34 |
 | `data/literature/extracts/su-2024-lunar-volatiles-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 19 | 57 | 84 |
+| `data/literature/extracts/sugawara-akaogi-2003-ni-co-fusion.yaml` | 18 | 18 | 18 |
 | `data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml` | 7 | 10 | 7 |
 | `data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml` | 6 | 6 | 6 |
 | `data/literature/extracts/suzuki-2026-vacuum-oxygen-extraction.yaml` | 7 | 16 | 0 |
@@ -18452,8 +18459,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 275785
+advisory issues: 275854
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 275785 |
+| `identity_incomplete` | 275854 |

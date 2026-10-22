@@ -1,0 +1,2387 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/dachs-geiger-2006-pyrope-grossular.yaml
+observations:
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_b96
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '331.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bosenick et al. (1996)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_b96
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_hw80
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '333.17'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Haselton and Westrum (1980)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_hw80
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_ppms_gr1
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '325.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '1'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_ppms_gr1
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_ppms_gr2
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '326.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '1'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_ppms_gr2
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_b88
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '255.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Berman (1988)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_b88
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_g97
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '257.47'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.24'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Gottschalk (1997)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_g97
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_hp98
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '255'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Holland and Powell (1998)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_hp98
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_hw80
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '260.12'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Haselton and Westrum (1980)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_hw80
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_ppms_gr1
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '257.86'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.26'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_ppms_gr1
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_ppms_gr2
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '259.47'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.25'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_ppms_gr2
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_b96
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '325.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bosenick et al. (1996)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_b96
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_hw80
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '325.31'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Haselton and Westrum (1980)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_hw80
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py1
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '320.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.9'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py1
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py2
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '322'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.8'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py2
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py3
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '322.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.9'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py3
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py4
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '322.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '1'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py4
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_b88
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '266.36'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Berman (1988)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_b88
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_hp98
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '266.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Holland and Powell (1998)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_hp98
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_hw80
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '266.27'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Haselton and Westrum (1980)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_hw80
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py1
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '265.94'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.23'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py1
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py2
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '265.81'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.22'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py2
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py3
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '264.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.23'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py3
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'
+- observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py4
+  experiment_id: 10.2138/am.2006.2005::dachs-geiger-2006-pyrope-grossular
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mg3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '265.01'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.24'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py4
+  source_id: dachs-geiger-2006-pyrope-grossular
+  locator:
+    page: 6
+    published_page: 899
+    pdf_page_index: 5
+    table: '2'
+  read_from: unknown:dachs-geiger-2006-pyrope-grossular
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 899
+        pdf_page_index: 5
+        table: '2'

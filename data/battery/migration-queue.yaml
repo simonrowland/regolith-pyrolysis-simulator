@@ -75289,6 +75289,16 @@ entries:
       page: 9
       pdf_page_index: 8
       table: '3'
+- work_id: 10.1007/s10765-025-03651-0
+  source: data/literature/extracts/brillo-2025-al-ti-thermophysical.yaml
+  why: extract yielded no observations
+  axes:
+  - document
+  observations:
+  - observation_id: brillo-2025-al-ti-thermophysical::typed_absence
+    locator:
+      note: extract-level typed absence
+      source_path: data/literature/extracts/brillo-2025-al-ti-thermophysical.yaml
 - work_id: 10.1007/s11663-024-02995-6
   source: data/literature/extracts/kems-031-halwax-2024.yaml
   why: PAGE method_class method_only
@@ -111058,6 +111068,138 @@ entries:
       table: 2a and 2b
       note: Table 2a and 2b; row-specific table locators are attached to every value.
       source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+- work_id: 10.1016/s0016-7037(03)00202-3
+  source: data/literature/extracts/sugawara-akaogi-2003-ni-co-fusion.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_co2sio4_2_entropy_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Co2SiO4 row 2
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_co2sio4_2_heat_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Co2SiO4 row 2
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_1_entropy_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Fe2SiO4 row 1
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_1_heat_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Fe2SiO4 row 1
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_2_entropy_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Fe2SiO4 row 2
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_2_heat_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Fe2SiO4 row 2
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_1_entropy_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Mg2SiO4 row 1
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_1_heat_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Mg2SiO4 row 1
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_2_entropy_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Mg2SiO4 row 2
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_2_heat_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Mg2SiO4 row 2
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_3_entropy_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Mg2SiO4 row 3
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_3_heat_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Mg2SiO4 row 3
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_4_entropy_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Mg2SiO4 row 4
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_4_heat_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Mg2SiO4 row 4
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mn2sio4_1_entropy_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Mn2SiO4 row 1
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mn2sio4_1_heat_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Mn2SiO4 row 1
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_ni2sio4_2_entropy_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Ni2SiO4 row 2
+  - observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_ni2sio4_2_heat_fusion
+    locator:
+      page: 6
+      published_page: 2688
+      pdf_page_index: 5
+      table: '4'
+      note: row=Ni2SiO4 row 2
 - work_id: 10.1016/s0016-7037(03)00376-4
   source: data/literature/extracts/gaillard-2003-hydrous-silicic-melt-activity.yaml
   why: missing phase
@@ -163327,6 +163469,192 @@ entries:
       published_page: 500
       pdf_page_index: 3
       figure: '3'
+- work_id: 10.2138/am.2006.2005
+  source: data/literature/extracts/dachs-geiger-2006-pyrope-grossular.yaml
+  why: conditional method_class author_derived lacks measured lineage
+  axes:
+  - evidence.class
+  observations:
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_ppms_gr1
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_ppms_gr2
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py1
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py2
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py3
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py4
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+- work_id: 10.2138/am.2006.2005
+  source: data/literature/extracts/dachs-geiger-2006-pyrope-grossular.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_b96
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_hw80
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_ppms_gr1
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_cp_ppms_gr2
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_b88
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_g97
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_hp98
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_hw80
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_ppms_gr1
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_grossular_entropy_ppms_gr2
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_b96
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_hw80
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py1
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py2
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py3
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_cp_ppms_py4
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_b88
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_hp98
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_hw80
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py1
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py2
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py3
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
+  - observation_id: dachs-geiger-2006-pyrope-grossular::dachs_geiger_2006_pyrope_entropy_ppms_py4
+    locator:
+      page: 6
+      published_page: 899
+      pdf_page_index: 5
+      table: '2'
 - work_id: 10.2138/rmg.2008.68.17
   source: data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml
   why: missing phase
@@ -214245,6 +214573,16 @@ entries:
       page: 82
       table: '1'
       source_path: docs-private/research/2026-08-27-ocr-repair/kems-040-stolyarova-2015/tables.md
+- work_id: 10.5194/ejm-35-1051-2023
+  source: data/literature/extracts/farmer-oneill-2023-mgo-zno-miscibility.yaml
+  why: extract yielded no observations
+  axes:
+  - document
+  observations:
+  - observation_id: farmer-oneill-2023-mgo-zno-miscibility::typed_absence
+    locator:
+      note: extract-level typed absence
+      source_path: data/literature/extracts/farmer-oneill-2023-mgo-zno-miscibility.yaml
 - work_id: 10.5194/ejm-36-173-2024
   source: data/literature/extracts/ta-flemetakis-2024.yaml
   why: declared quantity is unknown; unsupported quantity 'boron_gas_phase_speciation'; refusing to pick a number
@@ -237258,6 +237596,16 @@ entries:
       published_page: 45
       pdf_page_index: 51
       figure: '19'
+- work_id: 10.6028/nbs.nsrds.61p2
+  source: data/literature/extracts/janz-1979-nsrds61-part2-molten-salt-properties.yaml
+  why: extract yielded no observations
+  axes:
+  - document
+  observations:
+  - observation_id: janz-1979-nsrds61-part2-molten-salt-properties::typed_absence
+    locator:
+      note: extract-level typed absence
+      source_path: data/literature/extracts/janz-1979-nsrds61-part2-molten-salt-properties.yaml
 - work_id: 10.6082/uchicago.12651
   source: data/literature/extracts/zhang-2024-alkali-evaporation-ti-thesis.yaml
   why: locator source_path 'corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf'
@@ -243757,6 +244105,492 @@ entries:
       pdf_page_index: 6
       table: '2'
       note: Text below Table 2 reports the weighted activity at the 16.8 mol% SrO two-phase boundary.
+- work_id: 10.82308/34018
+  source: data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml
+  why: missing phase
+  axes:
+  - phase
+  observations:
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_cool
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1_average_cooling
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_heat
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1_average_heating
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_cool
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1_average_cooling
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_heat
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1_average_heating
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+- work_id: 10.82308/34018
+  source: data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml
+  why: phase string 'congruent melting' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm0_melting
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-0
+- work_id: 10.82308/34018
+  source: data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml
+  why: source does not state a numeric total_pressure_Pa
+  axes:
+  - total_pressure_Pa
+  observations:
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_cool
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1_average_cooling
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_heat
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1_average_heating
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_cool
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1_average_cooling
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_heat
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1_average_heating
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm0_melting
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-0
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm3_li2mg_sio4_transition
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-3
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm4_li2mg_sio4_transition
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-4
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_li2mg_sio4_transition
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-5
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_melting
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-5
+- work_id: 10.82308/34018
+  source: data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_cool
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1_average_cooling
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_average_heat
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1_average_heating
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_cool2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lc1_1_heat2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LC1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_cool
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1_average_cooling
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_average_heat
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1_average_heating
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_cool2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat1
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_a1_lm1_1_heat2
+    locator:
+      page: 370
+      published_page: 339
+      pdf_page_index: 369
+      table: A.1
+      note: row=LM1-1
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm0_melting
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-0
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm3_li2mg_sio4_transition
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-3
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm4_li2mg_sio4_transition
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-4
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_li2mg_sio4_transition
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-5
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_melting
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-5
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_c3_glass_lac1_2_al2o3
+    locator:
+      page: 434
+      published_page: 403
+      pdf_page_index: 433
+      table: C.3
+      note: row=LAC1-2_glass
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_c3_glass_lac1_2_cao
+    locator:
+      page: 434
+      published_page: 403
+      pdf_page_index: 433
+      table: C.3
+      note: row=LAC1-2_glass
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_c3_glass_lac1_2_li2o
+    locator:
+      page: 434
+      published_page: 403
+      pdf_page_index: 433
+      table: C.3
+      note: row=LAC1-2_glass
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s0_3_melting_point
+    locator:
+      page: 184
+      published_page: 153
+      pdf_page_index: 183
+      table: '5.2'
+      note: row=S0-3
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s2_3_li3nasi4_transition
+    locator:
+      page: 184
+      published_page: 153
+      pdf_page_index: 183
+      table: '5.2'
+      note: row=S2-3
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s3_3_li3nasi4_transition
+    locator:
+      page: 184
+      published_page: 153
+      pdf_page_index: 183
+      table: '5.2'
+      note: row=S3-3
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s4_3_li3nasi4_transition
+    locator:
+      page: 184
+      published_page: 153
+      pdf_page_index: 183
+      table: '5.2'
+      note: row=S4-3
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s4_3_li4sio4_transition
+    locator:
+      page: 184
+      published_page: 153
+      pdf_page_index: 183
+      table: '5.2'
+      note: row=S4-3
+- work_id: 10.82308/34018
+  source: data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml
+  why: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; v2.1 species.phase
+    has one phase axis and cannot hold a transition's phases
+  axes:
+  - phase
+  observations:
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_melting
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-5
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s0_3_melting_point
+    locator:
+      page: 184
+      published_page: 153
+      pdf_page_index: 183
+      table: '5.2'
+      note: row=S0-3
+- work_id: 10.82308/34018
+  source: data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml
+  why: source states transition property_kind 'solid_solid_transition' (solid -> solid) in values.property_kind; v2.1 species.phase
+    has one phase axis and cannot hold a transition's phases
+  axes:
+  - phase
+  observations:
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm3_li2mg_sio4_transition
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-3
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm4_li2mg_sio4_transition
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-4
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_b2_lsm5_li2mg_sio4_transition
+    locator:
+      page: 402
+      published_page: 371
+      pdf_page_index: 401
+      table: B.2
+      note: row=LSM-5
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s2_3_li3nasi4_transition
+    locator:
+      page: 184
+      published_page: 153
+      pdf_page_index: 183
+      table: '5.2'
+      note: row=S2-3
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s3_3_li3nasi4_transition
+    locator:
+      page: 184
+      published_page: 153
+      pdf_page_index: 183
+      table: '5.2'
+      note: row=S3-3
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s4_3_li3nasi4_transition
+    locator:
+      page: 184
+      published_page: 153
+      pdf_page_index: 183
+      table: '5.2'
+      note: row=S4-3
+  - observation_id: konar-2018-alkali-cmas-thesis::konar_t5_2_s4_3_li4sio4_transition
+    locator:
+      page: 184
+      published_page: 153
+      pdf_page_index: 183
+      table: '5.2'
+      note: row=S4-3
 - work_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd
   source: data/literature/extracts/ivtan-mno-coo-thermo.yaml
   why: source T_range_K [1000.0, 3000.0]; no midpoint invented
@@ -461460,6 +462294,16 @@ entries:
     locator:
       note: table-893
       source_path: data/literature/compilations/kelley-1960-usbm-b584/records/table-893.json
+- work_id: c1200fb15d8a995a15bec28db9d4cbd7f204c7eb632d77c8c1371df3506aa713
+  source: data/literature/extracts/abdul-2023-clinker-thesis.yaml
+  why: extract yielded no observations
+  axes:
+  - document
+  observations:
+  - observation_id: abdul-2023-clinker-thesis::typed_absence
+    locator:
+      note: extract-level typed absence
+      source_path: data/literature/extracts/abdul-2023-clinker-thesis.yaml
 - work_id: c16250ca10856aaeabc54fae7e64af35a1fb0970e4b9b4c42ed481252d9e9cf7
   source: data/literature/extracts/pending-mgcl2-measured-vp.yaml
   why: absent method_class

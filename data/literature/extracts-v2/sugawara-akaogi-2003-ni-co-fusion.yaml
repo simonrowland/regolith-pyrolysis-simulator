@@ -1,0 +1,1918 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/sugawara-akaogi-2003-ni-co-fusion.yaml
+observations:
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_co2sio4_2_entropy_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Co2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1688'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '58'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Hirschmann and Ghiorso (1994)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_co2sio4_2_entropy_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Co2SiO4 row 2
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1688'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Co2SiO4 row 2
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_co2sio4_2_heat_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Co2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1688'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '97.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Hirschmann and Ghiorso (1994)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_co2sio4_2_heat_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Co2SiO4 row 2
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1688'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Co2SiO4 row 2
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_1_entropy_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1490'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '59.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.7'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stebbins and Carmichael (1984)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_1_entropy_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Fe2SiO4 row 1
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1490'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Fe2SiO4 row 1
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_1_heat_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1490'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '89.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '1.1'
+      units: kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stebbins and Carmichael (1984)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_1_heat_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Fe2SiO4 row 1
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1490'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Fe2SiO4 row 1
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_2_entropy_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1490'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '61.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.2'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Orr (1953)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_2_entropy_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Fe2SiO4 row 2
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1490'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Fe2SiO4 row 2
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_2_heat_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1490'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '92.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.3'
+      units: kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Orr (1953)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_fe2sio4_2_heat_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Fe2SiO4 row 2
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1490'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Fe2SiO4 row 2
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_1_entropy_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2174'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '65.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '6.4'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet et al. (1993)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_1_entropy_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Mg2SiO4 row 1
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2174'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Mg2SiO4 row 1
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_1_heat_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2174'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '142'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 14
+      units: kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet et al. (1993)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_1_heat_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Mg2SiO4 row 1
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2174'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Mg2SiO4 row 1
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_2_entropy_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2163'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '52.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '9.2'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Navrotsky et al. (1989)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_2_entropy_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Mg2SiO4 row 2
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Mg2SiO4 row 2
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_2_heat_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2163'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '114'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 20
+      units: kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Navrotsky et al. (1989)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_2_heat_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Mg2SiO4 row 2
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Mg2SiO4 row 2
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_3_entropy_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2163'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '47.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Tangeman et al. (2001)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_3_entropy_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Mg2SiO4 row 3
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Mg2SiO4 row 3
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_3_heat_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2163'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '102.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Tangeman et al. (2001)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_3_heat_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Mg2SiO4 row 3
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Mg2SiO4 row 3
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_4_entropy_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2163'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '60.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '6'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stebbins et al. (1984)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_4_entropy_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Mg2SiO4 row 4
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Mg2SiO4 row 4
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_4_heat_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2163'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '130'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 13
+      units: kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stebbins et al. (1984)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mg2sio4_4_heat_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Mg2SiO4 row 4
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Mg2SiO4 row 4
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mn2sio4_1_entropy_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Mn2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1620'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '55.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.3'
+      units: J/mol/K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mah (1960)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mn2sio4_1_entropy_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Mn2SiO4 row 1
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1620'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Mn2SiO4 row 1
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mn2sio4_1_heat_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Mn2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1620'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '89'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.5'
+      units: kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mah (1960)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_mn2sio4_1_heat_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Mn2SiO4 row 1
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1620'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Mn2SiO4 row 1
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_ni2sio4_2_entropy_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Ni2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1923'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '58'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Hirschmann and Ghiorso (1994)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_ni2sio4_2_entropy_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Ni2SiO4 row 2
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Ni2SiO4 row 2
+- observation_id: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_ni2sio4_2_heat_fusion
+  experiment_id: 10.1016/s0016-7037(03)00202-3::sugawara-akaogi-2003-ni-co-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ni2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1923'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '111.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Hirschmann and Ghiorso (1994)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2003-ni-co-fusion::suga03_t4_ni2sio4_2_heat_fusion
+  source_id: sugawara-akaogi-2003-ni-co-fusion
+  locator:
+    page: 6
+    published_page: 2688
+    pdf_page_index: 5
+    table: '4'
+    note: row=Ni2SiO4 row 2
+  read_from: unknown:sugawara-akaogi-2003-ni-co-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 6
+        published_page: 2688
+        pdf_page_index: 5
+        table: '4'
+        note: row=Ni2SiO4 row 2

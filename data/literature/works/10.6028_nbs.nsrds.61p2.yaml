@@ -1,0 +1,4472 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.6028/nbs.nsrds.61p2
+  citation: 'Janz, G. J., Allen, C. B., Bansal, N. P., Murphy, R. M., and Tomkins, R. P. T. (1979). Physical Properties Data
+    Compilations Relevant to Energy Storage. II. Molten Salts: Data on Single and Multi-Component Salt Systems. NSRDS-NBS
+    61, Part II.'
+  source_ids:
+  - janz-1979-nsrds61-part2-molten-salt-properties
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:janz-1979-nsrds61-part2-molten-salt-properties
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.6028/nbs.nsrds.61p2
+experiments: []
+context:
+- observation_id: janz_p020_t18
+  type: measured_table_context
+  locator:
+    pdf_page_index: 19
+    page: 20
+    table: '18'
+    table_key: p020-t18
+    section_header_as_printed:
+    - LiF
+    - '6.'
+    - Safety and Hazards
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 1.6. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$  $(kcal mol^{-1})$
+      - Uncertainty
+    - - '6.43'
+      - $\sim \pm 0.8\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p020_t18
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p021_t19
+  type: model_table_context
+  locator:
+    pdf_page_index: 20
+    page: 21
+    table: '19'
+    table_key: p021-t19
+    section_header_as_printed:
+    - LiF
+    - '10.'
+    - Heat Capacity            (Cp)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 1.7. Heat capacity from equation (1.5)
+    printed_table_grid:
+    - - T(K)
+      - $C_{p}$ (cal  $K^{-1}mol^{-1}$ )
+      - T(K)
+      - $C_{p}$ (cal  $K^{-1}mol^{-1}$ )
+    - - '1120'
+      - '15.21'
+      - '1280'
+      - '16.19'
+    - - '1130'
+      - '15.27'
+      - '1290'
+      - '16.26'
+    - - '1140'
+      - '15.33'
+      - '1300'
+      - '16.32'
+    - - '1150'
+      - '15.39'
+      - '1310'
+      - '16.38'
+    - - '1160'
+      - '15.46'
+      - '1320'
+      - '16.44'
+    - - '1170'
+      - '15.52'
+      - '1330'
+      - '16.50'
+    - - '1180'
+      - '15.58'
+      - '1340'
+      - '16.56'
+    - - '1190'
+      - '15.64'
+      - '1350'
+      - '16.62'
+    - - '1200'
+      - '15.70'
+      - '1400'
+      - '16.93'
+    - - '1210'
+      - '15.76'
+      - '1500'
+      - '17.55'
+    - - '1220'
+      - '15.82'
+      - '1600'
+      - '18.16'
+    - - '1230'
+      - '15.89'
+      - '1700'
+      - '18.77'
+    - - '1240'
+      - '15.95'
+      - '1800'
+      - '19.39'
+    - - '1250'
+      - '16.01'
+      - '1900'
+      - '20.00'
+    - - '1260'
+      - '16.07'
+      - '2000'
+      - '20.62'
+    - - '1270'
+      - '16.13'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p021_t19
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p022_t22
+  type: model_table_context
+  locator:
+    pdf_page_index: 21
+    page: 22
+    table: '22'
+    table_key: p022-t22
+    section_header_as_printed:
+    - )                                                           1
+    - '443'
+    - '9'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 1.10. Vapor pressure from equations in table 1.9
+    printed_table_grid:
+    - - T(K)
+      - P(mm)
+      - T(K)
+      - P(mm)
+    - - '1120'
+      - '0.0089'
+      - '1630'
+      - '50.4'
+    - - '1125'
+      - '0.0099'
+      - '1640'
+      - '55.8'
+    - - '1130'
+      - '0.0110'
+      - '1650'
+      - '61.8'
+    - - '1135'
+      - '0.0122'
+      - '1660'
+      - '68.3'
+    - - '1140'
+      - '0.0136'
+      - '1670'
+      - '75.4'
+    - - '1145'
+      - '0.0150'
+      - '1680'
+      - '83.1'
+    - - '1150'
+      - '0.0167'
+      - '1690'
+      - '91.5'
+    - - '1155'
+      - '0.0185'
+      - '1700'
+      - '100.7'
+    - - '1160'
+      - '0.0204'
+      - '1710'
+      - '110.6'
+    - - '1180'
+      - '0.034'
+      - '1720'
+      - '121.4'
+    - - '1200'
+      - '0.053'
+      - '1730'
+      - '133.1'
+    - - '1220'
+      - '0.080'
+      - '1740'
+      - '145.8'
+    - - '1240'
+      - '0.12'
+      - '1750'
+      - '159.5'
+    - - '1260'
+      - '0.18'
+      - '1760'
+      - '174.4'
+    - - '1280'
+      - '0.26'
+      - '1770'
+      - '190.4'
+    - - '1300'
+      - '0.37'
+      - '1780'
+      - '207.7'
+    - - '1320'
+      - '0.53'
+      - '1790'
+      - '226.4'
+    - - '1340'
+      - '0.75'
+      - '1800'
+      - '246.4'
+    - - '1360'
+      - '1.05'
+      - '1810'
+      - '268.1'
+    - - '1380'
+      - '1.45'
+      - '1820'
+      - '291.3'
+    - - '1400'
+      - '1.99'
+      - '1830'
+      - '316.3'
+    - - '1420'
+      - '2.71'
+      - '1840'
+      - '343.1'
+    - - '1440'
+      - '3.65'
+      - '1850'
+      - '371.8'
+    - - '1460'
+      - '4.87'
+      - '1860'
+      - '402.6'
+    - - '1480'
+      - '6.47'
+      - '1870'
+      - '435.6'
+    - - '1500'
+      - '8.51'
+      - '1880'
+      - '470.9'
+    - - '1520'
+      - '11.12'
+      - '1890'
+      - '508.7'
+    - - '1540'
+      - '14.43'
+      - '1900'
+      - '549.0'
+    - - '1560'
+      - '18.61'
+      - '1910'
+      - '592.0'
+    - - '1580'
+      - '23.84'
+      - '1920'
+      - '637.9'
+    - - '1600'
+      - '30.34'
+      - '1930'
+      - '686.9'
+    - - '1620'
+      - '38.40'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p022_t22
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p031_t32
+  type: measured_table_context
+  locator:
+    pdf_page_index: 30
+    page: 31
+    table: '32'
+    table_key: p031-t32
+    section_header_as_printed:
+    - NaF
+    - Table 2.7.                          Heat of fusion
+    - AH°
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 2.7. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '8.03'
+      - $\sim \pm 0.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p031_t32
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p031_t33
+  type: model_table_context
+  locator:
+    pdf_page_index: 30
+    page: 31
+    table: '33'
+    table_key: p031-t33
+    section_header_as_printed:
+    - NaF
+    - Table 2.7.                          Heat of fusion
+    - AH°
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 2.8. Heat capacity (liquid) from equation (2.6)
+    printed_table_grid:
+    - - T(K)
+      - $C_{p}$ (cal  $K^{-1}$  mol $^{-1}$ )
+      - T(K)
+      - $C_{p}$ (cal  $K^{-1}$  mol $^{-1}$ )
+    - - '1270'
+      - '16.76'
+      - '1420'
+      - '17.47'
+    - - '1280'
+      - '16.81'
+      - '1430'
+      - '17.52'
+    - - '1290'
+      - '16.86'
+      - '1440'
+      - '17.57'
+    - - '1300'
+      - '16.90'
+      - '1450'
+      - '17.61'
+    - - '1310'
+      - '16.95'
+      - '1460'
+      - '17.66'
+    - - '1320'
+      - '17.00'
+      - '1470'
+      - '17.71'
+    - - '1330'
+      - '17.05'
+      - '1480'
+      - '17.76'
+    - - '1340'
+      - '17.09'
+      - '1490'
+      - '17.80'
+    - - '1350'
+      - '17.14'
+      - '1500'
+      - '17.85'
+    - - '1360'
+      - '17.19'
+      - '1600'
+      - '18.32'
+    - - '1370'
+      - '17.24'
+      - '1700'
+      - '18.79'
+    - - '1380'
+      - '17.28'
+      - '1800'
+      - '19.25'
+    - - '1390'
+      - '17.33'
+      - '1900'
+      - '19.73'
+    - - '1400'
+      - '17.38'
+      - '2000'
+      - '20.19'
+    - - '1410'
+      - '17.42'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p031_t33
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p032_t35
+  type: model_table_context
+  locator:
+    pdf_page_index: 31
+    page: 32
+    table: '35'
+    table_key: p032-t35
+    section_header_as_printed:
+    - NaF
+    - Table 2.10.       Vapor pressures from equation (2,7)
+    - T                P                               T                  P
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 2.10. Vapor pressures from equation (2,7)
+    printed_table_grid:
+    - - T(K)
+      - p(mm)
+      - T(K)
+      - p(mm)
+    - - '1280'
+      - '0.55'
+      - '1640'
+      - '48.56'
+    - - '1300'
+      - '0.76'
+      - '1660'
+      - '58.82'
+    - - '1320'
+      - '1.03'
+      - '1680'
+      - '70.92'
+    - - '1340'
+      - '1.38'
+      - '1700'
+      - '85.14'
+    - - '1360'
+      - '1.84'
+      - '1720'
+      - '101.8'
+    - - '1380'
+      - '2.42'
+      - '1740'
+      - '121.2'
+    - - '1400'
+      - '3.18'
+      - '1760'
+      - '143.7'
+    - - '1420'
+      - '4.13'
+      - '1780'
+      - '169.7'
+    - - '1440'
+      - '5.33'
+      - '1800'
+      - '199.7'
+    - - '1460'
+      - '6.83'
+      - '1820'
+      - '234.2'
+    - - '1480'
+      - '8.70'
+      - '1840'
+      - '273.7'
+    - - '1500'
+      - '11.00'
+      - '1860'
+      - '318.8'
+    - - '1520'
+      - '13.83'
+      - '1880'
+      - '370.1'
+    - - '1540'
+      - '17.28'
+      - '1900'
+      - '428.3'
+    - - '1560'
+      - '21.48'
+      - '1920'
+      - '494.1'
+    - - '1580'
+      - '26.54'
+      - '1940'
+      - '568.4'
+    - - '1600'
+      - '32.62'
+      - '1960'
+      - '652.1'
+    - - '1620'
+      - '39.90'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p032_t35
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p041_t45
+  type: measured_table_context
+  locator:
+    pdf_page_index: 40
+    page: 41
+    table: '45'
+    table_key: p041-t45
+    section_header_as_printed:
+    - 9.                                                                                              KF
+    - Heat of Fusion         (A Hj.)
+    - 'Measurement method:                        drop calorimetry [45]'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 3.7. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '7.05'
+      - $\sim \pm 0.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p041_t45
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p041_t46
+  type: model_table_context
+  locator:
+    pdf_page_index: 40
+    page: 41
+    table: '46'
+    table_key: p041-t46
+    section_header_as_printed:
+    - 9.                                                                                              KF
+    - Heat of Fusion         (A Hj.)
+    - 'Measurement method:                        drop calorimetry [45]'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 3.8. Heat capacity from equation (3.5)
+    printed_table_grid:
+    - - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+    - - '1130'
+      - '14.89'
+      - '1370'
+      - '15.58'
+    - - '1150'
+      - '14.95'
+      - '1390'
+      - '15.64'
+    - - '1170'
+      - '15.01'
+      - '1400'
+      - '15.66'
+    - - '1190'
+      - '15.07'
+      - '1410'
+      - '15.69'
+    - - '1200'
+      - '15.09'
+      - '1430'
+      - '15.75'
+    - - '1210'
+      - '15.12'
+      - '1450'
+      - '15.81'
+    - - '1230'
+      - '15.18'
+      - '1470'
+      - '15.86'
+    - - '1250'
+      - '15.24'
+      - '1490'
+      - '15.92'
+    - - '1270'
+      - '15.30'
+      - '1500'
+      - '15.95'
+    - - '1290'
+      - '15.35'
+      - '1600'
+      - '16.23'
+    - - '1300'
+      - '15.38'
+      - '1700'
+      - '16.51'
+    - - '1310'
+      - '15.41'
+      - '1800'
+      - '16.79'
+    - - '1330'
+      - '15.47'
+      - '1900'
+      - '17.07'
+    - - '1350'
+      - '15.52'
+      - '2000'
+      - '17.35'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p041_t46
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p042_t48
+  type: model_table_context
+  locator:
+    pdf_page_index: 41
+    page: 42
+    table: '48'
+    table_key: p042-t48
+    section_header_as_printed:
+    - KF
+    - Table 3.10.                Vapor pressure from equation (3.6)
+    - T                    P                              T                            P
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: KF Table 3.10. Vapor pressure from equation (3.6)
+    printed_table_grid:
+    - - T(K)
+      - P(mm)
+      - T(K)
+      - P(mm)
+    - - '1550'
+      - '123.2'
+      - '1670'
+      - '351.5'
+    - - '1560'
+      - '135.3'
+      - '1680'
+      - '381.0'
+    - - '1570'
+      - '148.4'
+      - '1690'
+      - '412.6'
+    - - '1580'
+      - '162.6'
+      - '1700'
+      - '446.4'
+    - - '1590'
+      - '177.9'
+      - '1710'
+      - '482.5'
+    - - '1600'
+      - '194.4'
+      - '1720'
+      - '521.1'
+    - - '1610'
+      - '212.2'
+      - '1730'
+      - '562.2'
+    - - '1620'
+      - '231.5'
+      - '1740'
+      - '606.1'
+    - - '1630'
+      - '252.2'
+      - '1750'
+      - '652.8'
+    - - '1640'
+      - '274.4'
+      - '1760'
+      - '702.5'
+    - - '1650'
+      - '298.3'
+      - '1770'
+      - '755.4'
+    - - '1660'
+      - '324.0'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p042_t48
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p049_t58
+  type: measured_table_context
+  locator:
+    pdf_page_index: 48
+    page: 49
+    table: '58'
+    table_key: p049-t58
+    section_header_as_printed:
+    - LiCl
+    - Table 4.6.2.                    Parameters of diffusion equation (4.5), precisions,
+    - and recommended study
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 4.7. Heat of Fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '4.76'
+      - $\sim \pm 1\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p049_t58
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p050_t60
+  type: model_table_context
+  locator:
+    pdf_page_index: 49
+    page: 50
+    table: '60'
+    table_key: p050-t60
+    section_header_as_printed:
+    - LiCl
+    - References    [2,10,80-82].
+    - Table 4.6.4.        Diffusion coefficients, D x                                            10**     (cm^ sec          ^")
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 4.8. Heat capacity from equation (4.6)
+    printed_table_grid:
+    - - T(K)
+      - $C_{p}$ (cal  $K^{-1}mol^{-1}$ )
+      - T(K)
+      - $C_{p}$ (cal  $K^{-1}mol^{-1}$ )
+    - - '900'
+      - '15.501'
+      - '1060'
+      - '15.139'
+    - - '920'
+      - '15.456'
+      - '1080'
+      - '15.094'
+    - - '940'
+      - '15.411'
+      - '1100'
+      - '15.049'
+    - - '960'
+      - '15.365'
+      - '1120'
+      - '15.004'
+    - - '980'
+      - '15.320'
+      - '1140'
+      - '14.959'
+    - - '1000'
+      - '15.275'
+      - '1160'
+      - '14.913'
+    - - '1020'
+      - '15.230'
+      - '1180'
+      - '14.868'
+    - - '1040'
+      - '15.185'
+      - '1200'
+      - '14.823'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p050_t60
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p051_t62
+  type: model_table_context
+  locator:
+    pdf_page_index: 50
+    page: 51
+    table: '62'
+    table_key: p051-t62
+    section_header_as_printed:
+    - LiCl
+    - References   [85]      .
+    - 12.   Vapor
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 4.10. Vapor pressure from equation (4.7)
+    printed_table_grid:
+    - - T(K)
+      - p(mm)
+      - T(K)
+      - p(mm)
+    - - '890'
+      - '0.029'
+      - '1140'
+      - '4.14'
+    - - '900'
+      - '0.037'
+      - '1150'
+      - '4.83'
+    - - '910'
+      - '0.048'
+      - '1160'
+      - '5.62'
+    - - '920'
+      - '0.061'
+      - '1170'
+      - '6.51'
+    - - '930'
+      - '0.077'
+      - '1180'
+      - '7.54'
+    - - '940'
+      - '0.097'
+      - '1190'
+      - '8.70'
+    - - '950'
+      - '0.121'
+      - '1200'
+      - '10.01'
+    - - '960'
+      - '0.151'
+      - '1210'
+      - '11.50'
+    - - '970'
+      - '0.188'
+      - '1220'
+      - '13.18'
+    - - '980'
+      - '0.232'
+      - '1230'
+      - '15.08'
+    - - '990'
+      - '0.285'
+      - '1240'
+      - '17.20'
+    - - '1000'
+      - '0.350'
+      - '1250'
+      - '19.59'
+    - - '1010'
+      - '0.427'
+      - '1260'
+      - '22.26'
+    - - '1020'
+      - '0.519'
+      - '1270'
+      - '25.24'
+    - - '1030'
+      - '0.629'
+      - '1280'
+      - '28.57'
+    - - '1040'
+      - '0.759'
+      - '1290'
+      - '32.27'
+    - - '1050'
+      - '0.912'
+      - '1300'
+      - '36.39'
+    - - '1060'
+      - '1.09'
+      - '1310'
+      - '40.95'
+    - - '1070'
+      - '1.31'
+      - '1320'
+      - '46.01'
+    - - '1080'
+      - '1.55'
+      - '1330'
+      - '51.60'
+    - - '1090'
+      - '1.84'
+      - '1340'
+      - '57.77'
+    - - '1100'
+      - '2.18'
+      - '1350'
+      - '64.56'
+    - - '1110'
+      - '2.57'
+      - '1360'
+      - '72.04'
+    - - '1120'
+      - '3.02'
+      - '1370'
+      - '80.26'
+    - - '1130'
+      - '3.54'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p051_t62
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p060_t72
+  type: measured_table_context
+  locator:
+    pdf_page_index: 59
+    page: 60
+    table: '72'
+    table_key: p060-t72
+    section_header_as_printed:
+    - NaCl
+    - The italicized species indicate studies with insufficient data-sets for
+    - characterization of temperature dependence of diffusion coefficients. For
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 5.7. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '6.73'
+      - $\sim \pm 0.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p060_t72
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p062_t77
+  type: model_table_context
+  locator:
+    pdf_page_index: 61
+    page: 62
+    table: '77'
+    table_key: p062-t77
+    section_header_as_printed:
+    - NaCl
+    - c              2            -
+    - Table 5.6.4.                   Diffusion coefficients, D x 10                                                                      (cm
+      sec                         ),        from equations
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 5.8. Heat capacity from equation (5.6)
+    printed_table_grid:
+    - - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+    - - '1100'
+      - '16.97'
+      - '1200'
+      - '16.22'
+    - - '1120'
+      - '16.82'
+      - '1220'
+      - '16.07'
+    - - '1140'
+      - '16.67'
+      - '1240'
+      - '15.92'
+    - - '1160'
+      - '16.52'
+      - '1260'
+      - '15.76'
+    - - '1180'
+      - '16.37'
+      - '1280'
+      - '15.61'
+    - - ''
+      - ''
+      - '1300'
+      - '15.46'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p062_t77
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p063_t79
+  type: model_table_context
+  locator:
+    pdf_page_index: 62
+    page: 63
+    table: '79'
+    table_key: p063-t79
+    section_header_as_printed:
+    - NaCl
+    - 11 .   Volume Change on Melting (A7^J
+    - 'Measurement method:                 densities                         [26]'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 5.10. Vapor pressure from equation (5.7)
+    printed_table_grid:
+    - - T(K)
+      - p(mm)
+      - T(K)
+      - p(mm)
+    - - '1250'
+      - '6.22'
+      - '1400'
+      - '41.1'
+    - - '1260'
+      - '7.16'
+      - '1410'
+      - '45.9'
+    - - '1270'
+      - '8.21'
+      - '1420'
+      - '51.3'
+    - - '1280'
+      - '9.40'
+      - '1430'
+      - '57.2'
+    - - '1290'
+      - '10.7'
+      - '1440'
+      - '63.6'
+    - - '1300'
+      - '12.3'
+      - '1450'
+      - '70.7'
+    - - '1310'
+      - '13.9'
+      - '1460'
+      - '78.4'
+    - - '1320'
+      - '15.8'
+      - '1470'
+      - '86.9'
+    - - '1330'
+      - '18.0'
+      - '1480'
+      - '96.2'
+    - - '1340'
+      - '20.3'
+      - '1490'
+      - '106.3'
+    - - '1350'
+      - '22.9'
+      - '1500'
+      - '117.3'
+    - - '1360'
+      - '25.9'
+      - '1510'
+      - '129.3'
+    - - '1370'
+      - '29.1'
+      - '1520'
+      - '142.3'
+    - - '1380'
+      - '32.7'
+      - '1530'
+      - '156.4'
+    - - '1390'
+      - '36.7'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p063_t79
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p077_t93
+  type: measured_table_context
+  locator:
+    pdf_page_index: 76
+    page: 77
+    table: '93'
+    table_key: p077-t93
+    section_header_as_printed:
+    - KC1
+    - Table 6.6.5.                    Diffusion coefficients for species not
+    - included in table 6.6.3 and 6.6.4
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 6.7. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '6.34'
+      - $\sim \pm 1\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p077_t93
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p077_t94
+  type: model_table_context
+  locator:
+    pdf_page_index: 76
+    page: 77
+    table: '94'
+    table_key: p077-t94
+    section_header_as_printed:
+    - KC1
+    - Table 6.6.5.                    Diffusion coefficients for species not
+    - included in table 6.6.3 and 6.6.4
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 6.8. Heat capacity
+    printed_table_grid:
+    - - $(cal K^{-1}mol^{-1})$  $C$
+      - Temp. range (K)
+      - Uncertainty
+    - - '17.58'
+      - 1050-1173
+      - $\sim \pm 18\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p077_t94
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p078_t96
+  type: model_table_context
+  locator:
+    pdf_page_index: 77
+    page: 78
+    table: '96'
+    table_key: p078-t96
+    section_header_as_printed:
+    - KC1
+    - '11.'
+    - Volume Change on Melting *( AF j.)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 6.10. Vapor pressure from equation (6.6)
+    printed_table_grid:
+    - - T(K)
+      - p(mm)
+      - T(K)
+      - p(mm)
+    - - '1180'
+      - '4.22'
+      - '1360'
+      - '43.5'
+    - - '1190'
+      - '4.90'
+      - '1370'
+      - '48.7'
+    - - '1200'
+      - '5.67'
+      - '1380'
+      - '54.3'
+    - - '1210'
+      - '6.54'
+      - '1390'
+      - '60.6'
+    - - '1220'
+      - '7.53'
+      - '1400'
+      - '67.4'
+    - - '1230'
+      - '8.65'
+      - '1410'
+      - '74.9'
+    - - '1240'
+      - '9.91'
+      - '1420'
+      - '83.1'
+    - - '1250'
+      - '11.3'
+      - '1430'
+      - '92.0'
+    - - '1260'
+      - '12.9'
+      - '1440'
+      - '101.8'
+    - - '1270'
+      - '14.7'
+      - '1450'
+      - '112.5'
+    - - '1280'
+      - '16.7'
+      - '1460'
+      - '124.1'
+    - - '1290'
+      - '19.0'
+      - '1470'
+      - '136.7'
+    - - '1300'
+      - '21.5'
+      - '1480'
+      - '150.4'
+    - - '1310'
+      - '24.3'
+      - '1490'
+      - '165.3'
+    - - '1320'
+      - '27.4'
+      - '1500'
+      - '181.4'
+    - - '1330'
+      - '30.8'
+      - '1510'
+      - '198.9'
+    - - '1340'
+      - '34.7'
+      - '1520'
+      - '217.7'
+    - - '1350'
+      - '38.9'
+      - '1530'
+      - '238.1'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p078_t96
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p091_t105
+  type: measured_table_context
+  locator:
+    pdf_page_index: 90
+    page: 91
+    table: '105'
+    table_key: p091-t105
+    section_header_as_printed:
+    - MgCl
+    - '2'
+    - (ii)    Chlorides evolve highly toxic fumes when
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 7.6. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '10.30'
+      - $\sim \pm 0.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p091_t105
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p091_t106
+  type: model_table_context
+  locator:
+    pdf_page_index: 90
+    page: 91
+    table: '106'
+    table_key: p091-t106
+    section_header_as_printed:
+    - MgCl
+    - '2'
+    - (ii)    Chlorides evolve highly toxic fumes when
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 7.7. Heat capacity
+    printed_table_grid:
+    - - $C_p$ (cal K $^{-1}$ mol $^{-1}$ )
+      - Temp. range(K)
+      - Uncertainty
+    - - '22.1'
+      - 987-1500
+      - $\sim \pm 0.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p091_t106
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p092_t108
+  type: model_table_context
+  locator:
+    pdf_page_index: 91
+    page: 92
+    table: '108'
+    table_key: p092-t108
+    section_header_as_printed:
+    - MgCl
+    - '2'
+    - 11   .   Volume Change on Melting (AV^J
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 7.9. Vapor pressure from equation (7.5)
+    printed_table_grid:
+    - - T(K)
+      - p(mm)
+      - T(K)
+      - p(mm)
+    - - '1210'
+      - '7.69'
+      - '1320'
+      - '34.70'
+    - - '1220'
+      - '8.94'
+      - '1330'
+      - '39.25'
+    - - '1230'
+      - '10.35'
+      - '1340'
+      - '44.31'
+    - - '1240'
+      - '11.95'
+      - '1350'
+      - '49.91'
+    - - '1250'
+      - '13.77'
+      - '1360'
+      - '56.11'
+    - - '1260'
+      - '15.83'
+      - '1370'
+      - '62.95'
+    - - '1270'
+      - '18.14'
+      - '1380'
+      - '70.51'
+    - - '1280'
+      - '20.75'
+      - '1390'
+      - '78.82'
+    - - '1290'
+      - '23.68'
+      - '1400'
+      - '87.95'
+    - - '1300'
+      - '26.95'
+      - '1410'
+      - '97.97'
+    - - '1310'
+      - '30.62'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p092_t108
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p099_t119
+  type: measured_table_context
+  locator:
+    pdf_page_index: 98
+    page: 99
+    table: '119'
+    table_key: p099-t119
+    section_header_as_printed:
+    - CaCl
+    - '2'
+    - Table 8.6.2.           Self-diffusion coefficients from equations in table 8.6.1
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 8.7. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '6.78'
+      - $\sim \pm 0.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p099_t119
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p099_t120
+  type: model_table_context
+  locator:
+    pdf_page_index: 98
+    page: 99
+    table: '120'
+    table_key: p099-t120
+    section_header_as_printed:
+    - CaCl
+    - '2'
+    - Table 8.6.2.           Self-diffusion coefficients from equations in table 8.6.1
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 8.8. Heat capacity from equation (8.6)
+    printed_table_grid:
+    - - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+    - - '1055'
+      - '25.41'
+      - '1260'
+      - '24.70'
+    - - '1060'
+      - '25.39'
+      - '1280'
+      - '24.63'
+    - - '1080'
+      - '25.32'
+      - '1300'
+      - '24.56'
+    - - '1100'
+      - '25.25'
+      - '1320'
+      - '24.49'
+    - - '1120'
+      - '25.18'
+      - '1340'
+      - '24.42'
+    - - '1140'
+      - '25.11'
+      - '1360'
+      - '24.35'
+    - - '1160'
+      - '25.04'
+      - '1380'
+      - '24.28'
+    - - '1180'
+      - '24.97'
+      - '1400'
+      - '24.21'
+    - - '1200'
+      - '24.90'
+      - '1500'
+      - '23.86'
+    - - '1220'
+      - '24.83'
+      - '1600'
+      - '23.51'
+    - - '1240'
+      - '24.76'
+      - '1700'
+      - '23.16'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p099_t120
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p100_t122
+  type: model_table_context
+  locator:
+    pdf_page_index: 99
+    page: 100
+    table: '122'
+    table_key: p100-t122
+    section_header_as_printed:
+    - CaCl
+    - 11.   Volume Change on Melting (AV^J
+    - 'Measurement method:               capillary technique [54]'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 8.10. Vapor pressure from equation (8.7)
+    printed_table_grid:
+    - - T(K)
+      - P(mm)
+      - T(K)
+      - P(mm)
+    - - '1120'
+      - '0.0014'
+      - '1420'
+      - '0.330'
+    - - '1140'
+      - '0.0022'
+      - '1440'
+      - '0.439'
+    - - '1160'
+      - '0.0034'
+      - '1460'
+      - '0.578'
+    - - '1180'
+      - '0.0051'
+      - '1480'
+      - '0.757'
+    - - '1200'
+      - '0.0077'
+      - '1500'
+      - '0.983'
+    - - '1220'
+      - '0.0115'
+      - '1520'
+      - '1.269'
+    - - '1240'
+      - '0.0169'
+      - '1540'
+      - '1.626'
+    - - '1260'
+      - '0.0245'
+      - '1560'
+      - '2.071'
+    - - '1280'
+      - '0.0352'
+      - '1580'
+      - '2.622'
+    - - '1300'
+      - '0.0499'
+      - '1600'
+      - '3.300'
+    - - '1320'
+      - '0.0700'
+      - '1620'
+      - '4.130'
+    - - '1340'
+      - '0.0973'
+      - '1640'
+      - '5.140'
+    - - '1360'
+      - '0.134'
+      - '1660'
+      - '6.363'
+    - - '1380'
+      - '0.182'
+      - '1680'
+      - '7.838'
+    - - '1400'
+      - '0.246'
+      - '1700'
+      - '9.607'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p100_t122
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p106_t130
+  type: measured_table_context
+  locator:
+    pdf_page_index: 105
+    page: 106
+    table: '130'
+    table_key: p106-t130
+    section_header_as_printed:
+    - aici
+    - '3'
+    - '7.'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 9.6. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '8.5'
+      - $\sim \pm 3\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p106_t130
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p106_t131
+  type: model_table_context
+  locator:
+    pdf_page_index: 105
+    page: 106
+    table: '131'
+    table_key: p106-t131
+    section_header_as_printed:
+    - aici
+    - '3'
+    - '7.'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 9.7. Heat capacity
+    printed_table_grid:
+    - - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - Temp. range(K)
+      - Uncertainty
+    - - '30'
+      - 473-504
+      - $\sim \pm 3\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p106_t131
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p107_t133
+  type: model_table_context
+  locator:
+    pdf_page_index: 106
+    page: 107
+    table: '133'
+    table_key: p107-t133
+    section_header_as_printed:
+    - A1C1
+    - '3'
+    - '11.'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 9.9. Vapor pressure from equation (9.5)
+    printed_table_grid:
+    - - T(K)
+      - p(mm)
+      - T(K)
+      - p(mm)
+    - - '455'
+      - '1374'
+      - '495'
+      - '3049'
+    - - '460'
+      - '1530'
+      - '500'
+      - '3338'
+    - - '465'
+      - '1699'
+      - '505'
+      - '3648'
+    - - '470'
+      - '1882'
+      - '510'
+      - '3980'
+    - - '475'
+      - '2081'
+      - '515'
+      - '4335'
+    - - '480'
+      - '2297'
+      - '520'
+      - '4714'
+    - - '485'
+      - '2529'
+      - '525'
+      - '5117'
+    - - '490'
+      - '2779'
+      - '530'
+      - '5547'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p107_t133
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p113_t142
+  type: measured_table_context
+  locator:
+    pdf_page_index: 112
+    page: 113
+    table: '142'
+    table_key: p113-t142
+    section_header_as_printed:
+    - Li^CO^
+    - Table 10.6.1.                        Parameters of diffusion equation (10.6)
+    - Species                         A x 10 3                                      E                      Temp, range
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: rable 10.7. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '9.8'
+      - $\sim \pm 10\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p113_t142
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p113_t143
+  type: model_table_context
+  locator:
+    pdf_page_index: 112
+    page: 113
+    table: '143'
+    table_key: p113-t143
+    section_header_as_printed:
+    - Li^CO^
+    - Table 10.6.1.                        Parameters of diffusion equation (10.6)
+    - Species                         A x 10 3                                      E                      Temp, range
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 10.8. Heat capacity from equation (10.7)
+    printed_table_grid:
+    - - T(K)
+      - $C_{p}$  $(cal \ K^{-1}mol^{-1})$
+      - T(K)
+      - $C_{p}$  $(cal \ K^{-1}mol^{-1})$
+    - - '1000'
+      - '44.39'
+      - '1080'
+      - '45.47'
+    - - '1010'
+      - '44.53'
+      - '1090'
+      - '45.61'
+    - - '1020'
+      - '44.66'
+      - '1100'
+      - '45.74'
+    - - '1030'
+      - '44.80'
+      - '1110'
+      - '45.88'
+    - - '1040'
+      - '44.93'
+      - '1120'
+      - '46.01'
+    - - '1050'
+      - '45.07'
+      - '1130'
+      - '46.15'
+    - - '1060'
+      - '45.20'
+      - '1140'
+      - '46.29'
+    - - '1070'
+      - '45.34'
+      - '1150'
+      - '46.42'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p113_t143
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p124_t157
+  type: measured_table_context
+  locator:
+    pdf_page_index: 123
+    page: 124
+    table: '157'
+    table_key: p124-t157
+    section_header_as_printed:
+    - Na C0
+    - 2            3
+    - Equation
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 11.7. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$  $(kcal mol^{-1})$
+      - Uncertainty
+    - - '7.1'
+      - $\sim \pm 4\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p124_t157
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p124_t158
+  type: model_table_context
+  locator:
+    pdf_page_index: 123
+    page: 124
+    table: '158'
+    table_key: p124-t158
+    section_header_as_printed:
+    - Na C0
+    - 2            3
+    - Equation
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 11.8. Heat capacity from equation (11.7)
+    printed_table_grid:
+    - - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+    - - '1130'
+      - '46.08'
+      - '1180'
+      - '46.62'
+    - - '1140'
+      - '46.19'
+      - '1190'
+      - '46.72'
+    - - '1150'
+      - '46.30'
+      - '1200'
+      - '46.83'
+    - - '1160'
+      - '46.40'
+      - '1210'
+      - '46.94'
+    - - '1170'
+      - '46.51'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p124_t158
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p134_t170
+  type: measured_table_context
+  locator:
+    pdf_page_index: 133
+    page: 134
+    table: '170'
+    table_key: p134-t170
+    section_header_as_printed:
+    - K C0
+    - 2     3
+    - '7.'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 12.6. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$  $(kcal mol^{-1})$
+      - Uncertainty
+    - - '6.6'
+      - $\sim \pm 1.0\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p134_t170
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p135_t171
+  type: model_table_context
+  locator:
+    pdf_page_index: 134
+    page: 135
+    table: '171'
+    table_key: p135-t171
+    section_header_as_printed:
+    - K C0
+    - 2           3
+    - Table 12.7.                           Heat capacity from equation (12.6)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 12.7. Heat capacity from equation (12.6)
+    printed_table_grid:
+    - - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+    - - '1170'
+      - '49.40'
+      - '1210'
+      - '49.82'
+    - - '1180'
+      - '49.51'
+      - '1220'
+      - '49.93'
+    - - '1190'
+      - '49.61'
+      - '1230'
+      - '50.04'
+    - - '1200'
+      - '49.72'
+      - '1240'
+      - '50.14'
+    - - ''
+      - ''
+      - '1250'
+      - '50.25'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p135_t171
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p144_t185
+  type: measured_table_context
+  locator:
+    pdf_page_index: 143
+    page: 144
+    table: '185'
+    table_key: p144-t185
+    section_header_as_printed:
+    - LiN0
+    - '3'
+    - Table 13.6.4.                              Diffusion coefficients,
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 13.7. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $\hat{1}^{-1}$ )
+      - Uncertainty
+    - - '5.96'
+      - $\sim \pm 1.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p144_t185
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p144_t186
+  type: model_table_context
+  locator:
+    pdf_page_index: 143
+    page: 144
+    table: '186'
+    table_key: p144-t186
+    section_header_as_printed:
+    - LiN0
+    - '3'
+    - Table 13.6.4.                              Diffusion coefficients,
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 13.8. Heat capacity
+    printed_table_grid:
+    - - $(cal K^{-1}mol^{-1})^{C}$
+      - Temp. range (K)
+      - Uncertainty
+    - - '26.6'
+      - $\sim 540-670$
+      - $\sim \pm 2\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p144_t186
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p155_t201
+  type: measured_table_context
+  locator:
+    pdf_page_index: 154
+    page: 155
+    table: '201'
+    table_key: p155-t201
+    section_header_as_printed:
+    - NaN0
+    - '3'
+    - 9.        Heat of Fusion               6Atf^i
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 14.7. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '3.70'
+      - $\sim \pm 1.0\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p155_t201
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p155_t202
+  type: model_table_context
+  locator:
+    pdf_page_index: 154
+    page: 155
+    table: '202'
+    table_key: p155-t202
+    section_header_as_printed:
+    - NaN0
+    - '3'
+    - 9.        Heat of Fusion               6Atf^i
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 14.8. Heat capacity
+    printed_table_grid:
+    - - $(cal K^{-1}^{p} mol^{-1})$ C
+      - Temp. range(K)
+      - Uncertainty
+    - - '37.0'
+      - 600-700
+      - $\sim \pm 5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p155_t202
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p167_t219
+  type: measured_table_context
+  locator:
+    pdf_page_index: 166
+    page: 167
+    table: '219'
+    table_key: p167-t219
+    section_header_as_printed:
+    - KN0
+    - '3'
+    - Table 15.6.3.                       Self-diffusion coefficients
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 15.7. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '2.41'
+      - $\sim \pm 1\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p167_t219
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p168_t220
+  type: model_table_context
+  locator:
+    pdf_page_index: 167
+    page: 168
+    table: '220'
+    table_key: p168-t220
+    section_header_as_printed:
+    - KNO
+    - '3'
+    - 10.   Heat Capacity                     J
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 15.8. Heat capacity
+    printed_table_grid:
+    - - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - Temp. range(K)
+      - Uncertainty
+    - - '32.4'
+      - 610-663
+      - $\sim \pm 1.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p168_t220
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p177_t230
+  type: measured_table_context
+  locator:
+    pdf_page_index: 176
+    page: 177
+    table: '230'
+    table_key: p177-t230
+    section_header_as_printed:
+    - Ll S0
+    - 2     4
+    - 7     Corrosion
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 16.5. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '1.79'
+      - $\sim \pm 2\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p177_t230
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p177_t231
+  type: model_table_context
+  locator:
+    pdf_page_index: 176
+    page: 177
+    table: '231'
+    table_key: p177-t231
+    section_header_as_printed:
+    - Ll S0
+    - 2     4
+    - 7     Corrosion
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 16.6. Heat capacity
+    printed_table_grid:
+    - - $C_{p}$ (cal  $K^{-1}mol^{-1}$ )
+      - Temp. range(K)
+      - Uncertainty
+    - - '48.3'
+      - 1132-1179
+      - $\sim \pm 0.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p177_t231
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p182_t239
+  type: measured_table_context
+  locator:
+    pdf_page_index: 181
+    page: 182
+    table: '239'
+    table_key: p182-t239
+    section_header_as_printed:
+    - Na S0
+    - 2   4
+    - 7.    Corrosion
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 17.6. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H^{\circ}_{f}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '5.63'
+      - $\sim \pm 1\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p182_t239
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p182_t240
+  type: model_table_context
+  locator:
+    pdf_page_index: 181
+    page: 182
+    table: '240'
+    table_key: p182-t240
+    section_header_as_printed:
+    - Na S0
+    - 2   4
+    - 7.    Corrosion
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 17.7. Heat capacity
+    printed_table_grid:
+    - - $C_{p}$ (cal  $K^{-1}mol^{-1}$ )
+      - Temp. range(K)
+      - Uncertainty
+    - - '47.3'
+      - 1157-1850
+      - $\sim \pm 1\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p182_t240
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p183_t242
+  type: model_table_context
+  locator:
+    pdf_page_index: 182
+    page: 183
+    table: '242'
+    table_key: p183-t242
+    section_header_as_printed:
+    - Na-,S0
+    - '4'
+    - 12.    Vapor Pressure            (
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 17.9. Vapor pressure from equation (17.5)
+    printed_table_grid:
+    - - T(K)
+      - $p \times 10^{4}$ (mm)
+      - T(K)
+      - $p \times 10^{4}$ (mm)
+    - - '1200'
+      - '0.46'
+      - '1340'
+      - '11.3'
+    - - '1210'
+      - '0.59'
+      - '1350'
+      - '13.9'
+    - - '1220'
+      - '0.76'
+      - '1360'
+      - '17.0'
+    - - '1230'
+      - '0.97'
+      - '1370'
+      - '20.7'
+    - - '1240'
+      - '1.24'
+      - '1380'
+      - '25.1'
+    - - '1250'
+      - '1.57'
+      - '1390'
+      - '30.4'
+    - - '1260'
+      - '1.98'
+      - '1400'
+      - '36.8'
+    - - '1270'
+      - '2.49'
+      - '1410'
+      - '44.3'
+    - - '1280'
+      - '3.13'
+      - '1420'
+      - '53.8'
+    - - '1290'
+      - '3.91'
+      - '1430'
+      - '63.8'
+    - - '1300'
+      - '4.87'
+      - '1440'
+      - '76.3'
+    - - '1310'
+      - '6.04'
+      - '1450'
+      - '91.0'
+    - - '1320'
+      - '7.47'
+      - '1460'
+      - '108.0'
+    - - '1330'
+      - '9.22'
+      - '1470'
+      - '128.0'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p183_t242
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p189_t249
+  type: measured_table_context
+  locator:
+    pdf_page_index: 188
+    page: 189
+    table: '249'
+    table_key: p189-t249
+    section_header_as_printed:
+    - 9.       Heat of Fusion   (A H°)
+    - 'Measurement method: averaged value; cryoscopy [2,9,36]'
+    - Table 18.5.  Heat of fusion
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 18.5. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H^{\circ}$  $\text{(kcal mol}^{-1}\text{)}$
+      - Uncertainty
+    - - '8.7'
+      - $\sim \pm 4\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p189_t249
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p189_t250
+  type: model_table_context
+  locator:
+    pdf_page_index: 188
+    page: 189
+    table: '250'
+    table_key: p189-t250
+    section_header_as_printed:
+    - 9.       Heat of Fusion   (A H°)
+    - 'Measurement method: averaged value; cryoscopy [2,9,36]'
+    - Table 18.5.  Heat of fusion
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 18.6. Heat capacity
+    printed_table_grid:
+    - - $C_{p}$  $(cal K^{-1}mol^{-1})$
+      - Temp. range(K)
+      - Uncertainty
+    - - '47.8'
+      - 1342-1400
+      - $\sim \pm 3\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p189_t250
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p189_t252
+  type: model_table_context
+  locator:
+    pdf_page_index: 188
+    page: 189
+    table: '252'
+    table_key: p189-t252
+    section_header_as_printed:
+    - 9.       Heat of Fusion   (A H°)
+    - 'Measurement method: averaged value; cryoscopy [2,9,36]'
+    - Table 18.5.  Heat of fusion
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 18.8. Vapor pressure from equation (18.4)
+    printed_table_grid:
+    - - T(K)
+      - p(mm)
+      - T(K)
+      - p(mm)
+    - - '1350'
+      - '0.070'
+      - '1510'
+      - '0.692'
+    - - '1360'
+      - '0.082'
+      - '1520'
+      - '0.787'
+    - - '1370'
+      - '0.096'
+      - '1530'
+      - '0.892'
+    - - '1380'
+      - '0.112'
+      - '1540'
+      - '1.01'
+    - - '1390'
+      - '0.130'
+      - '1550'
+      - '1.14'
+    - - '1400'
+      - '0.151'
+      - '1560'
+      - '1.29'
+    - - '1410'
+      - '0.175'
+      - '1570'
+      - '1.45'
+    - - '1420'
+      - '0.203'
+      - '1580'
+      - '1.63'
+    - - '1430'
+      - '0.234'
+      - '1590'
+      - '1.83'
+    - - '1440'
+      - '0.270'
+      - '1600'
+      - '2.06'
+    - - '1450'
+      - '0.311'
+      - '1610'
+      - '2.31'
+    - - '1460'
+      - '0.357'
+      - '1620'
+      - '2.58'
+    - - '1470'
+      - '0.409'
+      - '1630'
+      - '2.88'
+    - - '1480'
+      - '0.468'
+      - '1640'
+      - '3.21'
+    - - '1490'
+      - '0.534'
+      - '1650'
+      - '3.58'
+    - - '1500'
+      - '0.609'
+      - '1660'
+      - '3.98'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p189_t252
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p199_t269
+  type: measured_table_context
+  locator:
+    pdf_page_index: 198
+    page: 199
+    table: '269'
+    table_key: p199-t269
+    section_header_as_printed:
+    - Sulfur
+    - 9.   Heat of Fusion        (
+    - 'Measurement method:               adiabatic calorimetry [35]'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 19.9. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - $3.07^{a}$
+      - $\sim \pm 0.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p199_t269
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p199_t270
+  type: model_table_context
+  locator:
+    pdf_page_index: 198
+    page: 199
+    table: '270'
+    table_key: p199-t270
+    section_header_as_printed:
+    - Sulfur
+    - 9.   Heat of Fusion        (
+    - 'Measurement method:               adiabatic calorimetry [35]'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 19.10. Heat capacity $^{a}$
+    printed_table_grid:
+    - - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+    - - '393'
+      - '7.40'
+      - '498'
+      - '8.53'
+    - - '398'
+      - '7.42'
+      - '503'
+      - '8.52'
+    - - '403'
+      - '7.44'
+      - '508'
+      - '8.51'
+    - - '408'
+      - '7.46'
+      - '513'
+      - '8.51'
+    - - '413'
+      - '7.49'
+      - '518'
+      - '8.50'
+    - - '418'
+      - '7.54'
+      - '523'
+      - '8.50'
+    - - '423'
+      - '7.61'
+      - '528'
+      - '8.50'
+    - - '428'
+      - '7.83'
+      - '533'
+      - '8.50'
+    - - '432'
+      - '8.33'
+      - '538'
+      - '8.51'
+    - - '435'
+      - '12.48'
+      - '543'
+      - '8.51'
+    - - '438'
+      - '11.59'
+      - '548'
+      - '8.52'
+    - - '443'
+      - '10.70'
+      - '553'
+      - '8.53'
+    - - '448'
+      - '10.13'
+      - '558'
+      - '8.55'
+    - - '453'
+      - '9.73'
+      - '563'
+      - '8.56'
+    - - '458'
+      - '9.46'
+      - '568'
+      - '8.56'
+    - - '463'
+      - '9.22'
+      - '573'
+      - '8.57'
+    - - '468'
+      - '8.98'
+      - '578'
+      - '8.60'
+    - - '473'
+      - '8.83'
+      - '583'
+      - '8.62'
+    - - '478'
+      - '8.73'
+      - '588'
+      - '8.65'
+    - - '483'
+      - '8.66'
+      - '593'
+      - '8.68'
+    - - '488'
+      - '8.57'
+      - '598'
+      - '8.70'
+    - - '493'
+      - '8.55'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p199_t270
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p200_t273
+  type: model_table_context
+  locator:
+    pdf_page_index: 199
+    page: 200
+    table: '273'
+    table_key: p200-t273
+    section_header_as_printed:
+    - Sulfur
+    - 12.     Vapor Pressure    (p
+    - r vap )
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 19.13. Vapor pressure from equations in table 19.12
+    printed_table_grid:
+    - - T(K)
+      - p(mm)
+      - T(K)
+      - p(mm)
+    - - '420'
+      - '0.16'
+      - '580'
+      - '59.7'
+    - - '430'
+      - '0.28'
+      - '590'
+      - '76.5'
+    - - '440'
+      - '0.47'
+      - '600'
+      - '97.1'
+    - - '450'
+      - '0.77'
+      - '610'
+      - '122.5'
+    - - '460'
+      - '1.32'
+      - '620'
+      - '143.1'
+    - - '470'
+      - '1.95'
+      - '630'
+      - '174.3'
+    - - '480'
+      - '2.84'
+      - '640'
+      - '211.0'
+    - - '490'
+      - '4.07'
+      - '650'
+      - '254.0'
+    - - '500'
+      - '5.75'
+      - '660'
+      - '303.6'
+    - - '510'
+      - '8.02'
+      - '670'
+      - '359.8'
+    - - '520'
+      - '11.0'
+      - '680'
+      - '424.7'
+    - - '530'
+      - '15.0'
+      - '690'
+      - '499.0'
+    - - '540'
+      - '20.2'
+      - '700'
+      - '583.2'
+    - - '550'
+      - '26.9'
+      - '710'
+      - '678.4'
+    - - '560'
+      - '35.4'
+      - '720'
+      - '785.7'
+    - - '570'
+      - '46.2'
+      - '730'
+      - '906.4'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p200_t273
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p206_t277
+  type: model_table_context
+  locator:
+    pdf_page_index: 205
+    page: 206
+    table: '277'
+    table_key: p206-t277
+    section_header_as_printed:
+    - Na S
+    - '2'
+    - Heat of Fusion       (k Hj.)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed compilation labels this fusion value estimated or calculated; it is not a direct measurement,
+      and the salt system is outside regolith silicate scope.
+    caption_as_printed: Table 20.1. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H^{\circ}_{f}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '5.0'
+      - $\sim \pm 20\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p206_t277
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p206_t278
+  type: model_table_context
+  locator:
+    pdf_page_index: 205
+    page: 206
+    table: '278'
+    table_key: p206-t278
+    section_header_as_printed:
+    - Na S
+    - '2'
+    - Heat of Fusion       (k Hj.)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 20.2. Heat capacity from equation (20.1)
+    printed_table_grid:
+    - - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+    - - '1300'
+      - '21.807'
+      - '1480'
+      - '21.848'
+    - - '1320'
+      - '21.812'
+      - '1500'
+      - '21.852'
+    - - '1340'
+      - '21.816'
+      - '1600'
+      - '21.874'
+    - - '1360'
+      - '21.821'
+      - '1700'
+      - '21.897'
+    - - '1380'
+      - '21.825'
+      - '1800'
+      - '21.919'
+    - - '1400'
+      - '21.830'
+      - '1900'
+      - '21.942'
+    - - '1420'
+      - '21.834'
+      - '2000'
+      - '21.964'
+    - - '1440'
+      - '21.839'
+      - ''
+      - ''
+    - - '1460'
+      - '21.843'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p206_t278
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p222_t294
+  type: measured_table_context
+  locator:
+    pdf_page_index: 221
+    page: 222
+    table: '294'
+    table_key: p222-t294
+    section_header_as_printed:
+    - LiBr
+    - B.    Disaster hazards                        [18,21-23]
+    - '(i)    Molten salt bath "explosions":  i.e., explosive generation of'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 25.6. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '4.22'
+      - $\sim \pm 1\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p222_t294
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p222_t295
+  type: model_table_context
+  locator:
+    pdf_page_index: 221
+    page: 222
+    table: '295'
+    table_key: p222-t295
+    section_header_as_printed:
+    - LiBr
+    - B.    Disaster hazards                        [18,21-23]
+    - '(i)    Molten salt bath "explosions":  i.e., explosive generation of'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 25.7. Heat capacity
+    printed_table_grid:
+    - - $C_p$  $(cal K^{-1} mol^{-1})$
+      - Temp. range(K)
+      - Uncertainty
+    - - '15.60'
+      - 823-883
+      - $\sim \pm 2\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p222_t295
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p223_t297
+  type: model_table_context
+  locator:
+    pdf_page_index: 222
+    page: 223
+    table: '297'
+    table_key: p223-t297
+    section_header_as_printed:
+    - LiBr
+    - 12    .   Vapor
+    - r   Pressure   Cp
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 25.9.1. Vapor pressure from equation (25.5)
+    printed_table_grid:
+    - - T(K)
+      - p(mm)
+      - T(K)
+      - p(mm)
+    - - '1290'
+      - '64.6'
+      - '1420'
+      - '272.1'
+    - - '1300'
+      - '72.9'
+      - '1430'
+      - '300.7'
+    - - '1310'
+      - '82.1'
+      - '1440'
+      - '331.7'
+    - - '1320'
+      - '92.3'
+      - '1450'
+      - '365.6'
+    - - '1330'
+      - '103.6'
+      - '1460'
+      - '402.3'
+    - - '1340'
+      - '116.0'
+      - '1470'
+      - '442.2'
+    - - '1350'
+      - '129.8'
+      - '1480'
+      - '485.3'
+    - - '1360'
+      - '144.9'
+      - '1490'
+      - '532.0'
+    - - '1370'
+      - '161.6'
+      - '1500'
+      - '582.6'
+    - - '1380'
+      - '179.9'
+      - '1510'
+      - '637.1'
+    - - '1390'
+      - '199.9'
+      - '1520'
+      - '695.9'
+    - - '1400'
+      - '221.9'
+      - '1530'
+      - '759.3'
+    - - '1410'
+      - '245.9'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p223_t297
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p223_t298
+  type: model_table_context
+  locator:
+    pdf_page_index: 222
+    page: 223
+    table: '298'
+    table_key: p223-t298
+    section_header_as_printed:
+    - LiBr
+    - 12    .   Vapor
+    - r   Pressure   Cp
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 25.9.2. Additional vapor pressure data
+    printed_table_grid:
+    - - T(K)
+      - p(mm)
+    - - '861'
+      - $5.61 \times 10^{-2}$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p223_t298
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p228_t306
+  type: measured_table_context
+  locator:
+    pdf_page_index: 227
+    page: 228
+    table: '306'
+    table_key: p228-t306
+    section_header_as_printed:
+    - Lil
+    - Cii]        Iodides when heated to decomposition can evolve highly
+    - toxic fumes of iodine and iodides; dangerous
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 26.6. Heat of fusion
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '3.50'
+      - $\sim \pm 1.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p228_t306
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p228_t307
+  type: model_table_context
+  locator:
+    pdf_page_index: 227
+    page: 228
+    table: '307'
+    table_key: p228-t307
+    section_header_as_printed:
+    - Lil
+    - Cii]        Iodides when heated to decomposition can evolve highly
+    - toxic fumes of iodine and iodides; dangerous
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 26.7. Heat capacity
+    printed_table_grid:
+    - - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - Temp. range(K)
+      - Uncertainty
+    - - '15.10'
+      - 742-802
+      - $\sim \pm 2\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p228_t307
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p229_t309
+  type: model_table_context
+  locator:
+    pdf_page_index: 228
+    page: 229
+    table: '309'
+    table_key: p229-t309
+    section_header_as_printed:
+    - Lil
+    - '12.'
+    - Vapor Pressure
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 26.9. Vapor pressure from equation (26.5)
+    printed_table_grid:
+    - - T(K)
+      - P(mm)
+      - T(K)
+      - P(mm)
+    - - '1230'
+      - '73.5'
+      - '1330'
+      - '235.5'
+    - - '1240'
+      - '83.3'
+      - '1340'
+      - '262.1'
+    - - '1250'
+      - '94.2'
+      - '1350'
+      - '291.2'
+    - - '1260'
+      - '106.3'
+      - '1360'
+      - '323.0'
+    - - '1270'
+      - '119.8'
+      - '1370'
+      - '357.8'
+    - - '1280'
+      - '134.6'
+      - '1380'
+      - '395.7'
+    - - '1290'
+      - '151.1'
+      - '1390'
+      - '437.0'
+    - - '1300'
+      - '169.3'
+      - '1400'
+      - '481.9'
+    - - '1310'
+      - '189.3'
+      - '1410'
+      - '530.7'
+    - - '1320'
+      - '211.3'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p229_t309
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p243_t327
+  type: measured_table_context
+  locator:
+    pdf_page_index: 242
+    page: 243
+    table: '327'
+    table_key: p243-t327
+    section_header_as_printed:
+    - LiCl-KCl
+    - 9.   Heat of Fusion     ( AH^.)
+    - 'Measurement method:                drop calorimetry [138,139]'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 27.13. Heat of fusion of eutectic
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '3.13'
+      - $\sim \pm 1\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p243_t327
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p243_t328
+  type: model_table_context
+  locator:
+    pdf_page_index: 242
+    page: 243
+    table: '328'
+    table_key: p243-t328
+    section_header_as_printed:
+    - LiCl-KCl
+    - 9.   Heat of Fusion     ( AH^.)
+    - 'Measurement method:                drop calorimetry [138,139]'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 27.14. Heat capacity of eutectic
+    printed_table_grid:
+    - - $C_p$ (cal K-1mol-1)
+      - Temp. range(K)
+      - Uncertainty
+    - - '17.3'
+      - 625-852
+      - $\sim \pm 3.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p243_t328
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p261_t351
+  type: model_table_context
+  locator:
+    pdf_page_index: 260
+    page: 261
+    table: '351'
+    table_key: p261-t351
+    section_header_as_printed:
+    - NaCl-KCl
+    - '11.'
+    - Volume Change on Melting (AF^J
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 28.15. Vapor pressure(mm)
+    printed_table_grid:
+    - - Mol % KCl
+      - T (K)
+      - T (K)
+      - T (K)
+    - - Mol % KCl
+      - '1133'
+      - '1223'
+      - '1263'
+    - - '25.2'
+      - '2.9'
+      - ''
+      - ''
+    - - '49.8'
+      - '3.1'
+      - ''
+      - ''
+    - - '74.7'
+      - '4.0'
+      - ''
+      - ''
+    - - '25.8'
+      - ''
+      - '9.6'
+      - ''
+    - - '49.6'
+      - ''
+      - '9.7'
+      - ''
+    - - '74.4'
+      - ''
+      - '10.8'
+      - ''
+    - - '24.3'
+      - ''
+      - ''
+      - '16.5'
+    - - '49.5'
+      - ''
+      - ''
+      - '16.5'
+    - - '75.9'
+      - ''
+      - ''
+      - '17.9'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p261_t351
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p271_t358
+  type: model_table_context
+  locator:
+    pdf_page_index: 270
+    page: 271
+    table: '358'
+    table_key: p271-t358
+    section_header_as_printed:
+    - LiCl-AlCl
+    - '3'
+    - '7.'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed compilation labels this fusion value estimated or calculated; it is not a direct measurement,
+      and the salt system is outside regolith silicate scope.
+    caption_as_printed: Table 29.7. Heat of fusion of eutectic
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '5.8'
+      - $\sim \pm 5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p271_t358
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p280_t372
+  type: model_table_context
+  locator:
+    pdf_page_index: 279
+    page: 280
+    table: '372'
+    table_key: p280-t372
+    section_header_as_printed:
+    - NaCl -AlClj
+    - Table 30.8.4.                             Diffusion coefficients for species
+    - not included in table 30.8.3
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed compilation labels this fusion value estimated or calculated; it is not a direct measurement,
+      and the salt system is outside regolith silicate scope.
+    caption_as_printed: Table 30,9. Heat of fusion of eutectic
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '7.2'
+      - $\sim \pm 5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p280_t372
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p281_t375
+  type: model_table_context
+  locator:
+    pdf_page_index: 280
+    page: 281
+    table: '375'
+    table_key: p281-t375
+    section_header_as_printed:
+    - NaCl -A1C1
+    - 11.   Volume Change on Melting
+    - Measurement method"                      estimated from densities                                              [46]
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 30.11.2. Vapor pressure (mm) from equations in table 30.11.1
+    printed_table_grid:
+    - - T(K)
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+    - - T(K)
+      - '53.790'
+      - '54.250'
+      - '55.513'
+      - '58.062'
+      - '60.977'
+      - '62.677'
+      - '63.046'
+      - '65.904'
+      - '66.036'
+      - '69.277'
+      - '70.255'
+      - '73.929'
+    - - '380'
+      - ''
+      - ''
+      - ''
+      - '2.33'
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+    - - '390'
+      - ''
+      - ''
+      - ''
+      - '3.40'
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+    - - '400'
+      - ''
+      - ''
+      - ''
+      - '4.85'
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+    - - '410'
+      - ''
+      - ''
+      - ''
+      - '6.81'
+      - '14.03'
+      - '22.46'
+      - '29.57'
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+    - - '420'
+      - ''
+      - '2.86'
+      - '3.90'
+      - '9.41'
+      - '19.72'
+      - '31.07'
+      - '40.25'
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+    - - '430'
+      - ''
+      - '3.83'
+      - '5.15'
+      - '12.80'
+      - '27.27'
+      - '42.34'
+      - '54.00'
+      - '132.87'
+      - '118.21'
+      - ''
+      - ''
+      - ''
+    - - '440'
+      - '4.90'
+      - '5.07'
+      - '6.71'
+      - '17.18'
+      - '37.16'
+      - '56.89'
+      - '71.48'
+      - '168.50'
+      - '154.57'
+      - '341.63'
+      - ''
+      - ''
+    - - '450'
+      - '6.02'
+      - '6.63'
+      - '8.65'
+      - '22.75'
+      - '49.94'
+      - '75.44'
+      - '93.46'
+      - '211.44'
+      - '199.95'
+      - '428.67'
+      - '496.32'
+      - ''
+    - - '460'
+      - '7.33'
+      - '8.57'
+      - '11.02'
+      - '29.77'
+      - '66.27'
+      - '98.83'
+      - '120.77'
+      - '262.72'
+      - '255.63'
+      - '532.61'
+      - '617.00'
+      - '1066.37'
+    - - '470'
+      - '8.85'
+      - '10.96'
+      - '13.89'
+      - '38.51'
+      - '86.88'
+      - '127.99'
+      - '154.37'
+      - '323.43'
+      - '323.42'
+      - '655.66'
+      - '759.95'
+      - '1304.81'
+    - - '480'
+      - '10.60'
+      - '13.86'
+      - ''
+      - '49.28'
+      - '112.62'
+      - '163.97'
+      - '195.31'
+      - '394.73'
+      - '405.18'
+      - '800.17'
+      - '927.93'
+      - '1583.20'
+    - - '490'
+      - '12.61'
+      - '17.37'
+      - ''
+      - '62.44'
+      - '144.46'
+      - '207.96'
+      - '244.75'
+      - '477.85'
+      - '502.98'
+      - '968.63'
+      - ''
+      - '1905.89'
+    - - '500'
+      - ''
+      - '21.57'
+      - ''
+      - '78.36'
+      - '183.45'
+      - '261.25'
+      - '303.95'
+      - '574.07'
+      - '618.99'
+      - '1163.64'
+      - ''
+      - '2277.39'
+    - - '510'
+      - ''
+      - '26.56'
+      - ''
+      - '97.47'
+      - '230.80'
+      - '325.28'
+      - '374.28'
+      - '684.72'
+      - '755.60'
+      - '1387.87'
+      - ''
+      - '2702.36'
+    - - '520'
+      - ''
+      - '32.44'
+      - ''
+      - '120.22'
+      - '287.82'
+      - '401.59'
+      - '457.20'
+      - '811.19'
+      - '915.30'
+      - '1644.14'
+      - ''
+      - '3185.60'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p281_t375
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p289_t385
+  type: model_table_context
+  locator:
+    pdf_page_index: 288
+    page: 289
+    table: '385'
+    table_key: p289-t385
+    section_header_as_printed:
+    - KC1-A1C1 3
+    - '7.'
+    - Corrosion
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed compilation labels this fusion value estimated or calculated; it is not a direct measurement,
+      and the salt system is outside regolith silicate scope.
+    caption_as_printed: Table 31.6. Heat of fusion of eutectic
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '6.9'
+      - $\sim \pm 5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p289_t385
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p290_t388
+  type: model_table_context
+  locator:
+    pdf_page_index: 289
+    page: 290
+    table: '388'
+    table_key: p290-t388
+    section_header_as_printed:
+    - KC1-A1C1
+    - '3'
+    - Table 31.8.                        Parameters of equation (31.3), and precisions
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 31.9. Vapor pressure (mm) from equations in table 31.8
+    printed_table_grid:
+    - - T(K)
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+      - $Mol\% AlCl_{3}$
+    - - T(K)
+      - '36.2'
+      - '42.4'
+      - '48.5'
+      - '50.1'
+    - - '870'
+      - ''
+      - ''
+      - ''
+      - '4.6'
+    - - '880'
+      - ''
+      - ''
+      - ''
+      - '5.4'
+    - - '890'
+      - ''
+      - ''
+      - ''
+      - '6.5'
+    - - '900'
+      - ''
+      - ''
+      - ''
+      - '7.7'
+    - - '910'
+      - ''
+      - ''
+      - '4.1'
+      - '9.0'
+    - - '920'
+      - ''
+      - '4.4'
+      - '5.1'
+      - '10.6'
+    - - '930'
+      - ''
+      - '5.4'
+      - '6.3'
+      - '12.4'
+    - - '940'
+      - ''
+      - '6.6'
+      - '7.8'
+      - '14.5'
+    - - '950'
+      - '6.8'
+      - '8.1'
+      - '9.5'
+      - '16.8'
+    - - '960'
+      - '8.1'
+      - '9.8'
+      - '11.6'
+      - '19.5'
+    - - '970'
+      - '9.7'
+      - '11.8'
+      - '14.1'
+      - '22.6'
+    - - '980'
+      - '11.6'
+      - '14.2'
+      - '17.1'
+      - '26.0'
+    - - '990'
+      - '13.7'
+      - '17.1'
+      - '20.6'
+      - '29.9'
+    - - '1000'
+      - '16.3'
+      - '20.4'
+      - '24.7'
+      - '34.3'
+    - - '1010'
+      - '19.2'
+      - '24.2'
+      - '29.5'
+      - '39.2'
+    - - '1020'
+      - '22.5'
+      - '28.8'
+      - '35.2'
+      - '44.7'
+    - - '1030'
+      - '26.4'
+      - '34.0'
+      - '41.8'
+      - '50.8'
+    - - '1040'
+      - ''
+      - ''
+      - '49.5'
+      - '57.6'
+    - - '1050'
+      - ''
+      - ''
+      - '58.4'
+      - '65.2'
+    - - '1060'
+      - ''
+      - ''
+      - '68.7'
+      - '73.6'
+    - - '1070'
+      - ''
+      - ''
+      - '80.5'
+      - '82.9'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p290_t388
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p299_t402
+  type: model_table_context
+  locator:
+    pdf_page_index: 298
+    page: 299
+    table: '402'
+    table_key: p299-t402
+    section_header_as_printed:
+    - NaCl -CaCl
+    - '2'
+    - 9.      Heat of Fusion
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed compilation labels this fusion value estimated or calculated; it is not a direct measurement,
+      and the salt system is outside regolith silicate scope.
+    caption_as_printed: Table 32.12. Heat of fusion of eutectic
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '5.7'
+      - $\sim \pm 5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p299_t402
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p299_t404
+  type: model_table_context
+  locator:
+    pdf_page_index: 298
+    page: 299
+    table: '404'
+    table_key: p299-t404
+    section_header_as_printed:
+    - NaCl -CaCl
+    - '2'
+    - 9.      Heat of Fusion
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 32.14. Vapor pressures (mm)
+    printed_table_grid:
+    - - Mol % NaCl
+      - 1373 K
+      - 1423 K
+      - Mol % NaCl
+      - 1373 K
+      - 1423 K
+    - - '13'
+      - '1.46'
+      - '2.90'
+      - '84'
+      - '24.48'
+      - '41.10'
+    - - '29'
+      - '3.77'
+      - '7.32'
+      - '86'
+      - '25.71'
+      - '43.18'
+    - - '42'
+      - '7.37'
+      - '13.79'
+      - '88'
+      - '27.19'
+      - '46.08'
+    - - '53'
+      - '11.35'
+      - '18.37'
+      - '90'
+      - '28.43'
+      - '47.70'
+    - - '61'
+      - '14.30'
+      - '24.79'
+      - '91'
+      - '28.87'
+      - '48.91'
+    - - '69'
+      - '17.47'
+      - '30.08'
+      - '100'
+      - '32.07'
+      - '56.34'
+    - - '78'
+      - '20.92'
+      - '36.05'
+      - ''
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p299_t404
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p319_t426
+  type: model_table_context
+  locator:
+    pdf_page_index: 318
+    page: 319
+    table: '426'
+    table_key: p319-t426
+    section_header_as_printed:
+    - NaF-KF
+    - B.     Disaster hazards [14,17-19]
+    - '(i)   Molten salt bath "explosions":  i.e. explosive gen-'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed compilation labels this fusion value estimated or calculated; it is not a direct measurement,
+      and the salt system is outside regolith silicate scope.
+    caption_as_printed: Table 34.7. Heat of fusion
+    printed_table_grid:
+    - - Binary eutectic(mol % NaF)
+      - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '40'
+      - '4.97'
+      - $\sim \pm 2\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p319_t426
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p328_t437
+  type: measured_table_context
+  locator:
+    pdf_page_index: 327
+    page: 328
+    table: '437'
+    table_key: p328-t437
+    section_header_as_printed:
+    - '9.'
+    - LiF-LiCl
+    - Heat of Fusion          (A Hj.)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 35.9. Heat of fusion of eutectic
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '4.8'
+      - $\sim \pm 6\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p328_t437
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p334_t447
+  type: model_table_context
+  locator:
+    pdf_page_index: 333
+    page: 334
+    table: '447'
+    table_key: p334-t447
+    section_header_as_printed:
+    - NaCl-KCl-AlCl
+    - '3'
+    - '7.'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed compilation labels this fusion value estimated or calculated; it is not a direct measurement,
+      and the salt system is outside regolith silicate scope.
+    caption_as_printed: Table 36.8. Heat of fusion of eutectic
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '6.9'
+      - $\sim \pm 5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p334_t447
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p343_t456
+  type: model_table_context
+  locator:
+    pdf_page_index: 342
+    page: 343
+    table: '456'
+    table_key: p343-t456
+    section_header_as_printed:
+    - LiCl-NaCl-KCl
+    - '9.'
+    - Heat of Fusion       (A H°)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed compilation labels this fusion value estimated or calculated; it is not a direct measurement,
+      and the salt system is outside regolith silicate scope.
+    caption_as_printed: Table 38.6. Heat of fusion of eutectic
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '4.8'
+      - $\sim \pm 5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p343_t456
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p345_t458
+  type: measured_table_context
+  locator:
+    pdf_page_index: 344
+    page: 345
+    table: '458'
+    table_key: p345-t458
+    section_header_as_printed:
+    - 'XXXIX.       Lithium Fluoride-Lithium Chloride-Lithium Bromide:                                      LiF-LiCl -LiBr'
+    - '1.'
+    - Melting Temperatures (T              )
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The compiled property is for a non-silicate molten salt rather than a regolith silicate phase; retained
+      as source context.
+    caption_as_printed: Table 39.1. Density
+    printed_table_grid:
+    - - Composition
+      - T(K)
+      - $\rho$  $(g\ cm^{-3})$
+    - - ternary eutectic
+      - '773'
+      - '2.19'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p345_t458
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p357_t468
+  type: measured_table_context
+  locator:
+    pdf_page_index: 356
+    page: 357
+    table: '468'
+    table_key: p357-t468
+    section_header_as_printed:
+    - L^COj-Na^Oj-K-^CO^
+    - Table 41.8.2.    Self -diffusion coefficients, D x 10^ (cm^sec
+    - from equations in table 41.8.1.
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 41.9. Heat of fusion
+    printed_table_grid:
+    - - Composition
+      - $\Delta H^{\circ}_{f}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - ternary eutectic
+      - '6.55'
+      - $\sim \pm 1\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p357_t468
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p358_t469
+  type: model_table_context
+  locator:
+    pdf_page_index: 357
+    page: 358
+    table: '469'
+    table_key: p358-t469
+    section_header_as_printed:
+    - Li C0 -Na C0 -K C0
+    - 2       3            2        3          2           3
+    - ±0.   Heat Capacity      (C       J
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 41.10. Heat capacity from equation (41.7)
+    printed_table_grid:
+    - - T(K)
+      - $C_p(cal K^{-1}mol^{-1})$
+      - T(K)
+      - $C_p(cal K^{-1}mol^{-1})$
+    - - '680'
+      - '39.67'
+      - '900'
+      - '43.31'
+    - - '700'
+      - '40.00'
+      - '920'
+      - '43.65'
+    - - '720'
+      - '40.33'
+      - '940'
+      - '44.98'
+    - - '740'
+      - '40.66'
+      - '960'
+      - '44.31'
+    - - '760'
+      - '41.00'
+      - '980'
+      - '44.64'
+    - - '780'
+      - '41.33'
+      - '1000'
+      - '44.97'
+    - - '800'
+      - '41.66'
+      - '1020'
+      - '45.30'
+    - - '820'
+      - '41.99'
+      - '1040'
+      - '45.63'
+    - - '840'
+      - '42.32'
+      - '1060'
+      - '45.96'
+    - - '860'
+      - '42.65'
+      - '1080'
+      - '46.29'
+    - - '880'
+      - '42.98'
+      - '1100'
+      - '46.63'
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p358_t469
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p373_t489
+  type: model_table_context
+  locator:
+    pdf_page_index: 372
+    page: 373
+    table: '489'
+    table_key: p373-t489
+    section_header_as_printed:
+    - Li C 03 -Na C 0
+    - 2                  2       j
+    - 9.      Heat of Fusion       (Atf^)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed compilation labels this fusion value estimated or calculated; it is not a direct measurement,
+      and the salt system is outside regolith silicate scope.
+    caption_as_printed: Table 42.13. Heat of fusion of eutectic
+    printed_table_grid:
+    - - $\Delta H_{f}^{\circ}$ (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '7.9'
+      - $\sim \pm 5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p373_t489
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p387_t511
+  type: measured_table_context
+  locator:
+    pdf_page_index: 386
+    page: 387
+    table: '511'
+    table_key: p387-t511
+    section_header_as_printed:
+    - Li^CO^-K^CO^
+    - '9.'
+    - Heat of Fusion               ( CH^.)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 43.13. Heat of fusion
+    printed_table_grid:
+    - - $Mol\% Li_{2}CO_{3}$
+      - $\Delta H_{f}^{\circ}$  $(kcal\ mol^{-1})$
+      - Uncertainty
+    - - '50'
+      - '8.7'
+      - $\sim \pm 1.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p387_t511
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p387_t512
+  type: model_table_context
+  locator:
+    pdf_page_index: 386
+    page: 387
+    table: '512'
+    table_key: p387-t512
+    section_header_as_printed:
+    - Li^CO^-K^CO^
+    - '9.'
+    - Heat of Fusion               ( CH^.)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 43.14. Heat capacity
+    printed_table_grid:
+    - - $Mol\% Li_{2}CO_{3}$
+      - $^{C}_{p}$  $(cal\ K^{-1}mol^{-1})$
+      - Temp. range(K)
+      - Uncertainty
+    - - '50'
+      - 44.65 ± 0.1
+      - 778-1200
+      - $\sim \pm 0.5\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p387_t512
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p398_t528
+  type: measured_table_context
+  locator:
+    pdf_page_index: 397
+    page: 398
+    table: '528'
+    table_key: p398-t528
+    section_header_as_printed:
+    - Na C
+    - 2    V        K C0
+    - 2        3
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 44.11. Heat of fusion
+    printed_table_grid:
+    - - $Mol\% Na_{2}CO_{3}$
+      - $\Delta H^{\circ}_{f}$  $(kcal mol^{-1})$
+      - Uncertainty
+    - - '56'
+      - '4.7'
+      - $\sim \pm 2\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p398_t528
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p399_t529
+  type: model_table_context
+  locator:
+    pdf_page_index: 398
+    page: 399
+    table: '529'
+    table_key: p399-t529
+    section_header_as_printed:
+    - Na2C0j-K2C02
+    - '10.'
+    - Heat Capacity     (C^)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 44.12. Heat capacity
+    printed_table_grid:
+    - - $Mol\% Na_{2}CO_{3}$
+      - $(cal K^{P1}mol^{-1})$
+      - Temp. range (K)
+      - Uncertainty
+    - - '56'
+      - 44.3 ± 0.1
+      - 983-1197
+      - $\sim \pm$  0.5%
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p399_t529
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p414_t550
+  type: model_table_context
+  locator:
+    pdf_page_index: 413
+    page: 414
+    table: '550'
+    table_key: p414-t550
+    section_header_as_printed:
+    - NaN0 -KN0
+    - 3     3
+    - 9.   Heat of Fusion          (h H^,)
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 45.13. Heat capacity from equation (45.9) for minimum melting mixture
+    printed_table_grid:
+    - - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+      - T(K)
+      - $C_p$ (cal  $K^{-1}mol^{-1}$ )
+    - - '510'
+      - '39.99'
+      - '650'
+      - '36.29'
+    - - '520'
+      - '39.72'
+      - '660'
+      - '36.03'
+    - - '530'
+      - '39.46'
+      - '670'
+      - '35.77'
+    - - '540'
+      - '39.19'
+      - '680'
+      - '35.50'
+    - - '550'
+      - '38.93'
+      - '690'
+      - '35.24'
+    - - '560'
+      - '38.67'
+      - '700'
+      - '34.97'
+    - - '570'
+      - '38.40'
+      - '710'
+      - '34.71'
+    - - '580'
+      - '38.14'
+      - '720'
+      - '34.45'
+    - - '590'
+      - '37.88'
+      - '730'
+      - '34.18'
+    - - '600'
+      - '37.61'
+      - '740'
+      - '33.92'
+    - - '610'
+      - '37.35'
+      - '750'
+      - '33.66'
+    - - '620'
+      - '37.08'
+      - '760'
+      - '33.39'
+    - - '630'
+      - '36.82'
+      - '770'
+      - '33.13'
+    - - '640'
+      - '36.56'
+      - ''
+      - ''
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p414_t550
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p438_t570
+  type: measured_table_context
+  locator:
+    pdf_page_index: 437
+    page: 438
+    table: '570'
+    table_key: p438-t570
+    section_header_as_printed:
+    - NaCl-Li S0
+    - 2                 4
+    - '6.'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The measured property is for a non-silicate alkali/halide/sulfide/sulfate salt rather than a regolith
+      silicate phase; retained as source context.
+    caption_as_printed: Table 49.3. Heat of fusion
+    printed_table_grid:
+    - - Binary eutectic (mol %  $Li_{2}SO_{4}$ )
+      - $\Delta H_{f}^{\circ}$  (kcal mol $^{-1}$ )
+      - Uncertainty
+    - - '58.1'
+      - '7.48'
+      - $\sim \pm 2\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p438_t570
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
+- observation_id: janz_p438_t571
+  type: model_table_context
+  locator:
+    pdf_page_index: 437
+    page: 438
+    table: '571'
+    table_key: p438-t571
+    section_header_as_printed:
+    - NaCl-Li S0
+    - 2                 4
+    - '6.'
+  units: printed column units retained verbatim in the header row
+  values:
+    candidate_tokens:
+    - heat_of_fusion
+    - heat_capacity
+    - density
+    - vapor_pressure
+    not_scored_reason: The printed values are generated from the cited equation; the system is a non-silicate molten salt,
+      retained as source context.
+    caption_as_printed: Table 49.4. Heat capacity
+    printed_table_grid:
+    - - Binary eutectic (mol %  $Li_{2}SO_{4}$ )
+      - $C_p$  (cal  $K^{-1}mol^{-1}$ )
+      - Temp. range (K)
+      - Uncertainty
+    - - '58.1'
+      - '32.6'
+      - 763-874
+      - $\sim \pm 2\%$
+  context_id: janz-1979-nsrds61-part2-molten-salt-properties::context::janz_p438_t571
+  work_id: 10.6028/nbs.nsrds.61p2
+  source_id: janz-1979-nsrds61-part2-molten-salt-properties
+  species: Na2O
