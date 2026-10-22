@@ -1644,6 +1644,32 @@ def test_heck_atmospheric_pressure_remains_inferred():
     assert pressure["inferred"] is True
 
 
+def test_muan_total_pressure_remains_inferred():
+    """Muan reports air; 1 atm is inferred for all 57 typed rows."""
+    doc = yaml.safe_load((EXTRACTS / "muan-1959-manganese-silica-air.yaml").read_text())
+    pressures = [
+        observation["values"]["point_conditions"]["total_pressure_Pa"]
+        for species in doc["species"].values()
+        for observation in species.get("observations", [])
+        if "total_pressure_Pa"
+        in observation.get("values", {}).get("point_conditions", {})
+    ]
+    assert len(pressures) == 57
+    assert all(pressure["state"]["value"] == "101325" for pressure in pressures)
+    assert all(pressure["inferred"] is True for pressure in pressures)
+    assert all(
+        pressure["derivation"]
+        == "in air at the laboratory, 1 atm = 101325 Pa assumed from the text 'in air'"
+        for pressure in pressures
+    )
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT, EXTRACTS / "muan-1959-manganese-silica-air.yaml"
+    )
+    migrator.finalize()
+    assert len(migrator.result.observations) == 57
+    assert not migrator.result.validation.hard_issues
+
+
 def test_r16_extract_ids_resolve_and_preserve_unavailable_queue_links():
     """Rewritten observation IDs must retain experiment and queue ownership."""
     root = REPO_ROOT / "data" / "literature"
