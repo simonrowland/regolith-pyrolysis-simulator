@@ -178,6 +178,23 @@ def test_species_rail_antoine_evaluator_pins_real_rows(vapor_pressure_data):
         assert pressure_pa.hex() == expected_hex
 
 
+def test_foulant_consumer_refuses_missing_antoine_A_as_invalid_input():
+    refusal = None
+    try:
+        _pure_component_antoine_pa(
+            {"pure_component_antoine": {"B": 1000.0, "C": 0.0}},
+            1000.0,
+        )
+    except Exception as exc:
+        refusal = exc
+    else:
+        pytest.fail("missing Antoine A unexpectedly produced a pressure")
+
+    assert refusal is not None
+    assert type(refusal).__name__ == "_AntoineCoefficientRefusal"
+    assert str(refusal) == "missing_antoine_coefficient: coefficient=A value=None"
+
+
 def test_melt_effect_antoine_forms_keep_stull_pressure_pins():
     forms = WARN_TIER_ANALYTICAL_MODELS["cl_halide"]["forms"]
     result = _evaluate_analytical_forms(forms, T_K=1473.15)["vapor_pressure"]

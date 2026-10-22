@@ -152,6 +152,38 @@ def test_chi_escape_salt_high_vacuum_fraction() -> None:
     assert result.escaped_frac > 0.9
 
 
+def test_chi_escape_salt_uses_compiled_fallback_when_antoine_A_is_missing(
+    monkeypatch,
+) -> None:
+    import engines.builtin.foulant_disposition as foulant_module
+
+    entry = {"pure_component_antoine": {"B": 1000.0, "C": 0.0}}
+    monkeypatch.setattr(
+        foulant_module,
+        "_load_vapor_pressures",
+        lambda: {"foulant_vapor": {"NaCl": entry}},
+    )
+    fallback_calls = []
+
+    def compiled_fallback(carrier_key, temperature_K):
+        fallback_calls.append((carrier_key, temperature_K))
+        return 75_000.0, (1000.0, 1500.0), None
+
+    monkeypatch.setattr(
+        foulant_module,
+        "_compiled_carrier_pressure",
+        compiled_fallback,
+    )
+    try:
+        result = chi_escape_salt("NaCl", 1200.0, 2.0)
+    except Exception as refusal:
+        result = refusal
+
+    assert isinstance(result, EscapeSplit)
+    assert fallback_calls == [("NaCl", 1473.15)]
+    assert result.escaped_frac == pytest.approx(75_000.0 / 275_000.0)
+
+
 def test_chi_decomp_returns_disposition_extent_with_derived_width(
     foulant_registry_yaml: Path,
 ) -> None:
