@@ -2625,6 +2625,45 @@ def test_runner_failure_preserves_primary_when_yield_disposition_raises(
     )
 
 
+def test_runner_failure_records_unavailable_engine_lookup(monkeypatch):
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+    execution = SimpleNamespace(
+        status="failed",
+        reason="primary_failure",
+        error_message="primary execution failure",
+        envelope_detail_unavailable="",
+        per_hour=(),
+        shadow_trace=(),
+        simulator=SimpleNamespace(atom_ledger=AtomLedger()),
+        refusal_diagnostic={},
+        backend_status="unavailable",
+        backend_authoritative=False,
+        reduced_real_cache={},
+        campaigns_elapsed=0.0,
+    )
+
+    def raise_engine_lookup(*_args, **_kwargs):
+        raise LookupError("engine registry unavailable")
+
+    monkeypatch.setattr(run, "_engines_used", raise_engine_lookup)
+
+    payload = run._minimal_failure_output(execution)
+
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "primary_failure"
+    assert payload["error_message"].startswith("primary execution failure")
+    assert payload["run_metadata"]["engines_used"] == {
+        "status": "unavailable",
+        "section": "run_metadata.engines_used",
+        "exception_type": "LookupError",
+        "reason": "engine registry unavailable",
+    }
+
+
 def test_runner_failure_preserves_primary_when_yield_disposition_serialization_raises(
     monkeypatch,
 ):

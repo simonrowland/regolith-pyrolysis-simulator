@@ -1889,14 +1889,10 @@ class PyrolysisRun:
         self,
         execution: RunExecution,
     ) -> dict[str, object]:
-        try:
-            return self._engines_used(execution.simulator)
-        except Exception:  # noqa: BLE001 -- failure envelopes must survive
-            return {
-                "active": {},
-                "requested": {k: v for k, v in self.engines.items()},
-                "registry": {},
-            }
+        return _safe_failure_value(
+            lambda: self._engines_used(execution.simulator),
+            section="run_metadata.engines_used",
+        )
 
     def _requests_o2_bubbler_runtime(self, sim: PyrolysisSimulator) -> bool:
         manager = getattr(sim, "campaign_mgr", None)
