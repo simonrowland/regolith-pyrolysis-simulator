@@ -31,6 +31,30 @@ SOURCE_COLUMNS = {
     6: (("Sr", 1, -2), ("O", 2, -2)),
     7: (("Sr", 1, -2), ("O", 2, -2)),
 }
+_PRESSURE_CAPTION = re.compile(
+    r"Table S(\d+)\. Partial pressures of gaseous species over ([A-Za-z0-9]+) \(s\)\."
+)
+
+
+def _caption_solids(document: ET.Element) -> dict[str, str]:
+    """Bare solid printed in each S2–S7 caption, keyed by table label."""
+
+    body = document.find("w:body", NS)
+    assert body is not None
+    solids: dict[str, str] = {}
+    for child in body:
+        if child.tag != f"{{{NS['w']}}}p":
+            continue
+        text = " ".join(
+            "".join(node.text or "" for node in child.findall(".//w:t", NS)).split()
+        )
+        match = _PRESSURE_CAPTION.fullmatch(text)
+        if match is None:
+            continue
+        table = f"S{match.group(1)}"
+        assert table not in solids, table
+        solids[table] = match.group(2)
+    return solids
 
 
 def test_all_printed_pressure_cells_migrate_from_the_docx_source() -> None:
@@ -40,6 +64,15 @@ def test_all_printed_pressure_cells_migrate_from_the_docx_source() -> None:
     with zipfile.ZipFile(DOCX) as archive:
         document = ET.fromstring(archive.read("word/document.xml"))
     tables = document.findall(".//w:tbl", NS)
+    caption_solids = _caption_solids(document)
+    assert caption_solids == {
+        "S2": "SrO",
+        "S3": "Sr4Al2O7",
+        "S4": "Sr3Al2O6",
+        "S5": "SrAl2O4",
+        "S6": "SrAl4O7",
+        "S7": "SrAl12O19",
+    }
 
     source_points: Counter[tuple[str, Decimal, Decimal]] = Counter()
     table_rows = {}
@@ -79,6 +112,13 @@ def test_all_printed_pressure_cells_migrate_from_the_docx_source() -> None:
             if observation["values"].get("quantity") != "partial_pressure":
                 continue
             assert observation["values"]["gas_species"] == formula
+            assert observation["phase"] == "gas"
+            table = observation["locator"]["table"]
+            assert observation["condensed_formula"] == caption_solids[table]
+            form = observation["condensed_form"]
+            assert isinstance(form, str) and re.search(
+                r"\b(?:solid|crystal)\b", form, re.IGNORECASE
+            )
             for point in observation["values"]["points"]:
                 extract_points[
                     (
@@ -94,6 +134,7 @@ def test_all_printed_pressure_cells_migrate_from_the_docx_source() -> None:
     result = migrator.result
     assert not result.validation.hard_issues
     migrated_points = Counter()
+    reservoirs: Counter[tuple[str, str]] = Counter()
     for observation in result.observations.values():
         if observation.source_id != SID:
             continue
@@ -101,6 +142,19 @@ def test_all_printed_pressure_cells_migrate_from_the_docx_source() -> None:
         assert observation.value.kind is ValueKind.POINT
         assert observation.identity.species.phase.value is Phase.G
         assert observation.identity.temperature_K.is_value
+        table = observation.locator.table
+        assert isinstance(table, str)
+        reservoir = observation.identity.reservoir
+        assert reservoir is not None and reservoir.is_value, observation.observation_id
+        solid = reservoir.value
+        assert solid.formula == caption_solids[table], (
+            observation.observation_id,
+            table,
+            solid.formula,
+            caption_solids[table],
+        )
+        assert solid.phase.is_value and solid.phase.value is Phase.CR
+        reservoirs[(table, solid.formula)] += 1
         migrated_points[
             (
                 observation.identity.species.formula,
@@ -109,3 +163,5 @@ def test_all_printed_pressure_cells_migrate_from_the_docx_source() -> None:
             )
         ] += 1
     assert migrated_points == source_points
+    assert sum(reservoirs.values()) == 213
+    assert set(reservoirs) == set(caption_solids.items())
