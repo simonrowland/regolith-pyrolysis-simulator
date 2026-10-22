@@ -7,8 +7,8 @@ source:
   year: 1998
 extraction:
   method: MinerU table drafts transcribed as context because no existing token represents vanadium valence ratios
-    or average valency; all five target tables were checked against 600 dpi page renders. Relevant figures are listed
-    for deferred digitisation only.
+    or average valency; the five triage tables and four ruled-in redox appendices were checked against 600 dpi page
+    renders. Relevant figures are listed for deferred digitisation only.
   date: '2026-10-22'
   worker: fam41-1022
   provenance_path: extracts/farah-1998-vanadium-silicate-melts-thesis.yaml
@@ -340,6 +340,555 @@ species:
           stacked_values: Where two values are printed vertically in one cell, both remain in that cell as an ordered
             list; the table does not label them as separate conditions.
       units: pO2 is atm; average valency is dimensionless; sample temperatures are part of the column headings.
+    - observation_id: farah_1998_appendix_ix_melts_redox_page_225
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 248
+        page: 249
+        published_page: 225
+        table: Appendix IX
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: &vanadium_appendix_candidates
+        - fe3_fe2_ratio
+        - ion_intensity_ratio
+        - equilibrium_phase_composition
+        reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and ratios. The ratio
+          token is Fe-specific; ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no
+          oxidation-state identity axis and would collapse the separate V3+, V4+ and V5+ amounts under species V.
+        printed_data:
+          columns:
+          - melt
+          - temperature_C
+          - pO2_atm
+          - V3+_wt_percent
+          - V4+_wt_percent
+          - V5+_wt_percent
+          - log10_V4_over_V5_mean
+          - log10_V3_over_V4_mean
+          blocks:
+          - melt: A
+            temperature_C: '1125'
+            pO2_atm: '10^-2'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.095', '0.06', '0.06']
+              V5+_wt_percent: ['1.56', '1.47', '1.469']
+              log10_V4_over_V5_mean: ['-1.325']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1125'
+            pO2_atm: '10^-4'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.161', '0.161', '0.178']
+              V5+_wt_percent: ['1.476', '1.370', '1.371']
+              log10_V4_over_V5_mean: ['-0.927']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1125'
+            pO2_atm: '10^-6'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.116', '0.27', '0.27']
+              V5+_wt_percent: ['1.382', '1.260', '1.261']
+              log10_V4_over_V5_mean: ['-0.768']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1125'
+            pO2_atm: '10^-8'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.178', '0.45', '0.45']
+              V5+_wt_percent: ['1.370', '1.080', '1.081']
+              log10_V4_over_V5_mean: ['-0.494']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1125'
+            pO2_atm: '10^-10'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.41', '0.70', '0.70']
+              V5+_wt_percent: ['1.07', '0.830', '1.07']
+              log10_V4_over_V5_mean: ['-0.272']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1125'
+            pO2_atm: '10^-12'
+            cell_values:
+              V3+_wt_percent: ['0.177', '0.06', '0.06']
+              V4+_wt_percent: ['0.518', '0.80', '0.80']
+              V5+_wt_percent: ['0.835', '0.72', '0.719']
+              log10_V4_over_V5_mean: ['-0.023']
+              log10_V3_over_V4_mean: ['-0.775']
+          - melt: A
+            temperature_C: '1125'
+            pO2_atm: '10^-14'
+            cell_values:
+              V3+_wt_percent: ['0.578', '0.880', '0.879']
+              V4+_wt_percent: ['0.952', '0.650', '0.651']
+              V5+_wt_percent: ['-']
+              log10_V4_over_V5_mean: ['-']
+              log10_V3_over_V4_mean: ['0.043']
+          - melt: A
+            temperature_C: '1225'
+            pO2_atm: '10^-2'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.60', '0.90', '0.91']
+              V5+_wt_percent: ['1.51', '1.45', '1.45']
+              log10_V4_over_V5_mean: ['-1.263']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1225'
+            pO2_atm: '10^-4'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.169', '0.210', '0.322']
+              V5+_wt_percent: ['1.431', '1.33', '1.218']
+              log10_V4_over_V5_mean: ['-0.744']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1225'
+            pO2_atm: '10^-6'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.168', '0.370', '0.37']
+              V5+_wt_percent: ['1.392', '1.17', '1.19']
+              log10_V4_over_V5_mean: ['-0.600']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1225'
+            pO2_atm: '10^-8'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.356', '0.510', '0.510']
+              V5+_wt_percent: ['1.184', '1.03', '1.03']
+              log10_V4_over_V5_mean: ['-0.366']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1225'
+            pO2_atm: '10^-10'
+            cell_values:
+              V3+_wt_percent: ['0.263', '0.175', '0.263']
+              V4+_wt_percent: ['0.623', '0.800', '0.623']
+              V5+_wt_percent: ['0.624', '0.565', '0.623']
+              log10_V4_over_V5_mean: ['0.056']
+              log10_V3_over_V4_mean: ['-0.450']
+          - melt: A
+            temperature_C: '1225'
+            pO2_atm: '10^-12'
+            cell_values:
+              V3+_wt_percent: ['0.983', '0.860', '0.86']
+              V4+_wt_percent: ['0.398', '0.680', '0.680']
+              V5+_wt_percent: ['-']
+              log10_V4_over_V5_mean: ['-']
+              log10_V3_over_V4_mean: ['0.222']
+          note: Each list preserves the vertically ordered printed entries inside the corresponding table cell. A singleton
+            dash in a merged cell is recorded once. Dashes are not zero and blank cells are not repeated values.
+        printed_condition: pO2 values are printed as powers of ten in atm; no logarithm or bar conversion is applied.
+      units: V3+, V4+ and V5+ columns are wt%; log ratios are base 10 and dimensionless; temperature is °C; pO2 is atm.
+    - observation_id: farah_1998_appendix_ix_melts_redox_page_226
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 249
+        page: 250
+        published_page: 226
+        table: Appendix IX continued
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: *vanadium_appendix_candidates
+        reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and ratios. The ratio
+          token is Fe-specific; ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no
+          oxidation-state identity axis and would collapse the separate V3+, V4+ and V5+ amounts under species V.
+        printed_data:
+          columns:
+          - melt
+          - temperature_C
+          - pO2_atm
+          - V3+_wt_percent
+          - V4+_wt_percent
+          - V5+_wt_percent
+          - log10_V4_over_V5_mean
+          - log10_V3_over_V4_mean
+          blocks:
+          - melt: A
+            temperature_C: '1225'
+            pO2_atm: '10^-14'
+            cell_values:
+              V3+_wt_percent: ['0.105', '0.910', '0.9']
+              V4+_wt_percent: ['0.402', '0.630', '0.630']
+              V5+_wt_percent: ['-']
+              log10_V4_over_V5_mean: ['-']
+              log10_V3_over_V4_mean: ['0.263']
+          - melt: A
+            temperature_C: '1325'
+            pO2_atm: '10^-2'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.140']
+              V5+_wt_percent: ['1.39']
+              log10_V4_over_V5_mean: ['-0.997']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1325'
+            pO2_atm: '10^-4'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.438', '0.310']
+              V5+_wt_percent: ['1.092', '1.22']
+              log10_V4_over_V5_mean: ['-0.397', '-0.595']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1325'
+            pO2_atm: '10^-6'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.600']
+              V5+_wt_percent: ['0.93']
+              log10_V4_over_V5_mean: ['-0.190']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1325'
+            pO2_atm: '10^-8'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.900']
+              V5+_wt_percent: ['0.63']
+              log10_V4_over_V5_mean: ['0.155']
+              log10_V3_over_V4_mean: ['-']
+          - melt: A
+            temperature_C: '1325'
+            pO2_atm: '10^-10'
+            cell_values:
+              V3+_wt_percent: ['0.325', '0.447']
+              V4+_wt_percent: ['0.980', '0.735']
+              V5+_wt_percent: ['0.226', '0.348']
+              log10_V4_over_V5_mean: ['0.638', '0.325']
+              log10_V3_over_V4_mean: ['-0.480', '-0.216']
+          - melt: A
+            temperature_C: '1325'
+            pO2_atm: '10^-12'
+            cell_values:
+              V3+_wt_percent: ['0.788', '0.55']
+              V4+_wt_percent: ['0.741', '0.98']
+              V5+_wt_percent: ['-']
+              log10_V4_over_V5_mean: ['-']
+              log10_V3_over_V4_mean: ['0.027', '-0.251']
+          - melt: A
+            temperature_C: '1325'
+            pO2_atm: '10^-14'
+            cell_values:
+              V3+_wt_percent: ['1.013']
+              V4+_wt_percent: ['0.517']
+              V5+_wt_percent: ['-']
+              log10_V4_over_V5_mean: ['-']
+              log10_V3_over_V4_mean: ['0.292']
+          - melt: B
+            temperature_C: '1225'
+            pO2_atm: '10^-2'
+            cell_values:
+              V3+_wt_percent: ['-', '-']
+              V4+_wt_percent: ['0.23', '0.14']
+              V5+_wt_percent: ['7.17', '7.06']
+              log10_V4_over_V5_mean: ['-1.494', '-1.5']
+              log10_V3_over_V4_mean: ['-', '-']
+          - melt: B
+            temperature_C: '1225'
+            pO2_atm: '10^-4'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.40']
+              V5+_wt_percent: ['7.0']
+              log10_V4_over_V5_mean: ['-1.243']
+              log10_V3_over_V4_mean: ['-']
+          - melt: B
+            temperature_C: '1225'
+            pO2_atm: '10^-6'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.88']
+              V5+_wt_percent: ['6.52']
+              log10_V4_over_V5_mean: ['-0.870']
+              log10_V3_over_V4_mean: ['-']
+          - melt: B
+            temperature_C: '1225'
+            pO2_atm: '10^-8'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['2.50']
+              V5+_wt_percent: ['4.9']
+              log10_V4_over_V5_mean: ['-0.292']
+              log10_V3_over_V4_mean: ['-']
+          - melt: B
+            temperature_C: '1225'
+            pO2_atm: '10^-10'
+            cell_values:
+              V3+_wt_percent: ['-', '-']
+              V4+_wt_percent: ['5.90', '3.2']
+              V5+_wt_percent: ['1.5', '4.0']
+              log10_V4_over_V5_mean: ['0.594', '-0.096']
+              log10_V3_over_V4_mean: ['-', '-']
+          - melt: B
+            temperature_C: '1225'
+            pO2_atm: '10^-12'
+            cell_values:
+              V3+_wt_percent: ['1.595']
+              V4+_wt_percent: ['4.30']
+              V5+_wt_percent: ['1.505']
+              log10_V4_over_V5_mean: ['0.456']
+              log10_V3_over_V4_mean: ['-0.431']
+          - melt: C
+            temperature_C: not_printed
+            pO2_atm: '10^-2'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.010']
+              V5+_wt_percent: ['6.99']
+              log10_V4_over_V5_mean: ['-2.844']
+              log10_V3_over_V4_mean: ['-']
+          - melt: C
+            temperature_C: not_printed
+            pO2_atm: '10^-4'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.015']
+              V5+_wt_percent: ['6.985']
+              log10_V4_over_V5_mean: ['-2.668']
+              log10_V3_over_V4_mean: ['-']
+          - melt: C
+            temperature_C: not_printed
+            pO2_atm: '10^-6'
+            cell_values:
+              V3+_wt_percent: ['-', '-']
+              V4+_wt_percent: ['0.05', '0.10']
+              V5+_wt_percent: ['6.95', '6.87']
+              log10_V4_over_V5_mean: ['-2.143', '-1.829']
+              log10_V3_over_V4_mean: ['-', '-']
+          - melt: C
+            temperature_C: not_printed
+            pO2_atm: '10^-8'
+            cell_values:
+              V3+_wt_percent: ['-', '-']
+              V4+_wt_percent: ['0.100', '0.071']
+              V5+_wt_percent: ['6.9', '6.89']
+              log10_V4_over_V5_mean: ['-1.839', '-1.989']
+              log10_V3_over_V4_mean: ['-', '-']
+          - melt: C
+            temperature_C: not_printed
+            pO2_atm: '10^-10'
+            cell_values:
+              V3+_wt_percent: ['-', '-']
+              V4+_wt_percent: ['0.70', '0.378']
+              V5+_wt_percent: ['6.3', '6.58']
+              log10_V4_over_V5_mean: ['-0.954', '-1.241']
+              log10_V3_over_V4_mean: ['-', '-']
+          - melt: C
+            temperature_C: not_printed
+            pO2_atm: '10^-12'
+            cell_values:
+              V3+_wt_percent: ['-', '-']
+              V4+_wt_percent: ['1.75', '1.879']
+              V5+_wt_percent: ['5.25', '5.06']
+              log10_V4_over_V5_mean: ['-0.477', '-0.430']
+              log10_V3_over_V4_mean: ['-', '-']
+          - melt: D
+            temperature_C: not_printed
+            pO2_atm: '10^-2'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.595']
+              V5+_wt_percent: ['13.21']
+              log10_V4_over_V5_mean: ['-1.346']
+              log10_V3_over_V4_mean: ['-']
+          - melt: D
+            temperature_C: not_printed
+            pO2_atm: '10^-4'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['0.960']
+              V5+_wt_percent: ['12.84']
+              log10_V4_over_V5_mean: ['-1.126']
+              log10_V3_over_V4_mean: ['-']
+          - melt: D
+            temperature_C: not_printed
+            pO2_atm: '10^-6'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['2.060']
+              V5+_wt_percent: ['11.74']
+              log10_V4_over_V5_mean: ['-0.756']
+              log10_V3_over_V4_mean: ['-']
+          - melt: D
+            temperature_C: not_printed
+            pO2_atm: '10^-8'
+            cell_values:
+              V3+_wt_percent: ['-']
+              V4+_wt_percent: ['4.420']
+              V5+_wt_percent: ['9.38']
+              log10_V4_over_V5_mean: ['-0.327']
+              log10_V3_over_V4_mean: ['-']
+          - melt: D
+            temperature_C: not_printed
+            pO2_atm: '10^-10'
+            cell_values:
+              V3+_wt_percent: ['2.81']
+              V4+_wt_percent: ['8.18']
+              V5+_wt_percent: ['2.81']
+              log10_V4_over_V5_mean: ['0.464']
+              log10_V3_over_V4_mean: ['-0.464']
+          note: The data continue from physical page 249. Cell value lists preserve the displayed vertical order;
+            empty table cells remain unreported. Temperature is printed only for melt A and melt B on this page.
+        printed_condition: Melt B is shown at 1225°C; oxygen pressures are printed in atm as powers of ten. Blank
+          temperature cells for melts C and D are left unassigned.
+      units: V3+, V4+ and V5+ columns are wt%; log ratios are base 10 and dimensionless; temperature is °C; pO2 is atm.
+    - observation_id: farah_1998_appendix_xx_slags_redox_page_233
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 256
+        page: 257
+        published_page: 233
+        table: Appendix XX
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: *vanadium_appendix_candidates
+        reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and ratios. The ratio
+          token is Fe-specific; ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no
+          oxidation-state identity axis and would collapse the separate V3+, V4+ and V5+ amounts under species V.
+        printed_data:
+          columns: [slag, pO2_atm, V3+_wt_percent, V4+_wt_percent, V5+_wt_percent, log10_V4_over_V5, log10_V3_over_V4]
+          rows:
+          - ['F', '10^-2', '-', '3.45', '4.51', '-0.116', '-']
+          - ['F', '10^-4', '1.23', '5.5', '1.23', '0.651', '-0.651']
+          - ['F', '10^-6', '2.76', '5.2', '-', '-', '-0.275']
+          - ['F', '10^-8', '5.86', '2.1', '-', '-', '0.446']
+          - ['F', '10^-9', '6.76', '1.2', '-', '-', '0.751']
+          - ['G', '10^-2', '-', '2.9', '5.06', '-0.242', '-']
+          - ['G', '10^-4', '1.0', '5.0', '1.96', '0.407', '-0.699']
+          - ['G', '10^-6', '1.63', '4.7', '1.63', '0.459', '-0.459']
+          - ['G', '10^-8', '4.96', '3.0', '-', '-', '0.218']
+          - ['G', '10^-9', '5.96', '2.0', '-', '-', '0.474']
+          - ['J', '10^-2', '-', '2.5', '2.487', '0.002', '-']
+          - ['J', '10^-4', '-', '3.0', '1.987', '0.179', '-']
+          - ['J', '10^-6', '0.80', '3.3', '0.887', '0.571', '-0.615']
+          - ['J', '10^-8', '2.087', '2.9', '-', '', '-0.143']
+          - ['J', '10^-9', '2.987', '2.0', '-', '', '0.174']
+          - ['K', '10^-2', '-', '2.8', '6.95', '-0.95', '-']
+          - ['K', '10^-4', '0.75', '6.0', '3.0', '0.301', '-0.903']
+          - ['K', '10^-6', '1.75', '5.6', '2.45', '0.359', '-0.518']
+          - ['K', '10^-8', '5.85', '3.9', '-', '-', '0.176']
+          - ['K', '10^-9', '6.55', '3.2', '-', '-', '0.311']
+          - ['L', '10^-2', '-', '2.5', '5.63', '-0.353', '-']
+          - ['L', '10^-4', '0.95', '5.1', '2.08', '0.389', '-0.729']
+          - ['L', '10^-6', '1.6', '4.8', '1.73', '0.443', '-0.477']
+          - ['L', '10^-8', '5.23', '2.9', '-', '-', '0.256']
+          - ['L', '10^-9', '6.23', '1.9', '-', '-', '0.516']
+          - ['M', '10^-2', '-', '2.8', '4.88', '-0.241', '-']
+          - ['M', '10^-4', '0.85', '4.3', '2.53', '0.230', '-0.704']
+          - ['M', '10^-6', '1.955', '3.77', '1.955', '0.285', '-0.285']
+          - ['M', '10^-8', '5.18', '2.5', '-', '-', '0.316']
+          - ['M', '10^-9', '6.18', '1.5', '-', '-', '0.615']
+          - ['N', '10^-2', '-', '1.2', '8.55', '-0.853', '-']
+          - ['N', '10^-4', '-', '3.0', '6.75', '-0.352', '-']
+          - ['N', '10^-6', '-', '4.3', '5.45', '-0.103', '-']
+          - ['N', '10^-8', '5.75', '4.0', '-', '-', '0.158']
+          - ['N', '10^-9', '5.75', '4.0', '-', '-', '0.158']
+          note: Empty cells in the printed ratio columns for melt J are preserved as empty strings; printed dashes are
+            unreported values and are not converted to zero.
+        printed_condition: Redox data are for slags F-O at 1600°C; the table gives pO2 in atm as powers of ten.
+      units: V3+, V4+ and V5+ columns are wt%; log ratios are base 10 and dimensionless; pO2 is atm.
+    - observation_id: farah_1998_appendix_xx_slags_redox_page_234
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 257
+        page: 258
+        published_page: 234
+        table: Appendix XX continued
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: *vanadium_appendix_candidates
+        reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and ratios. The ratio
+          token is Fe-specific; ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no
+          oxidation-state identity axis and would collapse the separate V3+, V4+ and V5+ amounts under species V.
+        printed_data:
+          columns: [slag, pO2_atm, V3+_wt_percent, V4+_wt_percent, V5+_wt_percent, log10_V4_over_V5, log10_V3_over_V4]
+          rows:
+          - ['O', '10^-2', '-', '0.79', '7.34', '-0.968', '-']
+          - ['O', '10^-4', '-', '2.09', '6.04', '-0.461', '-']
+          - ['O', '10^-6', '-', '3.2', '4.93', '-0.188', '-']
+          - ['O', '10^-8', '5.13', '3.0', '-', '-', '0.233']
+          - ['O', '10^-9', '5.13', '3.0', '-', '-', '0.233']
+          note: These rows continue Appendix XX from physical page 257. Dashes are unreported, not zero.
+        printed_condition: Slag O at 1600°C; pO2 values are printed in atm as powers of ten.
+      units: V3+, V4+ and V5+ columns are wt%; log ratios are base 10 and dimensionless; pO2 is atm.
+    - observation_id: farah_1998_appendix_xxi_na2o_2sio2_v2o5_redox
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 257
+        page: 258
+        published_page: 234
+        table: Appendix XXI
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: *vanadium_appendix_candidates
+        reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and their log ratio.
+          The ratio token is Fe-specific; ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has
+          no oxidation-state identity axis and would collapse V4+ and V5+ under species V. Equilibrium time is a
+          printed condition but is not a stored redox quantity.
+        printed_data:
+          composition: Na2O-2SiO2-V2O5
+          pO2_atm: '10^-2'
+          columns: [temperature_C, equilibrium_time_h, V4+_wt_percent, V5+_wt_percent, log10_V5_over_V4]
+          rows:
+          - ['1125', '2', '0.005', '1.525', '2.50']
+          - ['1125', '4', '0.04', '1.49', '1.60']
+          - ['1125', '6', '0.07', '1.46', '1.30']
+          - ['1125', '8', '0.07', '1.46', '1.30']
+          - ['1125', '10', '0.10', '1.43', '1.15']
+          - ['1125', '12', '0.15', '1.38', '1.15']
+          - ['1125', '14', '0.11', '1.42', '1.10']
+          - ['1125', '16', '0.17', '1.36', '0.90']
+          - ['1225', '2', '0.002', '1.528', '2.90']
+          - ['1225', '4', '0.073', '1.457', '1.30']
+          - ['1225', '6', '0.09', '1.44', '1.20']
+          - ['1225', '8', '0.10', '1.43', '1.15']
+          - ['1225', '10', '0.10', '1.43', '1.15']
+          - ['1225', '12', '0.11', '1.42', '1.10']
+          - ['1225', '14', '0.11', '1.42', '1.10']
+          - ['1225', '16', '0.11', '1.42', '1.10']
+      units: V4+ and V5+ columns are wt%; log(V5+/V4+) is base 10 and dimensionless; equilibrium time is hours;
+        temperature is °C; pO2 is atm.
+    - observation_id: farah_1998_appendix_xxii_slags_g_o_redox
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 258
+        page: 259
+        published_page: 235
+        table: Appendix XXII
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: *vanadium_appendix_candidates
+        reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and their ratio. The
+          ratio token is Fe-specific; ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no
+          oxidation-state identity axis and would collapse V4+ and V5+ under species V. Equilibrium time is a printed
+          condition but is not a stored redox quantity.
+        printed_data:
+          printed_condition: 1600°C and pO2 = 10^-2 atm
+          columns: [slag, equilibrium_time_h, V4+_wt_percent, V5+_wt_percent, V4_over_V5]
+          rows:
+          - ['G', '1', '2.54', '5.42', '0.468']
+          - ['G', '2', '2.25', '5.71', '0.393']
+          - ['G', '3.5', '2.12', '5.84', '0.363']
+          - ['G', '4', '2.17', '5.79', '0.376']
+          - ['G', '5', '2.02', '5.94', '0.341']
+          - ['G', '6', '2.13', '5.83', '0.366']
+          - ['O', '1', '7.99', '7.333', '0.109']
+          - ['O', '2', '7.37', '7.393', '0.099']
+          - ['O', '3.2', '7.35', '7.395', '0.09']
+          - ['O', '4', '6.89', '7.440', '0.093']
+          - ['O', '5', '7.36', '7.394', '0.09']
+      units: V4+ and V5+ columns are wt%; ratios are dimensionless; equilibrium time is hours; temperature is °C;
+        pO2 is atm.
     - observation_id: farah_1998_table_7_1_slag_redox_ratios
       type: measured_table_no_token
       locator:
