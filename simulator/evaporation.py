@@ -3524,13 +3524,6 @@ class EvaporationMixin:
                     else 'evaporation'
                 )
             )
-            effective_pressure_species_ids = effective_pressure_source.species_ids
-            if campaign_name == 'C0B':
-                effective_pressure_species_ids = frozenset(
-                    species_id
-                    for species_id in effective_pressure_species_ids
-                    if species_id in {'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'}
-                )
             batch = builder(
                 temperature_K=float(temperature_K),
                 process_phase='hot_train',
@@ -3592,7 +3585,7 @@ class EvaporationMixin:
                 ),
                 flux_activation_context=FluxActivationContext(
                     epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
-                    effective_pressure_species_ids=effective_pressure_species_ids,
+                    effective_pressure_species_ids=effective_pressure_source.species_ids,
                 ),
             )
         except Exception as exc:  # noqa: BLE001 — typed failure, not live fallback

@@ -732,9 +732,6 @@ def test_stage0_p_markers_activate_only_p2o5_sourced_rules() -> None:
                     "NaCl",
                     "NaCl",
                     {"Na", "Cl"},
-                    predicate=(
-                        "applicable" if stage == "c0b_p_cleanup" else "stage0_only"
-                    ),
                 ),
             ),
             ledger_snapshot={"process.cleaned_melt": {"NaCl": 1.0}},

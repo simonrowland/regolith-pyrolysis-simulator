@@ -931,11 +931,6 @@ def _predicate_active(
 
     predicate = rule.applicability_predicate
     stage = (state.stage if state else None) or ""
-    if stage == "c0b_p_cleanup" and "P2O5" not in rule.parent_species_ids:
-        return (
-            False,
-            "c0b_p_cleanup admits only P2O5-sourced carrier rules",
-        )
     active, detail = applicability_verdict(
         predicate,
         process_phase=(state.process_phase if state else None),
@@ -960,15 +955,11 @@ def _applicability_evidence(
     active, detail = _predicate_active(rule, state)
     phase = state.process_phase if state else None
     stage = state.stage if state else None
-    if (
-        rule.applicability_predicate not in {"stage0_only", "not_applicable", "inapplicable"}
-        and not (stage == "c0b_p_cleanup" and "P2O5" not in rule.parent_species_ids)
-    ):
+    if rule.applicability_predicate not in {"stage0_only", "not_applicable", "inapplicable"}:
         return {}
     determined = (
         rule.applicability_predicate in {"not_applicable", "inapplicable"}
         or (rule.applicability_predicate == "stage0_only" and bool(phase or stage))
-        or (stage == "c0b_p_cleanup" and "P2O5" not in rule.parent_species_ids)
     )
     return {
         "predicate": rule.applicability_predicate,

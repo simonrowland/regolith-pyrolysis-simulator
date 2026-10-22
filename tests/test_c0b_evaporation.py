@@ -7,7 +7,6 @@ from simulator.runner import PyrolysisRun
 from simulator.state import CampaignPhase
 
 
-@pytest.mark.xfail(strict=True, reason="b-1025: C0B admits only P carriers")
 def test_c0b_hour_uses_general_evaporation_owner(monkeypatch):
     owner = PyrolysisSimulator._calculate_evaporation
     comparisons = []
