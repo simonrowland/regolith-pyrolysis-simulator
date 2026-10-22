@@ -16,6 +16,7 @@ from simulator.fe_redox import (
     feo_iw_log10_fO2_bar,
     kress91_fe3_over_sigma_fe,
     kress91_ferrous_feo_activity,
+    kress91_log10_fO2_from_fe3_over_sigma_fe,
     kress91_ln_fO2_temperature_delta,
     kress91_referenced_log_fO2,
     kress91_split,
@@ -111,6 +112,50 @@ def test_kress91_shared_function_matches_inline_formula_pins(
     ) == pytest.approx(expected_fe3, rel=0, abs=1.0e-15)
     assert split['fe3'] == pytest.approx(expected_fe3, rel=0, abs=1.0e-15)
     assert split['ratio'] == pytest.approx(expected_ratio, rel=0, abs=1.0e-15)
+
+
+def test_kress91_inverse_recovers_the_pinned_forward_log() -> None:
+    """The inverse is the forward relation run backwards.
+
+    The expected log is the independent input of the pinned forward case,
+    not a second copy of the inverse algebra.
+    """
+
+    fO2_log = -9.0
+    T_K = 1843.15
+    pressure_bar = 1.0e-6
+    fe3 = kress91_fe3_over_sigma_fe(
+        fO2_log=fO2_log,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    recovered = kress91_log10_fO2_from_fe3_over_sigma_fe(
+        fe3_over_sigma_fe=fe3,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    assert recovered == pytest.approx(fO2_log, abs=1.0e-9)
+    assert kress91_fe3_over_sigma_fe(
+        fO2_log=recovered,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    ) == pytest.approx(fe3, rel=0, abs=1.0e-12)
+
+
+@pytest.mark.parametrize("fraction", [0.0, 1.0])
+def test_kress91_inverse_refuses_a_fraction_with_no_finite_fugacity(
+    fraction: float,
+) -> None:
+    with pytest.raises(Kress91InvalidControls):
+        kress91_log10_fO2_from_fe3_over_sigma_fe(
+            fe3_over_sigma_fe=fraction,
+            mol_fractions=KRESS91_MOL_FRACTIONS,
+            T_K=1843.15,
+            pressure_bar=1.0e-6,
+        )
 
 
 def test_kress91_valid_finite_controls_stay_exactly_golden_neutral() -> None:

@@ -6,6 +6,7 @@ import csv
 import hashlib
 import itertools
 import json
+import math
 import os
 import re
 import subprocess
@@ -1511,6 +1512,7 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
     tmp_path: Path,
 ) -> None:
     from simulator.battery.migrate import wt_pct_to_mole_fraction
+    from simulator.battery.fo2_ladder import resolve_row_fo2
 
     result = _migrate_real_extract(tmp_path, "kems-020-hastie-1981-nbsir.yaml")
     expected_wt_pct = {
@@ -1633,17 +1635,45 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
     moved_composition = moved_observation.identity.composition
     assert moved_composition is not None and moved_composition.is_value
     assert moved_composition.value.proxy_flag == "initial_charge_only"
+    moved_experiment = result.experiments[moved_observation.experiment_id]
+    moved_fo2 = resolve_row_fo2(
+        moved_experiment,
+        None,
+        moved_observation,
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+    )
+    assert moved_fo2 is not None
+    assert moved_fo2.tier == 4
+    assert moved_fo2.route == "intrinsic_melt_fO2"
+    assert moved_fo2.borrowed is True
+    assert math.isfinite(moved_fo2.log10_fO2_bar)
     moved_prediction = predict_with_engine(
         Engine.OPENIMCC,
         moved_observation,
-        experiment=result.experiments[moved_observation.experiment_id],
+        experiment=moved_experiment,
     )
     assert moved_prediction.value is None
-    assert moved_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert moved_prediction.refusal_detail["reason"] == "missing_evidence"
-    (oxygen_gap,) = moved_prediction.refusal_detail["gaps"]
-    assert oxygen_gap["waypoint"] == "oxygen_condition"
-    assert "fO2_log" in oxygen_gap["missing"]
+    # d-180 supplies numeric intrinsic fO2 for this open TMS row. It now
+    # reaches OpenIMCC, whose terminal refusal is its unsupported K2O output.
+    assert moved_prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert moved_prediction.refusal_detail["reason"] == "outside_supported_species"
+    assert any(
+        notice.reason.startswith("fo2_tier=4; route=intrinsic_melt_fO2")
+        and notice.authority is not None
+        for notice in moved_prediction.notices
+    )
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    moved_request = activity_request_for_engine(
+        moved_experiment, moved_observation, "openimcc"
+    )
+    assert moved_request is not None
+    assert moved_request.payload is not None
+    assert moved_request.payload["fO2_borrowed"] is True
+    assert any(
+        flag["waypoint"] == "fo2_ladder" and flag["authority"] == "assumed"
+        for flag in moved_request.readiness.flags
+    )
 
     na_kms = next(
         row

@@ -40,6 +40,7 @@ from simulator.battery.enums import (
     ExecutionState,
     ExperimentKind,
     FO2Channel,
+    Fo2Mode,
     MethodToken,
     MetricOperation,
     NoticeKind,
@@ -515,6 +516,7 @@ class Notice:
     dropped_mass_fraction: Decimal | None = None
     authority: Authority | None = None
     certification: str | None = None
+    fo2_mode: Fo2Mode | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -1336,6 +1338,7 @@ class Residual:
     numeric: ResidualNumeric | None = None
     refusal: ResidualRefusal | None = None
     quench_state: QuenchState | None = None
+    fo2_mode: Fo2Mode | None = None
 
     def __post_init__(self) -> None:
         if not self.key:
@@ -1364,6 +1367,7 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.band,
                 notice.dropped,
                 notice.dropped_mass_fraction,
+                notice.fo2_mode,
             )
             if fingerprint in seen:
                 continue
