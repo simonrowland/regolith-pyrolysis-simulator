@@ -383,6 +383,17 @@ PHASE_MAP: dict[str, Phase] = {
     "(c)": Phase.CR,
 }
 
+# PHASE_MAP keys that name the condensed sample a vapour was measured over.
+# They are not the vapour species. Activity rows still take the mapped
+# condensed phase; a partial-pressure row does not.
+_SAMPLE_SOURCE_PHASE_LABELS = frozenset(
+    {
+        "basaltic_silicate_melt",
+        "silicate_melt_ferrobasalt_fcmas",
+        "cao-al2o3-sio2 liquid oxide melt",
+    }
+)
+
 
 def phase_for_sample_form(form: str | None) -> Phase | None:
     """Closed phase for a sample form token. Untyped prose is None.
@@ -4632,6 +4643,14 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
         State.unknown(f"phase string {text!r} is not in the closed automatic map"),
         text,
     )
+
+
+def _printed_phase_names_sample_source(raw: object) -> bool:
+    """True when the printed phase names a condensed sample, not a species."""
+
+    if not isinstance(raw, str):
+        return False
+    return raw.strip().lower() in _SAMPLE_SOURCE_PHASE_LABELS
 
 
 # Scorer reads these tokens from an unknown phase reason or a notice band.
@@ -14048,6 +14067,7 @@ class Migrator:
         )
         phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
         phase_provenance: str | None = None
+        sample_source_provenance: str | None = None
         transition_reason = transition_phase_reason(obs_type, values)
         method_class = str(values.get("method_class") or "").strip().casefold()
         measured_tabulated_gas_formula = (
@@ -14108,6 +14128,21 @@ class Migrator:
                     )
             if not (phase.is_value and phase.value is Phase.G):
                 phase_provenance = None
+            if q_token is Quantity.P_PARTIAL and _printed_phase_names_sample_source(
+                phase_raw
+            ):
+                # The printed field is the condensed source the vapour was
+                # measured over. The partial-pressure species is the gas.
+                phase = State.of(Phase.G)
+                unmapped_phase = None
+                phase_provenance = (
+                    "species.phase=gas; printed phase "
+                    f"{phase_raw!r} names the condensed source, not the vapour species"
+                )
+                # Point rows keep their unit-conversion relation. This sentence
+                # is the one interpretation those points have to carry: the
+                # printed phase is the condensed source, not the vapour.
+                sample_source_provenance = phase_provenance
         phase_role_token: PhaseRole | None = None
         counter_phase_role_token: PhaseRole | None = None
         if q_token in PHASE_ROW_QUANTITIES:
@@ -15649,6 +15684,7 @@ class Migrator:
                         read_from=read_from,
                         derived_from=derived_from,
                         source_derivation=source_derivation,
+                        phase_provenance=sample_source_provenance,
                         notices=(
                             *(
                                 ()

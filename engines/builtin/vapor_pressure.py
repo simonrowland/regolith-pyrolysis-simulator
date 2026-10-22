@@ -2042,6 +2042,52 @@ def vapor_pressure_authority_diagnostic(
     }
 
 
+# Segment phase words that name the same reservoir phase. Any other
+# non-empty token, including condensed_liquid and ideal_gas, stays itself.
+# An empty phase is undeclared: callers must not invent one.
+_ANTOINE_PHASE_SYNONYMS = {
+    "crystal": "cr",
+    "cr": "cr",
+    "c": "cr",
+    "solid": "cr",
+    "s": "cr",
+    "crystalline": "cr",
+    "liquid": "l",
+    "l": "l",
+    "gas": "g",
+    "g": "g",
+}
+
+
+def declared_antoine_segment_phase(block: Mapping[str, Any] | None) -> str | None:
+    """Closed phase token declared by an Antoine segment, or None if absent."""
+
+    if not _is_mapping(block):
+        return None
+    raw = str(block.get("phase") or block.get("fit_source_phase") or "").strip().lower()
+    if not raw:
+        return None
+    return _ANTOINE_PHASE_SYNONYMS.get(raw, raw)
+
+
+def _phase_boundary_gap(
+    left: Mapping[str, Any], right: Mapping[str, Any]
+) -> dict[str, Any] | None:
+    """Refusal when the gap between two segments crosses a declared phase."""
+
+    left_phase = declared_antoine_segment_phase(left)
+    right_phase = declared_antoine_segment_phase(right)
+    if not left_phase or not right_phase or left_phase == right_phase:
+        return None
+    return {
+        "selection_refusal": "antoine-gap-crosses-phase-boundary",
+        "left_segment": str(left.get("name") or ""),
+        "right_segment": str(right.get("name") or ""),
+        "left_phase": left_phase,
+        "right_phase": right_phase,
+    }
+
+
 def _selected_temperature_segment(
     block: Mapping[str, Any],
     temperature_K: float | None,
@@ -2078,6 +2124,18 @@ def _selected_temperature_segment(
     ranged.sort(key=lambda item: item[0])
     if temperature_K < ranged[0][0]:
         return ranged[0][2]
+    if temperature_K > ranged[-1][1]:
+        return ranged[-1][2]
+    previous = ranged[0]
+    for low, _high, segment in ranged[1:]:
+        if temperature_K < low:
+            gap = _phase_boundary_gap(previous[2], segment)
+            if gap is not None:
+                return gap
+            # Same declared phase, or a flank with no phase: today's
+            # choice is the last segment, not a nearer edge.
+            return ranged[-1][2]
+        previous = (low, _high, segment)
     return ranged[-1][2]
 
 
@@ -2158,6 +2216,10 @@ def vapor_pressure_antoine_coefficients(
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
+            # A phase-boundary gap is not an unusable fit. Falling through
+            # to the legacy antoine block would reintroduce the other phase.
+            if selected.get("selection_refusal"):
+                return selected, COEFF_BLOCK_PURE_COMPONENT
             if not _pure_segment_usable(selected, temperature_K):
                 antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
                 if _is_mapping(antoine):
@@ -2224,6 +2286,10 @@ def wall_condensation_antoine_coefficients(
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
+            # Same guard as the runtime selector: do not replace a
+            # phase-boundary refusal with an empty block or another phase.
+            if selected.get("selection_refusal"):
+                return selected, COEFF_BLOCK_PURE_COMPONENT
             if _pure_segment_usable(selected, temperature_K):
                 return selected, COEFF_BLOCK_PURE_COMPONENT
             # A grounded pure-species wall answer exists but not at this

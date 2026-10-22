@@ -98,6 +98,18 @@ CODE_INPUTS = (
 #     and 4b5ec3f56 touch only residue.py and score.py scoring code after that
 #     merge. This acknowledges STORE outputs only; the scoring changes are
 #     covered by the commits' tests.
+#   3d438ccc2, d75e341ee, 39792163d, ac3ad1a43, dbc4906f3, a6e51654a, 2a5cb1e76,
+#     c02b1c0a6: the SC-365 compilation-tier sweep (t-1437, no d-id; notice-only
+#     per physics). Most change Ellingham and Antoine scoring in
+#     compilation_tier.py, score.py and engines/builtin/vapor_pressure.py.
+#     Three also touch MIGRATION inputs: a6e51654a changes migrate.py (the
+#     partial-pressure melt label), and dbc4906f3 and 2a5cb1e76 change the
+#     B1452 generator (usgs_b1452.py) and polymorph_dictionary.py, which
+#     migration uses. So the receipt is the regen, not the file list: a full
+#     regen at the line's tip (c02b1c0a6) and again at its merge with
+#     train/b150r (e7c4a4d08, studio-2) were both fixed points, with no store
+#     file changed. This acknowledges STORE outputs only; the scoring changes
+#     are covered by the commits' tests.
 #   037f97ff6, 5d46c88e1: d-216, source-oxygen scoring. They score Knudsen
 #     vapour rows at typed source oxygen conditions and keep typed reasons for
 #     closure fallbacks, in simulator/battery/source_oxygen.py and score.py.
@@ -236,6 +248,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "19f472447", "67678d3d4", "0c5b7486a",
     "f53dcec23", "826f5848e", "bff436549", "25796706a", "8adec237c", "9196346ee",
     "e7dfdd4fe", "8a53c7629", "fa97603c0", "085e5cbae", "ff8650f45", "b99e4c167", "2ad98d246", "42d10d20d", "d5aaf3e40", "081f50759", "4b5ec3f56",
+    "3d438ccc2", "d75e341ee", "39792163d", "ac3ad1a43", "dbc4906f3", "a6e51654a", "2a5cb1e76", "c02b1c0a6",
     "037f97ff6", "5d46c88e1",
     "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
     "80fad2bfa",

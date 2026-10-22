@@ -2377,6 +2377,242 @@ def test_static_equilibrium_pressure_uses_pure_sodium_total_surface(
     ) is extrapolated
 
 
+# Matching-basis pressures captured from predict_with_engine. The mismatched
+# reservoir and the Si phase-boundary gap are refused below.
+_ANTOINE_MATCHING_CASES = (
+    ("Si", Decimal("2000"), Phase.L, Decimal("4.410122194873473"), ()),
+    ("Si", Decimal("1000"), Phase.CR, Decimal("1.5560633803943994E-11"), ()),
+    ("Si", Decimal("1800"), Phase.L, Decimal("0.320744894252916"), ()),
+    ("Mn", Decimal("1400"), Phase.CR, Decimal("22.630450812668585"), ()),
+    ("Mn", Decimal("1519"), Phase.CR, Decimal("135.85703758590856"), ()),
+    (
+        "Na",
+        Decimal("1056"),
+        Phase.L,
+        Decimal("33991.26166001457"),
+        ("antoine-segment-phase-undeclared",),
+    ),
+    (
+        "Na",
+        Decimal("1200"),
+        Phase.L,
+        Decimal("117402.20851973725"),
+        (
+            "pure_component_antoine_extrapolated",
+            "antoine-segment-phase-undeclared",
+        ),
+    ),
+)
+
+
+def _static_psat(formula: str, temperature: Decimal, reservoir_phase: Phase):
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=temperature
+    )
+    identity = F.psat_identity(
+        formula, T_K=temperature, reservoir_phase=reservoir_phase
+    )
+    observation = F.observation(
+        f"static-{formula}-{temperature}-{reservoir_phase.value}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        source_id="antoine-pin",
+    )
+    return predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, observation, experiment=experiment
+    )
+
+
+def _assert_antoine_phase_refusal(
+    formula: str,
+    temperature: Decimal,
+    phase: Phase,
+    *,
+    reason: str,
+    observation_basis: str | None = None,
+    segment_basis: str | None = None,
+    left_basis: str | None = None,
+    right_basis: str | None = None,
+):
+    prediction = _static_psat(formula, temperature, phase)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert prediction.refusal_detail["reason"] == reason
+    if observation_basis is not None:
+        assert prediction.refusal_detail["observation_reservoir_basis"] == observation_basis
+        assert prediction.refusal_detail["segment_basis"] == segment_basis
+    if left_basis is not None:
+        assert prediction.refusal_detail["left_segment_basis"] == left_basis
+        assert prediction.refusal_detail["right_segment_basis"] == right_basis
+    return prediction
+
+
+def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_gaps() -> None:
+    for formula, temperature, phase, expected, notice_reasons in _ANTOINE_MATCHING_CASES:
+        prediction = _static_psat(formula, temperature, phase)
+        assert prediction.refusal_reason is None, (formula, temperature, phase)
+        assert prediction.value == expected
+        assert tuple(notice.reason for notice in prediction.notices) == notice_reasons
+
+    _assert_antoine_phase_refusal(
+        "Si",
+        Decimal("2000"),
+        Phase.CR,
+        reason="antoine-reservoir-phase-mismatch",
+        observation_basis="Si(cr)",
+        segment_basis="liquid_janaf(l)",
+    )
+    _assert_antoine_phase_refusal(
+        "Mn",
+        Decimal("1600"),
+        Phase.CR,
+        reason="antoine-reservoir-phase-mismatch",
+        observation_basis="Mn(cr)",
+        segment_basis="liquid_nist_janaf_chase_1998(l)",
+    )
+    _assert_antoine_phase_refusal(
+        "Mn",
+        Decimal("1519"),
+        Phase.L,
+        reason="antoine-reservoir-phase-mismatch",
+        observation_basis="Mn(l)",
+        segment_basis="solid_nist_janaf_chase_1998(cr)",
+    )
+    for phase in (Phase.CR, Phase.L):
+        _assert_antoine_phase_refusal(
+            "Si",
+            Decimal("1690"),
+            phase,
+            reason="antoine-gap-crosses-phase-boundary",
+            left_basis="crystal_janaf(cr)",
+            right_basis="liquid_janaf(l)",
+        )
+
+    from engines.builtin.vapor_pressure import (
+        vapor_pressure_antoine_coefficients,
+        wall_condensation_antoine_coefficients,
+    )
+    from simulator.battery.score import REPO_ROOT, load_yaml
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    silicon = vapor_pressure_legacy_view(
+        load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
+    )["metals"]["Si"]
+    for selector in (
+        wall_condensation_antoine_coefficients,
+        vapor_pressure_antoine_coefficients,
+    ):
+        selected, block = selector(silicon, 1690.0)
+        assert block == "pure_component_antoine"
+        assert selected["selection_refusal"] == "antoine-gap-crosses-phase-boundary"
+        assert "A" not in selected
+        crystal, _ = selector(silicon, 1500.0)
+        liquid, _ = selector(silicon, 1800.0)
+        assert crystal["name"] == "crystal_janaf"
+        assert liquid["name"] == "liquid_janaf"
+
+
+_GAS_MAP_PARTIAL_PA = Decimal("1234.5")
+
+
+def test_condensed_partial_pressure_is_not_read_from_the_gas_map(monkeypatch) -> None:
+    """A condensed P_PARTIAL identity is not a gas-map partial pressure.
+
+    Gas and an undeclared species phase still read gas_partial_pressures_Pa.
+    The condensed identity refuses before equilibrate_cell.
+    """
+
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("0.55")), ("Na2O", Decimal("0.45"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    base = F.activity_identity(
+        formula="Na2O",
+        component_basis="Na2O",
+        composition=composition,
+    )
+    calls = {"n": 0}
+
+    def fake_equilibrate(_handle, pot, *, temperature_K, po2, **_kwargs):
+        calls["n"] += 1
+        return EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=Engine.VAPOROCK.value,
+            temperature_K=temperature_K,
+            po2=po2,
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa={"H2O": 1234.5},
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    monkeypatch.setattr(battery, "equilibrate_cell", fake_equilibrate)
+    handle = EngineHandle(
+        name=Engine.VAPOROCK.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+
+    def predict(species: Species):
+        identity = replace(base, quantity=Quantity.P_PARTIAL, species=species)
+        observation = F.observation(
+            f"partial-{species.formula}-{calls['n']}",
+            "exp-1",
+            identity,
+            Decimal("0"),
+            source_id="partial-pin",
+        )
+        return predict_with_engine(
+            Engine.VAPOROCK,
+            observation,
+            handles={Engine.VAPOROCK.value: handle},
+            isolated=False,
+        )
+
+    def assert_condensed_refusal(species: Species, basis: str) -> None:
+        before = calls["n"]
+        refused = predict(species)
+        assert refused.value is None
+        assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+        assert refused.refusal_detail["reason"] == (
+            "partial-pressure-condensed-species-not-on-gas-map"
+        )
+        assert refused.refusal_detail["observation_basis"] == basis
+        assert refused.refusal_detail["map_basis"] == "gas_partial_pressures_Pa(g)"
+        assert calls["n"] == before
+
+    assert_condensed_refusal(
+        Species("H2O", Phase.CR, polymorph=State.of(Polymorph.CRYSTALLINE)),
+        "H2O(cr)",
+    )
+    assert_condensed_refusal(Species("H2O", Phase.GLASS), "H2O(glass)")
+    gas = predict(Species("H2O", Phase.G))
+    assert gas.refusal_reason is None
+    assert gas.value == _GAS_MAP_PARTIAL_PA
+    assert calls["n"] == 1
+    unknown = predict(Species("H2O", State.unknown("phase not printed")))
+    assert unknown.refusal_reason is None
+    assert unknown.value == _GAS_MAP_PARTIAL_PA
+    assert calls["n"] == 2
+
+
 def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -11500,6 +11736,26 @@ def test_inferred_cell_material_is_noticed_in_each_record_form(record_form: str)
     assert json.loads(notice.reason.partition(":")[2])["field"] == record_form
 
 
+def test_stolyarova_partial_pressure_species_phase_follows_the_printed_field(
+    tmp_path: Path,
+) -> None:
+    """The fixture's melt string names the condensed source, not the Al vapour."""
+
+    context = _migrated_stolyarova_cell_context(tmp_path)
+    reference = next(
+        item
+        for item in context.observations.values()
+        if isinstance(item.identity, Identity)
+        and quantity_token(item.identity) is Quantity.P_PARTIAL
+        and item.evidence.class_.is_value
+        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    )
+    assert reference.identity.species.formula == "Al"
+    assert reference.identity.species.phase.value is Phase.G
+    assert reference.derivation is not None
+    assert "condensed source" in reference.derivation.relation
+
+
 def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -11576,8 +11832,28 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
         experiment=experiment,
         bench=bench,
     )
+    assert reference.identity.species.phase.value is Phase.G
     assert len(prediction_inputs) == 1
     assert prediction_inputs[0].cell_material == "Mo"
+    liquid = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            species=replace(reference.identity.species, phase=State.of(Phase.L)),
+        ),
+    )
+    refused = predict_with_engine(
+        Engine.OPENIMCC,
+        liquid,
+        experiment=experiment,
+        bench=bench,
+    )
+    assert len(prediction_inputs) == 1
+    assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert refused.refusal_detail["reason"] == (
+        "partial-pressure-condensed-species-not-on-gas-map"
+    )
+    assert refused.refusal_detail["observation_basis"] == "Al(l)"
 
     # This legacy extract leaves several identity axes unresolved. Use a typed
     # KEMS scoring identity for the residual while keeping the migrated row id,

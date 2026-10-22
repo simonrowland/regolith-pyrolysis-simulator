@@ -14,6 +14,7 @@ from simulator.battery.enums import (
     IdentityEqualKind,
     NoticeKind,
     Phase,
+    Polymorph,
     Quantity,
     UncertaintyKind,
 )
@@ -665,6 +666,19 @@ def test_oxide_asterisk_is_basis_not_damage() -> None:
         if "*" in row["as_published"] and row["column"] == "formation_gibbs_energy"
     ]
     assert refused_star == []
+
+
+def test_b1452_element_reference_follows_the_janaf_state_at_temperature() -> None:
+    """Every non-diatomic element is stamped crystal plus Polymorph.REFERENCE."""
+
+    potassium = generator._element_reference_species("K")
+    assert potassium.formula == "K"
+    assert potassium.phase.value is Phase.CR
+    assert potassium.polymorph is not None
+    assert potassium.polymorph.value is Polymorph.REFERENCE
+    oxygen = generator._element_reference_species("O")
+    assert oxygen.formula == "O2"
+    assert oxygen.phase.value is Phase.G
 
 
 def test_formation_basis_is_identity_axis() -> None:

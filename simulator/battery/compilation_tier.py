@@ -57,6 +57,7 @@ from simulator.battery.identity import (
     quantity_token,
     standard_pressure_delta_g_kJ_per_mol,
 )
+from simulator.battery.polymorph_dictionary import canonical_element_allotrope
 from simulator.battery.records import (
     DecisionBand,
     Notice,
@@ -130,9 +131,10 @@ def _engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
 class _Product:
     formula: str
     coeff: Fraction
-    phase: Phase
+    phase: Phase | None
     polymorph: str | None  # None = generic crystal or a fluid
     token: str
+    literature_note: bool = False  # citation text, not a phase
 
 
 @dataclass(frozen=True)
@@ -361,7 +363,7 @@ def _per_basis(identity: Identity) -> PerBasis | None:
 
 def _product_phase(token: str) -> tuple[Phase, str | None]:
     text = token.strip().lower()
-    if "liquid" in text or text == "l":
+    if text in {"liquid", "l"}:
         return Phase.L, None
     if text in {"g", "gas"}:
         return Phase.G, None
@@ -369,6 +371,12 @@ def _product_phase(token: str) -> tuple[Phase, str | None]:
     if specific in {"s", "cr", "c"}:
         return Phase.CR, None
     return Phase.CR, specific
+
+
+def _is_literature_phase_note(token: str) -> bool:
+    """``lit. liquid range`` cites a neighbour. It is not a phase token."""
+
+    return "lit." in token.strip().lower()
 
 
 def _parse_product(segment: EllinghamFitSegment) -> _Product | None:
@@ -381,11 +389,51 @@ def _parse_product(segment: EllinghamFitSegment) -> _Product | None:
         float(coeff) - float(segment.n_ox)
     ) > 1e-9:
         return None
+    if _is_literature_phase_note(token):
+        return _Product(
+            formula,
+            coeff,
+            None,
+            None,
+            token.strip(),
+            literature_note=True,
+        )
     phase, polymorph = _product_phase(token)
     return _Product(formula, coeff, phase, polymorph, token.strip())
 
 
+def _crystal_coefficient_donor(
+    metal: str, segment: EllinghamFitSegment
+) -> str | None:
+    """Phase basis of a crystal neighbour whose dH and dS this segment copies.
+
+    Equality is the stored floats. The only such pair is the MnO
+    ``lit. liquid range`` segment and the MnO(s) segment below it; any
+    later pair is the same refusal.
+    """
+
+    for other in ELLINGHAM_FIT_SEGMENTS.get(metal, ()):
+        if other is segment:
+            continue
+        if (
+            other.dH_f_kJ_per_mol_O2 != segment.dH_f_kJ_per_mol_O2
+            or other.dS_f_kJ_per_mol_K_per_mol_O2
+            != segment.dS_f_kJ_per_mol_K_per_mol_O2
+        ):
+            continue
+        parsed = _parse_product(other)
+        if (
+            parsed is not None
+            and not parsed.literature_note
+            and parsed.phase is Phase.CR
+        ):
+            return other.phase_basis
+    return None
+
+
 def _phase_compatible(product: _Product, identity: Identity) -> bool:
+    if product.literature_note or product.phase is None:
+        return False
     if phase_token(identity.species) is not product.phase:
         return False
     if product.phase is not Phase.CR:
@@ -397,6 +445,222 @@ def _phase_compatible(product: _Product, identity: Identity) -> bool:
     if identity_name is None:
         return False
     return identity_name == product.polymorph
+
+
+# These tokens do not name a crystal form. REFERENCE is resolved to the
+# standard state at T before comparison. CRYSTALLINE is not alpha or beta.
+_NONSPECIFIC_ELEMENT_ALLOTROPES = frozenset(
+    {Polymorph.REFERENCE.value, Polymorph.CRYSTALLINE.value}
+)
+
+
+def _element_basis_label(
+    formula: str, phase: Phase | None, allotrope: str | None
+) -> str:
+    if phase is None:
+        return formula
+    if allotrope:
+        return f"{formula}({phase.value},{allotrope})"
+    return f"{formula}({phase.value})"
+
+
+def _segment_element_bases(
+    segment: EllinghamFitSegment,
+) -> dict[str, tuple[Phase, str | None]]:
+    reactant_side = segment.phase_basis.split("->", 1)[0]
+    return {
+        formula: _product_phase(token)
+        for formula, token in _PHASED_SPECIES_RE.findall(reactant_side)
+        if formula != "O2"
+    }
+
+
+def _ellingham_call(metal: str, product: _Product, temperature_K: Decimal) -> str:
+    call = f"ellingham:{metal}:{product.token}:T={temperature_K}"
+    if product.polymorph is None and product.phase is Phase.CR:
+        call += ":generic-solid"
+    return call
+
+
+def _outside_segment_refusal(
+    segment: EllinghamFitSegment,
+    temperature_K: Decimal,
+    *,
+    quantity: Quantity,
+    origin: str,
+    call_evidence: str,
+) -> ThermoAttempt:
+    """A clamped neighbour is a different reaction, not an extrapolated ΔfG."""
+
+    return _refuse(
+        RefusalReason.UNSUPPORTED,
+        "ellingham-formation-outside-segment",
+        quantity=quantity,
+        origin=origin,
+        extra={
+            "segment_range_K": [segment.range_K[0], segment.range_K[1]],
+            "temperature_K": str(temperature_K),
+            "phase_basis": segment.phase_basis,
+        },
+        call_evidence=call_evidence,
+    )
+
+
+def _janaf_element_reference(
+    formula: str, temperature_K: Decimal
+) -> tuple[tuple[Phase, str | None] | None, str]:
+    """Phase and allotrope from the element's JANAF (ref) table.
+
+    The schedule owner is ``_element_reference_state``. ``None`` means that
+    table does not name a single state at this temperature.
+    """
+
+    from simulator.battery.generators.janaf import _element_reference_state
+
+    species_state, _count, _locator, note, _convention = _element_reference_state(
+        formula, temperature_K
+    )
+    if not species_state.is_value:
+        return None, species_state.reason or note
+    species = species_state.value
+    phase = phase_token(species)
+    if phase is None:
+        return None, note
+    poly = polymorph_token(species)
+    return (phase, None if poly is None else poly.value), note
+
+
+def _element_reference_refusal(
+    identity: Identity,
+    segment: EllinghamFitSegment,
+    *,
+    temperature_K: Decimal,
+    quantity: Quantity,
+    origin: str,
+    call_evidence: str,
+) -> tuple[ThermoAttempt | None, tuple[Notice, ...]]:
+    """Refuse a declared reactant whose phase or allotrope is not this segment.
+
+    Each known element reactant is compared on its own. An unknown phase on
+    one term, including O2 or the product, does not skip the others. A
+    missing reaction is not this refusal; the standard-pressure transform
+    still owns the phases it needs.
+
+    ``Polymorph.REFERENCE`` means the element's standard state at this
+    temperature, taken from its JANAF (ref) table. The B1452 crystal stamp
+    is not that state. An unresolved reference state is admissible and
+    noticed. An omitted observation allotrope is not a mismatch. A
+    nonspecific token, including crystalline, is not a declared name. A
+    declared named allotrope is compared with the allotrope that table
+    gives a generic segment solid; if the table names none, the segment
+    cannot support the declaration. CEA ``Zr(a)`` / ``Zr(b)`` and JANAF
+    alpha / beta are one allotrope.
+    """
+
+    reaction_state = identity.reaction
+    reaction = (
+        reaction_state.value
+        if isinstance(reaction_state, State) and reaction_state.is_value
+        else None
+    )
+    if reaction is None:
+        return None, ()
+    segment_bases = _segment_element_bases(segment)
+    notices: list[Notice] = []
+    for term in reaction.terms:
+        if term.coefficient >= 0 or term.species.formula == "O2":
+            continue
+        formula = term.species.formula
+        cell_phase = phase_token(term.species)
+        cell_poly = polymorph_token(term.species)
+        cell_allotrope = None if cell_poly is None else cell_poly.value
+        if cell_allotrope == Polymorph.REFERENCE.value:
+            resolved, detail = _janaf_element_reference(formula, temperature_K)
+            if resolved is None:
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.INPUT_OMITTED,
+                        affected_quantities=(quantity,),
+                        reason=(
+                            "element-reference-state-unresolved: "
+                            f"{formula} at {temperature_K} K; {detail}"
+                        ),
+                        origin=origin,
+                    )
+                )
+                continue
+            cell_phase, cell_allotrope = resolved
+        if cell_phase is None:
+            continue
+        found = segment_bases.get(formula)
+        if found is None:
+            segment_phase: Phase | None = None
+            segment_allotrope = None
+        else:
+            segment_phase, segment_allotrope = found
+        segment_allotrope_name = canonical_element_allotrope(formula, segment_allotrope)
+        if segment_phase is Phase.CR and segment_allotrope_name is None:
+            resolved_segment, _detail = _janaf_element_reference(formula, temperature_K)
+            if (
+                resolved_segment is not None
+                and resolved_segment[0] is Phase.CR
+                and resolved_segment[1] is not None
+            ):
+                segment_allotrope = resolved_segment[1]
+                segment_allotrope_name = canonical_element_allotrope(
+                    formula, segment_allotrope
+                )
+        cell_allotrope_name = canonical_element_allotrope(formula, cell_allotrope)
+        observation_basis = _element_basis_label(
+            formula, cell_phase, cell_allotrope_name
+        )
+        segment_basis = _element_basis_label(
+            formula, segment_phase, segment_allotrope_name
+        )
+        extra: dict[str, object] = {
+            "element": formula,
+            "cell_phase": cell_phase.value,
+            "segment_phase": None if segment_phase is None else segment_phase.value,
+            "observation_element_basis": observation_basis,
+            "segment_element_basis": segment_basis,
+        }
+
+        def refuse(detail: str, **more: object) -> tuple[ThermoAttempt, tuple[Notice, ...]]:
+            return (
+                _refuse(
+                    RefusalReason.IDENTITY_MISMATCH,
+                    detail,
+                    quantity=quantity,
+                    origin=origin,
+                    extra={**extra, **more},
+                    call_evidence=call_evidence,
+                ),
+                (),
+            )
+
+        if segment_phase is not cell_phase:
+            return refuse("identity-mismatch-element-reference-phase")
+        specific = (
+            cell_allotrope_name is not None
+            and cell_allotrope_name not in _NONSPECIFIC_ELEMENT_ALLOTROPES
+        )
+        if (
+            specific
+            and segment_allotrope_name
+            and cell_allotrope_name != segment_allotrope_name
+        ):
+            return refuse(
+                "identity-mismatch-element-reference-allotrope",
+                cell_allotrope=cell_allotrope_name,
+                segment_allotrope=segment_allotrope_name,
+            )
+        if specific and segment_allotrope_name is None:
+            return refuse(
+                "identity-mismatch-element-reference-allotrope",
+                cell_allotrope=cell_allotrope_name,
+                segment_allotrope=segment_allotrope_name,
+            )
+    return None, tuple(notices)
 
 
 def _vaporock_gas_provenance(equil_module) -> str:
@@ -485,6 +749,20 @@ def _ellingham_attempt(
     the segment's 0.442 kJ/mol O2 construction bound (0.221 kJ/mol oxide).
     log10 Kf from −3.7028 kJ/mol is 0.0879, 0.004 from the printed 0.092.
     K2O at 298.15 K is outside the 1100 K K(g) segment and is refused.
+
+    The segment's element basis is the reactant phase and allotrope printed
+    on ``phase_basis``. A generic solid's allotrope is the one the element's
+    JANAF reference table names at this temperature. ``Polymorph.REFERENCE``
+    is that standard state, not a separate allotrope. A declared reactant
+    that names a different phase, or a different named allotrope, is refused
+    before this value is returned, at every printed pressure including
+    exactly 1 bar and a missing pressure.
+    When the bases match and the printed pressure is some other positive
+    value, the 1 bar fit is still shifted by Δν_g R T ln(p2/p1).
+
+    A product token that is a literature note (``lit. liquid range``) is
+    not a phase. If that segment's dH and dS are copied from a crystal
+    neighbour, a liquid-product identity is refused instead of answered.
     """
 
     if quantity not in _ENGINE_ELLINGHAM_QUANTITIES:
@@ -516,6 +794,7 @@ def _ellingham_attempt(
         )
     temperature = float(temperature_K)
     matches: list[tuple[str, EllinghamFitSegment, _Product, bool]] = []
+    copied_liquid: list[tuple[str, EllinghamFitSegment, _Product, bool, str]] = []
     formula_hit = False
     for metal in ELLINGHAM_FIT_SEGMENTS:
         segment = ellingham_segment_for_temperature(metal, temperature)
@@ -525,11 +804,41 @@ def _ellingham_attempt(
         if parse_species_formula(product.formula) != target:
             continue
         formula_hit = True
-        if not _phase_compatible(product, identity):
-            continue
         low, high = segment.range_K
         extrapolated = not (low <= temperature <= high)
+        if phase_token(identity.species) is Phase.L and (
+            product.literature_note or product.phase is Phase.L
+        ):
+            donor = _crystal_coefficient_donor(metal, segment)
+            if donor is not None:
+                copied_liquid.append((metal, segment, product, extrapolated, donor))
+                continue
+        if not _phase_compatible(product, identity):
+            continue
         matches.append((metal, segment, product, extrapolated))
+    if not matches and len(copied_liquid) == 1:
+        metal, segment, product, extrapolated, donor = copied_liquid[0]
+        call = _ellingham_call(metal, product, temperature_K)
+        if extrapolated:
+            return _outside_segment_refusal(
+                segment,
+                temperature_K,
+                quantity=quantity,
+                origin=origin,
+                call_evidence=call + ":outside-segment",
+            )
+        return _refuse(
+            RefusalReason.IDENTITY_MISMATCH,
+            "ellingham-liquid-label-copies-crystal-coefficients",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "observation_product_basis": f"{product.formula}({Phase.L.value})",
+                "segment_phase_basis": segment.phase_basis,
+                "crystal_neighbour_phase_basis": donor,
+            },
+            call_evidence=call,
+        )
     if not matches:
         return _refuse(
             RefusalReason.UNSUPPORTED,
@@ -549,23 +858,26 @@ def _ellingham_attempt(
             extra={"formulas": [item[0] for item in matches]},
         )
     metal, segment, product, extrapolated = matches[0]
-    call = f"ellingham:{metal}:{product.token}:T={temperature_K}"
-    if product.polymorph is None and product.phase is Phase.CR:
-        call += ":generic-solid"
+    call = _ellingham_call(metal, product, temperature_K)
     if extrapolated:
-        # Neighbouring-segment reaction dG is a different reference state.
-        return _refuse(
-            RefusalReason.UNSUPPORTED,
-            "ellingham-formation-outside-segment",
+        return _outside_segment_refusal(
+            segment,
+            temperature_K,
             quantity=quantity,
             origin=origin,
-            extra={
-                "segment_range_K": [segment.range_K[0], segment.range_K[1]],
-                "temperature_K": str(temperature_K),
-                "phase_basis": segment.phase_basis,
-            },
             call_evidence=call + ":outside-segment",
         )
+
+    basis_refusal, basis_notices = _element_reference_refusal(
+        identity,
+        segment,
+        temperature_K=temperature_K,
+        quantity=quantity,
+        origin=origin,
+        call_evidence=call,
+    )
+    if basis_refusal is not None:
+        return basis_refusal
 
     # dG is kJ/mol O2. mol-species divides by n_ox (mol oxide per mol O2).
     dG = Decimal(str(segment.delta_g_kJ_per_mol_O2(temperature)))
@@ -607,34 +919,6 @@ def _ellingham_attempt(
                 if reaction is not None
                 else ()
             )
-            if reaction is not None and all(
-                phase is not None for phase in reaction_phases
-            ):
-                segment_reactant_phases = {
-                    formula: _product_phase(token)[0]
-                    for formula, token in _PHASED_SPECIES_RE.findall(
-                        segment.phase_basis.split("->", 1)[0]
-                    )
-                    if formula != "O2"
-                }
-                for term, cell_phase in zip(reaction.terms, reaction_phases):
-                    if term.coefficient >= 0 or term.species.formula == "O2":
-                        continue
-                    segment_phase = segment_reactant_phases.get(term.species.formula)
-                    if segment_phase is not cell_phase:
-                        return _refuse(
-                            RefusalReason.IDENTITY_MISMATCH,
-                            "identity-mismatch-element-reference-phase",
-                            quantity=quantity,
-                            origin=origin,
-                            extra={
-                                "element": term.species.formula,
-                                "cell_phase": cell_phase.value,
-                                "segment_phase": (
-                                    None if segment_phase is None else segment_phase.value
-                                ),
-                            },
-                        )
             if reaction is None:
                 return _refuse(
                     RefusalReason.IDENTITY_UNKNOWN,
@@ -698,7 +982,7 @@ def _ellingham_attempt(
     else:
         value = gibbs
         unit = QUANTITY_UNITS[Quantity.DELTA_FG]
-    notices: list[Notice] = []
+    notices: list[Notice] = list(basis_notices)
     authority = Authority.CERTIFIED
     if segment.authority_status != "authoritative":
         authority = Authority.EXTRAPOLATED
