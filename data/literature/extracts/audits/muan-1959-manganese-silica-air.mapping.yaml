@@ -1,0 +1,56 @@
+source_id: muan-1959-manganese-silica-air
+source:
+  citation: "Muan, A. (1959), ‘Phase Equilibria in the System Manganese Oxide—SiO2 in Air’, American Journal of Science 257 (April 1959), 297–315."
+extraction:
+  method: MinerU table draft, with scanned table cells checked against 600 dpi page renders
+  date: '2026-10-22'
+  worker: Codex
+review_status: draft
+tables:
+  - page: 14
+    table_index: 1
+    type: gibbs_table
+    quantity: equilibrium_phase_composition
+    unit: wt_percent
+    evidence_class: measured_direct
+    phase: l
+    rows: [5, 11, 13, 19, 24, 44, 47, 58, 71, 86, 98]
+    temperature: {column: 3, unit: C}
+    conditions:
+      - key: pO2_Pa
+        state: {tag: value, value: '21278.25'}
+        locator: {page: 2, pdf_page_index: 1, published_page: 298, note: Printed pO2 = 0.21 atm; converted with 1 atm = 101325 Pa}
+      - key: total_pressure_Pa
+        state: {tag: value, value: '101325'}
+        locator: {page: 2, pdf_page_index: 1, published_page: 298, note: Printed total pressure = 1 atm; converted with 1 atm = 101325 Pa}
+      - key: gas_mix
+        state: {tag: value, value: air}
+        locator: {page: 2, pdf_page_index: 1, published_page: 298}
+    values:
+      - {column: 6, species: MnO}
+      - {column: 7, species: Mn2O3}
+      - {column: 8, species: SiO2}
+  - page: 17
+    table_index: 5
+    type: gibbs_table
+    quantity: equilibrium_phase_composition
+    unit: wt_percent
+    evidence_class: measured_direct
+    phase: l
+    rows: [3, 6, 7, 10, 12, 13, 14, 16]
+    temperature: {column: 5, unit: C}
+    conditions:
+      - key: pO2_Pa
+        state: {tag: value, value: '21278.25'}
+        locator: {page: 2, pdf_page_index: 1, published_page: 298, note: Printed pO2 = 0.21 atm; converted with 1 atm = 101325 Pa}
+      - key: total_pressure_Pa
+        state: {tag: value, value: '101325'}
+        locator: {page: 2, pdf_page_index: 1, published_page: 298, note: Printed total pressure = 1 atm; converted with 1 atm = 101325 Pa}
+      - key: gas_mix
+        state: {tag: value, value: air}
+        locator: {page: 2, pdf_page_index: 1, published_page: 298}
+    published_page: 313
+    values:
+      - {column: 2, species: MnO}
+      - {column: 3, species: Mn2O3}
+      - {column: 4, species: SiO2}

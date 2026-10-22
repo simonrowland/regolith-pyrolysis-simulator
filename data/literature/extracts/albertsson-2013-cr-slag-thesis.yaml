@@ -1,0 +1,908 @@
+schema_version: literature_extract.v1
+source_id: albertsson-2013-cr-slag-thesis
+source:
+  citation: "Albertsson, G. J. (2013), Abatement of Chromium Emissions from Steelmaking Slags—Cr Stabilization by Phase Separation, doctoral thesis, KTH Royal Institute of Technology."
+  isbn: 978-91-7501-666-5
+extraction:
+  method: Born-digital pdftotext-layout transcription; MinerU converter returned zero table blocks; table cells and row-column assignments were checked against 600 dpi PDF renders.
+  date: '2026-10-22'
+  worker: Codex
+  schema_gap: "Measured phase compositions are printed as elemental at.% including oxygen. The available equilibrium_phase_composition basis is oxide-component wt_percent or mole_fraction; no at_percent basis exists. Do not convert at.% to oxide mole fractions. Crystalline phases also cannot use phase_role slag. Retained as context under controller ruling fam48-1022 ruling-1."
+review_status: draft
+species:
+  Cr2O3:
+    observations: []
+    context:
+      - observation_id: albertsson2013_table1_reagent_purity
+        type: table_context
+        locator:
+          page: 20
+          pdf_page_index: 19
+          published_page: 11
+          table: '1'
+        units: purity percent as printed
+        values:
+          quantity: reagent_purity_for_synthetic_slag_preparation
+          method_class: method_only
+          printed_values:
+            Pt: '99.99%'
+            Cr2O3: '99.8%'
+            SiO2: '99%'
+            MgO: '99%'
+            CaO: '99%'
+            Al2O3: '99.8%'
+            Fe-metal: '99.9%'
+            Fe2O3: '99.0%'
+            MnO: '99.5%'
+          disposition: Reagent specifications, not an equilibrium or process measurement.
+
+      - observation_id: albertsson2013_table2_synthetic_slag_compositions
+        type: table_context
+        locator:
+          page: 21
+          pdf_page_index: 20
+          published_page: 12
+          table: '2'
+        units: mass percent as printed
+        values:
+          quantity: designed_CaO_MgO_SiO2_Cr2O3_slag_compositions
+          method_class: method_only
+          components: [CaO, SiO2, MgO, Cr2O3]
+          rows:
+            - {series: S1, basicity_CaO_SiO2: '1.0', mass_percent: ['43.0', '43.0', '8.0', '6.0']}
+            - {series: S2, basicity_CaO_SiO2: '1.2', mass_percent: ['46.9', '39.1', '8.0', '6.0']}
+            - {series: S3, basicity_CaO_SiO2: '1.4', mass_percent: ['50.2', '35.8', '8.0', '6.0']}
+            - {series: S4, basicity_CaO_SiO2: '1.6', mass_percent: ['52.9', '33.1', '8.0', '6.0']}
+            - {series: S5, basicity_CaO_SiO2: '1.8', mass_percent: ['55.3', '30.7', '8.0', '6.0']}
+            - {series: S6, basicity_CaO_SiO2: '2.0', mass_percent: ['57.3', '28.7', '8.0', '6.0']}
+          disposition: Designed starting charges, not measured phase compositions.
+
+      - observation_id: albertsson2013_table3_alumina_slag_compositions
+        type: table_context
+        locator:
+          page: 21
+          pdf_page_index: 20
+          published_page: 12
+          table: '3'
+        units: mass percent as printed
+        values:
+          quantity: designed_CaO_MgO_SiO2_Cr2O3_Al2O3_slag_compositions
+          method_class: method_only
+          components: [Al2O3, CaO, SiO2, MgO, Cr2O3]
+          rows:
+            - {series: SA1, basicity_CaO_SiO2: '1.6', mass_percent: ['3.0', '51.1', '31.9', '8.0', '6.0']}
+            - {series: SA2, basicity_CaO_SiO2: '1.6', mass_percent: ['6.0', '49.2', '30.8', '8.0', '6.0']}
+            - {series: SA3, basicity_CaO_SiO2: '1.6', mass_percent: ['8.0', '48.0', '30.0', '8.0', '6.0']}
+            - {series: SA4, basicity_CaO_SiO2: '1.6', mass_percent: ['12.0', '45.5', '28.5', '8.0', '6.0']}
+          disposition: Designed starting charges, not measured phase compositions.
+
+      - observation_id: albertsson2013_table4_synthetic_eaf_slag_compositions
+        type: table_context
+        locator:
+          page: 21
+          pdf_page_index: 20
+          published_page: 12
+          table: '4'
+        units: mass percent as printed
+        values:
+          quantity: designed_EAF_slag4_synthetic_compositions
+          method_class: method_only
+          components: [CaO, SiO2, FeO, MgO, Cr2O3, Al2O3, MnO]
+          rows:
+            - {series: SY1, basicity: '1.5', mass_percent: ['26.0', '17.2', '35.0', '8.0', '6.0', '6.0', '2.0']}
+            - {series: SY2, basicity: '2.0', mass_percent: ['29.0', '14.3', '35.0', '8.0', '6.0', '6.0', '2.0']}
+            - {series: SY3, basicity: '2.5', mass_percent: ['31.0', '12.3', '35.0', '8.0', '6.0', '6.0', '2.0']}
+            - {series: SY4, basicity: '3.0', mass_percent: ['32.0', '10.8', '35.0', '8.0', '6.0', '6.0', '2.0']}
+          disposition: Designed starting charges, not measured phase compositions.
+
+      - observation_id: albertsson2013_table5_tga_slag_compositions
+        type: table_context
+        locator:
+          page: 22
+          pdf_page_index: 21
+          published_page: 13
+          table: '5'
+        units: mass percent as printed
+        values:
+          quantity: designed_alumina_saturated_slag_compositions
+          method_class: method_only
+          components: [Al2O3, CaO, SiO2, MgO, Cr2O3]
+          rows:
+            - {basicity_CaO_SiO2: '1.0', mass_percent: ['45.0', '20.0', '20.0', '8.0', '7.0']}
+            - {basicity_CaO_SiO2: '1.5', mass_percent: ['45.0', '24.0', '16.0', '8.0', '7.0']}
+            - {basicity_CaO_SiO2: '2.0', mass_percent: ['45.0', '26.6', '13.3', '8.0', '7.0']}
+          disposition: Designed starting charges, not measured phase compositions.
+
+      - observation_id: albertsson2013_table6_factsage_equilibrium
+        type: table_context
+        locator:
+          page: 26
+          pdf_page_index: 25
+          published_page: 17
+          table: '6'
+        units: mass percent as calculated
+        values:
+          quantity: calculated_equilibrium_phase_amounts
+          method_class: model_derived
+          model: FactSage 6.1, Fact53 and FToxid databases
+          T_K: '1873'
+          atmosphere: air
+          phases_by_series:
+            Slag_liquid:
+              S1: '93.5'
+              S2: '92.6'
+              S3: '87.6'
+            alpha_Ca2SiO4:
+              S3: '4.9'
+              S4: '41.8'
+              S5: '75.6'
+              S6: '70.9'
+            spinel:
+              S1: '6.6'
+              S2: '6.4'
+              S3: '6.5'
+              S4: '7.6'
+              S5: '7.1'
+              S6: '6.9'
+            merwinite:
+              S4: '50.4'
+              S5: '11.8'
+            monoxide:
+              S4: '0.3'
+              S5: '5.5'
+              S6: '7.1'
+            hatrurite:
+              S6: '14.9'
+          disposition: Calculated equilibrium output, not measured.
+
+      - observation_id: albertsson2013_table7_factsage_equilibrium
+        type: table_context
+        locator:
+          page: 26
+          pdf_page_index: 25
+          published_page: 17
+          table: '7'
+        units: mass percent as calculated
+        values:
+          quantity: calculated_equilibrium_phase_amounts
+          method_class: model_derived
+          model: FactSage 6.1, Fact53 and FToxid databases
+          T_K: '1673'
+          oxygen_partial_pressure_Pa: '1e-4'
+          air_comparison_oxygen_partial_pressure_Pa: '2.13e4'
+          calculated_values:
+            S1:
+              slag_liquid: '61.2'
+              slag_liquid_air: '54.2'
+              akermanite: '15.8'
+              akermanite_air: '28.5'
+              pseudo-wollastonite: '15.9'
+              pseudo-wollastonite_air: '9.9'
+              Mg_chromite: '7.0'
+              Mg_chromite_air: '7.3'
+            S2:
+              slag_liquid: '75.1'
+              slag_liquid_air: '61.9'
+              Mg_chromite: '6.8'
+              Mg_chromite_air: '7.1'
+              merwinite: '18.2'
+              merwinite_air: '31.0'
+            S3:
+              slag_liquid: '34.7'
+              slag_liquid_air: '32.4'
+              Mg_chromite: '7.1'
+              Mg_chromite_air: '7.3'
+              merwinite: '31.6'
+              merwinite_air: '47.2'
+              alpha_Ca2SiO4: '26.4'
+              alpha_Ca2SiO4_air: '13.2'
+            S4:
+              Mg_chromite: '7.6'
+              Mg_chromite_air: '7.5'
+              merwinite: '37.4'
+              merwinite_air: '40.2'
+              alpha_Ca2SiO4: '54.9'
+              alpha_Ca2SiO4_air: '50.9'
+              monoxide: '0.0'
+              monoxide_air: '1.5'
+            S5:
+              Mg_chromite_air: '7.3'
+              alpha_Ca2SiO4_air: '86.9'
+              monoxide_air: '5.8'
+            S6:
+              Mg_chromite_air: '7.3'
+              alpha_Ca2SiO4_air: '83.3'
+              monoxide_air: '9.5'
+          disposition: Calculated equilibrium output, not measured. Values in parentheses are for air.
+
+      - observation_id: albertsson2013_table8_factsage_scheil_gulliver
+        type: table_context
+        locator:
+          page: 27
+          pdf_page_index: 26
+          published_page: 18
+          table: '8'
+        units: mass percent as calculated
+        values:
+          quantity: calculated_phase_amounts_equilibrium_and_scheil_gulliver
+          method_class: model_derived
+          model: FactSage 6.1
+          T_K: '1673'
+          oxygen_partial_pressure_Pa: '1e-4'
+          components_by_phase:
+            ASpinel:
+              SA1: ['10.2', '2.4']
+              SA2: ['14.0', '5.3']
+              SA3: ['13.7', '7.1']
+              SA4: ['16.8', '9.3']
+            Mg_chromite:
+              SA1: ['1.6', '7.2']
+              SA2: ['0', '7.0']
+              SA3: ['0', '6.8']
+              SA4: ['0', '6.6']
+            alpha_Ca2SiO4:
+              SA1: ['62.3', '61.3']
+              SA2: ['59.0', '53.5']
+              SA3: ['53.4', '53.9']
+              SA4: ['51.5', '47.6']
+            merwinite:
+              SA1: ['24.6', '17.4']
+              SA2: ['19.3', '20.5']
+              SA3: ['15.9', '14.6']
+              SA4: ['6.5', '10.1']
+            ASlag_liq:
+              SA1: ['0', '11.2']
+              SA2: ['0', '3.5']
+              SA3: ['0', '2.7']
+              SA4: ['26.8', '1.6']
+            melilite:
+              SA1: ['0', '0']
+              SA2: ['6.7', '10.1']
+              SA3: ['17.0', '14.6']
+              SA4: ['24.1', '24.7']
+          column_order: [equilibrium, Scheil_Gulliver]
+          disposition: Calculated equilibrium and solidification-model outputs, not measurements.
+
+      - observation_id: albertsson2013_table9_factsage_liquidus
+        type: table_context
+        locator:
+          page: 27
+          pdf_page_index: 26
+          published_page: 18
+          table: '9'
+        units: K as calculated
+        values:
+          quantity: calculated_melting_temperatures_for_SA_series
+          method_class: model_derived
+          model: FactSage 6.1 equilibrium and Scheil-Gulliver
+          compositions_by_series:
+            SA1: {Al2O3: '3.0', CaO: '51.1', SiO2: '31.9', MgO: '8.0', Cr2O3: '6.0', equilibrium: '1647', Scheil_Gulliver: '1615'}
+            SA2: {Al2O3: '6.0', CaO: '49.2', SiO2: '30.8', MgO: '8.0', Cr2O3: '6.0', equilibrium: '1647', Scheil_Gulliver: '1623'}
+            SA3: {Al2O3: '8.0', CaO: '48.0', SiO2: '30.0', MgO: '8.0', Cr2O3: '6.0', equilibrium: '1647', Scheil_Gulliver: '1623'}
+            SA4: {Al2O3: '12.0', CaO: '45.5', SiO2: '28.5', MgO: '8.0', Cr2O3: '6.0', equilibrium: '1647', Scheil_Gulliver: '1627'}
+          disposition: Calculated outputs, not measured.
+
+      - observation_id: albertsson2013_table10_matrix_chromium
+        type: table_context
+        locator:
+          page: 36
+          pdf_page_index: 35
+          published_page: 27
+          table: '10'
+        units: elemental at.% as printed
+        values:
+          quantity: chromium_content_in_matrix_phases
+          method_class: measured_direct
+          schema_gap: "Candidate token equilibrium_phase_composition; no at_percent basis is available, and crystalline rows cannot be phase_role slag. At.% includes oxygen and cannot be converted directly to oxide mole_fraction."
+          columns: [sample, matrix_phase, I.a, I.b, II.a, II.b]
+          rows:
+            - {sample: S1, phase: glass, at_percent_Cr: ['0.1', '0.7', '0.1', '0.2']}
+            - {sample: S2, phase: pseudo-wollastonite, at_percent_Cr: ['0.6', '—', '1.1', '0.2']}
+            - {sample: S2, phase: merwinite, at_percent_Cr: ['0.3', '0.2', '0.4', '0.2']}
+            - {sample: S3, phase: Ca2SiO4, at_percent_Cr: ['1.5', '—', '0.2', '0.1']}
+            - {sample: S3, phase: merwinite, at_percent_Cr: ['0.3', '—', '0.1', '0.1']}
+            - {sample: S3, phase: pseudo-wollastonite, at_percent_Cr: ['0.2', '1.3', '—', '0.1']}
+            - {sample: S4, phase: merwinite, at_percent_Cr: ['0.2', '0.3', '0.2', '0.1']}
+            - {sample: S4, phase: Ca2SiO4, at_percent_Cr: ['0.5', '0.6', '0.5', '0.1']}
+            - {sample: S5, phase: merwinite, at_percent_Cr: ['0.9', '0.6', '0.9', '—']}
+            - {sample: S5, phase: Ca2SiO4, at_percent_Cr: ['1.5', '1.1', '1.9', '—']}
+            - {sample: S6, phase: Ca2SiO4, at_percent_Cr: ['—', '1.4', '1.1', '—']}
+          heat_treatment: "I.a: 1873 K for 24 h then water quench; I.b: 1873 K for 24 h, water quench, then reheat at 1673 K for 24 h and water quench; II.a: 1873 K for 24 h, slow cool to 1673 K, soak 24 h in air and water quench; II.b: same slow-cool sequence under CO/CO2 at printed PO2=1e-4 Pa."
+          disposition: Measured elemental Cr content by matrix phase, but the at.% basis and several crystalline phase roles do not fit an existing token.
+
+      - observation_id: albertsson2013_table11_bulk_eaf_chemistry
+        type: table_context
+        locator:
+          page: 40
+          pdf_page_index: 39
+          published_page: 31
+          table: '11'
+        units: wt.% and (at.%) as printed
+        values:
+          quantity: whole_sample_bulk_chemistry_of_multiphase_EAF_slags
+          method_class: measured_direct
+          schema_gap: Whole-sample bulk chemistry is context, not a single-phase composition.
+          columns: [oxide_or_phase, EAF_slag1_wt_at, EAF_slag2_wt_at, EAF_slag3_wt_at, EAF_slag4star_wt_at]
+          rows:
+            - {component: P2O5, values: [['0.4', '0.3'], ['0.0', '0.0'], ['0.0', '0.0'], ['0.6', '0.4']]}
+            - {component: MgO, values: [['11.3', '28.3'], ['4.7', '11.8'], ['18.2', '45.5'], ['8.5', '21.3']]}
+            - {component: CaO, values: [['36.9', '65.9'], ['41.0', '73.2'], ['26.4', '47.1'], ['28.8', '51.4']]}
+            - {component: TiO2, values: [['0.4', '0.5'], ['3.2', '4.0'], ['0.4', '0.5'], ['0.6', '0.8']]}
+            - {component: V2O5, values: [['0.1', '0.1'], ['0.2', '0.1'], ['0.3', '0.2'], ['0.5', '0.3']]}
+            - {component: Cr2O3, values: [['3.2', '2.1'], ['5.7', '3.8'], ['7.0', '4.6'], ['2.0', '1.3']]}
+            - {component: MnO, values: [['5.1', '7.2'], ['3.2', '4.5'], ['2.2', '3.1'], ['6.1', '8.6']]}
+            - {component: Al2O3, values: [['6.1', '6.0'], ['10.1', '9.9'], ['9.4', '9.2'], ['4.9', '4.8']]}
+            - {component: SiO2, values: [['14.1', '23.5'], ['28.4', '47.3'], ['31.0', '51.7'], ['11.8', '19.7']]}
+            - {component: Fe-metal, values: [['0.7', '1.3'], ['0.0', '0.0'], ['0.4', '0.7'], ['4.8', '8.6']]}
+            - {component: FeO, values: [['11.0', '15.3'], ['2.2', '3.1'], ['3.6', '5.0'], ['25.5', '35.4']]}
+            - {component: Fe2O3, values: [['10.4', '6.5'], ['0.0', '0.0'], ['0.0', '0.0'], ['4.9', '3.1']]}
+          note: Values in parentheses are at.%. The bulk Cr values are reported as Cr2O3 by chemical analysis; WDS table values are elemental Cr and are not directly comparable.
+          disposition: Measured whole-sample bulk composition of multiphase slags, not a phase composition.
+
+      - observation_id: albertsson2013_table12_untreated_eaf_phase_presence
+        type: table_context
+        locator:
+          page: 41
+          pdf_page_index: 40
+          published_page: 32
+          table: '12'
+        units: qualitative phase occurrence as printed
+        values:
+          quantity: XRD_identified_phases_in_untreated_EAF_slags
+          method_class: measured_direct
+          phases_by_sample:
+            - {phase: monticellite, formula_as_printed: CaMgSiO4, present_in: [EAF-slag3]}
+            - {phase: larnite, formula_as_printed: Ca2SiO4, present_in: [EAF-slag1, EAF-slag3, EAF-slag4]}
+            - {phase: akermanite, formula_as_printed: Ca2MgSi2O7, present_in: [EAF-slag2, EAF-slag3]}
+            - {phase: bredigite, formula_as_printed: Ca7Mg(SiO4)4, present_in: [EAF-slag2]}
+            - {phase: brownmillerite, formula_as_printed: 'Ca2(Al,Fe)2O5', present_in: [EAF-slag1]}
+            - {phase: ringwoodite, formula_as_printed: Mg2SiO4, present_in: [EAF-slag3]}
+            - {phase: forsterite, formula_as_printed: '(Mg,Fe)2SiO4', present_in: [EAF-slag3]}
+            - {phase: clinoenstatite, formula_as_printed: MgSiO3, present_in: [EAF-slag3]}
+            - {phase: wüstite, formula_as_printed: '(Fe,Mn,Mg)O', present_in: [EAF-slag1, EAF-slag4]}
+            - {phase: hematite, formula_as_printed: Fe2O3, present_in: [EAF-slag1]}
+            - {phase: spinel, formula_as_printed: '(Fe,Mg,Mn)(Cr,Fe,Al)2O4', present_in: [EAF-slag2, EAF-slag3]}
+            - {phase: merwinite, formula_as_printed: Ca3Mg(SiO4)2, present_in: [EAF-slag4]}
+          disposition: XRD phase presence is qualitative and has no existing quantity token.
+
+      - observation_id: albertsson2013_table13_eaf_slag1_phase_compositions
+        type: table_context
+        locator:
+          page: 43
+          pdf_page_index: 42
+          published_page: 34
+          table: '13'
+        units: elemental at.% as printed
+        values:
+          quantity: measured_phase_elemental_compositions
+          method_class: measured_direct
+          schema_gap: "Candidate token equilibrium_phase_composition; d-223 accepts oxide-component wt_percent or mole_fraction, not elemental at_percent. Crystalline phases cannot use phase_role slag."
+          elements: [Cr, Mg, Al, Si, Ca, Mn, Fe, Ti, V, O]
+          rows:
+            - {sample: EAF-slag1, treatment: untreated, phase: larnite, values: ['0.0', '0.1', '0.2', '11.6', '21.0', '0.0', '0.2', '0.0', '0.0', '66.8']}
+            - {sample: EAF-slag1, treatment: untreated, phase: brownmillerite, values: ['0.0', '0.0', '18.0', '0.3', '15.3', '0.1', '0.6', '0.0', '0.0', '65.7']}
+            - {sample: EAF-slag1, treatment: untreated, phase: wüstite, values: ['1.9', '19.7', '0.3', '0.0', '0.4', '2.8', '15.5', '0.0', '0.0', '59.2']}
+            - {sample: EAF-slag1, treatment: A, phase: spinel, values: ['14.1', '8.7', '3.0', '0.0', '0.6', '2.4', '6.2', '0.0', '0.0', '65.0']}
+            - {sample: EAF-slag1, treatment: A, phase: larnite, values: ['0.0', '0.6', '0.1', '13.2', '24.4', '0.2', '0.3', '0.1', '0.1', '61.0']}
+            - {sample: EAF-slag1, treatment: A, phase: wüstite, values: ['1.1', '19.5', '0.5', '0.0', '1.3', '5.5', '18.0', '0.0', '0.0', '54.1']}
+            - {sample: EAF-slag1, treatment: A, phase: brownmillerite, values: ['0.1', '0.6', '7.5', '2.5', '17.6', '1.0', '9.6', '0.4', '0.1', '60.5']}
+            - {sample: EAF-slag1, treatment: B, phase: larnite, values: ['0.0', '0.6', '0.1', '12.9', '23.2', '0.2', '0.3', '0.0', '0.0', '62.7']}
+            - {sample: EAF-slag1, treatment: B, phase: wüstite, values: ['0.2', '8.9', '2.1', '0.4', '3.3', '4.9', '22.4', '0.1', '0.0', '57.8']}
+            - {sample: EAF-slag1, treatment: B, phase: brownmillerite, values: ['0.0', '0.9', '8.0', '4.0', '16.4', '1.2', '8.1', '0.3', '0.1', '61.0']}
+          disposition: Measured elemental phase compositions in at.%; no matching basis token and crystalline rows cannot be relabeled as slag.
+
+      - observation_id: albertsson2013_table14_eaf_slag2_phase_compositions
+        type: table_context
+        locator:
+          page: 44
+          pdf_page_index: 43
+          published_page: 35
+          table: '14'
+        units: elemental at.% as printed
+        values:
+          quantity: measured_phase_elemental_compositions
+          method_class: measured_direct
+          schema_gap: "Candidate token equilibrium_phase_composition; d-223 accepts oxide-component wt_percent or mole_fraction, not elemental at_percent."
+          elements: [Cr, Mg, Al, Si, Ca, Mn, Fe, Ti, V, O]
+          rows:
+            - {sample: EAF-slag2, treatment: untreated, phase: akermanite, values: ['0.18', '5.5', '0.0', '12.7', '17.0', '0.5', '0.0', '0.0', '0.0', '64.0']}
+            - {sample: EAF-slag2, treatment: untreated, phase: pseudo-wollastonite, values: ['0.6', '1.9', '2.7', '10.6', '14.8', '0.7', '0.0', '4.1', '0.0', '66.4']}
+            - {sample: EAF-slag2, treatment: untreated, phase: spinel, values: ['17.2', '5.0', '3.1', '1.6', '1.6', '6.1', '0.3', '1.2', '0.0', '65.6']}
+            - {sample: EAF-slag2, treatment: A, phase: spinel, values: ['15.2', '11.1', '6.6', '0.0', '0.4', '3.0', '0.4', '0.2', '0.0', '63.2']}
+            - {sample: EAF-slag2, treatment: A, phase: pseudo-wollastonite, values: ['0.1', '1.7', '5.9', '13.1', '13.9', '0.8', '0.1', '1.4', '0.0', '62.9']}
+            - {sample: EAF-slag2, treatment: A, phase: larnite, values: ['0.0', '1.0', '0.1', '14.1', '23.6', '0.5', '0.0', '0.1', '0.0', '60.6']}
+            - {sample: EAF-slag2, treatment: B, phase: spinel, values: ['15.0', '10.4', '5.8', '0.0', '0.4', '3.1', '1.1', '0.2', '0.1', '64.1']}
+            - {sample: EAF-slag2, treatment: B, phase: pseudo-wollastonite, values: ['0.3', '1.6', '5.0', '12.5', '14.9', '0.9', '0.4', '1.3', '0.1', '63.2']}
+            - {sample: EAF-slag2, treatment: B, phase: larnite, values: ['0.1', '2.5', '1.3', '13.8', '21.2', '0.5', '0.2', '0.4', '0.0', '60.0']}
+          disposition: Measured elemental phase compositions in at.%; unsupported by the available phase-composition basis.
+
+      - observation_id: albertsson2013_table15_eaf_slag3_phase_compositions
+        type: table_context
+        locator:
+          page: 46
+          pdf_page_index: 45
+          published_page: 36
+          table: '15'
+        units: elemental at.% as printed
+        values:
+          quantity: measured_phase_elemental_compositions
+          method_class: measured_direct
+          schema_gap: "Candidate token equilibrium_phase_composition; d-223 accepts oxide-component wt_percent or mole_fraction, not elemental at_percent."
+          elements: [Cr, Mg, Al, Si, Ca, Mn, Fe, Ti, V, O, F]
+          rows:
+            - {sample: EAF-slag3, treatment: untreated, phase: spinel, values: ['17.6', '11.8', '4.1', '0.0', '0.0', '1.0', '0.3', '0.0', '0.3', '65.0', '0.0']}
+            - {sample: EAF-slag3, treatment: untreated, phase: forsterite, values: ['0.3', '7.2', '5.1', '0.0', '12.8', '1.5', '14.3', '0.0', '1.5', '64.3', '0.0']}
+            - {sample: EAF-slag3, treatment: untreated, phase: pseudo-wollastonite, values: ['0.1', '6.6', '6.0', '14.4', '7.4', '0.6', '0.8', '0.0', '0.0', '66.5', '0.0']}
+            - {sample: EAF-slag3, treatment: A, phase: spinel, values: ['15.2', '11.2', '1.9', '0.0', '0.2', '0.8', '1.7', '0.0', '0.2', '67.8', '0.0']}
+            - {sample: EAF-slag3, treatment: A, phase: merwinite, values: ['0.0', '9.6', '2.3', '11.7', '9.5', '0.5', '0.3', '0.1', '0.1', '59.7', '6.4']}
+            - {sample: EAF-slag3, treatment: B, phase: spinel, values: ['11.9', '15.7', '17.1', '0.1', '0.3', '0.7', '0.7', '0.1', '0.1', '53.3', '0.0']}
+            - {sample: EAF-slag3, treatment: B, phase: merwinite, values: ['0.1', '9.7', '2.6', '15.3', '10.9', '0.6', '0.3', '0.1', '0.1', '56.0', '4.4']}
+          disposition: Measured elemental phase compositions in at.%; unsupported by the available phase-composition basis.
+
+      - observation_id: albertsson2013_table16_sy1_phase_compositions
+        type: table_context
+        locator:
+          page: 48
+          pdf_page_index: 47
+          published_page: 38
+          table: '16'
+        units: elemental at.% as printed
+        values:
+          quantity: measured_phase_elemental_compositions
+          method_class: measured_direct
+          schema_gap: "Candidate token equilibrium_phase_composition; d-223 accepts oxide-component wt_percent or mole_fraction, not elemental at_percent. Glass basis is also elemental atom percent."
+          elements: [Cr, Mg, Al, Si, Ca, Mn, Fe, O]
+          rows:
+            - {sample: SY1, treatment: A, phase: spinel, values: ['26.5', '11.2', '6.9', '0.1', '0.9', '1.6', '2.9', '49.9']}
+            - {sample: SY1, treatment: A, phase: larnite, values: ['0.1', '2.8', '0.2', '14.1', '33.3', '0.5', '0.4', '48.7']}
+            - {sample: SY1, treatment: A, phase: glass, values: ['0.1', '1.8', '14.1', '10.1', '22.3', '0.3', '1.0', '50.6']}
+            - {sample: SY1, treatment: A, phase: merwinite, values: ['0.2', '6.7', '0.3', '13.8', '28.7', '0.3', '0.4', '49.8']}
+            - {sample: SY1, treatment: B, phase: spinel, values: ['25.0', '12.3', '8.8', '0.8', '1.6', '0.7', '1.6', '49.3']}
+            - {sample: SY1, treatment: B, phase: glass, values: ['0.4', '4.9', '7.6', '13.3', '22.9', '0.1', '0.3', '50.8']}
+            - {sample: SY1, treatment: B, phase: merwinite, values: ['0.3', '5.1', '0.2', '13.4', '30.6', '0.2', '0.3', '50.2']}
+          disposition: Measured compositions after heat treatment; the glass values are at.% and cannot be entered using the oxide-component wt_percent or mole_fraction basis.
+
+      - observation_id: albertsson2013_table17_sy2_phase_compositions
+        type: table_context
+        locator:
+          page: 48
+          pdf_page_index: 47
+          published_page: 39
+          table: '17'
+        units: elemental at.% as printed
+        values:
+          quantity: measured_phase_elemental_compositions
+          method_class: measured_direct
+          schema_gap: "Candidate token equilibrium_phase_composition; d-223 accepts oxide-component wt_percent or mole_fraction, not elemental at_percent."
+          elements: [Cr, Mg, Al, Si, Ca, Mn, Fe, O]
+          rows:
+            - {sample: SY2, treatment: A, phase: larnite, values: ['0.2', '1.0', '0.3', '14.2', '36.5', '0.1', '0.3', '47.6']}
+            - {sample: SY2, treatment: A, phase: spinel, values: ['30.9', '12.0', '3.1', '0.1', '1.5', '1.4', '3.5', '47.5']}
+            - {sample: SY2, treatment: A, phase: wüstite, values: ['9.6', '34.6', '2.0', '0.0', '0.8', '1.8', '8.3', '43.0']}
+            - {sample: SY2, treatment: A, phase: periclase, values: ['2.0', '45.2', '0.1', '0.0', '0.4', '1.8', '9.7', '40.9']}
+            - {sample: SY2, treatment: B, phase: spinel, values: ['19.8', '18.8', '3.5', '0.0', '0.4', '1.1', '3.5', '52.9']}
+            - {sample: SY2, treatment: B, phase: larnite, values: ['0.2', '0.2', '0.3', '13.2', '32.7', '0.1', '0.2', '53.1']}
+            - {sample: SY2, treatment: B, phase: periclase, values: ['2.3', '41.8', '0.1', '0.1', '0.3', '1.0', '8.0', '46.6']}
+          disposition: Measured elemental phase compositions in at.%; unsupported by the available phase-composition basis.
+
+      - observation_id: albertsson2013_table18_sy3_phase_compositions
+        type: table_context
+        locator:
+          page: 48
+          pdf_page_index: 47
+          published_page: 40
+          table: '18'
+        units: elemental at.% as printed
+        values:
+          quantity: measured_phase_elemental_compositions
+          method_class: measured_direct
+          schema_gap: "Candidate token equilibrium_phase_composition; d-223 accepts oxide-component wt_percent or mole_fraction, not elemental at_percent."
+          elements: [Cr, Mg, Al, Si, Ca, Mn, Fe, O]
+          rows:
+            - {sample: SY3, treatment: A, phase: larnite, values: ['0.1', '0.1', '0.9', '13.2', '35.2', '0.1', '0.1', '50.3']}
+            - {sample: SY3, treatment: A, phase: periclase, values: ['0.3', '49.5', '0.1', '0.0', '0.7', '4.5', '0.8', '44.1']}
+            - {sample: SY3, treatment: A, phase: Ca3SiO5, values: ['0.2', '0.1', '1.2', '12.5', '35.2', '0.2', '0.2', '50.5']}
+            - {sample: SY3, treatment: A, phase: spinel, values: ['27.4', '6.9', '3.0', '0.1', '3.3', '4.9', '2.6', '51.8']}
+            - {sample: SY3, treatment: A, phase: brownmillerite, values: ['0.1', '2.6', '23.1', '1.1', '21.9', '0.8', '0.7', '50.0']}
+            - {sample: SY3, treatment: B, phase: larnite, values: ['0.2', '0.3', '0.3', '13.8', '36.9', '0.2', '0.3', '48.1']}
+            - {sample: SY3, treatment: B, phase: spinel, values: ['29.1', '11.3', '1.3', '0.4', '4.0', '2.0', '5.9', '46.1']}
+            - {sample: SY3, treatment: B, phase: wüstite, values: ['1.5', '5.5', '3.1', '5.5', '15.6', '1.8', '11.4', '55.6']}
+            - {sample: SY3, treatment: B, phase: periclase, values: ['1.3', '49.6', '0.0', '0.1', '1.1', '2.3', '6.1', '39.4']}
+          disposition: Measured elemental phase compositions in at.%; unsupported by the available phase-composition basis.
+
+      - observation_id: albertsson2013_table19_sy4_phase_compositions
+        type: table_context
+        locator:
+          page: 48
+          pdf_page_index: 47
+          published_page: 41
+          table: '19'
+        units: elemental at.% as printed
+        values:
+          quantity: measured_phase_elemental_compositions
+          method_class: measured_direct
+          schema_gap: "Candidate token equilibrium_phase_composition; d-223 accepts oxide-component wt_percent or mole_fraction, not elemental at_percent."
+          elements: [Cr, Mg, Al, Si, Ca, Mn, Fe, O]
+          rows:
+            - {sample: SY4, treatment: A, phase: Ca3SiO5, values: ['0.2', '0.2', '0.4', '12.5', '37.7', '0.1', '0.3', '48.5']}
+            - {sample: SY4, treatment: A, phase: wüstite, values: ['6.9', '2.4', '1.4', '1.2', '25.9', '0.5', '14.3', '47.4']}
+            - {sample: SY4, treatment: A, phase: periclase, values: ['1.6', '49.9', '0.0', '0.1', '0.5', '1.2', '5.2', '41.6']}
+            - {sample: SY4, treatment: A, phase: CaCr2O4, values: ['26.4', '1.9', '1.1', '0.2', '20.1', '0.6', '2.1', '47.9']}
+            - {sample: SY4, treatment: A, phase: spinel, values: ['19.1', '26.9', '1.1', '0.1', '2.6', '1.1', '3.2', '45.9']}
+            - {sample: SY4, treatment: B, phase: Ca3SiO5, values: ['0.4', '0.5', '0.4', '10.8', '38.2', '0.2', '0.5', '49.1']}
+            - {sample: SY4, treatment: B, phase: periclase, values: ['1.7', '46.9', '0.2', '0.1', '1.5', '1.4', '4.4', '43.8']}
+            - {sample: SY4, treatment: B, phase: CaCr2O4, values: ['26.4', '1.7', '0.0', '0.1', '19.8', '0.0', '2.5', '49.5']}
+            - {sample: SY4, treatment: B, phase: spinel, values: ['16.2', '18.9', '0.8', '1.2', '9.3', '1.2', '4.4', '48.5']}
+          disposition: Measured elemental phase compositions in at.%; unsupported by the available phase-composition basis.
+
+      - observation_id: albertsson2013_table20_wds_phase_compositions
+        type: table_context
+        locator:
+          page: 52
+          pdf_page_index: 51
+          published_page: 43
+          table: '20'
+        units: elemental at.% as printed
+        values:
+          quantity: WDS_elemental_composition_after_oxygen_heat_treatment
+          method_class: measured_direct
+          schema_gap: "Candidate token equilibrium_phase_composition; d-223 has no elemental at_percent basis."
+          treatment: 1873 K for 24 h in pure oxygen
+          elements: [O, Mg, Al, Si, Ca, Cr]
+          rows:
+            - {phase: spinel, values: ['61.82', '8.36', '29.65', '0.10', '0.04', '0.03']}
+            - {phase: matrix, values: ['66.59', '3.07', '17.84', '8.03', '4.47', '0.00']}
+          disposition: Measured WDS phase compositions in at.%, unsupported by the available phase-composition basis.
+
+      - observation_id: albertsson2013_figure9_cr_matrix_partition
+        type: figure_context
+        locator:
+          page: 29
+          pdf_page_index: 28
+          published_page: 20
+          figure: '9'
+        units: at.% Cr and basicity as plotted
+        values:
+          quantity: Cr_content_in_matrix_phases_vs_basicity
+          method_class: measured_direct
+          species_as_published: Cr
+          phase_as_published: matrix phases
+          temperature_K: '1873'
+          atmosphere: air
+          axes_as_published: {x: 'Basicity (CaO/SiO2)', y: 'Cr (at.%)'}
+          caption: "Variation in Cr content in matrix phases as a function of basicity (CaO/SiO2), heat-treatment regime I.a"
+          panel: whole figure
+          series: [{label: regime I.a, marker_count: 4}]
+          attribution: Albertsson (2013), present work
+          digitisation: deferred to a figure pass
+          note: Candidate for a Cr phase-composition or Cr partition token; the plotted y quantity is measured elemental at.% and remains a schema gap.
+
+      - observation_id: albertsson2013_figure10_factsage_cr2o3_activity
+        type: figure_context
+        locator:
+          page: 30
+          pdf_page_index: 29
+          published_page: 21
+          figure: '10'
+        units: dimensionless activity as plotted
+        values:
+          quantity: Cr2O3_activity_vs_basicity
+          method_class: model_derived
+          species_as_published: Cr2O3
+          phase_as_published: slag system
+          temperature_K: '1653'
+          axes_as_published: {x: 'Basicity (CaO/SiO2)', y: 'a(Cr2O3)'}
+          standard_state_as_printed: pure, super-cooled liquid Cr2O3
+          caption: "Activity of Cr2O3 in CaO-MgO-SiO2-Cr2O3 slag system at 1653 K as a function of basicity; FactSage thermodynamic calculation."
+          panel: whole figure
+          series: [{label: calculated activity, marker_count: 6}]
+          attribution: FactSage 6.1 calculation by Albertsson (2013)
+          digitisation: deferred to a figure pass
+          note: The printed super-cooled-liquid standard state is not a stable liquid reference at 1653 K; do not type as a measured melt activity.
+
+      - observation_id: albertsson2013_figure11_factsage_mgo_activity
+        type: figure_context
+        locator:
+          page: 30
+          pdf_page_index: 29
+          published_page: 21
+          figure: '11'
+        units: dimensionless activity as plotted
+        values:
+          quantity: MgO_activity_vs_basicity
+          method_class: model_derived
+          species_as_published: MgO
+          phase_as_published: slag system
+          temperature_K: '1653'
+          axes_as_published: {x: 'Basicity (CaO/SiO2)', y: 'a(MgO)'}
+          standard_state_as_printed: pure, super-cooled liquid MgO
+          caption: "Activity of MgO in CaO-MgO-SiO2-Cr2O3 slag system at 1653 K as a function of basicity; FactSage thermodynamic calculation."
+          panel: whole figure
+          series: [{label: calculated activity, marker_count: 6}]
+          attribution: FactSage 6.1 calculation by Albertsson (2013)
+          digitisation: deferred to a figure pass
+          note: The printed super-cooled-liquid standard state is not a stable liquid reference at 1653 K; do not type as a measured melt activity.
+
+      - observation_id: albertsson2013_figure16_cr_partition
+        type: figure_context
+        locator:
+          page: 36
+          pdf_page_index: 35
+          published_page: 27
+          figure: '16'
+        units: elemental at.% Cr; Al2O3 wt.% as plotted
+        values:
+          quantity: Cr_partition_between_spinel_and_matrix_vs_alumina
+          method_class: measured_direct
+          species_as_published: Cr
+          phase_as_published: spinel and matrix
+          axes_as_published: {x: 'Al2O3 (wt%)', y: 'Cr (at%)'}
+          caption: Cr partition in CaO-SiO2-MgO-Cr2O3-Al2O3 synthetic slag
+          panel: whole figure
+          series:
+            - {label: spinel at PO2=1e-4 Pa, marker_count: 4}
+            - {label: matrix at PO2=1e-4 Pa, marker_count: 4}
+            - {label: spinel in air, marker_count: 3}
+            - {label: matrix in air, marker_count: 4}
+          attribution: Albertsson (2013), present work
+          digitisation: deferred to a figure pass
+          note: Cr values are elemental at.% and lack a matching store basis.
+
+      - observation_id: albertsson2013_figure17_cr_partition
+        type: figure_context
+        locator:
+          page: 37
+          pdf_page_index: 36
+          published_page: 28
+          figure: '17'
+        units: wt.% Cr and Al2O3 as plotted
+        values:
+          quantity: Cr_partition_between_spinel_and_matrix_vs_alumina
+          method_class: measured_direct
+          species_as_published: Cr
+          phase_as_published: spinel and matrix
+          temperature_K: '1673'
+          oxygen_partial_pressure_Pa: '1e-4'
+          axes_as_published: {x: 'Al2O3 (wt%)', y: 'Cr (wt%)'}
+          caption: Cr partition in CaO-MgO-SiO2-Cr2O3-Al2O3 slag system soaked at PO2=1e-4 Pa, regime II.b, as a function of Al2O3 content
+          panel: whole figure
+          series:
+            - {label: spinel, marker_count: 3}
+            - {label: matrix, marker_count: 3}
+          attribution: Albertsson (2013), present work
+          digitisation: deferred to a figure pass
+          note: Figure-only values are deferred. The plotted phase chromium wt.% may be a candidate component-composition token, but the oxide-component identity is not printed.
+
+      - observation_id: albertsson2013_figure27_cr_content_vs_temperature
+        type: figure_context
+        locator:
+          page: 52
+          pdf_page_index: 51
+          published_page: 43
+          figure: '27'
+        units: at.% Cr and K as plotted
+        values:
+          quantity: average_Cr_content_in_slag_vs_temperature_after_oxygen_soak
+          method_class: measured_direct
+          species_as_published: Cr
+          phase_as_published: slag sample
+          axes_as_published: {x: 'T (K)', y: 'Cr (at%)'}
+          caption: Average Cr content in the slag as a function of temperature after 6 h in oxygen; sample thickness 0.5 mm
+          panel: whole figure
+          series: [{label: 6 h oxygen, marker_count: 3}]
+          attribution: Albertsson (2013), present work
+          digitisation: deferred to a figure pass
+          printed_prose_values:
+            - {temperature_K: '1873', Cr_content: '0', statement: chromium content reached zero after 6 h}
+            - {temperature_K: '1773', Cr_oxide_loss: 'about 50%', statement: Cr oxide loss after 6 h}
+          note: Prose numbers are preserved. Cr oxide mass loss has no matching token and is not identical to the plotted elemental Cr at.%.
+
+      - observation_id: albertsson2013_figure29_cr_content_vs_time
+        type: figure_context
+        locator:
+          page: 53
+          pdf_page_index: 52
+          published_page: 44
+          figure: '29'
+        units: at.% Cr and K as plotted
+        values:
+          quantity: average_Cr_content_in_slag_after_oxygen_soak
+          method_class: measured_direct
+          species_as_published: Cr
+          phase_as_published: slag sample
+          axes_as_published: {x: 'T (K)', y: 'Cr (at%)'}
+          caption: Average Cr content in the slag after 2 h and 6 h in oxygen
+          panel: whole figure
+          series:
+            - {label: 2 h O2, marker_count: 2}
+            - {label: 6 h O2, marker_count: 3}
+          attribution: Albertsson (2013), present work
+          digitisation: deferred to a figure pass
+
+      - observation_id: albertsson2013_figure30_weight_loss
+        type: figure_context
+        locator:
+          page: 55
+          pdf_page_index: 54
+          published_page: 46
+          figure: '30'
+        units: weight-loss axis as published; seconds
+        values:
+          quantity: sample_weight_loss_vs_time
+          method_class: measured_direct
+          species_as_published: Cr2O3-bearing slag
+          phase_as_published: slag sample
+          temperature_K: '1873'
+          atmosphere: oxygen
+          axes_as_published: {x: 't (s)', y: 'weight loss; original axis glyph appears as b'}
+          caption: The weight loss over time at 1873 K in oxygen at different slag basicities
+          panel: whole figure
+          series:
+            - {label: basicity 1.0, marker_count: 0}
+            - {label: basicity 1.5, marker_count: 0}
+            - {label: basicity 2.0, marker_count: 0}
+          attribution: Albertsson (2013), present work
+          digitisation: deferred to a figure pass
+          note: Smooth plotted traces without discrete markers; no values read.
+
+      - observation_id: albertsson2013_figure31_cr_partition
+        type: figure_context
+        locator:
+          page: 55
+          pdf_page_index: 54
+          published_page: 46
+          figure: '31'
+        units: Cr wt.% as labeled on bars
+        values:
+          quantity: chromium_partition_between_spinel_and_matrix_after_oxygen_soak
+          method_class: measured_direct
+          species_as_published: Cr
+          phase_as_published: spinel surface, spinel middle, matrix surface, matrix middle
+          temperature_K: '1873'
+          atmosphere: oxygen
+          axes_as_published: {x: slag basicity, y: values printed on bars; no y-axis title}
+          caption: Chromium partition in slag at different slag basicities after 6 h in oxygen at 1873 K
+          panel: whole figure
+          series:
+            - {label: spinel surface, marker_count: 3}
+            - {label: spinel middle, marker_count: 3}
+            - {label: matrix surface, marker_count: 3}
+            - {label: matrix middle, marker_count: 3}
+          attribution: Albertsson (2013), present work
+          digitisation: deferred to a figure pass
+          note: The bar labels are printed, but numeric figure points remain deferred under this wave's figure rule.
+
+      - observation_id: albertsson2013_figure32_calculated_crO3_pressure
+        type: figure_context
+        locator:
+          page: 56
+          pdf_page_index: 55
+          published_page: 47
+          figure: '32'
+        units: Pa as calculated
+        values:
+          quantity: CrO3_gas_partial_pressure_vs_temperature
+          method_class: model_derived
+          species_as_published: CrO3(g)
+          phase_as_published: gas
+          axes_as_published: {x: 'Temperature (K)', y: 'PCrO3 (Pa)'}
+          caption: CrO3(g) partial pressures at different Cr2O3 activities as a function of temperature
+          panel: whole figure
+          series:
+            - {label: a(Cr2O3)=1, marker_count: 8}
+            - {label: a(Cr2O3)=0.1, marker_count: 8}
+            - {label: a(Cr2O3)=0.05, marker_count: 8}
+            - {label: a(Cr2O3)=0.01, marker_count: 8}
+          attribution: FactSage calculation as discussed by Albertsson (2013)
+          digitisation: deferred to a figure pass
+          note: Calculated curve data, not measurements.
+
+      - observation_id: albertsson2013_figure7_factsage_phase_diagram
+        type: figure_context
+        locator:
+          page: 25
+          pdf_page_index: 24
+          published_page: 16
+          figure: '7'
+        units: temperature and mass composition axes as printed
+        values:
+          quantity: FactSage_isopleth_phase_diagram
+          method_class: model_derived
+          species_as_published: CaO-MgO-SiO2-Cr2O3 system
+          temperature_range_K: '1673-1873'
+          axes_as_published: {x: 'mass CaO/(CaO+SiO2+MgO+Cr2O3)', y: 'T (°C), 1300-1600'}
+          caption: Isopleth for the CaO-MgO-SiO2-Cr2O3 system; solid triangles mark designed slag compositions
+          panel: whole figure
+          series: [{label: calculated phase fields and six current-work composition markers, marker_count: 6}]
+          attribution: FactSage 6.1 calculation by Albertsson (2013)
+          digitisation: deferred to a figure pass
+          note: Calculated phase diagram, no numeric points extracted.
+
+      - observation_id: albertsson2013_context_activity_standard_state
+        type: thermodynamic_context
+        locator:
+          page: 29
+          pdf_page_index: 28
+          published_page: 20
+          section: "4.2.1 Effect of basicity on chromium partition in slag"
+        units: K
+        values:
+          quantity: activity_reference_state
+          method_class: method_only
+          reference: pure, super-cooled liquid Cr2O3 and MgO
+          temperature_K: '1653'
+          note: Authors explicitly selected super-cooled liquid standards; these are not stable liquid reference phases at 1653 K.
+
+      - observation_id: albertsson2013_context_printed_cr_loss
+        type: measured_context
+        locator:
+          page: 52
+          pdf_page_index: 51
+          published_page: 43
+          section: "4.2.7 Effect of temperature on the Cr-oxide vaporization rate"
+        units: at.% and percent as printed
+        values:
+          quantity: prose_reported_chromium_loss_during_oxygen_soak
+          method_class: measured_direct
+          printed_values:
+            T_1873_K_after_6h: 'Cr content reached 0 at.%'
+            T_1773_K_after_6h: about 50% Cr oxide loss
+            sample_thickness_mm: '0.5'
+          schema_gap: Cr oxide loss percent is not a typed residue-composition or partition quantity.
+
+      - observation_id: albertsson2013_context_matrix_chromium_local_values
+        type: measured_context
+        locator:
+          page: 28
+          pdf_page_index: 27
+          published_page: 19
+          section: "4.2.1 Effect of basicity on the chromium partition in slag"
+        units: elemental at.% and particle size as printed
+        values:
+          quantity: chromium_content_in_matrix_and_periclase_features
+          method_class: measured_direct
+          temperature_K: '1873'
+          atmosphere: air
+          treatment: 24 h soak followed by water quench
+          observations:
+            - {feature: eutectic liquid-derived matrix, chromium_at_percent: up to 5}
+            - {feature: matrix close to spinel surface, chromium_at_percent: less than 1.6}
+            - {sample_group: S5-S6, phase: periclase, chromium_at_percent: '5.6'}
+            - {sample_group: S5-S6, phase: periclase, particle_size_um: up to 50}
+            - {sample: S3, phase: spinel, crystal_size_um: '2.5'}
+          schema_gap: Elemental at.% phase compositions have no matching d-223 basis.
+
+      - observation_id: albertsson2013_context_pt_cr_partition_72h
+        type: measured_context
+        locator:
+          page: 38
+          pdf_page_index: 37
+          published_page: 29
+          section: "4.2.4 Influence of the Al2O3 addition on chromium partition in slag"
+        units: elemental at.% as printed
+        values:
+          quantity: chromium_partition_after_extended_low_oxygen_soak
+          method_class: measured_direct
+          temperature_K: '1673'
+          oxygen_partial_pressure_Pa: '1e-4'
+          soak_time_h: '72'
+          observations:
+            - {phase: matrix, chromium_at_percent: below_WDS_detection_limit}
+            - {phase: Pt crucible, alumina_wt_percent: '3', chromium_at_percent: '4.5'}
+            - {phase: Pt crucible, alumina_wt_percent: '12', chromium_at_percent: '0.5'}
+          note: Authors state almost all Cr was bound to spinel and metallic phases.
+          schema_gap: Elemental at.% phase compositions have no matching d-223 basis.
+
+      - observation_id: albertsson2013_context_pt_cr_wds_noise
+        type: measured_context
+        locator:
+          page: 41
+          pdf_page_index: 40
+          published_page: 32
+          section: "4.2.5 Cr immobilization in industrial slags"
+        units: elemental at.% as printed
+        values:
+          quantity: chromium_in_pt_crucible_at_wds_noise_level
+          method_class: measured_direct
+          chromium_at_percent_as_published: around 0.02
+          schema_gap: Elemental at.% phase composition has no matching d-223 basis.
