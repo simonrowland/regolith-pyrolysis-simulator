@@ -54,6 +54,10 @@ from simulator.melt_backend.pure_phase_janaf_score import (
     reaction_sum,
     require_polymorph_match,
 )
+from tests.engine_availability import (
+    magemin_binary_available,
+    thermoengine_package_available,
+)
 
 # --- printed JANAF rows (data/literature/compilations/janaf/tables) --------
 # 1000 K formation_gibbs_energy, kJ/mol, as printed:
@@ -821,37 +825,13 @@ def test_build_all_rows_one_bad_phase_does_not_abort():
     )
 
 
-def _thermoengine_available() -> bool:
-    try:
-        from simulator.engine_local_config import setup_thermoengine_dylib_path
-
-        setup_thermoengine_dylib_path()
-        import thermoengine  # noqa: F401
-        return True
-    except Exception:
-        return False
-
-
 needs_thermoengine = pytest.mark.skipif(
-    not _thermoengine_available(),
+    not thermoengine_package_available(),
     reason='ThermoEngine dylibs/package unavailable on this machine',
 )
 
-
-def _magemin_binary_available() -> bool:
-    try:
-        from simulator.engine_local_config import configured_magemin_binary_path
-        from simulator.melt_backend.magemin import MAGEMinBackend
-
-        if configured_magemin_binary_path() is not None:
-            return True
-        return MAGEMinBackend._locate_binary(None) is not None
-    except Exception:
-        return False
-
-
 needs_magemin = pytest.mark.skipif(
-    not _magemin_binary_available(),
+    not magemin_binary_available(),
     reason='no MAGEMin binary',
 )
 

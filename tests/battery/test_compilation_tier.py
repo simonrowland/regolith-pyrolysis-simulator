@@ -61,6 +61,10 @@ from simulator.battery.score import (
 )
 from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
 from tests.battery import factories as F
+from tests.engine_availability import (
+    magemin_binary_available,
+    thermoengine_package_available,
+)
 
 _PRINTED_DFG = Decimal("-3.886")
 _PRINTED_LOGK = Decimal("0.092")
@@ -3982,30 +3986,6 @@ def _crystal_thermo_identity(formula: str, polymorph: str | None, temperature_K:
     return _pure_standard_identity(identity, Quantity.S)
 
 
-def _magemin_binary_available() -> bool:
-    try:
-        from simulator.engine_local_config import configured_magemin_binary_path
-        from simulator.melt_backend.magemin import MAGEMinBackend
-
-        if configured_magemin_binary_path() is not None:
-            return True
-        return MAGEMinBackend._locate_binary(None) is not None
-    except Exception:
-        return False
-
-
-def _thermoengine_package_available() -> bool:
-    try:
-        from simulator.engine_local_config import setup_thermoengine_dylib_path
-
-        setup_thermoengine_dylib_path()
-        import thermoengine  # noqa: F401
-
-        return True
-    except Exception:
-        return False
-
-
 def _close_cached_backend(engine: Engine) -> None:
     from simulator.battery import compilation_tier
 
@@ -4038,7 +4018,7 @@ def test_magemin_lunar_unset_tio2_entropy_matches_janaf_o045() -> None:
     assert held.value is None
     assert held.refusal_detail["reason"] == "pure-phase-call-required"
     assert held.refusal_detail["symbol"] == "ru"
-    if not _magemin_binary_available():
+    if not magemin_binary_available():
         pytest.skip("no MAGEMin binary")
     try:
         attempt = predict_thermo_attempt(Engine.MAGEMIN, observation)
@@ -4070,7 +4050,7 @@ def test_thermoengine_lunar_rutile_entropy_matches_janaf_o043() -> None:
     assert held.value is None
     assert held.refusal_detail["reason"] == "pure-phase-call-required"
     assert held.refusal_detail["symbol"] == "Rt"
-    if not _thermoengine_package_available():
+    if not thermoengine_package_available():
         pytest.skip("ThermoEngine package unavailable")
     try:
         attempt = predict_thermo_attempt(Engine.THERMOENGINE, observation)
