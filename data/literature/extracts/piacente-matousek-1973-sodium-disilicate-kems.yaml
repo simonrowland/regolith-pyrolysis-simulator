@@ -1,0 +1,1970 @@
+schema_version: literature_extract.v1
+source_id: piacente-matousek-1973-sodium-disilicate-kems
+source:
+  citation: Piacente, V. & Matoušek, J. (1973), ‘Mass spectrometric determination of sodium partial pressures over the system
+    Na2O.2SiO2’, Silikáty 17(4):269–281.
+  doi: null
+  url: null
+  year: 1973
+extraction:
+  method: Full machine-text transcription from MinerU table blocks and markdown with pdftotext-layout cross-check; flagged
+    differences resolved from PDF page renders 4 and 7. See data/literature/extracts/piacente-matousek-1973-sodium-disilicate-kems-audit.md.
+  date: '2026-10-22'
+  worker: wave51-F62
+review_status: draft
+fidelity_samples:
+- path: species.Na.observations[piacente_1973_run_2_1_partial_pressure].values.points[6].P_Na_times_10^7_atm_as_printed
+  value: '90.7'
+  note: Table I, run 2.1, row 7 at 1490 K; checked against page 4 render.
+  locator:
+    published_page: 272
+    pdf_page_index: 3
+    table: I
+- path: species.Na.observations[piacente_1973_run_3_1_partial_pressure].values.points[4].ion_intensity_as_printed
+  value: '11'
+  note: Table II, run 3.1, row 5 at 1430 K; render reads 11 × 10^-12.
+  locator:
+    published_page: 272
+    pdf_page_index: 3
+    table: II
+- path: species.Na.observations[piacente_1973_run_5_0_partial_pressure].values.points[5].P_Na_times_10^7_atm_as_printed
+  value: '12.18'
+  note: Table IV, run 5.0, row 6 at 1523 K; printed value preserved despite possible factor-of-ten slip.
+  locator:
+    published_page: 275
+    pdf_page_index: 6
+    table: IV
+benches:
+- id: piacente-1973-kems
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometer
+    locator:
+      published_page: 270
+      pdf_page_index: 1
+      section: Experimental and Results
+experiments:
+- experiment_id: run-1.0
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 272
+    pdf_page_index: 3
+    table: I
+    note: Table I; run 1.0.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: reported point temperatures are stored on each observation
+      locator: &id001
+        published_page: 272
+        pdf_page_index: 3
+        table: I
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id001
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id001
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  apparatus:
+    other_facts:
+    - name: cell_material_as_printed
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: Mo
+        locator: &id002
+          published_page: 270
+          pdf_page_index: 1
+          section: Experimental and Results
+          note: Molybdenum cell described; Table I identifies the runs.
+    - name: instrument_constant
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: 4.46 × 10^-3
+        locator: *id001
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: weight_percent
+          components:
+          - - Na2O
+            - '34.1'
+          - - SiO2
+            - '65.9'
+      locator: &id003
+        published_page: 270
+        pdf_page_index: 1
+        section: Experimental and Results
+        note: 'Starting glass composition as printed: 34.1 Na2O and 65.9 SiO2 wt.%'
+- experiment_id: run-2.1
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 272
+    pdf_page_index: 3
+    table: I
+    note: Table I; run 2.1.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: reported point temperatures are stored on each observation
+      locator: *id001
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id001
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id001
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  apparatus:
+    other_facts:
+    - name: cell_material_as_printed
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: Mo
+        locator: *id002
+    - name: instrument_constant
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: 1.1 × 10^-3
+        locator: *id001
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: weight_percent
+          components:
+          - - Na2O
+            - '34.1'
+          - - SiO2
+            - '65.9'
+      locator: *id003
+- experiment_id: run-2.2
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 272
+    pdf_page_index: 3
+    table: I
+    note: Table I; run 2.2.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: reported point temperatures are stored on each observation
+      locator: *id001
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id001
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id001
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  apparatus:
+    other_facts:
+    - name: cell_material_as_printed
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: Mo
+        locator: *id002
+    - name: instrument_constant
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: 1.1 × 10^-3
+        locator: *id001
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: weight_percent
+          components:
+          - - Na2O
+            - '34.1'
+          - - SiO2
+            - '65.9'
+      locator: *id003
+- experiment_id: run-2.3
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 272
+    pdf_page_index: 3
+    table: I
+    note: Table I; run 2.3.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: reported point temperatures are stored on each observation
+      locator: *id001
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id001
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id001
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  apparatus:
+    other_facts:
+    - name: cell_material_as_printed
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: Mo
+        locator: *id002
+    - name: instrument_constant
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: 1.1 × 10^-3
+        locator: *id001
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: weight_percent
+          components:
+          - - Na2O
+            - '34.1'
+          - - SiO2
+            - '65.9'
+      locator: *id003
+- experiment_id: run-3.0
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 272
+    pdf_page_index: 3
+    table: II
+    note: Table II; run 3.0.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: reported point temperatures are stored on each observation
+      locator: &id004
+        published_page: 272
+        pdf_page_index: 3
+        table: II
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id004
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id004
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  apparatus:
+    other_facts:
+    - name: cell_material_as_printed
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: MgO
+        locator: &id005
+          published_page: 272
+          pdf_page_index: 3
+          table: II
+          note: MgO crucible; instrument constant 4.8 × 10^-3.
+    - name: instrument_constant
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: 4.8 × 10^-3
+        locator: *id004
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: weight_percent
+          components:
+          - - Na2O
+            - '34.1'
+          - - SiO2
+            - '65.9'
+      locator: *id003
+- experiment_id: run-3.1
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 272
+    pdf_page_index: 3
+    table: II
+    note: Table II; run 3.1.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: reported point temperatures are stored on each observation
+      locator: *id004
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id004
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id004
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  apparatus:
+    other_facts:
+    - name: cell_material_as_printed
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: MgO
+        locator: *id005
+    - name: instrument_constant
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: 4.8 × 10^-3
+        locator: *id004
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: weight_percent
+          components:
+          - - Na2O
+            - '34.1'
+          - - SiO2
+            - '65.9'
+      locator: *id003
+- experiment_id: run-4.0
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 275
+    pdf_page_index: 6
+    table: III
+    note: Table III; run 4.0.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: reported point temperatures are stored on each observation
+      locator: &id006
+        published_page: 275
+        pdf_page_index: 6
+        table: III
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id006
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id006
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  apparatus:
+    other_facts:
+    - name: cell_material_as_printed
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: Re
+        locator: &id013
+          published_page: 274
+          pdf_page_index: 5
+          section: Evaporation from rhenium crucible
+          note: Rhenium cell; instrument constant 6.2 × 10^-2.
+    - name: instrument_constant
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: 6.2 × 10^-2
+        locator: *id006
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: weight_percent
+          components:
+          - - Na2O
+            - '34.1'
+          - - SiO2
+            - '65.9'
+      locator: *id003
+- experiment_id: run-5.0
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 275
+    pdf_page_index: 6
+    table: IV
+    note: Table IV; run 5.0.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: reported point temperatures are stored on each observation
+      locator: &id007
+        published_page: 275
+        pdf_page_index: 6
+        table: IV
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id007
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id007
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  apparatus:
+    other_facts:
+    - name: cell_material_as_printed
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: Ta
+        locator: &id014
+          published_page: 276
+          pdf_page_index: 7
+          section: Evaporation from tantalum crucible
+          note: Tantalum cell; instrument constant 1.5 × 10^-3.
+    - name: instrument_constant
+      unit: as_printed
+      value:
+        state:
+          tag: value
+          value: 1.5 × 10^-3
+        locator: *id007
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: weight_percent
+          components:
+          - - Na2O
+            - '34.1'
+          - - SiO2
+            - '65.9'
+      locator: *id003
+- experiment_id: run-mo-fit
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator: &id008
+    published_page: 271
+    pdf_page_index: 2
+    paragraph: Evaporation from Mo cell
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: fit applies across the source's reported temperature series
+      locator: *id008
+- experiment_id: run-mgo-fit
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator: &id009
+    published_page: 273
+    pdf_page_index: 4
+    paragraph: Evaporation from MgO cell
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: fit applies across the source's reported temperature series
+      locator: *id009
+- experiment_id: run-re-fit
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator: &id010
+    published_page: 274
+    pdf_page_index: 5
+    paragraph: Evaporation from Re cell
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: fit applies across the source's reported temperature series
+      locator: *id010
+- experiment_id: run-ta-fit
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator: &id011
+    published_page: 276
+    pdf_page_index: 7
+    paragraph: Evaporation from Ta cell
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: fit applies across the source's reported temperature series
+      locator: *id011
+- experiment_id: four-cell-mean
+  bench_id: piacente-1973-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 276
+    pdf_page_index: 7
+    section: Discussion
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1415'
+      locator:
+        published_page: 276
+        pdf_page_index: 7
+        section: Discussion
+        note: Middle temperature as printed.
+species:
+  Na:
+    observations:
+    - observation_id: piacente_1973_run_1_0_partial_pressure
+      type: partial_pressure
+      experiment: run-1.0
+      locator:
+        published_page: 272
+        pdf_page_index: 3
+        table: I
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      units: atm (P_Na × 10^7 as printed)
+      values:
+        quantity: partial_pressure
+        gas_species: Na
+        method_class: measured_direct
+        admission_status: admitted
+        method: knudsen_effusion
+        method_as_printed: mass spectrometric Knudsen effusion
+        composition_wt_pct: &id012
+          Na2O: '34.1'
+          SiO2: '65.9'
+        parent_formula: Na2O.2SiO2
+        reservoir:
+          formula: Na2O.2SiO2
+          phase: l
+        pressure_scale_as_printed: P_Na × 10^7 atm
+        series: Table I, experiment 1.0
+        points:
+        - T_K: '1350'
+          ion_intensity_as_printed: '27.8'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '8.4'
+          pressure_atm: '8.4E-7'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 1
+            note: Run 1.0; printed row 1.
+        - T_K: '1390'
+          ion_intensity_as_printed: '61.7'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '19.2'
+          pressure_atm: '0.00000192'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 2
+            note: Run 1.0; printed row 2.
+        - T_K: '1415'
+          ion_intensity_as_printed: '105.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '33.1'
+          pressure_atm: '0.00000331'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 3
+            note: Run 1.0; printed row 3.
+        - T_K: '1410'
+          ion_intensity_as_printed: '92.5'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '29.0'
+          pressure_atm: '0.00000290'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 4
+            note: Run 1.0; printed row 4.
+        - T_K: '1375'
+          ion_intensity_as_printed: '48.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '13.7'
+          pressure_atm: '0.00000137'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 5
+            note: Run 1.0; printed row 5.
+        - T_K: '1415'
+          ion_intensity_as_printed: '105.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '33.1'
+          pressure_atm: '0.00000331'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 6
+            note: Run 1.0; printed row 6.
+        - T_K: '1430'
+          ion_intensity_as_printed: '140.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '44.7'
+          pressure_atm: '0.00000447'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 7
+            note: Run 1.0; printed row 7.
+        - T_K: '1502'
+          ion_intensity_as_printed: '360.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '121.0'
+          pressure_atm: '0.00001210'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 8
+            note: Run 1.0; printed row 8.
+        - T_K: '1536'
+          ion_intensity_as_printed: '440.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '151.0'
+          pressure_atm: '0.00001510'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 9
+            note: Run 1.0; printed row 9.
+        - T_K: '1543'
+          ion_intensity_as_printed: '480.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '158.0'
+          pressure_atm: '0.00001580'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 10
+            note: Run 1.0; printed row 10.
+        - T_K: '1553'
+          ion_intensity_as_printed: '720.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '250.0'
+          pressure_atm: '0.00002500'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 11
+            note: Run 1.0; printed row 11.
+      equipment:
+        cell_material_and_liner:
+          value: Mo
+          locator: *id002
+    - observation_id: piacente_1973_run_2_1_partial_pressure
+      type: partial_pressure
+      experiment: run-2.1
+      locator:
+        published_page: 272
+        pdf_page_index: 3
+        table: I
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      units: atm (P_Na × 10^7 as printed)
+      values:
+        quantity: partial_pressure
+        gas_species: Na
+        method_class: measured_direct
+        admission_status: admitted
+        method: knudsen_effusion
+        method_as_printed: mass spectrometric Knudsen effusion
+        composition_wt_pct: *id012
+        parent_formula: Na2O.2SiO2
+        reservoir:
+          formula: Na2O.2SiO2
+          phase: l
+        pressure_scale_as_printed: P_Na × 10^7 atm
+        series: Table I, experiment 2.1
+        points:
+        - T_K: '1395'
+          ion_intensity_as_printed: '15.5'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '19.6'
+          pressure_atm: '0.00000196'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 1
+            note: Run 2.1; printed row 1.
+        - T_K: '1431'
+          ion_intensity_as_printed: '26.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '32.9'
+          pressure_atm: '0.00000329'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 2
+            note: Run 2.1; printed row 2.
+        - T_K: '1424'
+          ion_intensity_as_printed: '24.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '31.0'
+          pressure_atm: '0.00000310'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 3
+            note: Run 2.1; printed row 3.
+        - T_K: '1434'
+          ion_intensity_as_printed: '32.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '41.7'
+          pressure_atm: '0.00000417'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 4
+            note: Run 2.1; printed row 4.
+        - T_K: '1441'
+          ion_intensity_as_printed: '33.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '43.2'
+          pressure_atm: '0.00000432'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 5
+            note: Run 2.1; printed row 5.
+        - T_K: '1458'
+          ion_intensity_as_printed: '42.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '55.5'
+          pressure_atm: '0.00000555'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 6
+            note: Run 2.1; printed row 6.
+        - T_K: '1490'
+          ion_intensity_as_printed: '67.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '90.7'
+          pressure_atm: '0.00000907'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 7
+            note: Run 2.1; printed row 7.
+        - T_K: '1480'
+          ion_intensity_as_printed: '60.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '80.6'
+          pressure_atm: '0.00000806'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 8
+            note: Run 2.1; printed row 8.
+        - T_K: '1502'
+          ion_intensity_as_printed: '78.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '106.0'
+          pressure_atm: '0.00001060'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 9
+            note: Run 2.1; printed row 9.
+        - T_K: '1453'
+          ion_intensity_as_printed: '38.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '50.1'
+          pressure_atm: '0.00000501'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 10
+            note: Run 2.1; printed row 10.
+        - T_K: '1463'
+          ion_intensity_as_printed: '46.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '61.2'
+          pressure_atm: '0.00000612'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 11
+            note: Run 2.1; printed row 11.
+        - T_K: '1494'
+          ion_intensity_as_printed: '70.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '94.5'
+          pressure_atm: '0.00000945'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 12
+            note: Run 2.1; printed row 12.
+      equipment:
+        cell_material_and_liner:
+          value: Mo
+          locator: *id002
+    - observation_id: piacente_1973_run_2_2_partial_pressure
+      type: partial_pressure
+      experiment: run-2.2
+      locator:
+        published_page: 272
+        pdf_page_index: 3
+        table: I
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      units: atm (P_Na × 10^7 as printed)
+      values:
+        quantity: partial_pressure
+        gas_species: Na
+        method_class: measured_direct
+        admission_status: admitted
+        method: knudsen_effusion
+        method_as_printed: mass spectrometric Knudsen effusion
+        composition_wt_pct: *id012
+        parent_formula: Na2O.2SiO2
+        reservoir:
+          formula: Na2O.2SiO2
+          phase: l
+        pressure_scale_as_printed: P_Na × 10^7 atm
+        series: Table I, experiment 2.2
+        points:
+        - T_K: '1424'
+          ion_intensity_as_printed: '23.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '29.7'
+          pressure_atm: '0.00000297'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 1
+            note: Run 2.2; printed row 1.
+        - T_K: '1444'
+          ion_intensity_as_printed: '28.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '36.6'
+          pressure_atm: '0.00000366'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 2
+            note: Run 2.2; printed row 2.
+        - T_K: '1463'
+          ion_intensity_as_printed: '37.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '49.2'
+          pressure_atm: '0.00000492'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 3
+            note: Run 2.2; printed row 3.
+        - T_K: '1487'
+          ion_intensity_as_printed: '45.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '60.7'
+          pressure_atm: '0.00000607'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 4
+            note: Run 2.2; printed row 4.
+        - T_K: '1497'
+          ion_intensity_as_printed: '54.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '73.2'
+          pressure_atm: '0.00000732'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 5
+            note: Run 2.2; printed row 5.
+        - T_K: '1453'
+          ion_intensity_as_printed: '31.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '40.9'
+          pressure_atm: '0.00000409'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 6
+            note: Run 2.2; printed row 6.
+        - T_K: '1419'
+          ion_intensity_as_printed: '19.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '24.4'
+          pressure_atm: '0.00000244'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 7
+            note: Run 2.2; printed row 7.
+        - T_K: '1506'
+          ion_intensity_as_printed: '60.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '82.0'
+          pressure_atm: '0.00000820'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 8
+            note: Run 2.2; printed row 8.
+        - T_K: '1511'
+          ion_intensity_as_printed: '68.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '92.7'
+          pressure_atm: '0.00000927'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 9
+            note: Run 2.2; printed row 9.
+        - T_K: '1516'
+          ion_intensity_as_printed: '80.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '110.0'
+          pressure_atm: '0.00001100'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 10
+            note: Run 2.2; printed row 10.
+        - T_K: '1526'
+          ion_intensity_as_printed: '90.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '124.0'
+          pressure_atm: '0.00001240'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 11
+            note: Run 2.2; printed row 11.
+      equipment:
+        cell_material_and_liner:
+          value: Mo
+          locator: *id002
+    - observation_id: piacente_1973_run_2_3_partial_pressure
+      type: partial_pressure
+      experiment: run-2.3
+      locator:
+        published_page: 272
+        pdf_page_index: 3
+        table: I
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      units: atm (P_Na × 10^7 as printed)
+      values:
+        quantity: partial_pressure
+        gas_species: Na
+        method_class: measured_direct
+        admission_status: admitted
+        method: knudsen_effusion
+        method_as_printed: mass spectrometric Knudsen effusion
+        composition_wt_pct: *id012
+        parent_formula: Na2O.2SiO2
+        reservoir:
+          formula: Na2O.2SiO2
+          phase: l
+        pressure_scale_as_printed: P_Na × 10^7 atm
+        series: Table I, experiment 2.3
+        points:
+        - T_K: '1540'
+          ion_intensity_as_printed: '140.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '189.0'
+          pressure_atm: '0.00001890'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 1
+            note: Run 2.3; printed row 1.
+        - T_K: '1352'
+          ion_intensity_as_printed: '9.5'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '11.6'
+          pressure_atm: '0.00000116'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 2
+            note: Run 2.3; printed row 2.
+        - T_K: '1395'
+          ion_intensity_as_printed: '21.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '26.5'
+          pressure_atm: '0.00000265'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 3
+            note: Run 2.3; printed row 3.
+        - T_K: '1424'
+          ion_intensity_as_printed: '32.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '41.4'
+          pressure_atm: '0.00000414'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 4
+            note: Run 2.3; printed row 4.
+        - T_K: '1439'
+          ion_intensity_as_printed: '39.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '51.0'
+          pressure_atm: '0.00000510'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 5
+            note: Run 2.3; printed row 5.
+        - T_K: '1453'
+          ion_intensity_as_printed: '50.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '66.1'
+          pressure_atm: '0.00000661'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 6
+            note: Run 2.3; printed row 6.
+        - T_K: '1475'
+          ion_intensity_as_printed: '65.0'
+          ion_intensity_scale_as_printed: × 10^-13 working units
+          P_Na_times_10^7_atm_as_printed: '87.1'
+          pressure_atm: '0.00000871'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: I
+            row: 7
+            note: Run 2.3; printed row 7.
+      equipment:
+        cell_material_and_liner:
+          value: Mo
+          locator: *id002
+    - observation_id: piacente_1973_run_3_0_partial_pressure
+      type: partial_pressure
+      experiment: run-3.0
+      locator:
+        published_page: 272
+        pdf_page_index: 3
+        table: II
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      units: atm (P_Na × 10^7 as printed)
+      values:
+        quantity: partial_pressure
+        gas_species: Na
+        method_class: measured_direct
+        admission_status: admitted
+        method: knudsen_effusion
+        method_as_printed: mass spectrometric Knudsen effusion
+        composition_wt_pct: *id012
+        parent_formula: Na2O.2SiO2
+        reservoir:
+          formula: Na2O.2SiO2
+          phase: l
+        pressure_scale_as_printed: P_Na × 10^7 atm
+        series: Table II, experiment 3.0
+        points:
+        - T_K: '1328'
+          ion_intensity_as_printed: '20'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '5.53'
+          pressure_atm: '5.53E-7'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 1
+            note: Run 3.0; printed row 1.
+        - T_K: '1348'
+          ion_intensity_as_printed: '29'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '8.14'
+          pressure_atm: '8.14E-7'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 2
+            note: Run 3.0; printed row 2.
+        - T_K: '1363'
+          ion_intensity_as_printed: '35'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '9.94'
+          pressure_atm: '9.94E-7'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 3
+            note: Run 3.0; printed row 3.
+        - T_K: '1373'
+          ion_intensity_as_printed: '42.5'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '12.16'
+          pressure_atm: '0.000001216'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 4
+            note: Run 3.0; printed row 4.
+        - T_K: '1388'
+          ion_intensity_as_printed: '52'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '15.04'
+          pressure_atm: '0.000001504'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 5
+            note: Run 3.0; printed row 5.
+        - T_K: '1398'
+          ion_intensity_as_printed: '66'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '19.22'
+          pressure_atm: '0.000001922'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 6
+            note: Run 3.0; printed row 6.
+        - T_K: '1408'
+          ion_intensity_as_printed: '77'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '22.59'
+          pressure_atm: '0.000002259'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 7
+            note: Run 3.0; printed row 7.
+        - T_K: '1416'
+          ion_intensity_as_printed: '92'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '27.14'
+          pressure_atm: '0.000002714'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 8
+            note: Run 3.0; printed row 8.
+        - T_K: '1393'
+          ion_intensity_as_printed: '60.5'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '17.56'
+          pressure_atm: '0.000001756'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 9
+            note: Run 3.0; printed row 9.
+        - T_K: '1383'
+          ion_intensity_as_printed: '46'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '13.25'
+          pressure_atm: '0.000001325'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 10
+            note: Run 3.0; printed row 10.
+        - T_K: '1353'
+          ion_intensity_as_printed: '32'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '9.02'
+          pressure_atm: '9.02E-7'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 11
+            note: Run 3.0; printed row 11.
+        - T_K: '1313'
+          ion_intensity_as_printed: '16'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '4.38'
+          pressure_atm: '4.38E-7'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 12
+            note: Run 3.0; printed row 12.
+      equipment:
+        cell_material_and_liner:
+          value: MgO
+          locator: *id005
+    - observation_id: piacente_1973_run_3_1_partial_pressure
+      type: partial_pressure
+      experiment: run-3.1
+      locator:
+        published_page: 272
+        pdf_page_index: 3
+        table: II
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      units: atm (P_Na × 10^7 as printed)
+      values:
+        quantity: partial_pressure
+        gas_species: Na
+        method_class: measured_direct
+        admission_status: admitted
+        method: knudsen_effusion
+        method_as_printed: mass spectrometric Knudsen effusion
+        composition_wt_pct: *id012
+        parent_formula: Na2O.2SiO2
+        reservoir:
+          formula: Na2O.2SiO2
+          phase: l
+        pressure_scale_as_printed: P_Na × 10^7 atm
+        series: Table II, experiment 3.1
+        points:
+        - T_K: '1278'
+          ion_intensity_as_printed: '6.5'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '1.73'
+          pressure_atm: '1.73E-7'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 1
+            note: Run 3.1; printed row 1.
+        - T_K: '1283'
+          ion_intensity_as_printed: '8'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '2.14'
+          pressure_atm: '2.14E-7'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 2
+            note: Run 3.1; printed row 2.
+        - T_K: '1288'
+          ion_intensity_as_printed: '9'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '2.41'
+          pressure_atm: '2.41E-7'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 3
+            note: Run 3.1; printed row 3.
+        - T_K: '1313'
+          ion_intensity_as_printed: '13'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '3.56'
+          pressure_atm: '3.56E-7'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 4
+            note: Run 3.1; printed row 4.
+        - T_K: '1430'
+          ion_intensity_as_printed: '11'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '32.77'
+          pressure_atm: '0.000003277'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 5
+            note: Run 3.1; printed row 5.
+        - T_K: '1463'
+          ion_intensity_as_printed: '23'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '70.10'
+          pressure_atm: '0.000007010'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 6
+            note: Run 3.1; printed row 6.
+        - T_K: '1496'
+          ion_intensity_as_printed: '45'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '109.08'
+          pressure_atm: '0.000010908'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 7
+            note: Run 3.1; printed row 7.
+        - T_K: '1530'
+          ion_intensity_as_printed: '56'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '178.50'
+          pressure_atm: '0.000017850'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 8
+            note: Run 3.1; printed row 8.
+        - T_K: '1428'
+          ion_intensity_as_printed: '13'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '38.67'
+          pressure_atm: '0.000003867'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 9
+            note: Run 3.1; printed row 9.
+        - T_K: '1478'
+          ion_intensity_as_printed: '25'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '76.98'
+          pressure_atm: '0.000007698'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 10
+            note: Run 3.1; printed row 10.
+        - T_K: '1498'
+          ion_intensity_as_printed: '35'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '109.23'
+          pressure_atm: '0.000010923'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 11
+            note: Run 3.1; printed row 11.
+        - T_K: '1513'
+          ion_intensity_as_printed: '46'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '144.99'
+          pressure_atm: '0.000014499'
+          locator:
+            published_page: 272
+            pdf_page_index: 3
+            table: II
+            row: 12
+            note: Run 3.1; printed row 12.
+      equipment:
+        cell_material_and_liner:
+          value: MgO
+          locator: *id005
+    - observation_id: piacente_1973_run_4_0_partial_pressure
+      type: partial_pressure
+      experiment: run-4.0
+      locator:
+        published_page: 275
+        pdf_page_index: 6
+        table: III
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      units: atm (P_Na × 10^7 as printed)
+      values:
+        quantity: partial_pressure
+        gas_species: Na
+        method_class: measured_direct
+        admission_status: admitted
+        method: knudsen_effusion
+        method_as_printed: mass spectrometric Knudsen effusion
+        composition_wt_pct: *id012
+        parent_formula: Na2O.2SiO2
+        reservoir:
+          formula: Na2O.2SiO2
+          phase: l
+        pressure_scale_as_printed: P_Na × 10^7 atm
+        series: Table III, experiment 4.0
+        points:
+        - T_K: '1302'
+          ion_intensity_as_printed: '15'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '3.14'
+          pressure_atm: '3.14E-7'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: III
+            row: 1
+            note: Run 4.0; printed row 1.
+        - T_K: '1308'
+          ion_intensity_as_printed: '17'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '3.59'
+          pressure_atm: '3.59E-7'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: III
+            row: 2
+            note: Run 4.0; printed row 2.
+        - T_K: '1330'
+          ion_intensity_as_printed: '21'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '4.50'
+          pressure_atm: '4.50E-7'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: III
+            row: 3
+            note: Run 4.0; printed row 3.
+        - T_K: '1349'
+          ion_intensity_as_printed: '26'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '5.67'
+          pressure_atm: '5.67E-7'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: III
+            row: 4
+            note: Run 4.0; printed row 4.
+        - T_K: '1368'
+          ion_intensity_as_printed: '42'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '9.27'
+          pressure_atm: '9.27E-7'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: III
+            row: 5
+            note: Run 4.0; printed row 5.
+        - T_K: '1375'
+          ion_intensity_as_printed: '60'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '13.31'
+          pressure_atm: '0.000001331'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: III
+            row: 6
+            note: Run 4.0; printed row 6.
+        - T_K: '1380'
+          ion_intensity_as_printed: '60'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '13.35'
+          pressure_atm: '0.000001335'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: III
+            row: 7
+            note: Run 4.0; printed row 7.
+      equipment:
+        cell_material_and_liner:
+          value: Re
+          locator: *id013
+    - observation_id: piacente_1973_run_5_0_partial_pressure
+      type: partial_pressure
+      experiment: run-5.0
+      locator:
+        published_page: 275
+        pdf_page_index: 6
+        table: IV
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      units: atm (P_Na × 10^7 as printed)
+      values:
+        quantity: partial_pressure
+        gas_species: Na
+        method_class: measured_direct
+        admission_status: admitted
+        method: knudsen_effusion
+        method_as_printed: mass spectrometric Knudsen effusion
+        composition_wt_pct: *id012
+        parent_formula: Na2O.2SiO2
+        reservoir:
+          formula: Na2O.2SiO2
+          phase: l
+        pressure_scale_as_printed: P_Na × 10^7 atm
+        series: Table IV, experiment 5.0
+        points:
+        - T_K: '1364'
+          ion_intensity_as_printed: '10'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '9.09'
+          pressure_atm: '9.09E-7'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: IV
+            row: 1
+            note: Run 5.0; printed row 1.
+        - T_K: '1388'
+          ion_intensity_as_printed: '20'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '18.51'
+          pressure_atm: '0.000001851'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: IV
+            row: 2
+            note: Run 5.0; printed row 2.
+        - T_K: '1425'
+          ion_intensity_as_printed: '31'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '29.45'
+          pressure_atm: '0.000002945'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: IV
+            row: 3
+            note: Run 5.0; printed row 3.
+        - T_K: '1478'
+          ion_intensity_as_printed: '84'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '82.77'
+          pressure_atm: '0.000008277'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: IV
+            row: 4
+            note: Run 5.0; printed row 4.
+        - T_K: '1491'
+          ion_intensity_as_printed: '94'
+          ion_intensity_scale_as_printed: × 10^-13
+          P_Na_times_10^7_atm_as_printed: '93.44'
+          pressure_atm: '0.000009344'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: IV
+            row: 5
+            note: Run 5.0; printed row 5.
+        - T_K: '1523'
+          ion_intensity_as_printed: '12'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '12.18'
+          pressure_atm: '0.000001218'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: IV
+            row: 6
+            note: Run 5.0; printed row 6.
+        - T_K: '1531'
+          ion_intensity_as_printed: '17'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '17.35'
+          pressure_atm: '0.000001735'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: IV
+            row: 7
+            note: Run 5.0; printed row 7.
+        - T_K: '1546'
+          ion_intensity_as_printed: '20'
+          ion_intensity_scale_as_printed: × 10^-12
+          P_Na_times_10^7_atm_as_printed: '22.67'
+          pressure_atm: '0.000002267'
+          locator:
+            published_page: 275
+            pdf_page_index: 6
+            table: IV
+            row: 8
+            note: Run 5.0; printed row 8.
+      equipment:
+        cell_material_and_liner:
+          value: Ta
+          locator: *id014
+    - observation_id: piacente_1973_mo_enthalpy_fit
+      type: gibbs_table
+      experiment: run-mo-fit
+      locator: *id008
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      T_range_K:
+      - 1350
+      - 1553
+      units: kcal/mol as printed
+      values:
+        quantity: second_law_enthalpy_of_vaporization
+        present_work_kcal_mol: '65.1'
+        method_class: model_derived
+        admission_status: admitted
+        enthalpy_model: second_law_enthalpy_of_vaporization
+        units: kcal/mol
+        derived_from: &id015
+        - piacente_1973_run_1_0_partial_pressure
+        - piacente_1973_run_2_1_partial_pressure
+        - piacente_1973_run_2_2_partial_pressure
+        - piacente_1973_run_2_3_partial_pressure
+        derivation:
+          relation: Least-squares fit of log10 P_Na versus reciprocal temperature; converted to the reported second-law evaporation
+            enthalpy.
+          output_unit: kcal/mol
+          inputs: *id015
+        uncertainty_as_printed:
+          width: '1.4'
+          unit: kcal/mol
+          error_kind: standard_deviation
+          confidence_level: not_stated
+        note: run data least-squares fit; reported standard deviation
+    - observation_id: piacente_1973_mgo_enthalpy_fit
+      type: gibbs_table
+      experiment: run-mgo-fit
+      locator: *id009
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      T_range_K:
+      - 1278
+      - 1530
+      units: kcal/mol as printed
+      values:
+        quantity: second_law_enthalpy_of_vaporization
+        present_work_kcal_mol: '70.7'
+        method_class: model_derived
+        admission_status: admitted
+        enthalpy_model: second_law_enthalpy_of_vaporization
+        units: kcal/mol
+        derived_from: &id016
+        - piacente_1973_run_3_0_partial_pressure
+        - piacente_1973_run_3_1_partial_pressure
+        derivation:
+          relation: Least-squares fit of log10 P_Na versus reciprocal temperature; converted to the reported second-law evaporation
+            enthalpy.
+          output_unit: kcal/mol
+          inputs: *id016
+        uncertainty_as_printed:
+          width: '0.8'
+          unit: kcal/mol
+          error_kind: standard_deviation
+          confidence_level: not_stated
+        note: run data least-squares fit; reported standard deviation
+    - observation_id: piacente_1973_re_enthalpy_fit
+      type: gibbs_table
+      experiment: run-re-fit
+      locator: *id010
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      T_range_K:
+      - 1302
+      - 1380
+      units: kcal/mol as printed
+      values:
+        quantity: second_law_enthalpy_of_vaporization
+        present_work_kcal_mol: '65.0'
+        method_class: model_derived
+        admission_status: admitted
+        enthalpy_model: second_law_enthalpy_of_vaporization
+        units: kcal/mol
+        derived_from: &id017
+        - piacente_1973_run_4_0_partial_pressure
+        derivation:
+          relation: Least-squares fit of log10 P_Na versus reciprocal temperature; converted to the reported second-law evaporation
+            enthalpy.
+          output_unit: kcal/mol
+          inputs: *id017
+        uncertainty_as_printed:
+          width: '6.7'
+          unit: kcal/mol
+          error_kind: standard_deviation
+          confidence_level: not_stated
+        note: run data least-squares fit; reported standard deviation
+    - observation_id: piacente_1973_ta_enthalpy_fit
+      type: gibbs_table
+      experiment: run-ta-fit
+      locator: *id011
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      T_range_K:
+      - 1364
+      - 1546
+      units: kcal/mol as printed
+      values:
+        quantity: second_law_enthalpy_of_vaporization
+        present_work_kcal_mol: '69.7'
+        method_class: model_derived
+        admission_status: admitted
+        enthalpy_model: second_law_enthalpy_of_vaporization
+        units: kcal/mol
+        derived_from: &id018
+        - piacente_1973_run_5_0_partial_pressure
+        derivation:
+          relation: Least-squares fit of log10 P_Na versus reciprocal temperature; converted to the reported second-law evaporation
+            enthalpy.
+          output_unit: kcal/mol
+          inputs: *id018
+        uncertainty_as_printed:
+          width: '3.0'
+          unit: kcal/mol
+          error_kind: standard_deviation
+          confidence_level: not_stated
+        note: run data least-squares fit; reported standard deviation
+    - observation_id: piacente_1973_four_cell_mean_discussion
+      type: gibbs_table
+      experiment: four-cell-mean
+      locator:
+        published_page: 276
+        pdf_page_index: 7
+        section: Discussion
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      units: kcal/mol as printed
+      values:
+        quantity: second_law_enthalpy_of_vaporization
+        present_work_kcal_mol: '67.6'
+        method_class: model_derived
+        admission_status: admitted
+        derived_from: &id019
+        - piacente_1973_mo_enthalpy_fit
+        - piacente_1973_mgo_enthalpy_fit
+        - piacente_1973_re_enthalpy_fit
+        - piacente_1973_ta_enthalpy_fit
+        derivation:
+          relation: Mean of the four cell-specific fitted sodium evaporation enthalpies.
+          output_unit: kcal/mol
+          inputs: *id019
+        uncertainty_as_printed:
+          width: '4.0'
+          unit: kcal/mol
+          error_kind: estimated
+          confidence_level: not_stated
+        note: The discussion reports ±4.0 kcal/mol; Conclusions reports ±3.0 kcal/mol for the same printed mean. Both statements
+          retained verbatim as separate records.
+      T_K: '1415'
+    - observation_id: piacente_1973_four_cell_mean_conclusions
+      type: gibbs_table
+      experiment: four-cell-mean
+      locator:
+        published_page: 281
+        pdf_page_index: 12
+        section: Conclusions
+      phase: gas
+      condensed_form:
+        state: liquid
+        formula: Na2O.2SiO2
+        basis: explicit_author
+      regime: knudsen_effusion
+      units: kcal/mol as printed
+      values:
+        quantity: second_law_enthalpy_of_vaporization
+        present_work_kcal_mol: '67.6'
+        method_class: model_derived
+        admission_status: admitted
+        derived_from: *id019
+        derivation:
+          relation: Mean of the four cell-specific fitted sodium evaporation enthalpies.
+          output_unit: kcal/mol
+          inputs: *id019
+        uncertainty_as_printed:
+          width: '3.0'
+          unit: kcal/mol
+          error_kind: not_stated
+          confidence_level: not_stated
+        note: The discussion reports ±4.0 kcal/mol; Conclusions reports ±3.0 kcal/mol for the same printed mean. Both statements
+          retained verbatim as separate records.
