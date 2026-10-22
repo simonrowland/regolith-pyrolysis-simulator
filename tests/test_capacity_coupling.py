@@ -14,6 +14,7 @@ import simulator.chemistry.melt_activity as melt_activity
 from engines.builtin.evaporation_flux import _NONTRIVIAL_FLUX_KG_HR
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
+    OXYGEN_SPECIES,
     compressible_pressure_capacity_fraction,
 )
 from simulator.accounting import resolve_species_formula
@@ -71,6 +72,30 @@ def _real_capacity_sim():
         _load_yaml("feedstocks.yaml"),
         _load_yaml("setpoints.yaml"),
     )
+
+
+def _record_transport_estimates(sim):
+    """Record each owner estimate. Does not compute a conductance."""
+    calls = []
+    real_estimate = sim.overhead_model.estimate_transport_state
+
+    def _estimate(flux, melt, *args, **kwargs):
+        state = real_estimate(flux, melt, *args, **kwargs)
+        calls.append(
+            {
+                "demand_kg_hr": float(flux.total_kg_hr),
+                "capacity_kg_hr": float(state["pipe_conductance_kg_hr"]),
+                "species_kg_hr": {
+                    str(species): float(rate)
+                    for species, rate in flux.species_kg_hr.items()
+                    if float(rate) > 0.0
+                },
+            }
+        )
+        return state
+
+    sim.overhead_model.estimate_transport_state = _estimate
+    return calls
 
 
 def _canonical_bytes(value) -> bytes:
@@ -981,21 +1006,10 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     phosphorus_carriers = _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
     p2o5_source_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"]
     p2o5_projection_kg = sim.melt.composition_kg["P2O5"]
-    melt_before_kg = sim.melt.total_mass_kg
-    transport_calls = []
-    real_estimate = sim.overhead_model.estimate_transport_state
-
-    def _estimate(flux, melt, *args, **kwargs):
-        state = real_estimate(flux, melt, *args, **kwargs)
-        transport_calls.append(
-            (
-                float(flux.total_kg_hr),
-                float(state["pipe_conductance_kg_hr"]),
-            )
-        )
-        return state
-
-    sim.overhead_model.estimate_transport_state = _estimate
+    source_before_kg = float(
+        sim.atom_ledger.total_kg_by_account("process.cleaned_melt")
+    )
+    transport_calls = _record_transport_estimates(sim)
 
     snapshot = sim.step()
 
@@ -1003,12 +1017,14 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # mandatory C0 pipe cap: one estimate is over capacity, and the
     # admitted release matches that estimate within the flux floor.
     binding = [
-        (demand, capacity)
-        for demand, capacity in transport_calls
-        if demand > capacity
+        call
+        for call in transport_calls
+        if call["demand_kg_hr"] > call["capacity_kg_hr"]
     ]
     assert len(binding) == 1
-    demand_kg_hr, capacity_kg_hr = binding[0]
+    demand_kg_hr = binding[0]["demand_kg_hr"]
+    capacity_kg_hr = binding[0]["capacity_kg_hr"]
+    demand_species = binding[0]["species_kg_hr"]
     cap_record = sim._last_subsolidus_bakeout["transport_cap"]
     assert cap_record["demand_kg_hr"] == pytest.approx(
         demand_kg_hr, rel=0.0, abs=0.0
@@ -1020,12 +1036,50 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         capacity_kg_hr / demand_kg_hr, rel=0.0, abs=0.0
     )
     released_kg_hr = snapshot.evap_flux.total_kg_hr
+    released_species = {
+        str(species): float(rate)
+        for species, rate in snapshot.evap_flux.species_kg_hr.items()
+        if float(rate) > 0.0
+    }
     assert abs(released_kg_hr - capacity_kg_hr) <= _NONTRIVIAL_FLUX_KG_HR
-    remainder_kg_hr = demand_kg_hr - capacity_kg_hr
-    assert remainder_kg_hr > _NONTRIVIAL_FLUX_KG_HR
-    # Refused demand stays in the melt. A debit of that remainder would
-    # put the melt on or below this line.
-    assert snapshot.melt_mass_kg > melt_before_kg - remainder_kg_hr
+    assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
+
+    def _committed_vapor_kg(species: str) -> float:
+        credited = 0.0
+        for transition in sim.atom_ledger.transitions:
+            if transition.reason != f"evaporate_{species}":
+                continue
+            for lot in transition.credits:
+                credited += float(lot.species_kg.get(species, 0.0))
+        return credited
+
+    retained_total_kg = 0.0
+    for species in set(demand_species) | set(released_species):
+        demand_i = demand_species.get(species, 0.0)
+        released_i = released_species.get(species, 0.0)
+        committed_i = _committed_vapor_kg(species)
+        retained_i = demand_i - committed_i
+        assert abs(committed_i - released_i) <= _NONTRIVIAL_FLUX_KG_HR
+        assert abs(retained_i - (demand_i - released_i)) <= _NONTRIVIAL_FLUX_KG_HR
+        retained_total_kg += retained_i
+    assert abs(
+        retained_total_kg - (demand_kg_hr - released_kg_hr)
+    ) <= _NONTRIVIAL_FLUX_KG_HR
+    # Overhead bleed credits O2 after the cap. That credit is not in the
+    # admitted vapour flux, and it is the only extra cleaned-melt debit.
+    bleed_o2_kg = 0.0
+    for transition in sim.atom_ledger.transitions:
+        if transition.reason != "overhead_bleed":
+            continue
+        for lot in transition.credits:
+            bleed_o2_kg += float(lot.species_kg.get(OXYGEN_SPECIES, 0.0))
+    source_after_kg = float(
+        sim.atom_ledger.total_kg_by_account("process.cleaned_melt")
+    )
+    assert abs(snapshot.melt_mass_kg - source_after_kg) <= _NONTRIVIAL_FLUX_KG_HR
+    assert abs(
+        (source_before_kg - source_after_kg) - (released_kg_hr + bleed_o2_kg)
+    ) <= _NONTRIVIAL_FLUX_KG_HR
     assert sim._subsolidus_pending_release is None
     assert snapshot.mass_balance_error_pct <= 5.0e-12
     assert snapshot.overhead.transport_saturation_pct == pytest.approx(
@@ -1113,6 +1167,65 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
     bakeout = getattr(sim, "_last_subsolidus_bakeout", None) or {}
     assert "transport_cap" not in bakeout
     assert snapshot.overhead.transport_saturation_pct > 100.0
+
+    reasons = [transition.reason for transition in sim.atom_ledger.transitions]
+    reason_set = set(reasons)
+    for required in (
+        "evaporate_Ca",
+        "evaporate_CaO_gas",
+        "evaporate_Ti",
+        "evaporate_TiO",
+        "evaporate_TiO2_gas",
+        "condense_Ca",
+    ):
+        assert required in reason_set, required
+    assert {
+        "condense_SiO",
+        "condense_Al2O",
+        "condense_AlO",
+        "condense_CaO_gas",
+        "condense_CrO",
+        "condense_MgO_gas",
+        "condense_SiO2_gas",
+        "condense_TiO",
+        "condense_TiO2_gas",
+    } <= reason_set
+    assert tuple(reasons[-5:]) == (
+        "condense_TiO",
+        "evaporate_TiO2_gas",
+        "condense_TiO2_gas",
+        "fe_redox_respeciation",
+        "overhead_bleed",
+    )
+
+
+def test_unscaled_c0_commits_reversible_si_condensation():
+    """149df2858: reversible Si condensation commits when the C0 cap does not scale.
+
+    The default throat cannot carry this hot step, so the cap drops Si
+    under the commit floor. The geometry below is the config the equipment
+    designer applies before the cap. Demand stays within that pipe.
+    """
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 1600.0
+    geometry = dict(sim._overhead_condenser_geometry_config)
+    geometry["initial_throat_area_m2"] = 10.0
+    sim._overhead_condenser_geometry_config = geometry
+    transport_calls = _record_transport_estimates(sim)
+
+    sim.step()
+
+    assert transport_calls
+    assert all(
+        call["demand_kg_hr"] <= call["capacity_kg_hr"] for call in transport_calls
+    )
+    bakeout = getattr(sim, "_last_subsolidus_bakeout", None) or {}
+    assert "transport_cap" not in bakeout
+    assert "condense_Si" in {
+        transition.reason for transition in sim.atom_ledger.transitions
+    }
+    assert sim.melt.campaign == CampaignPhase.C0
 
 
 def test_explicit_runtime_enforcement_uses_configured_finite_capacity(monkeypatch):
