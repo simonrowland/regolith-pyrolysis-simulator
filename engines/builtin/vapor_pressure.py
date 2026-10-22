@@ -720,6 +720,8 @@ def _continued_certified_effective_gamma(
     *,
     temperature_K: float,
     composition: Mapping[str, float],
+    composition_distance_L1: float,
+    composition_cap_L1: float | None = None,
 ) -> dict[str, Any]:
     """First-order continuation of one certified effective gamma.
 
@@ -729,8 +731,8 @@ def _continued_certified_effective_gamma(
     The flux multiplies the current bulk single-cation fraction X_i, which
     is known without a solve, by an effective γ_i. A refused solve withholds
     γ_i. Continue ln γ rather than γ: ln γ is the excess part of RT ln a, so
-    a step is linear in the quantity the equilibrium condition uses, and the
-    exponential stays positive for any finite step.
+    a step is linear in the quantity the equilibrium condition uses. Apply
+    the composition cap before exponentiation.
 
     One certified step supplies the secant. With progress s,
         ln γ_i(s) = ln γ_i,last + (ln γ_i,last − ln γ_i,prev) * s.
@@ -795,8 +797,21 @@ def _continued_certified_effective_gamma(
             ) / step
         )
         progress_variable = "composition"
+    gamma_progress_s = progress_s
+    if (
+        composition_cap_L1 is not None
+        and composition_distance_L1 > composition_cap_L1
+    ):
+        # Continue only to the declared composition boundary before exp():
+        # s_cap = s * (cap / D). Both cap and D are dimensionless L1
+        # distances, so s_cap and the ln-gamma exponent stay dimensionless.
+        # A zero cap gives s_cap = 0 and the exact certified gamma_last.
+        gamma_progress_s = (
+            0.0 if composition_cap_L1 <= 0.0
+            else progress_s * (composition_cap_L1 / composition_distance_L1)
+        )
     return {
-        "gamma": _ln_gamma_at_progress(certificate, progress_s, slope),
+        "gamma": _ln_gamma_at_progress(certificate, gamma_progress_s, slope),
         "method": "extrapolated_first_order_ln_gamma",
         "progress_s": progress_s,
         "progress_variable": progress_variable,
@@ -1233,36 +1248,23 @@ def _build_high_t_melt_activity_authority(
                 composition_distance = _high_t_composition_distance(
                     composition, certificate["composition_single_cation"],
                 )
+                cap = _EXTRAPOLATION_CAP_L1.get(parent)
+                past_cap = cap is not None and composition_distance > cap
                 continued = _continued_certified_effective_gamma(
                     certificate,
                     temperature_K=temperature_K,
                     composition=composition,
+                    composition_distance_L1=composition_distance,
+                    composition_cap_L1=(
+                        0.0 if past_cap and parent in prior_extrapolated else cap
+                    ),
                 )
-                cap = _EXTRAPOLATION_CAP_L1.get(parent)
-                past_cap = cap is not None and composition_distance > cap
                 if past_cap and parent in prior_extrapolated:
                     gamma = float(prior_extrapolated[parent])
                     method = "extrapolation_capped_frozen"
                     flag = "extrapolation_capped_frozen"
                 elif past_cap:
-                    # First refusal is already past the cap. Freeze at the
-                    # Taylor value on the cap boundary so the stored gamma
-                    # is the last in-cap step, not a fresh table value.
-                    # s_cap = s * (cap / D). cap and D are both L1, so the
-                    # ratio is dimensionless and s_cap is a progress.
-                    # cap == 0 (Na2O) or a missing slope keeps gamma_last.
-                    slope = continued["ln_gamma_slope"]
-                    if (
-                        cap is None or cap <= 0.0 or slope is None
-                        or composition_distance <= 0.0
-                    ):
-                        gamma = float(certificate["gamma_last"])
-                    else:
-                        gamma = _ln_gamma_at_progress(
-                            certificate,
-                            continued["progress_s"] * (cap / composition_distance),
-                            slope,
-                        )
+                    gamma = float(continued["gamma"])
                     method = "extrapolation_capped_frozen"
                     flag = "extrapolation_capped_frozen"
                 else:

@@ -63,6 +63,19 @@ CODE_INPUTS = (
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
 # matching the keys stale_input_commits() emits.
+#   037f97ff6, 5d46c88e1: d-216, source-oxygen scoring. They score Knudsen
+#     vapour rows at typed source oxygen conditions and keep typed reasons for
+#     closure fallbacks, in simulator/battery/source_oxygen.py and score.py.
+#   6f308879c, 82655ba66, 9c40ad728, 6444f432c: the d-216 co-measured
+#     follow-up. A co-measured O/O2 pair is one printed pO2 condition; the
+#     JANAF atomic-O conversion moves into its owner; identity-based oxygen
+#     exclusions. 6444f432c also reads the optional extract field
+#     values.oxygen_partial_pressure.source_observation_id in
+#     simulator/battery/migrate.py (documented in the extract SCHEMA).
+#     The landing train's full regen of b149 (tip 988454487 on green
+#     2c7bcb1cc, studio-3) was a fixed point, so these change no STORE output.
+#     This acknowledges STORE outputs only; the scoring moves are covered by
+#     d-216 and by the commits' tests.
 #   80fad2bfa: the OpenIMCC af0f2a2 pin bump. The Sossi residue prediction path
 #     (simulator/battery/residue.py and score.py _sossi_residue_prediction) sends melt evaluation
 #     only the melt pack's oxides and passes the existing UNCERTIFIED MnO activity extension to the
@@ -155,6 +168,17 @@ CODE_INPUTS = (
 #     produced no store change (observations=126296 queue=80926
 #     hard_issues=3334; j01 7/7). This acknowledges STORE outputs only; the
 #     scoring and diagnostic changes are covered by the commits' tests.
+#   c21acfc5d, 6ba1b9771: t-1424 public battery tools. c21acfc5d names the
+#     residual-key spellings in simulator/battery/score.py, shares its key
+#     splitter with pins.py, and gives compilation_tier.py the shared
+#     no-headline rail token (same strings throughout). 6ba1b9771
+#     streams residual ledgers through iter_residual_payloads in score.py for
+#     scripts/battery_residuals_report.py. Migration's only import from these
+#     modules is the unchanged parse_species_formula, and neither commit
+#     touches scripts/battery_migrate.py, migrate.py, validate.py or data/.
+#     The landing train's full regen of b148 (on green 850a09e93) was a fixed
+#     point. This acknowledges STORE outputs only; the key and report changes
+#     are covered by the commits' tests.
 #   f74ef7a6f: scan-only parser; corpus census 24 source_form strings, 0 verdict changes.
 #     The census compared 29 occurrences across repo data and battery store
 #     inputs with the green implementation. This is the store-neutrality
@@ -167,7 +191,15 @@ CODE_INPUTS = (
 #     commit equals the tip, so no store change. This acknowledges STORE
 #     outputs only; the projection value moves (d-195) are covered by the
 #     commit's tests.
+#   7e0508bb5, b37e28bac, 297df02b9: t-1413 (d-223), printed phase
+#     compositions, distribution ratios and S/Cl capacities. They add the
+#     enums, identity axes, migrate readers and score.py paths for those rows.
+#     The landing train's full regen of b148 (tip 20a005ad5 on green 850a09e93,
+#     studio-3) was a fixed point: no store change. This acknowledges STORE
+#     outputs only; the new rows' scoring is covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
+    "037f97ff6", "5d46c88e1",
+    "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
     "80fad2bfa",
     "09c498b65",
     "1b78b5697", "574800443", "149df2858",
@@ -180,8 +212,10 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "23bee5e7b", "8c154cdb0", "ed246fcb7", "62224868f",
     "2e69a5faa", "4f9402dea", "31bb956c5", "cdd49ec85",
     "9364d3828",
+    "c21acfc5d", "6ba1b9771",
     "f74ef7a6f",
     "d6ccae4b4",
+    "7e0508bb5", "b37e28bac", "297df02b9",
 })
 
 
